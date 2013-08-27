@@ -21,78 +21,100 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Constraint\Validator;
 
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Exception\InvalidRuleException;
+use Thelia\Coupon\CouponAdapterInterface;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage a set of CouponRuleInterface
+ * Represent a DateTime
  *
- * @package Coupon
+ * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponRuleCollection
+class DateParam extends RuleParameterAbstract
 {
-    /** @var array Array of CouponRuleInterface */
-    protected $rules = array();
+    /** @var \DateTime Date  */
+    protected $dateTime = null;
 
     /**
      * Constructor
      *
-     * @param array $rules Array of CouponRuleInterface
-     *
-     * @throws \Thelia\Exception\InvalidRuleException
+     * @param CouponAdapterInterface $adapter  Provide necessary value from Thelia
+     * @param \DateTime              $dateTime DateTime
      */
-    function __construct(array $rules)
+    public function __construct(CouponAdapterInterface $adapter, \DateTime $dateTime)
     {
-        foreach ($rules as $rule) {
-            if (!$rule instanceof CouponRuleInterface) {
-                throw new InvalidRuleException(get_class());
-            }
+        $this->dateTime = $dateTime;
+        $this->adapter = $adapter;
+    }
+
+    /**
+     * Get DateTime
+     *
+     * @return \DateTime
+     */
+    public function getDateTime()
+    {
+        return clone $this->dateTime;
+    }
+
+    /**
+     * Compare the current object to the passed $other.
+     *
+     * Returns 0 if they are semantically equal, 1 if the other object
+     * is less than the current one, or -1 if its more than the current one.
+     *
+     * This method should not check for identity using ===, only for semantically equality for example
+     * when two different DateTime instances point to the exact same Date + TZ.
+     *
+     * @param mixed $other Object
+     *
+     * @throws \InvalidArgumentException
+     * @return int
+     */
+    public function compareTo($other)
+    {
+        if (!$other instanceof \DateTime) {
+            throw new \InvalidArgumentException('DateParam can compare only DateTime');
         }
-        $this->rules = $rules;
+
+        $ret = -1;
+        if ($this->dateTime == $other) {
+            $ret = 0;
+        } elseif ($this->dateTime > $other) {
+            $ret = 1;
+        } else {
+            $ret = -1;
+        }
+
+        return $ret;
     }
 
     /**
-     * Get Rules
+     * Get Parameter value to test against
      *
-     * @return array Array of CouponRuleInterface
+     * @return \Datetime
      */
-    public function getRules()
+    public function getValue()
     {
-        return $this->rules;
+        return clone $this->dateTime;
     }
 
     /**
-     * Add a CouponRuleInterface to the Collection
+     * Get I18n tooltip
      *
-     * @param CouponRuleInterface $rule Rule
-     *
-     * @return $this
+     * @return string
      */
-    public function add(CouponRuleInterface $rule)
+    public function getToolTip()
     {
-        $this->rules[] = $rule;
-
-        return $this;
+        return $this->adapter
+            ->getTranslator()
+            ->trans('A date (ex: YYYY-MM-DD HH:MM:SS)', null, 'constraint');
     }
-
-    /**
-     * Check if there is at least one rule in the collection
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return isEmpty($this->rules);
-    }
-
 
 }

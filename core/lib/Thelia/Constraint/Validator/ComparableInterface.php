@@ -21,78 +21,29 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
-
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Exception\InvalidRuleException;
+namespace Thelia\Constraint\Validator;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
+ * Comparable interface
+ * Allows to compare two value objects to each other for similarity.
  *
- * Manage a set of CouponRuleInterface
- *
- * @package Coupon
- * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
  */
-class CouponRuleCollection
+interface ComparableInterface
 {
-    /** @var array Array of CouponRuleInterface */
-    protected $rules = array();
-
     /**
-     * Constructor
+     * Compare the current object to the passed $other.
      *
-     * @param array $rules Array of CouponRuleInterface
+     * Returns 0 if they are semantically equal, 1 if the other object
+     * is less than the current one, or -1 if its more than the current one.
      *
-     * @throws \Thelia\Exception\InvalidRuleException
+     * This method should not check for identity using ===, only for semantically equality for example
+     * when two different DateTime instances point to the exact same Date + TZ.
+     *
+     * @param mixed $other Object
+     *
+     * @return int
      */
-    function __construct(array $rules)
-    {
-        foreach ($rules as $rule) {
-            if (!$rule instanceof CouponRuleInterface) {
-                throw new InvalidRuleException(get_class());
-            }
-        }
-        $this->rules = $rules;
-    }
-
-    /**
-     * Get Rules
-     *
-     * @return array Array of CouponRuleInterface
-     */
-    public function getRules()
-    {
-        return $this->rules;
-    }
-
-    /**
-     * Add a CouponRuleInterface to the Collection
-     *
-     * @param CouponRuleInterface $rule Rule
-     *
-     * @return $this
-     */
-    public function add(CouponRuleInterface $rule)
-    {
-        $this->rules[] = $rule;
-
-        return $this;
-    }
-
-    /**
-     * Check if there is at least one rule in the collection
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return isEmpty($this->rules);
-    }
-
-
+    public function compareTo($other);
 }

@@ -21,78 +21,57 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
-
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Exception\InvalidRuleException;
+namespace Thelia\Constraint\Validator;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage a set of CouponRuleInterface
+ * Allow to validate parameters
  *
- * @package Coupon
+ * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponRuleCollection
+class RuleValidator
 {
-    /** @var array Array of CouponRuleInterface */
-    protected $rules = array();
+    /** @var string Operator ex: Operators::INFERIOR */
+    protected $operator = null;
+
+    /** @var ComparableInterface Validator */
+    protected $param = null;
 
     /**
      * Constructor
      *
-     * @param array $rules Array of CouponRuleInterface
-     *
-     * @throws \Thelia\Exception\InvalidRuleException
+     * @param string              $operator Operator ex: Operators::INFERIOR
+     * @param ComparableInterface $param    Validator ex: PriceParam
      */
-    function __construct(array $rules)
+    function __construct($operator, ComparableInterface $param)
     {
-        foreach ($rules as $rule) {
-            if (!$rule instanceof CouponRuleInterface) {
-                throw new InvalidRuleException(get_class());
-            }
-        }
-        $this->rules = $rules;
+        $this->operator = $operator;
+        $this->param = $param;
     }
 
     /**
-     * Get Rules
+     * Get Validator Operator
      *
-     * @return array Array of CouponRuleInterface
+     * @return string
      */
-    public function getRules()
+    public function getOperator()
     {
-        return $this->rules;
+        return $this->operator;
     }
 
     /**
-     * Add a CouponRuleInterface to the Collection
+     * Get Validator Param
      *
-     * @param CouponRuleInterface $rule Rule
-     *
-     * @return $this
+     * @return ComparableInterface
      */
-    public function add(CouponRuleInterface $rule)
+    public function getParam()
     {
-        $this->rules[] = $rule;
-
-        return $this;
+        return $this->param;
     }
-
-    /**
-     * Check if there is at least one rule in the collection
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return isEmpty($this->rules);
-    }
-
 
 }

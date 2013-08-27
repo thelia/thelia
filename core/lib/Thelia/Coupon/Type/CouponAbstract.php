@@ -24,8 +24,8 @@
 namespace Thelia\Coupon\Type;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
+use Thelia\Constraint\ConstraintManager;
 use Thelia\Coupon\CouponAdapterInterface;
-use Thelia\Coupon\Rule\CouponRuleInterface;
 use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Coupon\RuleOrganizerInterface;
 use Thelia\Exception\InvalidRuleException;
@@ -43,11 +43,17 @@ use Thelia\Exception\InvalidRuleException;
  */
 abstract class CouponAbstract implements CouponInterface
 {
+    /** @var CouponAdapterInterface Provides necessary value from Thelia */
+    protected $adapter = null;
+
     /** @var RuleOrganizerInterface  */
     protected $organizer = null;
 
     /** @var CouponRuleCollection Array of CouponRuleInterface */
     protected $rules = null;
+
+    /** @var ConstraintManager CouponRuleInterface Manager*/
+    protected $constraintManager = null;
 
     /** @var string Coupon code (ex: XMAS) */
     protected $code = null;
@@ -194,6 +200,10 @@ abstract class CouponAbstract implements CouponInterface
     public function setRules(CouponRuleCollection $rules)
     {
         $this->rules = $rules;
+        $this->constraintManager = new ConstraintManager(
+            $this->adapter,
+            $this->rules
+        );
 
         return $this;
     }
@@ -209,16 +219,7 @@ abstract class CouponAbstract implements CouponInterface
      */
     public function isMatching(CouponAdapterInterface $adapter)
     {
-        $isMatching = true;
-
-        /** @var CouponRuleInterface $rule */
-        foreach ($this->rules->getRules() as $rule) {
-            if (!$rule->isMatching($adapter)) {
-                $isMatching = false;
-            }
-        }
-
-        return $isMatching;
+        return $this->constraintManager->isMatching();
     }
 
     /**

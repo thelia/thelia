@@ -21,77 +21,45 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Constraint\Validator;
 
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Exception\InvalidRuleException;
+use Thelia\Coupon\CouponAdapterInterface;
+use Thelia\Exception\NotImplementedException;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage a set of CouponRuleInterface
+ * Get a Param value
  *
- * @package Coupon
+ * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponRuleCollection
+abstract class RuleParameterAbstract implements ComparableInterface
 {
-    /** @var array Array of CouponRuleInterface */
-    protected $rules = array();
+    /** @var  CouponAdapterInterface Provide necessary value from Thelia*/
+    protected $adapter;
 
     /**
-     * Constructor
+     * Get Parameter value to test against
      *
-     * @param array $rules Array of CouponRuleInterface
-     *
-     * @throws \Thelia\Exception\InvalidRuleException
+     * @return mixed
      */
-    function __construct(array $rules)
+    public function getValue()
     {
-        foreach ($rules as $rule) {
-            if (!$rule instanceof CouponRuleInterface) {
-                throw new InvalidRuleException(get_class());
-            }
-        }
-        $this->rules = $rules;
+        return new NotImplementedException();
     }
 
     /**
-     * Get Rules
+     * Get I18n tooltip
      *
-     * @return array Array of CouponRuleInterface
+     * @return string
      */
-    public function getRules()
+    public function getToolTip()
     {
-        return $this->rules;
-    }
-
-    /**
-     * Add a CouponRuleInterface to the Collection
-     *
-     * @param CouponRuleInterface $rule Rule
-     *
-     * @return $this
-     */
-    public function add(CouponRuleInterface $rule)
-    {
-        $this->rules[] = $rule;
-
-        return $this;
-    }
-
-    /**
-     * Check if there is at least one rule in the collection
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return isEmpty($this->rules);
+        return new NotImplementedException();
     }
 
 

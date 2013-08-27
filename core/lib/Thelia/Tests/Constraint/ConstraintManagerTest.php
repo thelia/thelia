@@ -21,30 +21,47 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Constraint;
 
 use Thelia\Constraint\Validator\PriceParam;
 use Thelia\Constraint\Validator\RuleValidator;
 use Thelia\Constraint\Rule\AvailableForTotalAmount;
 use Thelia\Constraint\Rule\Operators;
+use Thelia\Coupon\CouponRuleCollection;
+use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Coupon\Type\RemoveXAmount;
+use Thelia\Tools\PhpUnitUtils;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test CouponRuleCollection Class
+ * Unit Test ConstraintManager Class
  *
- * @package Coupon
+ * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponRuleCollectionTest extends \PHPUnit_Framework_TestCase
+class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
 {
+
     /**
-     *
+     * Sets up the fixture, for example, opens a network connection.
+     * This method is called before a test is executed.
      */
-    public function testRuleSerialisation()
+    protected function setUp()
+    {
+    }
+
+
+
+    /**
+     * Generate valid CouponRuleInterfaces
+     *
+     * @return array Array of CouponRuleInterface
+     */
+    public static function generateValidRules()
     {
         $rule1 = new AvailableForTotalAmount(
             array(
@@ -68,12 +85,58 @@ class CouponRuleCollectionTest extends \PHPUnit_Framework_TestCase
         );
         $rules = new CouponRuleCollection(array($rule1, $rule2));
 
-        $serializedRules = base64_encode(serialize($rules));
-        $unserializedRules = unserialize(base64_decode($serializedRules));
+        return $rules;
+    }
 
-        $expected = $rules;
-        $actual = $unserializedRules;
+    /**
+     * Tears down the fixture, for example, closes a network connection.
+     * This method is called after a test is executed.
+     */
+    protected function tearDown()
+    {
+    }
 
-        $this->assertEquals($expected, $actual);
+    /**
+     * Generate a fake Adapter
+     *
+     * @param array $coupons            Coupons
+     * @param float $cartTotalPrice     Cart total price
+     * @param float $checkoutTotalPrice Checkout total price
+     * @param float $postagePrice       Checkout postage price
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    public function generateFakeAdapter(array $coupons, $cartTotalPrice, $checkoutTotalPrice, $postagePrice = 6.00)
+    {
+        $stubCouponBaseAdapter = $this->getMock(
+            'Thelia\Coupon\CouponBaseAdapter',
+            array(
+                'getCurrentCoupons',
+                'getCartTotalPrice',
+                'getCheckoutTotalPrice',
+                'getCheckoutPostagePrice'
+            ),
+            array()
+        );
+
+        $stubCouponBaseAdapter->expects($this->any())
+            ->method('getCurrentCoupons')
+            ->will($this->returnValue(($coupons)));
+
+        // Return Cart product amount = $cartTotalPrice euros
+        $stubCouponBaseAdapter->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue($cartTotalPrice));
+
+        // Return Checkout amount = $checkoutTotalPrice euros
+        $stubCouponBaseAdapter->expects($this->any())
+            ->method('getCheckoutTotalPrice')
+            ->will($this->returnValue($checkoutTotalPrice));
+
+        $stubCouponBaseAdapter->expects($this->any())
+            ->method('getCheckoutPostagePrice')
+            ->will($this->returnValue($postagePrice));
+
+        return $stubCouponBaseAdapter;
     }
 }

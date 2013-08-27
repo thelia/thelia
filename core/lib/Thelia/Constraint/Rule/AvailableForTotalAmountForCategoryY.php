@@ -21,78 +21,18 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
-
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Exception\InvalidRuleException;
+namespace Thelia\Constraint\Rule;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage a set of CouponRuleInterface
- *
- * @package Coupon
+ * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponRuleCollection
+class AvailableForTotalAmountForCategoryY extends AvailableForTotalAmount
 {
-    /** @var array Array of CouponRuleInterface */
-    protected $rules = array();
-
-    /**
-     * Constructor
-     *
-     * @param array $rules Array of CouponRuleInterface
-     *
-     * @throws \Thelia\Exception\InvalidRuleException
-     */
-    function __construct(array $rules)
-    {
-        foreach ($rules as $rule) {
-            if (!$rule instanceof CouponRuleInterface) {
-                throw new InvalidRuleException(get_class());
-            }
-        }
-        $this->rules = $rules;
-    }
-
-    /**
-     * Get Rules
-     *
-     * @return array Array of CouponRuleInterface
-     */
-    public function getRules()
-    {
-        return $this->rules;
-    }
-
-    /**
-     * Add a CouponRuleInterface to the Collection
-     *
-     * @param CouponRuleInterface $rule Rule
-     *
-     * @return $this
-     */
-    public function add(CouponRuleInterface $rule)
-    {
-        $this->rules[] = $rule;
-
-        return $this;
-    }
-
-    /**
-     * Check if there is at least one rule in the collection
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return isEmpty($this->rules);
-    }
-
 
 }

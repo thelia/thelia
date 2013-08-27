@@ -43,15 +43,33 @@ class RemoveXPercent extends CouponAbstract
     /**
      * Constructor
      *
-     * @param string $code              Coupon code (ex: XMAS)
-     * @param string $title             Coupon title (ex: Coupon for XMAS)
-     * @param string $shortDescription  Coupon short description
-     * @param string $description       Coupon description
-     * @param float  $percent           Coupon % to deduce (ex:3.14 for 3.14%)
-     * @param bool   $isCumulative      if Coupon is cumulative
-     * @param bool   $isRemovingPostage if Coupon is removing postage
+     * @param CouponInterface $adapter                    Provides necessary value from Thelia
+     * @param string          $code                       Coupon code (ex: XMAS)
+     * @param string          $title                      Coupon title (ex: Coupon for XMAS)
+     * @param string          $shortDescription           Coupon short description
+     * @param string          $description                Coupon description
+     * @param float           $percent                    Coupon percentage to deduce
+     * @param bool            $isCumulative               If Coupon is cumulative
+     * @param bool            $isRemovingPostage          If Coupon is removing postage
+     * @param bool            $isAvailableOnSpecialOffers If available on Product already
+     *                                                    on special offer price
+     * @param bool            $isEnabled                  False if Coupon is disabled by admin
+     * @param int             $maxUsage                   How many usage left
+     * @param \Datetime       $expirationDate             When the Code is expiring
      */
-    function __construct($code, $title, $shortDescription, $description, $percent, $isCumulative, $isRemovingPostage)
+    function __construct(
+        $adapter,
+        $code,
+        $title,
+        $shortDescription,
+        $description,
+        $percent,
+        $isCumulative,
+        $isRemovingPostage,
+        $isAvailableOnSpecialOffers,
+        $isEnabled,
+        $maxUsage,
+        \DateTime $expirationDate)
     {
         $this->code = $code;
         $this->title = $title;
@@ -62,6 +80,12 @@ class RemoveXPercent extends CouponAbstract
         $this->isRemovingPostage = $isRemovingPostage;
 
         $this->percent = $percent;
+
+        $this->isAvailableOnSpecialOffers = $isAvailableOnSpecialOffers;
+        $this->isEnabled = $isEnabled;
+        $this->maxUsage = $maxUsage;
+        $this->expirationDate = $expirationDate;
+        $this->adapter = $adapter;
     }
 
     /**
@@ -83,10 +107,40 @@ class RemoveXPercent extends CouponAbstract
             );
         }
 
-        $basePrice =$adapter
-            ->getCartTotalPrice();
+        $basePrice = $adapter->getCartTotalPrice();
 
-        return $basePrice * (( 100 - $this->percent ) / 100);
+        return $basePrice * (( $this->percent ) / 100);
+    }
+
+
+    /**
+     * Get I18n name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->adapter
+            ->getTranslator()
+            ->trans('Remove X percent to total cart', null, 'constraint');
+    }
+
+    /**
+     * Get I18n tooltip
+     *
+     * @return string
+     */
+    public function getToolTip()
+    {
+        $toolTip = $this->adapter
+            ->getTranslator()
+            ->trans(
+                'This coupon will remove the entered percentage to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.',
+                null,
+                'constraint'
+            );
+
+        return $toolTip;
     }
 
 }

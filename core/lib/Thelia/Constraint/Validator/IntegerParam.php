@@ -21,78 +21,101 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Constraint\Validator;
 
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Exception\InvalidRuleException;
+use Thelia\Coupon\CouponAdapterInterface;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage a set of CouponRuleInterface
+ * Represent an Integer
  *
- * @package Coupon
+ * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponRuleCollection
+class IntegerParam extends RuleParameterAbstract
 {
-    /** @var array Array of CouponRuleInterface */
-    protected $rules = array();
+    /** @var int Integer to compare with */
+    protected $integer = 0;
 
     /**
      * Constructor
      *
-     * @param array $rules Array of CouponRuleInterface
-     *
-     * @throws \Thelia\Exception\InvalidRuleException
+     * @param CouponAdapterInterface $adapter Provide necessary value from Thelia
+     * @param int                    $integer Integer
      */
-    function __construct(array $rules)
+    public function __construct(CouponAdapterInterface $adapter, $integer)
     {
-        foreach ($rules as $rule) {
-            if (!$rule instanceof CouponRuleInterface) {
-                throw new InvalidRuleException(get_class());
-            }
+        $this->integer = $integer;
+        $this->adapter = $adapter;
+    }
+
+    /**
+     * Get integer
+     *
+     * @return int
+     */
+    public function getInteger()
+    {
+        return $this->integer;
+    }
+
+
+    /**
+     * Compare the current object to the passed $other.
+     *
+     * Returns 0 if they are semantically equal, 1 if the other object
+     * is less than the current one, or -1 if its more than the current one.
+     *
+     * This method should not check for identity using ===, only for semantically equality for example
+     * when two different DateTime instances point to the exact same Date + TZ.
+     *
+     * @param mixed $other Object
+     *
+     * @throws \InvalidArgumentException
+     * @return int
+     */
+    public function compareTo($other)
+    {
+        if (!is_integer($other)) {
+            throw new \InvalidArgumentException('IntegerParam can compare only int');
         }
-        $this->rules = $rules;
+
+        $ret = -1;
+        if ($this->integer == $other) {
+            $ret = 0;
+        } elseif ($this->integer > $other) {
+            $ret = 1;
+        } else {
+            $ret = -1;
+        }
+
+        return $ret;
     }
 
     /**
-     * Get Rules
+     * Get Parameter value to test against
      *
-     * @return array Array of CouponRuleInterface
+     * @return int
      */
-    public function getRules()
+    public function getValue()
     {
-        return $this->rules;
+        return $this->integer;
     }
 
     /**
-     * Add a CouponRuleInterface to the Collection
+     * Get I18n tooltip
      *
-     * @param CouponRuleInterface $rule Rule
-     *
-     * @return $this
+     * @return string
      */
-    public function add(CouponRuleInterface $rule)
+    public function getToolTip()
     {
-        $this->rules[] = $rule;
-
-        return $this;
+        return $this->adapter
+            ->getTranslator()
+            ->trans('A number (ex: 42)', null, 'constraint');
     }
-
-    /**
-     * Check if there is at least one rule in the collection
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return isEmpty($this->rules);
-    }
-
 
 }

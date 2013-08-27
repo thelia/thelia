@@ -21,78 +21,67 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Constraint\Rule;
 
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Exception\InvalidRuleException;
+use Thelia\Coupon\CouponAdapterInterface;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage a set of CouponRuleInterface
+ * Represents a condition of whether the Rule is applied or not
  *
- * @package Coupon
+ * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponRuleCollection
+interface CouponRuleInterface
 {
-    /** @var array Array of CouponRuleInterface */
-    protected $rules = array();
-
     /**
-     * Constructor
-     *
-     * @param array $rules Array of CouponRuleInterface
-     *
-     * @throws \Thelia\Exception\InvalidRuleException
-     */
-    function __construct(array $rules)
-    {
-        foreach ($rules as $rule) {
-            if (!$rule instanceof CouponRuleInterface) {
-                throw new InvalidRuleException(get_class());
-            }
-        }
-        $this->rules = $rules;
-    }
-
-    /**
-     * Get Rules
-     *
-     * @return array Array of CouponRuleInterface
-     */
-    public function getRules()
-    {
-        return $this->rules;
-    }
-
-    /**
-     * Add a CouponRuleInterface to the Collection
-     *
-     * @param CouponRuleInterface $rule Rule
-     *
-     * @return $this
-     */
-    public function add(CouponRuleInterface $rule)
-    {
-        $this->rules[] = $rule;
-
-        return $this;
-    }
-
-    /**
-     * Check if there is at least one rule in the collection
+     * Check if backoffice inputs are relevant or not
      *
      * @return bool
      */
-    public function isEmpty()
-    {
-        return isEmpty($this->rules);
-    }
+    public function checkBackOfficeInput();
 
+    /**
+     * Check if Checkout inputs are relevant or not
+     *
+     * @return bool
+     */
+    public function checkCheckoutInput();
+
+    /**
+     * Check if the current Checkout matches this condition
+     *
+     * @param CouponAdapterInterface $adapter allowing to gather
+     *                               all necessary Thelia variables
+     *
+     * @return bool
+     */
+    public function isMatching(CouponAdapterInterface $adapter);
+
+    /**
+     * Return all available Operators for this Rule
+     *
+     * @return array Operators::CONST
+     */
+    public function getAvailableOperators();
+
+
+    /**
+     * Get I18n name
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Get I18n tooltip
+     *
+     * @return string
+     */
+    public function getToolTip();
 
 }

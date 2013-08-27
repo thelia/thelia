@@ -23,10 +23,10 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Coupon\Validator\PriceParam;
-use Thelia\Coupon\Validator\RuleValidator;
-use Thelia\Coupon\Rule\AvailableForTotalAmount;
-use Thelia\Coupon\Rule\Operators;
+use Thelia\Constraint\Validator\PriceParam;
+use Thelia\Constraint\Validator\RuleValidator;
+use Thelia\Constraint\Rule\AvailableForTotalAmount;
+use Thelia\Constraint\Rule\Operators;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Coupon\Type\RemoveXAmount;
 use Thelia\Tools\PhpUnitUtils;
@@ -103,6 +103,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     public function testGetDiscountTwoCoupon()
     {
+        $adapter = new CouponBaseAdapter();
         $cartTotalPrice = 100.00;
         $checkoutTotalPrice = 120.00;
 
@@ -113,8 +114,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::SUPERIOR,
                     new PriceParam(
-                        40.00,
-                        'EUR'
+                        $adapter, 40.00, 'EUR'
                     )
                 )
             )
@@ -143,6 +143,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     public function testGetDiscountAlwaysInferiorToPrice()
     {
+        $adapter = new CouponBaseAdapter();
         $cartTotalPrice = 21.00;
         $checkoutTotalPrice = 26.00;
 
@@ -151,8 +152,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::SUPERIOR,
                     new PriceParam(
-                        20.00,
-                        'EUR'
+                        $adapter, 20.00, 'EUR'
                     )
                 )
             )
@@ -180,6 +180,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     public function testIsCouponRemovingPostage()
     {
+        $adapter = new CouponBaseAdapter();
         $cartTotalPrice = 21.00;
         $checkoutTotalPrice = 27.00;
 
@@ -188,8 +189,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::SUPERIOR,
                     new PriceParam(
-                        20.00,
-                        'EUR'
+                        $adapter, 20.00, 'EUR'
                     )
                 )
             )
@@ -640,13 +640,13 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     public static function generateValidRules()
     {
+        $adapter = new CouponBaseAdapter();
         $rule1 = new AvailableForTotalAmount(
             array(
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::SUPERIOR,
                     new PriceParam(
-                        40.00,
-                        'EUR'
+                        $adapter, 40.00, 'EUR'
                     )
                 )
             )
@@ -656,8 +656,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::INFERIOR,
                     new PriceParam(
-                        400.00,
-                        'EUR'
+                        $adapter, 400.00, 'EUR'
                     )
                 )
             )
@@ -754,6 +753,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $isAvailableOnSpecialOffers = null,
         $maxUsage = null
     ) {
+        $adapter = new CouponBaseAdapter();
         if ($code === null) {
             $code = self::VALID_CODE;
         }
@@ -790,7 +790,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             $expirationDate->setTimestamp(strtotime("today + 2 months"));
         }
 
-        $coupon = new RemoveXAmount($code, $title, $shortDescription, $description, $amount, $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate);
+        $coupon = new RemoveXAmount($adapter, $code, $title, $shortDescription, $description, $amount, $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate);
 
         if ($rules === null) {
             $rules = self::generateValidRules();

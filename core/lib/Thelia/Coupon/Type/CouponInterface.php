@@ -165,4 +165,18 @@ interface CouponInterface
      * @return bool
      */
     public function isExpired();
+
+    /**
+     * Get I18n name
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Get I18n tooltip
+     *
+     * @return string
+     */
+    public function getToolTip();
 }

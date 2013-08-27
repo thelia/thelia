@@ -179,7 +179,7 @@ class CouponBaseAdapter implements CouponAdapterInterface
      */
     public function getContainer()
     {
-        // TODO: Implement getCheckoutPostagePrice() method.
+        // TODO: Implement getContainer() method.
     }
 
     /**
@@ -190,5 +190,17 @@ class CouponBaseAdapter implements CouponAdapterInterface
     public function getTranslator()
     {
         return $this->getContainer()->get('thelia.translator');
+    }
+
+
+    /**
+     * Return the main currency
+     * THe one used to set prices in BackOffice
+     *
+     * @return string
+     */
+    public function getMainCurrency()
+    {
+        // TODO: Implement getMainCurrency() method.
     }
 }

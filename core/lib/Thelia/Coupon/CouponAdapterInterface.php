@@ -131,4 +131,12 @@ interface CouponAdapterInterface
      */
     public function getTranslator();
 
+    /**
+     * Return the main currency
+     * THe one used to set prices in BackOffice
+     *
+     * @return string
+     */
+    public function getMainCurrency();
+
 }

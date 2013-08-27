@@ -38,7 +38,7 @@ use Thelia\Coupon\Type\CouponInterface;
  */
 class CouponManager
 {
-    /** @var  CouponAdapterInterface Provide necessary value from Thelia*/
+    /** @var CouponAdapterInterface Provides necessary value from Thelia */
     protected $adapter;
 
     /** @var array CouponInterface to process*/

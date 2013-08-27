@@ -23,10 +23,10 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Coupon\Validator\PriceParam;
-use Thelia\Coupon\Validator\RuleValidator;
-use Thelia\Coupon\Rule\AvailableForTotalAmount;
-use Thelia\Coupon\Rule\Operators;
+use Thelia\Constraint\Validator\PriceParam;
+use Thelia\Constraint\Validator\RuleValidator;
+use Thelia\Constraint\Rule\AvailableForTotalAmount;
+use Thelia\Constraint\Rule\Operators;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\CouponExpiredException;
 use Thelia\Model\Coupon;
@@ -208,8 +208,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::SUPERIOR,
                     new PriceParam(
-                        40.00,
-                        'EUR'
+                        , 40.00, 'EUR'
                     )
                 )
             )
@@ -219,8 +218,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::INFERIOR,
                     new PriceParam(
-                        400.00,
-                        'EUR'
+                        , 400.00, 'EUR'
                     )
                 )
             )

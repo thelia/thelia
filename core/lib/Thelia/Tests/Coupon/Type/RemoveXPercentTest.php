@@ -24,7 +24,14 @@
 namespace Thelia\Coupon;
 
 use PHPUnit_Framework_TestCase;
+use Thelia\Constraint\Rule\AvailableForTotalAmount;
+use Thelia\Constraint\Rule\Operators;
+use Thelia\Constraint\Validator\PriceParam;
+use Thelia\Constraint\Validator\RuleValidator;
+use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Coupon\Type\RemoveXPercent;
+
+require_once '../CouponManagerTest.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -48,92 +55,29 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-
-    protected function generateValidCumulativeRemovingPostageCoupon()
-    {
-        $coupon = new RemoveXPercent(
-            self::VALID_COUPON_CODE,
-            self::VALID_COUPON_TITLE,
-            self::VALID_COUPON_SHORT_DESCRIPTION,
-            self::VALID_COUPON_DESCRIPTION,
-            30.00,
-            true,
-            true
-        );
-
-        return $coupon;
-    }
-
-    protected function generateValidNonCumulativeNonRemovingPostageCoupon()
-    {
-        $coupon = new RemoveXPercent(
-            self::VALID_COUPON_CODE,
-            self::VALID_COUPON_TITLE,
-            self::VALID_COUPON_SHORT_DESCRIPTION,
-            self::VALID_COUPON_DESCRIPTION,
-            30.00,
-            false,
-            false
-        );
-
-        return $coupon;
-    }
-
     /**
+     * Test if a Coupon can be Cumulative
      *
-     * @covers Thelia\Coupon\Type\RemoveXPercent::getCode
-     * @covers Thelia\Coupon\Type\RemoveXPercent::getTitle
-     * @covers Thelia\Coupon\Type\RemoveXPercent::getShortDescription
-     * @covers Thelia\Coupon\Type\RemoveXPercent::getDescription
-     *
-     */
-    public function testDisplay()
-    {
-
-        $coupon = $this->generateValidCumulativeRemovingPostageCoupon();
-
-        $expected = self::VALID_COUPON_CODE;
-        $actual = $coupon->getCode();
-        $this->assertEquals($expected, $actual);
-
-        $expected = self::VALID_COUPON_TITLE;
-        $actual = $coupon->getTitle();
-        $this->assertEquals($expected, $actual);
-
-        $expected = self::VALID_COUPON_SHORT_DESCRIPTION;
-        $actual = $coupon->getShortDescription();
-        $this->assertEquals($expected, $actual);
-
-        $expected = self::VALID_COUPON_DESCRIPTION;
-        $actual = $coupon->getDescription();
-        $this->assertEquals($expected, $actual);
-
-    }
-
-
-    /**
-     *
-     * @covers Thelia\Coupon\Type\RemoveXPercent::isCumulative
+     * @covers Thelia\Coupon\type\RemoveXAmount::isCumulative
      *
      */
     public function testIsCumulative()
     {
-
-        $coupon = $this->generateValidCumulativeRemovingPostageCoupon();
+        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, true, true);
 
         $actual = $coupon->isCumulative();
         $this->assertTrue($actual);
     }
 
     /**
+     *  Test if a Coupon can be non cumulative
      *
-     * @covers Thelia\Coupon\Type\RemoveXPercent::isCumulative
+     * @covers Thelia\Coupon\type\RemoveXAmount::isCumulative
      *
      */
     public function testIsNotCumulative()
     {
-
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
+        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         $actual = $coupon->isCumulative();
         $this->assertFalse($actual);
@@ -141,28 +85,27 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     *  Test if a Coupon can remove postage
      *
-     * @covers Thelia\Coupon\Type\RemoveXPercent::isRemovingPostage
+     * @covers Thelia\Coupon\type\RemoveXAmount::isRemovingPostage
      *
      */
     public function testIsRemovingPostage()
     {
-
-        $coupon = $this->generateValidCumulativeRemovingPostageCoupon();
+        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, true, true);
 
         $actual = $coupon->isRemovingPostage();
         $this->assertTrue($actual);
     }
 
     /**
+     * Test if a Coupon won't remove postage if not set to
      *
-     * @covers Thelia\Coupon\Type\RemoveXPercent::isRemovingPostage
-     *
+     * @covers Thelia\Coupon\type\RemoveXAmount::isRemovingPostage
      */
     public function testIsNotRemovingPostage()
     {
-
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
+        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         $actual = $coupon->isRemovingPostage();
         $this->assertFalse($actual);
@@ -170,18 +113,335 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     * Test if a Coupon has the effect expected (discount 10euros)
      *
-     * @covers Thelia\Coupon\Type\RemoveXPercent::getDiscount
-     *
+     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
      */
     public function testGetEffect()
     {
+        $adapter = $this->generateFakeAdapter(245);
+        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
-
-        $expected = -30.00;
-        $actual = $coupon->getDiscount();
+        $expected = 24.50;
+        $actual = $coupon->getDiscount($adapter);
         $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Test Coupon rule setter
+     *
+     * @covers Thelia\Coupon\type\RemoveXAmount::setRules
+     * @covers Thelia\Coupon\type\RemoveXAmount::getRules
+     */
+    public function testSetRulesValid()
+    {
+        // Given
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
+            Operators::EQUAL,
+            20.00
+        );
+        $rule1 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
+            Operators::INFERIOR,
+            100.23
+        );
+        $rule2 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
+            Operators::SUPERIOR,
+            421.23
+        );
+
+        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+
+        // When
+        $coupon->setRules(new CouponRuleCollection(array($rule0, $rule1, $rule2)));
+
+        // Then
+        $expected = 3;
+        $this->assertCount($expected, $coupon->getRules()->getRules());
+    }
+
+    /**
+     * Test Coupon rule setter
+     *
+     * @covers Thelia\Coupon\type\RemoveXAmount::setRules
+     * @expectedException \Thelia\Exception\InvalidRuleException
+     *
+     */
+    public function testSetRulesInvalid()
+    {
+        // Given
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
+            Operators::EQUAL,
+            20.00
+        );
+        $rule1 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
+            Operators::INFERIOR,
+            100.23
+        );
+        $rule2 = $this;
+
+        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+
+        // When
+        $coupon->setRules(new CouponRuleCollection(array($rule0, $rule1, $rule2)));
+    }
+
+    /**
+     * Test Coupon effect for rule Total Amount < 400
+     *
+     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     *
+     */
+    public function testGetEffectIfTotalAmountInferiorTo400Valid()
+    {
+        // Given
+        $adapter = $this->generateFakeAdapter(245);
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
+            Operators::INFERIOR,
+            400.00
+        );
+        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+
+        // When
+        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+
+        // Then
+        $expected = 24.50;
+        $actual = $coupon->getDiscount($adapter);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Test Coupon effect for rule Total Amount <= 400
+     *
+     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     *
+     */
+    public function testGetEffectIfTotalAmountInferiorOrEqualTo400Valid()
+    {
+        // Given
+        $adapter = $this->generateFakeAdapter(245);
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
+            Operators::INFERIOR_OR_EQUAL,
+            400.00
+        );
+        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+
+        // When
+        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+
+        // Then
+        $expected = 24.50;
+        $actual = $coupon->getDiscount($adapter);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Test Coupon effect for rule Total Amount == 400
+     *
+     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     *
+     */
+    public function testGetEffectIfTotalAmountEqualTo400Valid()
+    {
+        // Given
+        $adapter = $this->generateFakeAdapter(245);
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
+            Operators::EQUAL,
+            400.00
+        );
+        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+
+        // When
+        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+
+        // Then
+        $expected = 24.50;
+        $actual = $coupon->getDiscount($adapter);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Test Coupon effect for rule Total Amount >= 400
+     *
+     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     *
+     */
+    public function testGetEffectIfTotalAmountSuperiorOrEqualTo400Valid()
+    {
+        // Given
+        $adapter = $this->generateFakeAdapter(245);
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
+            Operators::SUPERIOR_OR_EQUAL,
+            400.00
+        );
+        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+
+        // When
+        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+
+        // Then
+        $expected = 24.50;
+        $actual = $coupon->getDiscount($adapter);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Test Coupon effect for rule Total Amount > 400
+     *
+     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     *
+     */
+    public function testGetEffectIfTotalAmountSuperiorTo400Valid()
+    {
+        // Given
+        $adapter = $this->generateFakeAdapter(245);
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
+            Operators::SUPERIOR,
+            400.00
+        );
+        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+
+        // When
+        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+
+        // Then
+        $expected = 24.50;
+        $actual = $coupon->getDiscount($adapter);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Generate valid CouponInterface
+     *
+     * @param string               $code                       Coupon Code
+     * @param string               $title                      Coupon Title
+     * @param string               $shortDescription           Coupon short
+     *                                                         description
+     * @param string               $description                Coupon description
+     * @param float                $amount                     Coupon discount
+     * @param bool                 $isEnabled                  Is Coupon enabled
+     * @param \DateTime            $expirationDate             Coupon expiration date
+     * @param CouponRuleCollection $rules                      Coupon rules
+     * @param bool                 $isCumulative               If is cumulative
+     * @param bool                 $isRemovingPostage          If is removing postage
+     * @param bool                 $isAvailableOnSpecialOffers If is available on
+     *                                                         special offers or not
+     * @param int                  $maxUsage                   How many time a Coupon
+     *                                                         can be used
+     *
+     * @return CouponInterface
+     */
+    public static function generateValidCoupon(
+        $code = null,
+        $title = null,
+        $shortDescription = null,
+        $description = null,
+        $percent = null,
+        $isEnabled = null,
+        $expirationDate = null,
+        $rules = null,
+        $isCumulative = null,
+        $isRemovingPostage = null,
+        $isAvailableOnSpecialOffers = null,
+        $maxUsage = null
+    ) {
+        $adapter = new CouponBaseAdapter();
+        if ($code === null) {
+            $code = CouponManagerTest::VALID_CODE;
+        }
+        if ($title === null) {
+            $title = CouponManagerTest::VALID_TITLE;
+        }
+        if ($shortDescription === null) {
+            $shortDescription = CouponManagerTest::VALID_SHORT_DESCRIPTION;
+        }
+        if ($description === null) {
+            $description = CouponManagerTest::VALID_DESCRIPTION;
+        }
+        if ($percent === null) {
+            $percent = 10.00;
+        }
+        if ($isEnabled === null) {
+            $isEnabled = true;
+        }
+        if ($isCumulative === null) {
+            $isCumulative = true;
+        }
+        if ($isRemovingPostage === null) {
+            $isRemovingPostage = false;
+        }
+        if ($isAvailableOnSpecialOffers === null) {
+            $isAvailableOnSpecialOffers = true;
+        }
+        if ($maxUsage === null) {
+            $maxUsage = 40;
+        }
+
+        if ($expirationDate === null) {
+            $expirationDate = new \DateTime();
+            $expirationDate->setTimestamp(strtotime("today + 2 months"));
+        }
+
+        $coupon = new RemoveXPercent($adapter, $code, $title, $shortDescription, $description, $percent, $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate);
+
+        if ($rules === null) {
+            $rules = CouponManagerTest::generateValidRules();
+        }
+
+        $coupon->setRules($rules);
+
+        return $coupon;
+    }
+
+
+    /**
+     * Generate valid rule AvailableForTotalAmount
+     * according to given operator and amount
+     *
+     * @param string $operator Operators::CONST
+     * @param float  $amount   Amount with 2 decimals
+     *
+     * @return AvailableForTotalAmount
+     */
+    protected function generateValidRuleAvailableForTotalAmountOperatorTo($operator, $amount)
+    {
+        $adapter = new CouponBaseAdapter();
+        $validators = array(
+            AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
+                $operator,
+                new PriceParam(
+                    $adapter,
+                    $amount,
+                    'EUR'
+                )
+            )
+        );
+
+        return new AvailableForTotalAmount($validators);
+    }
+
+    /**
+     * Generate a fake Adapter
+     *
+     * @param float $cartTotalPrice     Cart total price
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    public function generateFakeAdapter($cartTotalPrice)
+    {
+        $stubCouponBaseAdapter = $this->getMock(
+            'Thelia\Coupon\CouponBaseAdapter',
+            array(
+                'getCartTotalPrice'
+            ),
+            array()
+        );
+
+        $stubCouponBaseAdapter->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue(($cartTotalPrice)));
+
+        return $stubCouponBaseAdapter;
     }
 
     /**
