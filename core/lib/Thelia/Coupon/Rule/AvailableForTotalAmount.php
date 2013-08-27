@@ -25,8 +25,8 @@ namespace Thelia\Coupon\Rule;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Coupon\CouponAdapterInterface;
-use Thelia\Coupon\Parameter\PriceParam;
-use Thelia\Coupon\Parameter\RuleValidator;
+use Thelia\Coupon\Validator\PriceParam;
+use Thelia\Coupon\Validator\RuleValidator;
 use Thelia\Exception\InvalidRuleException;
 use Thelia\Exception\InvalidRuleOperatorException;
 use Thelia\Exception\InvalidRuleValueException;
@@ -63,13 +63,12 @@ class AvailableForTotalAmount extends CouponRuleAbstract
      *
      * @param array $validators Array of RuleValidator
      *                          validating $paramsToValidate against
-     * @param array $validated  Parameters to be paramsToValidate
      *
      * @throws \Thelia\Exception\InvalidRuleException
      */
-    public function __construct(array $validators, array $validated = null)
+    public function __construct(array $validators)
     {
-        parent::__construct($validators, $validated);
+        parent::__construct($validators);
 
         if (isset($validators[self::PARAM1_PRICE])
             && $validators[self::PARAM1_PRICE] instanceof RuleValidator
@@ -138,7 +137,7 @@ class AvailableForTotalAmount extends CouponRuleAbstract
     /**
      * Check if a price is valid
      *
-     * @param int $price Price to check
+     * @param float $price Price to check
      *
      * @throws InvalidRuleValueException if Value is not allowed
      * @return bool
@@ -156,21 +155,6 @@ class AvailableForTotalAmount extends CouponRuleAbstract
     }
 
     /**
-     * Generate current Rule validator from adapter
-     *
-     * @param CouponAdapterInterface $adapter allowing to gather
-     *                               all necessary Thelia variables
-     *
-     * @throws \Symfony\Component\Intl\Exception\NotImplementedException
-     * @return $this
-     */
-    protected function setValidatorsFromAdapter(CouponAdapterInterface $adapter)
-    {
-//        $adapter->getRule($this);
-        // @todo implement
-    }
-
-    /**
      * Generate current Rule param to be validated from adapter
      *
      * @param CouponAdapterInterface $adapter allowing to gather
@@ -181,7 +165,7 @@ class AvailableForTotalAmount extends CouponRuleAbstract
     protected function setParametersToValidate(CouponAdapterInterface $adapter)
     {
         $this->paramsToValidate = array(
-            self::PARAM1_PRICE => $adapter->getCheckoutTotalPrice()
+            self::PARAM1_PRICE => $adapter->getCartTotalPrice()
         );
 
         return $this;

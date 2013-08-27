@@ -23,8 +23,6 @@
 
 namespace Thelia\Coupon\Rule;
 
-use Thelia\Coupon\CouponAdapterInterface;
-
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13

@@ -24,7 +24,7 @@
 namespace Thelia\Coupon;
 
 use InvalidArgumentException;
-use Thelia\Coupon\Parameter\IntervalParam;
+use Thelia\Coupon\Validator\IntervalParam;
 
 /**
  * Created by JetBrains PhpStorm.

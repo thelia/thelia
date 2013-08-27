@@ -23,6 +23,8 @@
 
 namespace Thelia\Coupon\Rule;
 
+use Thelia\Coupon\CouponAdapterInterface;
+
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
@@ -53,9 +55,12 @@ interface CouponRuleInterface
     /**
      * Check if the current Checkout matches this condition
      *
+     * @param CouponAdapterInterface $adapter allowing to gather
+     *                               all necessary Thelia variables
+     *
      * @return bool
      */
-    public function isMatching();
+    public function isMatching(CouponAdapterInterface $adapter);
 
     /**
      * Return all available Operators for this Rule
@@ -63,27 +68,5 @@ interface CouponRuleInterface
      * @return array Operators::CONST
      */
     public function getAvailableOperators();
-
-//    /**
-//     * Generate current Rule validator from adapter
-//     * Ex :
-//     * $validator = array(
-//     *
-//     * @param CouponAdapterInterface $adapter allowing to gather
-//     *                               all necessary Thelia variables
-//     *
-//     * @return array Validators : array of ComparableInterface
-//     */
-//    public function getValidators(CouponAdapterInterface $adapter);
-//
-//    /**
-//     * Retrieve all param to validate from adapter
-//     *
-//     * @param CouponAdapterInterface $adapter allowing to gather
-//     *                               all necessary Thelia variables
-//     *
-//     * @return array Validators : array of ComparableInterface
-//     */
-//    public function getParamToValidate(CouponAdapterInterface $adapter);
 
 }

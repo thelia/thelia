@@ -24,7 +24,7 @@
 namespace Thelia\Coupon;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
-use Thelia\Coupon\Parameter\RepeatedIntervalParam;
+use Thelia\Coupon\Validator\RepeatedIntervalParam;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -75,7 +75,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
      * @covers Thelia\Coupon\Parameter\RepeatedIntervalParam::compareTo
      *
      */
-    public function testEqualsDateRepeatEveryMonthOneTimeFirstPeriodBegining()
+    public function testEqualsDateRepeatEveryMonthOneTimeFirstPeriodBeginning()
     {
         $startDateValidator = new \DateTime("2012-07-08");
         $dateToValidate = new \DateTime("2012-07-08");
@@ -138,7 +138,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
      * @covers Thelia\Coupon\Parameter\RepeatedIntervalParam::compareTo
      *
      */
-    public function testEqualsDateRepeatEveryMonthOneTimeSecondPeriodBegining()
+    public function testEqualsDateRepeatEveryMonthOneTimeSecondPeriodBeginning()
     {
         $startDateValidator = new \DateTime("2012-08-08");
         $dateToValidate = new \DateTime("2012-08-08");
@@ -264,7 +264,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
      * @covers Thelia\Coupon\Parameter\RepeatedIntervalParam::compareTo
      *
      */
-    public function testNotEqualsDateRepeatEveryMonthFourTimeInTheBegining()
+    public function testNotEqualsDateRepeatEveryMonthFourTimeInTheBeginning()
     {
         $startDateValidator = new \DateTime("2012-10-08");
         $dateToValidate = new \DateTime("2012-07-19");
@@ -348,7 +348,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Thelia\Coupon\Parameter\DateParam::compareTo
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testInvalidArgumentException()
     {

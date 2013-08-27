@@ -23,6 +23,8 @@
 
 namespace Thelia\Coupon;
 
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 
@@ -70,10 +72,11 @@ interface CouponAdapterInterface
 
     /**
      * Return Products total price
+     * CartTotalPrice = Checkout total - discount - postage
      *
      * @return float
      */
-    public function getCheckoutTotalPriceWithoutDiscountAndPostagePrice();
+    public function getCartTotalPrice();
 
     /**
      * Return Checkout total postage (only) price
@@ -87,7 +90,7 @@ interface CouponAdapterInterface
      *
      * @return int
      */
-    public function getNbArticlesInTheCart();
+    public function getNbArticlesInCart();
 
     /**
      * Return all Coupon given during the Checkout
@@ -113,5 +116,19 @@ interface CouponAdapterInterface
      * @return $this
      */
     public function saveCoupon(CouponInterface $coupon);
+
+    /**
+     * Return platform Container
+     *
+     * @return Container
+     */
+    public function getContainer();
+
+    /**
+     * Return platform TranslatorInterface
+     *
+     * @return TranslatorInterface
+     */
+    public function getTranslator();
 
 }

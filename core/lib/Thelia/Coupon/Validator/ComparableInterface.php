@@ -21,62 +21,17 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Parameter;
-
-use Thelia\Coupon\Parameter\ComparableInterface;
+namespace Thelia\Coupon\Validator;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
+ * Comparable interface
+ * Allows to compare two value objects to each other for similarity.
  *
- * Represent a Price
- * Positive value with currency
- *
- * @package Coupon
- * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
  */
-class PriceParam implements ComparableInterface, RuleParameterInterface
+interface ComparableInterface
 {
-    /** @var float Positive Float to compare with */
-    protected $price = null;
-
-    /** @var string Currency Code ISO 4217 EUR|USD|GBP */
-    protected $currency = null;
-
-    /**
-     * Constructor
-     *
-     * @param float  $price    Positive float
-     * @param string $currency Currency Code ISO 4217 EUR|USD|GBP
-     */
-    public function __construct($price, $currency)
-    {
-        $this->price = $price;
-        $this->currency = $currency;
-    }
-
-    /**
-     * Get currency code
-     *
-     * @return string
-     */
-    public function getCurrency()
-    {
-        return $this->currency;
-    }
-
-    /**
-     * Get price
-     *
-     * @return float
-     */
-    public function getPrice()
-    {
-        return $this->price;
-    }
-
     /**
      * Compare the current object to the passed $other.
      *
@@ -88,38 +43,7 @@ class PriceParam implements ComparableInterface, RuleParameterInterface
      *
      * @param mixed $other Object
      *
-     * @throws \InvalidArgumentException
      * @return int
      */
-    public function compareTo($other)
-    {
-        if (!is_float($other)) {
-            throw new \InvalidArgumentException(
-                'PriceParam can compare only positive float'
-            );
-        }
-
-        $epsilon = 0.00001;
-
-        $ret = -1;
-        if (abs($this->price - $other) < $epsilon) {
-            $ret = 0;
-        } elseif ($this->price > $other) {
-            $ret = 1;
-        } else {
-            $ret = -1;
-        }
-
-        return $ret;
-    }
-
-    /**
-     * Get Parameter value to test against
-     *
-     * @return float
-     */
-    public function getValue()
-    {
-        return $this->price;
-    }
+    public function compareTo($other);
 }

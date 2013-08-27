@@ -23,7 +23,7 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Coupon\Parameter\QuantityParam;
+use Thelia\Coupon\Validator\QuantityParam;
 use Thelia\Coupon\Rule\Operators;
 
 /**
@@ -61,7 +61,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(12);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertTrue($actual);
@@ -80,7 +80,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(12);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertFalse($actual);
@@ -99,7 +99,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(12);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertFalse($actual);
@@ -118,7 +118,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(11);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertTrue($actual);
@@ -137,7 +137,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(11);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertTrue($actual);
@@ -156,7 +156,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(11);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertFalse($actual);
@@ -175,7 +175,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(12);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertTrue($actual);
@@ -194,7 +194,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(12);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertFalse($actual);
@@ -213,7 +213,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(12);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertFalse($actual);
@@ -232,7 +232,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(13);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertTrue($actual);
@@ -251,7 +251,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(13);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertTrue($actual);
@@ -270,7 +270,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(13);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertFalse($actual);
@@ -289,7 +289,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(12);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertTrue($actual);
@@ -308,7 +308,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(12);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertFalse($actual);
@@ -327,7 +327,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(12);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertFalse($actual);
@@ -346,7 +346,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(11);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertTrue($actual);
@@ -365,7 +365,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(11);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertFalse($actual);
@@ -384,7 +384,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $b = new QuantityParam(11);
 
         // When
-        $actual = Operators::isValidAccordingToOperator($a, $operator, $b);
+        $actual = Operators::isValid($a, $operator, $b);
 
         // Then
         $this->assertFalse($actual);

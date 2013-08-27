@@ -21,46 +21,43 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Parameter;
-
-use Thelia\Coupon\Parameter\ComparableInterface;
+namespace Thelia\Coupon\Validator;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Represent an Integer
+ * Represent a DateTime
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class IntegerParam implements ComparableInterface, RuleParameterInterface
+class DateParam extends RuleParameterAbstract
 {
-    /** @var int Integer to compare with */
-    protected $integer = 0;
+    /** @var \DateTime Date  */
+    protected $dateTime = null;
 
     /**
      * Constructor
      *
-     * @param int $integer Integer
+     * @param \DateTime $dateTime DateTime
      */
-    public function __construct($integer)
+    public function __construct(\DateTime $dateTime)
     {
-        $this->integer = $integer;
+        $this->dateTime = $dateTime;
     }
 
     /**
-     * Get integer
+     * Get DateTime
      *
-     * @return int
+     * @return \DateTime
      */
-    public function getInteger()
+    public function getDateTime()
     {
-        return $this->integer;
+        return clone $this->dateTime;
     }
-
 
     /**
      * Compare the current object to the passed $other.
@@ -78,14 +75,14 @@ class IntegerParam implements ComparableInterface, RuleParameterInterface
      */
     public function compareTo($other)
     {
-        if (!is_integer($other)) {
-            throw new \InvalidArgumentException('IntegerParam can compare only int');
+        if (!$other instanceof \DateTime) {
+            throw new \InvalidArgumentException('DateParam can compare only DateTime');
         }
 
         $ret = -1;
-        if ($this->integer == $other) {
+        if ($this->dateTime == $other) {
             $ret = 0;
-        } elseif ($this->integer > $other) {
+        } elseif ($this->dateTime > $other) {
             $ret = 1;
         } else {
             $ret = -1;
@@ -97,11 +94,12 @@ class IntegerParam implements ComparableInterface, RuleParameterInterface
     /**
      * Get Parameter value to test against
      *
-     * @return int
+     * @return \Datetime
      */
     public function getValue()
     {
-        return $this->integer;
+        return clone $this->dateTime;
     }
+
 
 }

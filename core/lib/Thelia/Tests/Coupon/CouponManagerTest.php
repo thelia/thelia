@@ -23,12 +23,12 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Coupon\Parameter\PriceParam;
-use Thelia\Coupon\Parameter\RuleValidator;
+use Thelia\Coupon\Validator\PriceParam;
+use Thelia\Coupon\Validator\RuleValidator;
 use Thelia\Coupon\Rule\AvailableForTotalAmount;
 use Thelia\Coupon\Rule\Operators;
+use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Coupon\Type\RemoveXAmount;
-use Thelia\Model\Coupon;
 use Thelia\Tools\PhpUnitUtils;
 
 /**
@@ -44,7 +44,8 @@ use Thelia\Tools\PhpUnitUtils;
  */
 class CouponManagerTest extends \PHPUnit_Framework_TestCase
 {
-
+    CONST VALID_CODE = 'XMAS';
+    CONST VALID_TITLE = 'XMAS coupon';
     CONST VALID_SHORT_DESCRIPTION = 'Coupon for Christmas removing 10€ if your total checkout is more than 40€';
     CONST VALID_DESCRIPTION = '<h3>Lorem ipsum dolor sit amet</h3>Consectetur adipiscing elit. Cras at luctus tellus. Integer turpis mauris, aliquet vitae risus tristique, pellentesque vestibulum urna. Vestibulum sodales laoreet lectus dictum suscipit. Praesent vulputate, sem id varius condimentum, quam magna tempor elit, quis venenatis ligula nulla eget libero. Cras egestas euismod tellus, id pharetra leo suscipit quis. Donec lacinia ac lacus et ultricies. Nunc in porttitor neque. Proin at quam congue, consectetur orci sed, congue nulla. Nulla eleifend nunc ligula, nec pharetra elit tempus quis. Vivamus vel mauris sed est dictum blandit. Maecenas blandit dapibus velit ut sollicitudin. In in euismod mauris, consequat viverra magna. Cras velit velit, sollicitudin commodo tortor gravida, tempus varius nulla.
 
@@ -68,167 +69,171 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     {
     }
 
-
     /**
-     * Generate valid CouponInterface
+     * Test getDiscount() behaviour
+     * Entering : 1 valid Coupon (If 40 < total amount 400) - 10euros
      *
-     * @param string $code
-     * @param string $title
-     * @param string $shortDescription
-     * @param string $description
-     * @param float $amount
-     * @param bool $isEnabled
-     * @param $expirationDate
-     * @param $rules
-     * @param bool $isCumulative
-     * @param bool $isRemovingPostage
-     * @param bool $isAvailableOnSpecialOffers
-     * @param int $maxUsage
-     *
-     * @return CouponInterface
+     * @covers Thelia\Coupon\CouponManager::getDiscount
      */
-    public function generateValidCoupon(
-        $code = 'XMAS1',
-        $title = 'Christmas coupon',
-        $shortDescription = self::VALID_SHORT_DESCRIPTION,
-        $description = self::VALID_DESCRIPTION,
-        $amount = 10.00,
-        $isEnabled = true,
-        $expirationDate = null,
-        $rules = null,
-        $isCumulative = true,
-        $isRemovingPostage = false,
-        $isAvailableOnSpecialOffers = true,
-        $maxUsage = 40
-    ) {
-        if ($expirationDate === null) {
-            $expirationDate = new \DateTime();
-            $expirationDate->setTimestamp(strtotime("today + 2 months"));
-        }
+    public function testGetDiscountOneCoupon()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
 
-        $coupon = new RemoveXAmount($code, $title, $shortDescription, $description, $amount, $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate);
+        /** @var CouponInterface $coupon */
+        $coupon = self::generateValidCoupon();
 
-        if ($rules === null) {
-            $rules = $this->generateValidRules();
-        }
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter(array($coupon), $cartTotalPrice, $checkoutTotalPrice);
 
-        $coupon->setRules($rules);
+        $couponManager = new CouponManager($stubCouponBaseAdapter);
+        $discount = $couponManager->getDiscount();
 
-        return $coupon;
+        $expected = 10.00;
+        $actual = $discount;
+        $this->assertEquals($expected, $actual);
     }
 
-//    /**
-//     * @covers Thelia\Coupon\CouponManager::getDiscount
-//     * @todo   Implement testGetDiscount().
-//     */
-//    public function testGetDiscountOneCoupon()
-//    {
-//        $this->markTestIncomplete(
-//            'This test has not been implemented yet.'
-//        );
-//        /** @var CouponInterface $coupon */
-//        $coupon = $this->generateValidCoupon();
-//
-//
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
-//        $stubCouponBaseAdapter = $this->getMock(
-//            'Thelia\Coupon\CouponBaseAdapter',
-//            array(
-//                'getCurrentCoupons',
-//                'getCheckoutTotalPriceWithoutDiscountAndPostagePrice'
-//            ),
-//            array()
-//        );
-//
-//        // Returns -10euros not removing postage Coupon
-//        // If 40 < total amount 400
-//        $stubCouponBaseAdapter->expects($this->any())
-//            ->method('getCurrentCoupons')
-//            ->will($this->returnValue(array($coupon)));
-//
-//        // Return Checkout product amoun = 100euros
-//        $stubCouponBaseAdapter->expects($this->any())
-//            ->method('getCheckoutTotalPriceWithoutDiscountAndPostagePrice')
-//            ->will($this->returnValue(100.00));
-//
-//        $couponManager = new CouponManager($stubCouponBaseAdapter);
-//        $discount = $couponManager->getDiscount();
-//
-//        $expected = 10.00;
-//        $actual = $discount;
-//        $this->assertEquals($expected, $actual);
-//    }
-//
-//    /**
-//     * @covers Thelia\Coupon\CouponManager::getDiscount
-//     * @todo   Implement testGetDiscount().
-//     */
-//    public function testGetDiscountAlwaysInferiorToPrice()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//          'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Thelia\Coupon\CouponManager::getDiscount
-//     * @covers Thelia\Coupon\CouponManager::sortCoupons
-//     * @todo   Implement testGetDiscount().
-//     */
-//    public function testGetDiscountCouponNotCumulativeCancelOthers()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//            'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Thelia\Coupon\CouponManager::getDiscount
-//     * @covers Thelia\Coupon\CouponManager::sortCoupons
-//     * @todo   Implement testGetDiscount().
-//     */
-//    public function testGetDiscountCouponCumulativeCumulatesWithOthers()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//            'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Thelia\Coupon\CouponManager::isCouponRemovingPostage
-//     * @covers Thelia\Coupon\CouponManager::sortCoupons
-//     * @todo   Implement testGetDiscount().
-//     */
-//    public function testIsCouponRemovingPostage()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//            'This test has not been implemented yet.'
-//        );
-//    }
+    /**
+     * Test getDiscount() behaviour
+     * Entering : 1 valid Coupon (If 40 < total amount 400) - 10euros
+     *            1 valid Coupon (If total amount > 20) - 15euros
+     *
+     * @covers Thelia\Coupon\CouponManager::getDiscount
+     */
+    public function testGetDiscountTwoCoupon()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
+        /** @var CouponInterface $coupon1 */
+        $coupon1 = self::generateValidCoupon();
+        $rule1 = new AvailableForTotalAmount(
+            array(
+                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
+                    Operators::SUPERIOR,
+                    new PriceParam(
+                        40.00,
+                        'EUR'
+                    )
+                )
+            )
+        );
+        $rules = new CouponRuleCollection(array($rule1));
+        /** @var CouponInterface $coupon2 */
+        $coupon2 = $this->generateValidCoupon('XMAS2', null, null, null, 15.00, null, null, $rules);
+
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter(array($coupon1, $coupon2), $cartTotalPrice, $checkoutTotalPrice);
+
+        $couponManager = new CouponManager($stubCouponBaseAdapter);
+        $discount = $couponManager->getDiscount();
+
+        $expected = 25.00;
+        $actual = $discount;
+        $this->assertEquals($expected, $actual);
+    }
 
     /**
+     * Test getDiscount() behaviour
+     * For a Cart of 21euros
+     * Entering : 1 valid Coupon (If total amount > 20) - 30euros
+     *
+     * @covers Thelia\Coupon\CouponManager::getDiscount
+     */
+    public function testGetDiscountAlwaysInferiorToPrice()
+    {
+        $cartTotalPrice = 21.00;
+        $checkoutTotalPrice = 26.00;
+
+        $rule1 = new AvailableForTotalAmount(
+            array(
+                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
+                    Operators::SUPERIOR,
+                    new PriceParam(
+                        20.00,
+                        'EUR'
+                    )
+                )
+            )
+        );
+        $rules = new CouponRuleCollection(array($rule1));
+        /** @var CouponInterface $coupon */
+        $coupon = $this->generateValidCoupon('XMAS2', null, null, null, 30.00, null, null, $rules);
+
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter(array($coupon), $cartTotalPrice, $checkoutTotalPrice);
+
+        $couponManager = new CouponManager($stubCouponBaseAdapter);
+        $discount = $couponManager->getDiscount();
+
+        $expected = 21.00;
+        $actual = $discount;
+        $this->assertEquals($expected, $actual);
+    }
+
+
+    /**
+     * Check if removing postage on discout is working
+     * @covers Thelia\Coupon\CouponManager::isCouponRemovingPostage
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     */
+    public function testIsCouponRemovingPostage()
+    {
+        $cartTotalPrice = 21.00;
+        $checkoutTotalPrice = 27.00;
+
+        $rule1 = new AvailableForTotalAmount(
+            array(
+                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
+                    Operators::SUPERIOR,
+                    new PriceParam(
+                        20.00,
+                        'EUR'
+                    )
+                )
+            )
+        );
+        $rules = new CouponRuleCollection(array($rule1));
+        /** @var CouponInterface $coupon */
+        $coupon = $this->generateValidCoupon('XMAS2', null, null, null, 30.00, null, null, $rules, null, true);
+
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter(array($coupon), $cartTotalPrice, $checkoutTotalPrice);
+
+        $couponManager = new CouponManager($stubCouponBaseAdapter);
+        $discount = $couponManager->getDiscount();
+
+        $expected = 21.00;
+        $actual = $discount;
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Testing how multiple Coupon behaviour
+     * Entering 1 Coupon not cumulative
+     *
      * @covers Thelia\Coupon\CouponManager::sortCoupons
      */
     public function testCouponCumulationOneCouponNotCumulative()
     {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
         // Given
         /** @var CouponInterface $coupon */
-        $couponCumulative1 = $this->generateValidCoupon(null, null, null, null, null, null, null, null, true);
-        $couponCumulative2 = $this->generateValidCoupon(null, null, null, null, null, null, null, null, true);
-        $couponNotCumulative1 = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false);
-        $couponNotCumulative2 = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false);
+        $couponCumulative1 = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false);
 
         $coupons = array($couponCumulative1);
 
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
+
         // When
         $sortedCoupons = PhpUnitUtils::callMethod(
-            new CouponManager(new CouponBaseAdapter()),
+            new CouponManager($stubCouponBaseAdapter),
             'sortCoupons',
-            $coupons
+            array($coupons)
         );
 
         // Then
@@ -238,13 +243,402 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $this->assertSame($expected, $actual, 'Array Sorted despite there is only once');
     }
 
+    /**
+     * Testing how multiple Coupon behaviour
+     * Entering 1 Coupon cumulative
+     *
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     */
+    public function testCouponCumulationOneCouponCumulative()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
+        // Given
+        /** @var CouponInterface $coupon */
+        $couponCumulative1 = $this->generateValidCoupon(null, null, null, null, null, null, null, null, true);
+
+        $coupons = array($couponCumulative1);
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
+
+        // When
+        $sortedCoupons = PhpUnitUtils::callMethod(
+            new CouponManager($stubCouponBaseAdapter),
+            'sortCoupons',
+            array($coupons)
+        );
+
+        // Then
+        $expected = $coupons;
+        $actual = $sortedCoupons;
+
+        $this->assertSame($expected, $actual, 'Array Sorted despite there is only once');
+    }
+
+    /**
+     * Testing how multiple Coupon behaviour
+     * Entering 1 Coupon cumulative
+     *          1 Coupon cumulative
+     *
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     */
+    public function testCouponCumulationTwoCouponCumulative()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
+        // Given
+        /** @var CouponInterface $coupon */
+        $couponCumulative1 = $this->generateValidCoupon('XMAS1', null, null, null, null, null, null, null, true);
+        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, null, null, true);
+
+        $coupons = array($couponCumulative1, $couponCumulative2);
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
+
+        // When
+        $sortedCoupons = PhpUnitUtils::callMethod(
+            new CouponManager($stubCouponBaseAdapter),
+            'sortCoupons',
+            array($coupons)
+        );
+
+        // Then
+        $expected = $coupons;
+        $actual = $sortedCoupons;
+
+        $this->assertSame($expected, $actual, 'Array Sorted despite both Coupon can be accumulated');
+    }
+
+    /**
+     * Testing how multiple Coupon behaviour
+     * Entering 1 Coupon cumulative
+     *          1 Coupon non cumulative
+     *
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     */
+    public function testCouponCumulationOneCouponCumulativeOneNonCumulative()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
+        // Given
+        /** @var CouponInterface $coupon */
+        $couponCumulative1 = $this->generateValidCoupon('XMAS1', null, null, null, null, null, null, null, true);
+        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, null, null, false);
+
+        $coupons = array($couponCumulative1, $couponCumulative2);
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
+
+        // When
+        $sortedCoupons = PhpUnitUtils::callMethod(
+            new CouponManager($stubCouponBaseAdapter),
+            'sortCoupons',
+            array($coupons)
+        );
+
+        // Then
+        $expected = array($couponCumulative2);
+        $actual = $sortedCoupons;
+
+        $this->assertSame($expected, $actual, 'Array Sorted despite both Coupon can be accumulated');
+    }
+
+    /**
+     * Testing how multiple Coupon behaviour
+     * Entering 1 Coupon non cumulative
+     *          1 Coupon cumulative
+     *
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     */
+    public function testCouponCumulationOneCouponNonCumulativeOneCumulative()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
+        // Given
+        /** @var CouponInterface $coupon */
+        $couponCumulative1 = $this->generateValidCoupon('XMAS1', null, null, null, null, null, null, null, false);
+        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, null, null, true);
+
+        $coupons = array($couponCumulative1, $couponCumulative2);
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
+
+        // When
+        $sortedCoupons = PhpUnitUtils::callMethod(
+            new CouponManager($stubCouponBaseAdapter),
+            'sortCoupons',
+            array($coupons)
+        );
+
+        // Then
+        $expected = array($couponCumulative2);
+        $actual = $sortedCoupons;
+
+        $this->assertSame($expected, $actual, 'Array Sorted despite both Coupon can be accumulated');
+    }
+
+    /**
+     * Testing how multiple Coupon behaviour
+     * Entering 1 Coupon non cumulative
+     *          1 Coupon non cumulative
+     *
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     */
+    public function testCouponCumulationTwoCouponNonCumulative()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
+        // Given
+        /** @var CouponInterface $coupon */
+        $couponCumulative1 = $this->generateValidCoupon('XMAS1', null, null, null, null, null, null, null, false);
+        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, null, null, false);
+
+        $coupons = array($couponCumulative1, $couponCumulative2);
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
+
+        // When
+        $sortedCoupons = PhpUnitUtils::callMethod(
+            new CouponManager($stubCouponBaseAdapter),
+            'sortCoupons',
+            array($coupons)
+        );
+
+        // Then
+        $expected = array($couponCumulative2);
+        $actual = $sortedCoupons;
+
+        $this->assertSame($expected, $actual, 'Array Sorted despite both Coupon can be accumulated');
+    }
+
+    /**
+     * Testing how multiple Coupon behaviour
+     * Entering 1 Coupon cumulative expired
+     *
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     */
+    public function testCouponCumulationOneCouponCumulativeExpired()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
+        // Given
+        /** @var CouponInterface $coupon */
+        $couponCumulative1 = $this->generateValidCoupon('XMAS1', null, null, null, null, null, new \DateTime(), null, true);
+
+        $coupons = array($couponCumulative1);
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
+
+        // When
+        $sortedCoupons = PhpUnitUtils::callMethod(
+            new CouponManager($stubCouponBaseAdapter),
+            'sortCoupons',
+            array($coupons)
+        );
+
+        // Then
+        $expected = array();
+        $actual = $sortedCoupons;
+
+        $this->assertSame($expected, $actual, 'Coupon expired ignored');
+    }
+
+    /**
+     * Testing how multiple Coupon behaviour
+     * Entering 1 Coupon cumulative expired
+     *          1 Coupon cumulative expired
+     *
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     */
+    public function testCouponCumulationTwoCouponCumulativeExpired()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
+        // Given
+        /** @var CouponInterface $coupon */
+        $couponCumulative1 = $this->generateValidCoupon('XMAS1', null, null, null, null, null, new \DateTime(), null, true);
+        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, new \DateTime(), null, true);
+
+        $coupons = array($couponCumulative1, $couponCumulative2);
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
+
+        // When
+        $sortedCoupons = PhpUnitUtils::callMethod(
+            new CouponManager($stubCouponBaseAdapter),
+            'sortCoupons',
+            array($coupons)
+        );
+
+        // Then
+        $expected = array();
+        $actual = $sortedCoupons;
+
+        $this->assertSame($expected, $actual, 'Coupon expired ignored');
+    }
+
+    /**
+     * Testing how multiple Coupon behaviour
+     * Entering 1 Coupon cumulative expired
+     *          1 Coupon cumulative valid
+     *
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     */
+    public function testCouponCumulationOneCouponCumulativeExpiredOneNonExpired()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
+        // Given
+        /** @var CouponInterface $coupon */
+        $couponCumulative1 = $this->generateValidCoupon('XMAS1', null, null, null, null, null, new \DateTime(), null, true);
+        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, null, null, true);
+
+        $coupons = array($couponCumulative1, $couponCumulative2);
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
+
+        // When
+        $sortedCoupons = PhpUnitUtils::callMethod(
+            new CouponManager($stubCouponBaseAdapter),
+            'sortCoupons',
+            array($coupons)
+        );
+
+        // Then
+        $expected = array($couponCumulative2);
+        $actual = $sortedCoupons;
+
+        $this->assertSame($expected, $actual, 'Coupon expired ignored');
+    }
+
+    /**
+     * Testing how multiple Coupon behaviour
+     * Entering 1 Coupon cumulative valid
+     *          1 Coupon cumulative expired
+     *
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     */
+    public function testCouponCumulationOneCouponCumulativeNonExpiredOneExpired()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
+        // Given
+        /** @var CouponInterface $coupon */
+        $couponCumulative1 = $this->generateValidCoupon('XMAS1', null, null, null, null, null, null, null, true);
+        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, new \DateTime(), null, true);
+
+        $coupons = array($couponCumulative1, $couponCumulative2);
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
+
+        // When
+        $sortedCoupons = PhpUnitUtils::callMethod(
+            new CouponManager($stubCouponBaseAdapter),
+            'sortCoupons',
+            array($coupons)
+        );
+
+        // Then
+        $expected = array($couponCumulative1);
+        $actual = $sortedCoupons;
+
+        $this->assertSame($expected, $actual, 'Coupon expired ignored');
+    }
+
+    /**
+     * Testing how multiple Coupon behaviour
+     * Entering 1 Coupon cumulative valid
+     *          1 Coupon cumulative valid
+     *          1 Coupon cumulative valid
+     *          1 Coupon cumulative valid
+     *
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     */
+    public function testCouponCumulationFourCouponCumulative()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
+        // Given
+        /** @var CouponInterface $coupon */
+        $couponCumulative1 = $this->generateValidCoupon('XMAS1', null, null, null, null, null, null, null, true);
+        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, null, null, true);
+        $couponCumulative3 = $this->generateValidCoupon('XMAS3', null, null, null, null, null, null, null, true);
+        $couponCumulative4 = $this->generateValidCoupon('XMAS4', null, null, null, null, null, null, null, true);
+
+        $coupons = array($couponCumulative1, $couponCumulative2, $couponCumulative3, $couponCumulative4);
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
+
+        // When
+        $sortedCoupons = PhpUnitUtils::callMethod(
+            new CouponManager($stubCouponBaseAdapter),
+            'sortCoupons',
+            array($coupons)
+        );
+
+        // Then
+        $expected = $coupons;
+        $actual = $sortedCoupons;
+
+        $this->assertSame($expected, $actual, 'Coupon cumulative ignored');
+    }
+
+    /**
+     * Testing how multiple Coupon behaviour
+     * Entering 1 Coupon cumulative valid
+     *          1 Coupon cumulative valid
+     *          1 Coupon cumulative valid
+     *          1 Coupon non cumulative valid
+     *
+     * @covers Thelia\Coupon\CouponManager::sortCoupons
+     */
+    public function testCouponCumulationThreeCouponCumulativeOneNonCumulative()
+    {
+        $cartTotalPrice = 100.00;
+        $checkoutTotalPrice = 120.00;
+
+        // Given
+        /** @var CouponInterface $coupon */
+        $couponCumulative1 = $this->generateValidCoupon('XMAS1', null, null, null, null, null, null, null, true);
+        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, null, null, true);
+        $couponCumulative3 = $this->generateValidCoupon('XMAS3', null, null, null, null, null, null, null, true);
+        $couponCumulative4 = $this->generateValidCoupon('XMAS4', null, null, null, null, null, null, null, false);
+
+        $coupons = array($couponCumulative1, $couponCumulative2, $couponCumulative3, $couponCumulative4);
+        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
+
+        // When
+        $sortedCoupons = PhpUnitUtils::callMethod(
+            new CouponManager($stubCouponBaseAdapter),
+            'sortCoupons',
+            array($coupons)
+        );
+
+        // Then
+        $expected = array($couponCumulative4);
+        $actual = $sortedCoupons;
+
+        $this->assertSame($expected, $actual, 'Coupon cumulative ignored');
+    }
+
 
     /**
      * Generate valid CouponRuleInterfaces
      *
      * @return array Array of CouponRuleInterface
      */
-    protected function generateValidRules()
+    public static function generateValidRules()
     {
         $rule1 = new AvailableForTotalAmount(
             array(
@@ -279,6 +673,132 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
      */
     protected function tearDown()
     {
+    }
+
+    /**
+     * Generate a fake Adapter
+     *
+     * @param array $coupons            Coupons
+     * @param float $cartTotalPrice     Cart total price
+     * @param float $checkoutTotalPrice Checkout total price
+     * @param float $postagePrice       Checkout postage price
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    public function generateFakeAdapter(array $coupons, $cartTotalPrice, $checkoutTotalPrice, $postagePrice = 6.00)
+    {
+        $stubCouponBaseAdapter = $this->getMock(
+            'Thelia\Coupon\CouponBaseAdapter',
+            array(
+                'getCurrentCoupons',
+                'getCartTotalPrice',
+                'getCheckoutTotalPrice',
+                'getCheckoutPostagePrice'
+            ),
+            array()
+        );
+
+        $stubCouponBaseAdapter->expects($this->any())
+            ->method('getCurrentCoupons')
+            ->will($this->returnValue(($coupons)));
+
+        // Return Cart product amount = $cartTotalPrice euros
+        $stubCouponBaseAdapter->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue($cartTotalPrice));
+
+        // Return Checkout amount = $checkoutTotalPrice euros
+        $stubCouponBaseAdapter->expects($this->any())
+            ->method('getCheckoutTotalPrice')
+            ->will($this->returnValue($checkoutTotalPrice));
+
+        $stubCouponBaseAdapter->expects($this->any())
+            ->method('getCheckoutPostagePrice')
+            ->will($this->returnValue($postagePrice));
+
+        return $stubCouponBaseAdapter;
+    }
+
+    /**
+     * Generate valid CouponInterface
+     *
+     * @param string               $code                       Coupon Code
+     * @param string               $title                      Coupon Title
+     * @param string               $shortDescription           Coupon short
+     *                                                         description
+     * @param string               $description                Coupon description
+     * @param float                $amount                     Coupon discount
+     * @param bool                 $isEnabled                  Is Coupon enabled
+     * @param \DateTime            $expirationDate             Coupon expiration date
+     * @param CouponRuleCollection $rules                      Coupon rules
+     * @param bool                 $isCumulative               If is cumulative
+     * @param bool                 $isRemovingPostage          If is removing postage
+     * @param bool                 $isAvailableOnSpecialOffers If is available on
+     *                                                         special offers or not
+     * @param int                  $maxUsage                   How many time a Coupon
+     *                                                         can be used
+     *
+     * @return CouponInterface
+     */
+    public static function generateValidCoupon(
+        $code = null,
+        $title = null,
+        $shortDescription = null,
+        $description = null,
+        $amount = null,
+        $isEnabled = null,
+        $expirationDate = null,
+        $rules = null,
+        $isCumulative = null,
+        $isRemovingPostage = null,
+        $isAvailableOnSpecialOffers = null,
+        $maxUsage = null
+    ) {
+        if ($code === null) {
+            $code = self::VALID_CODE;
+        }
+        if ($title === null) {
+            $title = self::VALID_TITLE;
+        }
+        if ($shortDescription === null) {
+            $shortDescription = self::VALID_SHORT_DESCRIPTION;
+        }
+        if ($description === null) {
+            $description = self::VALID_DESCRIPTION;
+        }
+        if ($amount === null) {
+            $amount = 10.00;
+        }
+        if ($isEnabled === null) {
+            $isEnabled = true;
+        }
+        if ($isCumulative === null) {
+            $isCumulative = true;
+        }
+        if ($isRemovingPostage === null) {
+            $isRemovingPostage = false;
+        }
+        if ($isAvailableOnSpecialOffers === null) {
+            $isAvailableOnSpecialOffers = true;
+        }
+        if ($maxUsage === null) {
+            $maxUsage = 40;
+        }
+
+        if ($expirationDate === null) {
+            $expirationDate = new \DateTime();
+            $expirationDate->setTimestamp(strtotime("today + 2 months"));
+        }
+
+        $coupon = new RemoveXAmount($code, $title, $shortDescription, $description, $amount, $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate);
+
+        if ($rules === null) {
+            $rules = self::generateValidRules();
+        }
+
+        $coupon->setRules($rules);
+
+        return $coupon;
     }
 
 }

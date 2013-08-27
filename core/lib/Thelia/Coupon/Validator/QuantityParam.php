@@ -21,57 +21,58 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Parameter;
+namespace Thelia\Coupon\Validator;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Allow to validate parameters
+ * Represent a Quantity
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RuleValidator
+class QuantityParam extends IntegerParam
 {
-    /** @var string Operator ex: Operators::INFERIOR */
-    protected $operator = null;
-
-    /** @var ComparableInterface Validator */
-    protected $param = null;
 
     /**
      * Constructor
      *
-     * @param string              $operator Operator ex: Operators::INFERIOR
-     * @param ComparableInterface $param    Validator ex: PriceParam
+     * @param int $integer Integer
      */
-    function __construct($operator, ComparableInterface $param)
+    public function __construct($integer)
     {
-        $this->operator = $operator;
-        $this->param = $param;
+        if ($integer < 0) {
+            $integer = 0;
+        }
+        $this->integer = $integer;
     }
 
     /**
-     * Get Validator Operator
+     * Compare the current object to the passed $other.
      *
-     * @return string
+     * Returns 0 if they are semantically equal, 1 if the other object
+     * is less than the current one, or -1 if its more than the current one.
+     *
+     * This method should not check for identity using ===, only for semantically equality for example
+     * when two different DateTime instances point to the exact same Date + TZ.
+     *
+     * @param mixed $other Object
+     *
+     * @throws \InvalidArgumentException
+     * @return int
      */
-    public function getOperator()
+    public function compareTo($other)
     {
-        return $this->operator;
-    }
+        if (!is_integer($other) || $other < 0) {
+            throw new \InvalidArgumentException(
+                'IntegerParam can compare only positive int'
+            );
+        }
 
-    /**
-     * Get Validator Param
-     *
-     * @return ComparableInterface
-     */
-    public function getParam()
-    {
-        return $this->param;
+        return parent::compareTo($other);
     }
 
 }

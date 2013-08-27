@@ -21,29 +21,57 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Parameter;
+namespace Thelia\Coupon\Validator;
 
 /**
- * Comparable interface
- * Allows to compare two value objects to each other for similarity.
+ * Created by JetBrains PhpStorm.
+ * Date: 8/19/13
+ * Time: 3:24 PM
  *
- * @author Benjamin Eberlei <kontakt@beberlei.de>
- * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * Allow to validate parameters
+ *
+ * @package Coupon
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ *
  */
-interface ComparableInterface
+class RuleValidator
 {
+    /** @var string Operator ex: Operators::INFERIOR */
+    protected $operator = null;
+
+    /** @var ComparableInterface Validator */
+    protected $param = null;
+
     /**
-     * Compare the current object to the passed $other.
+     * Constructor
      *
-     * Returns 0 if they are semantically equal, 1 if the other object
-     * is less than the current one, or -1 if its more than the current one.
-     *
-     * This method should not check for identity using ===, only for semantically equality for example
-     * when two different DateTime instances point to the exact same Date + TZ.
-     *
-     * @param mixed $other Object
-     *
-     * @return int
+     * @param string              $operator Operator ex: Operators::INFERIOR
+     * @param ComparableInterface $param    Validator ex: PriceParam
      */
-    public function compareTo($other);
+    function __construct($operator, ComparableInterface $param)
+    {
+        $this->operator = $operator;
+        $this->param = $param;
+    }
+
+    /**
+     * Get Validator Operator
+     *
+     * @return string
+     */
+    public function getOperator()
+    {
+        return $this->operator;
+    }
+
+    /**
+     * Get Validator Param
+     *
+     * @return ComparableInterface
+     */
+    public function getParam()
+    {
+        return $this->param;
+    }
+
 }

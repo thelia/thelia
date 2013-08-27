@@ -21,44 +21,64 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Parameter;
-
-use Thelia\Coupon\Parameter\ComparableInterface;
+namespace Thelia\Coupon\Validator;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Represent a DateTime
+ * Represent A repeated DateInterval across the time
+ * Ex :
+ * A duration of 1 month repeated every 2 months 5 times
+ * ---------****----****----****----****----****----****-----------------> time
+ *          1       2       3       4       5       6
+ * 1        : $this->from           Start date of the repetition
+ * ****---- : $this->interval       Duration of a whole cycle
+ * x5       : $this->recurrences    How many repeated cycle, 1st excluded
+ * x6       :                       How many occurrence
+ * ****     : $this->durationInDays Duration of a period
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class DateParam implements ComparableInterface, RuleParameterInterface
+class RepeatedIntervalParam extends RepeatedParam
 {
-    /** @var \DateTime Date  */
-    protected $dateTime = null;
+
+    /** @var int duration of the param */
+    protected $durationInDays = 1;
 
     /**
-     * Constructor
+     * Get how many day a Param is lasting
      *
-     * @param \DateTime $dateTime DateTime
+     * @return int
      */
-    public function __construct(\DateTime $dateTime)
+    public function getDurationInDays()
     {
-        $this->dateTime = $dateTime;
+        return $this->durationInDays;
     }
 
     /**
-     * Get DateTime
+     * Set how many day a Param is lasting
      *
-     * @return \DateTime
+     * @param int $durationInDays How many day a Param is lasting
+     *
+     * @return $this
      */
-    public function getDateTime()
+    public function setDurationInDays($durationInDays = 1)
     {
-        return clone $this->dateTime;
+        $this->durationInDays = $durationInDays;
+
+        return $this;
+    }
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->defaultConstructor();
     }
 
     /**
@@ -78,30 +98,37 @@ class DateParam implements ComparableInterface, RuleParameterInterface
     public function compareTo($other)
     {
         if (!$other instanceof \DateTime) {
-            throw new \InvalidArgumentException('DateParam can compare only DateTime');
+            throw new \InvalidArgumentException('RepeatedIntervalParam can compare only DateTime');
         }
 
         $ret = -1;
-        if ($this->dateTime == $other) {
-            $ret = 0;
-        } elseif ($this->dateTime > $other) {
-            $ret = 1;
-        } else {
-            $ret = -1;
+        $dates = array();
+        /** @var $value \DateTime */
+        foreach ($this->datePeriod as $value) {
+            $dates[$value->getTimestamp()]['startDate'] = $value;
+            $endDate = new \DateTime();
+            $dates[$value->getTimestamp()]['endDate'] = $endDate->setTimestamp(
+                $value->getTimestamp() + ($this->durationInDays * 60 *60 *24)
+            );
+        }
+
+        foreach ($dates as $date) {
+            if ($date['startDate'] <= $other && $other <= $date['endDate']) {
+                return 0;
+            }
         }
 
         return $ret;
+
     }
 
     /**
      * Get Parameter value to test against
      *
-     * @return \Datetime
+     * @return \DatePeriod
      */
     public function getValue()
     {
-        return clone $this->dateTime;
+        return clone $this->datePeriod;
     }
-
-
 }

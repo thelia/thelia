@@ -21,58 +21,23 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Parameter;
+namespace Thelia\Exception;
+
+use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
+use Thelia\Log\Tlog;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Represent a Quantity
+ * Thrown when an Abstract method has not been implemented
  *
- * @package Coupon
+ * @package Exception
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class QuantityParam extends IntegerParam
+class NotImplementedException extends BadMethodCallException
 {
-
-    /**
-     * Constructor
-     *
-     * @param int $integer Integer
-     */
-    public function __construct($integer)
-    {
-        if ($integer < 0) {
-            $integer = 0;
-        }
-        $this->integer = $integer;
-    }
-
-    /**
-     * Compare the current object to the passed $other.
-     *
-     * Returns 0 if they are semantically equal, 1 if the other object
-     * is less than the current one, or -1 if its more than the current one.
-     *
-     * This method should not check for identity using ===, only for semantically equality for example
-     * when two different DateTime instances point to the exact same Date + TZ.
-     *
-     * @param mixed $other Object
-     *
-     * @throws \InvalidArgumentException
-     * @return int
-     */
-    public function compareTo($other)
-    {
-        if (!is_integer($other) || $other < 0) {
-            throw new \InvalidArgumentException(
-                'IntegerParam can compare only positive int'
-            );
-        }
-
-        return parent::compareTo($other);
-    }
 
 }

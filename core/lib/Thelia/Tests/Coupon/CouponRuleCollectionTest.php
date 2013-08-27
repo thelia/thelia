@@ -23,8 +23,8 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Coupon\Parameter\PriceParam;
-use Thelia\Coupon\Parameter\RuleValidator;
+use Thelia\Coupon\Validator\PriceParam;
+use Thelia\Coupon\Validator\RuleValidator;
 use Thelia\Coupon\Rule\AvailableForTotalAmount;
 use Thelia\Coupon\Rule\Operators;
 

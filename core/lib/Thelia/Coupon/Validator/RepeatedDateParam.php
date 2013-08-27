@@ -21,78 +21,80 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
-
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Thelia\Coupon\Rule\CouponRuleInterface;
-use Thelia\Exception\InvalidRuleException;
+namespace Thelia\Coupon\Validator;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage a set of CouponRuleInterface
+ * Represent A repeated Date across the time
+ * Ex :
+ * A date repeated every 1 months 5 times
+ * ---------*---*---*---*---*---*---------------------------> time
+ *          1   2   3   4   5   6
+ * 1    : $this->from        Start date of the repetition
+ * *--- : $this->interval    Duration of a whole cycle
+ * x5   : $this->recurrences How many repeated cycle, 1st excluded
+ * x6   :                    How many occurrence
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponRuleCollection
+class RepeatedDateParam extends RepeatedParam
 {
-    /** @var array Array of CouponRuleInterface */
-    protected $rules = array();
-
     /**
      * Constructor
-     *
-     * @param array $rules Array of CouponRuleInterface
-     *
-     * @throws \Thelia\Exception\InvalidRuleException
      */
-    function __construct(array $rules)
+    public function __construct()
     {
-        foreach ($rules as $rule) {
-            if (!$rule instanceof CouponRuleInterface) {
-                throw new InvalidRuleException(get_class());
+        $this->defaultConstructor();
+    }
+
+    /**
+     * Compare the current object to the passed $other.
+     *
+     * Returns 0 if they are semantically equal, 1 if the other object
+     * is less than the current one, or -1 if its more than the current one.
+     *
+     * This method should not check for identity using ===, only for semantically equality for example
+     * when two different DateTime instances point to the exact same Date + TZ.
+     *
+     * @param mixed $other Object
+     *
+     * @throws \InvalidArgumentException
+     * @return int
+     */
+    public function compareTo($other)
+    {
+        if (!$other instanceof \DateTime) {
+            throw new \InvalidArgumentException('RepeatedDateParam can compare only DateTime');
+        }
+
+        $ret = -1;
+        $dates = array();
+        /** @var $value \DateTime */
+        foreach ($this->datePeriod as $value) {
+            $dates[$value->getTimestamp()] = $value;
+        }
+
+        foreach ($dates as $date) {
+            if ($date == $other) {
+                return 0;
             }
         }
-        $this->rules = $rules;
+
+        return $ret;
     }
 
     /**
-     * Get Rules
+     * Get Parameter value to test against
      *
-     * @return array Array of CouponRuleInterface
+     * @return \DatePeriod
      */
-    public function getRules()
+    public function getValue()
     {
-        return $this->rules;
+        return clone $this->datePeriod;
     }
-
-    /**
-     * Add a CouponRuleInterface to the Collection
-     *
-     * @param CouponRuleInterface $rule Rule
-     *
-     * @return $this
-     */
-    public function add(CouponRuleInterface $rule)
-    {
-        $this->rules[] = $rule;
-
-        return $this;
-    }
-
-    /**
-     * Check if there is at least one rule in the collection
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return isEmpty($this->rules);
-    }
-
-
 }

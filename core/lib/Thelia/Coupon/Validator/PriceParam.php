@@ -21,64 +21,58 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Parameter;
+namespace Thelia\Coupon\Validator;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Represent A repeated DateInterval across the time
- * Ex :
- * A duration of 1 month repeated every 2 months 5 times
- * ---------****----****----****----****----****----****-----------------> time
- *          1       2       3       4       5       6
- * 1        : $this->from           Start date of the repetition
- * ****---- : $this->interval       Duration of a whole cycle
- * x5       : $this->recurrences    How many repeated cycle, 1st excluded
- * x6       :                       How many occurrence
- * ****     : $this->durationInDays Duration of a period
+ * Represent a Price
+ * Positive value with currency
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RepeatedIntervalParam extends RepeatedParam
+class PriceParam extends RuleParameterAbstract
 {
+    /** @var float Positive Float to compare with */
+    protected $price = null;
 
-    /** @var int duration of the param */
-    protected $durationInDays = 1;
-
-    /**
-     * Get how many day a Param is lasting
-     *
-     * @return int
-     */
-    public function getDurationInDays()
-    {
-        return $this->durationInDays;
-    }
-
-    /**
-     * Set how many day a Param is lasting
-     *
-     * @param int $durationInDays How many day a Param is lasting
-     *
-     * @return $this
-     */
-    public function setDurationInDays($durationInDays = 1)
-    {
-        $this->durationInDays = $durationInDays;
-
-        return $this;
-    }
+    /** @var string Currency Code ISO 4217 EUR|USD|GBP */
+    protected $currency = null;
 
     /**
      * Constructor
+     *
+     * @param float  $price    Positive float
+     * @param string $currency Currency Code ISO 4217 EUR|USD|GBP
      */
-    public function __construct()
+    public function __construct($price, $currency)
     {
-        $this->defaultConstructor();
+        $this->price = $price;
+        $this->currency = $currency;
+    }
+
+    /**
+     * Get currency code
+     *
+     * @return string
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * Get price
+     *
+     * @return float
+     */
+    public function getPrice()
+    {
+        return $this->price;
     }
 
     /**
@@ -97,38 +91,33 @@ class RepeatedIntervalParam extends RepeatedParam
      */
     public function compareTo($other)
     {
-        if (!$other instanceof \DateTime) {
-            throw new \InvalidArgumentException('RepeatedIntervalParam can compare only DateTime');
-        }
-
-        $ret = -1;
-        $dates = array();
-        /** @var $value \DateTime */
-        foreach ($this->datePeriod as $value) {
-            $dates[$value->getTimestamp()]['startDate'] = $value;
-            $endDate = new \DateTime();
-            $dates[$value->getTimestamp()]['endDate'] = $endDate->setTimestamp(
-                $value->getTimestamp() + ($this->durationInDays * 60 *60 *24)
+        if (!is_float($other)) {
+            throw new \InvalidArgumentException(
+                'PriceParam can compare only positive float'
             );
         }
 
-        foreach ($dates as $date) {
-            if ($date['startDate'] <= $other && $other <= $date['endDate']) {
-                return 0;
-            }
+        $epsilon = 0.00001;
+
+        $ret = -1;
+        if (abs($this->price - $other) < $epsilon) {
+            $ret = 0;
+        } elseif ($this->price > $other) {
+            $ret = 1;
+        } else {
+            $ret = -1;
         }
 
         return $ret;
-
     }
 
     /**
      * Get Parameter value to test against
      *
-     * @return \DatePeriod
+     * @return float
      */
     public function getValue()
     {
-        return clone $this->datePeriod;
+        return $this->price;
     }
 }

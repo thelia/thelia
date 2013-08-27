@@ -23,13 +23,15 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Coupon\Parameter\PriceParam;
-use Thelia\Coupon\Parameter\RuleValidator;
+use Thelia\Coupon\Validator\PriceParam;
+use Thelia\Coupon\Validator\RuleValidator;
 use Thelia\Coupon\Rule\AvailableForTotalAmount;
-use Thelia\Coupon\Rule\CouponRuleInterface;
 use Thelia\Coupon\Rule\Operators;
+use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\CouponExpiredException;
 use Thelia\Model\Coupon;
+
+require_once 'CouponManagerTest.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -45,89 +47,6 @@ use Thelia\Model\Coupon;
 class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 {
 
-    CONST VALID_SHORT_DESCRIPTION = 'Coupon for Christmas removing 10€ if your total checkout is more than 40€';
-    CONST VALID_DESCRIPTION = '<h3>Lorem ipsum dolor sit amet</h3>Consectetur adipiscing elit. Cras at luctus tellus. Integer turpis mauris, aliquet vitae risus tristique, pellentesque vestibulum urna. Vestibulum sodales laoreet lectus dictum suscipit. Praesent vulputate, sem id varius condimentum, quam magna tempor elit, quis venenatis ligula nulla eget libero. Cras egestas euismod tellus, id pharetra leo suscipit quis. Donec lacinia ac lacus et ultricies. Nunc in porttitor neque. Proin at quam congue, consectetur orci sed, congue nulla. Nulla eleifend nunc ligula, nec pharetra elit tempus quis. Vivamus vel mauris sed est dictum blandit. Maecenas blandit dapibus velit ut sollicitudin. In in euismod mauris, consequat viverra magna. Cras velit velit, sollicitudin commodo tortor gravida, tempus varius nulla.
-
-Donec rhoncus leo mauris, id porttitor ante luctus tempus.
-<script type="text/javascript">
-    alert("I am an XSS attempt!");
-</script>
-Curabitur quis augue feugiat, ullamcorper mauris ac, interdum mi. Quisque aliquam lorem vitae felis lobortis, id interdum turpis mattis. Vestibulum diam massa, ornare congue blandit quis, facilisis at nisl. In tortor metus, venenatis non arcu nec, sollicitudin ornare nisl. Nunc erat risus, varius nec urna at, iaculis lacinia elit. Aenean ut felis tempus, tincidunt odio non, sagittis nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec vitae hendrerit elit. Nunc sit amet gravida risus, euismod lobortis massa. Nam a erat mauris. Nam a malesuada lorem. Nulla id accumsan dolor, sed rhoncus tellus. Quisque dictum felis sed leo auctor, at volutpat lectus viverra. Morbi rutrum, est ac aliquam imperdiet, nibh sem sagittis justo, ac mattis magna lacus eu nulla.
-
-Duis interdum lectus nulla, nec pellentesque sapien condimentum at. Suspendisse potenti. Sed eu purus tellus. Nunc quis rhoncus metus. Fusce vitae tellus enim. Interdum et malesuada fames ac ante ipsum primis in faucibus. Etiam tempor porttitor erat vitae iaculis. Sed est elit, consequat non ornare vitae, vehicula eget lectus. Etiam consequat sapien mauris, eget consectetur magna imperdiet eget. Nunc sollicitudin luctus velit, in commodo nulla adipiscing fermentum. Fusce nisi sapien, posuere vitae metus sit amet, facilisis sollicitudin dui. Fusce ultricies auctor enim sit amet iaculis. Morbi at vestibulum enim, eget adipiscing eros.
-
-Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentesque elit erat, lacinia sed semper ac, sagittis vel elit. Nam eu convallis est. Curabitur rhoncus odio vitae consectetur pellentesque. Nam vitae arcu nec ante scelerisque dignissim vel nec neque. Suspendisse augue nulla, mollis eget dui et, tempor facilisis erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ac diam ipsum. Donec convallis dui ultricies velit auctor, non lobortis nulla ultrices. Morbi vitae dignissim ante, sit amet lobortis tortor. Nunc dapibus condimentum augue, in molestie neque congue non.
-
-Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.';
-
-    /**
-     * Generate valid CouponInterface
-     *
-     * @param $code
-     * @param $type
-     * @param $title
-     * @param $shortDescription
-     * @param $description
-     * @param $amount
-     * @param $isUsed
-     * @param $isEnabled
-     * @param $expirationDate
-     * @param $rules
-     * @param $isCumulative
-     * @param $isRemovingPostage
-     *
-     * @return CouponInterface
-     */
-    public function generateValidCoupon(
-        $code = 'XMAS1',
-        $type = '\Thelia\Coupon\Type\RemoveXAmount',
-        $title = 'Christmas coupon',
-        $shortDescription = self::VALID_SHORT_DESCRIPTION,
-        $description = self::VALID_DESCRIPTION,
-        $amount = 10.00,
-        $isUsed = 1,
-        $isEnabled = 1,
-        $expirationDate = null,
-        $rules = null,
-        $isCumulative = 1,
-        $isRemovingPostage = 0
-    ) {
-        $coupon = new Coupon();
-        $coupon->setCode($code);
-        $coupon->setType($type);
-        $coupon->setTitle($title);
-        $coupon->setShortDescription($shortDescription);
-        $coupon->setDescription($description);
-        $coupon->setAmount($amount);
-        $coupon->setIsUsed($isUsed);
-        $coupon->setIsEnabled($isEnabled);
-
-        if ($expirationDate === null) {
-            $date = new \DateTime();
-            $coupon->setExpirationDate(
-                $date->setTimestamp(strtotime("today + 2 months"))
-            );
-        }
-
-        if ($rules === null) {
-            $rules = $this->generateValidRules();
-        }
-
-        $couponFactory = new CouponFactory(new CouponBaseAdapter());
-        $serializedData = $couponFactory->convertRulesInstancesIntoSerialized(
-            $rules
-        );
-
-        $coupon->setSerializedRulesType($serializedData['rulesType']);
-        $coupon->setSerializedRulesContent($serializedData['rulesContent']);
-
-        $coupon->setIsCumulative($isCumulative);
-        $coupon->setIsRemovingPostage($isRemovingPostage);
-
-        return $coupon;
-    }
-
-
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -136,38 +55,37 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     {
     }
 
-
-
     /**
      * Fake CouponQuery->findByCode
      *
-     * @param string $code
-     * @param string $type
-     * @param string $title
-     * @param string $shortDescription
-     * @param string $description
-     * @param float $amount
-     * @param int $isUsed
-     * @param int $isEnabled
-     * @param null $expirationDate
-     * @param null $rules
-     * @param int $isCumulative
-     * @param int $isRemovingPostage
+     * @param string               $code              Coupon code
+     * @param string               $type              Coupon type (object)
+     * @param string               $title             Coupon title
+     * @param string               $shortDescription  Coupon short description
+     * @param string               $description       Coupon description
+     * @param float                $amount            Coupon amount
+     * @param bool                 $isUsed            If Coupon has been used yet
+     * @param bool                 $isEnabled         If Coupon is enabled
+     * @param \DateTime            $expirationDate    When Coupon expires
+     * @param CouponRuleCollection $rules             Coupon rules
+     * @param bool                 $isCumulative      If Coupon is cumulative
+     * @param bool                 $isRemovingPostage If Coupon is removing postage
+     *
      * @return Coupon
      */
     public function generateCouponModelMock(
-        $code,
-        $type,
-        $title,
-        $shortDescription,
-        $description,
-        $amount,
-        $isUsed,
-        $isEnabled,
-        $expirationDate,
-        $rules,
-        $isCumulative,
-        $isRemovingPostage
+        $code = null,
+        $type = null,
+        $title = null,
+        $shortDescription = null,
+        $description = null,
+        $amount = null,
+        $isUsed = null,
+        $isEnabled = null,
+        $expirationDate = null,
+        $rules = null,
+        $isCumulative = null,
+        $isRemovingPostage = null
     ) {
         $coupon = $this->generateValidCoupon(
             $code,
@@ -200,8 +118,10 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
 
     /**
+     * Test if an expired Coupon is build or not (superior)
+     *
      * @covers Thelia\Coupon\CouponFactory::buildCouponFromCode
-     * @expectedException Thelia\Exception\CouponExpiredException
+     * @expectedException \Thelia\Exception\CouponExpiredException
      */
     public function testBuildCouponFromCodeExpiredDateBefore()
     {
@@ -215,8 +135,10 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     }
 
     /**
+     * Test if an expired Coupon is build or not (equal)
+     *
      * @covers Thelia\Coupon\CouponFactory::buildCouponFromCode
-     * @expectedException Thelia\Exception\CouponExpiredException
+     * @expectedException \Thelia\Exception\CouponExpiredException
      */
     public function testBuildCouponFromCodeExpiredDateEquals()
     {
@@ -229,6 +151,22 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     }
 
     /**
+     * Test if an expired Coupon is build or not (equal)
+     *
+     * @covers Thelia\Coupon\CouponFactory::buildCouponFromCode
+     * @expectedException \Thelia\Exception\InvalidRuleException
+     */
+    public function testBuildCouponFromCodeWithoutRule()
+    {
+        /** @var CouponAdapterInterface $mockAdapter */
+        $mockAdapter = $this->generateCouponModelMock(null, null, null, null, null, null, null, null, null, new CouponRuleCollection(array()));
+        $couponFactory = new CouponFactory($mockAdapter);
+        $coupon = $couponFactory->buildCouponFromCode('XMAS1');
+    }
+
+    /**
+     * Test if a CouponInterface can be built from database
+     *
      * @covers Thelia\Coupon\CouponFactory::buildCouponFromCode
      */
     public function testBuildCouponFromCode()
@@ -236,15 +174,32 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         /** @var CouponAdapterInterface $mockAdapter */
         $mockAdapter = $this->generateCouponModelMock();
         $couponFactory = new CouponFactory($mockAdapter);
+        /** @var CouponInterface $coupon */
         $coupon = $couponFactory->buildCouponFromCode('XMAS1');
 
-        $CouponManager = new CouponManager($mockAdapter)
+        $this->assertEquals('XMAS1', $coupon->getCode());
+        $this->assertEquals('Thelia\Coupon\Type\RemoveXAmount', get_class($coupon));
+        $this->assertEquals(CouponManagerTest::VALID_TITLE, $coupon->getTitle());
+        $this->assertEquals(CouponManagerTest::VALID_SHORT_DESCRIPTION, $coupon->getShortDescription());
+        $this->assertEquals(CouponManagerTest::VALID_DESCRIPTION, $coupon->getDescription());
+        $this->assertEquals(10.00, $coupon->getDiscount());
+        $this->assertEquals(1, $coupon->isEnabled());
+
+        $date = new \DateTime();
+        $date->setTimestamp(strtotime("today + 2 months"));
+        $this->assertEquals($date, $coupon->getExpirationDate());
+
+        $rules = $this->generateValidRules();
+        $this->assertEquals($rules, $coupon->getRules());
+
+        $this->assertEquals(1, $coupon->isCumulative());
+        $this->assertEquals(0, $coupon->isRemovingPostage());
     }
 
     /**
      * Generate valid CouponRuleInterfaces
      *
-     * @return array Array of CouponRuleInterface
+     * @return CouponRuleCollection Set of CouponRuleInterface
      */
     protected function generateValidRules()
     {
@@ -270,9 +225,109 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
                 )
             )
         );
-        $rules = array($rule1, $rule2);
+        $rules = new CouponRuleCollection(array($rule1, $rule2));
 
         return $rules;
+    }
+
+    /**
+     * Generate valid CouponInterface
+     *
+     * @param string               $code              Coupon code
+     * @param string               $type              Coupon type (object)
+     * @param string               $title             Coupon title
+     * @param string               $shortDescription  Coupon short description
+     * @param string               $description       Coupon description
+     * @param float                $amount            Coupon amount
+     * @param bool                 $isUsed            If Coupon has been used yet
+     * @param bool                 $isEnabled         If Coupon is enabled
+     * @param \DateTime            $expirationDate    When Coupon expires
+     * @param CouponRuleCollection $rules             Coupon rules
+     * @param bool                 $isCumulative      If Coupon is cumulative
+     * @param bool                 $isRemovingPostage If Coupon is removing postage
+     *
+     * @return Coupon
+     */
+    public function generateValidCoupon(
+        $code = null,
+        $type = null,
+        $title = null,
+        $shortDescription = null,
+        $description = null,
+        $amount = null,
+        $isUsed = null,
+        $isEnabled = null,
+        $expirationDate = null,
+        $rules = null,
+        $isCumulative = null,
+        $isRemovingPostage = null
+    ) {
+        $coupon = new Coupon();
+
+        if ($code === null) {
+            $code = 'XMAS1';
+        }
+        $coupon->setCode($code);
+
+        if ($type === null) {
+            $type = 'Thelia\Coupon\Type\RemoveXAmount';
+        }
+        $coupon->setType($type);
+
+        if ($title === null) {
+            $title = CouponManagerTest::VALID_TITLE;
+        }
+        $coupon->setTitle($title);
+
+        if ($shortDescription === null) {
+            $shortDescription = CouponManagerTest::VALID_SHORT_DESCRIPTION;
+        }
+        $coupon->setShortDescription($shortDescription);
+
+        if ($description === null) {
+            $description = CouponManagerTest::VALID_DESCRIPTION;
+        }
+        $coupon->setDescription($description);
+
+        if ($amount === null) {
+            $amount = 10.00;
+        }
+        $coupon->setAmount($amount);
+
+        if ($isUsed === null) {
+            $isUsed = 1;
+        }
+        $coupon->setIsUsed($isUsed);
+
+        if ($isEnabled === null) {
+            $isEnabled = 1;
+        }
+        $coupon->setIsEnabled($isEnabled);
+
+        if ($isCumulative === null) {
+            $isCumulative = 1;
+        }
+        if ($isRemovingPostage === null) {
+            $isRemovingPostage = 0;
+        }
+
+        if ($expirationDate === null) {
+            $date = new \DateTime();
+            $coupon->setExpirationDate(
+                $date->setTimestamp(strtotime("today + 2 months"))
+            );
+        }
+
+        if ($rules === null) {
+            $rules = $this->generateValidRules();
+        }
+
+        $coupon->setSerializedRules(base64_encode(serialize($rules)));
+
+        $coupon->setIsCumulative($isCumulative);
+        $coupon->setIsRemovingPostage($isRemovingPostage);
+
+        return $coupon;
     }
 
     /**

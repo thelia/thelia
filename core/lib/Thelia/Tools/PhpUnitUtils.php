@@ -39,11 +39,11 @@ class PhpUnitUtils
     /**
      * Allow to call a protected methods
      *
-     * @param string $obj  Class name + namespace
+     * @param Object $obj  Class name + namespace
      * @param string $name Method name
      * @param array  $args Method arguments
      *
-     * @return protected method result
+     * @return mixed protected method result
      */
     public static function callMethod($obj, $name, array $args)
     {

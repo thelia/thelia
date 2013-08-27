@@ -171,7 +171,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 
     /**
      *
-     * @covers Thelia\Coupon\Type\RemoveXPercent::getEffect
+     * @covers Thelia\Coupon\Type\RemoveXPercent::getDiscount
      *
      */
     public function testGetEffect()
@@ -180,7 +180,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
         $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
 
         $expected = -30.00;
-        $actual = $coupon->getEffect();
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 

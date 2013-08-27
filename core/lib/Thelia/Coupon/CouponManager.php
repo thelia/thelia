@@ -70,16 +70,20 @@ class CouponManager
 
         if (count($this->coupons) > 0) {
             $couponsKept = $this->sortCoupons($this->coupons);
+
             $isRemovingPostage = $this->isCouponRemovingPostage($couponsKept);
+
+            $discount = $this->getEffect($couponsKept);
 
             if ($isRemovingPostage) {
                 $postage = $this->adapter->getCheckoutPostagePrice();
-                $discount -= $postage;
+                $discount += $postage;
             }
 
             // Just In Case test
-            if ($discount >= $this->adapter->getCheckoutTotalPrice()) {
-                $discount = 0.00;
+            $checkoutTotalPrice = $this->adapter->getCartTotalPrice();
+            if ($discount >= $checkoutTotalPrice) {
+                $discount = $checkoutTotalPrice;
             }
         }
 
@@ -144,6 +148,34 @@ class CouponManager
             }
         }
 
+        $coupons = $couponsKept;
+        $couponsKept = array();
+
+        /** @var CouponInterface $coupon */
+        foreach ($coupons as $coupon) {
+            if ($coupon->isMatching($this->adapter)) {
+                $couponsKept[] = $coupon;
+            }
+        }
+
         return $couponsKept;
+    }
+
+    /**
+     * Process given Coupon in order to get their cumulative effects
+     *
+     * @param array $coupons CouponInterface to process
+     *
+     * @return float discount
+     */
+    protected function getEffect(array $coupons)
+    {
+        $discount = 0.00;
+        /** @var CouponInterface $coupon */
+        foreach ($coupons as $coupon) {
+            $discount += $coupon->getDiscount($this->adapter);
+        }
+
+        return $discount;
     }
 }

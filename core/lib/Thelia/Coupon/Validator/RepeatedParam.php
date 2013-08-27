@@ -21,7 +21,7 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Parameter;
+namespace Thelia\Coupon\Validator;
 
 use DateInterval;
 use DatePeriod;
@@ -38,7 +38,7 @@ use DateTime;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-abstract class RepeatedParam implements ComparableInterface, RuleParameterInterface
+abstract class RepeatedParam extends RuleParameterAbstract
 {
     /** @var DateTime The start date of the period. */
     protected $from = null;

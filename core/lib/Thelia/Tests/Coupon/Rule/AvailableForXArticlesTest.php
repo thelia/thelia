@@ -52,11 +52,11 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         /** @var CouponAdapterInterface $stubTheliaAdapter */
        $stubTheliaAdapter = $this->getMock(
            'CouponBaseAdapter',
-           array('getNbArticlesInTheCart'),
+           array('getNbArticlesInCart'),
            array()
        );
         $stubTheliaAdapter->expects($this->any())
-            ->method('getNbArticlesInTheCart')
+            ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
 
         return $stubTheliaAdapter;
@@ -73,7 +73,7 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
 
         $validators = array(4);
-        $validated = array($stubTheliaAdapter->getNbArticlesInTheCart());
+        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
         $rule = new AvailableForXArticles($validators, $validated);
 
         $expected = true;
@@ -92,7 +92,7 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
 
         $validators = array(4.5);
-        $validated = array($stubTheliaAdapter->getNbArticlesInTheCart());
+        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
         $rule = new AvailableForXArticles($validators, $validated);
 
         $expected = false;
@@ -100,7 +100,7 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
 
         $validators = array(-1);
-        $validated = array($stubTheliaAdapter->getNbArticlesInTheCart());
+        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
         $rule = new AvailableForXArticles($validators, $validated);
 
         $expected = false;
@@ -108,7 +108,7 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
 
         $validators = array('bad');
-        $validated = array($stubTheliaAdapter->getNbArticlesInTheCart());
+        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
         $rule = new AvailableForXArticles($validators, $validated);
 
         $expected = false;
@@ -129,7 +129,7 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
 
         $validators = array(4);
-        $validated = array($stubTheliaAdapter->getNbArticlesInTheCart());
+        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
         $rule = new AvailableForXArticles($validators, $validated);
 
         $expected = true;
@@ -148,7 +148,7 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
 
         $validators = array(4.5);
-        $validated = array($stubTheliaAdapter->getNbArticlesInTheCart());
+        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
         $rule = new AvailableForXArticles($validators, $validated);
 
         $expected = false;
@@ -156,7 +156,7 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
 
         $validators = array(-1);
-        $validated = array($stubTheliaAdapter->getNbArticlesInTheCart());
+        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
         $rule = new AvailableForXArticles($validators, $validated);
 
         $expected = false;
@@ -164,7 +164,7 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
 
         $validators = array('bad');
-        $validated = array($stubTheliaAdapter->getNbArticlesInTheCart());
+        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
         $rule = new AvailableForXArticles($validators, $validated);
 
         $expected = false;
@@ -183,7 +183,7 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
 
         $validators = array(4);
-        $validated = array($stubTheliaAdapter->getNbArticlesInTheCart());
+        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
         $rule = new AvailableForXArticles($validators, $validated);
 
         $expected = true;
@@ -202,7 +202,7 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
 
         $validators = array(5);
-        $validated = array($stubTheliaAdapter->getNbArticlesInTheCart());
+        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
         $rule = new AvailableForXArticles($validators, $validated);
 
         $expected = true;
@@ -221,7 +221,7 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
 
         $validators = array(3);
-        $validated = array($stubTheliaAdapter->getNbArticlesInTheCart());
+        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
         $rule = new AvailableForXArticles($validators, $validated);
 
         $expected = false;

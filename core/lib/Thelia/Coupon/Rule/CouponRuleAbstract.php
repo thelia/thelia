@@ -25,8 +25,8 @@ namespace Thelia\Coupon\Rule;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Coupon\CouponAdapterInterface;
-use Thelia\Coupon\Parameter\ComparableInterface;
-use Thelia\Coupon\Parameter\RuleValidator;
+use Thelia\Coupon\Validator\ComparableInterface;
+use Thelia\Coupon\Validator\RuleValidator;
 use Thelia\Exception\InvalidRuleException;
 use Thelia\Exception\InvalidRuleOperatorException;
 
@@ -72,14 +72,12 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
      *
      * @param array $validators Array of RuleValidator
      *                          validating $paramsToValidate against
-     * @param array $validated  Parameters to be paramsToValidate
      *
      * @throws InvalidRuleException
      */
-    public function __construct(array $validators, array $validated = null)
+    public function __construct(array $validators)
     {
         $this->setValidators($validators);
-        $this->paramsToValidate = $validated;
     }
 
     /**
@@ -106,10 +104,14 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     /**
      * Check if the current Checkout matches this condition
      *
+     * @param CouponAdapterInterface $adapter allowing to gather
+     *                               all necessary Thelia variables
+     *
      * @return bool
      */
-    public function isMatching()
+    public function isMatching(CouponAdapterInterface $adapter)
     {
+        $this->setParametersToValidate($adapter);
         $this->checkBackOfficeInput();
         $this->checkCheckoutInput();
 
@@ -118,10 +120,10 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
         foreach ($this->validators as $param => $validator) {
             $a = $this->paramsToValidate[$param];
             $operator = $validator->getOperator();
-            /** @var ComparableInterface, RuleParameterInterface $b */
+            /** @var ComparableInterface, RuleParameterAbstract $b */
             $b = $validator->getParam();
 
-            if (!Operators::isValidAccordingToOperator($a, $operator, $b)) {
+            if (!Operators::isValid($a, $operator, $b)) {
                 $isMatching = false;
             }
         }
@@ -161,34 +163,17 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     }
 
     /**
-     * Generate current Rule validator from adapter
-     *
-     * @param CouponAdapterInterface $adapter allowing to gather
-     *                               all necessary Thelia variables
-     *
-     * @throws \Symfony\Component\Intl\Exception\NotImplementedException
-     * @return $this
-     */
-    protected function setValidatorsFromAdapter(CouponAdapterInterface $adapter)
-    {
-        throw new NotImplementedException(
-            'CouponRuleInterface::setValidators needs to be implemented'
-        );
-    }
-
-    /**
      * Generate current Rule param to be validated from adapter
      *
      * @param CouponAdapterInterface $adapter allowing to gather
      *                               all necessary Thelia variables
      *
-     * @throws \Symfony\Component\Intl\Exception\NotImplementedException
+     * @throws \Thelia\Exception\NotImplementedException
      * @return $this
      */
     protected function setParametersToValidate(CouponAdapterInterface $adapter)
     {
-        throw new NotImplementedException(
-            'CouponRuleInterface::setValidators needs to be implemented'
-        );
+        throw new \Thelia\Exception\NotImplementedException();
     }
+
 }

@@ -21,35 +21,43 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Parameter;
+namespace Thelia\Coupon\Validator;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Represent A repeated Date across the time
- * Ex :
- * A date repeated every 1 months 5 times
- * ---------*---*---*---*---*---*---------------------------> time
- *          1   2   3   4   5   6
- * 1    : $this->from        Start date of the repetition
- * *--- : $this->interval    Duration of a whole cycle
- * x5   : $this->recurrences How many repeated cycle, 1st excluded
- * x6   :                    How many occurrence
+ * Represent an DateTime period
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RepeatedDateParam extends RepeatedParam
+class IntervalParam extends RuleParameterAbstract
 {
+    /** @var \DatePeriod Date period  */
+    protected $datePeriod = null;
+
     /**
      * Constructor
+     *
+     * @param \DateTime     $start    Start interval
+     * @param \DateInterval $interval Period
      */
-    public function __construct()
+    public function __construct(\DateTime $start, \DateInterval $interval)
     {
-        $this->defaultConstructor();
+        $this->datePeriod = new \DatePeriod($start, $interval, 1);
+    }
+
+    /**
+     * Get DatePeriod
+     *
+     * @return \DatePeriod
+     */
+    public function getDatePeriod()
+    {
+        return clone $this->datePeriod;
     }
 
     /**
@@ -69,20 +77,30 @@ class RepeatedDateParam extends RepeatedParam
     public function compareTo($other)
     {
         if (!$other instanceof \DateTime) {
-            throw new \InvalidArgumentException('RepeatedDateParam can compare only DateTime');
+            throw new \InvalidArgumentException('IntervalParam can compare only DateTime');
+        }
+
+        /** @var \DateTime Start Date */
+        $startDate = null;
+        /** @var \DateTime End Date */
+        $endDate = null;
+
+        foreach ($this->datePeriod as $key => $value) {
+            if ($key == 0) {
+                $startDate = $value;
+            }
+            if ($key == 1) {
+                $endDate = $value;
+            }
         }
 
         $ret = -1;
-        $dates = array();
-        /** @var $value \DateTime */
-        foreach ($this->datePeriod as $value) {
-            $dates[$value->getTimestamp()] = $value;
-        }
-
-        foreach ($dates as $date) {
-            if ($date == $other) {
-                return 0;
-            }
+        if ($startDate <= $other && $other <= $endDate) {
+            $ret = 0;
+        } elseif ($startDate > $other) {
+            $ret = 1;
+        } else {
+            $ret = -1;
         }
 
         return $ret;

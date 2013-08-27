@@ -23,7 +23,7 @@
 
 namespace Thelia\Coupon\Rule;
 
-use Thelia\Coupon\Parameter\ComparableInterface;
+use Thelia\Coupon\Validator\ComparableInterface;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -60,7 +60,7 @@ abstract class Operators
      *
      * @return bool
      */
-    public static function isValidAccordingToOperator($a, $operator, ComparableInterface $b)
+    public static function isValid($a, $operator, ComparableInterface $b)
     {
         $ret = false;
 

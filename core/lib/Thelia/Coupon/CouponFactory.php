@@ -25,8 +25,8 @@ namespace Thelia\Coupon;
 
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Coupon\Type\RemoveXAmount;
 use Thelia\Exception\CouponExpiredException;
+use Thelia\Exception\InvalidRuleException;
 use Thelia\Model\Coupon;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
@@ -79,7 +79,15 @@ class CouponFactory
             throw new CouponExpiredException($couponCode);
         }
 
-        return $this->buildCouponInterfacFromModel($couponModel);
+        /** @var CouponInterface $couponInterface */
+        $couponInterface = $this->buildCouponInterfacFromModel($couponModel);
+        if ($couponInterface->getRules()->isEmpty()) {
+            throw new InvalidRuleException(
+                get_class($couponInterface)
+            );
+        }
+
+        return $couponInterface;
     }
 
     /**

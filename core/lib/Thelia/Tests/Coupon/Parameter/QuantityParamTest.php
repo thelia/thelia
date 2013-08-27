@@ -24,7 +24,7 @@
 namespace Thelia\Coupon;
 
 use InvalidArgumentException;
-use Thelia\Coupon\Parameter\QuantityParam;
+use Thelia\Coupon\Validator\QuantityParam;
 
 /**
  * Created by JetBrains PhpStorm.

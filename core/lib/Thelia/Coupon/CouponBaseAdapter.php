@@ -23,6 +23,8 @@
 
 namespace Thelia\Coupon;
 
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
@@ -94,9 +96,9 @@ class CouponBaseAdapter implements CouponAdapterInterface
      *
      * @return float
      */
-    public function getCheckoutTotalPriceWithoutDiscountAndPostagePrice()
+    public function getCartTotalPrice()
     {
-        // TODO: Implement getCheckoutTotalPriceWithoutDiscountAndPostagePrice() method.
+        // TODO: Implement getCartTotalPrice() method.
     }
 
     /**
@@ -104,9 +106,9 @@ class CouponBaseAdapter implements CouponAdapterInterface
      *
      * @return int
      */
-    public function getNbArticlesInTheCart()
+    public function getNbArticlesInCart()
     {
-        // TODO: Implement getNbArticlesInTheCart() method.
+        // TODO: Implement getNbArticlesInCart() method.
     }
 
     /**
@@ -158,7 +160,7 @@ class CouponBaseAdapter implements CouponAdapterInterface
 //        $couponModel->setTitle($coupon->getTitle());
 //        $couponModel->setShortDescription($coupon->getShortDescription());
 //        $couponModel->setDescription($coupon->getDescription());
-//        $couponModel->setAmount($coupon->getEffect());
+//        $couponModel->setAmount($coupon->getDiscount());
 //        $couponModel->setIsUsed(0);
 //        $couponModel->setIsEnabled(1);
 //        $couponModel->set
@@ -170,5 +172,23 @@ class CouponBaseAdapter implements CouponAdapterInterface
 //        $couponModel->set
     }
 
+    /**
+     * Return plateform Container
+     *
+     * @return Container
+     */
+    public function getContainer()
+    {
+        // TODO: Implement getCheckoutPostagePrice() method.
+    }
 
+    /**
+     * Return platform TranslatorInterface
+     *
+     * @return TranslatorInterface
+     */
+    public function getTranslator()
+    {
+        return $this->getContainer()->get('thelia.translator');
+    }
 }

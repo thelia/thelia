@@ -28,13 +28,13 @@ namespace Thelia\Coupon;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test RemoveXPercenForCategoryY Class
+ * Unit Test RemoveXPercentForCategoryY Class
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveXPercenForCategoryYTest extends \PHPUnit_Framework_TestCase
+class RemoveXPercentForCategoryYTest extends \PHPUnit_Framework_TestCase
 {
 
     /**

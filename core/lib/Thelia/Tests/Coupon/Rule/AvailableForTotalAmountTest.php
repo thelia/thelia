@@ -23,8 +23,8 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Coupon\Parameter\PriceParam;
-use Thelia\Coupon\Parameter\RuleValidator;
+use Thelia\Coupon\Validator\PriceParam;
+use Thelia\Coupon\Validator\RuleValidator;
 use Thelia\Coupon\Rule\AvailableForTotalAmount;
 use Thelia\Coupon\Rule\Operators;
 use Thelia\Exception\InvalidRuleOperatorException;
@@ -52,6 +52,11 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     {
     }
 
+    /**
+     * Generate valid CouponBaseAdapter
+     *
+     * @return CouponAdapterInterface
+     */
     protected function generateValidCouponBaseAdapterMock()
     {
         /** @var CouponAdapterInterface $stubTheliaAdapter */
@@ -130,7 +135,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     /**
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::checkBackOfficeInput
-     * @expectedException ErrorException
+     * @expectedException \ErrorException
      *
      */
     public function testInValidBackOfficeInputValue()

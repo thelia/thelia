@@ -23,10 +23,13 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Coupon\Parameter\PriceParam;
+use Thelia\Coupon\Validator\PriceParam;
+use Thelia\Coupon\Validator\RuleValidator;
 use Thelia\Coupon\Rule\AvailableForTotalAmount;
 use Thelia\Coupon\Rule\Operators;
 use Thelia\Coupon\Type\RemoveXAmount;
+
+require_once '../CouponManagerTest.php';
 
 /**
  * Created by JetBrains PhpStorm.
@@ -41,11 +44,6 @@ use Thelia\Coupon\Type\RemoveXAmount;
  */
 class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 {
-
-    CONST VALID_COUPON_CODE = 'XMAS';
-    CONST VALID_COUPON_TITLE = 'XMAS Coupon';
-    CONST VALID_COUPON_SHORT_DESCRIPTION = 'Coupon for christmas';
-    CONST VALID_COUPON_DESCRIPTION = '<h1>Lorem</h1><span>ipsum</span>';
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -53,37 +51,6 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
 
-    }
-
-
-    protected function generateValidCumulativeRemovingPostageCoupon()
-    {
-        $coupon = new RemoveXAmount(
-            self::VALID_COUPON_CODE,
-            self::VALID_COUPON_TITLE,
-            self::VALID_COUPON_SHORT_DESCRIPTION,
-            self::VALID_COUPON_DESCRIPTION,
-            30.00,
-            true,
-            true
-        );
-
-        return $coupon;
-    }
-
-    protected function generateValidNonCumulativeNonRemovingPostageCoupon()
-    {
-        $coupon = new RemoveXAmount(
-            self::VALID_COUPON_CODE,
-            self::VALID_COUPON_TITLE,
-            self::VALID_COUPON_SHORT_DESCRIPTION,
-            self::VALID_COUPON_DESCRIPTION,
-            30.00,
-            false,
-            false
-        );
-
-        return $coupon;
     }
 
     /**
@@ -96,27 +63,24 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testDisplay()
     {
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, true, true);
 
-        $coupon = $this->generateValidCumulativeRemovingPostageCoupon();
-
-        $expected = self::VALID_COUPON_CODE;
+        $expected = CouponManagerTest::VALID_CODE;
         $actual = $coupon->getCode();
         $this->assertEquals($expected, $actual);
 
-        $expected = self::VALID_COUPON_TITLE;
+        $expected = CouponManagerTest::VALID_TITLE;
         $actual = $coupon->getTitle();
         $this->assertEquals($expected, $actual);
 
-        $expected = self::VALID_COUPON_SHORT_DESCRIPTION;
+        $expected = CouponManagerTest::VALID_SHORT_DESCRIPTION;
         $actual = $coupon->getShortDescription();
         $this->assertEquals($expected, $actual);
 
-        $expected = self::VALID_COUPON_DESCRIPTION;
+        $expected = CouponManagerTest::VALID_DESCRIPTION;
         $actual = $coupon->getDescription();
         $this->assertEquals($expected, $actual);
-
     }
-
 
     /**
      *
@@ -126,7 +90,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     public function testIsCumulative()
     {
 
-        $coupon = $this->generateValidCumulativeRemovingPostageCoupon();
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, true, true);
 
         $actual = $coupon->isCumulative();
         $this->assertTrue($actual);
@@ -140,7 +104,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     public function testIsNotCumulative()
     {
 
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         $actual = $coupon->isCumulative();
         $this->assertFalse($actual);
@@ -154,8 +118,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsRemovingPostage()
     {
-
-        $coupon = $this->generateValidCumulativeRemovingPostageCoupon();
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, true, true);
 
         $actual = $coupon->isRemovingPostage();
         $this->assertTrue($actual);
@@ -169,7 +132,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     public function testIsNotRemovingPostage()
     {
 
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         $actual = $coupon->isRemovingPostage();
         $this->assertFalse($actual);
@@ -184,42 +147,12 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     public function testGetEffect()
     {
 
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
-        $expected = -30.00;
-        $actual = $coupon->getEffect();
+        $expected = 10;
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
-
-    /**
-     *
-     * @covers Thelia\Coupon\type\RemoveXAmount::addRule
-     * @covers Thelia\Coupon\type\RemoveXAmount::getRules
-     *
-     */
-    public function testAddRuleValid()
-    {
-        // Given
-        $rule1 = $this->generateValideRuleAvailableForTotalAmountOperatorTo(
-            Operators::INFERIOR,
-            100.23
-        );
-        $rule2 = $this->generateValideRuleAvailableForTotalAmountOperatorTo(
-            Operators::SUPERIOR,
-            421.23
-        );
-
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
-
-        // When
-        $coupon->addRule($rule1)
-            ->addRule($rule2);
-
-        // Then
-        $expected = 2;
-        $this->assertCount($expected, $coupon->getRules());
-    }
-
 
     /**
      *
@@ -230,29 +163,27 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     public function testSetRulesValid()
     {
         // Given
-        $rule0 = $this->generateValideRuleAvailableForTotalAmountOperatorTo(
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::EQUAL,
             20.00
         );
-        $rule1 = $this->generateValideRuleAvailableForTotalAmountOperatorTo(
+        $rule1 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::INFERIOR,
             100.23
         );
-        $rule2 = $this->generateValideRuleAvailableForTotalAmountOperatorTo(
+        $rule2 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::SUPERIOR,
             421.23
         );
 
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
-        $coupon->addRule($rule0)
-            ->setRules(array($rule1, $rule2));
-
+        $coupon->setRules(new CouponRuleCollection(array($rule0, $rule1, $rule2)));
 
         // Then
-        $expected = 2;
-        $this->assertCount($expected, $coupon->getRules());
+        $expected = 3;
+        $this->assertCount($expected, $coupon->getRules()->getRules());
     }
 
     /**
@@ -264,21 +195,20 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     public function testSetRulesInvalid()
     {
         // Given
-        $rule0 = $this->generateValideRuleAvailableForTotalAmountOperatorTo(
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::EQUAL,
             20.00
         );
-        $rule1 = $this->generateValideRuleAvailableForTotalAmountOperatorTo(
+        $rule1 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::INFERIOR,
             100.23
         );
         $rule2 = $this;
 
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
-        $coupon->addRule($rule0)
-            ->setRules(array($rule1, $rule2));
+        $coupon->setRules(new CouponRuleCollection(array($rule0, $rule1, $rule2)));
     }
 
     /**
@@ -289,18 +219,18 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     public function testGetEffectIfTotalAmountInferiorTo400Valid()
     {
         // Given
-        $rule0 = $this->generateValideRuleAvailableForTotalAmountOperatorTo(
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::INFERIOR,
             400.00
         );
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
-        $coupon->addRule($rule0);
+        $coupon->setRules(new CouponRuleCollection(array($rule0)));
 
         // Then
-        $expected = -30.00;
-        $actual = $coupon->getEffect();
+        $expected = 10.00;
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -312,18 +242,18 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     public function testGetEffectIfTotalAmountInferiorOrEqualTo400Valid()
     {
         // Given
-        $rule0 = $this->generateValideRuleAvailableForTotalAmountOperatorTo(
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::INFERIOR_OR_EQUAL,
             400.00
         );
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
-        $coupon->addRule($rule0);
+        $coupon->setRules(new CouponRuleCollection(array($rule0)));
 
         // Then
-        $expected = -30.00;
-        $actual = $coupon->getEffect();
+        $expected = 10.00;
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -335,18 +265,18 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     public function testGetEffectIfTotalAmountEqualTo400Valid()
     {
         // Given
-        $rule0 = $this->generateValideRuleAvailableForTotalAmountOperatorTo(
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::EQUAL,
             400.00
         );
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
-        $coupon->addRule($rule0);
+        $coupon->setRules(new CouponRuleCollection(array($rule0)));
 
         // Then
-        $expected = -30.00;
-        $actual = $coupon->getEffect();
+        $expected = 10.00;
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -358,18 +288,18 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     public function testGetEffectIfTotalAmountSuperiorOrEqualTo400Valid()
     {
         // Given
-        $rule0 = $this->generateValideRuleAvailableForTotalAmountOperatorTo(
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::SUPERIOR_OR_EQUAL,
             400.00
         );
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
-        $coupon->addRule($rule0);
+        $coupon->setRules(new CouponRuleCollection(array($rule0)));
 
         // Then
-        $expected = -30.00;
-        $actual = $coupon->getEffect();
+        $expected = 10.00;
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -381,18 +311,18 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     public function testGetEffectIfTotalAmountSuperiorTo400Valid()
     {
         // Given
-        $rule0 = $this->generateValideRuleAvailableForTotalAmountOperatorTo(
+        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::SUPERIOR,
             400.00
         );
-        $coupon = $this->generateValidNonCumulativeNonRemovingPostageCoupon();
+        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
-        $coupon->addRule($rule0);
+        $coupon->setRules(new CouponRuleCollection(array($rule0)));
 
         // Then
-        $expected = -30.00;
-        $actual = $coupon->getEffect();
+        $expected = 10.00;
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -415,12 +345,15 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
      *
      * @return AvailableForTotalAmount
      */
-    protected function generateValideRuleAvailableForTotalAmountOperatorTo($operator, $amount)
+    protected function generateValidRuleAvailableForTotalAmountOperatorTo($operator, $amount)
     {
         $validators = array(
-            AvailableForTotalAmount::PARAM1_PRICE => array(
-                AvailableForTotalAmount::OPERATOR => $operator,
-                AvailableForTotalAmount::VALUE => new PriceParam($amount, 'EUR')
+            AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
+                $operator,
+                new PriceParam(
+                    $amount,
+                    'EUR'
+                )
             )
         );
 
