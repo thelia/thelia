@@ -41,8 +41,8 @@ $request = Request::createFromGlobals();
 $thelia = new Thelia("dev", true);
 
 if ( false === in_array($request->getClientIp(), $trustedIp)) {
-    // Redirect 403 Forbidden
-    $response = new Response('Forbidden', 404);
+    // Redirect 401 Unauthorized
+    $response = new Response('Unauthorized', 401);
     $thelia->terminate($request, $response);
 }
 
