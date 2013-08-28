@@ -33,8 +33,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\Tools\ModelCriteriaTools;
-
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Model\Map\ProductPriceTableMap;
@@ -138,12 +136,8 @@ class Product extends BaseLoop
     {
         $search = ProductQuery::create();
 
-        $backendContext = $this->getBackend_context();
-
-        $lang = $this->getLang();
-
         /* manage translations */
-        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        $this->configureI18nProcessing($search);
 
         $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
         $isPSELeftJoinList = array();

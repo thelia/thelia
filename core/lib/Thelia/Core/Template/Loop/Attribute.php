@@ -34,7 +34,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
 use Thelia\Model\Base\LangQuery;
-use Thelia\Model\Tools\ModelCriteriaTools;
 
 use Thelia\Model\Base\CategoryQuery;
 use Thelia\Model\Base\ProductCategoryQuery;
@@ -92,7 +91,7 @@ class Attribute extends BaseLoop
         $lang = $this->getLang();
 
         /* manage translations */
-        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 

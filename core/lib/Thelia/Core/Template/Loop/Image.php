@@ -207,16 +207,8 @@ class Image extends BaseLoop
 
         }
 
-        /**
-         * \Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-                $this->request->getSession()->getLocale(),
-                (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
+        /* manage translations */
+        $this->configureI18nProcessing($search);
 
         $results = $this->search($search, $pagination);
 
@@ -295,6 +287,7 @@ class Image extends BaseLoop
                     ),
                     'manual'
             ),
+            Argument::createIntTypeArgument('lang'),
 
             Argument::createIntTypeArgument('width'),
             Argument::createIntTypeArgument('height'),

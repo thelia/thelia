@@ -89,7 +89,7 @@ class CategoryController extends BaseAdminController
             $categoryDeletionForm = new CategoryDeletionForm($this->getRequest());
 
             $data = $this->validateForm($categoryDeletionForm, "POST")->getData();
-var_dump($data);
+
             $categoryDeleteEvent = new CategoryDeleteEvent($data['category_id']);
 
             $this->dispatch(TheliaEvents::CATEGORY_DELETE, $categoryDeleteEvent);
@@ -151,8 +151,8 @@ var_dump($data);
     protected function positionDown($args)
     {
         $event = new CategoryChangePositionEvent(
-                $this->getRequest()->get('category_id', 0),
-                CategoryChangePositionEvent::POSITION_DOWN
+            $this->getRequest()->get('category_id', 0),
+            CategoryChangePositionEvent::POSITION_DOWN
         );
 
         $this->dispatch(TheliaEvents::CATEGORY_CHANGE_POSITION, $event);
