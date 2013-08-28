@@ -46,37 +46,7 @@ class CouponController extends BaseAdminController
      */
     public function indexAction()
     {
-        return $this->processAction();
-    }
-
-    /**
-     * Create a Coupon Action
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function createAction()
-    {
-        return $this->processAction('create');
-    }
-
-    /**
-     * Edit a Coupon Action
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function editAction()
-    {
-        return $this->processAction('edit');
-    }
-
-    /**
-     * Read a Coupon Action
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function readAction()
-    {
-        return $this->processAction('read');
+        return $this->process();
     }
 
     /**
@@ -142,10 +112,11 @@ class CouponController extends BaseAdminController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function processAction($action = 'browse')
+    public function processAction()
     {
+        var_dump($this->getRequest()->attributes);
         // Get the current action
-//        $action = $this->getRequest()->get('action', 'browse');
+        $action = $this->getRequest()->get('action', 'browse');
 
         // Get the category ID
 //        $id = $this->getRequest()->get('id', 0);
