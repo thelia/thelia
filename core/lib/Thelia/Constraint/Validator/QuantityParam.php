@@ -47,9 +47,6 @@ class QuantityParam extends IntegerParam
      */
     public function __construct(CouponAdapterInterface $adapter, $integer)
     {
-        if ($integer < 0) {
-            $integer = 0;
-        }
         $this->integer = $integer;
         $this->adapter = $adapter;
     }

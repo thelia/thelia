@@ -100,6 +100,12 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
             if (!$validator instanceof RuleValidator) {
                 throw new InvalidRuleException(get_class());
             }
+            if (!in_array($validator->getOperator(), $this->availableOperators)) {
+                throw new InvalidRuleOperatorException(
+                    get_class(),
+                    $validator->getOperator()
+                );
+            }
         }
         $this->validators = $validators;
 

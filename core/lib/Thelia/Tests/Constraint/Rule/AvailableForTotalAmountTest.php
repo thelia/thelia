@@ -43,6 +43,8 @@ use Thelia\Exception\InvalidRuleValueException;
  */
 class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var CouponAdapterInterface $stubTheliaAdapter */
+    protected $stubTheliaAdapter = null;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -51,30 +53,33 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
+        $this->stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
     }
 
     /**
      * Generate valid CouponBaseAdapter
      *
+     * @param float $cartTotalPrice Total amount of the current Cart
+     *
      * @return CouponAdapterInterface
      */
-    protected function generateValidCouponBaseAdapterMock()
+    protected function generateValidCouponBaseAdapterMock($cartTotalPrice = 421.23)
     {
         /** @var CouponAdapterInterface $stubTheliaAdapter */
-       $stubTheliaAdapter = $this->getMock(
-           'CouponBaseAdapter',
-           array('getCartTotalPrice'),
-           array()
-       );
+        $stubTheliaAdapter = $this->getMock(
+            'Thelia\Coupon\CouponBaseAdapter',
+            array('getCartTotalPrice'),
+            array()
+        );
         $stubTheliaAdapter->expects($this->any())
             ->method('getCartTotalPrice')
-            ->will($this->returnValue(421.23));
+            ->will($this->returnValue($cartTotalPrice));
 
         return $stubTheliaAdapter;
     }
 
     /**
+     * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::checkBackOfficeInput
      *
@@ -91,10 +96,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
                 )
             )
         );
-        $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => $adapter->getCartTotalPrice()
-        );
-        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators);
 
         $expected = true;
         $actual = $rule->checkBackOfficeInput();
@@ -102,6 +104,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::checkBackOfficeInput
      * @expectedException \Thelia\Exception\InvalidRuleOperatorException
@@ -120,10 +123,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => $adapter->getCartTotalPrice()
-        );
-        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators);
 
         $expected = false;
         $actual = $rule->checkBackOfficeInput();
@@ -131,6 +131,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::checkBackOfficeInput
      * @expectedException \ErrorException
@@ -138,7 +139,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputValue()
     {
-        $adapter = new CouponBaseAdapter();
+        $adapter = $this->generateValidCouponBaseAdapterMock();
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
@@ -147,10 +148,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => $adapter->getCartTotalPrice()
-        );
-        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators);
 
         $expected = false;
         $actual = $rule->checkBackOfficeInput();
@@ -160,13 +158,14 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
 
 
     /**
+     * Check if validity test on FrontOffice inputs are working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::checkCheckoutInput
      *
      */
     public function testValidCheckoutInput()
     {
-        $adapter = new CouponBaseAdapter();
+        $adapter = $this->stubTheliaAdapter;
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
@@ -177,10 +176,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => $adapter->getCartTotalPrice()
-        );
-        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators);
 
         $expected = true;
         $actual = $rule->checkCheckoutInput();
@@ -188,6 +184,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Check if validity test on FrontOffice inputs are working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::checkCheckoutInput
      * @expectedException \Thelia\Exception\InvalidRuleValueException
@@ -195,7 +192,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidCheckoutInputValue()
     {
-        $adapter = new CouponBaseAdapter();
+        $adapter = $this->generateValidCouponBaseAdapterMock(421);
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
@@ -206,10 +203,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => 421
-        );
-        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators);
 
         $expected = false;
         $actual = $rule->checkCheckoutInput();
@@ -217,6 +211,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Check if validity test on FrontOffice inputs are working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::checkCheckoutInput
      * @expectedException \Thelia\Exception\InvalidRuleValueException
@@ -224,7 +219,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidCheckoutInputType()
     {
-        $adapter = new CouponBaseAdapter();
+        $adapter = $this->generateValidCouponBaseAdapterMock(421);
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
@@ -235,10 +230,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => 421
-        );
-        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators);
 
         $expected = false;
         $actual = $rule->checkCheckoutInput();
@@ -246,13 +238,14 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Check if test inferior operator is working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::isMatching
      *
      */
     public function testMatchingRuleInferior()
     {
-        $adapter = new CouponBaseAdapter();
+        $adapter = $this->generateValidCouponBaseAdapterMock(421.22);
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
@@ -263,10 +256,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => 421.22
-        );
-        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators);
 
         $expected = true;
         $actual = $rule->isMatching();
@@ -274,13 +264,14 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Check if test inferior operator is working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::isMatching
      *
      */
     public function testNotMatchingRuleInferior()
     {
-        $adapter = new CouponBaseAdapter();
+        $adapter = $this->generateValidCouponBaseAdapterMock(421.23);
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
@@ -291,10 +282,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => 421.23
-        );
-        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators);
 
         $expected = false;
         $actual = $rule->isMatching();
@@ -302,13 +290,14 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Check if test equals operator is working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::isMatching
      *
      */
     public function testMatchingRuleEqual()
     {
-        $adapter = new CouponBaseAdapter();
+        $adapter = $this->stubTheliaAdapter;
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
@@ -319,10 +308,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => $adapter->getCartTotalPrice()
-        );
-        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators);
 
         $expected = true;
         $actual = $rule->isMatching();
@@ -330,13 +316,14 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Check if test equals operator is working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::isMatching
      *
      */
     public function testNotMatchingRuleEqual()
     {
-        $adapter = new CouponBaseAdapter();
+        $adapter = $this->generateValidCouponBaseAdapterMock(421.22);
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
@@ -347,10 +334,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => 421.22
-        );
-        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators);
 
         $expected = false;
         $actual = $rule->isMatching();
@@ -358,13 +342,14 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Check if test superior operator is working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::isMatching
      *
      */
     public function testMatchingRuleSuperior()
     {
-        $adapter = new CouponBaseAdapter();
+        $adapter = $this->generateValidCouponBaseAdapterMock(421.24);
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
@@ -375,10 +360,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => 421.24
-        );
-        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators);
 
         $expected = true;
         $actual = $rule->isMatching();
@@ -386,13 +368,14 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Check if test superior operator is working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::isMatching
      *
      */
     public function testNotMatchingRuleSuperior()
     {
-        $adapter = new CouponBaseAdapter();
+        $adapter = $this->generateValidCouponBaseAdapterMock(421.23);
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
@@ -403,10 +386,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => 421.23
-        );
-        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators);
 
         $expected = false;
         $actual = $rule->isMatching();

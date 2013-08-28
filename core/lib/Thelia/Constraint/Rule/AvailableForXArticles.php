@@ -41,7 +41,7 @@ use Thelia\Exception\InvalidRuleValueException;
  */
 class AvailableForXArticles extends CouponRuleAbstract
 {
-    /** Rule 1st parameter : price */
+    /** Rule 1st parameter : quantity */
     CONST PARAM1_QUANTITY = 'quantity';
 
     /** @var array Available Operators (Operators::CONST) */
@@ -121,7 +121,7 @@ class AvailableForXArticles extends CouponRuleAbstract
     protected function setParametersToValidate()
     {
         $this->paramsToValidate = array(
-            self::PARAM1_QUANTITY => $this->adapter->getCartTotalPrice()
+            self::PARAM1_QUANTITY => $this->adapter->getNbArticlesInCart()
         );
 
         return $this;
@@ -130,11 +130,21 @@ class AvailableForXArticles extends CouponRuleAbstract
     /**
      * Check if Checkout inputs are relevant or not
      *
+     * @throws \Thelia\Exception\InvalidRuleValueException
      * @return bool
      */
     public function checkCheckoutInput()
     {
-        // TODO: Implement checkCheckoutInput() method.
+        if (!isset($this->paramsToValidate)
+            || empty($this->paramsToValidate)
+            ||!isset($this->paramsToValidate[self::PARAM1_QUANTITY])
+        ) {
+            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
+        }
+
+        $price = $this->paramsToValidate[self::PARAM1_QUANTITY];
+
+        return $this->isQuantityValid($price);
     }
 
     /**
