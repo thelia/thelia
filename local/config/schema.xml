@@ -755,39 +755,6 @@
       <parameter name="log_created_by" value="true" />
     </behavior>
   </table>
-  <table name="rewriting" namespace="Thelia\Model">
-    <column name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="url" required="true" size="255" type="VARCHAR" />
-    <column name="product_id" type="INTEGER" />
-    <column name="category_id" type="INTEGER" />
-    <column name="folder_id" type="INTEGER" />
-    <column name="content_id" type="INTEGER" />
-    <foreign-key foreignTable="product" name="fk_rewriting_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="product_id" />
-    </foreign-key>
-    <foreign-key foreignTable="category" name="fk_rewriting_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="category_id" />
-    </foreign-key>
-    <foreign-key foreignTable="folder" name="fk_rewriting_folder_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="folder_id" />
-    </foreign-key>
-    <foreign-key foreignTable="content" name="fk_rewriting_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="content_id" />
-    </foreign-key>
-    <index name="idx_rewriting_product_id">
-      <index-column name="product_id" />
-    </index>
-    <index name="idx_rewriting_category_id">
-      <index-column name="category_id" />
-    </index>
-    <index name="idx_rewriting_folder_id">
-      <index-column name="folder_id" />
-    </index>
-    <index name="idx_rewriting_content_id">
-      <index-column name="content_id" />
-    </index>
-    <behavior name="timestampable" />
-  </table>
   <table name="coupon" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="45" type="VARCHAR" />
@@ -1128,7 +1095,7 @@
   </table>
   <table name="rewriting_url" namespace="Thelia\Model">
     <column name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="url" size="255" type="VARCHAR" />
+    <column name="url" required="true" size="255" type="VARCHAR" />
     <column name="view" size="255" type="VARCHAR" />
     <column name="view_id" size="255" type="VARCHAR" />
     <column name="view_locale" size="255" type="VARCHAR" />

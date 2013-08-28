@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Category;
-use Thelia\Model\CategoryQuery;
+use Thelia\Model\RewritingUrl;
+use Thelia\Model\RewritingUrlQuery;
 
 
 /**
- * This class defines the structure of the 'category' table.
+ * This class defines the structure of the 'rewriting_url' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\CategoryQuery;
  * (i.e. if it's a text column type).
  *
  */
-class CategoryTableMap extends TableMap
+class RewritingUrlTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.CategoryTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.RewritingUrlTableMap';
 
     /**
      * The default database name for this class
@@ -42,22 +42,22 @@ class CategoryTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'category';
+    const TABLE_NAME = 'rewriting_url';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Category';
+    const OM_CLASS = '\\Thelia\\Model\\RewritingUrl';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Category';
+    const CLASS_DEFAULT = 'Thelia.Model.RewritingUrl';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -67,66 +67,52 @@ class CategoryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'category.ID';
+    const ID = 'rewriting_url.ID';
 
     /**
-     * the column name for the PARENT field
+     * the column name for the URL field
      */
-    const PARENT = 'category.PARENT';
+    const URL = 'rewriting_url.URL';
 
     /**
-     * the column name for the VISIBLE field
+     * the column name for the VIEW field
      */
-    const VISIBLE = 'category.VISIBLE';
+    const VIEW = 'rewriting_url.VIEW';
 
     /**
-     * the column name for the POSITION field
+     * the column name for the VIEW_ID field
      */
-    const POSITION = 'category.POSITION';
+    const VIEW_ID = 'rewriting_url.VIEW_ID';
+
+    /**
+     * the column name for the VIEW_LOCALE field
+     */
+    const VIEW_LOCALE = 'rewriting_url.VIEW_LOCALE';
+
+    /**
+     * the column name for the REDIRECTED field
+     */
+    const REDIRECTED = 'rewriting_url.REDIRECTED';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'category.CREATED_AT';
+    const CREATED_AT = 'rewriting_url.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'category.UPDATED_AT';
-
-    /**
-     * the column name for the VERSION field
-     */
-    const VERSION = 'category.VERSION';
-
-    /**
-     * the column name for the VERSION_CREATED_AT field
-     */
-    const VERSION_CREATED_AT = 'category.VERSION_CREATED_AT';
-
-    /**
-     * the column name for the VERSION_CREATED_BY field
-     */
-    const VERSION_CREATED_BY = 'category.VERSION_CREATED_BY';
+    const UPDATED_AT = 'rewriting_url.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
-
-    // i18n behavior
-
-    /**
-     * The default locale to use for translations.
-     *
-     * @var string
-     */
-    const DEFAULT_LOCALE = 'en_EN';
 
     /**
      * holds an array of fieldnames
@@ -135,12 +121,12 @@ class CategoryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Parent', 'Visible', 'Position', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'parent', 'visible', 'position', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
-        self::TYPE_COLNAME       => array(CategoryTableMap::ID, CategoryTableMap::PARENT, CategoryTableMap::VISIBLE, CategoryTableMap::POSITION, CategoryTableMap::CREATED_AT, CategoryTableMap::UPDATED_AT, CategoryTableMap::VERSION, CategoryTableMap::VERSION_CREATED_AT, CategoryTableMap::VERSION_CREATED_BY, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PARENT', 'VISIBLE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
-        self::TYPE_FIELDNAME     => array('id', 'parent', 'visible', 'position', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id', 'Url', 'View', 'ViewId', 'ViewLocale', 'Redirected', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'url', 'view', 'viewId', 'viewLocale', 'redirected', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(RewritingUrlTableMap::ID, RewritingUrlTableMap::URL, RewritingUrlTableMap::VIEW, RewritingUrlTableMap::VIEW_ID, RewritingUrlTableMap::VIEW_LOCALE, RewritingUrlTableMap::REDIRECTED, RewritingUrlTableMap::CREATED_AT, RewritingUrlTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'URL', 'VIEW', 'VIEW_ID', 'VIEW_LOCALE', 'REDIRECTED', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'url', 'view', 'view_id', 'view_locale', 'redirected', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -150,12 +136,12 @@ class CategoryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Parent' => 1, 'Visible' => 2, 'Position' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'Version' => 6, 'VersionCreatedAt' => 7, 'VersionCreatedBy' => 8, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'parent' => 1, 'visible' => 2, 'position' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'version' => 6, 'versionCreatedAt' => 7, 'versionCreatedBy' => 8, ),
-        self::TYPE_COLNAME       => array(CategoryTableMap::ID => 0, CategoryTableMap::PARENT => 1, CategoryTableMap::VISIBLE => 2, CategoryTableMap::POSITION => 3, CategoryTableMap::CREATED_AT => 4, CategoryTableMap::UPDATED_AT => 5, CategoryTableMap::VERSION => 6, CategoryTableMap::VERSION_CREATED_AT => 7, CategoryTableMap::VERSION_CREATED_BY => 8, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PARENT' => 1, 'VISIBLE' => 2, 'POSITION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, 'VERSION' => 6, 'VERSION_CREATED_AT' => 7, 'VERSION_CREATED_BY' => 8, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'parent' => 1, 'visible' => 2, 'position' => 3, 'created_at' => 4, 'updated_at' => 5, 'version' => 6, 'version_created_at' => 7, 'version_created_by' => 8, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Url' => 1, 'View' => 2, 'ViewId' => 3, 'ViewLocale' => 4, 'Redirected' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'url' => 1, 'view' => 2, 'viewId' => 3, 'viewLocale' => 4, 'redirected' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        self::TYPE_COLNAME       => array(RewritingUrlTableMap::ID => 0, RewritingUrlTableMap::URL => 1, RewritingUrlTableMap::VIEW => 2, RewritingUrlTableMap::VIEW_ID => 3, RewritingUrlTableMap::VIEW_LOCALE => 4, RewritingUrlTableMap::REDIRECTED => 5, RewritingUrlTableMap::CREATED_AT => 6, RewritingUrlTableMap::UPDATED_AT => 7, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'URL' => 1, 'VIEW' => 2, 'VIEW_ID' => 3, 'VIEW_LOCALE' => 4, 'REDIRECTED' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'url' => 1, 'view' => 2, 'view_id' => 3, 'view_locale' => 4, 'redirected' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -168,21 +154,20 @@ class CategoryTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('category');
-        $this->setPhpName('Category');
-        $this->setClassName('\\Thelia\\Model\\Category');
+        $this->setName('rewriting_url');
+        $this->setPhpName('RewritingUrl');
+        $this->setClassName('\\Thelia\\Model\\RewritingUrl');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('PARENT', 'Parent', 'INTEGER', false, null, null);
-        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, null);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
+        $this->addColumn('URL', 'Url', 'VARCHAR', true, 255, null);
+        $this->addColumn('VIEW', 'View', 'VARCHAR', false, 255, null);
+        $this->addColumn('VIEW_ID', 'ViewId', 'VARCHAR', false, 255, null);
+        $this->addColumn('VIEW_LOCALE', 'ViewLocale', 'VARCHAR', false, 255, null);
+        $this->addForeignKey('REDIRECTED', 'Redirected', 'INTEGER', 'rewriting_url', 'ID', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION', 'Version', 'INTEGER', false, null, 0);
-        $this->addColumn('VERSION_CREATED_AT', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION_CREATED_BY', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
     } // initialize()
 
     /**
@@ -190,17 +175,9 @@ class CategoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ProductCategory', '\\Thelia\\Model\\ProductCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'ProductCategories');
-        $this->addRelation('FeatureCategory', '\\Thelia\\Model\\FeatureCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'FeatureCategories');
-        $this->addRelation('AttributeCategory', '\\Thelia\\Model\\AttributeCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'AttributeCategories');
-        $this->addRelation('CategoryImage', '\\Thelia\\Model\\CategoryImage', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryImages');
-        $this->addRelation('CategoryDocument', '\\Thelia\\Model\\CategoryDocument', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryDocuments');
-        $this->addRelation('CategoryAssociatedContent', '\\Thelia\\Model\\CategoryAssociatedContent', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryAssociatedContents');
-        $this->addRelation('CategoryI18n', '\\Thelia\\Model\\CategoryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CategoryI18ns');
-        $this->addRelation('CategoryVersion', '\\Thelia\\Model\\CategoryVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CategoryVersions');
-        $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Products');
-        $this->addRelation('Feature', '\\Thelia\\Model\\Feature', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Features');
-        $this->addRelation('Attribute', '\\Thelia\\Model\\Attribute', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Attributes');
+        $this->addRelation('RewritingUrlRelatedByRedirected', '\\Thelia\\Model\\RewritingUrl', RelationMap::MANY_TO_ONE, array('redirected' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('RewritingUrlRelatedById', '\\Thelia\\Model\\RewritingUrl', RelationMap::ONE_TO_MANY, array('id' => 'redirected', ), 'RESTRICT', 'RESTRICT', 'RewritingUrlsRelatedById');
+        $this->addRelation('RewritingArgument', '\\Thelia\\Model\\RewritingArgument', RelationMap::ONE_TO_MANY, array('id' => 'rewriting_url_id', ), 'CASCADE', 'RESTRICT', 'RewritingArguments');
     } // buildRelations()
 
     /**
@@ -212,26 +189,17 @@ class CategoryTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
-            'versionable' => array('version_column' => 'version', 'version_table' => '', 'log_created_at' => 'true', 'log_created_by' => 'true', 'log_comment' => 'false', 'version_created_at_column' => 'version_created_at', 'version_created_by_column' => 'version_created_by', 'version_comment_column' => 'version_comment', ),
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
     /**
-     * Method to invalidate the instance pool of all tables related to category     * by a foreign key with ON DELETE CASCADE
+     * Method to invalidate the instance pool of all tables related to rewriting_url     * by a foreign key with ON DELETE CASCADE
      */
     public static function clearRelatedInstancePool()
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                ProductCategoryTableMap::clearInstancePool();
-                FeatureCategoryTableMap::clearInstancePool();
-                AttributeCategoryTableMap::clearInstancePool();
-                CategoryImageTableMap::clearInstancePool();
-                CategoryDocumentTableMap::clearInstancePool();
-                CategoryAssociatedContentTableMap::clearInstancePool();
-                CategoryI18nTableMap::clearInstancePool();
-                CategoryVersionTableMap::clearInstancePool();
+                RewritingArgumentTableMap::clearInstancePool();
             }
 
     /**
@@ -290,7 +258,7 @@ class CategoryTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? CategoryTableMap::CLASS_DEFAULT : CategoryTableMap::OM_CLASS;
+        return $withPrefix ? RewritingUrlTableMap::CLASS_DEFAULT : RewritingUrlTableMap::OM_CLASS;
     }
 
     /**
@@ -304,21 +272,21 @@ class CategoryTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Category object, last column rank)
+     * @return array (RewritingUrl object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = CategoryTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = CategoryTableMap::getInstanceFromPool($key))) {
+        $key = RewritingUrlTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = RewritingUrlTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + CategoryTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + RewritingUrlTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = CategoryTableMap::OM_CLASS;
+            $cls = RewritingUrlTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            CategoryTableMap::addInstanceToPool($obj, $key);
+            RewritingUrlTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -341,8 +309,8 @@ class CategoryTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = CategoryTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = CategoryTableMap::getInstanceFromPool($key))) {
+            $key = RewritingUrlTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = RewritingUrlTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -351,7 +319,7 @@ class CategoryTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                CategoryTableMap::addInstanceToPool($obj, $key);
+                RewritingUrlTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -372,25 +340,23 @@ class CategoryTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CategoryTableMap::ID);
-            $criteria->addSelectColumn(CategoryTableMap::PARENT);
-            $criteria->addSelectColumn(CategoryTableMap::VISIBLE);
-            $criteria->addSelectColumn(CategoryTableMap::POSITION);
-            $criteria->addSelectColumn(CategoryTableMap::CREATED_AT);
-            $criteria->addSelectColumn(CategoryTableMap::UPDATED_AT);
-            $criteria->addSelectColumn(CategoryTableMap::VERSION);
-            $criteria->addSelectColumn(CategoryTableMap::VERSION_CREATED_AT);
-            $criteria->addSelectColumn(CategoryTableMap::VERSION_CREATED_BY);
+            $criteria->addSelectColumn(RewritingUrlTableMap::ID);
+            $criteria->addSelectColumn(RewritingUrlTableMap::URL);
+            $criteria->addSelectColumn(RewritingUrlTableMap::VIEW);
+            $criteria->addSelectColumn(RewritingUrlTableMap::VIEW_ID);
+            $criteria->addSelectColumn(RewritingUrlTableMap::VIEW_LOCALE);
+            $criteria->addSelectColumn(RewritingUrlTableMap::REDIRECTED);
+            $criteria->addSelectColumn(RewritingUrlTableMap::CREATED_AT);
+            $criteria->addSelectColumn(RewritingUrlTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.PARENT');
-            $criteria->addSelectColumn($alias . '.VISIBLE');
-            $criteria->addSelectColumn($alias . '.POSITION');
+            $criteria->addSelectColumn($alias . '.URL');
+            $criteria->addSelectColumn($alias . '.VIEW');
+            $criteria->addSelectColumn($alias . '.VIEW_ID');
+            $criteria->addSelectColumn($alias . '.VIEW_LOCALE');
+            $criteria->addSelectColumn($alias . '.REDIRECTED');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_BY');
         }
     }
 
@@ -403,7 +369,7 @@ class CategoryTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(CategoryTableMap::DATABASE_NAME)->getTable(CategoryTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(RewritingUrlTableMap::DATABASE_NAME)->getTable(RewritingUrlTableMap::TABLE_NAME);
     }
 
     /**
@@ -411,16 +377,16 @@ class CategoryTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CategoryTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(CategoryTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new CategoryTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(RewritingUrlTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(RewritingUrlTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new RewritingUrlTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Category or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a RewritingUrl or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Category object or primary key or array of primary keys
+     * @param mixed               $values Criteria or RewritingUrl object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -431,25 +397,25 @@ class CategoryTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CategoryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RewritingUrlTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Category) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\RewritingUrl) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(CategoryTableMap::DATABASE_NAME);
-            $criteria->add(CategoryTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(RewritingUrlTableMap::DATABASE_NAME);
+            $criteria->add(RewritingUrlTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = CategoryQuery::create()->mergeWith($criteria);
+        $query = RewritingUrlQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { CategoryTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { RewritingUrlTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { CategoryTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { RewritingUrlTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -457,20 +423,20 @@ class CategoryTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the category table.
+     * Deletes all rows from the rewriting_url table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return CategoryQuery::create()->doDeleteAll($con);
+        return RewritingUrlQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Category or Criteria object.
+     * Performs an INSERT on the database, given a RewritingUrl or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Category object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or RewritingUrl object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -479,22 +445,18 @@ class CategoryTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CategoryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RewritingUrlTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Category object
-        }
-
-        if ($criteria->containsKey(CategoryTableMap::ID) && $criteria->keyContainsValue(CategoryTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CategoryTableMap::ID.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from RewritingUrl object
         }
 
 
         // Set the correct dbName
-        $query = CategoryQuery::create()->mergeWith($criteria);
+        $query = RewritingUrlQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -510,7 +472,7 @@ class CategoryTableMap extends TableMap
         return $pk;
     }
 
-} // CategoryTableMap
+} // RewritingUrlTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-CategoryTableMap::buildTableMap();
+RewritingUrlTableMap::buildTableMap();
