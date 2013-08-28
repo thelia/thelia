@@ -121,7 +121,7 @@ class DateParamTest extends \PHPUnit_Framework_TestCase
      * Test is the object is serializable
      * If no data is lost during the process
      */
-    protected function isSerializableTest()
+    public function isSerializableTest()
     {
         $adapter = new CouponBaseAdapter();
         $dateValidator = new \DateTime("2012-07-08");
