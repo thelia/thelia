@@ -337,7 +337,7 @@ abstract class Currency implements ActiveRecordInterface
      */
     public function hasVirtualColumn($name)
     {
-        return array_key_exists($name, $this->virtualColumns);
+        return isset($this->virtualColumns[$name]);
     }
 
     /**
