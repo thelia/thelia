@@ -10,30 +10,25 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Category as ChildCategory;
-use Thelia\Model\CategoryQuery as ChildCategoryQuery;
-use Thelia\Model\Content as ChildContent;
-use Thelia\Model\ContentQuery as ChildContentQuery;
-use Thelia\Model\Folder as ChildFolder;
-use Thelia\Model\FolderQuery as ChildFolderQuery;
-use Thelia\Model\Product as ChildProduct;
-use Thelia\Model\ProductQuery as ChildProductQuery;
-use Thelia\Model\Rewriting as ChildRewriting;
-use Thelia\Model\RewritingQuery as ChildRewritingQuery;
-use Thelia\Model\Map\RewritingTableMap;
+use Thelia\Model\RewritingArgument as ChildRewritingArgument;
+use Thelia\Model\RewritingArgumentQuery as ChildRewritingArgumentQuery;
+use Thelia\Model\RewritingUrl as ChildRewritingUrl;
+use Thelia\Model\RewritingUrlQuery as ChildRewritingUrlQuery;
+use Thelia\Model\Map\RewritingUrlTableMap;
 
-abstract class Rewriting implements ActiveRecordInterface
+abstract class RewritingUrl implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\RewritingTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\RewritingUrlTableMap';
 
 
     /**
@@ -75,28 +70,28 @@ abstract class Rewriting implements ActiveRecordInterface
     protected $url;
 
     /**
-     * The value for the product_id field.
-     * @var        int
+     * The value for the view field.
+     * @var        string
      */
-    protected $product_id;
+    protected $view;
 
     /**
-     * The value for the category_id field.
-     * @var        int
+     * The value for the view_id field.
+     * @var        string
      */
-    protected $category_id;
+    protected $view_id;
 
     /**
-     * The value for the folder_id field.
-     * @var        int
+     * The value for the view_locale field.
+     * @var        string
      */
-    protected $folder_id;
+    protected $view_locale;
 
     /**
-     * The value for the content_id field.
+     * The value for the redirected field.
      * @var        int
      */
-    protected $content_id;
+    protected $redirected;
 
     /**
      * The value for the created_at field.
@@ -111,24 +106,21 @@ abstract class Rewriting implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        Product
+     * @var        RewritingUrl
      */
-    protected $aProduct;
+    protected $aRewritingUrlRelatedByRedirected;
 
     /**
-     * @var        Category
+     * @var        ObjectCollection|ChildRewritingUrl[] Collection to store aggregation of ChildRewritingUrl objects.
      */
-    protected $aCategory;
+    protected $collRewritingUrlsRelatedById;
+    protected $collRewritingUrlsRelatedByIdPartial;
 
     /**
-     * @var        Folder
+     * @var        ObjectCollection|ChildRewritingArgument[] Collection to store aggregation of ChildRewritingArgument objects.
      */
-    protected $aFolder;
-
-    /**
-     * @var        Content
-     */
-    protected $aContent;
+    protected $collRewritingArguments;
+    protected $collRewritingArgumentsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -139,7 +131,19 @@ abstract class Rewriting implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\Rewriting object.
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $rewritingUrlsRelatedByIdScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $rewritingArgumentsScheduledForDeletion = null;
+
+    /**
+     * Initializes internal state of Thelia\Model\Base\RewritingUrl object.
      */
     public function __construct()
     {
@@ -234,9 +238,9 @@ abstract class Rewriting implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Rewriting</code> instance.  If
-     * <code>obj</code> is an instance of <code>Rewriting</code>, delegates to
-     * <code>equals(Rewriting)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>RewritingUrl</code> instance.  If
+     * <code>obj</code> is an instance of <code>RewritingUrl</code>, delegates to
+     * <code>equals(RewritingUrl)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param      obj The object to compare to.
      * @return Whether equal to the object specified.
@@ -294,7 +298,7 @@ abstract class Rewriting implements ActiveRecordInterface
      */
     public function hasVirtualColumn($name)
     {
-        return isset($this->virtualColumns[$name]);
+        return array_key_exists($name, $this->virtualColumns);
     }
 
     /**
@@ -317,7 +321,7 @@ abstract class Rewriting implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return Rewriting The current object, for fluid interface
+     * @return RewritingUrl The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -349,7 +353,7 @@ abstract class Rewriting implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return Rewriting The current object, for fluid interface
+     * @return RewritingUrl The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -415,47 +419,47 @@ abstract class Rewriting implements ActiveRecordInterface
     }
 
     /**
-     * Get the [product_id] column value.
+     * Get the [view] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getProductId()
+    public function getView()
     {
 
-        return $this->product_id;
+        return $this->view;
     }
 
     /**
-     * Get the [category_id] column value.
+     * Get the [view_id] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getCategoryId()
+    public function getViewId()
     {
 
-        return $this->category_id;
+        return $this->view_id;
     }
 
     /**
-     * Get the [folder_id] column value.
+     * Get the [view_locale] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getFolderId()
+    public function getViewLocale()
     {
 
-        return $this->folder_id;
+        return $this->view_locale;
     }
 
     /**
-     * Get the [content_id] column value.
+     * Get the [redirected] column value.
      *
      * @return   int
      */
-    public function getContentId()
+    public function getRedirected()
     {
 
-        return $this->content_id;
+        return $this->redirected;
     }
 
     /**
@@ -502,7 +506,7 @@ abstract class Rewriting implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\Rewriting The current object (for fluent API support)
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -512,7 +516,7 @@ abstract class Rewriting implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = RewritingTableMap::ID;
+            $this->modifiedColumns[] = RewritingUrlTableMap::ID;
         }
 
 
@@ -523,7 +527,7 @@ abstract class Rewriting implements ActiveRecordInterface
      * Set the value of [url] column.
      *
      * @param      string $v new value
-     * @return   \Thelia\Model\Rewriting The current object (for fluent API support)
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setUrl($v)
     {
@@ -533,7 +537,7 @@ abstract class Rewriting implements ActiveRecordInterface
 
         if ($this->url !== $v) {
             $this->url = $v;
-            $this->modifiedColumns[] = RewritingTableMap::URL;
+            $this->modifiedColumns[] = RewritingUrlTableMap::URL;
         }
 
 
@@ -541,111 +545,99 @@ abstract class Rewriting implements ActiveRecordInterface
     } // setUrl()
 
     /**
-     * Set the value of [product_id] column.
+     * Set the value of [view] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Rewriting The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
-    public function setProductId($v)
+    public function setView($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->product_id !== $v) {
-            $this->product_id = $v;
-            $this->modifiedColumns[] = RewritingTableMap::PRODUCT_ID;
-        }
-
-        if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
-            $this->aProduct = null;
+        if ($this->view !== $v) {
+            $this->view = $v;
+            $this->modifiedColumns[] = RewritingUrlTableMap::VIEW;
         }
 
 
         return $this;
-    } // setProductId()
+    } // setView()
 
     /**
-     * Set the value of [category_id] column.
+     * Set the value of [view_id] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Rewriting The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
-    public function setCategoryId($v)
+    public function setViewId($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->category_id !== $v) {
-            $this->category_id = $v;
-            $this->modifiedColumns[] = RewritingTableMap::CATEGORY_ID;
-        }
-
-        if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
-            $this->aCategory = null;
+        if ($this->view_id !== $v) {
+            $this->view_id = $v;
+            $this->modifiedColumns[] = RewritingUrlTableMap::VIEW_ID;
         }
 
 
         return $this;
-    } // setCategoryId()
+    } // setViewId()
 
     /**
-     * Set the value of [folder_id] column.
+     * Set the value of [view_locale] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Rewriting The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
-    public function setFolderId($v)
+    public function setViewLocale($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->folder_id !== $v) {
-            $this->folder_id = $v;
-            $this->modifiedColumns[] = RewritingTableMap::FOLDER_ID;
-        }
-
-        if ($this->aFolder !== null && $this->aFolder->getId() !== $v) {
-            $this->aFolder = null;
+        if ($this->view_locale !== $v) {
+            $this->view_locale = $v;
+            $this->modifiedColumns[] = RewritingUrlTableMap::VIEW_LOCALE;
         }
 
 
         return $this;
-    } // setFolderId()
+    } // setViewLocale()
 
     /**
-     * Set the value of [content_id] column.
+     * Set the value of [redirected] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\Rewriting The current object (for fluent API support)
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
-    public function setContentId($v)
+    public function setRedirected($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->content_id !== $v) {
-            $this->content_id = $v;
-            $this->modifiedColumns[] = RewritingTableMap::CONTENT_ID;
+        if ($this->redirected !== $v) {
+            $this->redirected = $v;
+            $this->modifiedColumns[] = RewritingUrlTableMap::REDIRECTED;
         }
 
-        if ($this->aContent !== null && $this->aContent->getId() !== $v) {
-            $this->aContent = null;
+        if ($this->aRewritingUrlRelatedByRedirected !== null && $this->aRewritingUrlRelatedByRedirected->getId() !== $v) {
+            $this->aRewritingUrlRelatedByRedirected = null;
         }
 
 
         return $this;
-    } // setContentId()
+    } // setRedirected()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Rewriting The current object (for fluent API support)
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -653,7 +645,7 @@ abstract class Rewriting implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = RewritingTableMap::CREATED_AT;
+                $this->modifiedColumns[] = RewritingUrlTableMap::CREATED_AT;
             }
         } // if either are not null
 
@@ -666,7 +658,7 @@ abstract class Rewriting implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Rewriting The current object (for fluent API support)
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -674,7 +666,7 @@ abstract class Rewriting implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = RewritingTableMap::UPDATED_AT;
+                $this->modifiedColumns[] = RewritingUrlTableMap::UPDATED_AT;
             }
         } // if either are not null
 
@@ -719,31 +711,31 @@ abstract class Rewriting implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : RewritingTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : RewritingUrlTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : RewritingTableMap::translateFieldName('Url', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : RewritingUrlTableMap::translateFieldName('Url', TableMap::TYPE_PHPNAME, $indexType)];
             $this->url = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : RewritingTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->product_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : RewritingUrlTableMap::translateFieldName('View', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->view = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : RewritingTableMap::translateFieldName('CategoryId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->category_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : RewritingUrlTableMap::translateFieldName('ViewId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->view_id = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : RewritingTableMap::translateFieldName('FolderId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->folder_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : RewritingUrlTableMap::translateFieldName('ViewLocale', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->view_locale = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : RewritingTableMap::translateFieldName('ContentId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->content_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : RewritingUrlTableMap::translateFieldName('Redirected', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->redirected = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : RewritingTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : RewritingUrlTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : RewritingTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : RewritingUrlTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -756,10 +748,10 @@ abstract class Rewriting implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = RewritingTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = RewritingUrlTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\Rewriting object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\RewritingUrl object", 0, $e);
         }
     }
 
@@ -778,17 +770,8 @@ abstract class Rewriting implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
-            $this->aProduct = null;
-        }
-        if ($this->aCategory !== null && $this->category_id !== $this->aCategory->getId()) {
-            $this->aCategory = null;
-        }
-        if ($this->aFolder !== null && $this->folder_id !== $this->aFolder->getId()) {
-            $this->aFolder = null;
-        }
-        if ($this->aContent !== null && $this->content_id !== $this->aContent->getId()) {
-            $this->aContent = null;
+        if ($this->aRewritingUrlRelatedByRedirected !== null && $this->redirected !== $this->aRewritingUrlRelatedByRedirected->getId()) {
+            $this->aRewritingUrlRelatedByRedirected = null;
         }
     } // ensureConsistency
 
@@ -813,13 +796,13 @@ abstract class Rewriting implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(RewritingTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(RewritingUrlTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildRewritingQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildRewritingUrlQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -829,10 +812,11 @@ abstract class Rewriting implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aProduct = null;
-            $this->aCategory = null;
-            $this->aFolder = null;
-            $this->aContent = null;
+            $this->aRewritingUrlRelatedByRedirected = null;
+            $this->collRewritingUrlsRelatedById = null;
+
+            $this->collRewritingArguments = null;
+
         } // if (deep)
     }
 
@@ -842,8 +826,8 @@ abstract class Rewriting implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Rewriting::setDeleted()
-     * @see Rewriting::isDeleted()
+     * @see RewritingUrl::setDeleted()
+     * @see RewritingUrl::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -852,12 +836,12 @@ abstract class Rewriting implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(RewritingTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RewritingUrlTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildRewritingQuery::create()
+            $deleteQuery = ChildRewritingUrlQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -894,7 +878,7 @@ abstract class Rewriting implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(RewritingTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RewritingUrlTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -904,16 +888,16 @@ abstract class Rewriting implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(RewritingTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(RewritingUrlTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(RewritingTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(RewritingUrlTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(RewritingTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(RewritingUrlTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -925,7 +909,7 @@ abstract class Rewriting implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                RewritingTableMap::addInstanceToPool($this);
+                RewritingUrlTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -960,32 +944,11 @@ abstract class Rewriting implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aProduct !== null) {
-                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
-                    $affectedRows += $this->aProduct->save($con);
+            if ($this->aRewritingUrlRelatedByRedirected !== null) {
+                if ($this->aRewritingUrlRelatedByRedirected->isModified() || $this->aRewritingUrlRelatedByRedirected->isNew()) {
+                    $affectedRows += $this->aRewritingUrlRelatedByRedirected->save($con);
                 }
-                $this->setProduct($this->aProduct);
-            }
-
-            if ($this->aCategory !== null) {
-                if ($this->aCategory->isModified() || $this->aCategory->isNew()) {
-                    $affectedRows += $this->aCategory->save($con);
-                }
-                $this->setCategory($this->aCategory);
-            }
-
-            if ($this->aFolder !== null) {
-                if ($this->aFolder->isModified() || $this->aFolder->isNew()) {
-                    $affectedRows += $this->aFolder->save($con);
-                }
-                $this->setFolder($this->aFolder);
-            }
-
-            if ($this->aContent !== null) {
-                if ($this->aContent->isModified() || $this->aContent->isNew()) {
-                    $affectedRows += $this->aContent->save($con);
-                }
-                $this->setContent($this->aContent);
+                $this->setRewritingUrlRelatedByRedirected($this->aRewritingUrlRelatedByRedirected);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -997,6 +960,41 @@ abstract class Rewriting implements ActiveRecordInterface
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->rewritingUrlsRelatedByIdScheduledForDeletion !== null) {
+                if (!$this->rewritingUrlsRelatedByIdScheduledForDeletion->isEmpty()) {
+                    foreach ($this->rewritingUrlsRelatedByIdScheduledForDeletion as $rewritingUrlRelatedById) {
+                        // need to save related object because we set the relation to null
+                        $rewritingUrlRelatedById->save($con);
+                    }
+                    $this->rewritingUrlsRelatedByIdScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collRewritingUrlsRelatedById !== null) {
+            foreach ($this->collRewritingUrlsRelatedById as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->rewritingArgumentsScheduledForDeletion !== null) {
+                if (!$this->rewritingArgumentsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\RewritingArgumentQuery::create()
+                        ->filterByPrimaryKeys($this->rewritingArgumentsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->rewritingArgumentsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collRewritingArguments !== null) {
+            foreach ($this->collRewritingArguments as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -1019,35 +1017,39 @@ abstract class Rewriting implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
+        $this->modifiedColumns[] = RewritingUrlTableMap::ID;
+        if (null !== $this->id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . RewritingUrlTableMap::ID . ')');
+        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(RewritingTableMap::ID)) {
+        if ($this->isColumnModified(RewritingUrlTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(RewritingTableMap::URL)) {
+        if ($this->isColumnModified(RewritingUrlTableMap::URL)) {
             $modifiedColumns[':p' . $index++]  = 'URL';
         }
-        if ($this->isColumnModified(RewritingTableMap::PRODUCT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
+        if ($this->isColumnModified(RewritingUrlTableMap::VIEW)) {
+            $modifiedColumns[':p' . $index++]  = 'VIEW';
         }
-        if ($this->isColumnModified(RewritingTableMap::CATEGORY_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'CATEGORY_ID';
+        if ($this->isColumnModified(RewritingUrlTableMap::VIEW_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'VIEW_ID';
         }
-        if ($this->isColumnModified(RewritingTableMap::FOLDER_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'FOLDER_ID';
+        if ($this->isColumnModified(RewritingUrlTableMap::VIEW_LOCALE)) {
+            $modifiedColumns[':p' . $index++]  = 'VIEW_LOCALE';
         }
-        if ($this->isColumnModified(RewritingTableMap::CONTENT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'CONTENT_ID';
+        if ($this->isColumnModified(RewritingUrlTableMap::REDIRECTED)) {
+            $modifiedColumns[':p' . $index++]  = 'REDIRECTED';
         }
-        if ($this->isColumnModified(RewritingTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(RewritingUrlTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
-        if ($this->isColumnModified(RewritingTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(RewritingUrlTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO rewriting (%s) VALUES (%s)',
+            'INSERT INTO rewriting_url (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1062,17 +1064,17 @@ abstract class Rewriting implements ActiveRecordInterface
                     case 'URL':
                         $stmt->bindValue($identifier, $this->url, PDO::PARAM_STR);
                         break;
-                    case 'PRODUCT_ID':
-                        $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
+                    case 'VIEW':
+                        $stmt->bindValue($identifier, $this->view, PDO::PARAM_STR);
                         break;
-                    case 'CATEGORY_ID':
-                        $stmt->bindValue($identifier, $this->category_id, PDO::PARAM_INT);
+                    case 'VIEW_ID':
+                        $stmt->bindValue($identifier, $this->view_id, PDO::PARAM_STR);
                         break;
-                    case 'FOLDER_ID':
-                        $stmt->bindValue($identifier, $this->folder_id, PDO::PARAM_INT);
+                    case 'VIEW_LOCALE':
+                        $stmt->bindValue($identifier, $this->view_locale, PDO::PARAM_STR);
                         break;
-                    case 'CONTENT_ID':
-                        $stmt->bindValue($identifier, $this->content_id, PDO::PARAM_INT);
+                    case 'REDIRECTED':
+                        $stmt->bindValue($identifier, $this->redirected, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1087,6 +1089,13 @@ abstract class Rewriting implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
+
+        try {
+            $pk = $con->lastInsertId();
+        } catch (Exception $e) {
+            throw new PropelException('Unable to get autoincrement id.', 0, $e);
+        }
+        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -1119,7 +1128,7 @@ abstract class Rewriting implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = RewritingTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = RewritingUrlTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1142,16 +1151,16 @@ abstract class Rewriting implements ActiveRecordInterface
                 return $this->getUrl();
                 break;
             case 2:
-                return $this->getProductId();
+                return $this->getView();
                 break;
             case 3:
-                return $this->getCategoryId();
+                return $this->getViewId();
                 break;
             case 4:
-                return $this->getFolderId();
+                return $this->getViewLocale();
                 break;
             case 5:
-                return $this->getContentId();
+                return $this->getRedirected();
                 break;
             case 6:
                 return $this->getCreatedAt();
@@ -1182,18 +1191,18 @@ abstract class Rewriting implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Rewriting'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['RewritingUrl'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Rewriting'][$this->getPrimaryKey()] = true;
-        $keys = RewritingTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['RewritingUrl'][$this->getPrimaryKey()] = true;
+        $keys = RewritingUrlTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getUrl(),
-            $keys[2] => $this->getProductId(),
-            $keys[3] => $this->getCategoryId(),
-            $keys[4] => $this->getFolderId(),
-            $keys[5] => $this->getContentId(),
+            $keys[2] => $this->getView(),
+            $keys[3] => $this->getViewId(),
+            $keys[4] => $this->getViewLocale(),
+            $keys[5] => $this->getRedirected(),
             $keys[6] => $this->getCreatedAt(),
             $keys[7] => $this->getUpdatedAt(),
         );
@@ -1204,17 +1213,14 @@ abstract class Rewriting implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aProduct) {
-                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aRewritingUrlRelatedByRedirected) {
+                $result['RewritingUrlRelatedByRedirected'] = $this->aRewritingUrlRelatedByRedirected->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aCategory) {
-                $result['Category'] = $this->aCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collRewritingUrlsRelatedById) {
+                $result['RewritingUrlsRelatedById'] = $this->collRewritingUrlsRelatedById->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aFolder) {
-                $result['Folder'] = $this->aFolder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aContent) {
-                $result['Content'] = $this->aContent->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collRewritingArguments) {
+                $result['RewritingArguments'] = $this->collRewritingArguments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1234,7 +1240,7 @@ abstract class Rewriting implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = RewritingTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = RewritingUrlTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1257,16 +1263,16 @@ abstract class Rewriting implements ActiveRecordInterface
                 $this->setUrl($value);
                 break;
             case 2:
-                $this->setProductId($value);
+                $this->setView($value);
                 break;
             case 3:
-                $this->setCategoryId($value);
+                $this->setViewId($value);
                 break;
             case 4:
-                $this->setFolderId($value);
+                $this->setViewLocale($value);
                 break;
             case 5:
-                $this->setContentId($value);
+                $this->setRedirected($value);
                 break;
             case 6:
                 $this->setCreatedAt($value);
@@ -1296,14 +1302,14 @@ abstract class Rewriting implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = RewritingTableMap::getFieldNames($keyType);
+        $keys = RewritingUrlTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setUrl($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setProductId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCategoryId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setFolderId($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setContentId($arr[$keys[5]]);
+        if (array_key_exists($keys[2], $arr)) $this->setView($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setViewId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setViewLocale($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setRedirected($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
     }
@@ -1315,16 +1321,16 @@ abstract class Rewriting implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(RewritingTableMap::DATABASE_NAME);
+        $criteria = new Criteria(RewritingUrlTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(RewritingTableMap::ID)) $criteria->add(RewritingTableMap::ID, $this->id);
-        if ($this->isColumnModified(RewritingTableMap::URL)) $criteria->add(RewritingTableMap::URL, $this->url);
-        if ($this->isColumnModified(RewritingTableMap::PRODUCT_ID)) $criteria->add(RewritingTableMap::PRODUCT_ID, $this->product_id);
-        if ($this->isColumnModified(RewritingTableMap::CATEGORY_ID)) $criteria->add(RewritingTableMap::CATEGORY_ID, $this->category_id);
-        if ($this->isColumnModified(RewritingTableMap::FOLDER_ID)) $criteria->add(RewritingTableMap::FOLDER_ID, $this->folder_id);
-        if ($this->isColumnModified(RewritingTableMap::CONTENT_ID)) $criteria->add(RewritingTableMap::CONTENT_ID, $this->content_id);
-        if ($this->isColumnModified(RewritingTableMap::CREATED_AT)) $criteria->add(RewritingTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(RewritingTableMap::UPDATED_AT)) $criteria->add(RewritingTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(RewritingUrlTableMap::ID)) $criteria->add(RewritingUrlTableMap::ID, $this->id);
+        if ($this->isColumnModified(RewritingUrlTableMap::URL)) $criteria->add(RewritingUrlTableMap::URL, $this->url);
+        if ($this->isColumnModified(RewritingUrlTableMap::VIEW)) $criteria->add(RewritingUrlTableMap::VIEW, $this->view);
+        if ($this->isColumnModified(RewritingUrlTableMap::VIEW_ID)) $criteria->add(RewritingUrlTableMap::VIEW_ID, $this->view_id);
+        if ($this->isColumnModified(RewritingUrlTableMap::VIEW_LOCALE)) $criteria->add(RewritingUrlTableMap::VIEW_LOCALE, $this->view_locale);
+        if ($this->isColumnModified(RewritingUrlTableMap::REDIRECTED)) $criteria->add(RewritingUrlTableMap::REDIRECTED, $this->redirected);
+        if ($this->isColumnModified(RewritingUrlTableMap::CREATED_AT)) $criteria->add(RewritingUrlTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(RewritingUrlTableMap::UPDATED_AT)) $criteria->add(RewritingUrlTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1339,8 +1345,8 @@ abstract class Rewriting implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(RewritingTableMap::DATABASE_NAME);
-        $criteria->add(RewritingTableMap::ID, $this->id);
+        $criteria = new Criteria(RewritingUrlTableMap::DATABASE_NAME);
+        $criteria->add(RewritingUrlTableMap::ID, $this->id);
 
         return $criteria;
     }
@@ -1381,23 +1387,43 @@ abstract class Rewriting implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Rewriting (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\RewritingUrl (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setId($this->getId());
         $copyObj->setUrl($this->getUrl());
-        $copyObj->setProductId($this->getProductId());
-        $copyObj->setCategoryId($this->getCategoryId());
-        $copyObj->setFolderId($this->getFolderId());
-        $copyObj->setContentId($this->getContentId());
+        $copyObj->setView($this->getView());
+        $copyObj->setViewId($this->getViewId());
+        $copyObj->setViewLocale($this->getViewLocale());
+        $copyObj->setRedirected($this->getRedirected());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getRewritingUrlsRelatedById() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addRewritingUrlRelatedById($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getRewritingArguments() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addRewritingArgument($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
+            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1410,7 +1436,7 @@ abstract class Rewriting implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Rewriting Clone of current object.
+     * @return                 \Thelia\Model\RewritingUrl Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1424,26 +1450,26 @@ abstract class Rewriting implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildProduct object.
+     * Declares an association between this object and a ChildRewritingUrl object.
      *
-     * @param                  ChildProduct $v
-     * @return                 \Thelia\Model\Rewriting The current object (for fluent API support)
+     * @param                  ChildRewritingUrl $v
+     * @return                 \Thelia\Model\RewritingUrl The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setProduct(ChildProduct $v = null)
+    public function setRewritingUrlRelatedByRedirected(ChildRewritingUrl $v = null)
     {
         if ($v === null) {
-            $this->setProductId(NULL);
+            $this->setRedirected(NULL);
         } else {
-            $this->setProductId($v->getId());
+            $this->setRedirected($v->getId());
         }
 
-        $this->aProduct = $v;
+        $this->aRewritingUrlRelatedByRedirected = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildProduct object, it will not be re-added.
+        // If this object has already been added to the ChildRewritingUrl object, it will not be re-added.
         if ($v !== null) {
-            $v->addRewriting($this);
+            $v->addRewritingUrlRelatedById($this);
         }
 
 
@@ -1452,179 +1478,484 @@ abstract class Rewriting implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildProduct object
+     * Get the associated ChildRewritingUrl object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildProduct The associated ChildProduct object.
+     * @return                 ChildRewritingUrl The associated ChildRewritingUrl object.
      * @throws PropelException
      */
-    public function getProduct(ConnectionInterface $con = null)
+    public function getRewritingUrlRelatedByRedirected(ConnectionInterface $con = null)
     {
-        if ($this->aProduct === null && ($this->product_id !== null)) {
-            $this->aProduct = ChildProductQuery::create()->findPk($this->product_id, $con);
+        if ($this->aRewritingUrlRelatedByRedirected === null && ($this->redirected !== null)) {
+            $this->aRewritingUrlRelatedByRedirected = ChildRewritingUrlQuery::create()->findPk($this->redirected, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aProduct->addRewritings($this);
+                $this->aRewritingUrlRelatedByRedirected->addRewritingUrlsRelatedById($this);
              */
         }
 
-        return $this->aProduct;
+        return $this->aRewritingUrlRelatedByRedirected;
+    }
+
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('RewritingUrlRelatedById' == $relationName) {
+            return $this->initRewritingUrlsRelatedById();
+        }
+        if ('RewritingArgument' == $relationName) {
+            return $this->initRewritingArguments();
+        }
     }
 
     /**
-     * Declares an association between this object and a ChildCategory object.
+     * Clears out the collRewritingUrlsRelatedById collection
      *
-     * @param                  ChildCategory $v
-     * @return                 \Thelia\Model\Rewriting The current object (for fluent API support)
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addRewritingUrlsRelatedById()
+     */
+    public function clearRewritingUrlsRelatedById()
+    {
+        $this->collRewritingUrlsRelatedById = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collRewritingUrlsRelatedById collection loaded partially.
+     */
+    public function resetPartialRewritingUrlsRelatedById($v = true)
+    {
+        $this->collRewritingUrlsRelatedByIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collRewritingUrlsRelatedById collection.
+     *
+     * By default this just sets the collRewritingUrlsRelatedById collection to an empty array (like clearcollRewritingUrlsRelatedById());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initRewritingUrlsRelatedById($overrideExisting = true)
+    {
+        if (null !== $this->collRewritingUrlsRelatedById && !$overrideExisting) {
+            return;
+        }
+        $this->collRewritingUrlsRelatedById = new ObjectCollection();
+        $this->collRewritingUrlsRelatedById->setModel('\Thelia\Model\RewritingUrl');
+    }
+
+    /**
+     * Gets an array of ChildRewritingUrl objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildRewritingUrl is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildRewritingUrl[] List of ChildRewritingUrl objects
      * @throws PropelException
      */
-    public function setCategory(ChildCategory $v = null)
+    public function getRewritingUrlsRelatedById($criteria = null, ConnectionInterface $con = null)
     {
-        if ($v === null) {
-            $this->setCategoryId(NULL);
-        } else {
-            $this->setCategoryId($v->getId());
+        $partial = $this->collRewritingUrlsRelatedByIdPartial && !$this->isNew();
+        if (null === $this->collRewritingUrlsRelatedById || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collRewritingUrlsRelatedById) {
+                // return empty collection
+                $this->initRewritingUrlsRelatedById();
+            } else {
+                $collRewritingUrlsRelatedById = ChildRewritingUrlQuery::create(null, $criteria)
+                    ->filterByRewritingUrlRelatedByRedirected($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collRewritingUrlsRelatedByIdPartial && count($collRewritingUrlsRelatedById)) {
+                        $this->initRewritingUrlsRelatedById(false);
+
+                        foreach ($collRewritingUrlsRelatedById as $obj) {
+                            if (false == $this->collRewritingUrlsRelatedById->contains($obj)) {
+                                $this->collRewritingUrlsRelatedById->append($obj);
+                            }
+                        }
+
+                        $this->collRewritingUrlsRelatedByIdPartial = true;
+                    }
+
+                    $collRewritingUrlsRelatedById->getInternalIterator()->rewind();
+
+                    return $collRewritingUrlsRelatedById;
+                }
+
+                if ($partial && $this->collRewritingUrlsRelatedById) {
+                    foreach ($this->collRewritingUrlsRelatedById as $obj) {
+                        if ($obj->isNew()) {
+                            $collRewritingUrlsRelatedById[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collRewritingUrlsRelatedById = $collRewritingUrlsRelatedById;
+                $this->collRewritingUrlsRelatedByIdPartial = false;
+            }
         }
 
-        $this->aCategory = $v;
+        return $this->collRewritingUrlsRelatedById;
+    }
 
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildCategory object, it will not be re-added.
-        if ($v !== null) {
-            $v->addRewriting($this);
+    /**
+     * Sets a collection of RewritingUrlRelatedById objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $rewritingUrlsRelatedById A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildRewritingUrl The current object (for fluent API support)
+     */
+    public function setRewritingUrlsRelatedById(Collection $rewritingUrlsRelatedById, ConnectionInterface $con = null)
+    {
+        $rewritingUrlsRelatedByIdToDelete = $this->getRewritingUrlsRelatedById(new Criteria(), $con)->diff($rewritingUrlsRelatedById);
+
+
+        $this->rewritingUrlsRelatedByIdScheduledForDeletion = $rewritingUrlsRelatedByIdToDelete;
+
+        foreach ($rewritingUrlsRelatedByIdToDelete as $rewritingUrlRelatedByIdRemoved) {
+            $rewritingUrlRelatedByIdRemoved->setRewritingUrlRelatedByRedirected(null);
         }
 
+        $this->collRewritingUrlsRelatedById = null;
+        foreach ($rewritingUrlsRelatedById as $rewritingUrlRelatedById) {
+            $this->addRewritingUrlRelatedById($rewritingUrlRelatedById);
+        }
+
+        $this->collRewritingUrlsRelatedById = $rewritingUrlsRelatedById;
+        $this->collRewritingUrlsRelatedByIdPartial = false;
 
         return $this;
     }
 
-
     /**
-     * Get the associated ChildCategory object
+     * Returns the number of related RewritingUrl objects.
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildCategory The associated ChildCategory object.
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related RewritingUrl objects.
      * @throws PropelException
      */
-    public function getCategory(ConnectionInterface $con = null)
+    public function countRewritingUrlsRelatedById(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        if ($this->aCategory === null && ($this->category_id !== null)) {
-            $this->aCategory = ChildCategoryQuery::create()->findPk($this->category_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aCategory->addRewritings($this);
-             */
+        $partial = $this->collRewritingUrlsRelatedByIdPartial && !$this->isNew();
+        if (null === $this->collRewritingUrlsRelatedById || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collRewritingUrlsRelatedById) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getRewritingUrlsRelatedById());
+            }
+
+            $query = ChildRewritingUrlQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByRewritingUrlRelatedByRedirected($this)
+                ->count($con);
         }
 
-        return $this->aCategory;
+        return count($this->collRewritingUrlsRelatedById);
     }
 
     /**
-     * Declares an association between this object and a ChildFolder object.
+     * Method called to associate a ChildRewritingUrl object to this object
+     * through the ChildRewritingUrl foreign key attribute.
      *
-     * @param                  ChildFolder $v
-     * @return                 \Thelia\Model\Rewriting The current object (for fluent API support)
-     * @throws PropelException
+     * @param    ChildRewritingUrl $l ChildRewritingUrl
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
      */
-    public function setFolder(ChildFolder $v = null)
+    public function addRewritingUrlRelatedById(ChildRewritingUrl $l)
     {
-        if ($v === null) {
-            $this->setFolderId(NULL);
-        } else {
-            $this->setFolderId($v->getId());
+        if ($this->collRewritingUrlsRelatedById === null) {
+            $this->initRewritingUrlsRelatedById();
+            $this->collRewritingUrlsRelatedByIdPartial = true;
         }
 
-        $this->aFolder = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildFolder object, it will not be re-added.
-        if ($v !== null) {
-            $v->addRewriting($this);
+        if (!in_array($l, $this->collRewritingUrlsRelatedById->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddRewritingUrlRelatedById($l);
         }
-
 
         return $this;
     }
 
-
     /**
-     * Get the associated ChildFolder object
-     *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildFolder The associated ChildFolder object.
-     * @throws PropelException
+     * @param RewritingUrlRelatedById $rewritingUrlRelatedById The rewritingUrlRelatedById object to add.
      */
-    public function getFolder(ConnectionInterface $con = null)
+    protected function doAddRewritingUrlRelatedById($rewritingUrlRelatedById)
     {
-        if ($this->aFolder === null && ($this->folder_id !== null)) {
-            $this->aFolder = ChildFolderQuery::create()->findPk($this->folder_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aFolder->addRewritings($this);
-             */
-        }
-
-        return $this->aFolder;
+        $this->collRewritingUrlsRelatedById[]= $rewritingUrlRelatedById;
+        $rewritingUrlRelatedById->setRewritingUrlRelatedByRedirected($this);
     }
 
     /**
-     * Declares an association between this object and a ChildContent object.
-     *
-     * @param                  ChildContent $v
-     * @return                 \Thelia\Model\Rewriting The current object (for fluent API support)
-     * @throws PropelException
+     * @param  RewritingUrlRelatedById $rewritingUrlRelatedById The rewritingUrlRelatedById object to remove.
+     * @return ChildRewritingUrl The current object (for fluent API support)
      */
-    public function setContent(ChildContent $v = null)
+    public function removeRewritingUrlRelatedById($rewritingUrlRelatedById)
     {
-        if ($v === null) {
-            $this->setContentId(NULL);
-        } else {
-            $this->setContentId($v->getId());
+        if ($this->getRewritingUrlsRelatedById()->contains($rewritingUrlRelatedById)) {
+            $this->collRewritingUrlsRelatedById->remove($this->collRewritingUrlsRelatedById->search($rewritingUrlRelatedById));
+            if (null === $this->rewritingUrlsRelatedByIdScheduledForDeletion) {
+                $this->rewritingUrlsRelatedByIdScheduledForDeletion = clone $this->collRewritingUrlsRelatedById;
+                $this->rewritingUrlsRelatedByIdScheduledForDeletion->clear();
+            }
+            $this->rewritingUrlsRelatedByIdScheduledForDeletion[]= $rewritingUrlRelatedById;
+            $rewritingUrlRelatedById->setRewritingUrlRelatedByRedirected(null);
         }
-
-        $this->aContent = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildContent object, it will not be re-added.
-        if ($v !== null) {
-            $v->addRewriting($this);
-        }
-
 
         return $this;
     }
 
+    /**
+     * Clears out the collRewritingArguments collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addRewritingArguments()
+     */
+    public function clearRewritingArguments()
+    {
+        $this->collRewritingArguments = null; // important to set this to NULL since that means it is uninitialized
+    }
 
     /**
-     * Get the associated ChildContent object
+     * Reset is the collRewritingArguments collection loaded partially.
+     */
+    public function resetPartialRewritingArguments($v = true)
+    {
+        $this->collRewritingArgumentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collRewritingArguments collection.
      *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildContent The associated ChildContent object.
+     * By default this just sets the collRewritingArguments collection to an empty array (like clearcollRewritingArguments());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initRewritingArguments($overrideExisting = true)
+    {
+        if (null !== $this->collRewritingArguments && !$overrideExisting) {
+            return;
+        }
+        $this->collRewritingArguments = new ObjectCollection();
+        $this->collRewritingArguments->setModel('\Thelia\Model\RewritingArgument');
+    }
+
+    /**
+     * Gets an array of ChildRewritingArgument objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildRewritingUrl is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildRewritingArgument[] List of ChildRewritingArgument objects
      * @throws PropelException
      */
-    public function getContent(ConnectionInterface $con = null)
+    public function getRewritingArguments($criteria = null, ConnectionInterface $con = null)
     {
-        if ($this->aContent === null && ($this->content_id !== null)) {
-            $this->aContent = ChildContentQuery::create()->findPk($this->content_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aContent->addRewritings($this);
-             */
+        $partial = $this->collRewritingArgumentsPartial && !$this->isNew();
+        if (null === $this->collRewritingArguments || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collRewritingArguments) {
+                // return empty collection
+                $this->initRewritingArguments();
+            } else {
+                $collRewritingArguments = ChildRewritingArgumentQuery::create(null, $criteria)
+                    ->filterByRewritingUrl($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collRewritingArgumentsPartial && count($collRewritingArguments)) {
+                        $this->initRewritingArguments(false);
+
+                        foreach ($collRewritingArguments as $obj) {
+                            if (false == $this->collRewritingArguments->contains($obj)) {
+                                $this->collRewritingArguments->append($obj);
+                            }
+                        }
+
+                        $this->collRewritingArgumentsPartial = true;
+                    }
+
+                    $collRewritingArguments->getInternalIterator()->rewind();
+
+                    return $collRewritingArguments;
+                }
+
+                if ($partial && $this->collRewritingArguments) {
+                    foreach ($this->collRewritingArguments as $obj) {
+                        if ($obj->isNew()) {
+                            $collRewritingArguments[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collRewritingArguments = $collRewritingArguments;
+                $this->collRewritingArgumentsPartial = false;
+            }
         }
 
-        return $this->aContent;
+        return $this->collRewritingArguments;
+    }
+
+    /**
+     * Sets a collection of RewritingArgument objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $rewritingArguments A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildRewritingUrl The current object (for fluent API support)
+     */
+    public function setRewritingArguments(Collection $rewritingArguments, ConnectionInterface $con = null)
+    {
+        $rewritingArgumentsToDelete = $this->getRewritingArguments(new Criteria(), $con)->diff($rewritingArguments);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->rewritingArgumentsScheduledForDeletion = clone $rewritingArgumentsToDelete;
+
+        foreach ($rewritingArgumentsToDelete as $rewritingArgumentRemoved) {
+            $rewritingArgumentRemoved->setRewritingUrl(null);
+        }
+
+        $this->collRewritingArguments = null;
+        foreach ($rewritingArguments as $rewritingArgument) {
+            $this->addRewritingArgument($rewritingArgument);
+        }
+
+        $this->collRewritingArguments = $rewritingArguments;
+        $this->collRewritingArgumentsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related RewritingArgument objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related RewritingArgument objects.
+     * @throws PropelException
+     */
+    public function countRewritingArguments(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collRewritingArgumentsPartial && !$this->isNew();
+        if (null === $this->collRewritingArguments || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collRewritingArguments) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getRewritingArguments());
+            }
+
+            $query = ChildRewritingArgumentQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByRewritingUrl($this)
+                ->count($con);
+        }
+
+        return count($this->collRewritingArguments);
+    }
+
+    /**
+     * Method called to associate a ChildRewritingArgument object to this object
+     * through the ChildRewritingArgument foreign key attribute.
+     *
+     * @param    ChildRewritingArgument $l ChildRewritingArgument
+     * @return   \Thelia\Model\RewritingUrl The current object (for fluent API support)
+     */
+    public function addRewritingArgument(ChildRewritingArgument $l)
+    {
+        if ($this->collRewritingArguments === null) {
+            $this->initRewritingArguments();
+            $this->collRewritingArgumentsPartial = true;
+        }
+
+        if (!in_array($l, $this->collRewritingArguments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddRewritingArgument($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param RewritingArgument $rewritingArgument The rewritingArgument object to add.
+     */
+    protected function doAddRewritingArgument($rewritingArgument)
+    {
+        $this->collRewritingArguments[]= $rewritingArgument;
+        $rewritingArgument->setRewritingUrl($this);
+    }
+
+    /**
+     * @param  RewritingArgument $rewritingArgument The rewritingArgument object to remove.
+     * @return ChildRewritingUrl The current object (for fluent API support)
+     */
+    public function removeRewritingArgument($rewritingArgument)
+    {
+        if ($this->getRewritingArguments()->contains($rewritingArgument)) {
+            $this->collRewritingArguments->remove($this->collRewritingArguments->search($rewritingArgument));
+            if (null === $this->rewritingArgumentsScheduledForDeletion) {
+                $this->rewritingArgumentsScheduledForDeletion = clone $this->collRewritingArguments;
+                $this->rewritingArgumentsScheduledForDeletion->clear();
+            }
+            $this->rewritingArgumentsScheduledForDeletion[]= clone $rewritingArgument;
+            $rewritingArgument->setRewritingUrl(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -1634,10 +1965,10 @@ abstract class Rewriting implements ActiveRecordInterface
     {
         $this->id = null;
         $this->url = null;
-        $this->product_id = null;
-        $this->category_id = null;
-        $this->folder_id = null;
-        $this->content_id = null;
+        $this->view = null;
+        $this->view_id = null;
+        $this->view_locale = null;
+        $this->redirected = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1659,12 +1990,27 @@ abstract class Rewriting implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collRewritingUrlsRelatedById) {
+                foreach ($this->collRewritingUrlsRelatedById as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collRewritingArguments) {
+                foreach ($this->collRewritingArguments as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aProduct = null;
-        $this->aCategory = null;
-        $this->aFolder = null;
-        $this->aContent = null;
+        if ($this->collRewritingUrlsRelatedById instanceof Collection) {
+            $this->collRewritingUrlsRelatedById->clearIterator();
+        }
+        $this->collRewritingUrlsRelatedById = null;
+        if ($this->collRewritingArguments instanceof Collection) {
+            $this->collRewritingArguments->clearIterator();
+        }
+        $this->collRewritingArguments = null;
+        $this->aRewritingUrlRelatedByRedirected = null;
     }
 
     /**
@@ -1674,7 +2020,7 @@ abstract class Rewriting implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(RewritingTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(RewritingUrlTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1682,11 +2028,11 @@ abstract class Rewriting implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildRewriting The current object (for fluent API support)
+     * @return     ChildRewritingUrl The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = RewritingTableMap::UPDATED_AT;
+        $this->modifiedColumns[] = RewritingUrlTableMap::UPDATED_AT;
 
         return $this;
     }

@@ -96,7 +96,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
         $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGOUT, $event);
 
-          $this->getFrontSecurityContext()->clear();
+        $this->getSecurityContext()->clearCustomerUser();
     }
 
     public function changePassword(ActionEvent $event)
@@ -127,8 +127,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            "action.createCustomer" => array("create", 128),
-            "action.modifyCustomer" => array("modify", 128),
+            TheliaEvents::CUSTOMER_CREATEACCOUNT => array("create", 128),
+            TheliaEvents::CUSTOMER_UPDATEACCOUNT => array("modify", 128),
         );
     }
 }

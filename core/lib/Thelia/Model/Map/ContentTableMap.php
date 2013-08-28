@@ -184,7 +184,6 @@ class ContentTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Rewriting', '\\Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
         $this->addRelation('ContentFolder', '\\Thelia\\Model\\ContentFolder', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'ContentFolders');
         $this->addRelation('ContentImage', '\\Thelia\\Model\\ContentImage', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'ContentImages');
         $this->addRelation('ContentDocument', '\\Thelia\\Model\\ContentDocument', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'ContentDocuments');
@@ -216,7 +215,6 @@ class ContentTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                RewritingTableMap::clearInstancePool();
                 ContentFolderTableMap::clearInstancePool();
                 ContentImageTableMap::clearInstancePool();
                 ContentDocumentTableMap::clearInstancePool();

@@ -21,17 +21,36 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Internal;
+namespace Thelia\Core\Event;
+use Thelia\Model\Category;
 
-use Thelia\Model\Cart;
-
-class CartEvent extends InternalEvent
+class CategoryDeleteEvent extends ActionEvent
 {
-    public $cart;
+    protected $id;
+    protected $deleted_category;
 
-    public function __construct(Cart $cart)
+    public function __construct($id)
     {
-        $this->cart = $cart;
+        $this->id = $id;
     }
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function getDeletedCategory()
+    {
+        return $this->deleted_category;
+    }
+
+    public function setDeletedCategory(Category $deleted_category)
+    {
+        $this->deleted_category = $deleted_category;
+    }
 }

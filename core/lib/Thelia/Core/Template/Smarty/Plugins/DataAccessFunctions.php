@@ -52,7 +52,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      */
     public function adminDataAccess($params, &$smarty)
     {
-         return $this->userDataAccess("Admin User", SecurityContext::CONTEXT_BACK_OFFICE, $params);
+         return $this->userDataAccess("Admin User", $this->securityContext->getAdminUser(), $params);
     }
 
      /**
@@ -64,7 +64,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
       */
      public function customerDataAccess($params, &$smarty)
      {
-         return $this->userDataAccess("Customer User", SecurityContext::CONTEXT_FRONT_OFFICE, $params);
+         return $this->userDataAccess("Customer User", $this->securityContext->getCustomerUser(), $params);
      }
 
     /**
@@ -75,12 +75,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      * @return string                   the value of the requested attribute
      * @throws InvalidArgumentException if the object does not have the requested attribute.
      */
-     protected function userDataAccess($objectLabel, $context, $params)
+     protected function userDataAccess($objectLabel, $user, $params)
      {
          $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
 
          if (! empty($attribute)) {
-             $user = $this->securityContext->setContext($context)->getUser();
 
              if (null != $user) {
                  $getter = sprintf("get%s", ucfirst($attribute));

@@ -2,11 +2,11 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\RewritingQuery as BaseRewritingQuery;
+use Thelia\Model\Base\RewritingUrlQuery as BaseRewritingUrlQuery;
 
 
 /**
- * Skeleton subclass for performing query and update operations on the 'rewriting' table.
+ * Skeleton subclass for performing query and update operations on the 'rewriting_url' table.
  *
  *
  *
@@ -15,6 +15,6 @@ use Thelia\Model\Base\RewritingQuery as BaseRewritingQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class RewritingQuery extends BaseRewritingQuery {
+class RewritingUrlQuery extends BaseRewritingUrlQuery {
 
-} // RewritingQuery
+} // RewritingUrlQuery

@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Rewriting;
-use Thelia\Model\RewritingQuery;
+use Thelia\Model\RewritingArgument;
+use Thelia\Model\RewritingArgumentQuery;
 
 
 /**
- * This class defines the structure of the 'rewriting' table.
+ * This class defines the structure of the 'rewriting_argument' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\RewritingQuery;
  * (i.e. if it's a text column type).
  *
  */
-class RewritingTableMap extends TableMap
+class RewritingArgumentTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.RewritingTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.RewritingArgumentTableMap';
 
     /**
      * The default database name for this class
@@ -42,22 +42,22 @@ class RewritingTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'rewriting';
+    const TABLE_NAME = 'rewriting_argument';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Rewriting';
+    const OM_CLASS = '\\Thelia\\Model\\RewritingArgument';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Rewriting';
+    const CLASS_DEFAULT = 'Thelia.Model.RewritingArgument';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 8;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -67,47 +67,32 @@ class RewritingTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 8;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
-     * the column name for the ID field
+     * the column name for the REWRITING_URL_ID field
      */
-    const ID = 'rewriting.ID';
+    const REWRITING_URL_ID = 'rewriting_argument.REWRITING_URL_ID';
 
     /**
-     * the column name for the URL field
+     * the column name for the PARAMETER field
      */
-    const URL = 'rewriting.URL';
+    const PARAMETER = 'rewriting_argument.PARAMETER';
 
     /**
-     * the column name for the PRODUCT_ID field
+     * the column name for the VALUE field
      */
-    const PRODUCT_ID = 'rewriting.PRODUCT_ID';
-
-    /**
-     * the column name for the CATEGORY_ID field
-     */
-    const CATEGORY_ID = 'rewriting.CATEGORY_ID';
-
-    /**
-     * the column name for the FOLDER_ID field
-     */
-    const FOLDER_ID = 'rewriting.FOLDER_ID';
-
-    /**
-     * the column name for the CONTENT_ID field
-     */
-    const CONTENT_ID = 'rewriting.CONTENT_ID';
+    const VALUE = 'rewriting_argument.VALUE';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'rewriting.CREATED_AT';
+    const CREATED_AT = 'rewriting_argument.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'rewriting.UPDATED_AT';
+    const UPDATED_AT = 'rewriting_argument.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -121,12 +106,12 @@ class RewritingTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Url', 'ProductId', 'CategoryId', 'FolderId', 'ContentId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'url', 'productId', 'categoryId', 'folderId', 'contentId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(RewritingTableMap::ID, RewritingTableMap::URL, RewritingTableMap::PRODUCT_ID, RewritingTableMap::CATEGORY_ID, RewritingTableMap::FOLDER_ID, RewritingTableMap::CONTENT_ID, RewritingTableMap::CREATED_AT, RewritingTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'URL', 'PRODUCT_ID', 'CATEGORY_ID', 'FOLDER_ID', 'CONTENT_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'url', 'product_id', 'category_id', 'folder_id', 'content_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
+        self::TYPE_PHPNAME       => array('RewritingUrlId', 'Parameter', 'Value', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('rewritingUrlId', 'parameter', 'value', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(RewritingArgumentTableMap::REWRITING_URL_ID, RewritingArgumentTableMap::PARAMETER, RewritingArgumentTableMap::VALUE, RewritingArgumentTableMap::CREATED_AT, RewritingArgumentTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('REWRITING_URL_ID', 'PARAMETER', 'VALUE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('rewriting_url_id', 'parameter', 'value', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -136,12 +121,12 @@ class RewritingTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Url' => 1, 'ProductId' => 2, 'CategoryId' => 3, 'FolderId' => 4, 'ContentId' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'url' => 1, 'productId' => 2, 'categoryId' => 3, 'folderId' => 4, 'contentId' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
-        self::TYPE_COLNAME       => array(RewritingTableMap::ID => 0, RewritingTableMap::URL => 1, RewritingTableMap::PRODUCT_ID => 2, RewritingTableMap::CATEGORY_ID => 3, RewritingTableMap::FOLDER_ID => 4, RewritingTableMap::CONTENT_ID => 5, RewritingTableMap::CREATED_AT => 6, RewritingTableMap::UPDATED_AT => 7, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'URL' => 1, 'PRODUCT_ID' => 2, 'CATEGORY_ID' => 3, 'FOLDER_ID' => 4, 'CONTENT_ID' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'url' => 1, 'product_id' => 2, 'category_id' => 3, 'folder_id' => 4, 'content_id' => 5, 'created_at' => 6, 'updated_at' => 7, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
+        self::TYPE_PHPNAME       => array('RewritingUrlId' => 0, 'Parameter' => 1, 'Value' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('rewritingUrlId' => 0, 'parameter' => 1, 'value' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(RewritingArgumentTableMap::REWRITING_URL_ID => 0, RewritingArgumentTableMap::PARAMETER => 1, RewritingArgumentTableMap::VALUE => 2, RewritingArgumentTableMap::CREATED_AT => 3, RewritingArgumentTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('REWRITING_URL_ID' => 0, 'PARAMETER' => 1, 'VALUE' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('rewriting_url_id' => 0, 'parameter' => 1, 'value' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -154,18 +139,15 @@ class RewritingTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('rewriting');
-        $this->setPhpName('Rewriting');
-        $this->setClassName('\\Thelia\\Model\\Rewriting');
+        $this->setName('rewriting_argument');
+        $this->setPhpName('RewritingArgument');
+        $this->setClassName('\\Thelia\\Model\\RewritingArgument');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('URL', 'Url', 'VARCHAR', true, 255, null);
-        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', false, null, null);
-        $this->addForeignKey('CATEGORY_ID', 'CategoryId', 'INTEGER', 'category', 'ID', false, null, null);
-        $this->addForeignKey('FOLDER_ID', 'FolderId', 'INTEGER', 'folder', 'ID', false, null, null);
-        $this->addForeignKey('CONTENT_ID', 'ContentId', 'INTEGER', 'content', 'ID', false, null, null);
+        $this->addForeignPrimaryKey('REWRITING_URL_ID', 'RewritingUrlId', 'INTEGER' , 'rewriting_url', 'ID', true, null, null);
+        $this->addPrimaryKey('PARAMETER', 'Parameter', 'VARCHAR', true, 255, null);
+        $this->addPrimaryKey('VALUE', 'Value', 'VARCHAR', true, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -175,10 +157,7 @@ class RewritingTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Category', '\\Thelia\\Model\\Category', RelationMap::MANY_TO_ONE, array('category_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Folder', '\\Thelia\\Model\\Folder', RelationMap::MANY_TO_ONE, array('folder_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Content', '\\Thelia\\Model\\Content', RelationMap::MANY_TO_ONE, array('content_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('RewritingUrl', '\\Thelia\\Model\\RewritingUrl', RelationMap::MANY_TO_ONE, array('rewriting_url_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
 
     /**
@@ -195,6 +174,59 @@ class RewritingTableMap extends TableMap
     } // getBehaviors()
 
     /**
+     * Adds an object to the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
+     *
+     * @param \Thelia\Model\RewritingArgument $obj A \Thelia\Model\RewritingArgument object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
+     */
+    public static function addInstanceToPool($obj, $key = null)
+    {
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getRewritingUrlId(), (string) $obj->getParameter(), (string) $obj->getValue()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \Thelia\Model\RewritingArgument object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \Thelia\Model\RewritingArgument) {
+                $key = serialize(array((string) $value->getRewritingUrlId(), (string) $value->getParameter(), (string) $value->getValue()));
+
+            } elseif (is_array($value) && count($value) === 3) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\RewritingArgument object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
+    }
+
+    /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
      *
      * For tables with a single-column primary key, that simple pkey value will be returned.  For tables with
@@ -208,11 +240,11 @@ class RewritingTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('RewritingUrlId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Parameter', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Value', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('RewritingUrlId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Parameter', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Value', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -230,11 +262,7 @@ class RewritingTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return (int) $row[
-                            $indexType == TableMap::TYPE_NUM
-                            ? 0 + $offset
-                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-                        ];
+            return $pks;
     }
 
     /**
@@ -250,7 +278,7 @@ class RewritingTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? RewritingTableMap::CLASS_DEFAULT : RewritingTableMap::OM_CLASS;
+        return $withPrefix ? RewritingArgumentTableMap::CLASS_DEFAULT : RewritingArgumentTableMap::OM_CLASS;
     }
 
     /**
@@ -264,21 +292,21 @@ class RewritingTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Rewriting object, last column rank)
+     * @return array (RewritingArgument object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = RewritingTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = RewritingTableMap::getInstanceFromPool($key))) {
+        $key = RewritingArgumentTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = RewritingArgumentTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + RewritingTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + RewritingArgumentTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = RewritingTableMap::OM_CLASS;
+            $cls = RewritingArgumentTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            RewritingTableMap::addInstanceToPool($obj, $key);
+            RewritingArgumentTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -301,8 +329,8 @@ class RewritingTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = RewritingTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = RewritingTableMap::getInstanceFromPool($key))) {
+            $key = RewritingArgumentTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = RewritingArgumentTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -311,7 +339,7 @@ class RewritingTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                RewritingTableMap::addInstanceToPool($obj, $key);
+                RewritingArgumentTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -332,21 +360,15 @@ class RewritingTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(RewritingTableMap::ID);
-            $criteria->addSelectColumn(RewritingTableMap::URL);
-            $criteria->addSelectColumn(RewritingTableMap::PRODUCT_ID);
-            $criteria->addSelectColumn(RewritingTableMap::CATEGORY_ID);
-            $criteria->addSelectColumn(RewritingTableMap::FOLDER_ID);
-            $criteria->addSelectColumn(RewritingTableMap::CONTENT_ID);
-            $criteria->addSelectColumn(RewritingTableMap::CREATED_AT);
-            $criteria->addSelectColumn(RewritingTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(RewritingArgumentTableMap::REWRITING_URL_ID);
+            $criteria->addSelectColumn(RewritingArgumentTableMap::PARAMETER);
+            $criteria->addSelectColumn(RewritingArgumentTableMap::VALUE);
+            $criteria->addSelectColumn(RewritingArgumentTableMap::CREATED_AT);
+            $criteria->addSelectColumn(RewritingArgumentTableMap::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.URL');
-            $criteria->addSelectColumn($alias . '.PRODUCT_ID');
-            $criteria->addSelectColumn($alias . '.CATEGORY_ID');
-            $criteria->addSelectColumn($alias . '.FOLDER_ID');
-            $criteria->addSelectColumn($alias . '.CONTENT_ID');
+            $criteria->addSelectColumn($alias . '.REWRITING_URL_ID');
+            $criteria->addSelectColumn($alias . '.PARAMETER');
+            $criteria->addSelectColumn($alias . '.VALUE');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -361,7 +383,7 @@ class RewritingTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(RewritingTableMap::DATABASE_NAME)->getTable(RewritingTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(RewritingArgumentTableMap::DATABASE_NAME)->getTable(RewritingArgumentTableMap::TABLE_NAME);
     }
 
     /**
@@ -369,16 +391,16 @@ class RewritingTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(RewritingTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(RewritingTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new RewritingTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(RewritingArgumentTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(RewritingArgumentTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new RewritingArgumentTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Rewriting or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a RewritingArgument or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Rewriting object or primary key or array of primary keys
+     * @param mixed               $values Criteria or RewritingArgument object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -389,25 +411,36 @@ class RewritingTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(RewritingTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RewritingArgumentTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Rewriting) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\RewritingArgument) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(RewritingTableMap::DATABASE_NAME);
-            $criteria->add(RewritingTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(RewritingArgumentTableMap::DATABASE_NAME);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(RewritingArgumentTableMap::REWRITING_URL_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(RewritingArgumentTableMap::PARAMETER, $value[1]));
+                $criterion->addAnd($criteria->getNewCriterion(RewritingArgumentTableMap::VALUE, $value[2]));
+                $criteria->addOr($criterion);
+            }
         }
 
-        $query = RewritingQuery::create()->mergeWith($criteria);
+        $query = RewritingArgumentQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { RewritingTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { RewritingArgumentTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { RewritingTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { RewritingArgumentTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -415,20 +448,20 @@ class RewritingTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the rewriting table.
+     * Deletes all rows from the rewriting_argument table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return RewritingQuery::create()->doDeleteAll($con);
+        return RewritingArgumentQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Rewriting or Criteria object.
+     * Performs an INSERT on the database, given a RewritingArgument or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Rewriting object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or RewritingArgument object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -437,18 +470,18 @@ class RewritingTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(RewritingTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(RewritingArgumentTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Rewriting object
+            $criteria = $criteria->buildCriteria(); // build Criteria from RewritingArgument object
         }
 
 
         // Set the correct dbName
-        $query = RewritingQuery::create()->mergeWith($criteria);
+        $query = RewritingArgumentQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -464,7 +497,7 @@ class RewritingTableMap extends TableMap
         return $pk;
     }
 
-} // RewritingTableMap
+} // RewritingArgumentTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-RewritingTableMap::buildTableMap();
+RewritingArgumentTableMap::buildTableMap();

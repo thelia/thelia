@@ -204,7 +204,6 @@ class ProductTableMap extends TableMap
         $this->addRelation('ProductDocument', '\\Thelia\\Model\\ProductDocument', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ProductDocuments');
         $this->addRelation('AccessoryRelatedByProductId', '\\Thelia\\Model\\Accessory', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'AccessoriesRelatedByProductId');
         $this->addRelation('AccessoryRelatedByAccessory', '\\Thelia\\Model\\Accessory', RelationMap::ONE_TO_MANY, array('id' => 'accessory', ), 'CASCADE', 'RESTRICT', 'AccessoriesRelatedByAccessory');
-        $this->addRelation('Rewriting', '\\Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
         $this->addRelation('CartItem', '\\Thelia\\Model\\CartItem', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), null, null, 'CartItems');
         $this->addRelation('ProductAssociatedContent', '\\Thelia\\Model\\ProductAssociatedContent', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ProductAssociatedContents');
         $this->addRelation('ProductI18n', '\\Thelia\\Model\\ProductI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ProductI18ns');
@@ -241,7 +240,6 @@ class ProductTableMap extends TableMap
                 ProductImageTableMap::clearInstancePool();
                 ProductDocumentTableMap::clearInstancePool();
                 AccessoryTableMap::clearInstancePool();
-                RewritingTableMap::clearInstancePool();
                 ProductAssociatedContentTableMap::clearInstancePool();
                 ProductI18nTableMap::clearInstancePool();
                 ProductVersionTableMap::clearInstancePool();

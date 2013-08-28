@@ -21,34 +21,36 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core;
+namespace Thelia\Core\Event;
+use Thelia\Model\Category;
 
-class Context
+class CategoryToggleVisibilityEvent extends ActionEvent
 {
-    const CONTEXT_FRONT_OFFICE = 'front';
-    const CONTEXT_BACK_OFFICE  = 'admin';
+    protected $id;
+    protected $category;
 
-    protected $defineContext = array(
-        self::CONTEXT_BACK_OFFICE,
-        self::CONTEXT_FRONT_OFFICE
-    );
-
-    protected $currentContext = self::CONTEXT_FRONT_OFFICE;
-
-    public function isValidContext($context)
+    public function __construct($id)
     {
-        return in_array($context, $this->defineContext);
+        $this->id = $id;
     }
 
-    public function setContext($context)
+    public function getId()
     {
-        if ($this->isValidContext($context)) {
-            $this->currentContext = $context;
-        }
+        return $this->id;
     }
 
-    public function getContext()
+    public function setId($id)
     {
-        return $this->currentContext;
+        $this->id = $id;
+    }
+
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    public function setCategory(Category $category)
+    {
+        $this->category = $category;
     }
 }

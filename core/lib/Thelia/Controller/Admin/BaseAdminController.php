@@ -30,10 +30,21 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Model\AdminLog;
 
 class BaseAdminController extends BaseController
 {
     const TEMPLATE_404 = "404";
+
+    /**
+     * Helper to append a message to the admin log.
+     *
+     * @param unknown $message
+     */
+    public function adminLogAppend($message) {
+        AdminLog::append($message, $this->getRequest(), $this->getSecurityContext()->getAdminUser());
+    }
 
     public function processTemplateAction($template)
     {

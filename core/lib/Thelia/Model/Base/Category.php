@@ -41,8 +41,6 @@ use Thelia\Model\Product as ChildProduct;
 use Thelia\Model\ProductCategory as ChildProductCategory;
 use Thelia\Model\ProductCategoryQuery as ChildProductCategoryQuery;
 use Thelia\Model\ProductQuery as ChildProductQuery;
-use Thelia\Model\Rewriting as ChildRewriting;
-use Thelia\Model\RewritingQuery as ChildRewritingQuery;
 use Thelia\Model\Map\CategoryTableMap;
 use Thelia\Model\Map\CategoryVersionTableMap;
 
@@ -154,12 +152,6 @@ abstract class Category implements ActiveRecordInterface
     protected $collAttributeCategoriesPartial;
 
     /**
-     * @var        ObjectCollection|ChildRewriting[] Collection to store aggregation of ChildRewriting objects.
-     */
-    protected $collRewritings;
-    protected $collRewritingsPartial;
-
-    /**
      * @var        ObjectCollection|ChildCategoryImage[] Collection to store aggregation of ChildCategoryImage objects.
      */
     protected $collCategoryImages;
@@ -269,12 +261,6 @@ abstract class Category implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $attributeCategoriesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $rewritingsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -1039,8 +1025,6 @@ abstract class Category implements ActiveRecordInterface
 
             $this->collAttributeCategories = null;
 
-            $this->collRewritings = null;
-
             $this->collCategoryImages = null;
 
             $this->collCategoryDocuments = null;
@@ -1325,23 +1309,6 @@ abstract class Category implements ActiveRecordInterface
 
                 if ($this->collAttributeCategories !== null) {
             foreach ($this->collAttributeCategories as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->rewritingsScheduledForDeletion !== null) {
-                if (!$this->rewritingsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\RewritingQuery::create()
-                        ->filterByPrimaryKeys($this->rewritingsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->rewritingsScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collRewritings !== null) {
-            foreach ($this->collRewritings as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1668,9 +1635,6 @@ abstract class Category implements ActiveRecordInterface
             if (null !== $this->collAttributeCategories) {
                 $result['AttributeCategories'] = $this->collAttributeCategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collRewritings) {
-                $result['Rewritings'] = $this->collRewritings->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collCategoryImages) {
                 $result['CategoryImages'] = $this->collCategoryImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1895,12 +1859,6 @@ abstract class Category implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getRewritings() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addRewriting($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getCategoryImages() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCategoryImage($relObj->copy($deepCopy));
@@ -1980,9 +1938,6 @@ abstract class Category implements ActiveRecordInterface
         }
         if ('AttributeCategory' == $relationName) {
             return $this->initAttributeCategories();
-        }
-        if ('Rewriting' == $relationName) {
-            return $this->initRewritings();
         }
         if ('CategoryImage' == $relationName) {
             return $this->initCategoryImages();
@@ -2731,299 +2686,6 @@ abstract class Category implements ActiveRecordInterface
         $query->joinWith('Attribute', $joinBehavior);
 
         return $this->getAttributeCategories($query, $con);
-    }
-
-    /**
-     * Clears out the collRewritings collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addRewritings()
-     */
-    public function clearRewritings()
-    {
-        $this->collRewritings = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collRewritings collection loaded partially.
-     */
-    public function resetPartialRewritings($v = true)
-    {
-        $this->collRewritingsPartial = $v;
-    }
-
-    /**
-     * Initializes the collRewritings collection.
-     *
-     * By default this just sets the collRewritings collection to an empty array (like clearcollRewritings());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initRewritings($overrideExisting = true)
-    {
-        if (null !== $this->collRewritings && !$overrideExisting) {
-            return;
-        }
-        $this->collRewritings = new ObjectCollection();
-        $this->collRewritings->setModel('\Thelia\Model\Rewriting');
-    }
-
-    /**
-     * Gets an array of ChildRewriting objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCategory is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildRewriting[] List of ChildRewriting objects
-     * @throws PropelException
-     */
-    public function getRewritings($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collRewritingsPartial && !$this->isNew();
-        if (null === $this->collRewritings || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collRewritings) {
-                // return empty collection
-                $this->initRewritings();
-            } else {
-                $collRewritings = ChildRewritingQuery::create(null, $criteria)
-                    ->filterByCategory($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collRewritingsPartial && count($collRewritings)) {
-                        $this->initRewritings(false);
-
-                        foreach ($collRewritings as $obj) {
-                            if (false == $this->collRewritings->contains($obj)) {
-                                $this->collRewritings->append($obj);
-                            }
-                        }
-
-                        $this->collRewritingsPartial = true;
-                    }
-
-                    $collRewritings->getInternalIterator()->rewind();
-
-                    return $collRewritings;
-                }
-
-                if ($partial && $this->collRewritings) {
-                    foreach ($this->collRewritings as $obj) {
-                        if ($obj->isNew()) {
-                            $collRewritings[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collRewritings = $collRewritings;
-                $this->collRewritingsPartial = false;
-            }
-        }
-
-        return $this->collRewritings;
-    }
-
-    /**
-     * Sets a collection of Rewriting objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $rewritings A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCategory The current object (for fluent API support)
-     */
-    public function setRewritings(Collection $rewritings, ConnectionInterface $con = null)
-    {
-        $rewritingsToDelete = $this->getRewritings(new Criteria(), $con)->diff($rewritings);
-
-
-        $this->rewritingsScheduledForDeletion = $rewritingsToDelete;
-
-        foreach ($rewritingsToDelete as $rewritingRemoved) {
-            $rewritingRemoved->setCategory(null);
-        }
-
-        $this->collRewritings = null;
-        foreach ($rewritings as $rewriting) {
-            $this->addRewriting($rewriting);
-        }
-
-        $this->collRewritings = $rewritings;
-        $this->collRewritingsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Rewriting objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Rewriting objects.
-     * @throws PropelException
-     */
-    public function countRewritings(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collRewritingsPartial && !$this->isNew();
-        if (null === $this->collRewritings || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collRewritings) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getRewritings());
-            }
-
-            $query = ChildRewritingQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByCategory($this)
-                ->count($con);
-        }
-
-        return count($this->collRewritings);
-    }
-
-    /**
-     * Method called to associate a ChildRewriting object to this object
-     * through the ChildRewriting foreign key attribute.
-     *
-     * @param    ChildRewriting $l ChildRewriting
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
-     */
-    public function addRewriting(ChildRewriting $l)
-    {
-        if ($this->collRewritings === null) {
-            $this->initRewritings();
-            $this->collRewritingsPartial = true;
-        }
-
-        if (!in_array($l, $this->collRewritings->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddRewriting($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Rewriting $rewriting The rewriting object to add.
-     */
-    protected function doAddRewriting($rewriting)
-    {
-        $this->collRewritings[]= $rewriting;
-        $rewriting->setCategory($this);
-    }
-
-    /**
-     * @param  Rewriting $rewriting The rewriting object to remove.
-     * @return ChildCategory The current object (for fluent API support)
-     */
-    public function removeRewriting($rewriting)
-    {
-        if ($this->getRewritings()->contains($rewriting)) {
-            $this->collRewritings->remove($this->collRewritings->search($rewriting));
-            if (null === $this->rewritingsScheduledForDeletion) {
-                $this->rewritingsScheduledForDeletion = clone $this->collRewritings;
-                $this->rewritingsScheduledForDeletion->clear();
-            }
-            $this->rewritingsScheduledForDeletion[]= $rewriting;
-            $rewriting->setCategory(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Rewritings from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildRewriting[] List of ChildRewriting objects
-     */
-    public function getRewritingsJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildRewritingQuery::create(null, $criteria);
-        $query->joinWith('Product', $joinBehavior);
-
-        return $this->getRewritings($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Rewritings from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildRewriting[] List of ChildRewriting objects
-     */
-    public function getRewritingsJoinFolder($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildRewritingQuery::create(null, $criteria);
-        $query->joinWith('Folder', $joinBehavior);
-
-        return $this->getRewritings($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Rewritings from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildRewriting[] List of ChildRewriting objects
-     */
-    public function getRewritingsJoinContent($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildRewritingQuery::create(null, $criteria);
-        $query->joinWith('Content', $joinBehavior);
-
-        return $this->getRewritings($query, $con);
     }
 
     /**
@@ -4749,11 +4411,6 @@ abstract class Category implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collRewritings) {
-                foreach ($this->collRewritings as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collCategoryImages) {
                 foreach ($this->collCategoryImages as $o) {
                     $o->clearAllReferences($deep);
@@ -4812,10 +4469,6 @@ abstract class Category implements ActiveRecordInterface
             $this->collAttributeCategories->clearIterator();
         }
         $this->collAttributeCategories = null;
-        if ($this->collRewritings instanceof Collection) {
-            $this->collRewritings->clearIterator();
-        }
-        $this->collRewritings = null;
         if ($this->collCategoryImages instanceof Collection) {
             $this->collCategoryImages->clearIterator();
         }

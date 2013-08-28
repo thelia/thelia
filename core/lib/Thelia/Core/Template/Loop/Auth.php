@@ -68,15 +68,12 @@ class Auth extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $context = $this->getContext();
         $roles = $this->_explode($this->getRoles());
         $permissions = $this->_explode($this->getPermissions());
 
         $loopResult = new LoopResult();
 
         try {
-            $this->securityContext->setContext($context);
-
             if (true === $this->securityContext->isGranted($roles, $permissions == null ? array() : $permissions)) {
 
                 // Create an empty row: loop is no longer empty :)

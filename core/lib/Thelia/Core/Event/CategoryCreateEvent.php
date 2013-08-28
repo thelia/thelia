@@ -21,26 +21,62 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Internal;
+namespace Thelia\Core\Event;
 
-use Thelia\Model\Customer;
+use Thelia\Model\Category;
 
-class CustomerEvent extends InternalEvent
+class CategoryCreateEvent extends ActionEvent
 {
-    public $customer;
+    protected $title;
+    protected $parent;
+    protected $locale;
+    protected $created_category;
 
-    public function __construct(Customer $customer)
+    public function __construct($title, $parent, $locale)
     {
-        $this->customer = $customer;
+        $this->title = $title;
+        $this->parent = $parent;
+        $this->locale = $locale;
     }
 
-    /**
-     * @return \Thelia\Model\Customer
-     */
-    public function getCustomer()
+    public function getTitle()
     {
-        return $this->customer;
+        return $this->title;
     }
 
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
 
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+
+    public function getCreatedCategory()
+    {
+        return $this->created_category;
+    }
+
+    public function setCreatedCategory(Category $created_category)
+    {
+        $this->created_category = $created_category;
+var_dump($this->created_category);
+    }
 }
