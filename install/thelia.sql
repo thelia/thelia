@@ -1085,16 +1085,29 @@ CREATE TABLE `coupon`
     `title` VARCHAR(255) NOT NULL,
     `short_description` TEXT NOT NULL,
     `description` LONGTEXT NOT NULL,
-    `value` FLOAT NOT NULL,
+    `amount` FLOAT NOT NULL,
     `is_used` TINYINT NOT NULL,
     `is_enabled` TINYINT NOT NULL,
     `expiration_date` DATETIME NOT NULL,
     `serialized_rules` TEXT NOT NULL,
+    `is_cumulative` TINYINT NOT NULL,
+    `is_removing_postage` TINYINT NOT NULL,
+    `max_usage` INTEGER NOT NULL,
+    `is_available_on_special_offers` TINYINT(1) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `code_UNIQUE` (`code`)
+    UNIQUE INDEX `code_UNIQUE` (`code`),
+    INDEX `idx_is_enabled` (`is_enabled`),
+    INDEX `idx_is_used` (`is_used`),
+    INDEX `idx_type` (`type`),
+    INDEX `idx_amount` (`amount`),
+    INDEX `idx_expiration_date` (`expiration_date`),
+    INDEX `idx_is_cumulative` (`is_cumulative`),
+    INDEX `idx_is_removing_postage` (`is_removing_postage`),
+    INDEX `idx_max_usage` (`max_usage`),
+    INDEX `idx_is_available_on_special_offers` (`is_available_on_special_offers`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1459,6 +1472,55 @@ CREATE TABLE `category_associated_content`
     CONSTRAINT `fk_category_associated_content_content_id`
         FOREIGN KEY (`content_id`)
         REFERENCES `content` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- rewriting_url
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `rewriting_url`;
+
+CREATE TABLE `rewriting_url`
+(
+    `id` INTEGER NOT NULL,
+    `url` VARCHAR(255),
+    `view` VARCHAR(255),
+    `view_id` VARCHAR(255),
+    `view_locale` VARCHAR(255),
+    `redirected` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `url_UNIQUE` (`url`),
+    INDEX `idx_view_id` (`view_id`),
+    INDEX `idx_rewriting_url_redirected` (`redirected`),
+    CONSTRAINT `fk_rewriting_url_redirected`
+        FOREIGN KEY (`redirected`)
+        REFERENCES `rewriting_url` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- rewriting_argument
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `rewriting_argument`;
+
+CREATE TABLE `rewriting_argument`
+(
+    `rewriting_url_id` INTEGER NOT NULL,
+    `parameter` VARCHAR(255) NOT NULL,
+    `value` VARCHAR(255) NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`rewriting_url_id`,`parameter`,`value`),
+    INDEX `fk_rewriting_argument_rewirting_url_id` (`rewriting_url_id`),
+    CONSTRAINT `fk_rewriting_argument_rewirting_url_id`
+        FOREIGN KEY (`rewriting_url_id`)
+        REFERENCES `rewriting_url` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -2169,11 +2231,15 @@ CREATE TABLE `coupon_version`
     `title` VARCHAR(255) NOT NULL,
     `short_description` TEXT NOT NULL,
     `description` LONGTEXT NOT NULL,
-    `value` FLOAT NOT NULL,
+    `amount` FLOAT NOT NULL,
     `is_used` TINYINT NOT NULL,
     `is_enabled` TINYINT NOT NULL,
     `expiration_date` DATETIME NOT NULL,
     `serialized_rules` TEXT NOT NULL,
+    `is_cumulative` TINYINT NOT NULL,
+    `is_removing_postage` TINYINT NOT NULL,
+    `max_usage` INTEGER NOT NULL,
+    `is_available_on_special_offers` TINYINT(1) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
