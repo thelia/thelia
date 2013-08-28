@@ -31,21 +31,21 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Base\FeatureAvQuery;
+use Thelia\Model\Tools\ModelCriteriaTools;
+
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
 
 /**
- *todo : to be finished
- * FeatureAvailable loop
+ *
+ * Currency loop
  *
  *
- * Class FeatureAvailable
+ * Class Currency
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class FeatureAvailable extends BaseLoop
+class Currency extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -54,15 +54,8 @@ class FeatureAvailable extends BaseLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('feature'),
             Argument::createIntListTypeArgument('exclude'),
-            new Argument(
-                'order',
-                new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
-                ),
-                'manual'
-            )
+            Argument::createBooleanTypeArgument('default_only', false)
         );
     }
 
@@ -73,7 +66,10 @@ class FeatureAvailable extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = FeatureAvQuery::create();
+        $search = CurrencyQuery::create();
+
+        /* manage translations */
+        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale(), array('NAME'));
 
         $id = $this->getId();
 
@@ -83,57 +79,30 @@ class FeatureAvailable extends BaseLoop
 
         $exclude = $this->getExclude();
 
-        if (null !== $exclude) {
+        if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $feature = $this->getFeature();
+        $default_only = $this->getDefaultOnly();
 
-        if (null !== $feature) {
-            $search->filterByFeatureId($feature, Criteria::IN);
+        if ($default_only === true) {
+            $search->filterByByDefault(true);
         }
 
-        $orders  = $this->getOrder();
+        $search->orderByPosition();
 
-        foreach ($orders as $order) {
-            switch ($order) {
-                case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureAvI18nTableMap::TITLE);
-                    break;
-                case "alpha-reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureAvI18nTableMap::TITLE);
-                    break;
-                case "manual":
-                    $search->orderByPosition(Criteria::ASC);
-                    break;
-                case "manual_reverse":
-                    $search->orderByPosition(Criteria::DESC);
-                    break;
-            }
-        }
-
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
-        $featuresAv = $this->search($search, $pagination);
+        /* perform search */
+        $currencies = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($featuresAv as $featureAv) {
+        foreach ($currencies as $currency) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $featureAv->getId());
-            $loopResultRow->set("TITLE",$featureAv->getTitle());
-            $loopResultRow->set("CHAPO", $featureAv->getChapo());
-            $loopResultRow->set("DESCRIPTION", $featureAv->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $featureAv->getPostscriptum());
+            $loopResultRow->set("ID", $currency->getId())
+                ->set("NAME",$currency->getVirtualColumn('i18n_NAME'))
+                ->set("ISOCODE", $currency->getCode())
+                ->set("RATE", $currency->getRate())
+                ->set("IS_DEFAULT", $currency->getByDefault());
 
             $loopResult->addRow($loopResultRow);
         }
