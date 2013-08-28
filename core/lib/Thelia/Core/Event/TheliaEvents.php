@@ -94,10 +94,28 @@ final class TheliaEvents
      */
     const AFTER_CHANGECUSTOMER 	= "action.after_changecustomer";
 
+
     /**
      * Sent once the category creation form has been successfully validated, and before category insertion in the database.
      */
     const BEFORE_CREATECATEGORY = "action.before_createcategory";
+
+    /**
+     * Create, change or delete a category
+     */
+    const CATEGORY_CREATE = "action.createCategory";
+    const CATEGORY_MODIFY = "action.modifyCategory";
+    const CATEGORY_DELETE = "action.deleteCategory";
+
+    /**
+     * Toggle category visibility
+     */
+    const CATEGORY_TOGGLE_VISIBILITY = "action.toggleCategoryVisibility";
+
+    /**
+     * Change category position
+     */
+    const CATEGORY_CHANGE_POSITION = "action.changeCategoryPosition";
 
     /**
      * Sent just after a successful insert of a new category in the database.
@@ -112,6 +130,11 @@ final class TheliaEvents
      * Sent just after a successful delete of a category from the database.
      */
     const AFTER_DELETECATEGORY 	= "action.after_deletecategory";
+
+    /**
+     * Sent just before a successful change of a category in the database.
+     */
+    const BEFORE_CHANGECATEGORY = "action.before_changecategory";
 
     /**
      * Sent just after a successful change of a category in the database.
@@ -154,5 +177,4 @@ final class TheliaEvents
      * Sent on cimage cache clear request
      */
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
-
 }

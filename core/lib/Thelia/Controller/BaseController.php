@@ -34,6 +34,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Thelia\Core\Factory\ActionEventFactory;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  *
@@ -56,34 +57,12 @@ class BaseController extends ContainerAware
     }
 
     /**
-     * Create an action event
+     * Dispatch a Thelia event
      *
-     * @param  string          $action
-     * @return EventDispatcher
+     * @param string    $eventName a TheliaEvent name, as defined in TheliaEvents class
+     * @param Event     $event the event
      */
-    protected function dispatchEvent($action)
-    {
-        // Create the
-        $eventFactory = new ActionEventFactory($this->getRequest(), $action, $this->container->getParameter("thelia.actionEvent"));
-
-        $actionEvent = $eventFactory->createActionEvent();
-
-        $this->dispatch("action.$action", $actionEvent);
-
-        if ($actionEvent->hasErrorForm()) {
-            $this->getParserContext()->setErrorForm($actionEvent->getErrorForm());
-        }
-
-        return $actionEvent;
-    }
-
-    /**
-     * Dispatch a Thelia event to modules
-     *
-     * @param string      $eventName a TheliaEvent name, as defined in TheliaEvents class
-     * @param ActionEvent $event     the event
-     */
-    protected function dispatch($eventName, ActionEvent $event = null)
+    protected function dispatch($eventName, Event $event = null)
     {
         $this->getDispatcher()->dispatch($eventName, $event);
     }
@@ -113,13 +92,9 @@ class BaseController extends ContainerAware
      *
      * @return \Thelia\Core\Security\SecurityContext
      */
-    protected function getSecurityContext($context = false)
+    protected function getSecurityContext()
     {
-        $securityContext = $this->container->get('thelia.securityContext');
-
-        $securityContext->setContext($context === false ? SecurityContext::CONTEXT_BACK_OFFICE : $context);
-
-        return $securityContext;
+        return $this->container->get('thelia.securityContext');
     }
 
     /**

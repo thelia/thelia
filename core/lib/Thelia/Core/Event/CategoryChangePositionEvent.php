@@ -22,14 +22,62 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
-
 use Thelia\Model\Category;
 
-class CategoryEvent extends InternalEvent
+class CategoryChangePositionEvent extends ActionEvent
 {
-    public $category;
+    const POSITION_UP = 1;
+    const POSITION_DOWN = 2;
+    const POSITION_ABSOLUTE = 3;
 
-    public function __construct(Category $category)
+    protected $id;
+    protected $mode;
+    protected $position;
+    protected $category;
+
+    public function __construct($id, $mode, $position = null)
+    {
+        $this->id = $id;
+        $this->mode = $mode;
+        $this->position = $position;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function getMode()
+    {
+        return $this->mode;
+    }
+
+    public function setMode($mode)
+    {
+        $this->mode = $mode;
+    }
+
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    public function setPosition($position)
+    {
+        $this->position = $position;
+    }
+
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    public function setCategory($category)
     {
         $this->category = $category;
     }
