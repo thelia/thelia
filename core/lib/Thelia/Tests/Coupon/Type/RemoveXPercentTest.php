@@ -63,7 +63,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsCumulative()
     {
-        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, true, true);
+        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, true, true);
 
         $actual = $coupon->isCumulative();
         $this->assertTrue($actual);
@@ -77,7 +77,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsNotCumulative()
     {
-        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         $actual = $coupon->isCumulative();
         $this->assertFalse($actual);
@@ -92,7 +92,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsRemovingPostage()
     {
-        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, true, true);
+        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, true, true);
 
         $actual = $coupon->isRemovingPostage();
         $this->assertTrue($actual);
@@ -105,7 +105,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsNotRemovingPostage()
     {
-        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         $actual = $coupon->isRemovingPostage();
         $this->assertFalse($actual);
@@ -120,7 +120,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     public function testGetEffect()
     {
         $adapter = $this->generateFakeAdapter(245);
-        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         $expected = 24.50;
         $actual = $coupon->getDiscount($adapter);
@@ -149,7 +149,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
             421.23
         );
 
-        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
         $coupon->setRules(new CouponRuleCollection(array($rule0, $rule1, $rule2)));
@@ -179,7 +179,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
         );
         $rule2 = $this;
 
-        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
         $coupon->setRules(new CouponRuleCollection(array($rule0, $rule1, $rule2)));
@@ -194,19 +194,18 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     public function testGetEffectIfTotalAmountInferiorTo400Valid()
     {
         // Given
-        $adapter = $this->generateFakeAdapter(245);
         $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::INFERIOR,
             400.00
         );
-        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
         $coupon->setRules(new CouponRuleCollection(array($rule0)));
 
         // Then
         $expected = 24.50;
-        $actual = $coupon->getDiscount($adapter);
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -219,19 +218,18 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     public function testGetEffectIfTotalAmountInferiorOrEqualTo400Valid()
     {
         // Given
-        $adapter = $this->generateFakeAdapter(245);
         $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::INFERIOR_OR_EQUAL,
             400.00
         );
-        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
         $coupon->setRules(new CouponRuleCollection(array($rule0)));
 
         // Then
         $expected = 24.50;
-        $actual = $coupon->getDiscount($adapter);
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -244,19 +242,18 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     public function testGetEffectIfTotalAmountEqualTo400Valid()
     {
         // Given
-        $adapter = $this->generateFakeAdapter(245);
         $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::EQUAL,
             400.00
         );
-        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
         $coupon->setRules(new CouponRuleCollection(array($rule0)));
 
         // Then
         $expected = 24.50;
-        $actual = $coupon->getDiscount($adapter);
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -269,19 +266,18 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     public function testGetEffectIfTotalAmountSuperiorOrEqualTo400Valid()
     {
         // Given
-        $adapter = $this->generateFakeAdapter(245);
         $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::SUPERIOR_OR_EQUAL,
             400.00
         );
-        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
         $coupon->setRules(new CouponRuleCollection(array($rule0)));
 
         // Then
         $expected = 24.50;
-        $actual = $coupon->getDiscount($adapter);
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -294,19 +290,18 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     public function testGetEffectIfTotalAmountSuperiorTo400Valid()
     {
         // Given
-        $adapter = $this->generateFakeAdapter(245);
         $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
             Operators::SUPERIOR,
             400.00
         );
-        $coupon = self::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
+        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         // When
         $coupon->setRules(new CouponRuleCollection(array($rule0)));
 
         // Then
         $expected = 24.50;
-        $actual = $coupon->getDiscount($adapter);
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -331,7 +326,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
      *
      * @return CouponInterface
      */
-    public static function generateValidCoupon(
+    public function generateValidCoupon(
         $code = null,
         $title = null,
         $shortDescription = null,
@@ -345,7 +340,8 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
         $isAvailableOnSpecialOffers = null,
         $maxUsage = null
     ) {
-        $adapter = new CouponBaseAdapter();
+        $adapter = $this->generateFakeAdapter(245);
+
         if ($code === null) {
             $code = CouponManagerTest::VALID_CODE;
         }
@@ -417,7 +413,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        return new AvailableForTotalAmount($validators);
+        return new AvailableForTotalAmount($adapter, $validators);
     }
 
     /**

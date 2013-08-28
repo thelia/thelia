@@ -45,16 +45,23 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        /** @var CouponAdapterInterface $stubTheliaAdapter */
+        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
     }
 
+    /**
+     * Return an Adapter Mock wick 4 products int the Cart
+     *
+     * @return CouponAdapterInterface
+     */
     protected function generateValidCouponBaseAdapterMock()
     {
         /** @var CouponAdapterInterface $stubTheliaAdapter */
-       $stubTheliaAdapter = $this->getMock(
-           'CouponBaseAdapter',
-           array('getNbArticlesInCart'),
-           array()
-       );
+        $stubTheliaAdapter = $this->getMock(
+            'CouponBaseAdapter',
+            array('getNbArticlesInCart'),
+            array()
+        );
         $stubTheliaAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
@@ -69,12 +76,11 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidBackOfficeInput()
     {
-        /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
+        $adapter = new CouponBaseAdapter();
 
         $validators = array(4);
-        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
-        $rule = new AvailableForXArticles($validators, $validated);
+        $validated = array($adapter->getNbArticlesInCart());
+        $rule = new AvailableForXArticles($adapter, $validators, $validated);
 
         $expected = true;
         $actual = $rule->checkBackOfficeInput();
@@ -88,28 +94,27 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInput()
     {
-        /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
+        $adapter = new CouponBaseAdapter();
 
         $validators = array(4.5);
-        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
-        $rule = new AvailableForXArticles($validators, $validated);
+        $validated = array($adapter->getNbArticlesInCart());
+        $rule = new AvailableForXArticles($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->checkBackOfficeInput();
         $this->assertEquals($expected, $actual);
 
         $validators = array(-1);
-        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
-        $rule = new AvailableForXArticles($validators, $validated);
+        $validated = array($adapter->getNbArticlesInCart());
+        $rule = new AvailableForXArticles($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->checkBackOfficeInput();
         $this->assertEquals($expected, $actual);
 
         $validators = array('bad');
-        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
-        $rule = new AvailableForXArticles($validators, $validated);
+        $validated = array($adapter->getNbArticlesInCart());
+        $rule = new AvailableForXArticles($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->checkBackOfficeInput();
@@ -125,12 +130,10 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidCheckoutInput()
     {
-        /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
-
+        $adapter = new CouponBaseAdapter();
         $validators = array(4);
-        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
-        $rule = new AvailableForXArticles($validators, $validated);
+        $validated = array($adapter->getNbArticlesInCart());
+        $rule = new AvailableForXArticles($adapter, $validators, $validated);
 
         $expected = true;
         $actual = $rule->checkCheckoutInput();
@@ -144,28 +147,26 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidCheckoutInput()
     {
-        /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
-
+        $adapter = new CouponBaseAdapter();
         $validators = array(4.5);
-        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
-        $rule = new AvailableForXArticles($validators, $validated);
+        $validated = array($adapter->getNbArticlesInCart());
+        $rule = new AvailableForXArticles($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->checkCheckoutInput();
         $this->assertEquals($expected, $actual);
 
         $validators = array(-1);
-        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
-        $rule = new AvailableForXArticles($validators, $validated);
+        $validated = array($adapter->getNbArticlesInCart());
+        $rule = new AvailableForXArticles($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->checkCheckoutInput();
         $this->assertEquals($expected, $actual);
 
         $validators = array('bad');
-        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
-        $rule = new AvailableForXArticles($validators, $validated);
+        $validated = array($adapter->getNbArticlesInCart());
+        $rule = new AvailableForXArticles($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->checkCheckoutInput();
@@ -179,12 +180,10 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleEqual()
     {
-        /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
-
+        $adapter = new CouponBaseAdapter();
         $validators = array(4);
-        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
-        $rule = new AvailableForXArticles($validators, $validated);
+        $validated = array($adapter->getNbArticlesInCart());
+        $rule = new AvailableForXArticles($adapter, $validators, $validated);
 
         $expected = true;
         $actual = $rule->isMatching();
@@ -198,12 +197,10 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleSuperior()
     {
-        /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
-
+        $adapter = new CouponBaseAdapter();
         $validators = array(5);
-        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
-        $rule = new AvailableForXArticles($validators, $validated);
+        $validated = array($adapter->getNbArticlesInCart());
+        $rule = new AvailableForXArticles($adapter, $validators, $validated);
 
         $expected = true;
         $actual = $rule->isMatching();
@@ -217,12 +214,10 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRule()
     {
-        /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
-
+        $adapter = new CouponBaseAdapter();
         $validators = array(3);
-        $validated = array($stubTheliaAdapter->getNbArticlesInCart());
-        $rule = new AvailableForXArticles($validators, $validated);
+        $validated = array($adapter->getNbArticlesInCart());
+        $rule = new AvailableForXArticles($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->isMatching();

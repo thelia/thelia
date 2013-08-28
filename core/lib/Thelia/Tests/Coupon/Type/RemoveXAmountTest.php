@@ -151,7 +151,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
         $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 
         $expected = 10;
-        $actual = $coupon->getDiscount($adapter);
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -234,7 +234,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 
         // Then
         $expected = 10.00;
-        $actual = $coupon->getDiscount($adapter);
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -259,7 +259,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 
         // Then
         $expected = 10.00;
-        $actual = $coupon->getDiscount($adapter);
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -284,7 +284,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 
         // Then
         $expected = 10.00;
-        $actual = $coupon->getDiscount($adapter);
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -309,7 +309,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 
         // Then
         $expected = 10.00;
-        $actual = $coupon->getDiscount($adapter);
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -334,7 +334,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 
         // Then
         $expected = 10.00;
-        $actual = $coupon->getDiscount($adapter);
+        $actual = $coupon->getDiscount();
         $this->assertEquals($expected, $actual);
     }
 
@@ -371,7 +371,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        return new AvailableForTotalAmount($validators);
+        return new AvailableForTotalAmount($adapter, $validators);
     }
 
 }

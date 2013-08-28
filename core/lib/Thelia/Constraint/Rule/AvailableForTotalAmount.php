@@ -61,14 +61,16 @@ class AvailableForTotalAmount extends CouponRuleAbstract
     /**
      * Constructor
      *
-     * @param array $validators Array of RuleValidator
-     *                          validating $paramsToValidate against
+     * @param CouponAdapterInterface $adapter    allowing to gather
+     *                                           all necessary Thelia variables
+     * @param array                  $validators Array of RuleValidator
+     *                                           validating $paramsToValidate against
      *
      * @throws \Thelia\Exception\InvalidRuleException
      */
-    public function __construct(array $validators)
+    public function __construct(CouponAdapterInterface $adapter, array $validators)
     {
-        parent::__construct($validators);
+        parent::__construct($adapter, $validators);
 
         if (isset($validators[self::PARAM1_PRICE])
             && $validators[self::PARAM1_PRICE] instanceof RuleValidator
@@ -77,7 +79,6 @@ class AvailableForTotalAmount extends CouponRuleAbstract
         } else {
             throw new InvalidRuleException(get_class());
         }
-
     }
 
 
@@ -109,8 +110,6 @@ class AvailableForTotalAmount extends CouponRuleAbstract
 
         $this->checkBackOfficeInputsOperators();
 
-
-
         return $this->isPriceValid($price->getPrice());
     }
 
@@ -129,9 +128,9 @@ class AvailableForTotalAmount extends CouponRuleAbstract
             throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
         }
 
-        $quantity = $this->paramsToValidate[self::PARAM1_PRICE];
+        $price = $this->paramsToValidate[self::PARAM1_PRICE];
 
-        return $this->isPriceValid($quantity);
+        return $this->isPriceValid($price);
     }
 
     /**
@@ -157,15 +156,12 @@ class AvailableForTotalAmount extends CouponRuleAbstract
     /**
      * Generate current Rule param to be validated from adapter
      *
-     * @param CouponAdapterInterface $adapter allowing to gather
-     *                               all necessary Thelia variables
-     *
      * @return $this
      */
-    protected function setParametersToValidate(CouponAdapterInterface $adapter)
+    protected function setParametersToValidate()
     {
         $this->paramsToValidate = array(
-            self::PARAM1_PRICE => $adapter->getCartTotalPrice()
+            self::PARAM1_PRICE => $this->adapter->getCartTotalPrice()
         );
 
         return $this;

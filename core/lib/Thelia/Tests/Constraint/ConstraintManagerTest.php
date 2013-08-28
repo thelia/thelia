@@ -56,36 +56,11 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
 
 
 
-    /**
-     * Generate valid CouponRuleInterfaces
-     *
-     * @return array Array of CouponRuleInterface
-     */
-    public static function generateValidRules()
+    public function incompleteTest()
     {
-        $rule1 = new AvailableForTotalAmount(
-            array(
-                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
-                    Operators::SUPERIOR,
-                    new PriceParam(
-                        , 40.00, 'EUR'
-                    )
-                )
-            )
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
         );
-        $rule2 = new AvailableForTotalAmount(
-            array(
-                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
-                    Operators::INFERIOR,
-                    new PriceParam(
-                        , 400.00, 'EUR'
-                    )
-                )
-            )
-        );
-        $rules = new CouponRuleCollection(array($rule1, $rule2));
-
-        return $rules;
     }
 
     /**
@@ -94,49 +69,5 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-    }
-
-    /**
-     * Generate a fake Adapter
-     *
-     * @param array $coupons            Coupons
-     * @param float $cartTotalPrice     Cart total price
-     * @param float $checkoutTotalPrice Checkout total price
-     * @param float $postagePrice       Checkout postage price
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    public function generateFakeAdapter(array $coupons, $cartTotalPrice, $checkoutTotalPrice, $postagePrice = 6.00)
-    {
-        $stubCouponBaseAdapter = $this->getMock(
-            'Thelia\Coupon\CouponBaseAdapter',
-            array(
-                'getCurrentCoupons',
-                'getCartTotalPrice',
-                'getCheckoutTotalPrice',
-                'getCheckoutPostagePrice'
-            ),
-            array()
-        );
-
-        $stubCouponBaseAdapter->expects($this->any())
-            ->method('getCurrentCoupons')
-            ->will($this->returnValue(($coupons)));
-
-        // Return Cart product amount = $cartTotalPrice euros
-        $stubCouponBaseAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue($cartTotalPrice));
-
-        // Return Checkout amount = $checkoutTotalPrice euros
-        $stubCouponBaseAdapter->expects($this->any())
-            ->method('getCheckoutTotalPrice')
-            ->will($this->returnValue($checkoutTotalPrice));
-
-        $stubCouponBaseAdapter->expects($this->any())
-            ->method('getCheckoutPostagePrice')
-            ->will($this->returnValue($postagePrice));
-
-        return $stubCouponBaseAdapter;
     }
 }

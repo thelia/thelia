@@ -110,7 +110,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         /** @var CouponInterface $coupon1 */
         $coupon1 = self::generateValidCoupon();
         $rule1 = new AvailableForTotalAmount(
-            array(
+            $adapter, array(
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::SUPERIOR,
                     new PriceParam(
@@ -148,7 +148,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $checkoutTotalPrice = 26.00;
 
         $rule1 = new AvailableForTotalAmount(
-            array(
+            $adapter, array(
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::SUPERIOR,
                     new PriceParam(
@@ -185,7 +185,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $checkoutTotalPrice = 27.00;
 
         $rule1 = new AvailableForTotalAmount(
-            array(
+            $adapter, array(
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::SUPERIOR,
                     new PriceParam(
@@ -642,7 +642,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     {
         $adapter = new CouponBaseAdapter();
         $rule1 = new AvailableForTotalAmount(
-            array(
+            $adapter, array(
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::SUPERIOR,
                     new PriceParam(
@@ -652,7 +652,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             )
         );
         $rule2 = new AvailableForTotalAmount(
-            array(
+            $adapter, array(
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::INFERIOR,
                     new PriceParam(

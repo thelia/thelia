@@ -45,6 +45,13 @@ class RemoveXAmountForCategoryYTest extends \PHPUnit_Framework_TestCase
     {
     }
 
+    public function incompleteTest()
+    {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+    }
+
     /**
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.

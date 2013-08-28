@@ -57,6 +57,9 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     /** @var array Parameters to be validated */
     protected $paramsToValidate = array();
 
+    /** @var  CouponAdapterInterface Provide necessary value from Thelia */
+    protected $adapter = null;
+
     /**
      * Constructor
      * Ex:
@@ -70,14 +73,16 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
      *     Param 2 :
      *     $paramsToValidate[AvailableForTotalAmount::PARAM1_PRICE] = 9
      *
-     * @param array $validators Array of RuleValidator
-     *                          validating $paramsToValidate against
-     *
-     * @throws InvalidRuleException
+     * @param CouponAdapterInterface $adapter    allowing to gather
+     *                                           all necessary Thelia variables
+     * @param array                  $validators Array of RuleValidator
+     *                                           validating $paramsToValidate against
      */
-    public function __construct(array $validators)
+    public function __construct(CouponAdapterInterface $adapter, array $validators)
     {
         $this->setValidators($validators);
+        $this->adapter = $adapter;
+        $this->setParametersToValidate($this->adapter);
     }
 
     /**
@@ -104,14 +109,10 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     /**
      * Check if the current Checkout matches this condition
      *
-     * @param CouponAdapterInterface $adapter allowing to gather
-     *                               all necessary Thelia variables
-     *
      * @return bool
      */
-    public function isMatching(CouponAdapterInterface $adapter)
+    public function isMatching()
     {
-        $this->setParametersToValidate($adapter);
         $this->checkBackOfficeInput();
         $this->checkCheckoutInput();
 
@@ -165,13 +166,10 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     /**
      * Generate current Rule param to be validated from adapter
      *
-     * @param CouponAdapterInterface $adapter allowing to gather
-     *                               all necessary Thelia variables
-     *
      * @throws \Thelia\Exception\NotImplementedException
      * @return $this
      */
-    protected function setParametersToValidate(CouponAdapterInterface $adapter)
+    protected function setParametersToValidate()
     {
         throw new \Thelia\Exception\NotImplementedException();
     }

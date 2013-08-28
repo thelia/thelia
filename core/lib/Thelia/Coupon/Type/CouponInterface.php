@@ -88,16 +88,13 @@ interface CouponInterface
      * A positive value
      *
      * Effects could also affect something else than the final Checkout price
-     * CouponAdapter could be use to directly pass a Session value
+     * CouponAdapter $adapter could be use to directly pass a Session value
      * some would wish to modify
      * Hence affecting a wide variety of Thelia elements
      *
-     * @param CouponAdapterInterface $adapter allowing to gather
-     *                               all necessary Thelia variables
-     *
      * @return float Amount removed from the Total Checkout
      */
-    public function getDiscount(CouponAdapterInterface $adapter);
+    public function getDiscount();
 
     /**
      * Return condition to validate the Coupon or not

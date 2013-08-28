@@ -24,6 +24,7 @@
 namespace Thelia\Coupon;
 
 use InvalidArgumentException;
+use Thelia\Constraint\Validator\PriceParam;
 use Thelia\Constraint\Validator\QuantityParam;
 
 /**
@@ -173,7 +174,7 @@ class QuantityParamTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($param->getValue(), $unserialized->getValue());
         $this->assertEquals($param->getInteger(), $unserialized->getInteger());
 
-        $new = new PriceParam($adapter, $unserialized->getInteger());
+        $new = new QuantityParam($adapter, $unserialized->getInteger());
         $this->assertEquals($param->getInteger(), $new->getInteger());
     }
 

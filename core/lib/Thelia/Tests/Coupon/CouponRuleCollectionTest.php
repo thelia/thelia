@@ -47,7 +47,7 @@ class CouponRuleCollectionTest extends \PHPUnit_Framework_TestCase
     public function testRuleSerialisation()
     {
         $rule1 = new AvailableForTotalAmount(
-            array(
+            , array(
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::SUPERIOR,
                     new PriceParam(
@@ -57,7 +57,7 @@ class CouponRuleCollectionTest extends \PHPUnit_Framework_TestCase
             )
         );
         $rule2 = new AvailableForTotalAmount(
-            array(
+            , array(
                 AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                     Operators::INFERIOR,
                     new PriceParam(

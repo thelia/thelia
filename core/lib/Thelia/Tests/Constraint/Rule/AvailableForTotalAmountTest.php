@@ -50,6 +50,8 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
+        /** @var CouponAdapterInterface $stubTheliaAdapter */
+        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
     }
 
     /**
@@ -62,11 +64,11 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         /** @var CouponAdapterInterface $stubTheliaAdapter */
        $stubTheliaAdapter = $this->getMock(
            'CouponBaseAdapter',
-           array('getCheckoutTotalPrice'),
+           array('getCartTotalPrice'),
            array()
        );
         $stubTheliaAdapter->expects($this->any())
-            ->method('getCheckoutTotalPrice')
+            ->method('getCartTotalPrice')
             ->will($this->returnValue(421.23));
 
         return $stubTheliaAdapter;
@@ -79,21 +81,20 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidBackOfficeInput()
     {
-        /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
+        $adapter = new CouponBaseAdapter();
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                 Operators::SUPERIOR,
                 new PriceParam(
-                    , 421.23, 'EUR'
+                    $adapter, 421.23, 'EUR'
                 )
             )
         );
         $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => $stubTheliaAdapter->getCheckoutTotalPrice()
+            AvailableForTotalAmount::PARAM1_PRICE => $adapter->getCartTotalPrice()
         );
-        $rule = new AvailableForTotalAmount($validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
 
         $expected = true;
         $actual = $rule->checkBackOfficeInput();
@@ -108,22 +109,21 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputOperator()
     {
-        /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
+        $adapter = new CouponBaseAdapter();
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                 'X',
                 new PriceParam(
-                    , 421.23, 'EUR'
+                    $adapter, 421.23, 'EUR'
                 )
             )
         );
 
         $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => $stubTheliaAdapter->getCheckoutTotalPrice()
+            AvailableForTotalAmount::PARAM1_PRICE => $adapter->getCartTotalPrice()
         );
-        $rule = new AvailableForTotalAmount($validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->checkBackOfficeInput();
@@ -138,8 +138,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputValue()
     {
-        /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
+        $adapter = new CouponBaseAdapter();
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
@@ -149,9 +148,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         );
 
         $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => $stubTheliaAdapter->getCheckoutTotalPrice()
+            AvailableForTotalAmount::PARAM1_PRICE => $adapter->getCartTotalPrice()
         );
-        $rule = new AvailableForTotalAmount($validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->checkBackOfficeInput();
@@ -167,22 +166,21 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidCheckoutInput()
     {
-        /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
+        $adapter = new CouponBaseAdapter();
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                 Operators::SUPERIOR,
                 new PriceParam(
-                    , 421.23, 'EUR'
+                    $adapter, 421.23, 'EUR'
                 )
             )
         );
 
         $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => $stubTheliaAdapter->getCheckoutTotalPrice()
+            AvailableForTotalAmount::PARAM1_PRICE => $adapter->getCartTotalPrice()
         );
-        $rule = new AvailableForTotalAmount($validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
 
         $expected = true;
         $actual = $rule->checkCheckoutInput();
@@ -197,11 +195,13 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidCheckoutInputValue()
     {
+        $adapter = new CouponBaseAdapter();
+
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                 Operators::SUPERIOR,
                 new PriceParam(
-                    , 421.23, 'EUR'
+                    $adapter, 421.23, 'EUR'
                 )
             )
         );
@@ -209,7 +209,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $validated = array(
             AvailableForTotalAmount::PARAM1_PRICE => 421
         );
-        $rule = new AvailableForTotalAmount($validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->checkCheckoutInput();
@@ -224,11 +224,13 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidCheckoutInputType()
     {
+        $adapter = new CouponBaseAdapter();
+
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                 Operators::SUPERIOR,
                 new PriceParam(
-                    , 421.23, 'EUR'
+                    $adapter, 421.23, 'EUR'
                 )
             )
         );
@@ -236,7 +238,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $validated = array(
             AvailableForTotalAmount::PARAM1_PRICE => 421
         );
-        $rule = new AvailableForTotalAmount($validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->checkCheckoutInput();
@@ -250,11 +252,13 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleInferior()
     {
+        $adapter = new CouponBaseAdapter();
+
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                 Operators::INFERIOR,
                 new PriceParam(
-                    , 421.23, 'EUR'
+                    $adapter, 421.23, 'EUR'
                 )
             )
         );
@@ -262,7 +266,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $validated = array(
             AvailableForTotalAmount::PARAM1_PRICE => 421.22
         );
-        $rule = new AvailableForTotalAmount($validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
 
         $expected = true;
         $actual = $rule->isMatching();
@@ -276,11 +280,13 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleInferior()
     {
+        $adapter = new CouponBaseAdapter();
+
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                 Operators::INFERIOR,
                 new PriceParam(
-                    , 421.23, 'EUR'
+                    $adapter, 421.23, 'EUR'
                 )
             )
         );
@@ -288,7 +294,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $validated = array(
             AvailableForTotalAmount::PARAM1_PRICE => 421.23
         );
-        $rule = new AvailableForTotalAmount($validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->isMatching();
@@ -302,22 +308,21 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleEqual()
     {
-        /** @var CouponAdapterInterface $stubTheliaAdapter */
-        $stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
+        $adapter = new CouponBaseAdapter();
 
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                 Operators::EQUAL,
                 new PriceParam(
-                    , 421.23, 'EUR'
+                    $adapter, 421.23, 'EUR'
                 )
             )
         );
 
         $validated = array(
-            AvailableForTotalAmount::PARAM1_PRICE => $stubTheliaAdapter->getCheckoutTotalPrice()
+            AvailableForTotalAmount::PARAM1_PRICE => $adapter->getCartTotalPrice()
         );
-        $rule = new AvailableForTotalAmount($validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
 
         $expected = true;
         $actual = $rule->isMatching();
@@ -331,11 +336,13 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleEqual()
     {
+        $adapter = new CouponBaseAdapter();
+
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                 Operators::EQUAL,
                 new PriceParam(
-                    , 421.23, 'EUR'
+                    $adapter, 421.23, 'EUR'
                 )
             )
         );
@@ -343,7 +350,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $validated = array(
             AvailableForTotalAmount::PARAM1_PRICE => 421.22
         );
-        $rule = new AvailableForTotalAmount($validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->isMatching();
@@ -357,11 +364,13 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleSuperior()
     {
+        $adapter = new CouponBaseAdapter();
+
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                 Operators::SUPERIOR,
                 new PriceParam(
-                    , 421.23, 'EUR'
+                    $adapter, 421.23, 'EUR'
                 )
             )
         );
@@ -369,7 +378,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $validated = array(
             AvailableForTotalAmount::PARAM1_PRICE => 421.24
         );
-        $rule = new AvailableForTotalAmount($validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
 
         $expected = true;
         $actual = $rule->isMatching();
@@ -383,11 +392,13 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleSuperior()
     {
+        $adapter = new CouponBaseAdapter();
+
         $validators = array(
             AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
                 Operators::SUPERIOR,
                 new PriceParam(
-                    , 421.23, 'EUR'
+                    $adapter, 421.23, 'EUR'
                 )
             )
         );
@@ -395,7 +406,7 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $validated = array(
             AvailableForTotalAmount::PARAM1_PRICE => 421.23
         );
-        $rule = new AvailableForTotalAmount($validators, $validated);
+        $rule = new AvailableForTotalAmount($adapter, $validators, $validated);
 
         $expected = false;
         $actual = $rule->isMatching();

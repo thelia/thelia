@@ -55,12 +55,9 @@ interface CouponRuleInterface
     /**
      * Check if the current Checkout matches this condition
      *
-     * @param CouponAdapterInterface $adapter allowing to gather
-     *                               all necessary Thelia variables
-     *
      * @return bool
      */
-    public function isMatching(CouponAdapterInterface $adapter);
+    public function isMatching();
 
     /**
      * Return all available Operators for this Rule
