@@ -16,8 +16,8 @@ class Category extends BaseCategory {
 
     public function getUrl()
     {
-
     }
+
     /**
      * Create a new category.
      *

@@ -24,7 +24,6 @@
 namespace Thelia\Command;
 
 use Thelia\Command\ContainerAwareCommand;
-use Thelia\Core\Event\TheliaEvents;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
