@@ -36,8 +36,17 @@
     </route>
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
-    <route id="admin.coupon" path="/admin/coupon">
+    <route id="admin.coupon.list" path="/admin/coupon">
         <default key="_controller">Thelia\Controller\Admin\CouponController::indexAction</default>
+    </route>
+    <route id="admin.coupon.create" path="/admin/coupon/create">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::createAction</default>
+    </route>
+    <route id="admin.coupon.edit" path="/admin/coupon/edit">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::editAction</default>
+    </route>
+    <route id="admin.coupon.read" path="/admin/coupon/read">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
     </route>
 
 	<!-- The default route, to display a template -->

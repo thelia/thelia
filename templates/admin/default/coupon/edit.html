@@ -1,0 +1,30 @@
+{check_auth context="admin" roles="ADMIN" permissions="admin.coupon.view" login_tpl="/admin/login"}
+
+{$page_title={intl l='Coupon'}}
+
+{$thelia_page_css_file = "assets/bootstrap-editable/css/bootstrap-editable.css"}
+
+{include file='includes/header.inc.html'}
+
+<div class="coupons">
+    <div id="wrapper" class="container">
+
+        <ul class="breadcrumb">
+            {include file="includes/coupon_breadcrumb.html"}
+        </ul>
+
+        <h1>EDIT</h1>
+    </div>
+</div>
+
+
+{include file='includes/js.inc.html'}
+
+{javascripts file='../assets/bootstrap-editable/js/bootstrap-editable.js'}
+<script src="{$asset_url}"></script>
+{/javascripts}
+
+<script>
+</script>
+
+{include file='includes/footer.inc.html'}
