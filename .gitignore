@@ -22,3 +22,5 @@ web/cache/*
 web/.htaccess
 phpdoc*.log
 php-cs
+xhprof
+phpunit.phar
