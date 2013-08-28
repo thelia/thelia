@@ -55,6 +55,7 @@
         <command class="Thelia\Command\ModuleGenerateCommand"/>
         <command class="Thelia\Command\ModuleGenerateModelCommand"/>
         <command class="Thelia\Command\ModuleGenerateSqlCommand"/>
+        <command class="Thelia\Command\CreateAdminUser"/>
     </commands>
 
     <services>

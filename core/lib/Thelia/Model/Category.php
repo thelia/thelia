@@ -17,7 +17,6 @@ class Category extends BaseCategory
 
     public function getUrl()
     {
-
     }
 
     /**
