@@ -5,7 +5,8 @@ namespace Thelia\Model;
 use Thelia\Model\Base\Category as BaseCategory;
 use Propel\Runtime\ActiveQuery\Criteria;
 
-class Category extends BaseCategory {
+class Category extends BaseCategory
+{
     /**
      * @return int number of child for the current category
      */

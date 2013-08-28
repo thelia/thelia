@@ -4,6 +4,10 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\Content as BaseContent;
 
-class Content extends BaseContent {
+class Content extends BaseContent
+{
+    public function getUrl()
+    {
 
+    }
 }

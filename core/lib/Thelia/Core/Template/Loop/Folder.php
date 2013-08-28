@@ -59,6 +59,7 @@ class Folder extends BaseLoop
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
+            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -79,8 +80,12 @@ class Folder extends BaseLoop
     {
         $search = FolderQuery::create();
 
+        $backendContext = $this->getBackend_context();
+
+        $lang = $this->getLang();
+
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
 
 		$id = $this->getId();
 
@@ -157,11 +162,13 @@ class Folder extends BaseLoop
 
             $loopResultRow
             	->set("ID", $folder->getId())
+                ->set("IS_TRANSLATED",$folder->getVirtualColumn('IS_TRANSLATED'))
                 ->set("TITLE",$folder->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $folder->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
 	            ->set("PARENT", $folder->getParent())
+                ->set("URL", $folder->getUrl())
 	            ->set("CONTENT_COUNT", $folder->countChild())
 	            ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
 	            ->set("POSITION", $folder->getPosition())

@@ -85,6 +85,7 @@ class Product extends BaseLoop
             Argument::createBooleanTypeArgument('current_category'),
             Argument::createIntTypeArgument('depth', 1),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
+            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -137,8 +138,12 @@ class Product extends BaseLoop
     {
         $search = ProductQuery::create();
 
+        $backendContext = $this->getBackend_context();
+
+        $lang = $this->getLang();
+
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
 
         $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
         $isPSELeftJoinList = array();
@@ -510,10 +515,12 @@ class Product extends BaseLoop
 
             $loopResultRow->set("ID", $product->getId())
                 ->set("REF",$product->getRef())
+                ->set("IS_TRANSLATED",$product->getVirtualColumn('IS_TRANSLATED'))
                 ->set("TITLE",$product->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $product->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("URL", $product->getUrl())
                 ->set("BEST_PRICE", $product->getVirtualColumn('real_lowest_price'))
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))

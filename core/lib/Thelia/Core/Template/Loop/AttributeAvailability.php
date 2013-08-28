@@ -59,6 +59,7 @@ class AttributeAvailability extends BaseLoop
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('attribute'),
             Argument::createIntListTypeArgument('exclude'),
+            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -78,8 +79,12 @@ class AttributeAvailability extends BaseLoop
     {
         $search = AttributeAvQuery::create();
 
+        $backendContext = $this->getBackend_context();
+
+        $lang = $this->getLang();
+
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
 
         $id = $this->getId();
 
@@ -126,6 +131,7 @@ class AttributeAvailability extends BaseLoop
         foreach ($attributesAv as $attributeAv) {
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $attributeAv->getId())
+                ->set("IS_TRANSLATED",$attributeAv->getVirtualColumn('IS_TRANSLATED'))
                 ->set("TITLE",$attributeAv->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $attributeAv->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))

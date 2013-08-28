@@ -84,7 +84,7 @@ class FeatureValue extends BaseLoop
         $search = FeatureProductQuery::create();
 
         /* manage featureAv translations */
-        ModelCriteriaTools::getI18n(
+        ModelCriteriaTools::getFrontEndI18n(
             $search,
             ConfigQuery::read("default_lang_without_translation", 1),
             $this->request->getSession()->getLocale(),

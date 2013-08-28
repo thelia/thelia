@@ -57,6 +57,7 @@ class FeatureAvailability extends BaseLoop
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('feature'),
             Argument::createIntListTypeArgument('exclude'),
+            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -76,8 +77,12 @@ class FeatureAvailability extends BaseLoop
     {
         $search = FeatureAvQuery::create();
 
+        $backendContext = $this->getBackend_context();
+
+        $lang = $this->getLang();
+
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
 
         $id = $this->getId();
 
@@ -124,6 +129,7 @@ class FeatureAvailability extends BaseLoop
         foreach ($featuresAv as $featureAv) {
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $featureAv->getId())
+                ->set("IS_TRANSLATED",$featureAv->getVirtualColumn('IS_TRANSLATED'))
                 ->set("TITLE",$featureAv->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $featureAv->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $featureAv->getVirtualColumn('i18n_DESCRIPTION'))

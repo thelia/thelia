@@ -33,6 +33,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\Base\LangQuery;
 use Thelia\Model\Tools\ModelCriteriaTools;
 
 use Thelia\Model\Base\CategoryQuery;
@@ -66,6 +67,7 @@ class Attribute extends BaseLoop
             Argument::createIntListTypeArgument('category'),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createIntListTypeArgument('exclude'),
+            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -85,8 +87,12 @@ class Attribute extends BaseLoop
     {
         $search = AttributeQuery::create();
 
+        $backendContext = $this->getBackend_context();
+
+        $lang = $this->getLang();
+
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
 
         $id = $this->getId();
 
@@ -151,6 +157,7 @@ class Attribute extends BaseLoop
         foreach ($attributes as $attribute) {
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $attribute->getId())
+                ->set("IS_TRANSLATED",$attribute->getVirtualColumn('IS_TRANSLATED'))
                 ->set("TITLE",$attribute->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $attribute->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $attribute->getVirtualColumn('i18n_DESCRIPTION'))

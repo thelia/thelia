@@ -80,6 +80,7 @@ abstract class BaseLoop
             Argument::createIntTypeArgument('offset', 0),
             Argument::createIntTypeArgument('page'),
             Argument::createIntTypeArgument('limit', PHP_INT_MAX),
+            Argument::createBooleanTypeArgument('backend_context', false),
         );
     }
 

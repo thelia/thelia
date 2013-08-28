@@ -77,6 +77,7 @@ class Category extends BaseLoop
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
+            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -97,8 +98,12 @@ class Category extends BaseLoop
     {
         $search = CategoryQuery::create();
 
+        $backendContext = $this->getBackend_context();
+
+        $lang = $this->getLang();
+
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
 
 		$id = $this->getId();
 
@@ -174,6 +179,7 @@ class Category extends BaseLoop
 
             $loopResultRow
             	->set("ID", $category->getId())
+                ->set("IS_TRANSLATED",$category->getVirtualColumn('IS_TRANSLATED'))
             	->set("TITLE",$category->getVirtualColumn('i18n_TITLE'))
 	            ->set("CHAPO", $category->getVirtualColumn('i18n_CHAPO'))
 	            ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
