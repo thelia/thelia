@@ -35,6 +35,11 @@
         <default key="_controller">Thelia\Controller\Admin\CategoryController::processAction</default>
     </route>
 
+    <!-- Route to the Coupon controller (process Coupon browsing) -->
+    <route id="admin.coupon" path="/admin/coupon">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::indexAction</default>
+    </route>
+
 	<!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">

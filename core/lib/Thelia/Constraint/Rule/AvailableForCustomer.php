@@ -23,9 +23,11 @@
 
 namespace Thelia\Constraint\Rule;
 
-use Thelia\Constraint\Validator\QuantityParam;
+use Thelia\Constraint\Validator\CustomerParam;
 use Thelia\Constraint\Validator\RuleValidator;
 use Thelia\Coupon\CouponAdapterInterface;
+use Thelia\Exception\InvalidRuleException;
+use Thelia\Exception\InvalidRuleOperatorException;
 use Thelia\Exception\InvalidRuleValueException;
 
 /**
@@ -33,26 +35,23 @@ use Thelia\Exception\InvalidRuleValueException;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Check a Checkout against its Product number
- *
  * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class AvailableForXArticles extends CouponRuleAbstract
+class AvailableForCustomer extends CouponRuleAbstract
 {
-    /** Rule 1st parameter : quantity */
-    CONST PARAM1_QUANTITY = 'quantity';
+
+    /** Rule 1st parameter : customer id */
+    CONST PARAM1 = 'customerId';
 
     /** @var array Available Operators (Operators::CONST) */
     protected $availableOperators = array(
-        Operators::INFERIOR,
         Operators::EQUAL,
-        Operators::SUPERIOR,
     );
 
-    /** @var RuleValidator Quantity Validator */
-    protected $quantityValidator = null;
+    /** @var RuleValidator Customer Validator */
+    protected $customerValidator = null;
 
     /**
      * Constructor
@@ -68,10 +67,10 @@ class AvailableForXArticles extends CouponRuleAbstract
     {
         parent::__construct($adapter, $validators);
 
-        if (isset($validators[self::PARAM1_QUANTITY])
-            && $validators[self::PARAM1_QUANTITY] instanceof RuleValidator
+        if (isset($validators[self::PARAM1])
+            && $validators[self::PARAM1] instanceof RuleValidator
         ) {
-            $this->quantityValidator = $validators[self::PARAM1_QUANTITY];
+            $this->customerValidator = $validators[self::PARAM1];
         } else {
             throw new InvalidRuleException(get_class());
         }
@@ -90,38 +89,35 @@ class AvailableForXArticles extends CouponRuleAbstract
     {
         if (!isset($this->validators)
             || empty($this->validators)
-            ||!isset($this->validators[self::PARAM1_QUANTITY])
-            ||!isset($this->validators[self::PARAM1_QUANTITY])
+            ||!isset($this->validators[self::PARAM1])
+            ||!isset($this->validators[self::PARAM1])
         ) {
-            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
+            throw new InvalidRuleValueException(get_class(), self::PARAM1);
         }
 
         /** @var RuleValidator $ruleValidator */
-        $ruleValidator = $this->validators[self::PARAM1_QUANTITY];
-        /** @var QuantityParam $quantity */
-        $quantity = $ruleValidator->getParam();
+        $ruleValidator = $this->validators[self::PARAM1];
+        /** @var CustomerParam $customer */
+        $customer = $ruleValidator->getParam();
 
-        if (!$quantity instanceof QuantityParam) {
-            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
+        if (!$customer instanceof CustomerParam) {
+            throw new InvalidRuleValueException(get_class(), self::PARAM1);
         }
 
         $this->checkBackOfficeInputsOperators();
 
-        return $this->isQuantityValid($quantity->getInteger());
+        return $this->isCustomerValid($customer->getInteger());
     }
 
     /**
      * Generate current Rule param to be validated from adapter
-     *
-     * @param CouponAdapterInterface $adapter allowing to gather
-     *                               all necessary Thelia variables
      *
      * @return $this
      */
     protected function setParametersToValidate()
     {
         $this->paramsToValidate = array(
-            self::PARAM1_QUANTITY => $this->adapter->getNbArticlesInCart()
+            self::PARAM1 => $this->adapter->getCustomer()->getId()
         );
 
         return $this;
@@ -137,31 +133,31 @@ class AvailableForXArticles extends CouponRuleAbstract
     {
         if (!isset($this->paramsToValidate)
             || empty($this->paramsToValidate)
-            ||!isset($this->paramsToValidate[self::PARAM1_QUANTITY])
+            ||!isset($this->paramsToValidate[self::PARAM1])
         ) {
-            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
+            throw new InvalidRuleValueException(get_class(), self::PARAM1);
         }
 
-        $price = $this->paramsToValidate[self::PARAM1_QUANTITY];
+        $customerId = $this->paramsToValidate[self::PARAM1];
 
-        return $this->isQuantityValid($price);
+        return $this->isCustomerValid($customerId);
     }
 
     /**
-     * Check if a quantity is valid
+     * Check if a Customer is valid
      *
-     * @param int $quantity Quantity to check
+     * @param int $customerId Customer to check
      *
      * @throws InvalidRuleValueException if Value is not allowed
      * @return bool
      */
-    protected function isQuantityValid($quantity)
+    protected function isCustomerValid($customerId)
     {
-        $quantityValidator = $this->quantityValidator;
+        $customerValidator = $this->customerValidator;
         try {
-            $quantityValidator->getParam()->compareTo($quantity);
+            $customerValidator->getParam()->compareTo($customerId);
         } catch(\InvalidArgumentException $e) {
-            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
+            throw new InvalidRuleValueException(get_class(), self::PARAM1);
         }
 
         return true;
@@ -176,7 +172,7 @@ class AvailableForXArticles extends CouponRuleAbstract
     {
         return $this->adapter
             ->getTranslator()
-            ->trans('Number of articles in cart', null, 'constraint');
+            ->trans('Customer', null, 'constraint');
     }
 
     /**
@@ -186,22 +182,22 @@ class AvailableForXArticles extends CouponRuleAbstract
      */
     public function getToolTip()
     {
-        $i18nOperator = Operators::getI18n(
-            $this->adapter, $this->priceValidator->getOperator()
-        );
-
+        /** @var CustomerParam $param */
+        $param = $this->customerValidator->getParam();
         $toolTip = $this->adapter
             ->getTranslator()
             ->trans(
-                'If cart products quantity is %operator% %quantity%',
+                'If customer is %fistname% %lastname% (%email%)',
                 array(
-                    '%operator%' => $i18nOperator,
-                    '%quantity%' => $this->quantityValidator->getParam()->getInteger(),
+                    '%fistname%' => $param->getFirstName(),
+                    '%lastname%' => $param->getLastName(),
+                    '%email%' => $param->getEmail(),
                 ),
                 'constraint'
             );
 
         return $toolTip;
     }
+
 
 }
