@@ -40,7 +40,7 @@ VALUES
 (1, 'en_EN', 'euro'),
 (2, 'fr_FR', 'dollar'),
 (2, 'en_EN', 'dollar'),
-(3, 'fr_FR', 'livre');
+(3, 'fr_FR', 'livre'),
 (3, 'en_EN', 'pound');
 
 

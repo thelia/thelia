@@ -1094,7 +1094,7 @@
     <behavior name="timestampable" />
   </table>
   <table name="rewriting_url" namespace="Thelia\Model">
-    <column name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="url" required="true" size="255" type="VARCHAR" />
     <column name="view" size="255" type="VARCHAR" />
     <column name="view_id" size="255" type="VARCHAR" />

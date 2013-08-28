@@ -158,7 +158,7 @@ class RewritingUrlTableMap extends TableMap
         $this->setPhpName('RewritingUrl');
         $this->setClassName('\\Thelia\\Model\\RewritingUrl');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('URL', 'Url', 'VARCHAR', true, 255, null);
@@ -452,6 +452,10 @@ class RewritingUrlTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from RewritingUrl object
+        }
+
+        if ($criteria->containsKey(RewritingUrlTableMap::ID) && $criteria->keyContainsValue(RewritingUrlTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.RewritingUrlTableMap::ID.')');
         }
 
 
