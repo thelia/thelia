@@ -6,17 +6,62 @@
 
 {include file='includes/header.inc.html'}
 
-<div class="coupons">
-    <div id="wrapper" class="container">
+<section id="wrapper" class="container">
 
+    <nav>
         <ul class="breadcrumb">
             {include file="includes/coupon_breadcrumb.html"}
         </ul>
-
-        <h1>EDIT</h1>
+    </nav>
+    
+    <div class="page-header">
+        <h1>Coupons : <small>Add a coupon</small></h1>
     </div>
-</div>
 
+    <section class="row-fluid">
+		<div class="span12 general-block-decorator">
+			
+			<form action="#" method="post">
+				
+				<div class="span4">					
+					
+					<div class="control-group">
+					    <label for="code">Code :</label>
+					    <input id="code" type="text" name="code" placeholder="code">
+				    </div>
+				
+					<div class="control-group">
+					    <label for="title">Title :</label>
+					    <input id="title" type="text" name="title" placeholder="title">					
+				  	</div>
+
+				  	<div class="control-group">
+						<label for="cumulative" class="checkbox">
+							<input id="cumulative" type="checkbox" name="cumulative" value="1">
+							Is cumulative ?
+						</label>
+					</div>
+
+					<div class="control-group">
+						<label for="renoving-shortage" class="checkbox">
+							<input id="renoving-shortage" type="checkbox" name="renoving-shortage" value="1">
+							Is renoving shortage ?
+						</label>
+					</div>
+
+					<div class="control-group">
+						<label for="expiration-date">Expiration date :</label>
+					    <input id="expiration-date" type="text" name="expiration-date" placeholder="29/08/2013" class="datepicker">
+					</div>
+
+				</div>
+
+			</form>
+
+		</div>
+	</section>
+
+</section> <!-- #wrapper -->
 
 {include file='includes/js.inc.html'}
 
