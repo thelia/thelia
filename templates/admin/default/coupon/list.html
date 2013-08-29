@@ -6,15 +6,168 @@
 
 {include file='includes/header.inc.html'}
 
-<div class="coupons">
-    <div id="wrapper" class="container">
 
+<section id="wrapper" class="container">
+
+    <nav>
         <ul class="breadcrumb">
             {include file="includes/coupon_breadcrumb.html"}
         </ul>
-        <h1>List</h1>
+    </nav>
+    
+    <div class="page-header">
+        <h1>Coupons : <small>List of coupons</small></h1>
     </div>
-</div>
+
+    <section class="row-fluid">
+		<div class="span12 general-block-decorator">
+	    	<table class="table table-striped tablesorter">
+	    		<caption>
+	    			List of enabled coupons
+	    		</caption>
+	    		<thead>
+	    			<tr>
+	    				<th>Code</th>
+	    				<th>Title</th>
+	    				<th>Expiration date</th>
+	    				<th>Usage left</th>
+	    				<th>Actions</th>
+	    			</tr>
+	    		</thead>
+	    		<tbody>
+	    			<tr>
+	    				<td>XMAS13</td>
+	    				<td>Coupon for XMAS -30 &euro;</td>
+	    				<td>25/12/2013</td>
+	    				<td>49 times</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
+	    					<a href="#url" class="btn btn-danger btn-medium" data-toggle="confirm" data-target="#disable"><span class="icon-off icon-white"></span> Disable</a>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>XMAS14</td>
+	    				<td>Coupon for XMAS -30 &euro;</td>
+	    				<td>25/12/2013</td>
+	    				<td>49 times</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
+	    					<a href="#url" class="btn btn-danger btn-medium" data-toggle="confirm" data-target="#disable"><span class="icon-off icon-white"></span> Disable</a>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>XMAS15</td>
+	    				<td>Coupon for XMAS -30 &euro;</td>
+	    				<td>25/12/2013</td>
+	    				<td>49 times</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
+	    					<a href="#url" class="btn btn-danger btn-medium" data-toggle="confirm" data-target="#disable"><span class="icon-off icon-white"></span> Disable</a>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>XMAS16</td>
+	    				<td>Coupon for XMAS -30 &euro;</td>
+	    				<td>25/12/2013</td>
+	    				<td>49 times</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
+	    					<a href="#url" class="btn btn-danger btn-medium" data-toggle="confirm" data-target="#disable"><span class="icon-off icon-white"></span> Disable</a>
+	    				</td>
+	    			</tr>
+	    		</tbody>
+	    	</table>
+		</div>
+    </section>
+
+    <section class="row-fluid">
+		<div class="span12 general-block-decorator">
+	    	<table class="table table-striped tablesorter">
+	    		<caption>
+	    			List of disabled coupons
+	    		</caption>
+	    		<thead>
+	    			<tr>
+	    				<th>Code</th>
+	    				<th>Title</th>
+	    				<th>Expiration date</th>
+	    				<th>Usage left</th>
+	    				<th>Actions</th>
+	    			</tr>
+	    		</thead>
+	    		<tbody>
+	    			<tr>
+	    				<td>XMAS13</td>
+	    				<td>Coupon for XMAS -30 &euro;</td>
+	    				<td>18/10/2013</td>
+	    				<td>49 times</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
+	    					<a href="#url" class="btn btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="icon-ok icon-white"></span> Enabled</a>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>XMAS13</td>
+	    				<td>Coupon for XMAS -20 &euro;</td>
+	    				<td>05/09/2013</td>
+	    				<td>49 times</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
+	    					<a href="#url" class="btn btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="icon-ok icon-white"></span> Enabled</a>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>XMAS13</td>
+	    				<td>Coupon for XMAS -50 &euro;</td>
+	    				<td>03/12/2013</td>
+	    				<td>49 times</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
+	    					<a href="#url" class="btn btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="icon-ok icon-white"></span> Enabled</a>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>XMAS13</td>
+	    				<td>Coupon for XMAS -5 &euro;</td>
+	    				<td>25/01/2013</td>
+	    				<td>49 times</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
+	    					<a href="#url" class="btn btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="icon-ok icon-white"></span> Enabled</a>
+	    				</td>
+	    			</tr>
+	    		</tbody>
+	    	</table>
+		</div>
+    </section>
+
+</section> <!-- #wrapper -->
+
+<aside id="disable" class="modal hide fade" role="dialog">
+    <div class="modal-header">                                    
+        <h3>Confirmation</h3>
+    </div>
+    <div class="modal-body">
+        <p>Do you really want to disable this element?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-inverse" data-dismiss="modal">Cancel</button>
+        <a href="#" class="btn btn-success" data-confirm="confirm">Confirm</a>
+    </div>
+</aside> <!-- #disable / Disable confirmation -->
+
+<aside id="enable" class="modal hide fade" role="dialog">
+    <div class="modal-header">                                    
+        <h3>Confirmation</h3>
+    </div>
+    <div class="modal-body">
+        <p>Do you really want to enable this element?</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-inverse" data-dismiss="modal">Cancel</button>
+        <a href="#" class="btn btn-success" data-confirm="confirm">Confirm</a>
+    </div>
+</aside> <!-- #enable / Enable confirmation -->
 
 
 {include file='includes/js.inc.html'}
@@ -24,6 +177,33 @@
 {/javascripts}
 
 <script>
+	// === Confirm Box === //
+	$('[data-toggle="confirm"]').click(function(e){		
+
+		var $link = $(this);
+		var modal = $(this).data('target');		
+
+		$(modal).modal('show');
+
+		$(modal).on('shown', function () {
+  			$('[data-confirm]').attr('href', $link.attr('href'));
+		});
+
+		if($(modal).is(':hidden')){
+			e.preventDefault();
+		}
+
+	});	
+</script>
+
+{javascripts file='../assets/js/tablesorter/jquery.tablesorter.min.js'}
+	<script src="{$asset_url}"></script>
+{/javascripts}
+
+<script>
+	// === Table sorter === //
+	
+	$('.tablesorter').tablesorter();
 </script>
 
 {include file='includes/footer.inc.html'}
