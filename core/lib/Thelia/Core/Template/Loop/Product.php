@@ -143,7 +143,7 @@ class Product extends BaseLoop
         $lang = $this->getLang();
 
         /* manage translations */
-        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        $locale = ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::getDefaultLangWhenNoTranslationAvailable(), $this->request->getSession()->getLocale());
 
         $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
         $isPSELeftJoinList = array();
@@ -520,7 +520,7 @@ class Product extends BaseLoop
                 ->set("CHAPO", $product->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL", $product->getUrl())
+                ->set("URL", $product->getUrl($locale))
                 ->set("BEST_PRICE", $product->getVirtualColumn('real_lowest_price'))
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))

@@ -218,10 +218,10 @@ abstract class BaseLoop
     }
 
     /**
-     * @param \ModelCriteria $search
-     * @param                $pagination
+     * @param ModelCriteria $search
+     * @param               $pagination
      *
-     * @return array|\PropelModelPager
+     * @return array|\Propel\Runtime\Util\PropelModelPager
      */
     protected function searchWithPagination(ModelCriteria $search, &$pagination)
     {

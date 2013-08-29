@@ -24,6 +24,7 @@
 namespace Thelia\Tools;
 
 use Thelia\Model\ConfigQuery;
+use Thelia\Rewriting\RewritingRetriever;
 
 class URL
 {
@@ -101,4 +102,15 @@ class URL
 
          return self::absoluteUrl($path, $parameters);
      }
+
+    public static function retrieve($view, $viewId, $viewLocale)
+    {
+        $rewrittenUrl = null;
+        if(ConfigQuery::isRewritingEnable()) {
+            $retriever = new RewritingRetriever();
+            $rewrittenUrl = $retriever->getViewUrl($view, $viewId, $viewLocale);
+        }
+
+        return $rewrittenUrl === null ? self::viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
+    }
 }

@@ -22,7 +22,7 @@
 
     {loop name="product" type="product" category="#ID"}
     <div style="border: dashed 2px red; padding: 20px; margin: 10px;">
-        <h3><a name="#REF">PRODUCT : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
+        <h3><a name="#REF" href="#URL">PRODUCT #ID : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
         <h4>#TITLE</h4>
         <p>#DESCRIPTION</p>
 
@@ -111,7 +111,7 @@
         {loop name="product" type="product" category="#ID"}
 
         <div style="border: solid 1px green; padding: 20px; margin: 10px;">
-            <h3><a name="#REF">PRODUCT : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
+            <h3><a name="#REF" href="#URL">PRODUCT #ID : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
             <h4>#TITLE</h4>
             <p>#DESCRIPTION</p>
 

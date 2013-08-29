@@ -215,7 +215,7 @@ class Image extends BaseLoop
 
         $search->joinWithI18n(
                 $this->request->getSession()->getLocale(),
-                (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
+                (ConfigQuery::getDefaultLangWhenNoTranslationAvailable()) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
         );
 
         $results = $this->search($search, $pagination);

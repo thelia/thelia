@@ -103,7 +103,7 @@ class Category extends BaseLoop
         $lang = $this->getLang();
 
         /* manage translations */
-        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        $locale = ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::getDefaultLangWhenNoTranslationAvailable(), $this->request->getSession()->getLocale());
 
 		$id = $this->getId();
 
@@ -185,7 +185,7 @@ class Category extends BaseLoop
 	            ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
 	            ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
 	            ->set("PARENT", $category->getParent())
-	            ->set("URL", $category->getUrl())
+	            ->set("URL", $category->getUrl($locale))
 	            ->set("PRODUCT_COUNT", $category->countChild())
 	            ->set("VISIBLE", $category->getVisible() ? "1" : "0")
 	            ->set("POSITION", $category->getPosition())

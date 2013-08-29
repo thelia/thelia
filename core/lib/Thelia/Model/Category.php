@@ -4,6 +4,7 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\Category as BaseCategory;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Tools\URL;
 
 class Category extends BaseCategory
 {
@@ -15,8 +16,9 @@ class Category extends BaseCategory
         return CategoryQuery::countChild($this->getId());
     }
 
-    public function getUrl()
+    public function getUrl($locale)
     {
+        return URL::retrieve('category', $this->getId(), $locale);
     }
 
     /**

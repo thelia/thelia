@@ -3,12 +3,12 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\Product as BaseProduct;
-use Thelia\Model\ProductSaleElements;
+use Thelia\Tools\URL;
 
 class Product extends BaseProduct
 {
-    public function getUrl()
+    public function getUrl($locale)
     {
-
+        return URL::retrieve('product', $this->getId(), $locale);
     }
 }

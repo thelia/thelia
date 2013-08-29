@@ -109,10 +109,14 @@ class ModelCriteriaTools
             }
         }
 
+        $askedLocale = $lang === null ? $currentLocale : $localeSearch->getLocale();
+
         if($backendContext) {
-            self::getBackEndI18n($search, $lang === null ? $currentLocale : $localeSearch->getLocale(), $columns, $foreignTable, $foreignKey);
+            self::getBackEndI18n($search, $askedLocale, $columns, $foreignTable, $foreignKey);
         } else {
-            self::getFrontEndI18n($search, $defaultLangWithoutTranslation, $lang === null ? $currentLocale : $localeSearch->getLocale(), $columns, $foreignTable, $foreignKey);
+            self::getFrontEndI18n($search, $defaultLangWithoutTranslation, $askedLocale, $columns, $foreignTable, $foreignKey);
         }
+
+        return $askedLocale;
     }
 }

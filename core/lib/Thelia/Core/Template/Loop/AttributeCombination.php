@@ -81,7 +81,7 @@ class AttributeCombination extends BaseLoop
         /* manage attribute translations */
         ModelCriteriaTools::getFrontEndI18n(
             $search,
-            ConfigQuery::read("default_lang_without_translation", 1),
+            ConfigQuery::getDefaultLangWhenNoTranslationAvailable(),
             $this->request->getSession()->getLocale(),
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             AttributeTableMap::TABLE_NAME,
@@ -91,7 +91,7 @@ class AttributeCombination extends BaseLoop
         /* manage attributeAv translations */
         ModelCriteriaTools::getFrontEndI18n(
             $search,
-            ConfigQuery::read("default_lang_without_translation", 1),
+            ConfigQuery::getDefaultLangWhenNoTranslationAvailable(),
             $this->request->getSession()->getLocale(),
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             AttributeAvTableMap::TABLE_NAME,

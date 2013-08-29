@@ -1095,24 +1095,19 @@
   </table>
   <table name="rewriting_url" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="url" required="true" size="255" type="VARCHAR" />
     <column name="view" size="255" type="VARCHAR" />
     <column name="view_id" size="255" type="VARCHAR" />
-    <column name="view_locale" size="255" type="VARCHAR" />
-    <column name="redirected" type="INTEGER" />
-    <foreign-key foreignTable="rewriting_url" name="fk_rewriting_url_redirected" onDelete="RESTRICT" onUpdate="RESTRICT">
-      <reference foreign="id" local="redirected" />
-    </foreign-key>
+    <column name="url" required="true" size="255" type="VARCHAR" />
     <unique name="url_UNIQUE">
       <unique-column name="url" />
     </unique>
     <index name="idx_view_id">
       <index-column name="view_id" />
     </index>
-    <index name="idx_rewriting_url_redirected">
-      <index-column name="redirected" />
-    </index>
     <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="url" />
+    </behavior>
   </table>
   <table name="rewriting_argument" namespace="Thelia\Model">
     <column name="rewriting_url_id" primaryKey="true" required="true" type="INTEGER" />
@@ -1122,6 +1117,18 @@
       <reference foreign="id" local="rewriting_url_id" />
     </foreign-key>
     <index name="fk_rewriting_argument_rewirting_url_id">
+      <index-column name="rewriting_url_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="rewriting_old_url" namespace="Thelia\Model">
+    <column name="rewriting_url_id" required="true" type="INTEGER" />
+    <column name="url" primaryKey="true" required="true" size="255" type="VARCHAR" />
+    <column name="locale" required="true" size="5" type="VARCHAR" />
+    <foreign-key foreignTable="rewriting_url" name="fk_rewriting_old_url_rewriting_url_id">
+      <reference foreign="id" local="rewriting_url_id" />
+    </foreign-key>
+    <index name="idx_rewriting_old_url_rewriting_url_id">
       <index-column name="rewriting_url_id" />
     </index>
     <behavior name="timestampable" />

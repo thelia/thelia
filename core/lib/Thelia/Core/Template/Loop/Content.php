@@ -93,7 +93,7 @@ class Content extends BaseLoop
         $lang = $this->getLang();
 
         /* manage translations */
-        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        $locale = ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::getDefaultLangWhenNoTranslationAvailable(), $this->request->getSession()->getLocale());
 
         $id = $this->getId();
 
@@ -226,7 +226,7 @@ class Content extends BaseLoop
                 ->set("DESCRIPTION", $content->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $content->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $content->getPosition())
-                ->set("URL", $content->getUrl())
+                ->set("URL", $content->getUrl($locale))
             ;
 
             $loopResult->addRow($loopResultRow);

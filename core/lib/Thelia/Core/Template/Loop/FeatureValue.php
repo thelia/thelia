@@ -86,7 +86,7 @@ class FeatureValue extends BaseLoop
         /* manage featureAv translations */
         ModelCriteriaTools::getFrontEndI18n(
             $search,
-            ConfigQuery::read("default_lang_without_translation", 1),
+            ConfigQuery::getDefaultLangWhenNoTranslationAvailable(),
             $this->request->getSession()->getLocale(),
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             FeatureAvTableMap::TABLE_NAME,

@@ -85,7 +85,7 @@ class Folder extends BaseLoop
         $lang = $this->getLang();
 
         /* manage translations */
-        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        $locale = ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::getDefaultLangWhenNoTranslationAvailable(), $this->request->getSession()->getLocale());
 
 		$id = $this->getId();
 
@@ -168,7 +168,7 @@ class Folder extends BaseLoop
                 ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
 	            ->set("PARENT", $folder->getParent())
-                ->set("URL", $folder->getUrl())
+                ->set("URL", $folder->getUrl($locale))
 	            ->set("CONTENT_COUNT", $folder->countChild())
 	            ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
 	            ->set("POSITION", $folder->getPosition())
