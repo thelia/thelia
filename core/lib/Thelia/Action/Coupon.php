@@ -44,6 +44,29 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 {
 
     /**
+     * Disable a Coupon
+     *
+     * @param ActionEvent $event
+     */
+    public function delete(CategoryDeleteEvent $event)
+    {
+        $this->checkAuth("ADMIN", "admin.category.delete");
+
+        $category = CategoryQuery::create()->findPk($event->getId());
+
+        if ($category !== null) {
+
+            $event->setDeletedCategory($category);
+
+            $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_DELETECATEGORY, $event);
+
+            $category->delete();
+
+            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_DELETECATEGORY, $event);
+        }
+    }
+
+    /**
      * Returns an array of event names this subscriber listens to.
      *
      * The array keys are event names and the value can be:
