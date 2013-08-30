@@ -29,6 +29,7 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Form\CouponCreationForm;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Coupon;
 
 /**
@@ -79,53 +80,46 @@ class CouponController extends BaseAdminController
     {
         $this->checkAuth("ADMIN", "admin.coupon.view");
 
-
         if ($this->getRequest()->isMethod('POST')) {
+            try {
+                $couponCreationForm = new CouponCreationForm($this->getRequest());
+                $couponBeingCreated = $this->buildCouponFromForm(
+                    $this->validateForm($couponCreationForm, "POST")->getData()
+                );
 
-            $couponCreationForm = new CouponCreationForm($this->getRequest());
+                $couponCreateEvent = new CouponCreateEvent(
+                    $couponBeingCreated
+                );
 
-            $form = $this->validateForm($couponCreationForm, "POST");
-
-            $data = $form->getData();
-
-            $couponBeingCreated = new Coupon();
-            $couponBeingCreated->setCode($data["code"]);
-            $couponBeingCreated->setType($data["type"]);
-            $couponBeingCreated->setTitle($data["title"]);
-            $couponBeingCreated->setShortDescription($data["shortDescription"]);
-            $couponBeingCreated->setDescription($data["description"]);
-            $couponBeingCreated->setAmount($data["amount"]);
-            $couponBeingCreated->setIsEnabled($data["isEnabled"]);
-            $couponBeingCreated->setExpirationDate($data["expirationDate"]);
-            $couponBeingCreated->setSerializedRules(
-                new CouponRuleCollection(
-                    array()
-                )
-            );
-            $couponBeingCreated->setIsCumulative($data["isCumulative"]);
-            $couponBeingCreated->setIsRemovingPostage($data["isRemovingPostage"]);
-            $couponBeingCreated->setMaxUsage($data["maxUsage"]);
-            $couponBeingCreated->setIsAvailableOnSpecialOffers($data["isAvailableOnSpecialOffers"]);
-
-            $couponCreateEvent = new CouponCreateEvent(
-                $couponBeingCreated
-            );
-
-            $this->dispatch(TheliaEvents::BEFORE_CREATE_COUPON, $couponCreateEvent);
-            // @todo Save
-            $this->adminLogAppend(
-                sprintf(
-                    'Coupon %s (ID %s) created',
-                    $couponBeingCreated->getTitle(),
-                    $couponBeingCreated->getId()
-                )
-            );
-            $this->dispatch(TheliaEvents::AFTER_CREATE_COUPON, $couponCreateEvent);
+                $this->dispatch(
+                    TheliaEvents::CREATE_COUPON,
+                    $couponCreateEvent
+                );
+                $this->adminLogAppend(
+                    sprintf(
+                        'Coupon %s (ID %s) created',
+                        $couponBeingCreated->getTitle(),
+                        $couponBeingCreated->getId()
+                    )
+                );
+                // @todo redirect if successful
+            } catch (FormValidationException $e) {
+                $couponCreationForm->setErrorMessage($e->getMessage());
+                    $this->getParserContext()->setErrorForm($couponCreationForm);
+            } catch (\Exception $e) {
+                Tlog::getInstance()->error(
+                    sprintf(
+                        "Failed to create coupon: %s",
+                        $e->getMessage()
+                    )
+                );
+                $this->getParserContext()->setGeneralError($e->getMessage());
+            }
         } else {
 
         }
 
-        return $this->render('coupon/edit', $args);
+        return $this->render('coupon/edit', array());
     }
 
     /**
@@ -195,5 +189,40 @@ class CouponController extends BaseAdminController
 
         // We did not recognized the action -> return a 404 page
         return $this->pageNotFound();
+    }
+
+    /**
+     * Build a Coupon from its form
+     *
+     * @param array $data Form data
+     *
+     * @return Coupon
+     */
+    protected function buildCouponFromForm(array $data)
+    {
+        $couponBeingCreated = new Coupon();
+        $couponBeingCreated->setCode($data["code"]);
+        $couponBeingCreated->setType($data["type"]);
+        $couponBeingCreated->setTitle($data["title"]);
+        $couponBeingCreated->setShortDescription($data["shortDescription"]);
+        $couponBeingCreated->setDescription($data["description"]);
+        $couponBeingCreated->setAmount($data["amount"]);
+        $couponBeingCreated->setIsEnabled($data["isEnabled"]);
+        $couponBeingCreated->setExpirationDate($data["expirationDate"]);
+        $couponBeingCreated->setSerializedRules(
+            new CouponRuleCollection(
+                array()
+            )
+        );
+        $couponBeingCreated->setIsCumulative($data["isCumulative"]);
+        $couponBeingCreated->setIsRemovingPostage(
+            $data["isRemovingPostage"]
+        );
+        $couponBeingCreated->setMaxUsage($data["maxUsage"]);
+        $couponBeingCreated->setIsAvailableOnSpecialOffers(
+            $data["isAvailableOnSpecialOffers"]
+        );
+
+        return $couponBeingCreated;
     }
 }
