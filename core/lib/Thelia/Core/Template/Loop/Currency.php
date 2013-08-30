@@ -31,8 +31,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Tools\ModelCriteriaTools;
-
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ConfigQuery;
 
@@ -69,12 +67,8 @@ class Currency extends BaseLoop
     {
         $search = CurrencyQuery::create();
 
-        $backendContext = $this->getBackend_context();
-
-        $lang = $this->getLang();
-
         /* manage translations */
-        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::getDefaultLangWhenNoTranslationAvailable(), $this->request->getSession()->getLocale(), array('NAME'));
+        $this->configureI18nProcessing($search, array('NAME'));
 
         $id = $this->getId();
 

@@ -3,7 +3,6 @@
 namespace Thelia\Model;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Thelia\Core\Event\Internal\CustomerEvent;
 use Thelia\Model\Base\Customer as BaseCustomer;
 
 use Thelia\Model\Exception\InvalidArgumentException;
@@ -17,6 +16,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Core\Security\Role\Role;
+use Thelia\Core\Event\CustomerEvent;
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.

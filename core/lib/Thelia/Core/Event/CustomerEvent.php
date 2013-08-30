@@ -21,16 +21,27 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Internal;
+namespace Thelia\Core\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Thelia\Model\Customer;
+use Thelia\Core\Event\ActionEvent;
 
-/**
- * Base class used for internal event like creating new Customer, adding item to cart, etc
- *
- * Class InternalEvent
- * @package Thelia\Core\Event
- */
-abstract class InternalEvent extends Event
+class CustomerEvent extends ActionEvent
 {
+    public $customer;
+
+    public function __construct(Customer $customer)
+    {
+        $this->customer = $customer;
+    }
+
+    /**
+     * @return \Thelia\Model\Customer
+     */
+    public function getCustomer()
+    {
+        return $this->customer;
+    }
+
+
 }

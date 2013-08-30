@@ -33,8 +33,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\Tools\ModelCriteriaTools;
-
 use Thelia\Model\Base\FeatureProductQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\FeatureAvTableMap;
@@ -70,7 +68,8 @@ class FeatureValue extends BaseLoop
                     new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
-            )
+            ),
+            Argument::createIntTypeArgument('lang')
         );
     }
 
@@ -84,10 +83,8 @@ class FeatureValue extends BaseLoop
         $search = FeatureProductQuery::create();
 
         /* manage featureAv translations */
-        ModelCriteriaTools::getFrontEndI18n(
+        $this->configureI18nProcessing(
             $search,
-            ConfigQuery::getDefaultLangWhenNoTranslationAvailable(),
-            $this->request->getSession()->getLocale(),
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             FeatureAvTableMap::TABLE_NAME,
             'FEATURE_AV_ID',

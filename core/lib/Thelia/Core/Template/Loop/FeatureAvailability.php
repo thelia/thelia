@@ -31,8 +31,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Tools\ModelCriteriaTools;
-
 use Thelia\Model\Base\FeatureAvQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
@@ -77,12 +75,8 @@ class FeatureAvailability extends BaseLoop
     {
         $search = FeatureAvQuery::create();
 
-        $backendContext = $this->getBackend_context();
-
-        $lang = $this->getLang();
-
         /* manage translations */
-        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::getDefaultLangWhenNoTranslationAvailable(), $this->request->getSession()->getLocale());
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 

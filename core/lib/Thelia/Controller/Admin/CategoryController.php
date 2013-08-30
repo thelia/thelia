@@ -25,12 +25,52 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
+use Thelia\Log\Tlog;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\CategoryCreateEvent;
+use Thelia\Form\CategoryCreationForm;
+use Thelia\Core\Event\CategoryDeleteEvent;
+use Thelia\Core\Event\CategoryToggleVisibilityEvent;
+use Thelia\Core\Event\CategoryChangePositionEvent;
+use Thelia\Form\CategoryDeletionForm;
 
 class CategoryController extends BaseAdminController
 {
     protected function createNewCategory($args)
     {
-        $this->dispatchEvent("createCategory");
+         try {
+            $categoryCreationForm = new CategoryCreationForm($this->getRequest());
+
+            $form = $this->validateForm($categoryCreationForm, "POST");
+
+            $data = $form->getData();
+
+            $categoryCreateEvent = new CategoryCreateEvent(
+                $data["title"],
+                $data["parent"],
+                $data["locale"]
+            );
+
+            $this->dispatch(TheliaEvents::CATEGORY_CREATE, $categoryCreateEvent);
+
+            $category = $categoryCreateEvent->getCreatedCategory();
+
+            $this->adminLogAppend(sprintf("Category %s (ID %s) created", $category->getTitle(), $category->getId()));
+
+            // Substitute _ID_ in the URL with the ID of the created category
+            $successUrl = str_replace('_ID_', $category->getId(), $categoryCreationForm->getSuccessUrl());
+
+            // Redirect to the success URL
+            $this->redirect($successUrl);
+        }
+        catch (FormValidationException $e) {
+            $categoryCreationForm->setErrorMessage($e->getMessage());
+            $this->getParserContext()->setErrorForm($categoryCreationForm);
+        }
+        catch (Exception $e) {
+           Tlog::getInstance()->error(sprintf("Failed to create category: %s", $e->getMessage()));
+            $this->getParserContext()->setGeneralError($e->getMessage());
+        }
 
         // At this point, the form has error, and should be redisplayed.
         return $this->render('categories', $args);
@@ -45,9 +85,35 @@ class CategoryController extends BaseAdminController
 
     protected function deleteCategory($args)
     {
-        $this->dispatchEvent("deleteCategory");
+        try {
+            $categoryDeletionForm = new CategoryDeletionForm($this->getRequest());
 
-        // Something was wrong, category was not deleted. Display parent category list
+            $data = $this->validateForm($categoryDeletionForm, "POST")->getData();
+
+            $categoryDeleteEvent = new CategoryDeleteEvent($data['category_id']);
+
+            $this->dispatch(TheliaEvents::CATEGORY_DELETE, $categoryDeleteEvent);
+
+            $category = $categoryDeleteEvent->getDeletedCategory();
+
+            $this->adminLogAppend(sprintf("Category %s (ID %s) deleted", $category->getTitle(), $category->getId()));
+
+            // Substitute _ID_ in the URL with the ID of the created category
+            $successUrl = str_replace('_ID_', $categoryDeleteEvent->getDeletedCategory()->getId(), $categoryDeletionForm->getSuccessUrl());
+
+            // Redirect to the success URL
+            $this->redirect($successUrl);
+        }
+        catch (FormValidationException $e) {
+            $categoryDeletionForm->setErrorMessage($e->getMessage());
+            $this->getParserContext()->setErrorForm($categoryDeletionForm);
+        }
+       catch (Exception $e) {
+            Tlog::getInstance()->error(sprintf("Failed to delete category: %s", $e->getMessage()));
+            $this->getParserContext()->setGeneralError($e->getMessage());
+        }
+
+        // At this point, something was wrong, category was not deleted. Display parent category list
         return $this->render('categories', $args);
     }
 
@@ -60,28 +126,48 @@ class CategoryController extends BaseAdminController
 
     protected function visibilityToggle($args)
     {
-        $this->dispatchEvent("toggleCategoryVisibility");
+        $event = new CategoryToggleVisibilityEvent($this->getRequest()->get('category_id', 0));
+
+        $this->dispatch(TheliaEvents::CATEGORY_TOGGLE_VISIBILITY, $event);
 
         return $this->nullResponse();
     }
 
     protected function changePosition($args)
     {
-        $this->dispatchEvent("changeCategoryPosition");
+        $request = $this->getRequest();
+
+        $event = new CategoryChangePositionEvent(
+                $request->get('category_id', 0),
+                CategoryChangePositionEvent::POSITION_ABSOLUTE,
+                $request->get('position', null)
+        );
+
+        $this->dispatch(TheliaEvents::CATEGORY_CHANGE_POSITION, $event);
 
         return $this->render('categories', $args);
     }
 
     protected function positionDown($args)
     {
-        $this->dispatchEvent("changeCategoryPositionDown");
+        $event = new CategoryChangePositionEvent(
+            $this->getRequest()->get('category_id', 0),
+            CategoryChangePositionEvent::POSITION_DOWN
+        );
+
+        $this->dispatch(TheliaEvents::CATEGORY_CHANGE_POSITION, $event);
 
         return $this->render('categories', $args);
     }
 
     protected function positionUp($args)
     {
-        $this->dispatchEvent("changeCategoryPositionUp");
+        $event = new CategoryChangePositionEvent(
+                $this->getRequest()->get('category_id', 0),
+                CategoryChangePositionEvent::POSITION_UP
+        );
+
+        $this->dispatch(TheliaEvents::CATEGORY_CHANGE_POSITION, $event);
 
         return $this->render('categories', $args);
     }
@@ -138,9 +224,11 @@ class CategoryController extends BaseAdminController
 
                     return $this->positionDown($args);
             }
-        } catch (AuthorizationException $ex) {
+        }
+        catch (AuthorizationException $ex) {
             return $this->errorPage($ex->getMessage());
-        } catch (AuthenticationException $ex) {
+        }
+        catch (AuthenticationException $ex) {
             return $this->errorPage($ex->getMessage());
         }
 

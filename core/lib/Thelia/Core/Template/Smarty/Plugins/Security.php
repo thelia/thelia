@@ -46,11 +46,6 @@ class Security extends AbstractSmartyPlugin
      */
     public function checkAuthFunction($params, &$smarty)
     {
-        // Context: 'front' or 'admin'
-           $context = $this->getNormalizedParam($params, 'context');
-
-           $this->securityContext->setContext($context);
-
            $roles = $this->_explode($this->getParam($params, 'roles'));
            $permissions = $this->_explode($this->getParam($params, 'permissions'));
 

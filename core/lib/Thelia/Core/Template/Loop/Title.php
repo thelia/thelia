@@ -31,8 +31,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Tools\ModelCriteriaTools;
-
 use Thelia\Model\CustomerTitleQuery;
 use Thelia\Model\ConfigQuery;
 
@@ -67,12 +65,8 @@ class Title extends BaseLoop
     {
         $search = CustomerTitleQuery::create();
 
-        $backendContext = $this->getBackend_context();
-
-        $lang = $this->getLang();
-
         /* manage translations */
-        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::getDefaultLangWhenNoTranslationAvailable(), $this->request->getSession()->getLocale(), array('SHORT', 'LONG'));
+        $this->configureI18nProcessing($search, array('SHORT', 'LONG'));
 
         $id = $this->getId();
 

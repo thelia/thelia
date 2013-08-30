@@ -43,7 +43,7 @@ class SessionController extends BaseAdminController
     {
         $this->dispatch(TheliaEvents::ADMIN_LOGOUT);
 
-        $this->getSecurityContext()->clear();
+        $this->getSecurityContext()->clearAdminUser();
 
         // Go back to login page.
         return Redirect::exec(URL::absoluteUrl('/admin/login')); // FIXME - should be a parameter
@@ -61,7 +61,7 @@ class SessionController extends BaseAdminController
             $user = $authenticator->getAuthentifiedUser();
 
             // Success -> store user in security context
-            $this->getSecurityContext()->setUser($user);
+            $this->getSecurityContext()->setAdminUser($user);
 
             // Log authentication success
             AdminLog::append("Authentication successful", $request, $user);

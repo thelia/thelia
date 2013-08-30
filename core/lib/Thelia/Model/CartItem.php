@@ -4,10 +4,10 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Event\Internal\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\CartItem as BaseCartItem;
 use Thelia\Model\ConfigQuery;
+use Thelia\Core\Event\CartEvent;
 
 class CartItem extends BaseCartItem
 {

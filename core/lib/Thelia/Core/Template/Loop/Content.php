@@ -31,8 +31,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Tools\ModelCriteriaTools;
-
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\ContentFolderQuery;
@@ -88,12 +86,8 @@ class Content extends BaseLoop
     {
         $search = ContentQuery::create();
 
-        $backendContext = $this->getBackend_context();
-
-        $lang = $this->getLang();
-
         /* manage translations */
-        $locale = ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::getDefaultLangWhenNoTranslationAvailable(), $this->request->getSession()->getLocale());
+        $locale = $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 

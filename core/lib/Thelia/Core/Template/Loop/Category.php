@@ -32,8 +32,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\Tools\ModelCriteriaTools;
-
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
@@ -98,12 +96,8 @@ class Category extends BaseLoop
     {
         $search = CategoryQuery::create();
 
-        $backendContext = $this->getBackend_context();
-
-        $lang = $this->getLang();
-
         /* manage translations */
-        $locale = ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::getDefaultLangWhenNoTranslationAvailable(), $this->request->getSession()->getLocale());
+        $locale = $this->configureI18nProcessing($search);
 
 		$id = $this->getId();
 
@@ -169,7 +163,6 @@ class Category extends BaseLoop
         $loopResult = new LoopResult();
 
         foreach ($categories as $category) {
-
             /*
              * no cause pagination lost :
              * if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;

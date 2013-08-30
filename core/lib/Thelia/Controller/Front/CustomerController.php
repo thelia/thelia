@@ -36,6 +36,7 @@ use Thelia\Form\CustomerModification;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\CustomerEvent;
 
 class CustomerController extends BaseFrontController
 {
@@ -76,7 +77,7 @@ class CustomerController extends BaseFrontController
 
         try {
 
-            $customer = $this->getSecurityContext(SecurityContext::CONTEXT_FRONT_OFFICE)->getUser();
+            $customer = $this->getSecurityContext()->getCustomerUser();
 
             $form = $this->validateForm($customerModification, "post");
 
@@ -116,9 +117,7 @@ class CustomerController extends BaseFrontController
         try {
             $customer = $authenticator->getAuthentifiedUser();
 
-            $customerLoginEvent = new CustomerLoginEvent($customer);
-
-            $this->processLogin($customer, $customerLoginEvent);
+            $this->processLogin($customer);
 
             $this->redirectSuccess();
         } catch (ValidatorException $e) {
@@ -132,11 +131,11 @@ class CustomerController extends BaseFrontController
         }
     }
 
-    public function processLogin(Customer $customer,$event = null)
+    public function processLogin(Customer $customer)
     {
-        $this->getSecurityContext(SecurityContext::CONTEXT_FRONT_OFFICE)->setUser($customer);
+        $this->getSecurityContext()->setCustomerUser($customer);
 
-        if($event) $this->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
+        if($event) $this->dispatch(TheliaEvents::CUSTOMER_LOGIN, new CustomerLoginEvent($customer));
     }
 
     /**

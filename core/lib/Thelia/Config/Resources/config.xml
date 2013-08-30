@@ -85,8 +85,6 @@
             <argument type="service" id="request" />
 		</service>
 
-        <service id="thelia.envContext" class="Thelia\Core\Context"/>
-
 		<!--  Parser context -->
 
         <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext" scope="request">

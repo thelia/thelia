@@ -33,8 +33,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\Tools\ModelCriteriaTools;
-
 use Thelia\Model\Base\AttributeCombinationQuery;
 use Thelia\Model\Map\AttributeAvTableMap;
 use Thelia\Model\Map\AttributeTableMap;
@@ -59,6 +57,7 @@ class AttributeCombination extends BaseLoop
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('product_sale_elements', null, true),
+            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -79,20 +78,16 @@ class AttributeCombination extends BaseLoop
         $search = AttributeCombinationQuery::create();
 
         /* manage attribute translations */
-        ModelCriteriaTools::getFrontEndI18n(
+        $this->configureI18nProcessing(
             $search,
-            ConfigQuery::getDefaultLangWhenNoTranslationAvailable(),
-            $this->request->getSession()->getLocale(),
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             AttributeTableMap::TABLE_NAME,
             'ATTRIBUTE_ID'
         );
 
         /* manage attributeAv translations */
-        ModelCriteriaTools::getFrontEndI18n(
+        $this->configureI18nProcessing(
             $search,
-            ConfigQuery::getDefaultLangWhenNoTranslationAvailable(),
-            $this->request->getSession()->getLocale(),
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             AttributeAvTableMap::TABLE_NAME,
             'ATTRIBUTE_AV_ID'

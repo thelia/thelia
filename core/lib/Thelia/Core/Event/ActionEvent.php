@@ -35,26 +35,7 @@ use Thelia\Form\BaseForm;
  */
 abstract class ActionEvent extends Event
 {
-
-    /**
-     *
-     * @var Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    protected $errorForm = null;
-
     protected $parameters = array();
-
-    /**
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param string                                    $action
-     */
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
 
     public function __set($name, $value)
     {
@@ -68,31 +49,5 @@ abstract class ActionEvent extends Event
         }
 
         return null;
-    }
-
-    /**
-     *
-     * @return \Symfony\Component\HttpFoundation\Request
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    public function setErrorForm(BaseForm $form)
-    {
-        $this->errorForm = $form;
-
-        if ($form != null) $this->stopPropagation();
-    }
-
-    public function getErrorForm()
-    {
-        return $this->errorForm;
-    }
-
-    public function hasErrorForm()
-    {
-        return $this->errorForm != null ? true : false;
     }
 }
