@@ -24,6 +24,7 @@ namespace Thelia\Rewriting;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Base\RewritingUrlQuery;
+use Thelia\Model\Map\RewritingUrlTableMap;
 
 /**
  * Class RewritingRetriever
@@ -36,7 +37,14 @@ class RewritingRetriever
 {
     public function getViewUrl($view, $viewId, $viewLocale)
     {
-        $url = RewritingUrlQuery::create()
+        $url = $this->getViewUrlQuery($view, $viewId, $viewLocale);
+
+        return $url === null ? null : $url->getUrl();
+    }
+
+    protected function getViewUrlQuery($view, $viewId, $viewLocale)
+    {
+        return RewritingUrlQuery::create()
             ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
             ->where('ISNULL(`ra`.REWRITING_URL_ID)')
             ->filterByView($view)
@@ -45,12 +53,49 @@ class RewritingRetriever
             ->filterByRedirected(null)
             ->orderByUpdatedAt(Criteria::DESC)
             ->findOne();
+    }
+
+    public function getSpecificUrl($view = null, $viewId = null, $viewLocale = null, $viewOtherParameters = array())
+    {
+        $urlQuery = RewritingUrlQuery::create()
+            ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
+            ->withColumn('`ra`.PARAMETER', 'ra_parameter')
+            ->withColumn('`ra`.VALUE', 'ra_value')
+            ->filterByView($view)
+            ->filterByViewId($viewId)
+            ->filterByViewLocale($viewLocale)
+            ->filterByRedirected(null)
+            ->orderByUpdatedAt(Criteria::DESC);
+
+        $otherParametersCount = count($viewOtherParameters);
+        if($otherParametersCount > 0) {
+            $parameterConditions = array();
+            foreach($viewOtherParameters as $parameter => $value) {
+                $conditionName = 'other_parameter_condition_' . count($parameterConditions);
+                $urlQuery->condition('parameter_condition', '`ra_parameter`= ?', $parameter, \PDO::PARAM_STR)
+                    ->condition('value_condition', '`ra_value` = ?', $value, \PDO::PARAM_STR)
+                    ->combine(array('parameter_condition', 'value_condition'), Criteria::LOGICAL_AND, $conditionName);
+                $parameterConditions[] = $conditionName;
+            }
+
+            $urlQuery->combine($parameterConditions, Criteria::LOGICAL_OR, 'parameter_full_condition');
+
+            $urlQuery->groupBy(RewritingUrlTableMap::ID);
+
+            $urlQuery->condition('count_condition', 'COUNT(' . RewritingUrlTableMap::ID . ') = ?', $otherParametersCount, \PDO::PARAM_INT)
+                ->combine(array('count_condition', 'parameter_full_condition'), Criteria::LOGICAL_AND, 'full_having_condition');
+
+
+            $urlQuery
+                ->having(array('full_having_condition'))
+                //->having('COUNT(' . RewritingUrlTableMap::ID . ') = ?', $otherParametersCount, \PDO::PARAM_INT)
+            ;
+        } else {
+            $urlQuery->where('ISNULL(`ra`.REWRITING_URL_ID)');
+        }
+
+        $url = $urlQuery->findOne();
 
         return $url === null ? null : $url->getUrl();
     }
-
-    /*public function getSpecificUrl($view, $viewId, $viewLocale, $viewOtherParameters = array())
-    {
-
-    }*/
 }

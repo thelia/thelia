@@ -23,6 +23,7 @@
 
 namespace Thelia\Tools;
 
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Model\ConfigQuery;
 use Thelia\Rewriting\RewritingRetriever;
 
@@ -103,12 +104,45 @@ class URL
          return self::absoluteUrl($path, $parameters);
      }
 
+    /**
+     * @param $view
+     * @param $viewId
+     * @param $viewLocale
+     *
+     * @return null|string
+     */
     public static function retrieve($view, $viewId, $viewLocale)
     {
         $rewrittenUrl = null;
         if(ConfigQuery::isRewritingEnable()) {
             $retriever = new RewritingRetriever();
             $rewrittenUrl = $retriever->getViewUrl($view, $viewId, $viewLocale);
+        }
+
+        return $rewrittenUrl === null ? self::viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
+    }
+
+    public static function retrieveCurrent(Request $request)
+    {
+        $rewrittenUrl = null;
+        if(ConfigQuery::isRewritingEnable()) {
+            $view = $request->query->get('view', null);
+            $viewId = $view === null ? null : $request->query->get($view . '_id', null);
+            $viewLocale = $request->query->get('locale', null);
+
+            $allOtherParameters = $request->query->all();
+            if($view !== null) {
+                unset($allOtherParameters['view']);
+            }
+            if($viewId !== null) {
+                unset($allOtherParameters[$view . '_id']);
+            }
+            if($viewLocale !== null) {
+                unset($allOtherParameters['locale']);
+            }
+
+            $retriever = new RewritingRetriever();
+            $rewrittenUrl = $retriever->getSpecificUrl($view, $viewId, $viewLocale, $allOtherParameters);
         }
 
         return $rewrittenUrl === null ? self::viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;

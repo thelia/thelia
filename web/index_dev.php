@@ -21,6 +21,8 @@ if ( false === in_array($request->getClientIp(), $trustIp)) {
 
 $thelia = new Thelia("dev", true);
 
+\Thelia\Tools\URL::retrieveCurrent($request);
+
 $response = $thelia->handle($request)->prepare($request)->send();
 
 $thelia->terminate($request, $response);
