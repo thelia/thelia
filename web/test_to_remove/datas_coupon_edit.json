@@ -1,0 +1,85 @@
+{
+	"breadcrumb" : [
+        {
+            "url" : "0",
+            "display" : "Racine",
+            "edit" : "",
+            "browse" : ""
+        }
+    ],
+    "categories" : [
+        {
+            "id" : "1",
+            "ligne" : "1",
+            "classement" : "1",
+            "titre" : "Boyaux",
+            "langue_courante" : true,
+            "parent" : 0
+        },
+        {
+            "id" : "18",
+            "ligne" : "1",
+            "classement" : "2",
+            "titre" : "Epices \/ condiments",
+            "langue_courante" : true,
+            "parent" : 0
+        },
+        {
+            "id" : "100",
+            "ligne" : "1",
+            "classement" : "3",
+            "titre" : "Emballage",
+            "langue_courante" : true,
+            "parent" : 0
+        },
+        {
+            "id" : "194",
+            "ligne" : "1",
+            "classement" : "4",
+            "titre" : "Petits mat\u00e9riels",
+            "langue_courante" : true,
+            "parent" : 0
+        },
+        {
+            "id" : "355",
+            "ligne" : "1",
+            "classement" : "5",
+            "titre" : "Materiel de cuisine",
+            "langue_courante" : true,
+            "parent" : 0
+        },
+        {
+            "id" : "426",
+            "ligne" : "0",
+            "classement" : "6",
+            "titre" : "Bacs",
+            "langue_courante" : true,
+            "parent" : 0
+        },
+        {
+            "id" : "458",
+            "ligne" : "1",
+            "classement" : "7",
+            "titre" : "Hygi\u00e8ne & entretien",
+            "langue_courante" : true,
+            "parent" : 0
+        },
+        {
+            "id" : "592",
+            "ligne" : "1",
+            "classement" : "8",
+            "titre" : "Art de la table",
+            "langue_courante" : true,
+            "parent" : 0
+        },
+        {
+            "id" : "601",
+            "ligne" : "1",
+            "classement" : "9",
+            "titre" : "Mat\u00e9riels",
+            "langue_courante" : true,
+            "parent" : 0
+        }
+    ],
+    "products":[]
+}

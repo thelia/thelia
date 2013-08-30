@@ -47,7 +47,7 @@
 	filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=1)",argb(@startColor),argb(@endColor))); // IE9 and down
 	}
 	.vertical(@startColor: #555, @endColor: #333) {
-	background-color: mix(@startColor, @endColor, 60%);
+	background-color: @endColor;
 	background-image: -moz-linear-gradient(top, @startColor, @endColor); // FF 3.6+
 	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@startColor), to(@endColor)); // Safari 4+, Chrome 2+
 	background-image: -webkit-linear-gradient(top, @startColor, @endColor); // Safari 5.1+, Chrome 10+
@@ -158,7 +158,7 @@ hr {
 }
 
 .btn-primary, .btn-large {
-	#gradient > .vertical(rgb(243,153,34), rgb(227,83,11));	
+	#gradient > .vertical(rgb(243,153,34), rgb(227,83,11));
 	box-shadow: inset 0px 0px 2px rgba(250,250,250,0.5), 0px 1px 3px rgba(0,0,0,0.2);
 	color: white;
 }
@@ -874,9 +874,18 @@ label {
 .input-append,
 .input-prepend {
 	&.date {
-		.add-on span {
+		span.add-on span {
 			display: block;
 			cursor: pointer;			
 		}
 	}
 }
+
+// -- Rules form -----------------------------------------------------
+.input-append{
+	button.add-on{
+		height: auto;
+	}
+}
+
+

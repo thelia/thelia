@@ -180,27 +180,8 @@
 	<script src="{$asset_url}"></script>
 {/javascripts}
 
-<script>
-	// === Confirm Box === //
-	$('[data-toggle="confirm"]').click(function(e){		
-
-		var $link = $(this);
-		var modal = $(this).data('target');		
-
-		$(modal).modal('show');
-
-		$(modal).on('shown', function () {
-  			$('[data-confirm]').attr('href', $link.attr('href'));
-		});
-
-		if($(modal).is(':hidden')){
-			e.preventDefault();
-		}
-
-	});	
-
-	// === Table sorter === //	
-	$('.tablesorter').tablesorter();
-</script>
+{javascripts file='../assets/js/main.js'}
+	<script src="{$asset_url}"></script>
+{/javascripts}
 
 {include file='includes/footer.inc.html'}
