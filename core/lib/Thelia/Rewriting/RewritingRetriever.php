@@ -35,6 +35,13 @@ use Thelia\Model\Map\RewritingUrlTableMap;
  */
 class RewritingRetriever
 {
+    /**
+     * @param $view
+     * @param $viewLocale
+     * @param $viewId
+     *
+     * @return null|$url
+     */
     public function getViewUrl($view, $viewLocale, $viewId)
     {
         $url = $this->getViewUrlQuery($view, $viewId, $viewLocale);
@@ -42,6 +49,13 @@ class RewritingRetriever
         return $url === null ? null : $url->getUrl();
     }
 
+    /**
+     * @param $view
+     * @param $viewId
+     * @param $viewLocale
+     *
+     * @return null|RewritingUrl
+     */
     protected function getViewUrlQuery($view, $viewId, $viewLocale)
     {
         return RewritingUrlQuery::create()
@@ -55,12 +69,18 @@ class RewritingRetriever
             ->findOne();
     }
 
+    /**
+     * @param       $view
+     * @param       $viewLocale
+     * @param null  $viewId
+     * @param array $viewOtherParameters
+     *
+     * @return null|$url
+     */
     public function getSpecificUrl($view, $viewLocale, $viewId = null, $viewOtherParameters = array())
     {
         $urlQuery = RewritingUrlQuery::create()
             ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
-            //->withColumn('`ra`.PARAMETER', 'ra_parameter')
-            //->withColumn('`ra`.VALUE', 'ra_value')
             ->withColumn('`ra`.REWRITING_URL_ID', 'ra_REWRITING_URL_ID')
             ->filterByView($view)
             ->filterByViewLocale($viewLocale)
