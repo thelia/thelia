@@ -22,61 +22,60 @@
 /**********************************************************************************/
 
 namespace Thelia\Core\Event\Coupon;
-
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Coupon;
 
+/**
+ * Created by JetBrains PhpStorm.
+ * Date: 8/29/13
+ * Time: 3:45 PM
+ *
+ * Occurring when a Coupon is created
+ *
+ * @package Coupon
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ *
+ */
 class CouponCreateEvent extends ActionEvent
 {
-    protected $title;
-    protected $parent;
-    protected $locale;
-    protected $created_category;
+    /**
+     * @var Coupon Coupon being created
+     */
+    protected $createdCoupon;
 
-    public function __construct($title, $parent, $locale)
+    /**
+     * Constructor
+     *
+     * @param Coupon $coupon Coupon being created
+     */
+    public function __construct(Coupon $coupon)
     {
-        $this->title = $title;
-        $this->parent = $parent;
-        $this->locale = $locale;
+        $this->createdCoupon = $coupon;
     }
 
-    public function getTitle()
+    /**
+     * Modify Coupon being created
+     *
+     * @param Coupon $createdCoupon Coupon being created
+     *
+     * @return $this
+     */
+    public function setCreatedCoupon(Coupon $createdCoupon)
     {
-        return $this->title;
+        $this->createdCoupon = $createdCoupon;
+
+        return $this;
     }
 
-    public function setTitle($title)
+    /**
+     * Get Coupon being created
+     *
+     * @return Coupon
+     */
+    public function getCreatedCoupon()
     {
-        $this->title = $title;
+        return clone $this->createdCoupon;
     }
 
-    public function getParent()
-    {
-        return $this->parent;
-    }
 
-    public function setParent($parent)
-    {
-        $this->parent = $parent;
-    }
-
-    public function getLocale()
-    {
-        return $this->locale;
-    }
-
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-    }
-
-    public function getCreatedCategory()
-    {
-        return $this->created_category;
-    }
-
-    public function setCreatedCategory(Category $created_category)
-    {
-        $this->created_category = $created_category;
-var_dump($this->created_category);
-    }
 }
