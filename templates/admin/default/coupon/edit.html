@@ -23,8 +23,7 @@
 			
 			<form action="#" method="post">
 				
-				<div class="span4">					
-					
+				<div class="span4">			
 					<div class="control-group">
 					    <label for="code">Code :</label>
 					    <input id="code" type="text" name="code" placeholder="code">
@@ -51,9 +50,28 @@
 
 					<div class="control-group">
 						<label for="expiration-date">Expiration date :</label>
-					    <input id="expiration-date" type="text" name="expiration-date" placeholder="29/08/2013" class="datepicker">
+					    <div class="input-append date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
+	  						<input type="text" id="expiration-date" value="12/02/2012">
+	  						<span class="add-on"><span class="icon-th"></span></span>
+						</div>
 					</div>
 
+					<div class="control-group">
+					    <label for="usable-max">Usable max :</label>
+					    <input id="usable-max" type="text" name="usable-max" placeholder="usable max">					
+				  	</div>
+				</div>
+				
+				<div class="span8">
+					<div class="control-group">
+					    <label for="effect">Effect :</label>
+					    <select name="effect" id="effect" class="span6">
+					    	<option value="1" data-description="More description n°1 about item">Remove x percents for category Y</option>
+					    	<option value="2" data-description="More description n°2 about item">Remove x percents</option>
+					    	<option value="3" data-description="More description n°3 about item">Remove x amount</option>
+					    </select>
+					    <span class="help-block">More description n°1 about item</span>
+				    </div>
 				</div>
 
 			</form>
@@ -65,11 +83,25 @@
 
 {include file='includes/js.inc.html'}
 
-{javascripts file='../assets/bootstrap-editable/js/bootstrap-editable.js'}
-<script src="{$asset_url}"></script>
+{javascripts file='../assets/bootstrap-datepicker/js/bootstrap-datepicker.js'}
+	<script src="{$asset_url}"></script>
 {/javascripts}
 
 <script>
+	$(function($){
+
+		// -- Init datepicker --
+		$('.date').datepicker();
+
+		// -- Effect description
+		var $effectSelect 	= $('[name=effect]'),
+			$helpBlock 		= $effectSelect.next('.help-block');
+
+		$effectSelect.change(function(){			
+			var description = $(this).find(":selected").data('description');			
+			$helpBlock.text(description);
+		});
+	});
 </script>
 
 {include file='includes/footer.inc.html'}
