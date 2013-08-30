@@ -1,6 +1,6 @@
 (function($, window, document){
     
-    $(function($){
+    $(function(){
 
         // -- Init datepicker --
         if($('.date').length){
@@ -41,76 +41,71 @@
                 }
 
             });
-        }        
+        }               
 
-    });
-
-
-
-}(window.jQuery, window, document));
-
-// -- Mini browser --
-function miniBrowser(root, url){
-    
-    $.getJSON(url, {
-        root: root
-    })
-    .done(function(data) {
-        var resultat = data;
+        // -- Mini browser --
+        miniBrowser = function (root, url){
             
-        var breadcrumb = $('<div />');
-        $(resultat.breadcrumb).each(function(k, v){
-            breadcrumb.append(
-                $('<span />').html(' > '),
-                $('<a />').attr('href', '#').html(v.display).click(function(e){
-                    e.preventDefault();
+            $.getJSON(url, {
+                root: root
+            })
+            .done(function(data) {
+                var resultat = data;
                     
-                    miniBrowser(v.url)
-                })
-            );
-        });
-        
-        var categories = $('<div />');
-        $(resultat.categories).each(function(k, v){
-            categories.append(
-                $('<p />').append(
-                    $('<a />').attr('href', '#').html(v.titre).click(function(e){
-                        e.preventDefault();
+                var breadcrumb = $('<div />');
+                $(resultat.breadcrumb).each(function(k, v){
+                    breadcrumb.append(
+                        $('<span />').html(' > '),
+                        $('<a />').attr('href', '#').html(v.display).click(function(e){
+                            e.preventDefault();                            
+                            miniBrowser(v.url);
+                        })
+                    );
+                });
+                
+                var categories = $('<div />');
+                $(resultat.categories).each(function(k, v){
+                    categories.append(
+                        $('<p />').append(
+                            $('<a />').attr('href', '#').html(v.titre).click(function(e){
+                                e.preventDefault();
+                                miniBrowser(v.id);
+                            })
+                        )
+                    );
+                });
+                
+                var products = $('<div />');
+                $(resultat.products).each(function(k, v){
+                    products.append(
+                        $('<p />').append(
+                            $('<a />').attr('href', '#').html(v.titre).click(function(e){
+                                e.preventDefault();
 
-                        miniBrowser(v.id)
-                    })
-                )
-            );
-        });
-        
-        var products = $('<div />');
-        $(resultat.products).each(function(k, v){
-            products.append(
-                $('<p />').append(
-                    $('<a />').attr('href', '#').html(v.titre).click(function(e){
-                        e.preventDefault();
+                                $('#productToAdd_ref').val(v.ref);
+                                $('#productToAdd_titre').val(v.titre);
+                                $('#productToAdd_quantite').val(1);
+                                
+                                manageStock(v.variants, v.promo?v.prix2:v.prix);
+                                
+                                $('#productToAdd_tva').val(v.tva);
+                                
+                                $('.productToAddInformation').show();
+                                $('#btn_ajout_produit').show();
+                            })
+                        )
+                    );
+                });
+                
+                $('#minibrowser-breadcrumb').unbind().empty().append(breadcrumb);
+                $('#minibrowser-categories').unbind().empty().append(categories);
+            })
+            .fail(function() {
+                console.log('The JSON file cant be read');
+            });
 
-                        $('#productToAdd_ref').val(v.ref);
-                        $('#productToAdd_titre').val(v.titre);
-                        $('#productToAdd_quantite').val(1);
-                        
-                        manageStock(v.variants, v.promo?v.prix2:v.prix);
-                        
-                        $('#productToAdd_tva').val(v.tva);
-                        
-                        $('.productToAddInformation').show();
-                        $('#btn_ajout_produit').show();
-                    })
-                )
-            );
-        });
-        
-        $('#fastBrowser_breadcrumb').unbind().empty().append(breadcrumb);
-        $('#fastBrowser_categories').unbind().empty().append(categories);
-        $('#fastBrowser_products').unbind().empty().append(products);
-    })
-    .fail(function() {
-        console.log('The JSON file cant be read');
+        }
+
     });
-
-}
+    
+}(window.jQuery, window, document));
