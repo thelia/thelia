@@ -65,7 +65,8 @@ class CategoryPath extends BaseLoop
             Argument::createIntTypeArgument('category', null, true),
             Argument::createIntTypeArgument('depth'),
             Argument::createIntTypeArgument('level'),
-            Argument::createBooleanOrBothTypeArgument('visible', true, false)
+            Argument::createBooleanOrBothTypeArgument('visible', true, false),
+            Argument::createIntTypeArgument('lang')
         );
     }
 
@@ -80,6 +81,9 @@ class CategoryPath extends BaseLoop
         $visible = $this->getVisible();
 
         $search = CategoryQuery::create();
+
+        $this->configureI18nProcessing($search, array('TITLE'));
+
         $search->filterById($id);
         if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
 
@@ -95,7 +99,7 @@ class CategoryPath extends BaseLoop
                 $loopResultRow = new LoopResultRow();
 
                 $loopResultRow
-                    ->set("TITLE",$category->getTitle())
+                    ->set("TITLE",$category->getVirtualColumn('i18n_TITLE'))
                     ->set("URL", $category->getUrl())
                     ->set("ID", $category->getId())
                 ;
@@ -114,8 +118,11 @@ class CategoryPath extends BaseLoop
                     $ids[] = $parent;
 
                     $search = CategoryQuery::create();
+
+                    $this->configureI18nProcessing($search, array('TITLE'));
+
                     $search->filterById($parent);
-                    if ($visible == true) $search->filterByVisible($visible);
+                    if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
                 }
             }
         } while ($category != null && $parent > 0);

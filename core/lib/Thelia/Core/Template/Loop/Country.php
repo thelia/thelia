@@ -31,8 +31,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Tools\ModelCriteriaTools;
-
 use Thelia\Model\CountryQuery;
 use Thelia\Model\ConfigQuery;
 
@@ -70,12 +68,8 @@ class Country extends BaseLoop
     {
         $search = CountryQuery::create();
 
-        $backendContext = $this->getBackend_context();
-
-        $lang = $this->getLang();
-
         /* manage translations */
-        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 

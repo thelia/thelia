@@ -177,4 +177,76 @@ final class TheliaEvents
      * Sent on cimage cache clear request
      */
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
+
+
+
+    /**
+     * Sent when creating a Coupon
+     */
+    const COUPON_CREATE = "action.create_coupon";
+
+    /**
+     * Sent just before a successful insert of a new Coupon in the database.
+     */
+    const BEFORE_CREATE_COUPON 	= "action.before_create_coupon";
+
+    /**
+     * Sent just after a successful insert of a new Coupon in the database.
+     */
+    const AFTER_CREATE_COUPON 	= "action.after_create_coupon";
+
+    /**
+     * Sent when editing a Coupon
+     */
+    const COUPON_EDIT = "action.edit_coupon";
+
+    /**
+     * Sent just before a successful update of a new Coupon in the database.
+     */
+    const BEFORE_EDIT_COUPON 	= "action.before_edit_coupon";
+
+    /**
+     * Sent just after a successful update of a new Coupon in the database.
+     */
+    const AFTER_EDIT_COUPON 	= "action.after_edit_coupon";
+
+    /**
+     * Sent when disabling a Coupon
+     */
+    const COUPON_DISABLE = "action.disable_coupon";
+
+    /**
+     * Sent just before a successful disable of a new Coupon in the database.
+     */
+    const BEFORE_DISABLE_COUPON 	= "action.before_disable_coupon";
+
+    /**
+     * Sent just after a successful disable of a new Coupon in the database.
+     */
+    const AFTER_DISABLE_COUPON 	= "action.after_disable_coupon";
+
+    /**
+     * Sent when enabling a Coupon
+     */
+    const COUPON_ENABLE = "action.enable_coupon";
+
+    /**
+     * Sent just before a successful enable of a new Coupon in the database.
+     */
+    const BEFORE_ENABLE_COUPON 	= "action.before_enable_coupon";
+
+    /**
+     * Sent just after a successful enable of a new Coupon in the database.
+     */
+    const AFTER_ENABLE_COUPON 	= "action.after_enable_coupon";
+
+    /**
+     * Sent just before an attempt to use a Coupon
+     */
+    const BEFORE_USE_COUPON 	= "action.before_use_coupon";
+
+    /**
+     * Sent just after an attempt to use a Coupon
+     */
+    const AFTER_USE_COUPON 	= "action.after_use_coupon";
 }

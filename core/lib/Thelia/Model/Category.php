@@ -48,7 +48,7 @@ class Category extends BaseCategory
 			->findOne()
 		;
 
-		return $last->getPosition() + 1;
+		return $last != null ? $last->getPosition() + 1 : 1;
      }
 
     /**
@@ -74,6 +74,4 @@ class Category extends BaseCategory
         return $countProduct;
 
     }
-
-
 }

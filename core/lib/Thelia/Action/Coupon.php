@@ -25,10 +25,14 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\Coupon\CouponCreateEvent;
+use Thelia\Core\Event\Coupon\CouponDisableEvent;
+use Thelia\Core\Event\Coupon\CouponEnableEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Category as CategoryModel;
 use Thelia\Form\CategoryCreationForm;
 use Thelia\Core\Event\CategoryEvent;
+use Thelia\Model\CouponQuery;
 use Thelia\Tools\Redirect;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\AdminLog;
@@ -40,8 +44,116 @@ use Propel\Runtime\Propel;
 use Thelia\Model\Map\CategoryTableMap;
 use Propel\Runtime\Exception\PropelException;
 
+/**
+ * Created by JetBrains PhpStorm.
+ * Date: 8/19/13
+ * Time: 3:24 PM
+ *
+ * Process Coupon Events
+ *
+ * @package Coupon
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ *
+ */
 class Coupon extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * Create a Coupon if a Coupon creation attempt is found
+     *
+     * @param CouponCreateEvent $event Coupon creation Event
+     */
+    public function create(CouponCreateEvent $event)
+    {
+        $this->checkAuth("ADMIN", "admin.coupon.create");
+
+        $this->dispatch(
+            TheliaEvents::BEFORE_CREATE_COUPON,
+            $event
+        );
+
+        $event->getCreatedCoupon()->save();
+
+        $this->dispatch(
+            TheliaEvents::AFTER_CREATE_COUPON,
+            $event
+        );
+    }
+
+    /**
+     * Edit a Coupon if a Coupon edition attempt is found
+     *
+     * @param CouponEditEvent $event Coupon edition Event
+     */
+    public function edit(CouponEditEvent $event)
+    {
+        $this->checkAuth("ADMIN", "admin.coupon.edit");
+
+        $this->dispatch(
+            TheliaEvents::BEFORE_EDIT_COUPON,
+            $event
+        );
+
+        $couponToUpdate = CouponQuery::create()->findPk($event->getId());
+
+        if ($couponToUpdate !== null) {
+            $event->getCreatedCoupon()->save();
+        }
+
+        $this->dispatch(
+            TheliaEvents::AFTER_EDIT_COUPON,
+            $event
+        );
+    }
+
+    /**
+     * Disable a Coupon if a Coupon disable attempt is found
+     *
+     * @param CouponDisableEvent $event Coupon disable Event
+     */
+    public function disable(CouponDisableEvent $event)
+    {
+        $this->checkAuth("ADMIN", "admin.coupon.disable");
+
+        $couponToUpdate = CouponQuery::create()->findPk($event->getId());
+
+        if ($couponToUpdate !== null) {
+            $couponToUpdate->setIsEnabled(0);
+            $event->getDispatcher()->dispatch(
+                TheliaEvents::BEFORE_DISABLE_COUPON, $event
+            );
+
+            $couponToUpdate->save();
+
+            $event->getDispatcher()->dispatch(
+                TheliaEvents::AFTER_DISABLE_COUPON, $event
+            );
+        }
+    }
+
+    /**
+     * Enable a Coupon if a Coupon enable attempt is found
+     *
+     * @param CouponEnableEvent $event Coupon enable Event
+     */
+    public function enable(CouponEnableEvent $event)
+    {
+        $this->checkAuth("ADMIN", "admin.coupon.enable");
+
+        $couponToUpdate = CouponQuery::create()->findPk($event->getId());
+
+        if ($couponToUpdate !== null) {
+            $couponToUpdate->setIsEnabled(1);
+            $event->getDispatcher()->dispatch(
+                TheliaEvents::BEFORE_ENABLE_COUPON, $event
+            );
+
+            $couponToUpdate->save();
+
+            $event->getDispatcher()->dispatch(
+                TheliaEvents::AFTER_ENABLE_COUPON, $event
+            );
+        }
+    }
 
     /**
      * Returns an array of event names this subscriber listens to.

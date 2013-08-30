@@ -21,57 +21,61 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Model;
-
-use Thelia\Coupon\CouponRuleCollection;
-use Thelia\Model\Base\Coupon as BaseCoupon;
+namespace Thelia\Core\Event\Coupon;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Coupon;
 
 /**
  * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
+ * Date: 8/29/13
+ * Time: 3:45 PM
  *
- * Used to provide an effect (mostly a discount)
- * at the end of the Customer checkout tunnel
- * It will be usable for a Customer only if it matches the Coupon criteria (Rules)
+ * Occurring when a Coupon is created
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class Coupon extends BaseCoupon
+class CouponCreateEvent extends ActionEvent
 {
     /**
-     * Set the value of [serialized_rules] column.
-     *
-     * @param CouponRuleCollection $rules A set of Rules
-     *
-     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
+     * @var Coupon Coupon being created
      */
-    public function setSerializedRules(CouponRuleCollection $rules)
-    {
-        if ($rules !== null) {
-
-            $v = (string) base64_encode(serialize($rules));
-        }
-
-        if ($this->serialized_rules !== $v) {
-            $this->serialized_rules = $v;
-            $this->modifiedColumns[] = CouponTableMap::SERIALIZED_RULES;
-        }
-
-
-        return $this;
-    } // setSerializedRules()
-
+    protected $createdCoupon;
 
     /**
-     * Get the [serialized_rules] column value.
+     * Constructor
      *
-     * @return CouponRuleCollection Rules ready to be processed
+     * @param Coupon $coupon Coupon being created
      */
-    public function getSerializedRules()
+    public function __construct(Coupon $coupon)
     {
-        return unserialize(base64_decode($this->serialized_rules));
+        $this->createdCoupon = $coupon;
     }
+
+    /**
+     * Modify Coupon being created
+     *
+     * @param Coupon $createdCoupon Coupon being created
+     *
+     * @return $this
+     */
+    public function setCreatedCoupon(Coupon $createdCoupon)
+    {
+        $this->createdCoupon = $createdCoupon;
+
+        return $this;
+    }
+
+    /**
+     * Get Coupon being created
+     *
+     * @return Coupon
+     */
+    public function getCreatedCoupon()
+    {
+        return clone $this->createdCoupon;
+    }
+
+
 }
