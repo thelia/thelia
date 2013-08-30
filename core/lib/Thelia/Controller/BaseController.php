@@ -35,6 +35,7 @@ use Thelia\Core\Factory\ActionEventFactory;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Symfony\Component\EventDispatcher\Event;
+use Thelia\Core\Event\DefaultActionEvent;
 
 /**
  *
@@ -60,10 +61,12 @@ class BaseController extends ContainerAware
      * Dispatch a Thelia event
      *
      * @param string    $eventName a TheliaEvent name, as defined in TheliaEvents class
-     * @param Event     $event the event
+     * @param Event     $event the action event, or null (a DefaultActionEvent will be dispatched)
      */
-    protected function dispatch($eventName, Event $event = null)
+    protected function dispatch($eventName, ActionEvent $event = null)
     {
+        if ($event == null) $event = new DefaultActionEvent();
+
         $this->getDispatcher()->dispatch($eventName, $event);
     }
 
@@ -145,7 +148,8 @@ class BaseController extends ContainerAware
 
     /**
      *
-     * redirect request to specify url
+     * redirect request to the specified url
+     *
      * @param string $url
      */
     public function redirect($url)
@@ -154,12 +158,21 @@ class BaseController extends ContainerAware
     }
 
     /**
-     * If success_url param is present in request, follow this link.
+     * If success_url param is present in request or in the provided form, redirect to this URL.
+     *
+     * @param BaseForm $form a base form, which may contains the success URL
      */
-    protected function redirectSuccess()
+    protected function redirectSuccess(BaseForm $form = null)
     {
-        if (null !== $url = $this->getRequest()->get("success_url")) {
-            $this->redirect($url);
+        if ($form != null) {
+            $url = $form->getSuccessUrl();
         }
+        else {
+            $url = $this->getRequest()->get("success_url");
+        }
+
+        echo "url=$url";
+
+        if (null !== $url) $this->redirect($url);
     }
 }

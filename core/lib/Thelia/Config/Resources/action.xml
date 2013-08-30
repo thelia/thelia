@@ -22,12 +22,12 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.category" class="Thelia\Action\Image">
+        <service id="thelia.action.image" class="Thelia\Action\Image">
             <argument type="service" id="service_container"/>
              <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.customer" class="Thelia\Action\Category">
+        <service id="thelia.action.category" class="Thelia\Action\Category">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>

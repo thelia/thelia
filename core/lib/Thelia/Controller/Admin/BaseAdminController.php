@@ -52,11 +52,13 @@ class BaseAdminController extends BaseController
             if (! empty($template)) {
                 // If we have a view in the URL, render this view
                 return $this->render($template);
-            } elseif (null != $view = $this->getRequest()->get('view')) {
+            }
+            elseif (null != $view = $this->getRequest()->get('view')) {
                 return $this->render($view);
             }
-        } catch (\Exception $ex) {
-            // Nothing special
+        }
+        catch (\Exception $ex) {
+            return new Response($this->errorPage($ex->getMessage()));
         }
 
         return $this->pageNotFound();

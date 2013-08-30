@@ -75,7 +75,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     {
         $this->checkAuth("ADMIN", "admin.category.delete");
 
-        $category = CategoryQuery::create()->findPk($event->getId());
+        $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
 
@@ -98,7 +98,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     {
         $this->checkAuth("ADMIN", "admin.category.edit");
 
-        $category = CategoryQuery::create()->findPk($event->getId());
+        $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
 
@@ -136,7 +136,7 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     protected function exchangePosition(CategoryChangePositionEvent $event)
     {
-       $category = CategoryQuery::create()->findPk($event->getId());
+       $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
 
@@ -195,7 +195,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     {
         $this->checkAuth("ADMIN", "admin.category.edit");
 
-        $category = CategoryQuery::create()->findPk($event->getId());
+        $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
 

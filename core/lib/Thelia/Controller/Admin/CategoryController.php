@@ -33,6 +33,7 @@ use Thelia\Core\Event\CategoryDeleteEvent;
 use Thelia\Core\Event\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\CategoryChangePositionEvent;
 use Thelia\Form\CategoryDeletionForm;
+use Thelia\Model\Lang;
 
 class CategoryController extends BaseAdminController
 {
@@ -99,7 +100,7 @@ class CategoryController extends BaseAdminController
             $this->adminLogAppend(sprintf("Category %s (ID %s) deleted", $category->getTitle(), $category->getId()));
 
             // Substitute _ID_ in the URL with the ID of the created category
-            $successUrl = str_replace('_ID_', $categoryDeleteEvent->getDeletedCategory()->getId(), $categoryDeletionForm->getSuccessUrl());
+            $successUrl = str_replace('_ID_', $categoryDeleteEvent->getDeletedCategory()->getParent(), $categoryDeletionForm->getSuccessUrl());
 
             // Redirect to the success URL
             $this->redirect($successUrl);
@@ -185,10 +186,33 @@ class CategoryController extends BaseAdminController
         // Get the category ID
         $id = $this->getRequest()->get('id', 0);
 
+        // Find the current order
+        $category_order = $this->getRequest()->get(
+                'category_order',
+                $this->getSession()->get('admin.category_order', 'manual')
+        );
+
+        // Find the current edit language ID
+        $edition_language = $this->getRequest()->get(
+                'edition_language',
+                $this->getSession()->get('admin.edition_language', Lang::getDefaultLanguage()->getId())
+        );
+
         $args = array(
             'action' 			  => $action,
-            'current_category_id' => $id
+            'current_category_id' => $id,
+            'category_order'      => $category_order,
+            'edition_language'    => $edition_language,
+            'date_format'         => Lang::getDefaultLanguage()->getDateFormat(),
+            'time_format'         => Lang::getDefaultLanguage()->getTimeFormat(),
+            'datetime_format'     => Lang::getDefaultLanguage()->getDateTimeFormat(),
         );
+
+        // Store the current sort order in session
+        $this->getSession()->set('admin.category_order', $category_order);
+
+        // Store the current edition language in session
+        $this->getSession()->set('admin.edition_language', $edition_language);
 
         try {
             switch ($action) {

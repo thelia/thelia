@@ -7,6 +7,7 @@ use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Model\Base\LangQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
 
 /**
  * Class ModelCriteriaTools
@@ -52,7 +53,7 @@ class ModelCriteriaTools
                 $search->withColumn('`' . $requestedLocaleI18nAlias . '`.`' . $column . '`', $aliasPrefix . 'i18n_' . $column);
             }
         } else {
-            $defaultLocale = LangQuery::create()->findOneById($defaultLangWithoutTranslation)->getLocale();
+            $defaultLocale = Lang::getDefaultLanguage()->getLocale();
 
             $defaultLocaleJoin = new Join();
             $defaultLocaleJoin->addExplicitCondition($search->getTableMap()->getName(), $foreignKey, null, $foreignTable . '_i18n', 'ID', $defaultLocaleI18nAlias);

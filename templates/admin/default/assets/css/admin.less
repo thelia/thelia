@@ -216,6 +216,10 @@ hr {
 			width: 23px;
 			height: @top-bar-height;
 		}
+
+		a.profile {
+		    color: #fff;
+		}
 	}
 
 	.view-shop {
@@ -232,10 +236,6 @@ hr {
 // -- Brandbar ----------------------------------------------------------------
 
 .loginpage {
-
-	.brandbar {
-		width: 100%;
-	}
 
 	.hero-unit {
     	background-color: transparent !important;
@@ -314,6 +314,10 @@ hr {
 			height: 24px;
 		}
 	}
+}
+
+.brandbar-wide {
+        width: 100%;
 }
 
 // -- Navigation bar ----------------------------------------------------------
@@ -717,4 +721,40 @@ label {
 		// Center the alert box (20px bottom margin) in the table cell
 		padding: 20px 20px 0 20px;
 	}
+
+	th {
+	    a {
+	        color: inherit;
+	    }
+	}
+
+    td {
+        vertical-align: middle;
+
+        img {
+            border: 2px solid white;
+            border-radius: 4px 4px 4px 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+    }
+}
+
+.menu-list-table .table-striped  {
+    td, th {
+        text-align: left;
+    }
+
+    td:nth-child(2) {
+        text-align: right;
+    }
+
+    caption {
+        background-color: #FFFFFF;
+        border-bottom: 2px solid #A5CED8;
+        color: #5A6876;
+        font-weight: bold;
+        line-height: 30px;
+        text-align: left;
+        text-transform: uppercase;
+    }
 }

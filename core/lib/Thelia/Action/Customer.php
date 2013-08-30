@@ -38,6 +38,7 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Core\Event\CustomerLoginEvent;
 
 class Customer extends BaseAction implements EventSubscriberInterface
 {
@@ -46,7 +47,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
 
         $customer = new CustomerModel();
-        $customer->setDispatcher($this->getDispatcher());
 
         $this->createOrUpdateCustomer($customer, $event);
 
@@ -56,7 +56,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
 
         $customer = $event->getCustomer();
-        $customer->setDispatcher($this->getDispatcher());
 
         $this->createOrUpdateCustomer($customer, $event);
 
@@ -64,6 +63,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event)
     {
+        $customer->setDispatcher($this->getDispatcher());
+
         $customer->createOrUpdate(
             $event->getTitle(),
             $event->getFirstname(),
@@ -87,6 +88,12 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $event->setCustomer($customer);
     }
 
+
+    public function login(CustomerLoginEvent $event)
+    {
+        $this->getSecurityContext()->setCustomerUser($event->getCustomer());
+    }
+
     /**
      * Perform user logout. The user is redirected to the provided view, if any.
      *
@@ -94,8 +101,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public function logout(ActionEvent $event)
     {
-        $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGOUT, $event);
-
         $this->getSecurityContext()->clearCustomerUser();
     }
 
@@ -129,6 +134,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::CUSTOMER_CREATEACCOUNT => array("create", 128),
             TheliaEvents::CUSTOMER_UPDATEACCOUNT => array("modify", 128),
+            TheliaEvents::CUSTOMER_LOGOUT        => array("logout", 128),
+            TheliaEvents::CUSTOMER_LOGIN         => array("login" , 128),
         );
     }
 }

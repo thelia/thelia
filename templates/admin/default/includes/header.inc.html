@@ -54,7 +54,9 @@
 
 		{module_include location='inside_topbar'}
 
-  		<div class="user-info">{admin attr="firstname"} {admin attr="lastname"} <a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}">{intl l="Logout"}</a></div>
+  		<div class="user-info">
+  		    <a class="profile" href="href="{url path='admin/edit_profile'}">{admin attr="firstname"} {admin attr="lastname"}</a>
+  		    <a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}">{intl l="Logout"}</a></div>
 
   		{loop name="top-bar-search" type="auth" context="admin" roles="ADMIN" permissions="admin.search"}
 	    <form class="form-search pull-right" action="{url path='/admin/search'}">
@@ -157,3 +159,9 @@
 {module_include location='after_top_menu'}
 
 {/loop}
+
+{elseloop rel="top-bar-auth"}
+    <div class="brandbar brandbar-wide container">
+        <a class="brand" href="{url path='/admin'}">{images file='../assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}</a>
+    </div>
+{/elseloop}

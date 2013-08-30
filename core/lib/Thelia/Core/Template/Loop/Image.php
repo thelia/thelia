@@ -63,7 +63,6 @@ class Image extends BaseLoop
 
         $queryClass   = sprintf("\Thelia\Model\%sImageQuery", $object);
         $filterMethod = sprintf("filterBy%sId", $object);
-        $mapClass     = sprintf("\Thelia\Model\Map\%sI18nTableMap", $object);
 
         // xxxImageQuery::create()
         $method = new \ReflectionMethod($queryClass, 'create');
@@ -73,19 +72,16 @@ class Image extends BaseLoop
         $method = new \ReflectionMethod($queryClass, $filterMethod);
         $method->invoke($search, $object_id);
 
-        $map = new \ReflectionClass($mapClass);
-        $title_map = $map->getConstant('TITLE');
-
         $orders  = $this->getOrder();
 
         // Results ordering
         foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn($title_map);
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
-                    $search->addDescendingOrderByColumn($title_map);
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual-reverse":
                     $search->orderByPosition(Criteria::DESC);
@@ -122,7 +118,7 @@ class Image extends BaseLoop
 
             $source_id = $this->getSourceId();
 
-            // echo "source = ".$this->getSource().", id=".$id."<br />";
+            // echo "source = ".$this->getSource().", id=".$source_id." - ".$this->getArg('source_id')->getValue()."<br />";
 
             if (is_null($source_id)) {
                 throw new \InvalidArgumentException("'source_id' argument cannot be null if 'source' argument is specified.");
@@ -167,6 +163,9 @@ class Image extends BaseLoop
 
         $search = $this->getSearchQuery($object_type, $object_id);
 
+        /* manage translations */
+        $this->configureI18nProcessing($search);
+
         $id = $this->getId();
 
         if (! is_null($id)) {
@@ -207,8 +206,7 @@ class Image extends BaseLoop
 
         }
 
-        /* manage translations */
-        $this->configureI18nProcessing($search);
+        // echo "sql=".$search->toString();
 
         $results = $this->search($search, $pagination);
 

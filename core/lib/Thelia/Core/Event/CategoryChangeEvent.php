@@ -20,52 +20,25 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Thelia\Core\Factory\ActionEventFactory;
-use Thelia\Core\Template\ParserContext;
+namespace Thelia\Core\Event;
 
-/**
- *
- * Action are dispatched here.
- *
- * A factory is used for creating appropriate action object
- *
- * Class ControllerListener
- * @package Thelia\Core\EventListener
- */
-class ControllerListener implements EventSubscriberInterface
+use Thelia\Model\Category;
+
+class CategoryCreateEvent extends ActionEvent
 {
-    /**
-     * @var ParserContext the parser context
-     */
-    protected $parserContext;
+    protected $category_id;
+    protected $locale;
+    protected $title;
+    protected $chapo;
+    protected $description;
+    protected $postscriptum;
+    protected $url;
+    protected $visibility;
+    protected $parent;
 
-    public function __construct(ParserContext $parserContext)
+    public function __construct($category_id)
     {
-        $this->parserContext = $parserContext;
+        $this->category_id = $category_id;
     }
-
-    public function onKernelController(FilterControllerEvent $event)
-    {
-        $dispatcher = $event->getDispatcher();
-        $request = $event->getRequest();
-
-        if (false !== $action = $request->get("action")) {
-           //search corresponding action
-            $event = new ActionEventFactory($request, $action, $event->getKernel()->getContainer()->getParameter("thelia.actionEvent"));
-            $actionEvent = $event->createActionEvent();
-            $dispatcher->dispatch("action.".$action, $actionEvent);
-         }
-    }
-
-   public static function getSubscribedEvents()
-   {
-        return array(
-            KernelEvents::CONTROLLER => array('onKernelController', 0)
-        );
-   }
 }

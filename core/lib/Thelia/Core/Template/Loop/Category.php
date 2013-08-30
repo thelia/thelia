@@ -79,7 +79,7 @@ class Category extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'random'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'visible', 'visible_reverse', 'random'))
                 ),
                 'manual'
             ),
@@ -146,6 +146,12 @@ class Category extends BaseLoop
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
                     break;
+                case "visible":
+                    $search->orderByVisible(Criteria::ASC);
+                    break;
+                case "visible_reverse":
+                    $search->orderByVisible(Criteria::DESC);
+                    break;
                 case "random":
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
@@ -173,7 +179,7 @@ class Category extends BaseLoop
             $loopResultRow
             	->set("ID", $category->getId())
                 ->set("IS_TRANSLATED",$category->getVirtualColumn('IS_TRANSLATED'))
-            	->set("TITLE",$category->getVirtualColumn('i18n_TITLE'))
+            	->set("TITLE", $category->getVirtualColumn('i18n_TITLE'))
 	            ->set("CHAPO", $category->getVirtualColumn('i18n_CHAPO'))
 	            ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
 	            ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))

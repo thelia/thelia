@@ -51,13 +51,16 @@ class SessionController extends BaseAdminController
 
     public function checkLoginAction()
     {
-        $adminLoginForm = new AdminLogin($this->getRequest());
-
         $request = $this->getRequest();
 
-        $authenticator = new AdminUsernamePasswordFormAuthenticator($request, $adminLoginForm);
+        $adminLoginForm = new AdminLogin($request);
 
         try {
+
+            $form = $this->validateForm($adminLoginForm, "post");
+
+            $authenticator = new AdminUsernamePasswordFormAuthenticator($request, $adminLoginForm);
+
             $user = $authenticator->getAuthentifiedUser();
 
             // Success -> store user in security context
@@ -85,7 +88,7 @@ class SessionController extends BaseAdminController
              // Log authentication failure
              AdminLog::append(sprintf("Undefined error: %s", $ex->getMessage()), $request);
 
-             $message = "Unable to process your request. Please try again.";
+             $message = "Unable to process your request. Please try again.".$ex->getMessage();
          }
 
          // Store error information in the form
