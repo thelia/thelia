@@ -176,6 +176,10 @@
 <script src="{$asset_url}"></script>
 {/javascripts}
 
+{javascripts file='../assets/js/tablesorter/jquery.tablesorter.min.js'}
+	<script src="{$asset_url}"></script>
+{/javascripts}
+
 <script>
 	// === Confirm Box === //
 	$('[data-toggle="confirm"]').click(function(e){		
@@ -194,15 +198,8 @@
 		}
 
 	});	
-</script>
 
-{javascripts file='../assets/js/tablesorter/jquery.tablesorter.min.js'}
-	<script src="{$asset_url}"></script>
-{/javascripts}
-
-<script>
-	// === Table sorter === //
-	
+	// === Table sorter === //	
 	$('.tablesorter').tablesorter();
 </script>
 
