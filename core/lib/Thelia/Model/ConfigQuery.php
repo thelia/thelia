@@ -22,4 +22,14 @@ class ConfigQuery extends BaseConfigQuery {
 
         return $value ? $value->getValue() : $default;
     }
+
+    public static function getDefaultLangWhenNoTranslationAvailable()
+    {
+        return ConfigQuery::read("default_lang_without_translation", 1);
+    }
+
+    public static function isRewritingEnable()
+    {
+        return self::read("rewriting_enable") == 1;
+    }
 } // ConfigQuery

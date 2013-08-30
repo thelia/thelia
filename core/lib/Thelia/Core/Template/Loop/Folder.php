@@ -79,7 +79,7 @@ class Folder extends BaseLoop
         $search = FolderQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search);
 
 		$id = $this->getId();
 
@@ -162,7 +162,7 @@ class Folder extends BaseLoop
                 ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
 	            ->set("PARENT", $folder->getParent())
-                ->set("URL", $folder->getUrl())
+                ->set("URL", $folder->getUrl($locale))
 	            ->set("CONTENT_COUNT", $folder->countChild())
 	            ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
 	            ->set("POSITION", $folder->getPosition())

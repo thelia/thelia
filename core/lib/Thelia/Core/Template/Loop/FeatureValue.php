@@ -87,7 +87,8 @@ class FeatureValue extends BaseLoop
             $search,
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             FeatureAvTableMap::TABLE_NAME,
-            'FEATURE_AV_ID'
+            'FEATURE_AV_ID',
+            true
         );
 
         $feature = $this->getFeature();

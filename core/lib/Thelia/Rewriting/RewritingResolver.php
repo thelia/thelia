@@ -20,82 +20,16 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Rewriting;
 
-namespace Thelia\Core\Template;
-
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Tools\URL;
-use Thelia\Form\BaseForm;
 /**
- * The parser context is an application-wide context, which stores var-value pairs.
- * Theses pairs are injected in the parser and becomes available to the templates.
+ * Class RewritingResolver
+ * @package Thelia\Rewriting
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
- * @author Franck Allimant <franck@cqfdev.fr>
+ * This class provides methods to resolve rewritten URL as a query
  */
-class ParserContext implements \IteratorAggregate
+class RewritingResolver
 {
-    private $store = array();
 
-    public function __construct(Request $request)
-    {
-        // Setup basic variables
-        $this->set('THELIA_VERSION'	, ConfigQuery::read('thelia_version', 'undefined'))
-        ;
-    }
-
-    // -- Error form -----------------------------------------------------------
-
-    /**
-     * @param BaseForm $form the errored form
-     */
-    public function setErrorForm(BaseForm $form)
-    {
-        $this->set('error_form', $form);
-
-        return $this;
-    }
-
-    public function setGeneralError($error)
-    {
-        $this->set('general_error', $error);
-
-        return $this;
-    }
-
-    public function getErrorForm()
-    {
-        return $this->get('error_form', null);
-    }
-
-    public function clearErrorForm()
-    {
-        return $this->remove('error_form');
-    }
-
-    // -- Internal table manipulation ------------------------------------------
-
-    public function set($name, $value)
-    {
-        $this->store[$name] = $value;
-
-        return $this;
-    }
-
-    public function remove($name)
-    {
-        unset($this->store[$name]);
-
-        return $this;
-    }
-
-    public function get($name, $default = null)
-    {
-        return isset($this->store[$name]) ? $this->store[$name] : $default;
-    }
-
-    public function getIterator()
-    {
-        return new \ArrayIterator( $this->store );
-    }
 }

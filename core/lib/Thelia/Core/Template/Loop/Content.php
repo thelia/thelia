@@ -87,7 +87,7 @@ class Content extends BaseLoop
         $search = ContentQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -220,7 +220,7 @@ class Content extends BaseLoop
                 ->set("DESCRIPTION", $content->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $content->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $content->getPosition())
-                ->set("URL", $content->getUrl())
+                ->set("URL", $content->getUrl($locale))
             ;
 
             $loopResult->addRow($loopResultRow);

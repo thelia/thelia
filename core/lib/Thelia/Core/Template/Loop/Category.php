@@ -97,7 +97,7 @@ class Category extends BaseLoop
         $search = CategoryQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search);
 
 		$id = $this->getId();
 
@@ -184,7 +184,7 @@ class Category extends BaseLoop
 	            ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
 	            ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
 	            ->set("PARENT", $category->getParent())
-	            ->set("URL", $category->getUrl())
+	            ->set("URL", $category->getUrl($locale))
 	            ->set("PRODUCT_COUNT", $category->countChild())
 	            ->set("VISIBLE", $category->getVisible() ? "1" : "0")
 	            ->set("POSITION", $category->getPosition())

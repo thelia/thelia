@@ -219,10 +219,10 @@ abstract class BaseLoop
     }
 
     /**
-     * @param \ModelCriteria $search
-     * @param                $pagination
+     * @param ModelCriteria $search
+     * @param               $pagination
      *
-     * @return array|\PropelModelPager
+     * @return array|\Propel\Runtime\Util\PropelModelPager
      */
     protected function searchWithPagination(ModelCriteria $search, &$pagination)
     {
@@ -242,18 +242,21 @@ abstract class BaseLoop
      * @param array $columns the i18n columns
      * @param string $foreignTable the specified table (default  to criteria table)
      * @param string $foreignKey the foreign key in this table (default to criteria table)
+     *
+     * @return mixed the locale
      */
-    protected function configureI18nProcessing(ModelCriteria $search, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID') {
+    protected function configureI18nProcessing(ModelCriteria $search, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID', $forceReturn = false) {
 
         /* manage translations */
-        ModelCriteriaTools::getI18n(
+        return ModelCriteriaTools::getI18n(
             $this->getBackend_context(),
             $this->getLang(),
             $search,
             $this->request->getSession()->getLocale(),
             $columns,
             $foreignTable,
-            $foreignKey
+            $foreignKey,
+            $forceReturn
         );
     }
 

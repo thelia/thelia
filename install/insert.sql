@@ -7,6 +7,8 @@ INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`by_default`,`created_at`,
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 ('session_config.default', '1', 1, 1, NOW(), NOW()),
 ('verifyStock', '1', 1, 0, NOW(), NOW()),
+('default_lang_without_translation', '1', 1, 0, NOW(), NOW()),
+('rewriting_enable', '0', 1, 0, NOW(), NOW()),
 ('imagine_graphic_driver', 'gd', 1, 0, NOW(), NOW()),
 ('default_images_quality_percent', '75', 1, 0, NOW(), NOW()),
 ('original_image_delivery_mode', 'symlink', 1, 0, NOW(), NOW()),

@@ -23,7 +23,9 @@
 
 namespace Thelia\Tools;
 
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Model\ConfigQuery;
+use Thelia\Rewriting\RewritingRetriever;
 
 class URL
 {
@@ -51,7 +53,11 @@ class URL
          // Already absolute ?
         if (substr($path, 0, 4) != 'http') {
 
-            $root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
+            /**
+             * @etienne : can't be done here for it's already done in ::viewUrl / ::adminViewUrl
+             */
+            //$root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
+            $root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : '';
 
             $base = rtrim($root, '/') . '/' . ltrim($path, '/');
         } else
@@ -101,4 +107,50 @@ class URL
 
          return self::absoluteUrl($path, $parameters);
      }
+
+    /**
+     * @param $view
+     * @param $viewId
+     * @param $viewLocale
+     *
+     * @return null|string
+     */
+    public static function retrieve($view, $viewId, $viewLocale)
+    {
+        $rewrittenUrl = null;
+        if(ConfigQuery::isRewritingEnable()) {
+            $retriever = new RewritingRetriever();
+            $rewrittenUrl = $retriever->getViewUrl($view, $viewLocale, $viewId);
+        }
+
+        return $rewrittenUrl === null ? self::viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
+    }
+
+    public static function retrieveCurrent(Request $request)
+    {
+        $rewrittenUrl = null;
+        if(ConfigQuery::isRewritingEnable()) {
+            $view = $request->query->get('view', null);
+            $viewLocale = $request->query->get('locale', null);
+            $viewId = $view === null ? null : $request->query->get($view . '_id', null);
+
+            $allParameters = $request->query->all();
+            $allParametersWithoutView = $allParameters;
+            if($view !== null) {
+                unset($allParametersWithoutView['view']);
+            }
+            $allOtherParameters = $allParametersWithoutView;
+            if($viewLocale !== null) {
+                unset($allOtherParameters['locale']);
+            }
+            if($viewId !== null) {
+                unset($allOtherParameters[$view . '_id']);
+            }
+
+            $retriever = new RewritingRetriever();
+            $rewrittenUrl = $retriever->getSpecificUrl($view, $viewLocale, $viewId, $allOtherParameters);
+        }
+
+        return $rewrittenUrl === null ? self::viewUrl($view, $allParametersWithoutView) : $rewrittenUrl;
+    }
 }
