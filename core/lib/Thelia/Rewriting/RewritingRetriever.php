@@ -35,7 +35,7 @@ use Thelia\Model\Map\RewritingUrlTableMap;
  */
 class RewritingRetriever
 {
-    public function getViewUrl($view, $viewId, $viewLocale)
+    public function getViewUrl($view, $viewLocale, $viewId)
     {
         $url = $this->getViewUrlQuery($view, $viewId, $viewLocale);
 
@@ -48,22 +48,22 @@ class RewritingRetriever
             ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
             ->where('ISNULL(`ra`.REWRITING_URL_ID)')
             ->filterByView($view)
-            ->filterByViewId($viewId)
             ->filterByViewLocale($viewLocale)
+            ->filterByViewId($viewId)
             ->filterByRedirected(null)
             ->orderByUpdatedAt(Criteria::DESC)
             ->findOne();
     }
 
-    public function getSpecificUrl($view = null, $viewId = null, $viewLocale = null, $viewOtherParameters = array())
+    public function getSpecificUrl($view, $viewLocale, $viewId = null, $viewOtherParameters = array())
     {
         $urlQuery = RewritingUrlQuery::create()
             ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
             ->withColumn('`ra`.PARAMETER', 'ra_parameter')
             ->withColumn('`ra`.VALUE', 'ra_value')
             ->filterByView($view)
-            ->filterByViewId($viewId)
             ->filterByViewLocale($viewLocale)
+            ->filterByViewId($viewId)
             ->filterByRedirected(null)
             ->orderByUpdatedAt(Criteria::DESC);
 
@@ -86,10 +86,7 @@ class RewritingRetriever
                 ->combine(array('count_condition', 'parameter_full_condition'), Criteria::LOGICAL_AND, 'full_having_condition');
 
 
-            $urlQuery
-                ->having(array('full_having_condition'))
-                //->having('COUNT(' . RewritingUrlTableMap::ID . ') = ?', $otherParametersCount, \PDO::PARAM_INT)
-            ;
+            $urlQuery->having(array('full_having_condition'));
         } else {
             $urlQuery->where('ISNULL(`ra`.REWRITING_URL_ID)');
         }

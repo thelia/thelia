@@ -23,7 +23,7 @@ class ModelCriteriaTools
      * @param null          $foreignTable
      * @param string        $foreignKey
      */
-    public static function getFrontEndI18n(ModelCriteria &$search, $defaultLangWithoutTranslation, $askedLocale, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID')
+    public static function getFrontEndI18n(ModelCriteria &$search, $defaultLangWithoutTranslation, $askedLocale, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID', $forceReturn = false)
     {
         if($foreignTable === null) {
             $foreignTable = $search->getTableMap()->getName();
@@ -32,13 +32,13 @@ class ModelCriteriaTools
             $aliasPrefix = $foreignTable . '_';
         }
 
-        $askedLocaleI18nAlias = 'asked_locale_i18n';
-        $defaultLocaleI18nAlias = 'default_locale_i18n';
+        $askedLocaleI18nAlias = $aliasPrefix . 'asked_locale_i18n';
+        $defaultLocaleI18nAlias = $aliasPrefix . 'default_locale_i18n';
 
         if($defaultLangWithoutTranslation == 0) {
             $askedLocaleJoin = new Join();
             $askedLocaleJoin->addExplicitCondition($search->getTableMap()->getName(), $foreignKey, null, $foreignTable . '_i18n', 'ID', $askedLocaleI18nAlias);
-            $askedLocaleJoin->setJoinType(Criteria::INNER_JOIN);
+            $askedLocaleJoin->setJoinType($forceReturn === false ? Criteria::INNER_JOIN : Criteria::LEFT_JOIN);
 
             $search->addJoinObject($askedLocaleJoin, $askedLocaleI18nAlias)
                 ->addJoinCondition($askedLocaleI18nAlias ,'`' . $askedLocaleI18nAlias . '`.LOCALE = ?', $askedLocale, null, \PDO::PARAM_STR);
@@ -67,7 +67,9 @@ class ModelCriteriaTools
 
             $search->withColumn('NOT ISNULL(`' . $askedLocaleI18nAlias . '`.`ID`)', $aliasPrefix . 'IS_TRANSLATED');
 
-            $search->where('NOT ISNULL(`' . $askedLocaleI18nAlias . '`.ID)')->_or()->where('NOT ISNULL(`' . $defaultLocaleI18nAlias . '`.ID)');
+            if(!$forceReturn) {
+                $search->where('NOT ISNULL(`' . $askedLocaleI18nAlias . '`.ID)')->_or()->where('NOT ISNULL(`' . $defaultLocaleI18nAlias . '`.ID)');
+            }
 
             foreach($columns as $column) {
                 $search->withColumn('CASE WHEN NOT ISNULL(`' . $askedLocaleI18nAlias . '`.ID) THEN `' . $askedLocaleI18nAlias . '`.`' . $column . '` ELSE `' . $defaultLocaleI18nAlias . '`.`' . $column . '` END', $aliasPrefix . 'i18n_' . $column);
@@ -84,7 +86,7 @@ class ModelCriteriaTools
             $aliasPrefix = $foreignTable . '_';
         }
 
-        $askedLocaleI18nAlias = 'asked_locale_i18n';
+        $askedLocaleI18nAlias = $aliasPrefix . 'asked_locale_i18n';
 
         $askedLocaleJoin = new Join();
         $askedLocaleJoin->addExplicitCondition($search->getTableMap()->getName(), $foreignKey, null, $foreignTable . '_i18n', 'ID', $askedLocaleI18nAlias);

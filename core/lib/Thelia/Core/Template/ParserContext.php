@@ -40,11 +40,7 @@ class ParserContext implements \IteratorAggregate
     public function __construct(Request $request)
     {
         // Setup basic variables
-        $this
-            ->set('BASE_URL'		, ConfigQuery::read('base_url', '/'))
-            ->set('INDEX_PAGE'		, URL::getIndexPage())
-            ->set('RETURN_TO_URL'	, URL::absoluteUrl($request->getSession()->getReturnToUrl()))
-            ->set('THELIA_VERSION'	, ConfigQuery::read('thelia_version', 'undefined'))
+        $this->set('THELIA_VERSION'	, ConfigQuery::read('thelia_version', 'undefined'))
         ;
     }
 

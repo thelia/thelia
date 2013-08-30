@@ -53,7 +53,11 @@ class URL
          // Already absolute ?
         if (substr($path, 0, 4) != 'http') {
 
-            $root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
+            /**
+             * @etienne : can't be done here for it's already done in ::viewUrl / ::adminViewUrl
+             */
+            //$root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
+            $root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : '';
 
             $base = rtrim($root, '/') . '/' . ltrim($path, '/');
         } else
@@ -116,7 +120,7 @@ class URL
         $rewrittenUrl = null;
         if(ConfigQuery::isRewritingEnable()) {
             $retriever = new RewritingRetriever();
-            $rewrittenUrl = $retriever->getViewUrl($view, $viewId, $viewLocale);
+            $rewrittenUrl = $retriever->getViewUrl($view, $viewLocale, $viewId);
         }
 
         return $rewrittenUrl === null ? self::viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
@@ -127,24 +131,26 @@ class URL
         $rewrittenUrl = null;
         if(ConfigQuery::isRewritingEnable()) {
             $view = $request->query->get('view', null);
-            $viewId = $view === null ? null : $request->query->get($view . '_id', null);
             $viewLocale = $request->query->get('locale', null);
+            $viewId = $view === null ? null : $request->query->get($view . '_id', null);
 
-            $allOtherParameters = $request->query->all();
+            $allParameters = $request->query->all();
+            $allParametersWithoutView = $allParameters;
             if($view !== null) {
-                unset($allOtherParameters['view']);
+                unset($allParametersWithoutView['view']);
+            }
+            $allOtherParameters = $allParametersWithoutView;
+            if($viewLocale !== null) {
+                unset($allOtherParameters['locale']);
             }
             if($viewId !== null) {
                 unset($allOtherParameters[$view . '_id']);
             }
-            if($viewLocale !== null) {
-                unset($allOtherParameters['locale']);
-            }
 
             $retriever = new RewritingRetriever();
-            $rewrittenUrl = $retriever->getSpecificUrl($view, $viewId, $viewLocale, $allOtherParameters);
+            $rewrittenUrl = $retriever->getSpecificUrl($view, $viewLocale, $viewId, $allOtherParameters);
         }
 
-        return $rewrittenUrl === null ? self::viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
+        return $rewrittenUrl === null ? self::viewUrl($view, $allParametersWithoutView) : $rewrittenUrl;
     }
 }
