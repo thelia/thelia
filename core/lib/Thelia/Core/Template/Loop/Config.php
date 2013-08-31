@@ -28,22 +28,26 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\CountryQuery;
+use Thelia\Model\LangQuery;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ConfigQuery;
+use Thelia\Type\BooleanOrBothType;
 
 /**
+ * Config loop, to access configuration variables
  *
- * Country loop
+ * - id is the config id
+ * - name is the config name
+ * - hidden filters by hidden status (yes, no, both)
+ * - secured filters by secured status (yes, no, both)
+ * - exclude is a comma separated list of config IDs that will be excluded from output
  *
- *
- * Class Country
  * @package Thelia\Core\Template\Loop
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Country extends BaseI18nLoop
+class Config extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -51,69 +55,67 @@ class Country extends BaseI18nLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('area'),
-            Argument::createBooleanTypeArgument('with_area'),
-            Argument::createIntListTypeArgument('exclude')
+            Argument::createIntTypeArgument('id'),
+            Argument::createIntListTypeArgument('exclude'),
+            Argument::createAnyTypeArgument('name'),
+            Argument::createBooleanOrBothTypeArgument('hidden'),
+            Argument::createBooleanOrBothTypeArgument('secured')
         );
-    }
+     }
 
     /**
-     * @param $pagination
+     * @param $pagination (ignored)
      *
      * @return \Thelia\Core\Template\Element\LoopResult
      */
     public function exec(&$pagination)
     {
-        $search = CountryQuery::create();
+        $id      = $this->getId();
+        $name    = $this->getName();
 
-        /* manage translations */
+        $search = ConfigQuery::create();
+
         $this->configureI18nProcessing($search);
 
-        $id = $this->getId();
+        if (! is_null($id))
+            $search->filterById($id);
 
-        if (null !== $id) {
-            $search->filterById($id, Criteria::IN);
-        }
+        if (! is_null($name))
+            $search->filterByName($name);
 
-        $area = $this->getArea();
-
-        if (null !== $area) {
-            $search->filterByAreaId($area, Criteria::IN);
-        }
-
-        $withArea = $this->getWith_area();
-
-        if (true === $withArea) {
-            $search->filterByAreaId(null, Criteria::ISNOTNULL);
-        } elseif (false == $withArea) {
-            $search->filterByAreaId(null, Criteria::ISNULL);
-        }
-
-        $exclude = $this->getExclude();
-
-        if (!is_null($exclude)) {
+        if (! is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $search->addAscendingOrderByColumn('i18n_TITLE');
+        if ($this->getHidden() != BooleanOrBothType::ANY)
+            $search->filterByHidden($this->getHidden() ? 1 : 0);
 
-        /* perform search */
-        $countries = $this->search($search, $pagination);
+        if ($this->getSecured() != BooleanOrBothType::ANY)
+            $search->filterBySecured($this->getSecured() ? 1 : 0);
+
+        $search->orderByName(Criteria::ASC);
+
+        $results = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($countries as $country) {
+        foreach ($results as $result) {
+
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $country->getId())
-                ->set("IS_TRANSLATED",$country->getVirtualColumn('IS_TRANSLATED'))
-                ->set("TITLE",$country->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $country->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $country->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $country->getVirtualColumn('i18n_POSTSCRIPTUM'));
-            $loopResultRow->set("ISOCODE", $country->getIsocode());
-            $loopResultRow->set("ISOALPHA2", $country->getIsoalpha2());
-            $loopResultRow->set("ISOALPHA3", $country->getIsoalpha3());
+
+            $loopResultRow
+                ->set("ID"           , $result->getId())
+                ->set("NAME"         , $result->getName())
+                ->set("VALUE"        , $result->getValue())
+                ->set("IS_TRANSLATED", $result->getVirtualColumn('IS_TRANSLATED'))
+                ->set("TITLE"        , $result->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO"        , $result->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION"  , $result->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM" , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("HIDDEN"       , $result->getHidden())
+                ->set("CREATE_DATE"  , $result->getCreatedAt())
+                ->set("UPDATE_DATE"  , $result->getUpdatedAt())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

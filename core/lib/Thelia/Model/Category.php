@@ -5,9 +5,12 @@ namespace Thelia\Model;
 use Thelia\Model\Base\Category as BaseCategory;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Tools\URL;
+use Thelia\Core\Event\TheliaEvents;
 
 class Category extends BaseCategory
 {
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
     /**
      * @return int number of child for the current category
      */
@@ -74,6 +77,39 @@ class Category extends BaseCategory
         }
 
         return $countProduct;
+    }
 
+    public function preInsert(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECATEGORY, new CategoryEvent($this));
+
+        return true;
+    }
+
+    public function postInsert(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_CREATECATEGORY, new CategoryEvent($this));
+    }
+
+    public function preUpdate(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECATEGORY, new CategoryEvent($this));
+
+        return true;
+    }
+
+    public function postUpdate(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECATEGORY, new CategoryEvent($this));
+    }
+
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECATEGORY, new CategoryEvent($this));
+    }
+
+    public function postDelete(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_DELETECATEGORY, new CategoryEvent($this));
     }
 }

@@ -35,10 +35,30 @@
         <default key="_controller">Thelia\Controller\Admin\CategoryController::processAction</default>
     </route>
 
+    <!-- Routes to the Config controller -->
+
+    <route id="admin.config.default" path="/admin/configuration/config">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::defaultAction</default>
+    </route>
+
+    <route id="admin.config.create" path="/admin/config/configuration/create">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::createAction</default>
+    </route>
+
+    <route id="admin.config.change" path="/admin/config/configuration/change">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::changeAction</default>
+    </route>
+
+    <route id="admin.config.delete" path="/admin/config/configuration/delete">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::deleteAction</default>
+    </route>
+
+
 	<!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">
         <default key="_controller">Thelia\Controller\Admin\AdminController::processTemplateAction</default>
         <requirement key="template">.*</requirement>
     </route>
+
 </routes>

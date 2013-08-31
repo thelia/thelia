@@ -21,48 +21,31 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Model;
+namespace Thelia\Model\Tools;
 
-use Thelia\Model\Base\Config as BaseConfig;
-use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\ConfigEvent;
+use Thelia\Core\Event\ActionEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class Config extends BaseConfig {
+/**
+ * A trait to provide event dispatching mechanism to Model objects
+ */
+trait ModelEventDispatcherTrait {
 
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     */
+    protected $dispatcher = null;
 
-    public function preInsert(ConnectionInterface $con = null)
+
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECONFIG, new ConfigEvent($this));
-
-        return true;
+        $this->dispatcher = $dispatcher;
     }
 
-    public function postInsert(ConnectionInterface $con = null)
+    protected function dispatchEvent($eventName, ActionEvent $event)
     {
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATECONFIG, new ConfigEvent($this));
-    }
-
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECONFIG, new ConfigEvent($this));
-
-        return true;
-    }
-
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECONFIG, new ConfigEvent($this));
-    }
-
-    public function preDelete(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONFIG, new ConfigEvent($this));
-    }
-
-    public function postDelete(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETECONFIG, new ConfigEvent($this));
+        if (!is_null($this->dispatcher)) {
+            $this->dispatcher->dispatch($eventName, $event);
+        }
     }
 }

@@ -22,7 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\ImageEvent;
 use Thelia\Model\CategoryImageQuery;
@@ -43,7 +43,7 @@ use Thelia\Log\Tlog;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Image extends BaseLoop
+class Image extends BaseI18nLoop
 {
     /**
      * @var array Possible image sources
@@ -312,9 +312,7 @@ class Image extends BaseLoop
                         new EnumType($this->possible_sources)
                 )
             ),
-            Argument::createIntTypeArgument('source_id'),
-
-            Argument::createIntListTypeArgument('lang')
+            Argument::createIntTypeArgument('source_id')
         );
 
         // Add possible image sources

@@ -25,7 +25,7 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -48,7 +48,7 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class AttributeCombination extends BaseLoop
+class AttributeCombination extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -57,7 +57,6 @@ class AttributeCombination extends BaseLoop
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('product_sale_elements', null, true),
-            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(

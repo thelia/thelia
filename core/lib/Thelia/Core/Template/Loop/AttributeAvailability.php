@@ -25,7 +25,7 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -46,7 +46,7 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class AttributeAvailability extends BaseLoop
+class AttributeAvailability extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -57,7 +57,6 @@ class AttributeAvailability extends BaseLoop
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('attribute'),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(

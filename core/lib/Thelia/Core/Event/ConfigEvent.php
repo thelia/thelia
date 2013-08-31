@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,52 +17,18 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Model;
+namespace Thelia\Core\Event;
 
-use Thelia\Model\Base\Config as BaseConfig;
-use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\ConfigEvent;
+use Thelia\Model\Config;
 
-class Config extends BaseConfig {
-
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
-
-    public function preInsert(ConnectionInterface $con = null)
+class ConfigEvent extends ActionEvent
+{
+    public function __construct(Config $config)
     {
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECONFIG, new ConfigEvent($this));
-
-        return true;
-    }
-
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATECONFIG, new ConfigEvent($this));
-    }
-
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECONFIG, new ConfigEvent($this));
-
-        return true;
-    }
-
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECONFIG, new ConfigEvent($this));
-    }
-
-    public function preDelete(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONFIG, new ConfigEvent($this));
-    }
-
-    public function postDelete(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETECONFIG, new ConfigEvent($this));
+        $this->config = $config;
     }
 }

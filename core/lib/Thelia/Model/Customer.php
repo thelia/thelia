@@ -31,10 +31,7 @@ use Thelia\Core\Event\CustomerEvent;
  */
 class Customer extends BaseCustomer implements UserInterface
 {
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    protected $dispatcher;
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**
      * @param int $titleId customer title id (from customer_title table)
@@ -137,13 +134,6 @@ class Customer extends BaseCustomer implements UserInterface
         $this->dispatchEvent(TheliaEvents::AFTER_CHANGECUSTOMER, $customerEvent);
     }
 
-    protected function dispatchEvent($eventName, CustomerEvent $customerEvent)
-    {
-        if (!is_null($this->dispatcher)) {
-            $this->dispatcher->dispatch($eventName, $customerEvent);
-        }
-    }
-
     protected function generateRef()
     {
         return uniqid(substr($this->getLastname(), 0, (strlen($this->getLastname()) >= 3) ? 3 : strlen($this->getLastname())), true);
@@ -182,11 +172,6 @@ class Customer extends BaseCustomer implements UserInterface
         }
 
         return parent::setEmail($email);
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
     }
 
    /**

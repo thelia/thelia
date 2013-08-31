@@ -23,7 +23,7 @@
 
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -54,7 +54,7 @@ use Thelia\Type\BooleanOrBothType;
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class CategoryPath extends BaseLoop
+class CategoryPath extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -65,8 +65,7 @@ class CategoryPath extends BaseLoop
             Argument::createIntTypeArgument('category', null, true),
             Argument::createIntTypeArgument('depth'),
             Argument::createIntTypeArgument('level'),
-            Argument::createBooleanOrBothTypeArgument('visible', true, false),
-            Argument::createIntTypeArgument('lang')
+            Argument::createBooleanOrBothTypeArgument('visible', true, false)
         );
     }
 

@@ -219,7 +219,7 @@ class SmartyParser extends Smarty implements ParserInterface
             $fileName .= ".html";
 
             if (!file_exists($fileName)) {
-                throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
+                throw new ResourceNotFoundException(sprintf("%s file (%s) not found in %s template", $file, $fileName, $this->template));
             }
         }
 

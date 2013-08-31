@@ -25,7 +25,7 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -49,7 +49,7 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class FeatureValue extends BaseLoop
+class FeatureValue extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -68,8 +68,7 @@ class FeatureValue extends BaseLoop
                     new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
-            ),
-            Argument::createIntTypeArgument('lang')
+            )
         );
     }
 

@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -21,76 +21,59 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Loop;
+namespace Thelia\Core\Template\Element;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseI18nLoop;
-use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Core\Template\Element\LoopResultRow;
-
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
-use Thelia\Model\CustomerTitleQuery;
-use Thelia\Model\ConfigQuery;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Model\Tools\ModelCriteriaTools;
 
 /**
  *
- * Title loop
+ * Class BaseI18nLoop, imlplemented by loops providing internationalized data, such as title, description, etc.
  *
- *
- * Class Title
- * @package Thelia\Core\Template\Loop
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * @package Thelia\Core\Template\Element
  */
-class Title extends BaseI18nLoop
+abstract class BaseI18nLoop extends BaseLoop
 {
     /**
-     * @return ArgumentCollection
+     * Define common loop arguments
+     *
+     * @return Argument[]
      */
-    protected function getArgDefinitions()
+    protected function getDefaultArgs()
     {
-        return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id')
-        );
+        $args = parent::getDefaultArgs();
+
+        $args[] = Argument::createIntTypeArgument('lang');
+
+        return $args;
     }
 
     /**
-     * @param $pagination
+     * Setup ModelCriteria for proper i18n processing
      *
-     * @return \Thelia\Core\Template\Element\LoopResult
+     * @param ModelCriteria $search the Propel Criteria to configure
+     * @param array $columns the i18n columns
+     * @param string $foreignTable the specified table (default  to criteria table)
+     * @param string $foreignKey the foreign key in this table (default to criteria table)
+     *
+     * @return mixed the locale
      */
-    public function exec(&$pagination)
-    {
-        $search = CustomerTitleQuery::create();
+    protected function configureI18nProcessing(ModelCriteria $search, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID', $forceReturn = false) {
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('SHORT', 'LONG'));
-
-        $id = $this->getId();
-
-        if (null !== $id) {
-            $search->filterById($id, Criteria::IN);
-        }
-
-        $search->orderByPosition();
-
-        /* perform search */
-        $titles = $this->search($search, $pagination);
-
-        $loopResult = new LoopResult();
-
-        foreach ($titles as $title) {
-            $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $title->getId())
-                ->set("IS_TRANSLATED",$title->getVirtualColumn('IS_TRANSLATED'))
-                ->set("DEFAULT", $title->getByDefault())
-                ->set("SHORT", $title->getVirtualColumn('i18n_SHORT'))
-                ->set("LONG", $title->getVirtualColumn('i18n_LONG'));
-
-            $loopResult->addRow($loopResultRow);
-        }
-
-        return $loopResult;
+        return ModelCriteriaTools::getI18n(
+            $this->getBackend_context(),
+            $this->getLang(),
+            $search,
+            $this->request->getSession()->getLocale(),
+            $columns,
+            $foreignTable,
+            $foreignKey,
+            $forceReturn
+        );
     }
 }

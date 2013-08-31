@@ -21,48 +21,20 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Model;
+namespace Thelia\Controller\Admin;
 
-use Thelia\Model\Base\Config as BaseConfig;
-use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\ConfigEvent;
-
-class Config extends BaseConfig {
-
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
-
-    public function preInsert(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECONFIG, new ConfigEvent($this));
-
-        return true;
+class ConfigController extends BaseAdminController
+{
+    public function defaultAction() {
+        $this->render('config');
     }
 
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATECONFIG, new ConfigEvent($this));
+    public function createAction() {
     }
 
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECONFIG, new ConfigEvent($this));
-
-        return true;
+    public function deleteAction() {
     }
 
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECONFIG, new ConfigEvent($this));
-    }
-
-    public function preDelete(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONFIG, new ConfigEvent($this));
-    }
-
-    public function postDelete(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETECONFIG, new ConfigEvent($this));
+    public function updateAction() {
     }
 }

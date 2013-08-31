@@ -24,7 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -62,7 +62,7 @@ use Thelia\Type\BooleanOrBothType;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Category extends BaseLoop
+class Category extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -75,7 +75,6 @@ class Category extends BaseLoop
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
-            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(

@@ -24,7 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -43,7 +43,7 @@ use Thelia\Model\ConfigQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Currency extends BaseLoop
+class Currency extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -53,8 +53,7 @@ class Currency extends BaseLoop
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createBooleanTypeArgument('default_only', false),
-            Argument::createIntTypeArgument('lang')
+            Argument::createBooleanTypeArgument('default_only', false)
         );
     }
 
