@@ -6,6 +6,7 @@ use Thelia\Model\Base\Category as BaseCategory;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Tools\URL;
 use Thelia\Core\Event\TheliaEvents;
+use Propel\Runtime\Connection\ConnectionInterface;
 
 class Category extends BaseCategory
 {
