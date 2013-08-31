@@ -102,38 +102,6 @@ class Customer extends BaseCustomer implements UserInterface
         }
     }
 
-    public function preInsert(ConnectionInterface $con = null)
-    {
-        $this->setRef($this->generateRef());
-        $customerEvent = new CustomerEvent($this);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, $customerEvent);
-
-        return true;
-    }
-
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        $customerEvent = new CustomerEvent($this);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATECUSTOMER, $customerEvent);
-
-    }
-
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        $customerEvent = new CustomerEvent($this);
-        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECUSTOMER, $customerEvent);
-
-        return true;
-    }
-
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        $customerEvent = new CustomerEvent($this);
-        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECUSTOMER, $customerEvent);
-    }
-
     protected function generateRef()
     {
         return uniqid(substr($this->getLastname(), 0, (strlen($this->getLastname()) >= 3) ? 3 : strlen($this->getLastname())), true);
@@ -201,5 +169,58 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function getRoles() {
     	return array(new Role('CUSTOMER'));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preInsert(ConnectionInterface $con = null)
+    {
+        $this->setRef($this->generateRef());
+
+        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, new CustomerEvent($this));
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function postInsert(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_CREATECUSTOMER, new CustomerEvent($this));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preUpdate(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECUSTOMER, new CustomerEvent($this));
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function postUpdate(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECUSTOMER, new CustomerEvent($this));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONFIG, new CustomerEvent($this));
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function postDelete(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_DELETECONFIG, new CustomerEvent($this));
     }
 }

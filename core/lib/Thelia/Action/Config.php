@@ -77,7 +77,7 @@ class Config extends BaseAction implements EventSubscriberInterface
 
         $search = ConfigQuery::create();
 
-        if (null !== $config = $search->findById($event->getConfigId())) {
+        if (null !== $config = $search->findOneById($event->getConfigId())) {
 
             $config
                 ->setDispatcher($this->getDispatcher())
@@ -98,7 +98,7 @@ class Config extends BaseAction implements EventSubscriberInterface
 
         $search = ConfigQuery::create();
 
-        if (null !== $config = ConfigQuery::create()->findById($event->getConfigId())) {
+        if (null !== $config = ConfigQuery::create()->findOneById($event->getConfigId())) {
 
             $config
                 ->setDispatcher($this->getDispatcher())
@@ -127,10 +127,10 @@ class Config extends BaseAction implements EventSubscriberInterface
     {
         $this->checkAuth("ADMIN", "admin.configuration.variables.delete");
 
-        if (null !== $config = ConfigQuery::create()->findById($event->getConfigId())) {
-
+        if (null !== ($config = ConfigQuery::create()->findOneById($event->getConfigId()))) {
             if (! $config->getSecured()) {
-                $config->setDispatcher($this->getDispatcher())->delete();
+                $config->setDispatcher($this->getDispatcher());
+                $config->delete();
             }
         }
     }

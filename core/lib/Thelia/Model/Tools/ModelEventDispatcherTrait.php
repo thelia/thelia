@@ -40,6 +40,8 @@ trait ModelEventDispatcherTrait {
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+
+        return $this;
     }
 
     protected function dispatchEvent($eventName, ActionEvent $event)

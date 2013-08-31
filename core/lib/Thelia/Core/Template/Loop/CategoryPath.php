@@ -81,7 +81,7 @@ class CategoryPath extends BaseI18nLoop
 
         $search = CategoryQuery::create();
 
-        $this->configureI18nProcessing($search, array('TITLE'));
+        $locale = $this->configureI18nProcessing($search, array('TITLE'));
 
         $search->filterById($id);
         if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
@@ -99,7 +99,7 @@ class CategoryPath extends BaseI18nLoop
 
                 $loopResultRow
                     ->set("TITLE",$category->getVirtualColumn('i18n_TITLE'))
-                    ->set("URL", $category->getUrl())
+                    ->set("URL", $category->getUrl($locale))
                     ->set("ID", $category->getId())
                 ;
 

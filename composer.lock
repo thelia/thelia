@@ -397,12 +397,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/simplepie/simplepie.git",
-                "reference": "f5436d69a8efa9d4ab3a9abc65d17317eb24b7f4"
+                "reference": "f97c8ef9be655c35e6fecdb608bdf5af05a4374a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/simplepie/simplepie/zipball/f5436d69a8efa9d4ab3a9abc65d17317eb24b7f4",
-                "reference": "f5436d69a8efa9d4ab3a9abc65d17317eb24b7f4",
+                "url": "https://api.github.com/repos/simplepie/simplepie/zipball/f97c8ef9be655c35e6fecdb608bdf5af05a4374a",
+                "reference": "f97c8ef9be655c35e6fecdb608bdf5af05a4374a",
                 "shasum": ""
             },
             "require": {
@@ -443,7 +443,7 @@
                 "feeds",
                 "rss"
             ],
-            "time": "2013-04-29 06:13:26"
+            "time": "2013-08-31 01:38:46"
         },
         {
             "name": "smarty/smarty",
@@ -1622,12 +1622,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fzaninotto/Faker.git",
-                "reference": "feb6492762a77db946bc13cc44a20a01546be0e6"
+                "reference": "77a4e394d99a67e7fb611e8b402c2da4b80fa4f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/feb6492762a77db946bc13cc44a20a01546be0e6",
-                "reference": "feb6492762a77db946bc13cc44a20a01546be0e6",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/77a4e394d99a67e7fb611e8b402c2da4b80fa4f8",
+                "reference": "77a4e394d99a67e7fb611e8b402c2da4b80fa4f8",
                 "shasum": ""
             },
             "require": {
@@ -1660,7 +1660,7 @@
                 "faker",
                 "fixtures"
             ],
-            "time": "2013-08-12 10:05:47"
+            "time": "2013-08-29 19:11:59"
         },
         {
             "name": "phpunit/php-code-coverage",

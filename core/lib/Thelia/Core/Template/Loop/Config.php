@@ -57,7 +57,7 @@ class Config extends BaseI18nLoop
         return new ArgumentCollection(
             Argument::createIntTypeArgument('id'),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createAnyTypeArgument('name'),
+            Argument::createAnyTypeArgument('variable'),
             Argument::createBooleanOrBothTypeArgument('hidden'),
             Argument::createBooleanOrBothTypeArgument('secured')
         );
@@ -71,11 +71,11 @@ class Config extends BaseI18nLoop
     public function exec(&$pagination)
     {
         $id      = $this->getId();
-        $name    = $this->getName();
+        $name    = $this->getVariable();
 
         $search = ConfigQuery::create();
 
-        $this->configureI18nProcessing($search);
+       $this->configureI18nProcessing($search);
 
         if (! is_null($id))
             $search->filterById($id);
@@ -113,6 +113,7 @@ class Config extends BaseI18nLoop
                 ->set("DESCRIPTION"  , $result->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM" , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("HIDDEN"       , $result->getHidden())
+                ->set("SECURED"       , $result->getSecured())
                 ->set("CREATE_DATE"  , $result->getCreatedAt())
                 ->set("UPDATE_DATE"  , $result->getUpdatedAt())
             ;

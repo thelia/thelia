@@ -59,6 +59,8 @@ class Config extends BaseConfig {
     public function preDelete(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONFIG, new ConfigEvent($this));
+
+        return true;
     }
 
     public function postDelete(ConnectionInterface $con = null)

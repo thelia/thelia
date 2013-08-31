@@ -35,22 +35,22 @@
         <default key="_controller">Thelia\Controller\Admin\CategoryController::processAction</default>
     </route>
 
-    <!-- Routes to the Config controller -->
+    <!-- Routes to the Config (system variables) controller -->
 
-    <route id="admin.config.default" path="/admin/configuration/config">
-        <default key="_controller">Thelia\Controller\Admin\ConfigController::defaultAction</default>
+    <route id="admin.configuration.variables.default" path="/admin/configuration/variables">
+        <default key="_controller">Thelia\Controller\Admin\VariablesController::defaultAction</default>
     </route>
 
-    <route id="admin.config.create" path="/admin/config/configuration/create">
-        <default key="_controller">Thelia\Controller\Admin\ConfigController::createAction</default>
+    <route id="admin.configuration.variables.create" path="/admin/configuration/variables/create">
+        <default key="_controller">Thelia\Controller\Admin\VariablesController::createAction</default>
     </route>
 
-    <route id="admin.config.change" path="/admin/config/configuration/change">
-        <default key="_controller">Thelia\Controller\Admin\ConfigController::changeAction</default>
+    <route id="admin.configuration.variables.change" path="/admin/configuration/variables/change">
+        <default key="_controller">Thelia\Controller\Admin\VariablesController::changeAction</default>
     </route>
 
-    <route id="admin.config.delete" path="/admin/config/configuration/delete">
-        <default key="_controller">Thelia\Controller\Admin\ConfigController::deleteAction</default>
+    <route id="admin.configuration.variables.delete" path="/admin/configuration/variables/delete">
+        <default key="_controller">Thelia\Controller\Admin\VariablesController::deleteAction</default>
     </route>
 
 

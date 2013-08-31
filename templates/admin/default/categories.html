@@ -32,7 +32,7 @@
 							{module_include location='category_list_caption'}
 
                             {loop type="auth" name="can_create" context="admin" roles="ADMIN" permissions="admin.category.create"}
-	                        <a class="btn btn-primary btn-add-item" title="{intl l='Add a new category'}" href="#add_category_dialog" data-toggle="modal">
+	                        <a class="btn btn-primary action-btn" title="{intl l='Add a new category'}" href="#add_category_dialog" data-toggle="modal">
 	                            <i class="icon-plus-sign icon-white"></i>
 	                        </a>
 	                        {/loop}
@@ -185,7 +185,7 @@
 
 							{module_include location='product_list_caption'}
 
-	                        <a class="btn btn-primary btn-add-item" title="{intl l='Add a new product'}" href="#productAddModal" data-toggle="modal">
+	                        <a class="btn btn-primary action-btn" title="{intl l='Add a new product'}" href="#productAddModal" data-toggle="modal">
 	                            <i class="icon-plus-sign icon-white"></i>
 	                        </a>
 	                    </caption>

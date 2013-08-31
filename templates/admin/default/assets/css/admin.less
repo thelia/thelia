@@ -703,9 +703,12 @@ label {
 
 		line-height: 30px;
 
-		.btn-add-item {
+		.action-btn {
 			display: block;
 			float: right;
+			margin-left: 10px;
+
+			text-transform: none;
 		}
 	}
 
@@ -756,5 +759,15 @@ label {
         line-height: 30px;
         text-align: left;
         text-transform: uppercase;
+    }
+}
+
+.table-left-aligned {
+    th, td {
+        text-align: left;
+    }
+
+    select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+        margin-bottom: 0;
     }
 }

@@ -23,16 +23,24 @@
 
 namespace Thelia\Controller\Admin;
 
-class ConfigController extends BaseAdminController
+use Thelia\Core\Event\ConfigDeleteEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Tools\URL;
+class VariablesController extends BaseAdminController
 {
     public function defaultAction() {
-        $this->render('config');
+        return $this->render('variables');
     }
 
     public function createAction() {
     }
 
     public function deleteAction() {
+        $event = new ConfigDeleteEvent($this->getRequest()->get('id'));
+
+        $this->dispatch(TheliaEvents::CONFIG_DELETE, $event);
+
+        $this->redirect(URL::adminViewUrl('variables'));
     }
 
     public function updateAction() {
