@@ -36,6 +36,14 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 
+/**
+ *
+ * Load, read and validate config xml files
+ *
+ * Class XmlFileLoader
+ * @package Thelia\Core\DependencyInjection\Loader
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class XmlFileLoader extends FileLoader
 {
     /**

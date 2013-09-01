@@ -41,6 +41,7 @@ use Thelia\Model\ConfigQuery;
  *
  * Class Cart
  * @package Thelia\Action
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 class Cart extends BaseAction implements EventSubscriberInterface
 {

@@ -28,6 +28,13 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Cart;
 use Thelia\Model\Customer;
 
+/**
+ * Test the helpers adding in Session class
+ *
+ * Class SessionTest
+ * @package Thelia\Tests\Core\HttpFoundation\Session
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
 

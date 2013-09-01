@@ -30,6 +30,14 @@ use Thelia\Model\CartQuery;
 use Thelia\Model\Cart;
 use Thelia\Tools\URL;
 
+/**
+ *
+ * extends mfony\Component\HttpFoundation\Session\Session for adding some helpers
+ *
+ * Class Session
+ * @package Thelia\Core\HttpFoundation\Session
+ * Symfony\Component\HttpFoundation\Request
+ */
 class Session extends BaseSession
 {
     // -- Language ------------------------------------------------------------

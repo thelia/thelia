@@ -40,6 +40,14 @@ use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\CustomerLoginEvent;
 
+/**
+ *
+ * customer class where all actions are managed
+ *
+ * Class Customer
+ * @package Thelia\Action
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class Customer extends BaseAction implements EventSubscriberInterface
 {
 

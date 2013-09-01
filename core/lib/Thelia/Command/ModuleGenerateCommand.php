@@ -27,6 +27,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * generate a new Module
+ *
+ * Class ModuleGenerateCommand
+ * @package Thelia\Command
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class ModuleGenerateCommand extends BaseModuleGenerate
 {
     protected function configure()

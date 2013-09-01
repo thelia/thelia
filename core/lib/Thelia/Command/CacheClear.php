@@ -30,6 +30,14 @@ use Symfony\Component\Filesystem\Exception\IOException;
 
 use Thelia\Command\ContainerAwareCommand;
 
+/**
+ * clear the cache
+ *
+ * Class CacheClear
+ * @package Thelia\Command
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ *
+ */
 class CacheClear extends ContainerAwareCommand
 {
     protected function configure()
