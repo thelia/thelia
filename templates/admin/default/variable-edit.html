@@ -1,4 +1,4 @@
-{check_auth context="admin" roles="ADMIN" permissions="admin.configuration.variables.edit" login_tpl="admin/login"}
+{check_auth context="admin" roles="ADMIN" permissions="admin.configuration.variables.edit" login_tpl="/admin/login"}
 
 {$page_title={intl l='Edit a system variable'}}
 
@@ -11,9 +11,9 @@
         {loop name="config_edit" type="config" hidden="*" id="$variable_id" backend_context="1" lang="$edition_language"}
 
         <ul class="breadcrumb">
-			<li><a href="{url path='admin/home'}">{intl l="Home"}</a> <span class="divider">/</span></li>
-            <li><a href="{url path='admin/configuration'}">{intl l="Configuration"}</a> <span class="divider">/</span></li>
-            <li><a href="{url path='admin/configuration/variables'}">{intl l="System variables"}</a> <span class="divider">/</span></li>
+			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a> <span class="divider">/</span></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a> <span class="divider">/</span></li>
+            <li><a href="{url path='/admin/configuration/variables'}">{intl l="System variables"}</a> <span class="divider">/</span></li>
             <li>{intl l='Editing variable "%name"' name="{$NAME}"}</li>
         </ul>
 
@@ -30,7 +30,7 @@
                              <fieldset>
 
 							    {form name="thelia.admin.variable.modification"}
-							    <form method="POST" action="{url path='admin/configuration/variables/save-change'}" {form_enctype form=$form}>
+							    <form method="POST" action="{url path='/admin/configuration/variables/save-change'}" {form_enctype form=$form}>
 
                                     {* Be sure to get the variable ID, even if the form could not be validated *}
                                     <input type="hidden" name="variable_id" value="{$variable_id}" />
@@ -40,7 +40,7 @@
 							        {form_hidden_fields form=$form}
 
 							        {form_field form=$form field='success_url'}
-							        <input type="hidden" name="{$name}" value="{url path='admin/configuration/variables'}" />
+							        <input type="hidden" name="{$name}" value="{url path='/admin/configuration/variables'}" />
 							        {/form_field}
 
 							        {* We do not allow creation of hidden variables *}
@@ -50,7 +50,7 @@
                                     {/form_field}
 
 			                        {form_field form=$form field='hidden'}
-			                        <input type="hidden" name="{$name}" value="0" />
+			                        <input type="hidden" name="{$name}" value="{$value}" />
 			                        {/form_field}
 
 			                        {form_field form=$form field='locale'}
@@ -94,7 +94,7 @@
 			                            </label>
 
 			                            <div class="controls">
-			                                {form_field form=$form field='value'}
+			                                {form_field form=$form field='secured'}
 			                                <span {if $error}class="error"{/if}>
 												<label class="checkbox">
 			                                        <input type="checkbox" name="{$name}" value="1" {if $value == 1}checked="checked"{/if}>

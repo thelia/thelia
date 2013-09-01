@@ -83,7 +83,9 @@ class VariablesController extends BaseAdminController
                 ->setValue($data['value'])
                 ->setLocale($data["locale"])
                 ->setTitle($data['title'])
-            ;
+                ->setHidden($data['hidden'])
+                ->setSecured($data['secured'])
+                ;
 
             $this->dispatch(TheliaEvents::CONFIG_CREATE, $createEvent);
 
@@ -288,7 +290,7 @@ class VariablesController extends BaseAdminController
         if (null !== $response = $this->checkAuth("admin.configuration.variables.delete")) return $response;
 
         // Get the config id, and dispatch the delet request
-        $event = new ConfigDeleteEvent($this->getRequest()->get('id'));
+        $event = new ConfigDeleteEvent($this->getRequest()->get('variable_id'));
 
         $this->dispatch(TheliaEvents::CONFIG_DELETE, $event);
 

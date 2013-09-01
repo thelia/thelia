@@ -31,7 +31,7 @@ class VariableModificationForm extends BaseDescForm
 {
     protected function buildForm()
     {
-        parent::buildForm();
+        parent::buildForm(true);
 
         $this->formBuilder
             ->add("id", "hidden", array(
@@ -49,11 +49,11 @@ class VariableModificationForm extends BaseDescForm
             ->add("value", "text", array())
             ->add("hidden", "hidden", array())
             ->add("secured", "hidden", array())
-            ;
+         ;
     }
 
     public function getName()
     {
-        return "thelia_variable_creation";
+        return "thelia_variable_modification";
     }
 }

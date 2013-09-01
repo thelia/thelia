@@ -121,6 +121,29 @@ class BaseController extends ContainerAware
     }
 
     /**
+     * Get all errors that occured in a form
+     *
+     * @param \Symfony\Component\Form\Form $form
+     * @return string the error string
+     */
+    private function getErrorMessages(\Symfony\Component\Form\Form $form) {
+
+        $errors = '';
+
+        foreach ($form->getErrors() as $key => $error) {
+            $errors .= $error->getMessage() . ', ';
+        }
+
+        foreach ($form->all() as $child) {
+            if (!$child->isValid()) {
+                $errors .= $this->getErrorMessages($child) . ', ';
+            }
+        }
+
+        return rtrim($errors, ', ');
+    }
+
+    /**
      * Validate a BaseForm
      *
      * @param  BaseForm                     $aBaseForm      the form
@@ -138,10 +161,12 @@ class BaseController extends ContainerAware
 
             if ($form->isValid()) {
                 return $form;
-            } else {
-                throw new FormValidationException("Missing or invalid data");
             }
-        } else {
+            else {
+                throw new FormValidationException(sprintf("Missing or invalid data: %s", $this->getErrorMessages($form)));
+            }
+        }
+        else {
             throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
         }
     }

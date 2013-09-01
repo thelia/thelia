@@ -27,8 +27,22 @@ use Thelia\Model\Config;
 
 class ConfigDeleteEvent extends ConfigEvent
 {
+    protected $config_id;
+
     public function __construct($config_id)
     {
         $this->setConfigId($config_id);
+    }
+
+    public function getConfigId()
+    {
+        return $this->config_id;
+    }
+
+    public function setConfigId($config_id)
+    {
+        $this->config_id = $config_id;
+
+        return $this;
     }
 }

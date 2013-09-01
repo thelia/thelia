@@ -30,6 +30,8 @@ class ConfigCreateEvent extends ConfigEvent
     protected $value;
     protected $locale;
     protected $title;
+    protected $hidden;
+    protected $secured;
 
     // Use event_name to prevent conflict with Event::name property.
     public function getEventName()
@@ -76,6 +78,30 @@ class ConfigCreateEvent extends ConfigEvent
     public function setTitle($title)
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function getHidden()
+    {
+        return $this->hidden;
+    }
+
+    public function setHidden($hidden)
+    {
+        $this->hidden = $hidden;
+
+        return $this;
+    }
+
+    public function getSecured()
+    {
+        return $this->secured;
+    }
+
+    public function setSecured($secured)
+    {
+        $this->secured = $secured;
 
         return $this;
     }
