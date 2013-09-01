@@ -77,7 +77,7 @@ class AttributeCombination extends BaseI18nLoop
         $search = AttributeCombinationQuery::create();
 
         /* manage attribute translations */
-        $this->configureI18nProcessing(
+        $locale = $this->configureI18nProcessing(
             $search,
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             AttributeTableMap::TABLE_NAME,
@@ -85,7 +85,7 @@ class AttributeCombination extends BaseI18nLoop
         );
 
         /* manage attributeAv translations */
-        $this->configureI18nProcessing(
+        $locale = $this->configureI18nProcessing(
             $search,
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             AttributeAvTableMap::TABLE_NAME,
@@ -117,6 +117,7 @@ class AttributeCombination extends BaseI18nLoop
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow
+                ->set("LOCALE",$locale)
                 ->set("ATTRIBUTE_TITLE", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE'))
                 ->set("ATTRIBUTE_CHAPO", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_CHAPO'))
                 ->set("ATTRIBUTE_DESCRIPTION", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))

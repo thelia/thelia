@@ -1,0 +1,60 @@
+{* The standard description fields, used by many Thelia objects *}
+
+{form_field form=$form field='title'}
+<div class="control-group">
+    <label class="control-label">
+       {intl l='Title *'}
+    </label>
+
+    <div class="controls">
+        <span {if $error}class="error"{/if}>
+            <input type="text" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="input-block-level" value="{$value|htmlspecialchars}">
+        </span>
+    </div>
+</div>
+{/form_field}
+
+{form_field form=$form field='chapo'}
+<div class="control-group">
+    <label class="control-label">
+        {intl l='Summary'}
+        <span class="label-help-block">{intl l="A short description, used when a summary or an introduction is required"}</span>
+    </label>
+
+    <div class="controls">
+        <span {if $error}class="error"{/if}>
+            <textarea name="{$name}" rows="3" title="{intl l='Short description'}" placeholder="{intl l='Short description'}" class="input-block-level">{$value|htmlspecialchars}</textarea>
+        </span>
+    </div>
+</div>
+{/form_field}
+
+{form_field form=$form field='description'}
+<div class="control-group">
+    <label class="control-label">
+      {intl l='Detailed description'}
+      <span class="label-help-block">{intl l="The détailed description."}</span>
+    </label>
+
+    <div class="controls">
+        <span {if $error}class="error"{/if}>
+        <textarea name="{$name}" rows="10" class="input-block-level">{$value|htmlspecialchars}</textarea>
+        </span>
+    </div>
+</div>
+{/form_field}
+
+{form_field form=$form field='postscriptum'}
+<div class="control-group">
+    <label class="control-label">
+      {intl l='Conclusion'}
+      <span class="label-help-block">{intl l="A short post-description information"}</span>
+    </label>
+
+    <div class="controls">
+        <span {if $error}class="error"{/if}>
+        <textarea name="{$name}" rows="3" title="{intl l='Short conclusion'}" placeholder="{intl l='Short conclusion'}" class="input-block-level">{$value|htmlspecialchars}</textarea>
+        </span>
+    </div>
+</div>
+{/form_field}

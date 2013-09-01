@@ -110,6 +110,16 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Return the security context
+     *
+     * @return Thelia\Core\Security\SecurityContext
+     */
+    protected function getSecurityContext()
+    {
+        return $this->container->get('thelia.securityContext');
+    }
+
+    /**
      * Returns an array of event names this subscriber wants to listen to.
      *
      * The array keys are event names and the value can be:

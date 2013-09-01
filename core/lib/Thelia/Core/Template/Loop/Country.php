@@ -68,7 +68,7 @@ class Country extends BaseI18nLoop
         $search = CountryQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -107,6 +107,7 @@ class Country extends BaseI18nLoop
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $country->getId())
                 ->set("IS_TRANSLATED",$country->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("TITLE",$country->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $country->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $country->getVirtualColumn('i18n_DESCRIPTION'))

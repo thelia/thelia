@@ -20,33 +20,40 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Action;
+namespace Thelia\Form;
 
-use Thelia\Form\BaseForm;
-use Thelia\Action\Exception\FormValidationException;
-use Thelia\Core\Event\ActionEvent;
-use Symfony\Component\Form\Form;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Model\LangQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 
-class BaseAction
+class VariableModificationForm extends BaseDescForm
 {
-    /**
-     * @var The container
-     */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
+    protected function buildForm()
     {
-        $this->container = $container;
+        parent::buildForm();
+
+        $this->formBuilder
+            ->add("id", "hidden", array(
+                    "constraints" => array(
+                        new GreaterThan(
+                            array('value' => 0)
+                        )
+                    )
+            ))
+            ->add("name", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                )
+            ))
+            ->add("value", "text", array())
+            ->add("hidden", "hidden", array())
+            ->add("secured", "hidden", array())
+            ;
     }
 
-    /**
-     * Return the event dispatcher,
-     *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    public function getDispatcher()
+    public function getName()
     {
-        return $this->container->get('event_dispatcher');
+        return "thelia_variable_creation";
     }
 }

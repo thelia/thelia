@@ -24,26 +24,22 @@
 namespace Thelia\Core\Event;
 use Thelia\Model\Config;
 
-class ConfigCreateEvent extends ActionEvent
+class ConfigCreateEvent extends ConfigEvent
 {
-    protected $name;
+    protected $event_name;
     protected $value;
-    protected $hidden;
-    protected $secured;
     protected $locale;
     protected $title;
-    protected $description;
-    protected $chapo;
-    protected $postscriptum;
 
-    public function getName()
+    // Use event_name to prevent conflict with Event::name property.
+    public function getEventName()
     {
-        return $this->name;
+        return $this->event_name;
     }
 
-    public function setName($name)
+    public function setEventName($event_name)
     {
-        $this->name = $name;
+        $this->event_name = $event_name;
 
         return $this;
     }
@@ -56,30 +52,6 @@ class ConfigCreateEvent extends ActionEvent
     public function setValue($value)
     {
         $this->value = $value;
-
-        return $this;
-    }
-
-    public function getHidden()
-    {
-        return $this->hidden;
-    }
-
-    public function setHidden($hidden)
-    {
-        $this->hidden = $hidden;
-
-        return $this;
-    }
-
-    public function getSecured()
-    {
-        return $this->secured;
-    }
-
-    public function setSecured($secured)
-    {
-        $this->secured = $secured;
 
         return $this;
     }
@@ -104,42 +76,6 @@ class ConfigCreateEvent extends ActionEvent
     public function setTitle($title)
     {
         $this->title = $title;
-
-        return $this;
-    }
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getChapo()
-    {
-        return $this->chapo;
-    }
-
-    public function setChapo($chapo)
-    {
-        $this->chapo = $chapo;
-
-        return $this;
-    }
-
-    public function getPostscriptum()
-    {
-        return $this->postscriptum;
-    }
-
-    public function setPostscriptum($postscriptum)
-    {
-        $this->postscriptum = $postscriptum;
 
         return $this;
     }

@@ -156,6 +156,7 @@ class Folder extends BaseI18nLoop
             $loopResultRow
             	->set("ID", $folder->getId())
                 ->set("IS_TRANSLATED",$folder->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("TITLE",$folder->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $folder->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))

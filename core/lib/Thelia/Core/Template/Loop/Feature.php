@@ -82,7 +82,7 @@ class Feature extends BaseI18nLoop
         $search = FeatureQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -148,6 +148,7 @@ class Feature extends BaseI18nLoop
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $feature->getId())
                 ->set("IS_TRANSLATED",$feature->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("TITLE",$feature->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $feature->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $feature->getVirtualColumn('i18n_DESCRIPTION'))

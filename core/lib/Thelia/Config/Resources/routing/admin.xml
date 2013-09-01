@@ -41,12 +41,20 @@
         <default key="_controller">Thelia\Controller\Admin\VariablesController::defaultAction</default>
     </route>
 
+    <route id="admin.configuration.variables.change-values" path="/admin/configuration/variables/change-values">
+        <default key="_controller">Thelia\Controller\Admin\VariablesController::changeValuesAction</default>
+    </route>
+
     <route id="admin.configuration.variables.create" path="/admin/configuration/variables/create">
         <default key="_controller">Thelia\Controller\Admin\VariablesController::createAction</default>
     </route>
 
     <route id="admin.configuration.variables.change" path="/admin/configuration/variables/change">
         <default key="_controller">Thelia\Controller\Admin\VariablesController::changeAction</default>
+    </route>
+
+    <route id="admin.configuration.variables.save-change" path="/admin/configuration/variables/save-change">
+        <default key="_controller">Thelia\Controller\Admin\VariablesController::saveChangeAction</default>
     </route>
 
     <route id="admin.configuration.variables.delete" path="/admin/configuration/variables/delete">

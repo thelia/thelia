@@ -214,6 +214,7 @@ class Content extends BaseI18nLoop
 
             $loopResultRow->set("ID", $content->getId())
                 ->set("IS_TRANSLATED",$content->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("TITLE",$content->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $content->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $content->getVirtualColumn('i18n_DESCRIPTION'))

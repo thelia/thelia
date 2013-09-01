@@ -75,10 +75,10 @@ class CustomerController extends BaseFrontController
             if ($message !== false) {
                 Tlog::getInstance()->error(sprintf("Error during customer creation process : %s. Exception was %s", $message, $e->getMessage()));
 
-                $customerLoginForm->setErrorMessage($message);
+                $customerCreation->setErrorMessage($message);
 
                 $this->getParserContext()
-                    ->setErrorForm($customerLoginForm)
+                    ->addForm($customerCreation)
                     ->setGeneralError($message)
                 ;
             }
@@ -123,10 +123,10 @@ class CustomerController extends BaseFrontController
             if ($message !== false) {
                 Tlog::getInstance()->error(sprintf("Error during customer modification process : %s. Exception was %s", $message, $e->getMessage()));
 
-                $customerLoginForm->setErrorMessage($message);
+                $customerModification->setErrorMessage($message);
 
                 $this->getParserContext()
-                    ->setErrorForm($customerLoginForm)
+                    ->addForm($customerModification)
                     ->setGeneralError($message)
                 ;
             }
@@ -183,7 +183,7 @@ class CustomerController extends BaseFrontController
 
                 $customerLoginForm->setErrorMessage($message);
 
-                $this->getParserContext()->setErrorForm($customerLoginForm);
+                $this->getParserContext()->addForm($customerLoginForm);
             }
         }
     }

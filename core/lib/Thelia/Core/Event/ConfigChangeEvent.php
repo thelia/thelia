@@ -29,6 +29,12 @@ class ConfigChangeEvent extends ConfigCreateEvent
 {
     protected $config_id;
 
+    protected $hidden;
+    protected $secured;
+    protected $description;
+    protected $chapo;
+    protected $postscriptum;
+
     public function __construct($config_id)
     {
         $this->setConfigId($config_id);
@@ -42,6 +48,66 @@ class ConfigChangeEvent extends ConfigCreateEvent
     public function setConfigId($config_id)
     {
         $this->config_id = $config_id;
+
+        return $this;
+    }
+
+    public function getHidden()
+    {
+        return $this->hidden;
+    }
+
+    public function setHidden($hidden)
+    {
+        $this->hidden = $hidden;
+
+        return $this;
+    }
+
+    public function getSecured()
+    {
+        return $this->secured;
+    }
+
+    public function setSecured($secured)
+    {
+        $this->secured = $secured;
+
+        return $this;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getChapo()
+    {
+        return $this->chapo;
+    }
+
+    public function setChapo($chapo)
+    {
+        $this->chapo = $chapo;
+
+        return $this;
+    }
+
+    public function getPostscriptum()
+    {
+        return $this->postscriptum;
+    }
+
+    public function setPostscriptum($postscriptum)
+    {
+        $this->postscriptum = $postscriptum;
 
         return $this;
     }

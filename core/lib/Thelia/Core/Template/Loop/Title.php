@@ -65,7 +65,7 @@ class Title extends BaseI18nLoop
         $search = CustomerTitleQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('SHORT', 'LONG'));
+        $locale = $this->configureI18nProcessing($search, array('SHORT', 'LONG'));
 
         $id = $this->getId();
 
@@ -84,6 +84,7 @@ class Title extends BaseI18nLoop
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $title->getId())
                 ->set("IS_TRANSLATED",$title->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("DEFAULT", $title->getByDefault())
                 ->set("SHORT", $title->getVirtualColumn('i18n_SHORT'))
                 ->set("LONG", $title->getVirtualColumn('i18n_LONG'));

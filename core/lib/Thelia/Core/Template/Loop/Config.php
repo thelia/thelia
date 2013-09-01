@@ -72,10 +72,11 @@ class Config extends BaseI18nLoop
     {
         $id      = $this->getId();
         $name    = $this->getVariable();
+        $secured = $this->getSecured();
 
         $search = ConfigQuery::create();
 
-       $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search);
 
         if (! is_null($id))
             $search->filterById($id);
@@ -90,8 +91,8 @@ class Config extends BaseI18nLoop
         if ($this->getHidden() != BooleanOrBothType::ANY)
             $search->filterByHidden($this->getHidden() ? 1 : 0);
 
-        if ($this->getSecured() != BooleanOrBothType::ANY)
-            $search->filterBySecured($this->getSecured() ? 1 : 0);
+        if (! is_null($secured) && $secured != BooleanOrBothType::ANY)
+            $search->filterBySecured($secured ? 1 : 0);
 
         $search->orderByName(Criteria::ASC);
 
@@ -108,6 +109,7 @@ class Config extends BaseI18nLoop
                 ->set("NAME"         , $result->getName())
                 ->set("VALUE"        , $result->getValue())
                 ->set("IS_TRANSLATED", $result->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("TITLE"        , $result->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO"        , $result->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION"  , $result->getVirtualColumn('i18n_DESCRIPTION'))

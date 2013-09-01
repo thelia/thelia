@@ -90,7 +90,7 @@ class Attribute extends BaseI18nLoop
         $lang = $this->getLang();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -156,6 +156,7 @@ class Attribute extends BaseI18nLoop
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $attribute->getId())
                 ->set("IS_TRANSLATED",$attribute->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("TITLE",$attribute->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $attribute->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $attribute->getVirtualColumn('i18n_DESCRIPTION'))

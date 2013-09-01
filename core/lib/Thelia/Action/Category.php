@@ -42,8 +42,6 @@ class Category extends BaseAction implements EventSubscriberInterface
 {
     public function create(CategoryCreateEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.create");
-
         $category = new CategoryModel();
 
         $category
@@ -57,9 +55,6 @@ class Category extends BaseAction implements EventSubscriberInterface
 
     public function modify(CategoryChangeEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.change");
-
-        // TODO !!
     }
 
     /**
@@ -69,8 +64,6 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function delete(CategoryDeleteEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.delete");
-
         $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
@@ -86,8 +79,6 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function toggleVisibility(CategoryToggleVisibilityEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.edit");
-
         $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
@@ -107,8 +98,6 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function changePosition(CategoryChangePositionEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.edit");
-
         if ($event->getMode() == CategoryChangePositionEvent::POSITION_ABSOLUTE)
             return $this->changeAbsolutePosition($event);
         else
@@ -177,8 +166,6 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     protected function changeAbsolutePosition(CategoryChangePositionEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.edit");
-
         $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {

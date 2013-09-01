@@ -46,6 +46,9 @@
         <form name="thelia.admin.category.deletion" class="Thelia\Form\CategoryDeletionForm"/>
 
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
+
+        <form name="thelia.admin.variable.creation" class="Thelia\Form\VariableCreationForm"/>
+        <form name="thelia.admin.variable.modification" class="Thelia\Form\VariableModificationForm"/>
     </forms>
 
 

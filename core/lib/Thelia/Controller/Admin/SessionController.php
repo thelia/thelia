@@ -96,7 +96,7 @@ class SessionController extends BaseAdminController
          $adminLoginForm->setErrorMessage($message);
 
          // Store the form name in session (see Form Smarty plugin to find usage of this parameter)
-         $this->getParserContext()->setErrorForm($adminLoginForm);
+         $this->getParserContext()->addForm($adminLoginForm);
 
           // Display the login form again
         return $this->render("login");

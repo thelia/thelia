@@ -67,7 +67,7 @@ class Currency extends BaseI18nLoop
         $search = CurrencyQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('NAME'));
+        $locale = $this->configureI18nProcessing($search, array('NAME'));
 
         $id = $this->getId();
 
@@ -98,6 +98,7 @@ class Currency extends BaseI18nLoop
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $currency->getId())
                 ->set("IS_TRANSLATED",$currency->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("NAME",$currency->getVirtualColumn('i18n_NAME'))
                 ->set("ISOCODE", $currency->getCode())
                 ->set("SYMBOL", $currency->getSymbol())

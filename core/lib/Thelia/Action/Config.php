@@ -44,26 +44,20 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public function create(ConfigCreateEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.configuration.variables.create");
-
         $config = new ConfigModel();
 
         $config
             ->setDispatcher($this->getDispatcher())
 
-            ->setName($event->getName())
+            ->setName($event->getEventName())
             ->setValue($event->getValue())
-            ->setHidden($evetn->getHidden())
-            ->setSecured($event->getSecured())
-
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-            ->setDescription($event->getDescription())
-            ->setChapo($event->getChapo())
-            ->setPostscriptum($event->getPostscriptum())
 
             ->save()
         ;
+
+        $event->setConfig($config);
     }
 
     /**
@@ -73,17 +67,20 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public function setValue(ConfigChangeEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.configuration.variables.change");
-
         $search = ConfigQuery::create();
 
-        if (null !== $config = $search->findOneById($event->getConfigId())) {
+        if (null !== $config = $search->findOneById($event->getConfigId())
+            &&
+            $event->getValue() != $config->getValue()) {
 
             $config
                 ->setDispatcher($this->getDispatcher())
+
                 ->setValue($event->getValue())
                 ->save()
             ;
+
+           $event->setConfig($config);
         }
     }
 
@@ -94,8 +91,6 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public function modify(ConfigChangeEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.configuration.variables.change");
-
         $search = ConfigQuery::create();
 
         if (null !== $config = ConfigQuery::create()->findOneById($event->getConfigId())) {
@@ -103,9 +98,9 @@ class Config extends BaseAction implements EventSubscriberInterface
             $config
                 ->setDispatcher($this->getDispatcher())
 
-                ->setName($event->getName())
+                ->setName($event->getEventName())
                 ->setValue($event->getValue())
-                ->setHidden($evetn->getHidden())
+                ->setHidden($event->getHidden())
                 ->setSecured($event->getSecured())
 
                 ->setLocale($event->getLocale())
@@ -115,6 +110,8 @@ class Config extends BaseAction implements EventSubscriberInterface
                 ->setPostscriptum($event->getPostscriptum())
 
                 ->save();
+
+            $event->setConfig($config);
         }
     }
 
@@ -125,22 +122,22 @@ class Config extends BaseAction implements EventSubscriberInterface
      */
     public function delete(ConfigDeleteEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.configuration.variables.delete");
-
         if (null !== ($config = ConfigQuery::create()->findOneById($event->getConfigId()))) {
+
             if (! $config->getSecured()) {
-                $config->setDispatcher($this->getDispatcher());
-                $config->delete();
+
+                $config
+                    ->setDispatcher($this->getDispatcher())
+                    ->delete()
+                ;
+
+                $event->setConfig($config);
             }
         }
     }
 
     /**
-     * Returns an array of event names this subscriber listens to.
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {

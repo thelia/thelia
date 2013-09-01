@@ -101,6 +101,7 @@ class CategoryPath extends BaseI18nLoop
                     ->set("TITLE",$category->getVirtualColumn('i18n_TITLE'))
                     ->set("URL", $category->getUrl($locale))
                     ->set("ID", $category->getId())
+                    ->set("LOCALE",$locale)
                 ;
 
                 $results[] = $loopResultRow;

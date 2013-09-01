@@ -178,6 +178,7 @@ class Category extends BaseI18nLoop
             $loopResultRow
             	->set("ID", $category->getId())
                 ->set("IS_TRANSLATED",$category->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
             	->set("TITLE", $category->getVirtualColumn('i18n_TITLE'))
 	            ->set("CHAPO", $category->getVirtualColumn('i18n_CHAPO'))
 	            ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))

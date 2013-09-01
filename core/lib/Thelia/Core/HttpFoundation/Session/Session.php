@@ -29,6 +29,7 @@ use Thelia\Exception\InvalidCartException;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Cart;
 use Thelia\Tools\URL;
+use Thelia\Model\Lang;
 
 class Session extends BaseSession
 {
@@ -39,9 +40,35 @@ class Session extends BaseSession
         return $this->get("locale", "en_US");
     }
 
+    public function setLocale($locale)
+    {
+        $this->set("locale", $locale);
+
+        return $this;
+    }
+
     public function getLang()
     {
-        return substr($this->getLocale(), 0, 2);
+        return $this->get("lang", substr($this->getLocale(), 0, 2));
+    }
+
+    public function setLang($lang)
+    {
+        $this->set("lang", $lang);
+
+        return $this;
+    }
+
+    public function getAdminEditionLangId()
+    {
+        return $this->get('admin.edition_language', Lang::getDefaultLanguage()->getId());
+    }
+
+    public function setAdminEditionLangId($langId)
+    {
+        $this->set('admin.edition_language', $langId);
+
+        return $this;
     }
 
     // -- Customer user --------------------------------------------------------
@@ -49,6 +76,7 @@ class Session extends BaseSession
     public function setCustomerUser(UserInterface $user)
     {
         $this->set('customer_user', $user);
+        return $this;
     }
 
     public function getCustomerUser()
@@ -66,6 +94,7 @@ class Session extends BaseSession
     public function setAdminUser(UserInterface $user)
     {
         $this->set('admin_user', $user);
+        return $this;
     }
 
     public function getAdminUser()
@@ -83,6 +112,7 @@ class Session extends BaseSession
     public function setReturnToUrl($url)
     {
         $this->set('return_to_url', $url);
+        return $this;
     }
 
     /**
@@ -141,6 +171,6 @@ class Session extends BaseSession
     public function setCart($cart_id)
     {
         $this->set("cart_id", $cart_id);
+        return $this;
     }
-
 }

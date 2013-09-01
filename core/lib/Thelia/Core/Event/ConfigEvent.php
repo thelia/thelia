@@ -22,13 +22,26 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
-
 use Thelia\Model\Config;
 
 class ConfigEvent extends ActionEvent
 {
-    public function __construct(Config $config)
+    protected $config;
+
+    public function __construct(Config $config = null)
     {
         $this->config = $config;
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    public function setConfig($config)
+    {
+        $this->config = $config;
+
+        return $this;
     }
 }

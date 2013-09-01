@@ -575,6 +575,11 @@ form .info .input-append .add-on {
         line-height: 30px;
     }
 
+    .title-without-tabs {
+        border-bottom: 2px solid #A5CED8;
+        margin-bottom: 0.5em;
+    }
+
     // The action bar on the right
     .actions {
         text-align: right;
@@ -594,6 +599,8 @@ form .info .input-append .add-on {
 
         line-height: 30px;
         margin-bottom: 1em;
+        border-bottom: 1px dotted #A5CED8;
+        padding-bottom: 0.5em;
 
         .inner-actions {
             text-align: right;
@@ -633,7 +640,7 @@ label {
 }
 
 .input-append.input-block-level .add-on img {
-    max-height: 18px;
+    max-height: 16px;
 }
 
 // Information in field label
@@ -739,6 +746,10 @@ label {
             border-radius: 4px 4px 4px 4px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
+
+        &.actions {
+            text-align: right;
+        }
     }
 }
 
@@ -770,4 +781,9 @@ label {
     select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
         margin-bottom: 0;
     }
+}
+
+// Modal is no longer limited
+.modal-body {
+    max-height: none;
 }

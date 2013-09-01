@@ -20,33 +20,35 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Action;
+namespace Thelia\Form;
 
-use Thelia\Form\BaseForm;
-use Thelia\Action\Exception\FormValidationException;
-use Thelia\Core\Event\ActionEvent;
-use Symfony\Component\Form\Form;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
-class BaseAction
+/**
+ * A base form for all objects with standard contents.
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
+abstract class BaseDescForm extends BaseForm
 {
-    /**
-     * @var The container
-     */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
+    protected function buildForm()
     {
-        $this->container = $container;
-    }
-
-    /**
-     * Return the event dispatcher,
-     *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    public function getDispatcher()
-    {
-        return $this->container->get('event_dispatcher');
-    }
+        $this->formBuilder
+            ->add("locale", "hidden", array(
+                    "constraints" => array(
+                        new NotBlank()
+                    )
+                )
+            )
+            ->add("title", "text", array(
+                    "constraints" => array(
+                        new NotBlank()
+                    )
+                )
+            )
+            ->add("chapo", "text", array())
+            ->add("description", "text", array())
+            ->add("postscriptum", "text", array())
+        ;
+     }
 }

@@ -66,7 +66,7 @@ class CategoryController extends BaseAdminController
         }
         catch (FormValidationException $e) {
             $categoryCreationForm->setErrorMessage($e->getMessage());
-            $this->getParserContext()->setErrorForm($categoryCreationForm);
+            $this->getParserContext()->addForm($categoryCreationForm);
         }
         catch (Exception $e) {
            Tlog::getInstance()->error(sprintf("Failed to create category: %s", $e->getMessage()));
@@ -79,7 +79,7 @@ class CategoryController extends BaseAdminController
 
     protected function editCategory($args)
     {
-        $this->checkAuth("ADMIN", "admin.category.edit");
+        if (null !== $response = $this->checkAuth("admin.category.edit")) return $response;
 
         return $this->render('edit_category', $args);
     }
@@ -107,7 +107,7 @@ class CategoryController extends BaseAdminController
         }
         catch (FormValidationException $e) {
             $categoryDeletionForm->setErrorMessage($e->getMessage());
-            $this->getParserContext()->setErrorForm($categoryDeletionForm);
+            $this->getParserContext()->addForm($categoryDeletionForm);
         }
        catch (Exception $e) {
             Tlog::getInstance()->error(sprintf("Failed to delete category: %s", $e->getMessage()));
@@ -120,7 +120,7 @@ class CategoryController extends BaseAdminController
 
     protected function browseCategory($args)
     {
-        $this->checkAuth("AMIN", "admin.catalog.view");
+        if (null !== $response = $this->checkAuth("admin.catalog.view")) return $response;
 
         return $this->render('categories', $args);
     }
@@ -203,9 +203,6 @@ class CategoryController extends BaseAdminController
             'current_category_id' => $id,
             'category_order'      => $category_order,
             'edition_language'    => $edition_language,
-            'date_format'         => Lang::getDefaultLanguage()->getDateFormat(),
-            'time_format'         => Lang::getDefaultLanguage()->getTimeFormat(),
-            'datetime_format'     => Lang::getDefaultLanguage()->getDateTimeFormat(),
         );
 
         // Store the current sort order in session

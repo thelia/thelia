@@ -82,7 +82,7 @@ class FeatureValue extends BaseI18nLoop
         $search = FeatureProductQuery::create();
 
         /* manage featureAv translations */
-        $this->configureI18nProcessing(
+        $locale = $this->configureI18nProcessing(
             $search,
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             FeatureAvTableMap::TABLE_NAME,
@@ -141,7 +141,9 @@ class FeatureValue extends BaseI18nLoop
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $featureValue->getId());
 
-            $loopResultRow->set("PERSONAL_VALUE", $featureValue->getByDefault())
+            $loopResultRow
+                ->set("LOCALE",$locale)
+                ->set("PERSONAL_VALUE", $featureValue->getByDefault())
                 ->set("TITLE",$featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
                 ->set("CHAPO", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
                 ->set("DESCRIPTION", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))

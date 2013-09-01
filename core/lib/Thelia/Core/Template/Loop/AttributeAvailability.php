@@ -77,7 +77,7 @@ class AttributeAvailability extends BaseI18nLoop
         $search = AttributeAvQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -125,6 +125,7 @@ class AttributeAvailability extends BaseI18nLoop
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $attributeAv->getId())
                 ->set("IS_TRANSLATED",$attributeAv->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("TITLE",$attributeAv->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $attributeAv->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))

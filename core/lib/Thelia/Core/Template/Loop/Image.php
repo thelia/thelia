@@ -164,7 +164,7 @@ class Image extends BaseI18nLoop
         $search = $this->getSearchQuery($object_type, $object_id);
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -186,7 +186,7 @@ class Image extends BaseI18nLoop
         $background_color = $this->getBackgroundColor();
         $quality = $this->getQuality();
         $effects = $this->getEffects();
-        $effects = $this->getEffects();
+
         if (! is_null($effects)) {
             $effects = explode(',', $effects);
         }
@@ -245,14 +245,15 @@ class Image extends BaseI18nLoop
 
                 $loopResultRow
                     ->set("ID", $result->getId())
+                    ->set("LOCALE",$locale)
                     ->set("IMAGE_URL", $event->getFileUrl())
                     ->set("ORIGINAL_IMAGE_URL", $event->getOriginalFileUrl())
                     ->set("IMAGE_PATH", $event->getCacheFilepath())
                     ->set("ORIGINAL_IMAGE_PATH", $source_filepath)
-                    ->set("TITLE", $result->getTitle())
-                    ->set("CHAPO", $result->getChapo())
-                    ->set("DESCRIPTION", $result->getDescription())
-                    ->set("POSTSCRIPTUM", $result->getPostscriptum())
+                    ->set("TITLE",$folder->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO", $folder->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
                     ->set("POSITION", $result->getPosition())
                     ->set("OBJECT_TYPE", $object_type)
                     ->set("OBJECT_ID", $object_id)

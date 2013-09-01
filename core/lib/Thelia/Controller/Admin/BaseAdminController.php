@@ -32,6 +32,8 @@ use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\AdminLog;
+use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 
 class BaseAdminController extends BaseController
 {
@@ -46,6 +48,12 @@ class BaseAdminController extends BaseController
         AdminLog::append($message, $this->getRequest(), $this->getSecurityContext()->getAdminUser());
     }
 
+    /**
+     * This method process the rendering of view called from an admin page
+     *
+     * @param unknown $template
+     * @return Response the reponse which contains the rendered view
+     */
     public function processTemplateAction($template)
     {
         try {
@@ -89,19 +97,31 @@ class BaseAdminController extends BaseController
     /**
      * Check current admin user authorisations. An ADMIN role is assumed.
      *
-     * @param unknown $permissions a single permission or an array of permissions.
+     * @param mixed $permissions a single permission or an array of permissions.
      *
-     * @throws AuthenticationException if permissions are not granted ti the current user.
+     * @return mixed null if authorization is granted, or a Response object which contains the error page otherwise
+     *
      */
     protected function checkAuth($permissions)
     {
-        if (! $this->getSecurityContext()->isGranted(array("ADMIN"), is_array($permissions) ? $permissions : array($permissions))) {
-            throw new AuthorizationException("Sorry, you're not allowed to perform this action");
-        }
+         $permArr = is_array($permissions) ? $permissions : array($permissions);
+
+         if ($this->getSecurityContext()->isGranted(array("ADMIN"), $permArr)) {
+             // Okay !
+             return null;
+         }
+
+         // Log the problem
+         $this->adminLogAppend("User is not granted for permissions %s", implode(", ", $permArr));
+
+         // Generate the proper response
+         $response = new Response();
+
+         return $response->setContent($this->errorPage("Sorry, you're not allowed to perform this action"));
     }
 
     /**
-     * @return a ParserInterfac instance parser
+     * @return a ParserInterface instance parser
      */
     protected function getParser()
     {
@@ -131,6 +151,23 @@ class BaseAdminController extends BaseController
     }
 
     /**
+     * Get the current edition lang ID, checking if a change was requested in the current request
+     */
+    protected function getCurrentEditionLangId() {
+        return $this->getRequest()->get(
+                'edition_language',
+                $this->getSession()->getAdminEditionLangId()
+        );
+    }
+
+    /**
+     * A simple helper to get the current edition locale, from the session edition language ID
+     */
+    protected function getCurrentEditionLocale() {
+        return LangQuery::create()->findOneById($this->getCurrentEditionLangId())->getLocale();
+    }
+
+    /**
      * Render the given template, and returns the result as an Http Response.
      *
      * @param $templateName the complete template name, with extension
@@ -153,26 +190,40 @@ class BaseAdminController extends BaseController
      */
     protected function renderRaw($templateName, $args = array())
     {
+
         // Add the template standard extension
         $templateName .= '.html';
 
         $session = $this->getSession();
 
+        // Find the current edit language ID
+        $edition_language = $this->getCurrentEditionLangId();
+
+        // Prepare common template variables
         $args = array_merge($args, array(
-            'locale' => $session->getLocale(),
-            'lang'   => $session->getLang()
+            'locale'           => $session->getLocale(),
+            'lang'             => $session->getLang(),
+            'edition_language' => $edition_language,
+            'current_url'      => htmlspecialchars($this->getRequest()->getUri())
         ));
 
+        // Update the current edition language in session
+        $this->getSession()->setAdminEditionLangId($edition_language);
+
+        // Render the template.
         try {
             $data = $this->getParser()->render($templateName, $args);
 
             return $data;
-        } catch (AuthenticationException $ex) {
-
+        }
+        catch (AuthenticationException $ex) {
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.
-
             Redirect::exec(URL::absoluteUrl($ex->getLoginTemplate()));
+        }
+        catch (AuthorizationException $ex) {
+            // User is not allowed to perform the required action. Return the error page instead of the requested page.
+            return $this->errorPage("Sorry, you are not allowed to perform this action.");
         }
     }
 }

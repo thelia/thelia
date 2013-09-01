@@ -509,6 +509,7 @@ class Product extends BaseI18nLoop
             $loopResultRow->set("ID", $product->getId())
                 ->set("REF",$product->getRef())
                 ->set("IS_TRANSLATED",$product->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("TITLE",$product->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $product->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))

@@ -32,6 +32,9 @@ class Config extends BaseConfig {
 
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
+    /**
+     * {@inheritDoc}
+     */
     public function preInsert(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECONFIG, new ConfigEvent($this));
@@ -39,11 +42,17 @@ class Config extends BaseConfig {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function postInsert(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECONFIG, new ConfigEvent($this));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function preUpdate(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECONFIG, new ConfigEvent($this));
@@ -51,11 +60,17 @@ class Config extends BaseConfig {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function postUpdate(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::AFTER_CHANGECONFIG, new ConfigEvent($this));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function preDelete(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONFIG, new ConfigEvent($this));
@@ -63,6 +78,9 @@ class Config extends BaseConfig {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function postDelete(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECONFIG, new ConfigEvent($this));
