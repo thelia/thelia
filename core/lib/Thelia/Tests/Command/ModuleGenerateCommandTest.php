@@ -27,6 +27,13 @@ use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Application;
 use Thelia\Command\ModuleGenerateCommand;
 
+/**
+ * test the module:generate command
+ *
+ * Class ModuleGenerateCommandTest
+ * @package Thelia\Tests\Command
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class ModuleGenerateCommandTest extends BaseCommandTest
 {
     protected $command;

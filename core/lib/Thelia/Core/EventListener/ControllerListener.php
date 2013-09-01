@@ -36,6 +36,7 @@ use Thelia\Core\Template\ParserContext;
  *
  * Class ControllerListener
  * @package Thelia\Core\EventListener
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 class ControllerListener implements EventSubscriberInterface
 {

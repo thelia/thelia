@@ -22,6 +22,13 @@
 /*************************************************************************************/
 namespace Thelia\Command;
 
+/**
+ * base class for module commands
+ *
+ * Class BaseModuleGenerate
+ * @package Thelia\Command
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 abstract class BaseModuleGenerate extends ContainerAwareCommand
 {
      protected $module;

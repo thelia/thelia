@@ -29,6 +29,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Command\ContainerAwareCommand;
 
+/**
+ * try to install a new instance of Thelia
+ *
+ * Class Install
+ * @package Thelia\Command
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class Install extends ContainerAwareCommand
 {
     /**
