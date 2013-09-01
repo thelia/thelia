@@ -95,7 +95,7 @@
         <h3>{intl l="Create a new variable"}</h3>
     </div>
 
-    {form name="thelia.admin.variable.creation"}
+    {form name="thelia.admin.config.creation"}
     <form method="POST" action="{url path='/admin/configuration/variables/create'}" {form_enctype form=$form}>
 
         {form_hidden_fields form=$form}
@@ -221,7 +221,7 @@
 
         {* display the form creation dialog if it contains errors *}
 
-        {form name="thelia.admin.variable.creation"}
+        {form name="thelia.admin.config.creation"}
             {if #form_error}
                 $('#add_variable_dialog').modal();
             {/if}

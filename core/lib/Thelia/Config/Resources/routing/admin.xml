@@ -38,27 +38,27 @@
     <!-- Routes to the Config (system variables) controller -->
 
     <route id="admin.configuration.variables.default" path="/admin/configuration/variables">
-        <default key="_controller">Thelia\Controller\Admin\VariablesController::defaultAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::defaultAction</default>
     </route>
 
     <route id="admin.configuration.variables.change-values" path="/admin/configuration/variables/change-values">
-        <default key="_controller">Thelia\Controller\Admin\VariablesController::changeValuesAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::changeValuesAction</default>
     </route>
 
     <route id="admin.configuration.variables.create" path="/admin/configuration/variables/create">
-        <default key="_controller">Thelia\Controller\Admin\VariablesController::createAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::createAction</default>
     </route>
 
     <route id="admin.configuration.variables.change" path="/admin/configuration/variables/change">
-        <default key="_controller">Thelia\Controller\Admin\VariablesController::changeAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::changeAction</default>
     </route>
 
     <route id="admin.configuration.variables.save-change" path="/admin/configuration/variables/save-change">
-        <default key="_controller">Thelia\Controller\Admin\VariablesController::saveChangeAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::saveChangeAction</default>
     </route>
 
     <route id="admin.configuration.variables.delete" path="/admin/configuration/variables/delete">
-        <default key="_controller">Thelia\Controller\Admin\VariablesController::deleteAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::deleteAction</default>
     </route>
 
 

@@ -27,20 +27,20 @@ use Thelia\Core\Event\ConfigDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Tools\URL;
 use Thelia\Core\Event\ConfigChangeEvent;
-use Thelia\Form\VariableCreationForm;
 use Thelia\Core\Event\ConfigCreateEvent;
 use Thelia\Log\Tlog;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
-use Thelia\Form\VariableModificationForm;
 use Thelia\Model\ConfigQuery;
+use Thelia\Form\ConfigModificationForm;
+use Thelia\Form\ConfigCreationForm;
 
 /**
  * Manages Thelmia system variables, aka Config objects.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class VariablesController extends BaseAdminController
+class ConfigController extends BaseAdminController
 {
     /**
      * The default action is displaying the variables list.
@@ -67,7 +67,7 @@ class VariablesController extends BaseAdminController
         $message = false;
 
         // Create the Creation Form
-        $creationForm = new VariableCreationForm($this->getRequest());
+        $creationForm = new ConfigCreationForm($this->getRequest());
 
         try {
 
@@ -159,7 +159,7 @@ class VariablesController extends BaseAdminController
             );
 
             // Setup the object form
-            $changeForm = new VariableModificationForm($this->getRequest(), "form", $data);
+            $changeForm = new ConfigModificationForm($this->getRequest(), "form", $data);
 
             // Pass it to the parser
             $this->getParserContext()->addForm($changeForm);
@@ -182,7 +182,7 @@ class VariablesController extends BaseAdminController
         $message = false;
 
         // Create the form from the request
-        $changeForm = new VariableModificationForm($this->getRequest());
+        $changeForm = new ConfigModificationForm($this->getRequest());
 
         // Get the variable ID
         $variable_id = $this->getRequest()->get('variable_id');

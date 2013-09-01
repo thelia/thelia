@@ -22,38 +22,54 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Model\LangQuery;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints;
+use Thelia\Model\ConfigQuery;
+use Symfony\Component\Validator\ExecutionContextInterface;
 
-class VariableModificationForm extends BaseDescForm
+class ConfigCreationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm($change_mode = false)
     {
-        parent::buildForm(true);
+        $name_constraints = array(new Constraints\NotBlank());
+
+        if (!$change_mode) {
+            $name_constraints[] = new Constraints\Callback(array(
+                "methods" => array(array($this, "checkDuplicateName"))
+            ));
+        }
 
         $this->formBuilder
-            ->add("id", "hidden", array(
-                    "constraints" => array(
-                        new GreaterThan(
-                            array('value' => 0)
-                        )
-                    )
-            ))
             ->add("name", "text", array(
+                "constraints" => $name_constraints
+            ))
+            ->add("title", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new Constraints\NotBlank()
+                )
+            ))
+            ->add("locale", "hidden", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
                 )
             ))
             ->add("value", "text", array())
             ->add("hidden", "hidden", array())
             ->add("secured", "hidden", array())
-         ;
+        ;
     }
 
     public function getName()
     {
-        return "thelia_variable_modification";
+        return "thelia_config_creation";
     }
+
+    public function checkDuplicateName($value, ExecutionContextInterface $context)
+    {
+        $config = ConfigQuery::create()->findOneByName($value);
+
+        if ($config) {
+            $context->addViolation(sprintf("A variable with name \"%s\" already exists.", $value));
+        }
+    }
+
 }

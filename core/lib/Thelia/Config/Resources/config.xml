@@ -47,8 +47,8 @@
 
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
 
-        <form name="thelia.admin.variable.creation" class="Thelia\Form\VariableCreationForm"/>
-        <form name="thelia.admin.variable.modification" class="Thelia\Form\VariableModificationForm"/>
+        <form name="thelia.admin.config.creation" class="Thelia\Form\ConfigCreationForm"/>
+        <form name="thelia.admin.config.modification" class="Thelia\Form\ConfigModificationForm"/>
     </forms>
 
 
