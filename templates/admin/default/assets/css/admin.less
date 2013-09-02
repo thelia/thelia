@@ -959,20 +959,26 @@ label {
 }
 
 // -- Table sorter --
-th.header { 
+th.tablesorter-header { 
     background: url("data:image/gif;base64,R0lGODlhFQAJAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==") no-repeat center right;     
     cursor: pointer; 
-    font-weight: bold; 
     padding-left: 20px; 
     border-right: 1px solid #dad9c7; 
     border-left: 1px solid #dad9c7; 
     margin-left: -1px; 
-} 
+}
+th.sorter-false { 
+    background: none;     
+    cursor: auto; 
+    padding-left: 0; 
+    border: none;
+    margin-left: 0; 
+}
 
-th.headerSortUp { 
+th.tablesorter-headerAsc { 
     background: #F9F9F9 url("data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7") no-repeat center right; 
 }
 
-th.headerSortDown { 
+th.tablesorter-headerDesc { 
     background: #F9F9F9 url("data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7") no-repeat center right; 
 }

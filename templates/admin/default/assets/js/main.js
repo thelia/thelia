@@ -9,7 +9,12 @@
 
         // -- Init tablesorter --
         if($('.tablesorter').length){
-            $('.tablesorter').tablesorter();
+            $('.tablesorter').tablesorter({
+                widgets: ["filter"],
+                widgetOptions : {
+                    filter_cssFilter : 'input-medium',
+                }
+            });
         }
 
         // -- Effect description
