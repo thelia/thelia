@@ -31,4 +31,8 @@ use Thelia\Install\BaseInstall;
  */
 class InstallController extends BaseInstallController {
 
+    public function index()
+    {
+        $this->render("index.html");
+    }
 }

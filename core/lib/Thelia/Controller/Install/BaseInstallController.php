@@ -41,17 +41,17 @@ class BaseInstallController extends BaseController
         $parser = $this->container->get("thelia.parser");
 
         // Define the template thant shoud be used
-        $parser->setTemplate("install/default");
+        $parser->setTemplate("install");
 
         return $parser;
     }
 
-    public function render($templateName, $args)
+    public function render($templateName, $args = array())
     {
         return new Response($this->renderRaw($templateName, $args));
     }
 
-    public function renderRaw($templateName, $args)
+    public function renderRaw($templateName, $args = array())
     {
         $data = $this->getParser()->render($templateName, $args);
 
