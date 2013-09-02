@@ -33,6 +33,7 @@
         <loop class="Thelia\Core\Template\Loop\Cart" name="cart"/>
         <loop class="Thelia\Core\Template\Loop\Image" name="image"/>
         <loop class="Thelia\Core\Template\Loop\Config" name="config"/>
+        <loop class="Thelia\Core\Template\Loop\Coupon" name="coupon"/>
     </loops>
 
     <forms>
