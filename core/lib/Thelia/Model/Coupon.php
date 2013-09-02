@@ -48,7 +48,7 @@ class Coupon extends BaseCoupon
      *
      * @return   \Thelia\Model\Coupon The current object (for fluent API support)
      */
-    public function setSerializedRules(CouponRuleCollection $rules)
+    public function setRules(CouponRuleCollection $rules)
     {
         if ($rules !== null) {
 
@@ -70,7 +70,7 @@ class Coupon extends BaseCoupon
      *
      * @return CouponRuleCollection Rules ready to be processed
      */
-    public function getSerializedRules()
+    public function getRules()
     {
         return unserialize(base64_decode($this->serialized_rules));
     }
