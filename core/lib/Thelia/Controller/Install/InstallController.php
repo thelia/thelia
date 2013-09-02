@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Install;
 use Thelia\Install\BaseInstall;
+use Thelia\Install\CheckPermission;
 
 /**
  * Class InstallController
@@ -33,6 +34,36 @@ class InstallController extends BaseInstallController {
 
     public function index()
     {
+        $this->verifyStep(1);
+
+        $this->getSession()->set("step", 1);
+
         $this->render("index.html");
+    }
+
+    public function checkPermission()
+    {
+        $this->verifyStep(2);
+
+        $permission = new CheckPermission();
+    }
+
+    protected function verifyStep($step)
+    {
+        $session = $this->getSession();
+
+        if ($session->has("step")) {
+            $sessionStep = $session->get("step");
+        } else {
+           return true;
+        }
+
+        switch($step) {
+            case "1" :
+                if ($sessionStep > 1) {
+                    $this->redirect("/install/step/2");
+                }
+                break;
+        }
     }
 }

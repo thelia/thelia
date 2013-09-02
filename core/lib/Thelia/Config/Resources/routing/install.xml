@@ -8,4 +8,8 @@
         <default key="_controller">Thelia\Controller\Install\InstallController::index</default>
     </route>
 
+    <route id="home" path="/install/step/2" >
+        <default key="_controller">Thelia\Controller\Install\InstallController::checkPermission</default>
+    </route>
+
 </routes>

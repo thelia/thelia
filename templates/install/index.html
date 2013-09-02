@@ -1,4 +1,12 @@
 {extends file="layout.html"}
 {block name="content"}
-    Hello World !
+    <h1>{intl l="Thelia installation wizard"}</h1>
+    <br />
+
+    {intl l="Bienvenue au sein du programme d'installation de Thelia."}<br />
+    {intl l="Nous allons vous guider tout au long de ce processus afin d'installer l'application sur votre système."}<br /><br />
+
+    <form action="{url path="/install/step/2" }" method="post">
+        <input type="submit" value="Continuer" />
+    </form>
 {/block}
