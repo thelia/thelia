@@ -34,6 +34,7 @@
         <loop class="Thelia\Core\Template\Loop\Image" name="image"/>
         <loop class="Thelia\Core\Template\Loop\Config" name="config"/>
         <loop class="Thelia\Core\Template\Loop\Coupon" name="coupon"/>
+        <loop class="Thelia\Core\Template\Loop\Message" name="message"/>
     </loops>
 
     <forms>
@@ -50,6 +51,9 @@
 
         <form name="thelia.admin.config.creation" class="Thelia\Form\ConfigCreationForm"/>
         <form name="thelia.admin.config.modification" class="Thelia\Form\ConfigModificationForm"/>
+
+        <form name="thelia.admin.message.creation" class="Thelia\Form\MessageCreationForm"/>
+        <form name="thelia.admin.message.modification" class="Thelia\Form\MessageModificationForm"/>
     </forms>
 
 

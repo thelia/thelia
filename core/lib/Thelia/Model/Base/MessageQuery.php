@@ -23,9 +23,8 @@ use Thelia\Model\Map\MessageTableMap;
  *
  *
  * @method     ChildMessageQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildMessageQuery orderByCode($order = Criteria::ASC) Order by the code column
+ * @method     ChildMessageQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildMessageQuery orderBySecured($order = Criteria::ASC) Order by the secured column
- * @method     ChildMessageQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildMessageQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildMessageQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method     ChildMessageQuery orderByVersion($order = Criteria::ASC) Order by the version column
@@ -33,9 +32,8 @@ use Thelia\Model\Map\MessageTableMap;
  * @method     ChildMessageQuery orderByVersionCreatedBy($order = Criteria::ASC) Order by the version_created_by column
  *
  * @method     ChildMessageQuery groupById() Group by the id column
- * @method     ChildMessageQuery groupByCode() Group by the code column
+ * @method     ChildMessageQuery groupByName() Group by the name column
  * @method     ChildMessageQuery groupBySecured() Group by the secured column
- * @method     ChildMessageQuery groupByRef() Group by the ref column
  * @method     ChildMessageQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildMessageQuery groupByUpdatedAt() Group by the updated_at column
  * @method     ChildMessageQuery groupByVersion() Group by the version column
@@ -58,9 +56,8 @@ use Thelia\Model\Map\MessageTableMap;
  * @method     ChildMessage findOneOrCreate(ConnectionInterface $con = null) Return the first ChildMessage matching the query, or a new ChildMessage object populated from the query conditions when no match is found
  *
  * @method     ChildMessage findOneById(int $id) Return the first ChildMessage filtered by the id column
- * @method     ChildMessage findOneByCode(string $code) Return the first ChildMessage filtered by the code column
+ * @method     ChildMessage findOneByName(string $name) Return the first ChildMessage filtered by the name column
  * @method     ChildMessage findOneBySecured(int $secured) Return the first ChildMessage filtered by the secured column
- * @method     ChildMessage findOneByRef(string $ref) Return the first ChildMessage filtered by the ref column
  * @method     ChildMessage findOneByCreatedAt(string $created_at) Return the first ChildMessage filtered by the created_at column
  * @method     ChildMessage findOneByUpdatedAt(string $updated_at) Return the first ChildMessage filtered by the updated_at column
  * @method     ChildMessage findOneByVersion(int $version) Return the first ChildMessage filtered by the version column
@@ -68,9 +65,8 @@ use Thelia\Model\Map\MessageTableMap;
  * @method     ChildMessage findOneByVersionCreatedBy(string $version_created_by) Return the first ChildMessage filtered by the version_created_by column
  *
  * @method     array findById(int $id) Return ChildMessage objects filtered by the id column
- * @method     array findByCode(string $code) Return ChildMessage objects filtered by the code column
+ * @method     array findByName(string $name) Return ChildMessage objects filtered by the name column
  * @method     array findBySecured(int $secured) Return ChildMessage objects filtered by the secured column
- * @method     array findByRef(string $ref) Return ChildMessage objects filtered by the ref column
  * @method     array findByCreatedAt(string $created_at) Return ChildMessage objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildMessage objects filtered by the updated_at column
  * @method     array findByVersion(int $version) Return ChildMessage objects filtered by the version column
@@ -171,7 +167,7 @@ abstract class MessageQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, SECURED, REF, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM message WHERE ID = :p0';
+        $sql = 'SELECT ID, NAME, SECURED, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM message WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -302,32 +298,32 @@ abstract class MessageQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the code column
+     * Filter the query on the name column
      *
      * Example usage:
      * <code>
-     * $query->filterByCode('fooValue');   // WHERE code = 'fooValue'
-     * $query->filterByCode('%fooValue%'); // WHERE code LIKE '%fooValue%'
+     * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
+     * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $code The value to use as filter.
+     * @param     string $name The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageQuery The current query, for fluid interface
      */
-    public function filterByCode($code = null, $comparison = null)
+    public function filterByName($name = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($code)) {
+            if (is_array($name)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $code)) {
-                $code = str_replace('*', '%', $code);
+            } elseif (preg_match('/[\%\*]/', $name)) {
+                $name = str_replace('*', '%', $name);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(MessageTableMap::CODE, $code, $comparison);
+        return $this->addUsingAlias(MessageTableMap::NAME, $name, $comparison);
     }
 
     /**
@@ -369,35 +365,6 @@ abstract class MessageQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(MessageTableMap::SECURED, $secured, $comparison);
-    }
-
-    /**
-     * Filter the query on the ref column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByRef('fooValue');   // WHERE ref = 'fooValue'
-     * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $ref The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildMessageQuery The current query, for fluid interface
-     */
-    public function filterByRef($ref = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($ref)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $ref)) {
-                $ref = str_replace('*', '%', $ref);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(MessageTableMap::REF, $ref, $comparison);
     }
 
     /**
@@ -913,7 +880,7 @@ abstract class MessageQuery extends ModelCriteria
      *
      * @return    ChildMessageQuery The current query, for fluid interface
      */
-    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'MessageI18n';
 
@@ -931,7 +898,7 @@ abstract class MessageQuery extends ModelCriteria
      *
      * @return    ChildMessageQuery The current query, for fluid interface
      */
-    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
@@ -952,7 +919,7 @@ abstract class MessageQuery extends ModelCriteria
      *
      * @return    ChildMessageI18nQuery A secondary query class using the current class as primary query
      */
-    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)

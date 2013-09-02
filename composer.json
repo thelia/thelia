@@ -38,6 +38,8 @@
 
         "imagine/imagine": "dev-master",
         "symfony/serializer": "2.2.*"
+        "imagine/imagine": "dev-master",
+        "symfony/icu": "1.0"
     },
     "require-dev" : {
         "phpunit/phpunit": "3.7.*",

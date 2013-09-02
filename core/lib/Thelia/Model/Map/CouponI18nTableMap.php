@@ -150,6 +150,7 @@ class CouponI18nTableMap extends TableMap
         $this->addColumn('TITLE', 'Title', 'VARCHAR', true, 255, null);
         $this->addColumn('SHORT_DESCRIPTION', 'ShortDescription', 'LONGVARCHAR', true, null, null);
         $this->addColumn('DESCRIPTION', 'Description', 'CLOB', true, null, null);
+        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_US');
     } // initialize()
 
     /**
@@ -349,15 +350,9 @@ class CouponI18nTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(CouponI18nTableMap::ID);
             $criteria->addSelectColumn(CouponI18nTableMap::LOCALE);
-            $criteria->addSelectColumn(CouponI18nTableMap::TITLE);
-            $criteria->addSelectColumn(CouponI18nTableMap::SHORT_DESCRIPTION);
-            $criteria->addSelectColumn(CouponI18nTableMap::DESCRIPTION);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.LOCALE');
-            $criteria->addSelectColumn($alias . '.TITLE');
-            $criteria->addSelectColumn($alias . '.SHORT_DESCRIPTION');
-            $criteria->addSelectColumn($alias . '.DESCRIPTION');
         }
     }
 

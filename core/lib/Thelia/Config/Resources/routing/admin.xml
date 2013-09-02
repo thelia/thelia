@@ -94,6 +94,27 @@
         <default key="_controller">Thelia\Controller\Admin\ConfigController::deleteAction</default>
     </route>
 
+    <!-- Routes to the Messages controller -->
+
+    <route id="admin.configuration.messages.default" path="/admin/configuration/messages">
+        <default key="_controller">Thelia\Controller\Admin\MessageController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.messages.create" path="/admin/configuration/messages/create">
+        <default key="_controller">Thelia\Controller\Admin\MessageController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.messages.change" path="/admin/configuration/messages/change">
+        <default key="_controller">Thelia\Controller\Admin\MessageController::changeAction</default>
+    </route>
+
+    <route id="admin.configuration.messages.save-change" path="/admin/configuration/messages/save-change">
+        <default key="_controller">Thelia\Controller\Admin\MessageController::saveChangeAction</default>
+    </route>
+
+    <route id="admin.configuration.messages.delete" path="/admin/configuration/messages/delete">
+        <default key="_controller">Thelia\Controller\Admin\MessageController::deleteAction</default>
+    </route>
 
 	<!-- The default route, to display a template -->
 

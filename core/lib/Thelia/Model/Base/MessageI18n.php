@@ -61,7 +61,7 @@ abstract class MessageI18n implements ActiveRecordInterface
 
     /**
      * The value for the locale field.
-     * Note: this column has a database default value of: 'en_EN'
+     * Note: this column has a database default value of: 'en_US'
      * @var        string
      */
     protected $locale;
@@ -73,16 +73,22 @@ abstract class MessageI18n implements ActiveRecordInterface
     protected $title;
 
     /**
-     * The value for the description field.
+     * The value for the subject field.
      * @var        string
      */
-    protected $description;
+    protected $subject;
 
     /**
-     * The value for the description_html field.
+     * The value for the text_message field.
      * @var        string
      */
-    protected $description_html;
+    protected $text_message;
+
+    /**
+     * The value for the html_message field.
+     * @var        string
+     */
+    protected $html_message;
 
     /**
      * @var        Message
@@ -105,7 +111,7 @@ abstract class MessageI18n implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->locale = 'en_EN';
+        $this->locale = 'en_US';
     }
 
     /**
@@ -398,25 +404,36 @@ abstract class MessageI18n implements ActiveRecordInterface
     }
 
     /**
-     * Get the [description] column value.
+     * Get the [subject] column value.
      *
      * @return   string
      */
-    public function getDescription()
+    public function getSubject()
     {
 
-        return $this->description;
+        return $this->subject;
     }
 
     /**
-     * Get the [description_html] column value.
+     * Get the [text_message] column value.
      *
      * @return   string
      */
-    public function getDescriptionHtml()
+    public function getTextMessage()
     {
 
-        return $this->description_html;
+        return $this->text_message;
+    }
+
+    /**
+     * Get the [html_message] column value.
+     *
+     * @return   string
+     */
+    public function getHtmlMessage()
+    {
+
+        return $this->html_message;
     }
 
     /**
@@ -487,46 +504,67 @@ abstract class MessageI18n implements ActiveRecordInterface
     } // setTitle()
 
     /**
-     * Set the value of [description] column.
+     * Set the value of [subject] column.
      *
      * @param      string $v new value
      * @return   \Thelia\Model\MessageI18n The current object (for fluent API support)
      */
-    public function setDescription($v)
+    public function setSubject($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->description !== $v) {
-            $this->description = $v;
-            $this->modifiedColumns[] = MessageI18nTableMap::DESCRIPTION;
+        if ($this->subject !== $v) {
+            $this->subject = $v;
+            $this->modifiedColumns[] = MessageI18nTableMap::SUBJECT;
         }
 
 
         return $this;
-    } // setDescription()
+    } // setSubject()
 
     /**
-     * Set the value of [description_html] column.
+     * Set the value of [text_message] column.
      *
      * @param      string $v new value
      * @return   \Thelia\Model\MessageI18n The current object (for fluent API support)
      */
-    public function setDescriptionHtml($v)
+    public function setTextMessage($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->description_html !== $v) {
-            $this->description_html = $v;
-            $this->modifiedColumns[] = MessageI18nTableMap::DESCRIPTION_HTML;
+        if ($this->text_message !== $v) {
+            $this->text_message = $v;
+            $this->modifiedColumns[] = MessageI18nTableMap::TEXT_MESSAGE;
         }
 
 
         return $this;
-    } // setDescriptionHtml()
+    } // setTextMessage()
+
+    /**
+     * Set the value of [html_message] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\MessageI18n The current object (for fluent API support)
+     */
+    public function setHtmlMessage($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->html_message !== $v) {
+            $this->html_message = $v;
+            $this->modifiedColumns[] = MessageI18nTableMap::HTML_MESSAGE;
+        }
+
+
+        return $this;
+    } // setHtmlMessage()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -538,7 +576,7 @@ abstract class MessageI18n implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->locale !== 'en_EN') {
+            if ($this->locale !== 'en_US') {
                 return false;
             }
 
@@ -578,11 +616,14 @@ abstract class MessageI18n implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : MessageI18nTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
             $this->title = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : MessageI18nTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->description = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : MessageI18nTableMap::translateFieldName('Subject', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->subject = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : MessageI18nTableMap::translateFieldName('DescriptionHtml', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->description_html = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : MessageI18nTableMap::translateFieldName('TextMessage', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->text_message = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : MessageI18nTableMap::translateFieldName('HtmlMessage', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->html_message = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -591,7 +632,7 @@ abstract class MessageI18n implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = MessageI18nTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = MessageI18nTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\MessageI18n object", 0, $e);
@@ -821,11 +862,14 @@ abstract class MessageI18n implements ActiveRecordInterface
         if ($this->isColumnModified(MessageI18nTableMap::TITLE)) {
             $modifiedColumns[':p' . $index++]  = 'TITLE';
         }
-        if ($this->isColumnModified(MessageI18nTableMap::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
+        if ($this->isColumnModified(MessageI18nTableMap::SUBJECT)) {
+            $modifiedColumns[':p' . $index++]  = 'SUBJECT';
         }
-        if ($this->isColumnModified(MessageI18nTableMap::DESCRIPTION_HTML)) {
-            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION_HTML';
+        if ($this->isColumnModified(MessageI18nTableMap::TEXT_MESSAGE)) {
+            $modifiedColumns[':p' . $index++]  = 'TEXT_MESSAGE';
+        }
+        if ($this->isColumnModified(MessageI18nTableMap::HTML_MESSAGE)) {
+            $modifiedColumns[':p' . $index++]  = 'HTML_MESSAGE';
         }
 
         $sql = sprintf(
@@ -847,11 +891,14 @@ abstract class MessageI18n implements ActiveRecordInterface
                     case 'TITLE':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case 'DESCRIPTION':
-                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
+                    case 'SUBJECT':
+                        $stmt->bindValue($identifier, $this->subject, PDO::PARAM_STR);
                         break;
-                    case 'DESCRIPTION_HTML':
-                        $stmt->bindValue($identifier, $this->description_html, PDO::PARAM_STR);
+                    case 'TEXT_MESSAGE':
+                        $stmt->bindValue($identifier, $this->text_message, PDO::PARAM_STR);
+                        break;
+                    case 'HTML_MESSAGE':
+                        $stmt->bindValue($identifier, $this->html_message, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -918,10 +965,13 @@ abstract class MessageI18n implements ActiveRecordInterface
                 return $this->getTitle();
                 break;
             case 3:
-                return $this->getDescription();
+                return $this->getSubject();
                 break;
             case 4:
-                return $this->getDescriptionHtml();
+                return $this->getTextMessage();
+                break;
+            case 5:
+                return $this->getHtmlMessage();
                 break;
             default:
                 return null;
@@ -955,8 +1005,9 @@ abstract class MessageI18n implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getLocale(),
             $keys[2] => $this->getTitle(),
-            $keys[3] => $this->getDescription(),
-            $keys[4] => $this->getDescriptionHtml(),
+            $keys[3] => $this->getSubject(),
+            $keys[4] => $this->getTextMessage(),
+            $keys[5] => $this->getHtmlMessage(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1012,10 +1063,13 @@ abstract class MessageI18n implements ActiveRecordInterface
                 $this->setTitle($value);
                 break;
             case 3:
-                $this->setDescription($value);
+                $this->setSubject($value);
                 break;
             case 4:
-                $this->setDescriptionHtml($value);
+                $this->setTextMessage($value);
+                break;
+            case 5:
+                $this->setHtmlMessage($value);
                 break;
         } // switch()
     }
@@ -1044,8 +1098,9 @@ abstract class MessageI18n implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setLocale($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setTitle($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setDescriptionHtml($arr[$keys[4]]);
+        if (array_key_exists($keys[3], $arr)) $this->setSubject($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setTextMessage($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setHtmlMessage($arr[$keys[5]]);
     }
 
     /**
@@ -1060,8 +1115,9 @@ abstract class MessageI18n implements ActiveRecordInterface
         if ($this->isColumnModified(MessageI18nTableMap::ID)) $criteria->add(MessageI18nTableMap::ID, $this->id);
         if ($this->isColumnModified(MessageI18nTableMap::LOCALE)) $criteria->add(MessageI18nTableMap::LOCALE, $this->locale);
         if ($this->isColumnModified(MessageI18nTableMap::TITLE)) $criteria->add(MessageI18nTableMap::TITLE, $this->title);
-        if ($this->isColumnModified(MessageI18nTableMap::DESCRIPTION)) $criteria->add(MessageI18nTableMap::DESCRIPTION, $this->description);
-        if ($this->isColumnModified(MessageI18nTableMap::DESCRIPTION_HTML)) $criteria->add(MessageI18nTableMap::DESCRIPTION_HTML, $this->description_html);
+        if ($this->isColumnModified(MessageI18nTableMap::SUBJECT)) $criteria->add(MessageI18nTableMap::SUBJECT, $this->subject);
+        if ($this->isColumnModified(MessageI18nTableMap::TEXT_MESSAGE)) $criteria->add(MessageI18nTableMap::TEXT_MESSAGE, $this->text_message);
+        if ($this->isColumnModified(MessageI18nTableMap::HTML_MESSAGE)) $criteria->add(MessageI18nTableMap::HTML_MESSAGE, $this->html_message);
 
         return $criteria;
     }
@@ -1135,8 +1191,9 @@ abstract class MessageI18n implements ActiveRecordInterface
         $copyObj->setId($this->getId());
         $copyObj->setLocale($this->getLocale());
         $copyObj->setTitle($this->getTitle());
-        $copyObj->setDescription($this->getDescription());
-        $copyObj->setDescriptionHtml($this->getDescriptionHtml());
+        $copyObj->setSubject($this->getSubject());
+        $copyObj->setTextMessage($this->getTextMessage());
+        $copyObj->setHtmlMessage($this->getHtmlMessage());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -1223,8 +1280,9 @@ abstract class MessageI18n implements ActiveRecordInterface
         $this->id = null;
         $this->locale = null;
         $this->title = null;
-        $this->description = null;
-        $this->description_html = null;
+        $this->subject = null;
+        $this->text_message = null;
+        $this->html_message = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
