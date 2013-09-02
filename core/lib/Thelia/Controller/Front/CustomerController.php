@@ -40,6 +40,11 @@ use Thelia\Tools\URL;
 use Thelia\Log\Tlog;
 use Thelia\Core\Security\Exception\WrongPasswordException;
 
+/**
+ * Class CustomerController
+ * @package Thelia\Controller\Front
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class CustomerController extends BaseFrontController
 {
     /**
@@ -146,10 +151,9 @@ class CustomerController extends BaseFrontController
             $message = false;
 
             $request = $this->getRequest();
+            $customerLoginForm = new CustomerLogin($request);
 
             try {
-
-                $customerLoginForm = new CustomerLogin($request);
 
                 $form = $this->validateForm($customerLoginForm, "post");
 
@@ -190,8 +194,6 @@ class CustomerController extends BaseFrontController
 
     /**
      * Perform customer logout.
-     *
-     * @param Customer $customer
      */
     public function logoutAction()
     {
@@ -203,6 +205,11 @@ class CustomerController extends BaseFrontController
         $this->redirect(URL::getIndexPage());
     }
 
+    /**
+     * Dispatch event for customer login action
+     *
+     * @param Customer $customer
+     */
     protected function processLogin(Customer $customer)
     {
         $this->dispatch(TheliaEvents::CUSTOMER_LOGIN, new CustomerLoginEvent($customer));
