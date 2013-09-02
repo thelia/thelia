@@ -67,6 +67,18 @@ class Session extends BaseSession
         return $this;
     }
 
+    public function getLangId()
+    {
+        return $this->get("lang_id", Lang::getDefaultLanguage()->getId());
+    }
+
+    public function setLangId($langId)
+    {
+        $this->set("lang_id", $langId);
+
+        return $this;
+    }
+
     public function getAdminEditionLangId()
     {
         return $this->get('admin.edition_language', Lang::getDefaultLanguage()->getId());

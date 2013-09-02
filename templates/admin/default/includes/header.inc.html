@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{$lang}">
+<html lang="{$lang_code}">
 <head>
 	<title>{intl l='Thelia Back Office'}{if ! empty($page_title)} - {$page_title}{/if}</title>
 
@@ -43,7 +43,7 @@
 
 {* display top bar once admin is connected *}
 
-{loop name="top-bar-auth" type="auth" context="admin" roles="ADMIN"}
+{loop name="top-bar-auth" type="auth" roles="ADMIN"}
 
 {module_include location='before_topbar'}
 
@@ -58,7 +58,7 @@
   		    <a class="profile" href="{url path='admin/edit_profile'}">{admin attr="firstname"} {admin attr="lastname"}</a>
   		    <a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}">{intl l="Logout"}</a></div>
 
-  		{loop name="top-bar-search" type="auth" context="admin" roles="ADMIN" permissions="admin.search"}
+  		{loop name="top-bar-search" type="auth" roles="ADMIN" permissions="admin.search"}
 	    <form class="form-search pull-right" action="{url path='/admin/search'}">
 	         <div class="control-group">
 	             <div class="input-append">
@@ -89,13 +89,13 @@
             			<a href="{url path='/admin/home'}">{intl l="Home"}</a>
             		</li>
 
-            		{loop name="menu-auth-customer" type="auth" context="admin" roles="ADMIN" permissions="admin.customers.view"}
+            		{loop name="menu-auth-customer" type="auth" roles="ADMIN" permissions="admin.customers.view"}
             		<li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
             			<a href="{url path='/admin/customers'}">{intl l="Customers"}</a>
             		</li>
             		{/loop}
 
-            		{loop name="menu-auth-order" type="auth" context="admin" roles="ADMIN" permissions="admin.orders.view"}
+            		{loop name="menu-auth-order" type="auth" roles="ADMIN" permissions="admin.orders.view"}
             		<li class="dropdown {if $admin_current_location == 'customer'}active{/if}" id="orders_menu" data-toggle="dropdown">
 
             			<a href="#">{intl l="Orders"} <span class="caret"></span></a>
@@ -118,31 +118,31 @@
             		</li>
             		{/loop}
 
-            		{loop name="menu-auth-catalog" type="auth" context="admin" roles="ADMIN" permissions="admin.catalog.view"}
+            		{loop name="menu-auth-catalog" type="auth" roles="ADMIN" permissions="admin.catalog.view"}
             		<li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
             			<a href="{url path='/admin/catalog'}">{intl l="Catalog"}</a>
             		</li>
 					{/loop}
 
-            		{loop name="menu-auth-content" type="auth" context="admin" roles="ADMIN" permissions="admin.content.view"}
+            		{loop name="menu-auth-content" type="auth" roles="ADMIN" permissions="admin.content.view"}
             		<li class="{if $admin_current_location == 'content'}active{/if}" id="content_menu">
             			<a href="{url path='/admin/content'}">{intl l="Content"}</a>
             		</li>
 					{/loop}
 
-            		{loop name="menu-auth-discount" type="auth" context="admin" roles="ADMIN" permissions="admin.discount.view"}
+            		{loop name="menu-auth-discount" type="auth" roles="ADMIN" permissions="admin.discount.view"}
             		<li class="{if $admin_current_location == 'discount'}active{/if}" id="discount_menu">
             			<a href="{url path='/admin/discount'}">{intl l="Discount"}</a>
             		</li>
 					{/loop}
 
-            		{loop name="menu-auth-config" type="auth" context="admin" roles="ADMIN" permissions="admin.config.view"}
+            		{loop name="menu-auth-config" type="auth" roles="ADMIN" permissions="admin.config.view"}
             		<li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
             			<a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a>
             		</li>
 					{/loop}
 
-            		{loop name="menu-auth-modules" type="auth" context="admin" roles="ADMIN" permissions="admin.modules.view"}
+            		{loop name="menu-auth-modules" type="auth" roles="ADMIN" permissions="admin.modules.view"}
             		<li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
             			<a href="{url path='/admin/modules'}">{intl l="Modules"}</a>
             		</li>

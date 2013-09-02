@@ -202,7 +202,8 @@ class BaseAdminController extends BaseController
         // Prepare common template variables
         $args = array_merge($args, array(
             'locale'           => $session->getLocale(),
-            'lang'             => $session->getLang(),
+            'lang_code'        => $session->getLang(),
+            'lang_id'          => $session->getLangId(),
             'edition_language' => $edition_language,
             'current_url'      => htmlspecialchars($this->getRequest()->getUri())
         ));

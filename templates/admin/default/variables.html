@@ -1,4 +1,4 @@
-{check_auth context="admin" roles="ADMIN" permissions="admin.configuration.variables.view" login_tpl="/admin/login"}
+{check_auth roles="ADMIN" permissions="admin.configuration.variables.view" login_tpl="/admin/login"}
 
 {$page_title={intl l='Thelia System Variables'}}
 
@@ -11,12 +11,10 @@
         <ul class="breadcrumb">
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a> <span class="divider">/</span></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a> <span class="divider">/</span></li>
-            <li>{intl l="System variables"}</li>
+            <li><a href="{url path='/admin/configuration/variables'}">{intl l="System variables"}</a></li>
         </ul>
 
         {module_include location='variables_top'}
-
-        <h2>{intl l="Thelia system variables configuration"}</h2>
 
         <div class="row-fluid">
 
@@ -26,7 +24,7 @@
 	                    <table class="table table-striped table-condensed table-left-aligned">
 	                        <caption>
 	                           {intl l='Thelia system variables'}
-	                           {loop type="auth" name="can_create" context="admin" roles="ADMIN" permissions="admin.configuration.variables.create"}
+	                           {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.variables.create"}
                                 <a class="btn btn-primary action-btn" title="{intl l='Add a new variable'}" href="#add_variable_dialog" data-toggle="modal">
                                     <i class="icon-plus-sign icon-white"></i>
                                 </a>
@@ -43,10 +41,25 @@
 
                                <th>&nbsp;</th>
 	                        </tr>
-	                        {loop name="config" type="config" hidden="0" secured="*" backend_context="1"}
+
+	                        {loop name="config" type="config" hidden="0" secured="*" backend_context="1" lang="$lang_id"}
 	                            <tr>
-	                                <td>{$TITLE}</td>
-	                                <td>{$NAME}</td>
+
+	                               <td>{$TITLE}</td>
+
+                                   <td>
+                                   {if ! $SECURED}
+                                       {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.variables.change"}
+                                           <a title="{intl l='Change this variable'}" href="{url path='/admin/configuration/variables/change' variable_id="$ID"}">{$NAME}</a>
+                                       {/loop}
+                                       {elseloop rel="can_change"}
+                                           {$NAME}
+                                       {/elseloop}
+                                   {else}
+                                       {$NAME}
+                                   {/if}
+                                   </td>
+
 	                                <td>
 	                                    {if $SECURED}
 	                                        {$VALUE}
@@ -62,14 +75,16 @@
 		                                    <div class="btn-group">
                                                <a class="btn btn-mini cancel-edit" id="cancel_edit_btn_{$ID}" data-id="{$ID}" title="{intl l='Cancel changes and revert to original value'}" href="#"><i class="icon-remove"></i></a>
 
-                                               {loop type="auth" name="can_change" context="admin" roles="ADMIN" permissions="admin.configuration.variables.change"}
+                                               {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.variables.change"}
                                                    <a class="btn btn-mini config-change" title="{intl l='Change this variable'}" href="{url path='/admin/configuration/variables/change' variable_id="$ID"}"><i class="icon-edit"></i></a>
                                                {/loop}
 
-                                               {loop type="auth" name="can_delete" context="admin" roles="ADMIN" permissions="admin.configuration.variables.delete"}
+                                               {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.variables.delete"}
                                                    <a class="btn btn-mini config-delete" title="{intl l='Delete this variable'}" href="#delete_variable_dialog" data-id="{$ID}" data-toggle="modal"><i class="icon-trash"></i></a>
                                                {/loop}
 		                                    </div>
+		                                {else}
+		                                    <i title="{intl l='This variable could not be changed.'}" class="icon icon-ban-circle"></i>
 	                                    {/if}
 	                                </td>
 	                            </tr>

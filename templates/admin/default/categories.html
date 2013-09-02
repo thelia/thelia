@@ -1,4 +1,4 @@
-{check_auth context="admin" roles="ADMIN" permissions="admin.catalog.view" login_tpl="/admin/login"}
+{check_auth roles="ADMIN" permissions="admin.catalog.view" login_tpl="/admin/login"}
 
 {$page_title={intl l='Catalog'}}
 
@@ -31,7 +31,7 @@
 
 							{module_include location='category_list_caption'}
 
-                            {loop type="auth" name="can_create" context="admin" roles="ADMIN" permissions="admin.category.create"}
+                            {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.category.create"}
 	                        <a class="btn btn-primary action-btn" title="{intl l='Add a new category'}" href="#add_category_dialog" data-toggle="modal">
 	                            <i class="icon-plus-sign icon-white"></i>
 	                        </a>
@@ -111,7 +111,7 @@
 	 							{module_include location='category_list_row'}
 
 		                    	<td>
-		                    	    {loop type="auth" name="can_change" context="admin" roles="ADMIN" permissions="admin.category.edit"}
+		                    	    {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
 		                    		<input type="checkbox" data-id="{$ID}" class="categoryVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
 		                    		{/loop}
 
@@ -121,7 +121,7 @@
 		                    	</td>
 
 		                    	<td>
-		                    	    {loop type="auth" name="can_change" context="admin" roles="ADMIN" permissions="admin.category.edit"}
+		                    	    {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
 			                        	<a href="{url path='admin/catalog/category' category_id="{$ID}" action='positionUp'}"><i class="icon-arrow-up"></i></a>
 			                            <span class="categoryPositionChange" data-id="{$ID}">{$POSITION}</span>
 			                          	<a href="{url path='admin/catalog/category' category_id="{$ID}" action='positionDown'}"><i class="icon-arrow-down"></i></a>
@@ -135,11 +135,11 @@
 		                        <td>
 	                                <a class="btn btn-mini" title="{intl l='Browse this category'}" href="{url path='admin/catalog/category' id="$ID" action='browse'}"><i class="icon-folder-open"></i></a>
 
-	                                {loop type="auth" name="can_change" context="admin" roles="ADMIN" permissions="admin.category.edit"}
+	                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
 	                                   <a class="btn btn-mini" title="{intl l='Edit this category'}" href="{url path='admin/catalog/category' id="$ID" action='edit'}"><i class="icon-edit"></i></a>
 	                                {/loop}
 
-	                                {loop type="auth" name="can_delete" context="admin" roles="ADMIN" permissions="admin.category.delete"}
+	                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.category.delete"}
 	                                   <a class="btn btn-mini category-delete" title="{intl l='Delete this category and all its contents'}"  href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal"><i class="icon-trash"></i></a>
 	                                {/loop}
 		                         </td>
@@ -153,7 +153,7 @@
 							<tr>
 								<td class="message">
 								    <div class="alert alert-info">
-								    {loop type="auth" name="can_create" context="admin" roles="ADMIN" permissions="admin.category.create"}
+								    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.category.create"}
 								        {intl l="This category has no sub-categories. To create a new one, click the + button above."}
 								    {/loop}
 
