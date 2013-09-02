@@ -24,9 +24,6 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     ChildCouponVersionQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCouponVersionQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method     ChildCouponVersionQuery orderByType($order = Criteria::ASC) Order by the type column
- * @method     ChildCouponVersionQuery orderByTitle($order = Criteria::ASC) Order by the title column
- * @method     ChildCouponVersionQuery orderByShortDescription($order = Criteria::ASC) Order by the short_description column
- * @method     ChildCouponVersionQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method     ChildCouponVersionQuery orderByAmount($order = Criteria::ASC) Order by the amount column
  * @method     ChildCouponVersionQuery orderByIsUsed($order = Criteria::ASC) Order by the is_used column
  * @method     ChildCouponVersionQuery orderByIsEnabled($order = Criteria::ASC) Order by the is_enabled column
@@ -43,9 +40,6 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     ChildCouponVersionQuery groupById() Group by the id column
  * @method     ChildCouponVersionQuery groupByCode() Group by the code column
  * @method     ChildCouponVersionQuery groupByType() Group by the type column
- * @method     ChildCouponVersionQuery groupByTitle() Group by the title column
- * @method     ChildCouponVersionQuery groupByShortDescription() Group by the short_description column
- * @method     ChildCouponVersionQuery groupByDescription() Group by the description column
  * @method     ChildCouponVersionQuery groupByAmount() Group by the amount column
  * @method     ChildCouponVersionQuery groupByIsUsed() Group by the is_used column
  * @method     ChildCouponVersionQuery groupByIsEnabled() Group by the is_enabled column
@@ -73,9 +67,6 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     ChildCouponVersion findOneById(int $id) Return the first ChildCouponVersion filtered by the id column
  * @method     ChildCouponVersion findOneByCode(string $code) Return the first ChildCouponVersion filtered by the code column
  * @method     ChildCouponVersion findOneByType(string $type) Return the first ChildCouponVersion filtered by the type column
- * @method     ChildCouponVersion findOneByTitle(string $title) Return the first ChildCouponVersion filtered by the title column
- * @method     ChildCouponVersion findOneByShortDescription(string $short_description) Return the first ChildCouponVersion filtered by the short_description column
- * @method     ChildCouponVersion findOneByDescription(string $description) Return the first ChildCouponVersion filtered by the description column
  * @method     ChildCouponVersion findOneByAmount(double $amount) Return the first ChildCouponVersion filtered by the amount column
  * @method     ChildCouponVersion findOneByIsUsed(int $is_used) Return the first ChildCouponVersion filtered by the is_used column
  * @method     ChildCouponVersion findOneByIsEnabled(int $is_enabled) Return the first ChildCouponVersion filtered by the is_enabled column
@@ -92,9 +83,6 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     array findById(int $id) Return ChildCouponVersion objects filtered by the id column
  * @method     array findByCode(string $code) Return ChildCouponVersion objects filtered by the code column
  * @method     array findByType(string $type) Return ChildCouponVersion objects filtered by the type column
- * @method     array findByTitle(string $title) Return ChildCouponVersion objects filtered by the title column
- * @method     array findByShortDescription(string $short_description) Return ChildCouponVersion objects filtered by the short_description column
- * @method     array findByDescription(string $description) Return ChildCouponVersion objects filtered by the description column
  * @method     array findByAmount(double $amount) Return ChildCouponVersion objects filtered by the amount column
  * @method     array findByIsUsed(int $is_used) Return ChildCouponVersion objects filtered by the is_used column
  * @method     array findByIsEnabled(int $is_enabled) Return ChildCouponVersion objects filtered by the is_enabled column
@@ -195,7 +183,7 @@ abstract class CouponVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, TYPE, TITLE, SHORT_DESCRIPTION, DESCRIPTION, AMOUNT, IS_USED, IS_ENABLED, EXPIRATION_DATE, SERIALIZED_RULES, IS_CUMULATIVE, IS_REMOVING_POSTAGE, MAX_USAGE, IS_AVAILABLE_ON_SPECIAL_OFFERS, CREATED_AT, UPDATED_AT, VERSION FROM coupon_version WHERE ID = :p0 AND VERSION = :p1';
+        $sql = 'SELECT ID, CODE, TYPE, AMOUNT, IS_USED, IS_ENABLED, EXPIRATION_DATE, SERIALIZED_RULES, IS_CUMULATIVE, IS_REMOVING_POSTAGE, MAX_USAGE, IS_AVAILABLE_ON_SPECIAL_OFFERS, CREATED_AT, UPDATED_AT, VERSION FROM coupon_version WHERE ID = :p0 AND VERSION = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -395,93 +383,6 @@ abstract class CouponVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CouponVersionTableMap::TYPE, $type, $comparison);
-    }
-
-    /**
-     * Filter the query on the title column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByTitle('fooValue');   // WHERE title = 'fooValue'
-     * $query->filterByTitle('%fooValue%'); // WHERE title LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $title The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponVersionQuery The current query, for fluid interface
-     */
-    public function filterByTitle($title = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($title)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $title)) {
-                $title = str_replace('*', '%', $title);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CouponVersionTableMap::TITLE, $title, $comparison);
-    }
-
-    /**
-     * Filter the query on the short_description column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByShortDescription('fooValue');   // WHERE short_description = 'fooValue'
-     * $query->filterByShortDescription('%fooValue%'); // WHERE short_description LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $shortDescription The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponVersionQuery The current query, for fluid interface
-     */
-    public function filterByShortDescription($shortDescription = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($shortDescription)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $shortDescription)) {
-                $shortDescription = str_replace('*', '%', $shortDescription);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CouponVersionTableMap::SHORT_DESCRIPTION, $shortDescription, $comparison);
-    }
-
-    /**
-     * Filter the query on the description column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByDescription('fooValue');   // WHERE description = 'fooValue'
-     * $query->filterByDescription('%fooValue%'); // WHERE description LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $description The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponVersionQuery The current query, for fluid interface
-     */
-    public function filterByDescription($description = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($description)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $description)) {
-                $description = str_replace('*', '%', $description);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CouponVersionTableMap::DESCRIPTION, $description, $comparison);
     }
 
     /**

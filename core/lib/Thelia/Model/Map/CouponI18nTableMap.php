@@ -57,7 +57,7 @@ class CouponI18nTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class CouponI18nTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the ID field
@@ -78,6 +78,21 @@ class CouponI18nTableMap extends TableMap
      * the column name for the LOCALE field
      */
     const LOCALE = 'coupon_i18n.LOCALE';
+
+    /**
+     * the column name for the TITLE field
+     */
+    const TITLE = 'coupon_i18n.TITLE';
+
+    /**
+     * the column name for the SHORT_DESCRIPTION field
+     */
+    const SHORT_DESCRIPTION = 'coupon_i18n.SHORT_DESCRIPTION';
+
+    /**
+     * the column name for the DESCRIPTION field
+     */
+    const DESCRIPTION = 'coupon_i18n.DESCRIPTION';
 
     /**
      * The default string format for model objects of the related table
@@ -91,12 +106,12 @@ class CouponI18nTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Locale', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'locale', ),
-        self::TYPE_COLNAME       => array(CouponI18nTableMap::ID, CouponI18nTableMap::LOCALE, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', ),
-        self::TYPE_FIELDNAME     => array('id', 'locale', ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id', 'Locale', 'Title', 'ShortDescription', 'Description', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'locale', 'title', 'shortDescription', 'description', ),
+        self::TYPE_COLNAME       => array(CouponI18nTableMap::ID, CouponI18nTableMap::LOCALE, CouponI18nTableMap::TITLE, CouponI18nTableMap::SHORT_DESCRIPTION, CouponI18nTableMap::DESCRIPTION, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', 'TITLE', 'SHORT_DESCRIPTION', 'DESCRIPTION', ),
+        self::TYPE_FIELDNAME     => array('id', 'locale', 'title', 'short_description', 'description', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -106,12 +121,12 @@ class CouponI18nTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, ),
-        self::TYPE_COLNAME       => array(CouponI18nTableMap::ID => 0, CouponI18nTableMap::LOCALE => 1, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, 'Title' => 2, 'ShortDescription' => 3, 'Description' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, 'title' => 2, 'shortDescription' => 3, 'description' => 4, ),
+        self::TYPE_COLNAME       => array(CouponI18nTableMap::ID => 0, CouponI18nTableMap::LOCALE => 1, CouponI18nTableMap::TITLE => 2, CouponI18nTableMap::SHORT_DESCRIPTION => 3, CouponI18nTableMap::DESCRIPTION => 4, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, 'TITLE' => 2, 'SHORT_DESCRIPTION' => 3, 'DESCRIPTION' => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, 'title' => 2, 'short_description' => 3, 'description' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -132,6 +147,9 @@ class CouponI18nTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'coupon', 'ID', true, null, null);
         $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_EN');
+        $this->addColumn('TITLE', 'Title', 'VARCHAR', true, 255, null);
+        $this->addColumn('SHORT_DESCRIPTION', 'ShortDescription', 'LONGVARCHAR', true, null, null);
+        $this->addColumn('DESCRIPTION', 'Description', 'CLOB', true, null, null);
     } // initialize()
 
     /**
@@ -331,9 +349,15 @@ class CouponI18nTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(CouponI18nTableMap::ID);
             $criteria->addSelectColumn(CouponI18nTableMap::LOCALE);
+            $criteria->addSelectColumn(CouponI18nTableMap::TITLE);
+            $criteria->addSelectColumn(CouponI18nTableMap::SHORT_DESCRIPTION);
+            $criteria->addSelectColumn(CouponI18nTableMap::DESCRIPTION);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.LOCALE');
+            $criteria->addSelectColumn($alias . '.TITLE');
+            $criteria->addSelectColumn($alias . '.SHORT_DESCRIPTION');
+            $criteria->addSelectColumn($alias . '.DESCRIPTION');
         }
     }
 

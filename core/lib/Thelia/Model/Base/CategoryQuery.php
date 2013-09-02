@@ -58,6 +58,10 @@ use Thelia\Model\Map\CategoryTableMap;
  * @method     ChildCategoryQuery rightJoinAttributeCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeCategory relation
  * @method     ChildCategoryQuery innerJoinAttributeCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeCategory relation
  *
+ * @method     ChildCategoryQuery leftJoinRewriting($relationAlias = null) Adds a LEFT JOIN clause to the query using the Rewriting relation
+ * @method     ChildCategoryQuery rightJoinRewriting($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Rewriting relation
+ * @method     ChildCategoryQuery innerJoinRewriting($relationAlias = null) Adds a INNER JOIN clause to the query using the Rewriting relation
+ *
  * @method     ChildCategoryQuery leftJoinCategoryImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the CategoryImage relation
  * @method     ChildCategoryQuery rightJoinCategoryImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CategoryImage relation
  * @method     ChildCategoryQuery innerJoinCategoryImage($relationAlias = null) Adds a INNER JOIN clause to the query using the CategoryImage relation
@@ -864,6 +868,79 @@ abstract class CategoryQuery extends ModelCriteria
         return $this
             ->joinAttributeCategory($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'AttributeCategory', '\Thelia\Model\AttributeCategoryQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Rewriting object
+     *
+     * @param \Thelia\Model\Rewriting|ObjectCollection $rewriting  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCategoryQuery The current query, for fluid interface
+     */
+    public function filterByRewriting($rewriting, $comparison = null)
+    {
+        if ($rewriting instanceof \Thelia\Model\Rewriting) {
+            return $this
+                ->addUsingAlias(CategoryTableMap::ID, $rewriting->getCategoryId(), $comparison);
+        } elseif ($rewriting instanceof ObjectCollection) {
+            return $this
+                ->useRewritingQuery()
+                ->filterByPrimaryKeys($rewriting->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByRewriting() only accepts arguments of type \Thelia\Model\Rewriting or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Rewriting relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCategoryQuery The current query, for fluid interface
+     */
+    public function joinRewriting($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Rewriting');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Rewriting');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Rewriting relation Rewriting object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\RewritingQuery A secondary query class using the current class as primary query
+     */
+    public function useRewritingQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinRewriting($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Rewriting', '\Thelia\Model\RewritingQuery');
     }
 
     /**

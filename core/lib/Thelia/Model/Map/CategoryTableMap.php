@@ -193,6 +193,7 @@ class CategoryTableMap extends TableMap
         $this->addRelation('ProductCategory', '\\Thelia\\Model\\ProductCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'ProductCategories');
         $this->addRelation('FeatureCategory', '\\Thelia\\Model\\FeatureCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'FeatureCategories');
         $this->addRelation('AttributeCategory', '\\Thelia\\Model\\AttributeCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'AttributeCategories');
+        $this->addRelation('Rewriting', '\\Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
         $this->addRelation('CategoryImage', '\\Thelia\\Model\\CategoryImage', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryImages');
         $this->addRelation('CategoryDocument', '\\Thelia\\Model\\CategoryDocument', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryDocuments');
         $this->addRelation('CategoryAssociatedContent', '\\Thelia\\Model\\CategoryAssociatedContent', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryAssociatedContents');
@@ -227,6 +228,7 @@ class CategoryTableMap extends TableMap
                 ProductCategoryTableMap::clearInstancePool();
                 FeatureCategoryTableMap::clearInstancePool();
                 AttributeCategoryTableMap::clearInstancePool();
+                RewritingTableMap::clearInstancePool();
                 CategoryImageTableMap::clearInstancePool();
                 CategoryDocumentTableMap::clearInstancePool();
                 CategoryAssociatedContentTableMap::clearInstancePool();

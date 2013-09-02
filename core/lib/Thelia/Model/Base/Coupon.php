@@ -20,8 +20,6 @@ use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Coupon as ChildCoupon;
 use Thelia\Model\CouponI18n as ChildCouponI18n;
 use Thelia\Model\CouponI18nQuery as ChildCouponI18nQuery;
-use Thelia\Model\CouponOrder as ChildCouponOrder;
-use Thelia\Model\CouponOrderQuery as ChildCouponOrderQuery;
 use Thelia\Model\CouponQuery as ChildCouponQuery;
 use Thelia\Model\CouponVersion as ChildCouponVersion;
 use Thelia\Model\CouponVersionQuery as ChildCouponVersionQuery;
@@ -79,24 +77,6 @@ abstract class Coupon implements ActiveRecordInterface
      * @var        string
      */
     protected $type;
-
-    /**
-     * The value for the title field.
-     * @var        string
-     */
-    protected $title;
-
-    /**
-     * The value for the short_description field.
-     * @var        string
-     */
-    protected $short_description;
-
-    /**
-     * The value for the description field.
-     * @var        string
-     */
-    protected $description;
 
     /**
      * The value for the amount field.
@@ -172,12 +152,6 @@ abstract class Coupon implements ActiveRecordInterface
     protected $version;
 
     /**
-     * @var        ObjectCollection|ChildCouponOrder[] Collection to store aggregation of ChildCouponOrder objects.
-     */
-    protected $collCouponOrders;
-    protected $collCouponOrdersPartial;
-
-    /**
      * @var        ObjectCollection|ChildCouponI18n[] Collection to store aggregation of ChildCouponI18n objects.
      */
     protected $collCouponI18ns;
@@ -218,12 +192,6 @@ abstract class Coupon implements ActiveRecordInterface
      * @var bool
      */
     protected $enforceVersion = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $couponOrdersScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -538,39 +506,6 @@ abstract class Coupon implements ActiveRecordInterface
     }
 
     /**
-     * Get the [title] column value.
-     *
-     * @return   string
-     */
-    public function getTitle()
-    {
-
-        return $this->title;
-    }
-
-    /**
-     * Get the [short_description] column value.
-     *
-     * @return   string
-     */
-    public function getShortDescription()
-    {
-
-        return $this->short_description;
-    }
-
-    /**
-     * Get the [description] column value.
-     *
-     * @return   string
-     */
-    public function getDescription()
-    {
-
-        return $this->description;
-    }
-
-    /**
      * Get the [amount] column value.
      *
      * @return   double
@@ -791,69 +726,6 @@ abstract class Coupon implements ActiveRecordInterface
 
         return $this;
     } // setType()
-
-    /**
-     * Set the value of [title] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
-     */
-    public function setTitle($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->title !== $v) {
-            $this->title = $v;
-            $this->modifiedColumns[] = CouponTableMap::TITLE;
-        }
-
-
-        return $this;
-    } // setTitle()
-
-    /**
-     * Set the value of [short_description] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
-     */
-    public function setShortDescription($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->short_description !== $v) {
-            $this->short_description = $v;
-            $this->modifiedColumns[] = CouponTableMap::SHORT_DESCRIPTION;
-        }
-
-
-        return $this;
-    } // setShortDescription()
-
-    /**
-     * Set the value of [description] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
-     */
-    public function setDescription($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->description !== $v) {
-            $this->description = $v;
-            $this->modifiedColumns[] = CouponTableMap::DESCRIPTION;
-        }
-
-
-        return $this;
-    } // setDescription()
 
     /**
      * Set the value of [amount] column.
@@ -1165,58 +1037,49 @@ abstract class Coupon implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CouponTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
             $this->type = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CouponTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->title = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CouponTableMap::translateFieldName('ShortDescription', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->short_description = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CouponTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->description = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CouponTableMap::translateFieldName('Amount', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CouponTableMap::translateFieldName('Amount', TableMap::TYPE_PHPNAME, $indexType)];
             $this->amount = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CouponTableMap::translateFieldName('IsUsed', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CouponTableMap::translateFieldName('IsUsed', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_used = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CouponTableMap::translateFieldName('IsEnabled', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CouponTableMap::translateFieldName('IsEnabled', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_enabled = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : CouponTableMap::translateFieldName('ExpirationDate', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CouponTableMap::translateFieldName('ExpirationDate', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->expiration_date = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : CouponTableMap::translateFieldName('SerializedRules', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CouponTableMap::translateFieldName('SerializedRules', TableMap::TYPE_PHPNAME, $indexType)];
             $this->serialized_rules = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : CouponTableMap::translateFieldName('IsCumulative', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CouponTableMap::translateFieldName('IsCumulative', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_cumulative = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : CouponTableMap::translateFieldName('IsRemovingPostage', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : CouponTableMap::translateFieldName('IsRemovingPostage', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_removing_postage = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : CouponTableMap::translateFieldName('MaxUsage', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : CouponTableMap::translateFieldName('MaxUsage', TableMap::TYPE_PHPNAME, $indexType)];
             $this->max_usage = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : CouponTableMap::translateFieldName('IsAvailableOnSpecialOffers', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : CouponTableMap::translateFieldName('IsAvailableOnSpecialOffers', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_available_on_special_offers = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : CouponTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : CouponTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : CouponTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : CouponTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : CouponTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : CouponTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -1226,7 +1089,7 @@ abstract class Coupon implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 18; // 18 = CouponTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 15; // 15 = CouponTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Coupon object", 0, $e);
@@ -1286,8 +1149,6 @@ abstract class Coupon implements ActiveRecordInterface
         $this->hydrate($row, 0, true, $dataFetcher->getIndexType()); // rehydrate
 
         if ($deep) {  // also de-associate any related objects?
-
-            $this->collCouponOrders = null;
 
             $this->collCouponI18ns = null;
 
@@ -1435,23 +1296,6 @@ abstract class Coupon implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->couponOrdersScheduledForDeletion !== null) {
-                if (!$this->couponOrdersScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\CouponOrderQuery::create()
-                        ->filterByPrimaryKeys($this->couponOrdersScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->couponOrdersScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collCouponOrders !== null) {
-            foreach ($this->collCouponOrders as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->couponI18nsScheduledForDeletion !== null) {
                 if (!$this->couponI18nsScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\CouponI18nQuery::create()
@@ -1521,15 +1365,6 @@ abstract class Coupon implements ActiveRecordInterface
         if ($this->isColumnModified(CouponTableMap::TYPE)) {
             $modifiedColumns[':p' . $index++]  = 'TYPE';
         }
-        if ($this->isColumnModified(CouponTableMap::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = 'TITLE';
-        }
-        if ($this->isColumnModified(CouponTableMap::SHORT_DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = 'SHORT_DESCRIPTION';
-        }
-        if ($this->isColumnModified(CouponTableMap::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
-        }
         if ($this->isColumnModified(CouponTableMap::AMOUNT)) {
             $modifiedColumns[':p' . $index++]  = 'AMOUNT';
         }
@@ -1585,15 +1420,6 @@ abstract class Coupon implements ActiveRecordInterface
                         break;
                     case 'TYPE':
                         $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
-                        break;
-                    case 'TITLE':
-                        $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
-                        break;
-                    case 'SHORT_DESCRIPTION':
-                        $stmt->bindValue($identifier, $this->short_description, PDO::PARAM_STR);
-                        break;
-                    case 'DESCRIPTION':
-                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
                     case 'AMOUNT':
                         $stmt->bindValue($identifier, $this->amount, PDO::PARAM_STR);
@@ -1703,48 +1529,39 @@ abstract class Coupon implements ActiveRecordInterface
                 return $this->getType();
                 break;
             case 3:
-                return $this->getTitle();
-                break;
-            case 4:
-                return $this->getShortDescription();
-                break;
-            case 5:
-                return $this->getDescription();
-                break;
-            case 6:
                 return $this->getAmount();
                 break;
-            case 7:
+            case 4:
                 return $this->getIsUsed();
                 break;
-            case 8:
+            case 5:
                 return $this->getIsEnabled();
                 break;
-            case 9:
+            case 6:
                 return $this->getExpirationDate();
                 break;
-            case 10:
+            case 7:
                 return $this->getSerializedRules();
                 break;
-            case 11:
+            case 8:
                 return $this->getIsCumulative();
                 break;
-            case 12:
+            case 9:
                 return $this->getIsRemovingPostage();
                 break;
-            case 13:
+            case 10:
                 return $this->getMaxUsage();
                 break;
-            case 14:
+            case 11:
                 return $this->getIsAvailableOnSpecialOffers();
                 break;
-            case 15:
+            case 12:
                 return $this->getCreatedAt();
                 break;
-            case 16:
+            case 13:
                 return $this->getUpdatedAt();
                 break;
-            case 17:
+            case 14:
                 return $this->getVersion();
                 break;
             default:
@@ -1779,21 +1596,18 @@ abstract class Coupon implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
             $keys[2] => $this->getType(),
-            $keys[3] => $this->getTitle(),
-            $keys[4] => $this->getShortDescription(),
-            $keys[5] => $this->getDescription(),
-            $keys[6] => $this->getAmount(),
-            $keys[7] => $this->getIsUsed(),
-            $keys[8] => $this->getIsEnabled(),
-            $keys[9] => $this->getExpirationDate(),
-            $keys[10] => $this->getSerializedRules(),
-            $keys[11] => $this->getIsCumulative(),
-            $keys[12] => $this->getIsRemovingPostage(),
-            $keys[13] => $this->getMaxUsage(),
-            $keys[14] => $this->getIsAvailableOnSpecialOffers(),
-            $keys[15] => $this->getCreatedAt(),
-            $keys[16] => $this->getUpdatedAt(),
-            $keys[17] => $this->getVersion(),
+            $keys[3] => $this->getAmount(),
+            $keys[4] => $this->getIsUsed(),
+            $keys[5] => $this->getIsEnabled(),
+            $keys[6] => $this->getExpirationDate(),
+            $keys[7] => $this->getSerializedRules(),
+            $keys[8] => $this->getIsCumulative(),
+            $keys[9] => $this->getIsRemovingPostage(),
+            $keys[10] => $this->getMaxUsage(),
+            $keys[11] => $this->getIsAvailableOnSpecialOffers(),
+            $keys[12] => $this->getCreatedAt(),
+            $keys[13] => $this->getUpdatedAt(),
+            $keys[14] => $this->getVersion(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1802,9 +1616,6 @@ abstract class Coupon implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collCouponOrders) {
-                $result['CouponOrders'] = $this->collCouponOrders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collCouponI18ns) {
                 $result['CouponI18ns'] = $this->collCouponI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1855,48 +1666,39 @@ abstract class Coupon implements ActiveRecordInterface
                 $this->setType($value);
                 break;
             case 3:
-                $this->setTitle($value);
-                break;
-            case 4:
-                $this->setShortDescription($value);
-                break;
-            case 5:
-                $this->setDescription($value);
-                break;
-            case 6:
                 $this->setAmount($value);
                 break;
-            case 7:
+            case 4:
                 $this->setIsUsed($value);
                 break;
-            case 8:
+            case 5:
                 $this->setIsEnabled($value);
                 break;
-            case 9:
+            case 6:
                 $this->setExpirationDate($value);
                 break;
-            case 10:
+            case 7:
                 $this->setSerializedRules($value);
                 break;
-            case 11:
+            case 8:
                 $this->setIsCumulative($value);
                 break;
-            case 12:
+            case 9:
                 $this->setIsRemovingPostage($value);
                 break;
-            case 13:
+            case 10:
                 $this->setMaxUsage($value);
                 break;
-            case 14:
+            case 11:
                 $this->setIsAvailableOnSpecialOffers($value);
                 break;
-            case 15:
+            case 12:
                 $this->setCreatedAt($value);
                 break;
-            case 16:
+            case 13:
                 $this->setUpdatedAt($value);
                 break;
-            case 17:
+            case 14:
                 $this->setVersion($value);
                 break;
         } // switch()
@@ -1926,21 +1728,18 @@ abstract class Coupon implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setType($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setTitle($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setShortDescription($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setDescription($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setAmount($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setIsUsed($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setIsEnabled($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setExpirationDate($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setSerializedRules($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setIsCumulative($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setIsRemovingPostage($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setMaxUsage($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setIsAvailableOnSpecialOffers($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setCreatedAt($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setUpdatedAt($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setVersion($arr[$keys[17]]);
+        if (array_key_exists($keys[3], $arr)) $this->setAmount($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setIsUsed($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setIsEnabled($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setExpirationDate($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setSerializedRules($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setIsCumulative($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setIsRemovingPostage($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setMaxUsage($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setIsAvailableOnSpecialOffers($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setVersion($arr[$keys[14]]);
     }
 
     /**
@@ -1955,9 +1754,6 @@ abstract class Coupon implements ActiveRecordInterface
         if ($this->isColumnModified(CouponTableMap::ID)) $criteria->add(CouponTableMap::ID, $this->id);
         if ($this->isColumnModified(CouponTableMap::CODE)) $criteria->add(CouponTableMap::CODE, $this->code);
         if ($this->isColumnModified(CouponTableMap::TYPE)) $criteria->add(CouponTableMap::TYPE, $this->type);
-        if ($this->isColumnModified(CouponTableMap::TITLE)) $criteria->add(CouponTableMap::TITLE, $this->title);
-        if ($this->isColumnModified(CouponTableMap::SHORT_DESCRIPTION)) $criteria->add(CouponTableMap::SHORT_DESCRIPTION, $this->short_description);
-        if ($this->isColumnModified(CouponTableMap::DESCRIPTION)) $criteria->add(CouponTableMap::DESCRIPTION, $this->description);
         if ($this->isColumnModified(CouponTableMap::AMOUNT)) $criteria->add(CouponTableMap::AMOUNT, $this->amount);
         if ($this->isColumnModified(CouponTableMap::IS_USED)) $criteria->add(CouponTableMap::IS_USED, $this->is_used);
         if ($this->isColumnModified(CouponTableMap::IS_ENABLED)) $criteria->add(CouponTableMap::IS_ENABLED, $this->is_enabled);
@@ -2035,9 +1831,6 @@ abstract class Coupon implements ActiveRecordInterface
     {
         $copyObj->setCode($this->getCode());
         $copyObj->setType($this->getType());
-        $copyObj->setTitle($this->getTitle());
-        $copyObj->setShortDescription($this->getShortDescription());
-        $copyObj->setDescription($this->getDescription());
         $copyObj->setAmount($this->getAmount());
         $copyObj->setIsUsed($this->getIsUsed());
         $copyObj->setIsEnabled($this->getIsEnabled());
@@ -2055,12 +1848,6 @@ abstract class Coupon implements ActiveRecordInterface
             // important: temporarily setNew(false) because this affects the behavior of
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
-
-            foreach ($this->getCouponOrders() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCouponOrder($relObj->copy($deepCopy));
-                }
-            }
 
             foreach ($this->getCouponI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -2115,258 +1902,12 @@ abstract class Coupon implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('CouponOrder' == $relationName) {
-            return $this->initCouponOrders();
-        }
         if ('CouponI18n' == $relationName) {
             return $this->initCouponI18ns();
         }
         if ('CouponVersion' == $relationName) {
             return $this->initCouponVersions();
         }
-    }
-
-    /**
-     * Clears out the collCouponOrders collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addCouponOrders()
-     */
-    public function clearCouponOrders()
-    {
-        $this->collCouponOrders = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collCouponOrders collection loaded partially.
-     */
-    public function resetPartialCouponOrders($v = true)
-    {
-        $this->collCouponOrdersPartial = $v;
-    }
-
-    /**
-     * Initializes the collCouponOrders collection.
-     *
-     * By default this just sets the collCouponOrders collection to an empty array (like clearcollCouponOrders());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initCouponOrders($overrideExisting = true)
-    {
-        if (null !== $this->collCouponOrders && !$overrideExisting) {
-            return;
-        }
-        $this->collCouponOrders = new ObjectCollection();
-        $this->collCouponOrders->setModel('\Thelia\Model\CouponOrder');
-    }
-
-    /**
-     * Gets an array of ChildCouponOrder objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCoupon is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildCouponOrder[] List of ChildCouponOrder objects
-     * @throws PropelException
-     */
-    public function getCouponOrders($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collCouponOrdersPartial && !$this->isNew();
-        if (null === $this->collCouponOrders || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCouponOrders) {
-                // return empty collection
-                $this->initCouponOrders();
-            } else {
-                $collCouponOrders = ChildCouponOrderQuery::create(null, $criteria)
-                    ->filterByCoupon($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collCouponOrdersPartial && count($collCouponOrders)) {
-                        $this->initCouponOrders(false);
-
-                        foreach ($collCouponOrders as $obj) {
-                            if (false == $this->collCouponOrders->contains($obj)) {
-                                $this->collCouponOrders->append($obj);
-                            }
-                        }
-
-                        $this->collCouponOrdersPartial = true;
-                    }
-
-                    $collCouponOrders->getInternalIterator()->rewind();
-
-                    return $collCouponOrders;
-                }
-
-                if ($partial && $this->collCouponOrders) {
-                    foreach ($this->collCouponOrders as $obj) {
-                        if ($obj->isNew()) {
-                            $collCouponOrders[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collCouponOrders = $collCouponOrders;
-                $this->collCouponOrdersPartial = false;
-            }
-        }
-
-        return $this->collCouponOrders;
-    }
-
-    /**
-     * Sets a collection of CouponOrder objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $couponOrders A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCoupon The current object (for fluent API support)
-     */
-    public function setCouponOrders(Collection $couponOrders, ConnectionInterface $con = null)
-    {
-        $couponOrdersToDelete = $this->getCouponOrders(new Criteria(), $con)->diff($couponOrders);
-
-
-        $this->couponOrdersScheduledForDeletion = $couponOrdersToDelete;
-
-        foreach ($couponOrdersToDelete as $couponOrderRemoved) {
-            $couponOrderRemoved->setCoupon(null);
-        }
-
-        $this->collCouponOrders = null;
-        foreach ($couponOrders as $couponOrder) {
-            $this->addCouponOrder($couponOrder);
-        }
-
-        $this->collCouponOrders = $couponOrders;
-        $this->collCouponOrdersPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related CouponOrder objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related CouponOrder objects.
-     * @throws PropelException
-     */
-    public function countCouponOrders(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collCouponOrdersPartial && !$this->isNew();
-        if (null === $this->collCouponOrders || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCouponOrders) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getCouponOrders());
-            }
-
-            $query = ChildCouponOrderQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByCoupon($this)
-                ->count($con);
-        }
-
-        return count($this->collCouponOrders);
-    }
-
-    /**
-     * Method called to associate a ChildCouponOrder object to this object
-     * through the ChildCouponOrder foreign key attribute.
-     *
-     * @param    ChildCouponOrder $l ChildCouponOrder
-     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
-     */
-    public function addCouponOrder(ChildCouponOrder $l)
-    {
-        if ($this->collCouponOrders === null) {
-            $this->initCouponOrders();
-            $this->collCouponOrdersPartial = true;
-        }
-
-        if (!in_array($l, $this->collCouponOrders->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddCouponOrder($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param CouponOrder $couponOrder The couponOrder object to add.
-     */
-    protected function doAddCouponOrder($couponOrder)
-    {
-        $this->collCouponOrders[]= $couponOrder;
-        $couponOrder->setCoupon($this);
-    }
-
-    /**
-     * @param  CouponOrder $couponOrder The couponOrder object to remove.
-     * @return ChildCoupon The current object (for fluent API support)
-     */
-    public function removeCouponOrder($couponOrder)
-    {
-        if ($this->getCouponOrders()->contains($couponOrder)) {
-            $this->collCouponOrders->remove($this->collCouponOrders->search($couponOrder));
-            if (null === $this->couponOrdersScheduledForDeletion) {
-                $this->couponOrdersScheduledForDeletion = clone $this->collCouponOrders;
-                $this->couponOrdersScheduledForDeletion->clear();
-            }
-            $this->couponOrdersScheduledForDeletion[]= clone $couponOrder;
-            $couponOrder->setCoupon(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Coupon is new, it will return
-     * an empty collection; or if this Coupon has previously
-     * been saved, it will retrieve related CouponOrders from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Coupon.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildCouponOrder[] List of ChildCouponOrder objects
-     */
-    public function getCouponOrdersJoinOrder($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildCouponOrderQuery::create(null, $criteria);
-        $query->joinWith('Order', $joinBehavior);
-
-        return $this->getCouponOrders($query, $con);
     }
 
     /**
@@ -2823,9 +2364,6 @@ abstract class Coupon implements ActiveRecordInterface
         $this->id = null;
         $this->code = null;
         $this->type = null;
-        $this->title = null;
-        $this->short_description = null;
-        $this->description = null;
         $this->amount = null;
         $this->is_used = null;
         $this->is_enabled = null;
@@ -2858,11 +2396,6 @@ abstract class Coupon implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collCouponOrders) {
-                foreach ($this->collCouponOrders as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collCouponI18ns) {
                 foreach ($this->collCouponI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -2879,10 +2412,6 @@ abstract class Coupon implements ActiveRecordInterface
         $this->currentLocale = 'en_EN';
         $this->currentTranslations = null;
 
-        if ($this->collCouponOrders instanceof Collection) {
-            $this->collCouponOrders->clearIterator();
-        }
-        $this->collCouponOrders = null;
         if ($this->collCouponI18ns instanceof Collection) {
             $this->collCouponI18ns->clearIterator();
         }
@@ -3016,6 +2545,78 @@ abstract class Coupon implements ActiveRecordInterface
         return $this->getTranslation($this->getLocale(), $con);
     }
 
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return   string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param      string $v new value
+         * @return   \Thelia\Model\CouponI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [short_description] column value.
+         *
+         * @return   string
+         */
+        public function getShortDescription()
+        {
+        return $this->getCurrentTranslation()->getShortDescription();
+    }
+
+
+        /**
+         * Set the value of [short_description] column.
+         *
+         * @param      string $v new value
+         * @return   \Thelia\Model\CouponI18n The current object (for fluent API support)
+         */
+        public function setShortDescription($v)
+        {    $this->getCurrentTranslation()->setShortDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return   string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param      string $v new value
+         * @return   \Thelia\Model\CouponI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
     // versionable behavior
 
     /**
@@ -3067,9 +2668,6 @@ abstract class Coupon implements ActiveRecordInterface
         $version->setId($this->getId());
         $version->setCode($this->getCode());
         $version->setType($this->getType());
-        $version->setTitle($this->getTitle());
-        $version->setShortDescription($this->getShortDescription());
-        $version->setDescription($this->getDescription());
         $version->setAmount($this->getAmount());
         $version->setIsUsed($this->getIsUsed());
         $version->setIsEnabled($this->getIsEnabled());
@@ -3122,9 +2720,6 @@ abstract class Coupon implements ActiveRecordInterface
         $this->setId($version->getId());
         $this->setCode($version->getCode());
         $this->setType($version->getType());
-        $this->setTitle($version->getTitle());
-        $this->setShortDescription($version->getShortDescription());
-        $this->setDescription($version->getDescription());
         $this->setAmount($version->getAmount());
         $this->setIsUsed($version->getIsUsed());
         $this->setIsEnabled($version->getIsEnabled());

@@ -190,6 +190,7 @@ class FolderTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Rewriting', '\\Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
         $this->addRelation('ContentFolder', '\\Thelia\\Model\\ContentFolder', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'ContentFolders');
         $this->addRelation('FolderImage', '\\Thelia\\Model\\FolderImage', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'FolderImages');
         $this->addRelation('FolderDocument', '\\Thelia\\Model\\FolderDocument', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'FolderDocuments');
@@ -219,6 +220,7 @@ class FolderTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+                RewritingTableMap::clearInstancePool();
                 ContentFolderTableMap::clearInstancePool();
                 FolderImageTableMap::clearInstancePool();
                 FolderDocumentTableMap::clearInstancePool();
