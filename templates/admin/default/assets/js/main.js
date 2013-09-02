@@ -101,7 +101,7 @@
                 $('#minibrowser-categories').unbind().empty().append(categories);
             })
             .fail(function() {
-                console.log('The JSON file cant be read');
+                console.log('An error occurred while reading from JSON file');
             });
 
         }
