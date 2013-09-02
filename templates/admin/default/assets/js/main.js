@@ -9,10 +9,26 @@
 
         // -- Init tablesorter --
         if($('.tablesorter').length){
-            $('.tablesorter').tablesorter({
-                widgets: ["filter"],
+            $('.tablesorter').tablesorter({                
+                widgets: ["filter", "stickyHeaders"],
+                widthFixed : false,
                 widgetOptions : {
                     filter_cssFilter : 'input-medium',
+                    filter_formatter : {
+                        3 : function($cell, indx){
+                          return $.tablesorter.filterFormatter.uiSlider( $cell, indx, {
+                                animate : true,
+                                value: 1,
+                                min: 1,
+                                max: 50,
+                                delayed: true,
+                                valueToHeader: true,
+                                exactMatch: false,
+                                allText: 'all',
+                                compare: '>='
+                          });
+                        }
+                    }
                 }
             });
         }
