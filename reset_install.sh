@@ -9,7 +9,7 @@ if [ ! -f local/config/database.yml ]; then
     echo "[FAILED] Please add your database informations in local/config/database.yml and start this script again."
 else
     echo -e "\n\e[01;34m[INFO] Downloading vendors\e[00m\n"
-    php composer install --prefer-dist --no-dev
+    composer install
 
     cd local/config/
 
