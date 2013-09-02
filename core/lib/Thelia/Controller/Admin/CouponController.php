@@ -77,9 +77,12 @@ class CouponController extends BaseAdminController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function createCoupon($args)
+    protected function createAction($args)
     {
-        $this->checkAuth("ADMIN", "admin.coupon.view");
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.coupon.create")) return $response;
+
+        $message = false;
 
         if ($this->getRequest()->isMethod('POST')) {
             try {

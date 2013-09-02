@@ -34,6 +34,16 @@
     <route id="admin.category" path="/admin/catalog/category">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::processAction</default>
     </route>
+    <route id="admin.category.ajax" path="/admin/catalog/category/parent/{parentId}.{_format}" methods="GET">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::getByParentIdAction</default>
+        <requirement key="_format">xml|json</requirement>
+    </route>
+
+
+
+
+
+
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
     <route id="admin.coupon.list" path="/admin/coupon">
@@ -52,6 +62,11 @@
         <default key="_controller">Thelia\Controller\Admin\CouponController::processAction</default>
         <default key="action">read</default>
     </route>
+
+
+
+
+
 
     <!-- Routes to the Config (system variables) controller -->
 

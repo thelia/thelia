@@ -516,31 +516,31 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $date = new \DateTime();
     $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
 
-    $rule1 = new Thelia\Coupon\Rule\AvailableForTotalAmount(
-        array(
-            Thelia\Coupon\Rule\AvailableForTotalAmount::PARAM1_PRICE => new Thelia\Coupon\Parameter\RuleValidator(
-                Thelia\Coupon\Rule\Operators::SUPERIOR,
-                new Thelia\Coupon\Parameter\PriceParam(
-                    40.00,
-                    'EUR'
-                )
-            )
-        )
-    );
-    $rule2 = new Thelia\Coupon\Rule\AvailableForTotalAmount(
-        array(
-            Thelia\Coupon\Rule\AvailableForTotalAmount::PARAM1_PRICE => new Thelia\Coupon\Parameter\RuleValidator(
-                Thelia\Coupon\Rule\Operators::INFERIOR,
-                new Thelia\Coupon\Parameter\PriceParam(
-                    400.00,
-                    'EUR'
-                )
-            )
-        )
-    );
-    $rules = new \Thelia\Coupon\CouponRuleCollection(array($rule1, $rule2));
+//    $rule1 = new Thelia\Constraint\Rule\AvailableForTotalAmount(
+//        array(
+//            Thelia\Constraint\Rule\AvailableForTotalAmount::PARAM1_PRICE => new Thelia\Constraint\Validator\RuleValidator(
+//                Thelia\Constraint\Rule\Operators::SUPERIOR,
+//                new Thelia\Constraint\Validator\PriceParam(
+//                    40.00,
+//                    'EUR'
+//                )
+//            )
+//        )
+//    );
+//    $rule2 = new Thelia\Constraint\Rule\AvailableForTotalAmount(
+//        array(
+//            Thelia\Constraint\Rule\AvailableForTotalAmount::PARAM1_PRICE => new Thelia\Coupon\Parameter\RuleValidator(
+//                Thelia\Constraint\Rule\Operators::INFERIOR,
+//                new Thelia\Constraint\Parameter\PriceParam(
+//                    400.00,
+//                    'EUR'
+//                )
+//            )
+//        )
+//    );
+//    $rules = new \Thelia\Coupon\CouponRuleCollection(array($rule1, $rule2));
 
-    $coupon1->setSerializedRules(base64_encode(serialize($rules)));
+//    $coupon1->setSerializedRules(base64_encode(serialize($rules)));
 
     $coupon1->setIsCumulative(1);
     $coupon1->setIsRemovingPostage(0);

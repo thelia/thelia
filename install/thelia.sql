@@ -1029,6 +1029,49 @@ CREATE TABLE `message`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- rewriting
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `rewriting`;
+
+CREATE TABLE `rewriting`
+(
+    `id` INTEGER NOT NULL,
+    `url` VARCHAR(255) NOT NULL,
+    `product_id` INTEGER,
+    `category_id` INTEGER,
+    `folder_id` INTEGER,
+    `content_id` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_rewriting_product_id` (`product_id`),
+    INDEX `idx_rewriting_category_id` (`category_id`),
+    INDEX `idx_rewriting_folder_id` (`folder_id`),
+    INDEX `idx_rewriting_content_id` (`content_id`),
+    CONSTRAINT `fk_rewriting_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_rewriting_category_id`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `category` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_rewriting_folder_id`
+        FOREIGN KEY (`folder_id`)
+        REFERENCES `folder` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_rewriting_content_id`
+        FOREIGN KEY (`content_id`)
+        REFERENCES `content` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- coupon
 -- ---------------------------------------------------------------------
 
@@ -1039,9 +1082,6 @@ CREATE TABLE `coupon`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45) NOT NULL,
     `type` VARCHAR(255) NOT NULL,
-    `title` VARCHAR(255) NOT NULL,
-    `short_description` TEXT NOT NULL,
-    `description` LONGTEXT NOT NULL,
     `amount` FLOAT NOT NULL,
     `is_used` TINYINT NOT NULL,
     `is_enabled` TINYINT NOT NULL,
@@ -1077,21 +1117,16 @@ CREATE TABLE `coupon_order`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `order_id` INTEGER NOT NULL,
-    `code` VARCHAR(45) NOT NULL,
     `value` FLOAT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_coupon_order_order_id` (`order_id`),
-    INDEX `fk_coupon_order_coupon_idx` (`code`),
     CONSTRAINT `fk_coupon_order_order_id`
         FOREIGN KEY (`order_id`)
         REFERENCES `order` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_coupon_order_coupon`
-        FOREIGN KEY (`code`)
-        REFERENCES `coupon` (`code`)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1429,55 +1464,6 @@ CREATE TABLE `category_associated_content`
     CONSTRAINT `fk_category_associated_content_content_id`
         FOREIGN KEY (`content_id`)
         REFERENCES `content` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- rewriting_url
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `rewriting_url`;
-
-CREATE TABLE `rewriting_url`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `url` VARCHAR(255) NOT NULL,
-    `view` VARCHAR(255) NOT NULL,
-    `view_id` VARCHAR(255),
-    `view_locale` VARCHAR(255) NOT NULL,
-    `redirected` INTEGER,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
-    UNIQUE INDEX `url_UNIQUE` (`url`),
-    INDEX `idx_view_id` (`view_id`),
-    INDEX `idx_rewriting_url_redirected` (`redirected`),
-    CONSTRAINT `fk_rewriting_url_redirected`
-        FOREIGN KEY (`redirected`)
-        REFERENCES `rewriting_url` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE RESTRICT
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- rewriting_argument
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `rewriting_argument`;
-
-CREATE TABLE `rewriting_argument`
-(
-    `rewriting_url_id` INTEGER NOT NULL,
-    `parameter` VARCHAR(255) NOT NULL,
-    `value` VARCHAR(255) NOT NULL,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`rewriting_url_id`,`parameter`,`value`),
-    INDEX `fk_rewriting_argument_rewirting_url_id` (`rewriting_url_id`),
-    CONSTRAINT `fk_rewriting_argument_rewirting_url_id`
-        FOREIGN KEY (`rewriting_url_id`)
-        REFERENCES `rewriting_url` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -1921,6 +1907,9 @@ CREATE TABLE `coupon_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `short_description` TEXT NOT NULL,
+    `description` LONGTEXT NOT NULL,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `coupon_i18n_FK_1`
         FOREIGN KEY (`id`)
@@ -2185,9 +2174,6 @@ CREATE TABLE `coupon_version`
     `id` INTEGER NOT NULL,
     `code` VARCHAR(45) NOT NULL,
     `type` VARCHAR(255) NOT NULL,
-    `title` VARCHAR(255) NOT NULL,
-    `short_description` TEXT NOT NULL,
-    `description` LONGTEXT NOT NULL,
     `amount` FLOAT NOT NULL,
     `is_used` TINYINT NOT NULL,
     `is_enabled` TINYINT NOT NULL,

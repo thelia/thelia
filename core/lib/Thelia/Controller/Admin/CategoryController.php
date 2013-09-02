@@ -256,4 +256,16 @@ class CategoryController extends BaseAdminController
         // We did not recognized the action -> return a 404 page
         return $this->pageNotFound();
     }
+
+    /**
+     * Get a Category from its parent id
+     *
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     */
+    public function getByParentIdAction($parentId, $_format = 'json')
+    {
+        if (null !== $response = $this->checkAuth("admin.catalog.view")) return $response;
+
+        return $this->render('categories', $args);
+    }
 }
