@@ -53,10 +53,38 @@
         <default key="action">read</default>
     </route>
 
+    <!-- Routes to the Config (system variables) controller -->
+
+    <route id="admin.configuration.variables.default" path="/admin/configuration/variables">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.variables.change-values" path="/admin/configuration/variables/change-values">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::changeValuesAction</default>
+    </route>
+
+    <route id="admin.configuration.variables.create" path="/admin/configuration/variables/create">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.variables.change" path="/admin/configuration/variables/change">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::changeAction</default>
+    </route>
+
+    <route id="admin.configuration.variables.save-change" path="/admin/configuration/variables/save-change">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::saveChangeAction</default>
+    </route>
+
+    <route id="admin.configuration.variables.delete" path="/admin/configuration/variables/delete">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::deleteAction</default>
+    </route>
+
+
 	<!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">
         <default key="_controller">Thelia\Controller\Admin\AdminController::processTemplateAction</default>
         <requirement key="template">.*</requirement>
     </route>
+
 </routes>

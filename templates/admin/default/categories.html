@@ -1,4 +1,4 @@
-{check_auth context="admin" roles="ADMIN" permissions="admin.catalog.view" login_tpl="/admin/login"}
+{check_auth roles="ADMIN" permissions="admin.catalog.view" login_tpl="/admin/login"}
 
 {$page_title={intl l='Catalog'}}
 
@@ -31,8 +31,8 @@
 
 							{module_include location='category_list_caption'}
 
-                            {loop type="auth" name="can_create" context="admin" roles="ADMIN" permissions="admin.category.create"}
-	                        <a class="btn btn-primary btn-add-item" title="{intl l='Add a new category'}" href="#add_category_dialog" data-toggle="modal">
+                            {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.category.create"}
+	                        <a class="btn btn-primary action-btn" title="{intl l='Add a new category'}" href="#add_category_dialog" data-toggle="modal">
 	                            <i class="icon-plus-sign icon-white"></i>
 	                        </a>
 	                        {/loop}
@@ -41,25 +41,77 @@
 						{ifloop rel="category_list"}
 		                    <thead>
 		                        <tr>
-		                            <th class="object-title">{intl l="Category title"}</th>
+                                    <th class="object-image">&nbsp;</th>
+                                    <th class="object-title">
+                                        {if $category_order == 'alpha'}
+                                            <i class="icon  icon-chevron-up"></i>
+                                            {$order_change = 'alpha_reverse'}
+                                        {elseif $category_order == 'alpha_reverse'}
+                                            <i class="icon  icon-chevron-down"></i>
+                                            {$order_change = 'alpha'}
+                                        {else}
+                                            {$order_change = 'alpha'}
+                                        {/if}
+                                        <a href="{url path='/admin/catalog/category' id="{$current_category_id}" category_order="$order_change"}">
+                                            {intl l="Category title"}
+                                        </a>
+                                     </th>
 
 		                            {module_include location='category_list_header'}
 
-		                            <th>{intl l="Online"}</th>
-		                            <th>{intl l="Position"}</th>
+		                            <th>
+                                        {if $category_order == 'visible'}
+                                            <i class="icon  icon-chevron-up"></i>
+                                            {$order_change = 'visible_reverse'}
+                                        {elseif $category_order == 'visible_reverse'}
+                                            <i class="icon  icon-chevron-down"></i>
+                                            {$order_change = 'visible'}
+                                        {else}
+                                            {$order_change = 'visible'}
+                                        {/if}
+
+		                                <a href="{url path='admin/catalog/category' id="{$current_category_id}" category_order="$order_change"}">
+		                                   {intl l="Online"}
+		                                </a>
+		                            </th>
+
+		                            <th>
+		                                {if $category_order == 'manual'}
+                                            <i class="icon  icon-chevron-up"></i>
+                                            {$order_change = 'manual_reverse'}
+                                        {elseif $category_order == 'manual_reverse'}
+                                            <i class="icon  icon-chevron-down"></i>
+                                            {$order_change = 'manual'}
+                                        {else}
+                                            {$order_change = 'manual'}
+                                        {/if}
+
+		                                <a href="{url path='admin/catalog/category' id="{$current_category_id}" category_order="$order_change"}">{intl l="Position"}</a>
+		                            </th>
+
 		                            <th>{intl l="Actions"}</th>
 		                        </tr>
 		                    </thead>
 
 		                    <tbody>
-		                    {loop name="category_list" type="category" visible="*" parent="{$current_category_id}" order="manual"}
+		                    {loop name="category_list" type="category" visible="*" parent="{$current_category_id}" order="$category_order"}
 		                    <tr>
-		                    	<td class="object-title"><a href="{url path='admin/catalog/category' id="$ID" action='browse'}" title="{intl l='Browse this category'}">{$TITLE}</a></td>
+		                        <td>
+		                        {loop type="image" name="cat_image" source="category" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
+		                          <a href="{url path='admin/catalog/category' id="$ID" action='browse'}" title="{intl l='Browse this category'}"><img src="#IMAGE_URL" alt="#TITLE" /></a>
+		                        {/loop}
+		                        </td>
+
+		                    	<td class="object-title">
+		                    	     <a href="{url path='admin/catalog/category' id="$ID" action='browse'}" title="{intl l='Browse this category'}">
+		                    	        {$TITLE}
+		                    	     </a>
+		                    	</td>
 
 	 							{module_include location='category_list_row'}
 
 		                    	<td>
-		                    	    {loop type="auth" name="can_change" context="admin" roles="ADMIN" permissions="admin.category.edit"}
+		                    	    {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
 		                    		<input type="checkbox" data-id="{$ID}" class="categoryVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
 		                    		{/loop}
 
@@ -69,7 +121,7 @@
 		                    	</td>
 
 		                    	<td>
-		                    	    {loop type="auth" name="can_change" context="admin" roles="ADMIN" permissions="admin.category.edit"}
+		                    	    {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
 			                        	<a href="{url path='admin/catalog/category' category_id="{$ID}" action='positionUp'}"><i class="icon-arrow-up"></i></a>
 			                            <span class="categoryPositionChange" data-id="{$ID}">{$POSITION}</span>
 			                          	<a href="{url path='admin/catalog/category' category_id="{$ID}" action='positionDown'}"><i class="icon-arrow-down"></i></a>
@@ -83,11 +135,11 @@
 		                        <td>
 	                                <a class="btn btn-mini" title="{intl l='Browse this category'}" href="{url path='admin/catalog/category' id="$ID" action='browse'}"><i class="icon-folder-open"></i></a>
 
-	                                {loop type="auth" name="can_change" context="admin" roles="ADMIN" permissions="admin.category.edit"}
+	                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
 	                                   <a class="btn btn-mini" title="{intl l='Edit this category'}" href="{url path='admin/catalog/category' id="$ID" action='edit'}"><i class="icon-edit"></i></a>
 	                                {/loop}
 
-	                                {loop type="auth" name="can_delete" context="admin" roles="ADMIN" permissions="admin.category.delete"}
+	                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.category.delete"}
 	                                   <a class="btn btn-mini category-delete" title="{intl l='Delete this category and all its contents'}"  href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal"><i class="icon-trash"></i></a>
 	                                {/loop}
 		                         </td>
@@ -101,7 +153,7 @@
 							<tr>
 								<td class="message">
 								    <div class="alert alert-info">
-								    {loop type="auth" name="can_create" context="admin" roles="ADMIN" permissions="admin.category.create"}
+								    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.category.create"}
 								        {intl l="This category has no sub-categories. To create a new one, click the + button above."}
 								    {/loop}
 
@@ -133,7 +185,7 @@
 
 							{module_include location='product_list_caption'}
 
-	                        <a class="btn btn-primary btn-add-item" title="{intl l='Add a new product'}" href="#productAddModal" data-toggle="modal">
+	                        <a class="btn btn-primary action-btn" title="{intl l='Add a new product'}" href="#productAddModal" data-toggle="modal">
 	                            <i class="icon-plus-sign icon-white"></i>
 	                        </a>
 	                    </caption>
@@ -141,7 +193,7 @@
 						{ifloop rel="product_list"}
 		                    <thead>
 		                        <tr>
-		                            <th>{intl l="Image"}</th>
+		                            <th>&nbsp;</th>
 
 		                            <th class="object-title">{intl l="Product title"}</th>
 
@@ -156,7 +208,12 @@
 		                    <tbody>
 		                    {loop name="product_list" type="product" category="{$current_category_id}" order="manual"}
 		                    <tr>
-		                    	<td><a href="{url path='admin/catalog/product' id="$ID" action='edit'}" title="{intl l='Edit this product'}">Image !</a></td>
+		                    	<td>
+                                {loop type="image" name="cat_image" source="product" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
+                                  <a href="{url path='admin/catalog/product' id="$ID" action='edit'}" title="{intl l='Edit this product'}">
+                                    <img src="#IMAGE_URL" alt="#TITLE" />
+                                  </a>
+                                {/loop}
 
 		                    	<td class="object-title"><a href="{url path='admin/catalog/product' id="$ID" action='edit'}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
 

@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "458aeccc06b7394d7653a9063b6fd981",
+    "hash": "050e3da6bd52d5743a46e09992cf67c0",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -254,16 +254,16 @@
         },
         {
             "name": "propel/propel",
-            "version": "2.0.0-alpha1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/propelorm/Propel2.git",
-                "reference": "3b9ea45a6e1b9fb3903cb910a31fbbac4a66c184"
+                "reference": "58a25ded43c3d04313cad2b738342d307988b1b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/3b9ea45a6e1b9fb3903cb910a31fbbac4a66c184",
-                "reference": "3b9ea45a6e1b9fb3903cb910a31fbbac4a66c184",
+                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/58a25ded43c3d04313cad2b738342d307988b1b5",
+                "reference": "58a25ded43c3d04313cad2b738342d307988b1b5",
                 "shasum": ""
             },
             "require": {
@@ -310,7 +310,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2013-06-05 06:46:14"
+            "time": "2013-09-01 13:29:51"
         },
         {
             "name": "psr/log",
@@ -397,12 +397,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/simplepie/simplepie.git",
-                "reference": "f5436d69a8efa9d4ab3a9abc65d17317eb24b7f4"
+                "reference": "f97c8ef9be655c35e6fecdb608bdf5af05a4374a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/simplepie/simplepie/zipball/f5436d69a8efa9d4ab3a9abc65d17317eb24b7f4",
-                "reference": "f5436d69a8efa9d4ab3a9abc65d17317eb24b7f4",
+                "url": "https://api.github.com/repos/simplepie/simplepie/zipball/f97c8ef9be655c35e6fecdb608bdf5af05a4374a",
+                "reference": "f97c8ef9be655c35e6fecdb608bdf5af05a4374a",
                 "shasum": ""
             },
             "require": {
@@ -443,7 +443,7 @@
                 "feeds",
                 "rss"
             ],
-            "time": "2013-04-29 06:13:26"
+            "time": "2013-08-31 01:38:46"
         },
         {
             "name": "smarty/smarty",
@@ -1066,22 +1066,23 @@
         },
         {
             "name": "symfony/icu",
-            "version": "v1.0.0",
+            "version": "v1.2.0",
             "target-dir": "Symfony/Component/Icu",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Icu.git",
-                "reference": "v1.0.0"
+                "reference": "7299cd3d8d6602103d1ebff5d0a9917b7bc6de72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Icu/zipball/v1.0.0",
-                "reference": "v1.0.0",
+                "url": "https://api.github.com/repos/symfony/Icu/zipball/7299cd3d8d6602103d1ebff5d0a9917b7bc6de72",
+                "reference": "7299cd3d8d6602103d1ebff5d0a9917b7bc6de72",
                 "shasum": ""
             },
             "require": {
+                "lib-icu": ">=4.4",
                 "php": ">=5.3.3",
-                "symfony/intl": ">=2.3,<3.0"
+                "symfony/intl": "~2.3"
             },
             "type": "library",
             "autoload": {
@@ -1109,7 +1110,7 @@
                 "icu",
                 "intl"
             ],
-            "time": "2013-06-03 18:32:07"
+            "time": "2013-06-03 18:32:58"
         },
         {
             "name": "symfony/intl",
@@ -1508,7 +1509,7 @@
         },
         {
             "name": "symfony/validator",
-            "version": "2.3.x-dev",
+            "version": "v2.3.4",
             "target-dir": "Symfony/Component/Validator",
             "source": {
                 "type": "git",
@@ -1622,12 +1623,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fzaninotto/Faker.git",
-                "reference": "feb6492762a77db946bc13cc44a20a01546be0e6"
+                "reference": "77a4e394d99a67e7fb611e8b402c2da4b80fa4f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/feb6492762a77db946bc13cc44a20a01546be0e6",
-                "reference": "feb6492762a77db946bc13cc44a20a01546be0e6",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/77a4e394d99a67e7fb611e8b402c2da4b80fa4f8",
+                "reference": "77a4e394d99a67e7fb611e8b402c2da4b80fa4f8",
                 "shasum": ""
             },
             "require": {
@@ -1660,7 +1661,7 @@
                 "faker",
                 "fixtures"
             ],
-            "time": "2013-08-12 10:05:47"
+            "time": "2013-08-29 19:11:59"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -2037,8 +2038,7 @@
     "stability-flags": {
         "ezyang/htmlpurifier": 20,
         "ircmaxell/password-compat": 20,
-        "propel/propel": 15,
-        "symfony/validator": 20,
+        "propel/propel": 20,
         "kriswallsmith/assetic": 20,
         "leafo/lessphp": 20,
         "ptachoire/cssembed": 20,

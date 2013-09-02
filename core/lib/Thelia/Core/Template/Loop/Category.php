@@ -24,7 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -62,7 +62,7 @@ use Thelia\Type\BooleanOrBothType;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Category extends BaseLoop
+class Category extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -75,11 +75,10 @@ class Category extends BaseLoop
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
-            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'random'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'visible', 'visible_reverse', 'random'))
                 ),
                 'manual'
             ),
@@ -97,7 +96,7 @@ class Category extends BaseLoop
         $search = CategoryQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search);
 
 		$id = $this->getId();
 
@@ -146,6 +145,12 @@ class Category extends BaseLoop
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
                     break;
+                case "visible":
+                    $search->orderByVisible(Criteria::ASC);
+                    break;
+                case "visible_reverse":
+                    $search->orderByVisible(Criteria::DESC);
+                    break;
                 case "random":
                     $search->clearOrderByColumns();
                     $search->addAscendingOrderByColumn('RAND()');
@@ -173,12 +178,13 @@ class Category extends BaseLoop
             $loopResultRow
             	->set("ID", $category->getId())
                 ->set("IS_TRANSLATED",$category->getVirtualColumn('IS_TRANSLATED'))
-            	->set("TITLE",$category->getVirtualColumn('i18n_TITLE'))
+                ->set("LOCALE",$locale)
+            	->set("TITLE", $category->getVirtualColumn('i18n_TITLE'))
 	            ->set("CHAPO", $category->getVirtualColumn('i18n_CHAPO'))
 	            ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
 	            ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
 	            ->set("PARENT", $category->getParent())
-	            ->set("URL", $category->getUrl())
+	            ->set("URL", $category->getUrl($locale))
 	            ->set("PRODUCT_COUNT", $category->countChild())
 	            ->set("VISIBLE", $category->getVisible() ? "1" : "0")
 	            ->set("POSITION", $category->getPosition())

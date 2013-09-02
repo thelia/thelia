@@ -77,6 +77,5 @@ class CategoryCreateEvent extends ActionEvent
     public function setCreatedCategory(Category $created_category)
     {
         $this->created_category = $created_category;
-var_dump($this->created_category);
     }
 }

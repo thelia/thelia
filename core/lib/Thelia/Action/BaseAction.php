@@ -49,34 +49,4 @@ class BaseAction
     {
         return $this->container->get('event_dispatcher');
     }
-
-    /**
-     * Check current user authorisations.
-     *
-     * @param mixed $roles a single role or an array of roles.
-     * @param mixed $permissions a single permission or an array of permissions.
-     *
-     * @throws AuthenticationException if permissions are not granted to the current user.
-     */
-    protected function checkAuth($roles, $permissions) {
-
-        if (! $this->getSecurityContext()->isGranted(
-                is_array($roles) ? $roles : array($roles),
-                is_array($permissions) ? $permissions : array($permissions)) ) {
-
-            Tlog::getInstance()->addAlert("Authorization roles:", $roles, " permissions:", $permissions, " refused.");
-
-            throw new AuthorizationException("Sorry, you're not allowed to perform this action");
-        }
-    }
-
-    /**
-     * Return the security context
-     *
-     * @return Thelia\Core\Security\SecurityContext
-     */
-    protected function getSecurityContext()
-    {
-        return $this->container->get('thelia.securityContext');
-    }
 }

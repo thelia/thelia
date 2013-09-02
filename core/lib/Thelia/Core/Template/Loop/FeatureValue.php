@@ -25,7 +25,7 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -49,7 +49,7 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class FeatureValue extends BaseLoop
+class FeatureValue extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -68,8 +68,7 @@ class FeatureValue extends BaseLoop
                     new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
-            ),
-            Argument::createIntTypeArgument('lang')
+            )
         );
     }
 
@@ -83,11 +82,12 @@ class FeatureValue extends BaseLoop
         $search = FeatureProductQuery::create();
 
         /* manage featureAv translations */
-        $this->configureI18nProcessing(
+        $locale = $this->configureI18nProcessing(
             $search,
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             FeatureAvTableMap::TABLE_NAME,
-            'FEATURE_AV_ID'
+            'FEATURE_AV_ID',
+            true
         );
 
         $feature = $this->getFeature();
@@ -141,7 +141,9 @@ class FeatureValue extends BaseLoop
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $featureValue->getId());
 
-            $loopResultRow->set("PERSONAL_VALUE", $featureValue->getByDefault())
+            $loopResultRow
+                ->set("LOCALE",$locale)
+                ->set("PERSONAL_VALUE", $featureValue->getByDefault())
                 ->set("TITLE",$featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
                 ->set("CHAPO", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
                 ->set("DESCRIPTION", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))

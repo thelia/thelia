@@ -25,6 +25,11 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 
+/**
+ * Class CustomerModification
+ * @package Thelia\Form
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class CustomerModification extends BaseForm
 {
     /**

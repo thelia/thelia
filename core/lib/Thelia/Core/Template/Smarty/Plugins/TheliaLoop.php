@@ -311,13 +311,13 @@ class TheliaLoop extends AbstractSmartyPlugin
         $type = strtolower($smartyParams['type']);
 
         if (! isset($this->loopDefinition[$type])) {
-            throw new ElementNotFoundException(sprintf("%s loop does not exists", $type));
+            throw new ElementNotFoundException(sprintf("'%s' loop type does not exists", $type));
         }
 
         $class = new \ReflectionClass($this->loopDefinition[$type]);
 
         if ($class->isSubclassOf("Thelia\Core\Template\Element\BaseLoop") === false) {
-            throw new InvalidElementException(sprintf("%s Loop class have to extends Thelia\Core\Template\Element\BaseLoop",
+            throw new InvalidElementException(sprintf("'%s' Loop class should extends Thelia\Core\Template\Element\BaseLoop",
                     $type));
         }
 

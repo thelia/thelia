@@ -474,7 +474,6 @@ abstract class Category implements ActiveRecordInterface
         if (!$this->hasVirtualColumn($name)) {
             throw new PropelException(sprintf('Cannot get value of inexistent virtual column %s.', $name));
         }
-
         return $this->virtualColumns[$name];
     }
 

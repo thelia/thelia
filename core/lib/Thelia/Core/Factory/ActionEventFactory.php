@@ -25,6 +25,14 @@ namespace Thelia\Core\Factory;
 
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * *
+ * try to instanciate the good action class
+ *
+ * Class ActionEventFactory
+ * @package Thelia\Core\Factory
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class ActionEventFactory
 {
 

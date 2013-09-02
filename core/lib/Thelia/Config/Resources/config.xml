@@ -32,6 +32,7 @@
         <loop class="Thelia\Core\Template\Loop\CategoryTree" name="category-tree"/>
         <loop class="Thelia\Core\Template\Loop\Cart" name="cart"/>
         <loop class="Thelia\Core\Template\Loop\Image" name="image"/>
+        <loop class="Thelia\Core\Template\Loop\Config" name="config"/>
     </loops>
 
     <forms>
@@ -45,6 +46,9 @@
         <form name="thelia.admin.category.deletion" class="Thelia\Form\CategoryDeletionForm"/>
 
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
+
+        <form name="thelia.admin.config.creation" class="Thelia\Form\ConfigCreationForm"/>
+        <form name="thelia.admin.config.modification" class="Thelia\Form\ConfigModificationForm"/>
     </forms>
 
 

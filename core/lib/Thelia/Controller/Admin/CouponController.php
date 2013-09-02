@@ -31,6 +31,7 @@ use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Form\CouponCreationForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Coupon;
+use Thelia\Model\CouponQuery;
 
 /**
  * Created by JetBrains PhpStorm.

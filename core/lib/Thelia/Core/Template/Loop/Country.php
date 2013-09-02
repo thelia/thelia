@@ -24,7 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -43,7 +43,7 @@ use Thelia\Model\ConfigQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Country extends BaseLoop
+class Country extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -54,8 +54,7 @@ class Country extends BaseLoop
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('area'),
             Argument::createBooleanTypeArgument('with_area'),
-            Argument::createIntListTypeArgument('exclude'),
-            Argument::createIntTypeArgument('lang')
+            Argument::createIntListTypeArgument('exclude')
         );
     }
 
@@ -69,7 +68,7 @@ class Country extends BaseLoop
         $search = CountryQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -108,6 +107,7 @@ class Country extends BaseLoop
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $country->getId())
                 ->set("IS_TRANSLATED",$country->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("TITLE",$country->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $country->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $country->getVirtualColumn('i18n_DESCRIPTION'))
