@@ -24,14 +24,16 @@ use Thelia\Model\Map\MessageI18nTableMap;
  * @method     ChildMessageI18nQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildMessageI18nQuery orderByLocale($order = Criteria::ASC) Order by the locale column
  * @method     ChildMessageI18nQuery orderByTitle($order = Criteria::ASC) Order by the title column
- * @method     ChildMessageI18nQuery orderByDescription($order = Criteria::ASC) Order by the description column
- * @method     ChildMessageI18nQuery orderByDescriptionHtml($order = Criteria::ASC) Order by the description_html column
+ * @method     ChildMessageI18nQuery orderBySubject($order = Criteria::ASC) Order by the subject column
+ * @method     ChildMessageI18nQuery orderByTextMessage($order = Criteria::ASC) Order by the text_message column
+ * @method     ChildMessageI18nQuery orderByHtmlMessage($order = Criteria::ASC) Order by the html_message column
  *
  * @method     ChildMessageI18nQuery groupById() Group by the id column
  * @method     ChildMessageI18nQuery groupByLocale() Group by the locale column
  * @method     ChildMessageI18nQuery groupByTitle() Group by the title column
- * @method     ChildMessageI18nQuery groupByDescription() Group by the description column
- * @method     ChildMessageI18nQuery groupByDescriptionHtml() Group by the description_html column
+ * @method     ChildMessageI18nQuery groupBySubject() Group by the subject column
+ * @method     ChildMessageI18nQuery groupByTextMessage() Group by the text_message column
+ * @method     ChildMessageI18nQuery groupByHtmlMessage() Group by the html_message column
  *
  * @method     ChildMessageI18nQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildMessageI18nQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -47,14 +49,16 @@ use Thelia\Model\Map\MessageI18nTableMap;
  * @method     ChildMessageI18n findOneById(int $id) Return the first ChildMessageI18n filtered by the id column
  * @method     ChildMessageI18n findOneByLocale(string $locale) Return the first ChildMessageI18n filtered by the locale column
  * @method     ChildMessageI18n findOneByTitle(string $title) Return the first ChildMessageI18n filtered by the title column
- * @method     ChildMessageI18n findOneByDescription(string $description) Return the first ChildMessageI18n filtered by the description column
- * @method     ChildMessageI18n findOneByDescriptionHtml(string $description_html) Return the first ChildMessageI18n filtered by the description_html column
+ * @method     ChildMessageI18n findOneBySubject(string $subject) Return the first ChildMessageI18n filtered by the subject column
+ * @method     ChildMessageI18n findOneByTextMessage(string $text_message) Return the first ChildMessageI18n filtered by the text_message column
+ * @method     ChildMessageI18n findOneByHtmlMessage(string $html_message) Return the first ChildMessageI18n filtered by the html_message column
  *
  * @method     array findById(int $id) Return ChildMessageI18n objects filtered by the id column
  * @method     array findByLocale(string $locale) Return ChildMessageI18n objects filtered by the locale column
  * @method     array findByTitle(string $title) Return ChildMessageI18n objects filtered by the title column
- * @method     array findByDescription(string $description) Return ChildMessageI18n objects filtered by the description column
- * @method     array findByDescriptionHtml(string $description_html) Return ChildMessageI18n objects filtered by the description_html column
+ * @method     array findBySubject(string $subject) Return ChildMessageI18n objects filtered by the subject column
+ * @method     array findByTextMessage(string $text_message) Return ChildMessageI18n objects filtered by the text_message column
+ * @method     array findByHtmlMessage(string $html_message) Return ChildMessageI18n objects filtered by the html_message column
  *
  */
 abstract class MessageI18nQuery extends ModelCriteria
@@ -143,7 +147,7 @@ abstract class MessageI18nQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, LOCALE, TITLE, DESCRIPTION, DESCRIPTION_HTML FROM message_i18n WHERE ID = :p0 AND LOCALE = :p1';
+        $sql = 'SELECT ID, LOCALE, TITLE, SUBJECT, TEXT_MESSAGE, HTML_MESSAGE FROM message_i18n WHERE ID = :p0 AND LOCALE = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -346,61 +350,90 @@ abstract class MessageI18nQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the description column
+     * Filter the query on the subject column
      *
      * Example usage:
      * <code>
-     * $query->filterByDescription('fooValue');   // WHERE description = 'fooValue'
-     * $query->filterByDescription('%fooValue%'); // WHERE description LIKE '%fooValue%'
+     * $query->filterBySubject('fooValue');   // WHERE subject = 'fooValue'
+     * $query->filterBySubject('%fooValue%'); // WHERE subject LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $description The value to use as filter.
+     * @param     string $subject The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageI18nQuery The current query, for fluid interface
      */
-    public function filterByDescription($description = null, $comparison = null)
+    public function filterBySubject($subject = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($description)) {
+            if (is_array($subject)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $description)) {
-                $description = str_replace('*', '%', $description);
+            } elseif (preg_match('/[\%\*]/', $subject)) {
+                $subject = str_replace('*', '%', $subject);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(MessageI18nTableMap::DESCRIPTION, $description, $comparison);
+        return $this->addUsingAlias(MessageI18nTableMap::SUBJECT, $subject, $comparison);
     }
 
     /**
-     * Filter the query on the description_html column
+     * Filter the query on the text_message column
      *
      * Example usage:
      * <code>
-     * $query->filterByDescriptionHtml('fooValue');   // WHERE description_html = 'fooValue'
-     * $query->filterByDescriptionHtml('%fooValue%'); // WHERE description_html LIKE '%fooValue%'
+     * $query->filterByTextMessage('fooValue');   // WHERE text_message = 'fooValue'
+     * $query->filterByTextMessage('%fooValue%'); // WHERE text_message LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $descriptionHtml The value to use as filter.
+     * @param     string $textMessage The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageI18nQuery The current query, for fluid interface
      */
-    public function filterByDescriptionHtml($descriptionHtml = null, $comparison = null)
+    public function filterByTextMessage($textMessage = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($descriptionHtml)) {
+            if (is_array($textMessage)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $descriptionHtml)) {
-                $descriptionHtml = str_replace('*', '%', $descriptionHtml);
+            } elseif (preg_match('/[\%\*]/', $textMessage)) {
+                $textMessage = str_replace('*', '%', $textMessage);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(MessageI18nTableMap::DESCRIPTION_HTML, $descriptionHtml, $comparison);
+        return $this->addUsingAlias(MessageI18nTableMap::TEXT_MESSAGE, $textMessage, $comparison);
+    }
+
+    /**
+     * Filter the query on the html_message column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByHtmlMessage('fooValue');   // WHERE html_message = 'fooValue'
+     * $query->filterByHtmlMessage('%fooValue%'); // WHERE html_message LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $htmlMessage The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildMessageI18nQuery The current query, for fluid interface
+     */
+    public function filterByHtmlMessage($htmlMessage = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($htmlMessage)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $htmlMessage)) {
+                $htmlMessage = str_replace('*', '%', $htmlMessage);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(MessageI18nTableMap::HTML_MESSAGE, $htmlMessage, $comparison);
     }
 
     /**

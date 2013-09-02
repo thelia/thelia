@@ -62,22 +62,16 @@ abstract class MessageVersion implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the code field.
+     * The value for the name field.
      * @var        string
      */
-    protected $code;
+    protected $name;
 
     /**
      * The value for the secured field.
      * @var        int
      */
     protected $secured;
-
-    /**
-     * The value for the ref field.
-     * @var        string
-     */
-    protected $ref;
 
     /**
      * The value for the created_at field.
@@ -402,14 +396,14 @@ abstract class MessageVersion implements ActiveRecordInterface
     }
 
     /**
-     * Get the [code] column value.
+     * Get the [name] column value.
      *
      * @return   string
      */
-    public function getCode()
+    public function getName()
     {
 
-        return $this->code;
+        return $this->name;
     }
 
     /**
@@ -421,17 +415,6 @@ abstract class MessageVersion implements ActiveRecordInterface
     {
 
         return $this->secured;
-    }
-
-    /**
-     * Get the [ref] column value.
-     *
-     * @return   string
-     */
-    public function getRef()
-    {
-
-        return $this->ref;
     }
 
     /**
@@ -542,25 +525,25 @@ abstract class MessageVersion implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [code] column.
+     * Set the value of [name] column.
      *
      * @param      string $v new value
      * @return   \Thelia\Model\MessageVersion The current object (for fluent API support)
      */
-    public function setCode($v)
+    public function setName($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->code !== $v) {
-            $this->code = $v;
-            $this->modifiedColumns[] = MessageVersionTableMap::CODE;
+        if ($this->name !== $v) {
+            $this->name = $v;
+            $this->modifiedColumns[] = MessageVersionTableMap::NAME;
         }
 
 
         return $this;
-    } // setCode()
+    } // setName()
 
     /**
      * Set the value of [secured] column.
@@ -582,27 +565,6 @@ abstract class MessageVersion implements ActiveRecordInterface
 
         return $this;
     } // setSecured()
-
-    /**
-     * Set the value of [ref] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\MessageVersion The current object (for fluent API support)
-     */
-    public function setRef($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->ref !== $v) {
-            $this->ref = $v;
-            $this->modifiedColumns[] = MessageVersionTableMap::REF;
-        }
-
-
-        return $this;
-    } // setRef()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -753,37 +715,34 @@ abstract class MessageVersion implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : MessageVersionTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : MessageVersionTableMap::translateFieldName('Code', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->code = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : MessageVersionTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->name = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : MessageVersionTableMap::translateFieldName('Secured', TableMap::TYPE_PHPNAME, $indexType)];
             $this->secured = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : MessageVersionTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->ref = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : MessageVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : MessageVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : MessageVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : MessageVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : MessageVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : MessageVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : MessageVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : MessageVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : MessageVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : MessageVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -793,7 +752,7 @@ abstract class MessageVersion implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 9; // 9 = MessageVersionTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = MessageVersionTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\MessageVersion object", 0, $e);
@@ -1017,14 +976,11 @@ abstract class MessageVersion implements ActiveRecordInterface
         if ($this->isColumnModified(MessageVersionTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(MessageVersionTableMap::CODE)) {
-            $modifiedColumns[':p' . $index++]  = 'CODE';
+        if ($this->isColumnModified(MessageVersionTableMap::NAME)) {
+            $modifiedColumns[':p' . $index++]  = 'NAME';
         }
         if ($this->isColumnModified(MessageVersionTableMap::SECURED)) {
             $modifiedColumns[':p' . $index++]  = 'SECURED';
-        }
-        if ($this->isColumnModified(MessageVersionTableMap::REF)) {
-            $modifiedColumns[':p' . $index++]  = 'REF';
         }
         if ($this->isColumnModified(MessageVersionTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -1055,14 +1011,11 @@ abstract class MessageVersion implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'CODE':
-                        $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
+                    case 'NAME':
+                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
                     case 'SECURED':
                         $stmt->bindValue($identifier, $this->secured, PDO::PARAM_INT);
-                        break;
-                    case 'REF':
-                        $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1138,27 +1091,24 @@ abstract class MessageVersion implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getCode();
+                return $this->getName();
                 break;
             case 2:
                 return $this->getSecured();
                 break;
             case 3:
-                return $this->getRef();
-                break;
-            case 4:
                 return $this->getCreatedAt();
                 break;
-            case 5:
+            case 4:
                 return $this->getUpdatedAt();
                 break;
-            case 6:
+            case 5:
                 return $this->getVersion();
                 break;
-            case 7:
+            case 6:
                 return $this->getVersionCreatedAt();
                 break;
-            case 8:
+            case 7:
                 return $this->getVersionCreatedBy();
                 break;
             default:
@@ -1191,14 +1141,13 @@ abstract class MessageVersion implements ActiveRecordInterface
         $keys = MessageVersionTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getCode(),
+            $keys[1] => $this->getName(),
             $keys[2] => $this->getSecured(),
-            $keys[3] => $this->getRef(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
-            $keys[6] => $this->getVersion(),
-            $keys[7] => $this->getVersionCreatedAt(),
-            $keys[8] => $this->getVersionCreatedBy(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
+            $keys[5] => $this->getVersion(),
+            $keys[6] => $this->getVersionCreatedAt(),
+            $keys[7] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1248,27 +1197,24 @@ abstract class MessageVersion implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setCode($value);
+                $this->setName($value);
                 break;
             case 2:
                 $this->setSecured($value);
                 break;
             case 3:
-                $this->setRef($value);
-                break;
-            case 4:
                 $this->setCreatedAt($value);
                 break;
-            case 5:
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
-            case 6:
+            case 5:
                 $this->setVersion($value);
                 break;
-            case 7:
+            case 6:
                 $this->setVersionCreatedAt($value);
                 break;
-            case 8:
+            case 7:
                 $this->setVersionCreatedBy($value);
                 break;
         } // switch()
@@ -1296,14 +1242,13 @@ abstract class MessageVersion implements ActiveRecordInterface
         $keys = MessageVersionTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
+        if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setSecured($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setRef($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setVersion($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setVersionCreatedAt($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setVersionCreatedBy($arr[$keys[8]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setVersion($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setVersionCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setVersionCreatedBy($arr[$keys[7]]);
     }
 
     /**
@@ -1316,9 +1261,8 @@ abstract class MessageVersion implements ActiveRecordInterface
         $criteria = new Criteria(MessageVersionTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(MessageVersionTableMap::ID)) $criteria->add(MessageVersionTableMap::ID, $this->id);
-        if ($this->isColumnModified(MessageVersionTableMap::CODE)) $criteria->add(MessageVersionTableMap::CODE, $this->code);
+        if ($this->isColumnModified(MessageVersionTableMap::NAME)) $criteria->add(MessageVersionTableMap::NAME, $this->name);
         if ($this->isColumnModified(MessageVersionTableMap::SECURED)) $criteria->add(MessageVersionTableMap::SECURED, $this->secured);
-        if ($this->isColumnModified(MessageVersionTableMap::REF)) $criteria->add(MessageVersionTableMap::REF, $this->ref);
         if ($this->isColumnModified(MessageVersionTableMap::CREATED_AT)) $criteria->add(MessageVersionTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(MessageVersionTableMap::UPDATED_AT)) $criteria->add(MessageVersionTableMap::UPDATED_AT, $this->updated_at);
         if ($this->isColumnModified(MessageVersionTableMap::VERSION)) $criteria->add(MessageVersionTableMap::VERSION, $this->version);
@@ -1395,9 +1339,8 @@ abstract class MessageVersion implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setId($this->getId());
-        $copyObj->setCode($this->getCode());
+        $copyObj->setName($this->getName());
         $copyObj->setSecured($this->getSecured());
-        $copyObj->setRef($this->getRef());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setVersion($this->getVersion());
@@ -1487,9 +1430,8 @@ abstract class MessageVersion implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->code = null;
+        $this->name = null;
         $this->secured = null;
-        $this->ref = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->version = null;

@@ -1,0 +1,239 @@
+{check_auth roles="ADMIN" permissions="admin.configuration.messages.view" login_tpl="/admin/login"}
+
+{$page_title={intl l='Thelia Mailing Templates'}}
+
+{include file='includes/header.inc.html'}
+
+<div class="messages">
+
+    <div id="wrapper" class="container">
+
+        <ul class="breadcrumb">
+            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a> <span class="divider">/</span></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a> <span class="divider">/</span></li>
+            <li><a href="{url path='/admin/configuration/messages'}">{intl l="Mailing templates"}</a></li>
+        </ul>
+
+        {module_include location='messages_top'}
+
+        <div class="row-fluid">
+
+            <div class="span12">
+                <form action="{url path='/admin/configuration/messages/change-values'}" method="post">
+	                <div class="general-block-decorator">
+	                    <table class="table table-striped table-condensed table-left-aligned">
+	                        <caption>
+	                           {intl l='Thelia mailing templates'}
+	                           {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.messages.create"}
+                                <a class="btn btn-primary action-btn" title="{intl l='Add a new mailing template'}" href="#add_message_dialog" data-toggle="modal">
+                                    <i class="icon-plus-sign icon-white"></i>
+                                </a>
+                            {/loop}
+
+	                        </caption>
+	                        <tr>
+	                           <th>{intl l="Purpose"}</th>
+                               <th>{intl l="Name"}</th>
+
+                               {module_include location='messages_table_header'}
+
+                               <th>&nbsp;</th>
+	                        </tr>
+
+	                        {loop name="mailing-templates" type="message" secured="*" backend_context="1" lang="$lang_id"}
+	                            <tr>
+
+	                               <td>{$TITLE}</td>
+
+                                   <td>
+                                   {if ! $SECURED}
+                                       {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.messages.change"}
+                                           <a title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/change' message_id="$ID"}">{$NAME}</a>
+                                       {/loop}
+                                       {elseloop rel="can_change"}
+                                           {$NAME}
+                                       {/elseloop}
+                                   {else}
+                                       {$NAME}
+                                   {/if}
+                                   </td>
+
+	                                {module_include location='messages_table_row'}
+
+	                                <td class="actions">
+	                                    {if ! $SECURED}
+		                                    <div class="btn-group">
+                                               {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.messages.change"}
+                                                   <a class="btn btn-mini message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/change' message_id="$ID"}"><i class="icon-edit"></i></a>
+                                               {/loop}
+
+                                               {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.messages.delete"}
+                                                   <a class="btn btn-mini message-delete" title="{intl l='Delete this mailing template'}" href="#delete_message_dialog" data-id="{$ID}" data-toggle="modal"><i class="icon-trash"></i></a>
+                                               {/loop}
+		                                    </div>
+		                                {else}
+		                                    <i title="{intl l='This mailing template could not be changed.'}" class="icon icon-ban-circle"></i>
+	                                    {/if}
+	                                </td>
+	                            </tr>
+	                        {/loop}
+
+	                        {elseloop rel="mailing-templates"}
+	                        <tr>
+	                           <td colspan="3">
+	                               <div class="alert alert-info">
+	                               {intl l="No mailing template has been created yet. Click the + button to create one."}
+	                               </div>
+	                           </td>
+	                        </tr>
+	                        {/elseloop}
+	                    </table>
+	                </div>
+                </form>
+            </div>
+        </div>
+
+        {module_include location='messages_bottom'}
+
+    </div>
+</div>
+
+
+{* Adding a new message *}
+
+<div class="modal hide fade" id="add_message_dialog" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>{intl l="Create a new mailing template"}</h3>
+    </div>
+
+    {form name="thelia.admin.message.creation"}
+    <form method="POST" action="{url path='/admin/configuration/messages/create'}" {form_enctype form=$form}>
+
+        {form_hidden_fields form=$form}
+
+        {form_field form=$form field='success_url'}
+        {* on success, redirect to the edition page, _ID_ is replaced with the created message ID, see controller  *}
+        <input type="hidden" name="{$name}" value="{url path='/admin/configuration/messages/change' message_id='_ID_'}" />
+        {/form_field}
+
+        {* We do not allow users to create secured messages from here *}
+
+        {form_field form=$form field='secured'}
+        <input type="hidden" name="{$name}" value="0" />
+        {/form_field}
+
+        <div class="modal-body">
+
+            {if #form_error}<div class="alert alert-block alert-error" id="add_message_dialog_error">#form_error_message</div>{/if}
+
+            <div class="control-group">
+
+                <label class="control-label">
+                   {intl l='Name *'}
+                </label>
+
+                <div class="controls">
+	                {form_field form=$form field='name'}
+	                <span {if $error}class="error"{/if}>
+	                   <input type="text" required="required" name="{$name}" value="{$value}" title="{intl l='Mailing template name'}" placeholder="{intl l='Mailing template name'}" class="input-block-level">
+	                </span>
+	                {/form_field}
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">
+                   {intl l='Purpose *'}
+                </label>
+
+                <div class="controls">
+                    {loop type="lang" name="default-lang" default_only="1"}
+                        {form_field form=$form field='locale'}
+                        <input type="hidden" name="{$name}" value="{$LOCALE}" />
+                        {/form_field}
+
+                        <div class="input-append input-block-level">
+                            {form_field form=$form field='title'}
+                            <span {if $error}class="error"{/if}>
+                               <input type="text" required="required" name="{$name}" value="{$value}" title="{intl l='Mailing template purpose'}" placeholder="{intl l='Mailing template purpose'}" class="input-block-level">
+                            </span>
+                            {/form_field}
+                            <span class="add-on"><img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="{intl l=$TITLE}" /></span>
+                        </div>
+
+                        <div class="help-block">{intl l="Enter here the mailing template purpose in the default language ($TITLE)"}</div>
+                    {/loop}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">{intl l="Create this mailing template"}</button>
+            <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">{intl l="Cancel"}</button>
+        </div>
+
+    </form>
+    {/form}
+</div>
+
+
+{* Delete confirmation dialog *}
+
+<div class="modal hide fade" id="delete_message_dialog" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>{intl l="Delete a mailing template"}</h3>
+    </div>
+
+    <div class="modal-body">
+        <p>{intl l="Do you really want to delete this mailing template ?"}</p>
+    </div>
+
+    <form method="post" action="{url path='/admin/configuration/messages/delete'}">
+        <input type="hidden" name="message_id" id="message_delete_id" value="" />
+
+	    <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">{intl l="Yes"}</button>
+	        <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">{intl l="No"}</button>
+	    </div>
+    </form>
+</div>
+
+{include file='includes/js.inc.html'}
+
+<script>
+    $(function() {
+
+    	// Set proper message ID in delete from
+    	$('a.message-delete').click(function(ev) {
+    		$('#message_delete_id').val($(this).data('id'));
+     	});
+
+        {* display the form creation dialog if it contains errors *}
+
+        {form name="thelia.admin.message.creation"}
+            {if #form_error}
+                $('#add_message_dialog').modal();
+            {/if}
+        {/form}
+
+        {* Always reset create dialog on close *}
+
+        $('#add_message_dialog').on('hidden',function() {
+            // Hide error message
+            $('#add_message_dialog_error').remove();
+
+            // Clear error status
+            $("#add_message_dialog .error").removeClass('error');
+
+            // Empty field values
+            $("#add_message_dialog input[type=text]").val('');
+        });
+    });
+</script>
+
+{include file='includes/footer.inc.html'}

@@ -193,4 +193,21 @@ final class TheliaEvents
 
     const BEFORE_DELETECONFIG = "action.before_deleteConfig";
     const AFTER_DELETECONFIG  = "action.after_deleteConfig";
+
+
+    // -- Messages management ---------------------------------------------
+
+    const MESSAGE_CREATE   = "action.createMessage";
+    const MESSAGE_MODIFY   = "action.changeMessage";
+    const MESSAGE_DELETE   = "action.deleteMessage";
+
+    const BEFORE_CREATEMESSAGE = "action.before_createMessage";
+    const AFTER_CREATEMESSAGE  = "action.after_createMessage";
+
+    const BEFORE_CHANGEMESSAGE = "action.before_changeMessage";
+    const AFTER_CHANGEMESSAGE  = "action.after_changeMessage";
+
+    const BEFORE_DELETEMESSAGE = "action.before_deleteMessage";
+    const AFTER_DELETEMESSAGE  = "action.after_deleteMessage";
+
 }
