@@ -41,7 +41,7 @@
                 }
 
             });
-        }               
+        }           
 
         // -- Mini browser --
         miniBrowser = function (root, url){

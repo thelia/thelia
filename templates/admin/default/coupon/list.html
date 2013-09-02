@@ -31,7 +31,7 @@
 	    				<th>Title</th>
 	    				<th>Expiration date</th>
 	    				<th>Usage left</th>
-	    				<th>Actions</th>
+	    				<th class="{literal}{sorter: false}{/literal}">Actions</th>
 	    			</tr>
 	    		</thead>
 	    		<tbody>
@@ -92,7 +92,7 @@
 	    				<th>Title</th>
 	    				<th>Expiration date</th>
 	    				<th>Usage left</th>
-	    				<th>Actions</th>
+	    				<th class="{literal}{sorter: false}{/literal}">Actions</th>
 	    			</tr>
 	    		</thead>
 	    		<tbody>
@@ -177,6 +177,10 @@
 {/javascripts}
 
 {javascripts file='../assets/js/tablesorter/jquery.tablesorter.min.js'}
+	<script src="{$asset_url}"></script>
+{/javascripts}
+
+{javascripts file='../assets/js/tablesorter/jquery.metadata.js'}
 	<script src="{$asset_url}"></script>
 {/javascripts}
 
