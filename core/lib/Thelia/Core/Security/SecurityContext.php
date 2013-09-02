@@ -61,6 +61,16 @@ class SecurityContext
     }
 
     /**
+     * Check if an admin user is logged in.
+     *
+     * @return true if an admin user is logged in, false otherwise.
+     */
+    public function hasAdminUser()
+    {
+        return $this->getSession()->getAdminUser() != null;
+    }
+
+    /**
      * Gets the currently authenticated customer, or null if none is defined
      *
      * @return UserInterface|null A UserInterface instance or null if no user is available
@@ -68,6 +78,16 @@ class SecurityContext
     public function getCustomerUser()
     {
         return $this->getSession()->getCustomerUser();
+    }
+
+    /**
+     * Check if a customer user is logged in.
+     *
+     * @return true if a customer is logged in, false otherwise.
+     */
+    public function hasCustomerUser()
+    {
+        return $this->getSession()->getCustomerUser() != null;
     }
 
     /**

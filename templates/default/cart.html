@@ -8,7 +8,7 @@
 </ul>
 
 {form name="thelia.cart.add" }
-{* We use $INDEX_PAGE as form action to avoid mixing post and get data *}
+{* We use {navigate to="index"} as form action to avoid mixing post and get data *}
     <form action="{url path="/cart/add" }" method="post" {form_enctype form=$form}>
 
         {*

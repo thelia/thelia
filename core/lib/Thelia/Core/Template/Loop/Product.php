@@ -25,7 +25,7 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -56,7 +56,7 @@ use Thelia\Type\BooleanOrBothType;
  *
  * @todo : manage currency in price filter
  */
-class Product extends BaseLoop
+class Product extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -83,7 +83,6 @@ class Product extends BaseLoop
             Argument::createBooleanTypeArgument('current_category'),
             Argument::createIntTypeArgument('depth', 1),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
-            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -137,7 +136,7 @@ class Product extends BaseLoop
         $search = ProductQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search);
 
         $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
         $isPSELeftJoinList = array();
@@ -510,11 +509,12 @@ class Product extends BaseLoop
             $loopResultRow->set("ID", $product->getId())
                 ->set("REF",$product->getRef())
                 ->set("IS_TRANSLATED",$product->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("TITLE",$product->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $product->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL", $product->getUrl())
+                ->set("URL", $product->getUrl($locale))
                 ->set("BEST_PRICE", $product->getVirtualColumn('real_lowest_price'))
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))

@@ -40,11 +40,7 @@ class ParserContext implements \IteratorAggregate
     public function __construct(Request $request)
     {
         // Setup basic variables
-        $this
-            ->set('BASE_URL'		, ConfigQuery::read('base_url', '/'))
-            ->set('INDEX_PAGE'		, URL::getIndexPage())
-            ->set('RETURN_TO_URL'	, URL::absoluteUrl($request->getSession()->getReturnToUrl()))
-            ->set('THELIA_VERSION'	, ConfigQuery::read('thelia_version', 'undefined'))
+        $this->set('THELIA_VERSION'	, ConfigQuery::read('thelia_version', 'undefined'))
         ;
     }
 
@@ -53,24 +49,23 @@ class ParserContext implements \IteratorAggregate
     /**
      * @param BaseForm $form the errored form
      */
-    public function setErrorForm(BaseForm $form)
+    public function addForm(BaseForm $form)
     {
-        $this->set('error_form', $form);
+        $this->set($form->getName(), $form);
+
+        return $this;
+    }
+
+    public function getForm($name)
+    {
+        return $this->get($name, null);
     }
 
     public function setGeneralError($error)
     {
         $this->set('general_error', $error);
-    }
 
-    public function getErrorForm()
-    {
-        return $this->get('error_form', null);
-    }
-
-    public function clearErrorForm()
-    {
-        return $this->remove('error_form');
+        return $this;
     }
 
     // -- Internal table manipulation ------------------------------------------

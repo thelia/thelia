@@ -34,6 +34,7 @@ use Thelia\Model\Customer;
  *
  * Class CartTraitTest
  * @package Thelia\Tests\Cart\CartTraitTest
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 class CartTraitTest extends \PHPUnit_Framework_TestCase
 {

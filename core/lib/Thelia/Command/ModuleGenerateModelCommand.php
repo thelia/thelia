@@ -31,6 +31,13 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * generate class model for a specific module
+ *
+ * Class ModuleGenerateModelCommand
+ * @package Thelia\Command
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class ModuleGenerateModelCommand extends BaseModuleGenerate
 {
     protected function configure()

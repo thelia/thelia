@@ -24,7 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -43,7 +43,7 @@ use Thelia\Model\ConfigQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Title extends BaseLoop
+class Title extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -51,8 +51,7 @@ class Title extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id'),
-            Argument::createIntTypeArgument('lang')
+            Argument::createIntListTypeArgument('id')
         );
     }
 
@@ -66,7 +65,7 @@ class Title extends BaseLoop
         $search = CustomerTitleQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('SHORT', 'LONG'));
+        $locale = $this->configureI18nProcessing($search, array('SHORT', 'LONG'));
 
         $id = $this->getId();
 
@@ -85,6 +84,7 @@ class Title extends BaseLoop
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $title->getId())
                 ->set("IS_TRANSLATED",$title->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("DEFAULT", $title->getByDefault())
                 ->set("SHORT", $title->getVirtualColumn('i18n_SHORT'))
                 ->set("LONG", $title->getVirtualColumn('i18n_LONG'));

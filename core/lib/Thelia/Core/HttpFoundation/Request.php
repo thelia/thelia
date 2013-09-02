@@ -24,6 +24,13 @@ namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
 
+/**
+ * extends Symfony\Component\HttpFoundation\Request for adding some helpers
+ *
+ * Class Request
+ * @package Thelia\Core\HttpFoundation
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class Request extends BaseRequest
 {
 

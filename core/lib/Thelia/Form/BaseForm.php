@@ -32,6 +32,13 @@ use Symfony\Component\Validator\Validation;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
+/**
+ * Base form class for creating form objects
+ *
+ * Class BaseForm
+ * @package Thelia\Form
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 abstract class BaseForm
 {
     /**

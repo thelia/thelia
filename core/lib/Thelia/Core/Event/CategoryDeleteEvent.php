@@ -26,22 +26,22 @@ use Thelia\Model\Category;
 
 class CategoryDeleteEvent extends ActionEvent
 {
-    protected $id;
+    protected $category_id;
     protected $deleted_category;
 
-    public function __construct($id)
+    public function __construct($category_id)
     {
-        $this->id = $id;
+        $this->category_id = $category_id;
     }
 
-    public function getId()
+    public function getCategoryId()
     {
-        return $this->id;
+        return $this->category_id;
     }
 
-    public function setId($id)
+    public function setCategoryId($category_id)
     {
-        $this->id = $id;
+        $this->category_id = $category_id;
     }
 
     public function getDeletedCategory()

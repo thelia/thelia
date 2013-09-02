@@ -25,6 +25,13 @@ namespace Thelia\Core;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * extends Symfony\Component\DependencyInjection\ContainerBuilder for changing some behavior
+ *
+ * Class TheliaContainerBuilder
+ * @package Thelia\Core
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class TheliaContainerBuilder extends ContainerBuilder
 {
 

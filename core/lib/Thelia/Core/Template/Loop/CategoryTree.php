@@ -22,9 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
-
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -34,6 +32,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\CategoryQuery;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 
 /**
  *
@@ -46,19 +45,17 @@ use Thelia\Type\BooleanOrBothType;
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class CategoryTree extends BaseLoop
+class CategoryTree extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
      */
     protected function getArgDefinitions()
     {
-        return new ArgumentCollection(
-            Argument::createIntTypeArgument('category', null, true),
-            Argument::createIntTypeArgument('depth', PHP_INT_MAX),
-            Argument::createBooleanOrBothTypeArgument('visible', true, false),
-            Argument::createIntListTypeArgument('exclude', array())
-        );
+        return new ArgumentCollection(Argument::createIntTypeArgument('category', null, true),
+                Argument::createIntTypeArgument('depth', PHP_INT_MAX),
+                Argument::createBooleanOrBothTypeArgument('visible', true, false),
+                Argument::createIntListTypeArgument('exclude', array()));
     }
 
     // changement de rubrique
@@ -66,7 +63,11 @@ class CategoryTree extends BaseLoop
     {
         if ($level > $max_level) return;
 
-         $search = CategoryQuery::create();
+        $search = CategoryQuery::create();
+
+        $locale = $this->configureI18nProcessing($search, array(
+                    'TITLE'
+                ));
 
         $search->filterByParent($parent);
 
@@ -82,18 +83,15 @@ class CategoryTree extends BaseLoop
 
             $loopResultRow = new LoopResultRow();
 
-               $loopResultRow
-                   ->set("ID", $result->getId())
-                ->set("TITLE",$result->getTitle())
-                ->set("PARENT", $result->getParent())
-                ->set("URL", $result->getUrl())
-                ->set("VISIBLE", $result->getVisible() ? "1" : "0")
-                ->set("LEVEL", $level)
+            $loopResultRow
+                ->set("ID", $result->getId())->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
+                ->set("PARENT", $result->getParent())->set("URL", $result->getUrl($locale))
+                ->set("VISIBLE", $result->getVisible() ? "1" : "0")->set("LEVEL", $level)
             ;
 
-               $loopResult->addRow($loopResultRow);
+            $loopResult->addRow($loopResultRow);
 
-               $this->buildCategoryTree($result->getId(), $visible,  1 + $level, $max_level, $exclude, $loopResult);
+            $this->buildCategoryTree($result->getId(), $visible, 1 + $level, $max_level, $exclude, $loopResult);
         }
     }
 
@@ -105,7 +103,7 @@ class CategoryTree extends BaseLoop
     public function exec(&$pagination)
     {
         $id = $this->getCategory();
-        $depth   = $this->getDepth();
+        $depth = $this->getDepth();
         $visible = $this->getVisible();
         $exclude = $this->getExclude();
 

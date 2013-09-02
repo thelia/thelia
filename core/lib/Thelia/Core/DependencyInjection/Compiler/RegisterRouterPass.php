@@ -28,6 +28,14 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ *
+ * this compiler can add many router to symfony-cms routing
+ *
+ * Class RegisterRouterPass
+ * @package Thelia\Core\DependencyInjection\Compiler
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class RegisterRouterPass implements CompilerPassInterface
 {
 

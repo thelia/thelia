@@ -22,6 +22,13 @@
 /*************************************************************************************/
 namespace Thelia\Tests\Command;
 
+/**
+ * base class for testing command line command
+ *
+ * Class BaseCommandTest
+ * @package Thelia\Tests\Command
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 abstract class BaseCommandTest extends \PHPUnit_Framework_TestCase
 {
     public function getKernel()

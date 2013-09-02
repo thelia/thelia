@@ -26,7 +26,7 @@ namespace Thelia\Core;
 /**
  * Root class of Thelia
  *
- * It extends Symfony\Component\HttpKernel\Kernel for changing some fonctionnality
+ * It extends Symfony\Component\HttpKernel\Kernel for changing some features
  *
  *
  * @author Manuel Raynaud <mraynaud@openstudio.fr>

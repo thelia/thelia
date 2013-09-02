@@ -29,10 +29,4 @@ class AdminController extends BaseAdminController
     {
         return $this->render("home");
     }
-
-    public function processAction()
-    {
-        echo "not yet coded !";
-        exit();
-    }
 }

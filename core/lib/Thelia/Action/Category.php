@@ -42,28 +42,19 @@ class Category extends BaseAction implements EventSubscriberInterface
 {
     public function create(CategoryCreateEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.create");
-
         $category = new CategoryModel();
 
-        $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CREATECATEGORY, $event);
-
-        $category->create(
-           $event->getTitle(),
-           $event->getParent(),
-           $event->getLocale()
+        $category
+            ->setDispatcher($this->getDispatcher())
+            ->create(
+               $event->getTitle(),
+               $event->getParent(),
+               $event->getLocale()
          );
-
-        $event->setCreatedCategory($category);
-
-        $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECATEGORY, $event);
     }
 
     public function modify(CategoryChangeEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.change");
-
-        // TODO !!
     }
 
     /**
@@ -73,19 +64,11 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function delete(CategoryDeleteEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.delete");
-
-        $category = CategoryQuery::create()->findPk($event->getId());
+        $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
 
-            $event->setDeletedCategory($category);
-
-            $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_DELETECATEGORY, $event);
-
-            $category->delete();
-
-            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_DELETECATEGORY, $event);
+            $category->setDispatcher($this->getDispatcher())->delete();
         }
     }
 
@@ -96,21 +79,15 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function toggleVisibility(CategoryToggleVisibilityEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.edit");
-
-        $category = CategoryQuery::create()->findPk($event->getId());
+        $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
 
-            $event->setCategory($category);
-            $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECATEGORY, $event);
-
-            $category->setVisible($category->getVisible() ? false : true);
-
-            $category->save();
-
-            $event->setCategory($category);
-            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECATEGORY, $event);
+            $category
+                ->setDispatcher($this->getDispatcher())
+                ->setVisible($category->getVisible() ? false : true)
+                ->save()
+            ;
         }
     }
 
@@ -121,8 +98,6 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function changePosition(CategoryChangePositionEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.edit");
-
         if ($event->getMode() == CategoryChangePositionEvent::POSITION_ABSOLUTE)
             return $this->changeAbsolutePosition($event);
         else
@@ -136,12 +111,9 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     protected function exchangePosition(CategoryChangePositionEvent $event)
     {
-       $category = CategoryQuery::create()->findPk($event->getId());
+       $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
-
-            $event->setCategory($category);
-            $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECATEGORY, $event);
 
             // The current position of the category
             $my_position = $category->getPosition();
@@ -171,7 +143,11 @@ class Category extends BaseAction implements EventSubscriberInterface
                 $cnx->beginTransaction();
 
                 try {
-                    $category->setPosition($result->getPosition())->save();
+                    $category
+                        ->setDispatcher($this->getDispatcher())
+                        ->setPosition($result->getPosition())
+                        ->save()
+                    ;
 
                     $result->setPosition($my_position)->save();
 
@@ -180,9 +156,6 @@ class Category extends BaseAction implements EventSubscriberInterface
                     $cnx->rollback();
                 }
             }
-
-            $event->setCategory($category);
-            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECATEGORY, $event);
         }
     }
 
@@ -193,14 +166,9 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     protected function changeAbsolutePosition(CategoryChangePositionEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.edit");
-
-        $category = CategoryQuery::create()->findPk($event->getId());
+        $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
-
-            $event->setCategory($category);
-            $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECATEGORY, $event);
 
             // The required position
             $new_position = $event->getPosition();
@@ -236,16 +204,17 @@ class Category extends BaseAction implements EventSubscriberInterface
                         $result->setPosition($result->getPosition() + $delta)->save($cnx);
                     }
 
-                    $category->setPosition($new_position)->save($cnx);
+                    $category
+                        ->setDispatcher($this->getDispatcher())
+                        ->setPosition($new_position)
+                        ->save($cnx)
+                    ;
 
                     $cnx->commit();
                 } catch (Exception $e) {
                     $cnx->rollback();
                 }
             }
-
-            $event->setCategory($category);
-            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECATEGORY, $event);
         }
     }
 

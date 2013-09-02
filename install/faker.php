@@ -246,7 +246,7 @@ try {
     //categories and products
     $productIdList = array();
     $categoryIdList = array();
-    for($i=0; $i<4; $i++) {
+    for($i=1; $i<5; $i++) {
         $category = createCategory($faker, 0, $i, $categoryIdList, $contentIdList);
 
         for($j=1; $j<rand(0, 5); $j++) {
@@ -257,7 +257,7 @@ try {
             }
         }
 
-        for($k=0; $k<rand(1, 5); $k++) {
+        for($k=1; $k<rand(1, 6); $k++) {
             createProduct($faker, $category, $k, $productIdList);
         }
     }
@@ -388,7 +388,7 @@ function createProduct($faker, $category, $position, &$productIdList)
     $image = new ProductImage();
     $image->setProductId($productId);
     generate_image($image, 1, 'product', $productId);
-    
+
     return $product;
 }
 
@@ -423,7 +423,7 @@ function createCategory($faker, $parent, $position, &$categoryIdList, $contentId
     $image = new CategoryImage();
     $image->setCategoryId($categoryId);
     generate_image($image, 1, 'category', $categoryId);
-    
+
     return $category;
 }
 

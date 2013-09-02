@@ -1443,9 +1443,9 @@ CREATE TABLE `rewriting_url`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `url` VARCHAR(255) NOT NULL,
-    `view` VARCHAR(255),
+    `view` VARCHAR(255) NOT NULL,
     `view_id` VARCHAR(255),
-    `view_locale` VARCHAR(255),
+    `view_locale` VARCHAR(255) NOT NULL,
     `redirected` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,

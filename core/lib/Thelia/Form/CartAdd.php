@@ -30,6 +30,11 @@ use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductQuery;
 
+/**
+ * Class CartAdd
+ * @package Thelia\Form
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class CartAdd extends BaseForm
 {
 

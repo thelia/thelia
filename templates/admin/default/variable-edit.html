@@ -1,0 +1,136 @@
+{check_auth roles="ADMIN" permissions="admin.configuration.variables.edit" login_tpl="/admin/login"}
+
+{$page_title={intl l='Edit a system variable'}}
+
+{include file='includes/header.inc.html'}
+
+<div class="variables edit-variable">
+
+    <div id="wrapper" class="container">
+
+        {loop name="config_edit" type="config" hidden="*" id="$variable_id" backend_context="1" lang="$edition_language"}
+
+        <ul class="breadcrumb">
+			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a> <span class="divider">/</span></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a> <span class="divider">/</span></li>
+            <li><a href="{url path='/admin/configuration/variables'}">{intl l="System variables"}</a> <span class="divider">/</span></li>
+            <li>{intl l='Editing variable "%name"' name="{$NAME}"}</li>
+        </ul>
+
+		<div class="row-fluid">
+			<div class="span12 general-block-decorator">
+				<div class="row-fluid">
+
+					<div class="span12 title title-without-tabs">
+					   {intl l="Edit variable $NAME"}
+					</div>
+
+                    <div class="form-container">
+                         <div class="form-horizontal span12">
+                             <fieldset>
+
+							    {form name="thelia.admin.config.modification"}
+							    <form method="POST" action="{url path='/admin/configuration/variables/save-change'}" {form_enctype form=$form}>
+
+                                    {* Be sure to get the variable ID, even if the form could not be validated *}
+                                    <input type="hidden" name="variable_id" value="{$variable_id}" />
+
+                                    {include file="includes/inner-form-toolbar.html"}
+
+							        {form_hidden_fields form=$form}
+
+							        {form_field form=$form field='success_url'}
+							        <input type="hidden" name="{$name}" value="{url path='/admin/configuration/variables'}" />
+							        {/form_field}
+
+							        {* We do not allow creation of hidden variables *}
+
+                                    {form_field form=$form field='id'}
+                                    <input type="hidden" name="{$name}" value="{$value|htmlspecialchars}" />
+                                    {/form_field}
+
+			                        {form_field form=$form field='hidden'}
+			                        <input type="hidden" name="{$name}" value="{$value}" />
+			                        {/form_field}
+
+			                        {form_field form=$form field='locale'}
+			                        <input type="hidden" name="{$name}" value="{$value|htmlspecialchars}" />
+			                        {/form_field}
+
+						            {if #form_error}<div class="alert alert-block alert-error">#form_error_message</div>{/if}
+
+						            <div class="control-group">
+
+						                <label class="control-label">
+						                   {intl l='Name *'}
+						                </label>
+
+						                <div class="controls">
+						                    {form_field form=$form field='name'}
+						                    <span {if $error}class="error"{/if}>
+						                       <input type="text" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="input-block-level">
+						                    </span>
+						                    {/form_field}
+						                </div>
+						            </div>
+
+						            <div class="control-group">
+						                <label class="control-label">
+						                   {intl l='Value'}
+						                </label>
+
+						                <div class="controls">
+						                    {form_field form=$form field='value'}
+						                    <span {if $error}class="error"{/if}>
+						                       <input type="text" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Variable value'}" placeholder="{intl l='Variable value'}" class="input-block-level">
+						                    </span>
+						                    {/form_field}
+						                </div>
+						            </div>
+
+			                        <div class="control-group">
+			                            <label class="control-label">
+			                               {intl l='Secured'}
+			                            </label>
+
+			                            <div class="controls">
+			                                {form_field form=$form field='secured'}
+			                                <span {if $error}class="error"{/if}>
+												<label class="checkbox">
+			                                        <input type="checkbox" name="{$name}" value="1" {if $value == 1}checked="checked"{/if}>
+			                                        {intl l="Prevent variable modification or deletion, except for super-admin"}
+												</label>
+			                                </span>
+			                                {/form_field}
+			                            </div>
+			                        </div>
+
+                                    {include file="includes/standard-description-form-fields.html"}
+
+								</form>
+								{/form}
+							</fieldset>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		{/loop}
+
+        {elseloop rel="config_edit"}
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="alert alert-error">
+                    {intl l="Sorry, variable ID=$variable_id was not found."}
+                </div>
+            </div>
+        </div>
+        {/elseloop}
+
+    </div>
+</div>
+
+{include file='includes/js.inc.html'}
+
+{include file='includes/footer.inc.html'}
