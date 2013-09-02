@@ -30,14 +30,12 @@ use Thelia\Core\Template\Smarty\Plugins\Format;
 class FormatTest extends \PHPUnit_Framework_TestCase
 {
     protected $request;
-    protected $session;
 
     public function setUp()
     {
-        $this->session = new Session(new MockArraySessionStorage());
         $this->request = new Request();
 
-        $this->request->setSession($this->session);
+        $this->request->setSession(new Session(new MockArraySessionStorage()));
     }
 
     public function testFormatDateWithSpecificFormat()
@@ -54,5 +52,98 @@ class FormatTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($dateTime->format($format), $render);
     }
+
+    public function testFormatDateWithDefaultSessionParam()
+    {
+        $dateTime = new \DateTime();
+
+        $langMock = $this->getLangMock();
+        $this->request->getSession()->setLang($langMock);
+
+        $formatClass = new Format($this->request);
+
+        $render = $formatClass->formatDate(array("date" => $dateTime));
+
+        $this->assertEquals($dateTime->format("Y-m-d H:i:s"), $render);
+    }
+
+    public function testFormatDateWithDateSessionParam()
+    {
+        $dateTime = new \DateTime();
+
+        $langMock = $this->getLangMock();
+        $this->request->getSession()->setLang($langMock);
+
+        $formatClass = new Format($this->request);
+
+        $render = $formatClass->formatDate(array(
+            "date" => $dateTime,
+            "output" => "date"
+        ));
+
+        $this->assertEquals($dateTime->format("Y-m-d"), $render);
+    }
+
+    public function testFormatDateWithTimeSessionParam()
+    {
+        $dateTime = new \DateTime();
+
+        $langMock = $this->getLangMock();
+        $this->request->getSession()->setLang($langMock);
+
+        $formatClass = new Format($this->request);
+
+        $render = $formatClass->formatDate(array(
+            "date" => $dateTime,
+            "output" => "time"
+        ));
+
+        $this->assertEquals($dateTime->format("H:i:s"), $render);
+    }
+
+    public function testFormatDateWithDateTimeSessionParam()
+    {
+        $dateTime = new \DateTime();
+
+        $langMock = $this->getLangMock();
+        $this->request->getSession()->setLang($langMock);
+
+        $formatClass = new Format($this->request);
+
+        $render = $formatClass->formatDate(array(
+            "date" => $dateTime,
+            "output" => "datetime"
+        ));
+
+        $this->assertEquals($dateTime->format("Y-m-d H:i:s"), $render);
+    }
+
+    public function getLangMock()
+    {
+        $mock = $this->getMock(
+            "Thelia\Model\Lang",
+            array(
+                "getDateFormat",
+                "getTimeFormat",
+                "getDateTimeFormat"
+            )
+        );
+
+        $mock->expects($this->any())
+            ->method("getDateFormat")
+            ->will($this->returnValue("Y-m-d"));
+
+        $mock->expects($this->any())
+            ->method("getTimeFormat")
+            ->will($this->returnValue("H:i:s"));
+
+        $mock->expects($this->any())
+            ->method("getDateTimeFormat")
+            ->will($this->returnValue("Y-m-d H:i:s"));
+
+        return $mock;
+    }
+
+
 
 }
