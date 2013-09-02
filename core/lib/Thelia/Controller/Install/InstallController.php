@@ -22,14 +22,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Install;
-use Thelia\Controller\BaseController;
-
+use Thelia\Install\BaseInstall;
 
 /**
  * Class InstallController
  * @package Thelia\Controller\Install
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class InstallController extends BaseController {
+class InstallController extends BaseInstallController {
 
 }
