@@ -42,10 +42,15 @@ class Format extends AbstractSmartyPlugin
     }
 
     /**
-     * @param $params
-     * @param $smarty
+     * return date in expected format
+     *
+     * ex : {format_date date=$dateTimeObject format="Y-m-d H:i:s"}
+     *
+     * @param array $params
+     * @param null $template
+     * @return string
      */
-    public function formatDate($params, &$smarty = null)
+    public function formatDate($params, $template = null)
     {
         $date = $params["date"];
 
@@ -82,13 +87,19 @@ class Format extends AbstractSmartyPlugin
 
     }
 
+    public function formatNumber($params, $template = null)
+    {
+
+    }
+
     /**
      * @return an array of SmartyPluginDescriptor
      */
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor("function", "format_date", $this, "formatDate")
+            new SmartyPluginDescriptor("function", "format_date", $this, "formatDate"),
+            new SmartyPluginDescriptor("function", "format_number", $this, "formatNumber")
         );
     }
 }
