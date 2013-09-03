@@ -49,7 +49,7 @@ class Format extends AbstractSmartyPlugin
      * return date in expected format
      *
      * available parameters :
-     *  date => DateTime objet (mandatory)
+     *  date => DateTime object (mandatory)
      *  format => expected format
      *  output => list of default system format. Values available :
      *      date => date format
