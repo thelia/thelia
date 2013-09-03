@@ -57,7 +57,7 @@ class MessageVersionTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class MessageVersionTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the ID field
@@ -75,19 +75,14 @@ class MessageVersionTableMap extends TableMap
     const ID = 'message_version.ID';
 
     /**
-     * the column name for the CODE field
+     * the column name for the NAME field
      */
-    const CODE = 'message_version.CODE';
+    const NAME = 'message_version.NAME';
 
     /**
      * the column name for the SECURED field
      */
     const SECURED = 'message_version.SECURED';
-
-    /**
-     * the column name for the REF field
-     */
-    const REF = 'message_version.REF';
 
     /**
      * the column name for the CREATED_AT field
@@ -126,12 +121,12 @@ class MessageVersionTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'Secured', 'Ref', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'secured', 'ref', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
-        self::TYPE_COLNAME       => array(MessageVersionTableMap::ID, MessageVersionTableMap::CODE, MessageVersionTableMap::SECURED, MessageVersionTableMap::REF, MessageVersionTableMap::CREATED_AT, MessageVersionTableMap::UPDATED_AT, MessageVersionTableMap::VERSION, MessageVersionTableMap::VERSION_CREATED_AT, MessageVersionTableMap::VERSION_CREATED_BY, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'SECURED', 'REF', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'secured', 'ref', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'Secured', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'name', 'secured', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
+        self::TYPE_COLNAME       => array(MessageVersionTableMap::ID, MessageVersionTableMap::NAME, MessageVersionTableMap::SECURED, MessageVersionTableMap::CREATED_AT, MessageVersionTableMap::UPDATED_AT, MessageVersionTableMap::VERSION, MessageVersionTableMap::VERSION_CREATED_AT, MessageVersionTableMap::VERSION_CREATED_BY, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'NAME', 'SECURED', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
+        self::TYPE_FIELDNAME     => array('id', 'name', 'secured', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -141,12 +136,12 @@ class MessageVersionTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Secured' => 2, 'Ref' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'Version' => 6, 'VersionCreatedAt' => 7, 'VersionCreatedBy' => 8, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'secured' => 2, 'ref' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'version' => 6, 'versionCreatedAt' => 7, 'versionCreatedBy' => 8, ),
-        self::TYPE_COLNAME       => array(MessageVersionTableMap::ID => 0, MessageVersionTableMap::CODE => 1, MessageVersionTableMap::SECURED => 2, MessageVersionTableMap::REF => 3, MessageVersionTableMap::CREATED_AT => 4, MessageVersionTableMap::UPDATED_AT => 5, MessageVersionTableMap::VERSION => 6, MessageVersionTableMap::VERSION_CREATED_AT => 7, MessageVersionTableMap::VERSION_CREATED_BY => 8, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'SECURED' => 2, 'REF' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, 'VERSION' => 6, 'VERSION_CREATED_AT' => 7, 'VERSION_CREATED_BY' => 8, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'secured' => 2, 'ref' => 3, 'created_at' => 4, 'updated_at' => 5, 'version' => 6, 'version_created_at' => 7, 'version_created_by' => 8, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Secured' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, 'Version' => 5, 'VersionCreatedAt' => 6, 'VersionCreatedBy' => 7, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'name' => 1, 'secured' => 2, 'createdAt' => 3, 'updatedAt' => 4, 'version' => 5, 'versionCreatedAt' => 6, 'versionCreatedBy' => 7, ),
+        self::TYPE_COLNAME       => array(MessageVersionTableMap::ID => 0, MessageVersionTableMap::NAME => 1, MessageVersionTableMap::SECURED => 2, MessageVersionTableMap::CREATED_AT => 3, MessageVersionTableMap::UPDATED_AT => 4, MessageVersionTableMap::VERSION => 5, MessageVersionTableMap::VERSION_CREATED_AT => 6, MessageVersionTableMap::VERSION_CREATED_BY => 7, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'NAME' => 1, 'SECURED' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, 'VERSION' => 5, 'VERSION_CREATED_AT' => 6, 'VERSION_CREATED_BY' => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'secured' => 2, 'created_at' => 3, 'updated_at' => 4, 'version' => 5, 'version_created_at' => 6, 'version_created_by' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -166,9 +161,8 @@ class MessageVersionTableMap extends TableMap
         $this->setUseIdGenerator(false);
         // columns
         $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'message', 'ID', true, null, null);
-        $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
+        $this->addColumn('NAME', 'Name', 'VARCHAR', true, 255, null);
         $this->addColumn('SECURED', 'Secured', 'TINYINT', false, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', false, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         $this->addPrimaryKey('VERSION', 'Version', 'INTEGER', true, null, 0);
@@ -251,11 +245,11 @@ class MessageVersionTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 6 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 5 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -372,9 +366,8 @@ class MessageVersionTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(MessageVersionTableMap::ID);
-            $criteria->addSelectColumn(MessageVersionTableMap::CODE);
+            $criteria->addSelectColumn(MessageVersionTableMap::NAME);
             $criteria->addSelectColumn(MessageVersionTableMap::SECURED);
-            $criteria->addSelectColumn(MessageVersionTableMap::REF);
             $criteria->addSelectColumn(MessageVersionTableMap::CREATED_AT);
             $criteria->addSelectColumn(MessageVersionTableMap::UPDATED_AT);
             $criteria->addSelectColumn(MessageVersionTableMap::VERSION);
@@ -382,9 +375,8 @@ class MessageVersionTableMap extends TableMap
             $criteria->addSelectColumn(MessageVersionTableMap::VERSION_CREATED_BY);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CODE');
+            $criteria->addSelectColumn($alias . '.NAME');
             $criteria->addSelectColumn($alias . '.SECURED');
-            $criteria->addSelectColumn($alias . '.REF');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
             $criteria->addSelectColumn($alias . '.VERSION');

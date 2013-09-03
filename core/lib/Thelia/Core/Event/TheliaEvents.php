@@ -177,4 +177,37 @@ final class TheliaEvents
      * Sent on cimage cache clear request
      */
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
+
+    // -- Configuration management ---------------------------------------------
+
+    const CONFIG_CREATE   = "action.createConfig";
+    const CONFIG_SETVALUE = "action.setConfigValue";
+    const CONFIG_MODIFY   = "action.changeConfig";
+    const CONFIG_DELETE   = "action.deleteConfig";
+
+    const BEFORE_CREATECONFIG = "action.before_createConfig";
+    const AFTER_CREATECONFIG  = "action.after_createConfig";
+
+    const BEFORE_CHANGECONFIG = "action.before_changeConfig";
+    const AFTER_CHANGECONFIG  = "action.after_changeConfig";
+
+    const BEFORE_DELETECONFIG = "action.before_deleteConfig";
+    const AFTER_DELETECONFIG  = "action.after_deleteConfig";
+
+
+    // -- Messages management ---------------------------------------------
+
+    const MESSAGE_CREATE   = "action.createMessage";
+    const MESSAGE_MODIFY   = "action.changeMessage";
+    const MESSAGE_DELETE   = "action.deleteMessage";
+
+    const BEFORE_CREATEMESSAGE = "action.before_createMessage";
+    const AFTER_CREATEMESSAGE  = "action.after_createMessage";
+
+    const BEFORE_CHANGEMESSAGE = "action.before_changeMessage";
+    const AFTER_CHANGEMESSAGE  = "action.after_changeMessage";
+
+    const BEFORE_DELETEMESSAGE = "action.before_deleteMessage";
+    const AFTER_DELETEMESSAGE  = "action.after_deleteMessage";
+
 }

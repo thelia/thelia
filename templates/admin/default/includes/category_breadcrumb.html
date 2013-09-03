@@ -1,26 +1,13 @@
 {* Breadcrumb for categories browsing and editing *}
 
 <li><a href="{url path='admin/home'}">Home</a> <span class="divider">/</span></li>
-<li><a href="{url path='admin/catalog'}">Catalog</a>
+<li><a href="{url path='admin/catalog'}">Catalog</a> {ifloop rel="category_path"} <span class="divider">/</span></li>
 
-{ifloop rel="category_path"}
-	 <span class="divider">/</span></li>
-
-    {loop name="category_path" type="category-path" visible="*" category="{$current_category_id}"}
-    	{if $ID == $current_category_id}
-    	    <li class="active">
-                {if $action == 'edit'}
-                    {intl l='Editing %cat' cat="{$TITLE}"}
-                {else}
-                    {$TITLE} <a href="{url path='admin/catalog/category' id="$ID" action='edit'}" title="{intl l='Edit this category'}">{intl l="(edit)"}</a>
-				{/if}
-    		</li>
-    	{else}
-    		<li><a href="{url path='admin/catalog/category' id="$ID" action='browse'}">{$TITLE}</a> <span class="divider">/</span></li>
-    	{/if}
-    {/loop}
-{/ifloop}
-
-{elseloop rel="category_path"}
-    </li>
+{loop name="category_path" type="category-path" visible="*" category="{$current_category_id}"} {if $ID == $current_category_id}
+<li class="active">{if $action == 'edit'} {intl l='Editing %cat' cat="{$TITLE}"} {else} {$TITLE} <a href="{url path='admin/catalog/category' id=" $ID" action='edit' }" title="{intl l='Edit this category'}">{intl l="(edit)"}</a> {/if}
+</li>
+{else}
+<li><a href="{url path='admin/catalog/category' id=" $ID" action='browse'}">{$TITLE}</a> <span class="divider">/</span></li>
+{/if} {/loop} {/ifloop} {elseloop rel="category_path"}
+</li>
 {/elseloop}

@@ -24,7 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -49,7 +49,7 @@ use Thelia\Type\BooleanOrBothType;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Content extends BaseLoop
+class Content extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -63,7 +63,6 @@ class Content extends BaseLoop
             Argument::createBooleanTypeArgument('current_folder'),
             Argument::createIntTypeArgument('depth', 1),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
-            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -215,6 +214,7 @@ class Content extends BaseLoop
 
             $loopResultRow->set("ID", $content->getId())
                 ->set("IS_TRANSLATED",$content->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
                 ->set("TITLE",$content->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $content->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $content->getVirtualColumn('i18n_DESCRIPTION'))

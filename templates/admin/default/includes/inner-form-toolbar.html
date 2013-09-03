@@ -11,17 +11,17 @@
 
 		<ul class="nav nav-pills">
 		    {loop name="lang_list" type="lang" default_only={$default_only}}
-		    <li {if $IS_DEFAULT}class="active"{/if}>
-		        <a href="#"  title="{intl l="Edit information in %lng" lng=$TITLE}">
+		    <li {if $ID == $edition_language}class="active"{/if}>
+		        <a href="{$current_url}&amp;edition_language={$ID}" title="{intl l="Edit information in %lng" lng=$TITLE}">
 		            <img src="{image file="../assets/img/flags/{$CODE}.gif"}" alt="{intl l=$TITLE}" />
-		         </a>
+		        </a>
 		    </li>
 		    {/loop}
   		</ul>
      </div>
 
      <div class="span6 inner-actions">
-         <button class="btn btn-primary" title="{intl l='Save'}">{intl l='Save'} <i class="icon icon-white icon-ok"></i></button>
-         <button class="btn btn-info" title="{intl l='Save and close'}">{intl l='Save and close'} <i class="icon icon-remove icon-white"></i></button>
+         <button type="submit" name="save_mode" value="stay" class="btn btn-primary" title="{intl l='Save'}">{intl l='Save'} <i class="icon icon-white icon-ok"></i></button>
+         <button type="submit" name="save_mode" value="close" class="btn btn-info" title="{intl l='Save and close'}">{intl l='Save and close'} <i class="icon icon-remove icon-white"></i></button>
      </div>
  </div>

@@ -33,6 +33,7 @@ use Thelia\Core\Event\CategoryDeleteEvent;
 use Thelia\Core\Event\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\CategoryChangePositionEvent;
 use Thelia\Form\CategoryDeletionForm;
+use Thelia\Model\Lang;
 
 class CategoryController extends BaseAdminController
 {
@@ -65,7 +66,7 @@ class CategoryController extends BaseAdminController
         }
         catch (FormValidationException $e) {
             $categoryCreationForm->setErrorMessage($e->getMessage());
-            $this->getParserContext()->setErrorForm($categoryCreationForm);
+            $this->getParserContext()->addForm($categoryCreationForm);
         }
         catch (Exception $e) {
            Tlog::getInstance()->error(sprintf("Failed to create category: %s", $e->getMessage()));
@@ -78,7 +79,7 @@ class CategoryController extends BaseAdminController
 
     protected function editCategory($args)
     {
-        $this->checkAuth("ADMIN", "admin.category.edit");
+        if (null !== $response = $this->checkAuth("admin.category.edit")) return $response;
 
         return $this->render('edit_category', $args);
     }
@@ -99,14 +100,14 @@ class CategoryController extends BaseAdminController
             $this->adminLogAppend(sprintf("Category %s (ID %s) deleted", $category->getTitle(), $category->getId()));
 
             // Substitute _ID_ in the URL with the ID of the created category
-            $successUrl = str_replace('_ID_', $categoryDeleteEvent->getDeletedCategory()->getId(), $categoryDeletionForm->getSuccessUrl());
+            $successUrl = str_replace('_ID_', $categoryDeleteEvent->getDeletedCategory()->getParent(), $categoryDeletionForm->getSuccessUrl());
 
             // Redirect to the success URL
             $this->redirect($successUrl);
         }
         catch (FormValidationException $e) {
             $categoryDeletionForm->setErrorMessage($e->getMessage());
-            $this->getParserContext()->setErrorForm($categoryDeletionForm);
+            $this->getParserContext()->addForm($categoryDeletionForm);
         }
        catch (Exception $e) {
             Tlog::getInstance()->error(sprintf("Failed to delete category: %s", $e->getMessage()));
@@ -119,7 +120,7 @@ class CategoryController extends BaseAdminController
 
     protected function browseCategory($args)
     {
-        $this->checkAuth("AMIN", "admin.catalog.view");
+        if (null !== $response = $this->checkAuth("admin.catalog.view")) return $response;
 
         return $this->render('categories', $args);
     }
@@ -185,10 +186,30 @@ class CategoryController extends BaseAdminController
         // Get the category ID
         $id = $this->getRequest()->get('id', 0);
 
+        // Find the current order
+        $category_order = $this->getRequest()->get(
+                'category_order',
+                $this->getSession()->get('admin.category_order', 'manual')
+        );
+
+        // Find the current edit language ID
+        $edition_language = $this->getRequest()->get(
+                'edition_language',
+                $this->getSession()->get('admin.edition_language', Lang::getDefaultLanguage()->getId())
+        );
+
         $args = array(
             'action' 			  => $action,
-            'current_category_id' => $id
+            'current_category_id' => $id,
+            'category_order'      => $category_order,
+            'edition_language'    => $edition_language,
         );
+
+        // Store the current sort order in session
+        $this->getSession()->set('admin.category_order', $category_order);
+
+        // Store the current edition language in session
+        $this->getSession()->set('admin.edition_language', $edition_language);
 
         try {
             switch ($action) {

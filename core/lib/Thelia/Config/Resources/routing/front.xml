@@ -18,8 +18,12 @@
         <default key="_controller">Thelia\Controller\Front\CustomerController::updateAction</default>
     </route>
 
-    <route id="customler.login.process" path="/customer/login" methods="post">
+    <route id="customer.login.process" path="/customer/login" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::loginAction</default>
+    </route>
+
+    <route id="customer.logout.process" path="/customer/logout">
+        <default key="_controller">Thelia\Controller\Front\CustomerController::logoutAction</default>
     </route>
 
     <route id="cart.add.process" path="/cart/add">

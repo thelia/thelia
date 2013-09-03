@@ -56,14 +56,14 @@ class URL
 
             /**
              * @etienne : can't be done here for it's already done in ::viewUrl / ::adminViewUrl
+             * @franck : should be done, as absoluteUrl() is sometimes called directly (see UrlGenerator::generateUrlFunction())
              */
-            //$root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
-            $root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : '';
+            $root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
+            //$root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : '';
 
             $base = rtrim($root, '/') . '/' . ltrim($path, '/');
         } else
             $base = $path;
-
 
         $queryString = '';
 

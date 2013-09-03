@@ -31,6 +31,13 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\CartEvent;
 
+/**
+ * managed cart
+ *
+ * Trait CartTrait
+ * @package Thelia\Cart
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 trait CartTrait
 {
     /**

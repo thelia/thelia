@@ -22,9 +22,8 @@ use Thelia\Model\Map\MessageVersionTableMap;
  *
  *
  * @method     ChildMessageVersionQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildMessageVersionQuery orderByCode($order = Criteria::ASC) Order by the code column
+ * @method     ChildMessageVersionQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildMessageVersionQuery orderBySecured($order = Criteria::ASC) Order by the secured column
- * @method     ChildMessageVersionQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildMessageVersionQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildMessageVersionQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method     ChildMessageVersionQuery orderByVersion($order = Criteria::ASC) Order by the version column
@@ -32,9 +31,8 @@ use Thelia\Model\Map\MessageVersionTableMap;
  * @method     ChildMessageVersionQuery orderByVersionCreatedBy($order = Criteria::ASC) Order by the version_created_by column
  *
  * @method     ChildMessageVersionQuery groupById() Group by the id column
- * @method     ChildMessageVersionQuery groupByCode() Group by the code column
+ * @method     ChildMessageVersionQuery groupByName() Group by the name column
  * @method     ChildMessageVersionQuery groupBySecured() Group by the secured column
- * @method     ChildMessageVersionQuery groupByRef() Group by the ref column
  * @method     ChildMessageVersionQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildMessageVersionQuery groupByUpdatedAt() Group by the updated_at column
  * @method     ChildMessageVersionQuery groupByVersion() Group by the version column
@@ -53,9 +51,8 @@ use Thelia\Model\Map\MessageVersionTableMap;
  * @method     ChildMessageVersion findOneOrCreate(ConnectionInterface $con = null) Return the first ChildMessageVersion matching the query, or a new ChildMessageVersion object populated from the query conditions when no match is found
  *
  * @method     ChildMessageVersion findOneById(int $id) Return the first ChildMessageVersion filtered by the id column
- * @method     ChildMessageVersion findOneByCode(string $code) Return the first ChildMessageVersion filtered by the code column
+ * @method     ChildMessageVersion findOneByName(string $name) Return the first ChildMessageVersion filtered by the name column
  * @method     ChildMessageVersion findOneBySecured(int $secured) Return the first ChildMessageVersion filtered by the secured column
- * @method     ChildMessageVersion findOneByRef(string $ref) Return the first ChildMessageVersion filtered by the ref column
  * @method     ChildMessageVersion findOneByCreatedAt(string $created_at) Return the first ChildMessageVersion filtered by the created_at column
  * @method     ChildMessageVersion findOneByUpdatedAt(string $updated_at) Return the first ChildMessageVersion filtered by the updated_at column
  * @method     ChildMessageVersion findOneByVersion(int $version) Return the first ChildMessageVersion filtered by the version column
@@ -63,9 +60,8 @@ use Thelia\Model\Map\MessageVersionTableMap;
  * @method     ChildMessageVersion findOneByVersionCreatedBy(string $version_created_by) Return the first ChildMessageVersion filtered by the version_created_by column
  *
  * @method     array findById(int $id) Return ChildMessageVersion objects filtered by the id column
- * @method     array findByCode(string $code) Return ChildMessageVersion objects filtered by the code column
+ * @method     array findByName(string $name) Return ChildMessageVersion objects filtered by the name column
  * @method     array findBySecured(int $secured) Return ChildMessageVersion objects filtered by the secured column
- * @method     array findByRef(string $ref) Return ChildMessageVersion objects filtered by the ref column
  * @method     array findByCreatedAt(string $created_at) Return ChildMessageVersion objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildMessageVersion objects filtered by the updated_at column
  * @method     array findByVersion(int $version) Return ChildMessageVersion objects filtered by the version column
@@ -159,7 +155,7 @@ abstract class MessageVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, SECURED, REF, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM message_version WHERE ID = :p0 AND VERSION = :p1';
+        $sql = 'SELECT ID, NAME, SECURED, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM message_version WHERE ID = :p0 AND VERSION = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -304,32 +300,32 @@ abstract class MessageVersionQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the code column
+     * Filter the query on the name column
      *
      * Example usage:
      * <code>
-     * $query->filterByCode('fooValue');   // WHERE code = 'fooValue'
-     * $query->filterByCode('%fooValue%'); // WHERE code LIKE '%fooValue%'
+     * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
+     * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $code The value to use as filter.
+     * @param     string $name The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildMessageVersionQuery The current query, for fluid interface
      */
-    public function filterByCode($code = null, $comparison = null)
+    public function filterByName($name = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($code)) {
+            if (is_array($name)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $code)) {
-                $code = str_replace('*', '%', $code);
+            } elseif (preg_match('/[\%\*]/', $name)) {
+                $name = str_replace('*', '%', $name);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(MessageVersionTableMap::CODE, $code, $comparison);
+        return $this->addUsingAlias(MessageVersionTableMap::NAME, $name, $comparison);
     }
 
     /**
@@ -371,35 +367,6 @@ abstract class MessageVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(MessageVersionTableMap::SECURED, $secured, $comparison);
-    }
-
-    /**
-     * Filter the query on the ref column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByRef('fooValue');   // WHERE ref = 'fooValue'
-     * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $ref The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildMessageVersionQuery The current query, for fluid interface
-     */
-    public function filterByRef($ref = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($ref)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $ref)) {
-                $ref = str_replace('*', '%', $ref);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(MessageVersionTableMap::REF, $ref, $comparison);
     }
 
     /**

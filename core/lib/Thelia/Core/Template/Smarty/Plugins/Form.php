@@ -82,6 +82,7 @@ class Form extends AbstractSmartyPlugin
 
     public function generateForm($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
+
         if ($repeat) {
 
             $name = $this->getParam($params, 'name');
@@ -93,15 +94,11 @@ class Form extends AbstractSmartyPlugin
             $instance = $this->createInstance($name);
 
             // Check if parser context contains our form
-            $errorForm = $this->parserContext->getErrorForm();
+            $form = $this->parserContext->getForm($instance->getName());
 
-            if (null != $errorForm && $errorForm->getName() == $instance->getName()) {
-
-                // Re-use the errored form
-                $instance = $errorForm;
-
-                // Don't do that, as we may want to use this form firther in the template code
-                //$this->parserContext->clearErrorForm();
+            if (null != $form) {
+                // Re-use the form
+                $instance = $form;
             }
 
             $instance->createView();
@@ -110,7 +107,8 @@ class Form extends AbstractSmartyPlugin
 
             $template->assign("form_error", $instance->hasError() ? true : false);
             $template->assign("form_error_message", $instance->getErrorMessage());
-        } else {
+        }
+        else {
             return $content;
         }
     }

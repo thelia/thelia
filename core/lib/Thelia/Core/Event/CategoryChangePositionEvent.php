@@ -30,26 +30,16 @@ class CategoryChangePositionEvent extends ActionEvent
     const POSITION_DOWN = 2;
     const POSITION_ABSOLUTE = 3;
 
-    protected $id;
+    protected $category_id;
     protected $mode;
     protected $position;
     protected $category;
 
-    public function __construct($id, $mode, $position = null)
+    public function __construct($category_id, $mode, $position = null)
     {
-        $this->id = $id;
+        $this->category_id = $category_id;
         $this->mode = $mode;
         $this->position = $position;
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
     }
 
     public function getMode()
@@ -81,4 +71,15 @@ class CategoryChangePositionEvent extends ActionEvent
     {
         $this->category = $category;
     }
+
+    public function getCategoryId()
+    {
+        return $this->category_id;
+    }
+
+    public function setCategoryId($category_id)
+    {
+        $this->category_id = $category_id;
+    }
+
 }

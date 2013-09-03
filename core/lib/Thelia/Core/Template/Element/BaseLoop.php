@@ -138,7 +138,7 @@ abstract class BaseLoop
             } elseif ($value !== null && !$argument->type->isValid($value)) {
                 /* check type */
                 $faultActor[] = $argument->name;
-                $faultDetails[] = sprintf('Invalid value for "%s" argument in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
+                $faultDetails[] = sprintf('Invalid value "%s" for "%s" argument in loop type: %s, name: %s', $value, $argument->name, $loopType, $loopName);
             } else {
                 /* set default */
                 /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */

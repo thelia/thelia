@@ -22,7 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\ImageEvent;
 use Thelia\Model\CategoryImageQuery;
@@ -43,7 +43,7 @@ use Thelia\Log\Tlog;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Image extends BaseLoop
+class Image extends BaseI18nLoop
 {
     /**
      * @var array Possible image sources
@@ -63,7 +63,6 @@ class Image extends BaseLoop
 
         $queryClass   = sprintf("\Thelia\Model\%sImageQuery", $object);
         $filterMethod = sprintf("filterBy%sId", $object);
-        $mapClass     = sprintf("\Thelia\Model\Map\%sI18nTableMap", $object);
 
         // xxxImageQuery::create()
         $method = new \ReflectionMethod($queryClass, 'create');
@@ -73,19 +72,16 @@ class Image extends BaseLoop
         $method = new \ReflectionMethod($queryClass, $filterMethod);
         $method->invoke($search, $object_id);
 
-        $map = new \ReflectionClass($mapClass);
-        $title_map = $map->getConstant('TITLE');
-
         $orders  = $this->getOrder();
 
         // Results ordering
         foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn($title_map);
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
-                    $search->addDescendingOrderByColumn($title_map);
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual-reverse":
                     $search->orderByPosition(Criteria::DESC);
@@ -122,7 +118,7 @@ class Image extends BaseLoop
 
             $source_id = $this->getSourceId();
 
-            // echo "source = ".$this->getSource().", id=".$id."<br />";
+            // echo "source = ".$this->getSource().", id=".$source_id." - ".$this->getArg('source_id')->getValue()."<br />";
 
             if (is_null($source_id)) {
                 throw new \InvalidArgumentException("'source_id' argument cannot be null if 'source' argument is specified.");
@@ -167,6 +163,9 @@ class Image extends BaseLoop
 
         $search = $this->getSearchQuery($object_type, $object_id);
 
+        /* manage translations */
+        $locale = $this->configureI18nProcessing($search);
+
         $id = $this->getId();
 
         if (! is_null($id)) {
@@ -187,7 +186,7 @@ class Image extends BaseLoop
         $background_color = $this->getBackgroundColor();
         $quality = $this->getQuality();
         $effects = $this->getEffects();
-        $effects = $this->getEffects();
+
         if (! is_null($effects)) {
             $effects = explode(',', $effects);
         }
@@ -207,8 +206,7 @@ class Image extends BaseLoop
 
         }
 
-        /* manage translations */
-        $this->configureI18nProcessing($search);
+        // echo "sql=".$search->toString();
 
         $results = $this->search($search, $pagination);
 
@@ -247,14 +245,15 @@ class Image extends BaseLoop
 
                 $loopResultRow
                     ->set("ID", $result->getId())
+                    ->set("LOCALE",$locale)
                     ->set("IMAGE_URL", $event->getFileUrl())
                     ->set("ORIGINAL_IMAGE_URL", $event->getOriginalFileUrl())
                     ->set("IMAGE_PATH", $event->getCacheFilepath())
                     ->set("ORIGINAL_IMAGE_PATH", $source_filepath)
-                    ->set("TITLE", $result->getTitle())
-                    ->set("CHAPO", $result->getChapo())
-                    ->set("DESCRIPTION", $result->getDescription())
-                    ->set("POSTSCRIPTUM", $result->getPostscriptum())
+                    ->set("TITLE",$folder->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO", $folder->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
                     ->set("POSITION", $result->getPosition())
                     ->set("OBJECT_TYPE", $object_type)
                     ->set("OBJECT_ID", $object_id)
@@ -314,9 +313,7 @@ class Image extends BaseLoop
                         new EnumType($this->possible_sources)
                 )
             ),
-            Argument::createIntTypeArgument('source_id'),
-
-            Argument::createIntListTypeArgument('lang')
+            Argument::createIntTypeArgument('source_id')
         );
 
         // Add possible image sources

@@ -125,8 +125,10 @@ class TheliaHttpKernel extends HttpKernel
         $lang = $this->detectLang($request);
 
         if ($lang) {
-            $request->getSession()->set("lang", $lang->getCode());
-            $request->getSession()->set("locale", $lang->getLocale());
+            $request->getSession()
+                ->setLang($lang)
+                ->setLocale($lang->getLocale())
+            ;
         }
     }
 
@@ -164,7 +166,7 @@ class TheliaHttpKernel extends HttpKernel
         }
 
         //check if lang is not defined. If not we have to search the good one.
-        if (null === $request->getSession()->get("lang")) {
+        if (null === $request->getSession()->getLang()) {
 
             if (Model\ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
                 //find lang with domain
@@ -173,9 +175,7 @@ class TheliaHttpKernel extends HttpKernel
 
             //find default lang
             return Model\LangQuery::create()->findOneByByDefault(1);
-
         }
-
     }
 
     protected function initSession(Request $request)

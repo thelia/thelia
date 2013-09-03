@@ -3,15 +3,12 @@
 <h1>{intl l='Please login'}</h1>
 
 {form name="thelia.customer.login" }
-{* We use {navigate to="index"} as form action to avoid mixing post and get data *}
-<form action="{navigate to="index"}" method="post" {form_enctype form=$form}>
 
+<form action="{url path='/customer/login'}" method="post" {form_enctype form=$form}>
 	{*
-	The two fields below are not par of the Login form, they are here to defines
-	the action to process, and the view to render once the form is submited
+	The field below are not par of the Login form, it defines view to render if the form cannot be validated
 	*}
-	<input type="hidden" name="action" value="loginCustomer" /> {* the action triggered by this form *}
-	<input type="hidden" name="view" value="login" /> 			{* the view to return to if the form cannot be validated *}
+	<input type="hidden" name="view" value="login" /> 	{* the view to return to if the form cannot be validated *}
 
 	{*
 	This field is common to all BaseForm instances (thus, this one), and defines
@@ -34,11 +31,11 @@
 
     {form_field form=$form field="email"}
         {if #error}{#message}{/if}
-        <label>{intl l="Your e-mail address"}: </label><input type="email" name="{$name}" {$attr} ><br />
+        <label>{intl l="Your e-mail address"}: </label><input type="email" name="{$name}" {$attr} value="{$value}"><br />
     {/form_field}
 
     {form_field form=$form field='password'}
-    <label>{intl l="Your password"}: </label><input type="password" name="{$name}" {$attr}> <br />
+    <label>{intl l="Your password"}: </label><input type="password" name="{$name}" {$attr} value="{$value}"> <br />
     {/form_field}
 
 	{form_field form=$form field='remember_me'}

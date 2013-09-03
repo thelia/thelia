@@ -25,7 +25,7 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -48,7 +48,7 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class AttributeCombination extends BaseLoop
+class AttributeCombination extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -57,7 +57,6 @@ class AttributeCombination extends BaseLoop
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('product_sale_elements', null, true),
-            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -78,7 +77,7 @@ class AttributeCombination extends BaseLoop
         $search = AttributeCombinationQuery::create();
 
         /* manage attribute translations */
-        $this->configureI18nProcessing(
+        $locale = $this->configureI18nProcessing(
             $search,
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             AttributeTableMap::TABLE_NAME,
@@ -86,7 +85,7 @@ class AttributeCombination extends BaseLoop
         );
 
         /* manage attributeAv translations */
-        $this->configureI18nProcessing(
+        $locale = $this->configureI18nProcessing(
             $search,
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
             AttributeAvTableMap::TABLE_NAME,
@@ -118,6 +117,7 @@ class AttributeCombination extends BaseLoop
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow
+                ->set("LOCALE",$locale)
                 ->set("ATTRIBUTE_TITLE", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE'))
                 ->set("ATTRIBUTE_CHAPO", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_CHAPO'))
                 ->set("ATTRIBUTE_DESCRIPTION", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))

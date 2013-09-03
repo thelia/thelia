@@ -116,7 +116,7 @@ abstract class Resource implements ActiveRecordInterface
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -1968,7 +1968,7 @@ abstract class Resource implements ActiveRecordInterface
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collGroupResources instanceof Collection) {
@@ -2018,7 +2018,7 @@ abstract class Resource implements ActiveRecordInterface
      *
      * @return    ChildResource The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -2042,7 +2042,7 @@ abstract class Resource implements ActiveRecordInterface
      * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildResourceI18n */
-    public function getTranslation($locale = 'en_EN', ConnectionInterface $con = null)
+    public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collResourceI18ns) {
@@ -2077,7 +2077,7 @@ abstract class Resource implements ActiveRecordInterface
      *
      * @return    ChildResource The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', ConnectionInterface $con = null)
+    public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
         if (!$this->isNew()) {
             ChildResourceI18nQuery::create()
