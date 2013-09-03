@@ -52,7 +52,7 @@ class DefaultController extends BaseFrontController
             $rewrittenUrl = URL::init()->retrieveCurrent($request);
             if($rewrittenUrl->rewrittenUrl !== null) {
                 /* 301 redirection to rewritten URL */
-                $this->redirect($rewrittenUrl->url, 301);
+                $this->redirect($rewrittenUrl->rewrittenUrl, 301);
             }
         }
 
