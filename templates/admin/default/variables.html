@@ -34,16 +34,42 @@
 
 	                        </caption>
 	                        <tr>
-	                           <th>{intl l="Purpose"}</th>
-                               <th>{intl l="Name"}</th>
-                               <th>{intl l="Value"}</th>
+	                           <th>
+                               {admin_sortable_header
+                                  current_order=$order
+                                  order='title'
+                                  reverse_order='title_reverse'
+                                  path={url path='/admin/configuration/variables'}
+                                  label={intl l='Purpose'}
+                               }
+	                           </th>
+
+                               <th>
+                               {admin_sortable_header
+                                  current_order=$order
+                                  order='name'
+                                  reverse_order='name_reverse'
+                                  path={url path='/admin/configuration/variables'}
+                                  label={intl l='Name'}
+                               }
+                               </th>
+
+                               <th>
+                               {admin_sortable_header
+                                  current_order=$order
+                                  order='value'
+                                  reverse_order='value_reverse'
+                                  path={url path='/admin/configuration/variables'}
+                                  label={intl l='Value'}
+                               }
+                               </th>
 
                                {module_include location='variables_table_header'}
 
                                <th>&nbsp;</th>
 	                        </tr>
 
-	                        {loop name="config" type="config" hidden="0" secured="*" backend_context="1" lang="$lang_id"}
+	                        {loop name="config" type="config" hidden="0" secured="*" backend_context="1" lang="$lang_id" order="$order"}
 	                            <tr>
 
 	                               <td>{$TITLE}</td>
@@ -172,6 +198,10 @@
 
                 <div class="controls">
                     {loop type="lang" name="default-lang" default_only="1"}
+
+                        {* Switch edition to the current locale *}
+                        <input type="hidden" name="edit_language_id" value="{$ID}" />
+
                         {form_field form=$form field='locale'}
                         <input type="hidden" name="{$name}" value="{$LOCALE}" />
                         {/form_field}

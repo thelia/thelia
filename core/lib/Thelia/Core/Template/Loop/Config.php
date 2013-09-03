@@ -34,6 +34,8 @@ use Thelia\Model\LangQuery;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\BooleanOrBothType;
+use Thelia\Type\TypeCollection;
+use Thelia\Type\EnumListType;
 
 /**
  * Config loop, to access configuration variables
@@ -59,7 +61,21 @@ class Config extends BaseI18nLoop
             Argument::createIntListTypeArgument('exclude'),
             Argument::createAnyTypeArgument('variable'),
             Argument::createBooleanOrBothTypeArgument('hidden'),
-            Argument::createBooleanOrBothTypeArgument('secured')
+            Argument::createBooleanOrBothTypeArgument('secured'),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new EnumListType(
+                        array(
+                            'id', 'id_reverse',
+                            'name', 'name_reverse',
+                            'title', 'title_reverse',
+                            'value', 'value_reverse',
+                        )
+                    )
+                ),
+                'name'
+            )
         );
      }
 
@@ -94,7 +110,39 @@ class Config extends BaseI18nLoop
         if (! is_null($secured) && $secured != BooleanOrBothType::ANY)
             $search->filterBySecured($secured ? 1 : 0);
 
-        $search->orderByName(Criteria::ASC);
+        $orders  = $this->getOrder();
+
+        foreach($orders as $order) {
+            switch ($order) {
+                case 'id':
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case 'id_reverse':
+                    $search->orderById(Criteria::DESC);
+                    break;
+
+                case 'name':
+                     $search->orderByName(Criteria::ASC);
+                    break;
+                case 'name_reverse':
+                     $search->orderByName(Criteria::DESC);
+                    break;
+
+                case 'title':
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
+                    break;
+                case 'title_reverse':
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
+                    break;
+
+                case 'value':
+                    $search->orderByValue(Criteria::ASC);
+                    break;
+                case 'value_reverse':
+                    $search->orderByValue(Criteria::DESC);
+                    break;
+             }
+        }
 
         $results = $this->search($search, $pagination);
 

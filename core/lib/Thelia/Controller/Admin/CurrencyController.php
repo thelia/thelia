@@ -101,7 +101,9 @@ class CurrencyController extends BaseAdminController
                 ->setCurrencyName($data['name'])
                 ->setLocale($data["locale"])
                 ->setSymbol($data['symbol'])
-                ;
+                ->setCode($data['code'])
+                ->setRate($data['rate'])
+            ;
 
             $this->dispatch(TheliaEvents::CURRENCY_CREATE, $createEvent);
 

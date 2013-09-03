@@ -43,6 +43,25 @@ use Thelia\Form\ConfigCreationForm;
 class ConfigController extends BaseAdminController
 {
     /**
+     * Render the currencies list, ensuring the sort order is set.
+     *
+     * @return Symfony\Component\HttpFoundation\Response the response
+     */
+    protected function renderList() {
+
+        // Find the current order
+        $order = $this->getRequest()->get(
+                'order',
+                $this->getSession()->get('admin.variables_order', 'name')
+        );
+
+        // Store the current sort order in session
+        $this->getSession()->set('admin.variables_order', $order);
+
+        return $this->render('variables', array('order' => $order));
+    }
+
+    /**
      * The default action is displaying the variables list.
      *
      * @return Symfony\Component\HttpFoundation\Response the response
@@ -51,7 +70,7 @@ class ConfigController extends BaseAdminController
 
         if (null !== $response = $this->checkAuth("admin.configuration.variables.view")) return $response;
 
-        return $this->render('variables');
+        return $this->renderList();
     }
 
     /**
@@ -124,7 +143,7 @@ class ConfigController extends BaseAdminController
         }
 
         // At this point, the form has error, and should be redisplayed.
-        return $this->render('variables');
+        return $this->renderList();
     }
 
     /**
@@ -276,7 +295,7 @@ class ConfigController extends BaseAdminController
             $this->dispatch(TheliaEvents::CONFIG_SETVALUE, $event);
         }
 
-        $this->redirect(URL::adminViewUrl('variables'));
+        $this->redirect(URL::absoluteUrl('/admin/configuration/variables'));
     }
 
     /**
@@ -294,6 +313,6 @@ class ConfigController extends BaseAdminController
 
         $this->dispatch(TheliaEvents::CONFIG_DELETE, $event);
 
-        $this->redirect(URL::adminViewUrl('variables'));
+        $this->redirect(URL::absoluteUrl('/admin/configuration/variables'));
     }
 }

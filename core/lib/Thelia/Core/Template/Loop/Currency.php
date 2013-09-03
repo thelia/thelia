@@ -66,8 +66,9 @@ class Currency extends BaseI18nLoop
                             'code', 'code_reverse',
                             'symbol', 'symbol_reverse',
                             'rate', 'rate_reverse',
+                            'is_default', 'is_default_reverse',
                             'manual', 'manual_reverse')
-                        )
+                    )
                     ),
                 'manual'
             )
@@ -141,6 +142,13 @@ class Currency extends BaseI18nLoop
                     break;
                 case 'rate_reverse':
                     $search->orderByRate(Criteria::DESC);
+                    break;
+
+                case 'is_default':
+                    $search->orderByByDefault(Criteria::ASC);
+                    break;
+                case 'is_default_reverse':
+                    $search->orderByByDefault(Criteria::DESC);
                     break;
 
                 case 'manual':

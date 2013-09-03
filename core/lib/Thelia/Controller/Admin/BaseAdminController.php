@@ -155,7 +155,7 @@ class BaseAdminController extends BaseController
      */
     protected function getCurrentEditionLangId() {
         return $this->getRequest()->get(
-                'edition_language',
+                'edit_language_id',
                 $this->getSession()->getAdminEditionLangId()
         );
     }
@@ -196,29 +196,32 @@ class BaseAdminController extends BaseController
 
         $session = $this->getSession();
 
-        // Find the current edit language ID
         $edition_language = $this->getCurrentEditionLangId();
 
         // Current back-office (not edition) language
-        $current_lang = LangQuery::create()->findOneById($session->getLangId());
+        $current_lang     = LangQuery::create()->findOneById($session->getLangId());
+
+        // Find the current edit language ID
+        $edition_language = LangQuery::create()->findOneById($this->getCurrentEditionLangId());
 
         // Prepare common template variables
         $args = array_merge($args, array(
-            'locale'           => $session->getLocale(),
-            'lang_code'        => $session->getLang(),
-            'lang_id'          => $session->getLangId(),
+            'locale'               => $session->getLocale(),
+            'lang_code'            => $session->getLang(),
+            'lang_id'              => $session->getLangId(),
 
-            'datetime_format'  => $current_lang->getDateTimeFormat(),
-            'date_format'      => $current_lang->getDateFormat(),
-            'time_format'      => $current_lang->getTimeFormat(),
+            'datetime_format'      => $current_lang->getDateTimeFormat(),
+            'date_format'          => $current_lang->getDateFormat(),
+            'time_format'          => $current_lang->getTimeFormat(),
 
-            'edition_language' => $edition_language,
+            'edit_language_id'     => $edition_language->getId(),
+            'edit_language_locale' => $edition_language->getLocale(),
 
-            'current_url'      => htmlspecialchars($this->getRequest()->getUri())
+            'current_url'          => htmlspecialchars($this->getRequest()->getUri())
         ));
 
         // Update the current edition language in session
-        $this->getSession()->setAdminEditionLangId($edition_language);
+        $this->getSession()->setAdminEditionLangId($edition_language->getId());
 
         // Render the template.
         try {

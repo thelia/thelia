@@ -9,7 +9,7 @@
 
     <div id="wrapper" class="container">
 
-        {loop name="config_edit" type="config" hidden="*" id="$variable_id" backend_context="1" lang="$edition_language"}
+        {loop name="config_edit" type="config" hidden="*" id="$variable_id" backend_context="1" lang="$edit_language_id"}
 
         <ul class="breadcrumb">
 			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a> <span class="divider">/</span></li>
@@ -53,7 +53,7 @@
 			                        {/form_field}
 
 			                        {form_field form=$form field='locale'}
-			                        <input type="hidden" name="{$name}" value="{$value|htmlspecialchars}" />
+			                        <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
 			                        {/form_field}
 
 						            {if #form_error}<div class="alert alert-block alert-error">#form_error_message</div>{/if}
