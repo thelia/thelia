@@ -53,12 +53,24 @@ class CustomerAddressController extends BaseFrontController
             $event = $this->createAddressEvent($form->getData(), $customer);
 
             $this->dispatch(TheliaEvents::ADDRESS_CREATE, $event);
+            $this->redirectSuccess($addressCreate);
 
         }catch (FormValidationException $e) {
             $message = sprintf("Please check your input: %s", $e->getMessage());
         }
         catch (\Exception $e) {
             $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+        }
+
+        if ($message !== false) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during address creation process : %s", $message));
+
+            $addressCreate->setErrorMessage($message);
+
+            $this->getParserContext()
+                ->addForm($addressCreate)
+                ->setGeneralError($message)
+            ;
         }
     }
 

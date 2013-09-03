@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
+use Symfony\Component\EventDispatcher\Event;
 use Thelia\Model\Customer;
 
 
@@ -30,7 +31,8 @@ use Thelia\Model\Customer;
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class AddressCreateOrUpdateEvent {
+class AddressCreateOrUpdateEvent extends Event
+{
     /**
      * @var string address label
      */
