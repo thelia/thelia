@@ -15,18 +15,25 @@
                 widgetOptions : {
                     filter_cssFilter : 'input-medium',
                     filter_formatter : {
+                        
+                        2 : function($cell, indx){                            
+                            return $.tablesorter.filterFormatter.uiDateCompare( $cell, indx, {
+                                dateFormat: "dd/mm/yy",
+                                changeMonth : true,
+                                changeYear : true,
+                                compare : '='
+                            });
+                        },
+                        
                         3 : function($cell, indx){
-                          return $.tablesorter.filterFormatter.uiSlider( $cell, indx, {
-                                animate : true,
+                            return $.tablesorter.filterFormatter.uiRange( $cell, indx, {
                                 value: 1,
                                 min: 1,
                                 max: 50,
                                 delayed: true,
-                                valueToHeader: true,
-                                exactMatch: false,
-                                allText: 'all',
-                                compare: '>='
-                          });
+                                valueToHeader: false,
+                                exactMatch: false
+                            });
                         }
                     }
                 }

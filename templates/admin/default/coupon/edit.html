@@ -69,7 +69,7 @@
 				  	</div>
 				</div>
 				
-				<div class="span8">
+				<div class="span8 well">
 					<div class="span6">
 						<div class="control-group">
 						    <label for="effect">Effect :</label>
@@ -107,7 +107,7 @@
 			  	
 				<div class="control-group">
 				    <label for="long-description">Long description :</label>
-				    <textarea id="long-description" name="long-description" placeholder="long description" class="span12" rows="10"></textarea>				
+				    <textarea id="long-description" name="long-description" placeholder="long description" class="span12 wysiwyg" rows="10"></textarea>				
 			  	</div>
 
 			  	<button type="submit" class="btn btn-primary">Save</button>
@@ -135,17 +135,17 @@
 					<tbody>
 						<tr>
 							<td>Total Amount</td>
-							<td>>=</td>
-							<td>300</td>
+							<td><span class="label">is superior or equals to</span></td>
+							<td>300 &euro;</td>
 							<td>
 		    					<a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
 		    					<a href="#url" class="btn btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="icon-remove icon-white"></span> Delete</a>
 		    				</td>
 						</tr>
 						<tr>
-							<td><span class="label label-info">AND</span> NbArticleFromCategory</td>
-							<td>=</td>
-							<td>12 - Chaussettes rouges</td>
+							<td><span class="label">AND</span> NbArticleFromCategory</td>
+							<td><span class="label">is equals to</span></td>
+							<td>12 - <a href="#" target="_blank">Chaussettes rouges</a></td>
 							<td>
 		    					<a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
 		    					<a href="#url" class="btn btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="icon-remove icon-white"></span> Delete</a>
@@ -153,7 +153,7 @@
 						</tr>
 						<tr>
 							<td><span class="label label-info">OR</span> Date</td>
-							<td><=</td>
+							<td><span class="label">is inferior or equals to</span></td>
 							<td>12/02/2014</td>
 							<td>
 		    					<a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
@@ -167,7 +167,7 @@
 
 		<section class="row-fluid">
 			<div class="span12 general-block-decorator">
-
+				
 				<div class="control-group span2">
 					<label for="type">Condition type :</label>
 					<label class="radio">
@@ -205,13 +205,14 @@
 				    <label for="operator">Operator :</label>
 				    <div class="controls">
 					    <select name="operator" id="operator">
-					    	<option value="1">></option>
-					    	<option value="2">=</option>
-					    	<option value="3"><</option>
-					    	<option value="4"><=</option>
-					    	<option value="5">>=</option>
+					    	<option value="1">is superior to</option>
+					    	<option value="2">equals to</option>
+					    	<option value="3">is inferior to</option>
+					    	<option value="4">is inferior or equals to</option>
+					    	<option value="5">is superior or equals to</option>
 					    </select>
-					    <div class="input-append">
+					    <div class="input-append input-prepend">
+					    	<span class="add-on">&euro;</span>
 						    <input type="text" name="value" class="input-mini">
 						    <button class="add-on btn btn-primary"><span class="icon-plus icon-white"></span></button>
 					    </div>
@@ -220,11 +221,11 @@
 					<label for="operator">Operator :</label>
 				    <div class="controls">
 					    <select name="operator" id="operator">
-					    	<option value="1">></option>
-					    	<option value="2" selected>=</option>
-					    	<option value="3"><</option>
-					    	<option value="4"><=</option>
-					    	<option value="5">>=</option>
+					    	<option value="1">is superior to</option>
+					    	<option value="2">equals to</option>
+					    	<option value="3">is inferior to</option>
+					    	<option value="4">is inferior or equals to</option>
+					    	<option value="5">is superior or equals to</option>
 					    </select>					    
 					    <div class="input-append input-prepend date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
 					    	<span class="add-on"><span class="icon-th"></span></span>
@@ -236,11 +237,11 @@
 					<label for="operator">Operator :</label>
 				    <div class="controls">
 					    <select name="operator" id="operator">
-					    	<option value="1">></option>
-					    	<option value="2" selected>=</option>
-					    	<option value="3"><</option>
-					    	<option value="4"><=</option>
-					    	<option value="5">>=</option>
+					    	<option value="1">is superior to</option>
+					    	<option value="2">equals to</option>
+					    	<option value="3">is inferior to</option>
+					    	<option value="4">is inferior or equals to</option>
+					    	<option value="5">is superior or equals to</option>
 					    </select>					    
 					    <input type="text" name="value" class="input-mini">
 						

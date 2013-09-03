@@ -36,7 +36,7 @@
 	    		</thead>
 	    		<tbody>
 	    			<tr>
-	    				<td>XMAS13</td>
+	    				<td><a href="#">XMAS13</a></td>
 	    				<td>Coupon for XMAS -30 &euro;</td>
 	    				<td>18/10/2013</td>
 	    				<td>49</td>
@@ -46,7 +46,7 @@
 	    				</td>
 	    			</tr>
 	    			<tr>
-	    				<td>XMAS14</td>
+	    				<td><a href="#">XMAS13</a></td>
 	    				<td>Coupon for XMAS -30 &euro;</td>
 	    				<td>05/09/2013</td>
 	    				<td>20</td>
@@ -56,7 +56,7 @@
 	    				</td>
 	    			</tr>
 	    			<tr>
-	    				<td>XMAS15</td>
+	    				<td><a href="#">XMAS13</a></td>
 	    				<td>Coupon for XMAS -30 &euro;</td>
 	    				<td>03/12/2013</td>
 	    				<td>9</td>
@@ -66,7 +66,7 @@
 	    				</td>
 	    			</tr>
 	    			<tr>
-	    				<td>XMAS16</td>
+	    				<td><a href="#">XMAS13</a></td>
 	    				<td>Coupon for XMAS -30 &euro;</td>
 	    				<td>25/01/2013</td>
 	    				<td>4</td>
@@ -172,8 +172,12 @@
 
 {include file='includes/js.inc.html'}
 
-<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/themes/cupertino/jquery-ui.css">
+{stylesheets file='../assets/css/jqueryui/custom-theme/*' filters='less,cssembed'}
+	<link rel="stylesheet" href="{$asset_url}">
+{/stylesheets}
+
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
+
 {javascripts file='../assets/bootstrap-editable/js/bootstrap-editable.js'}
 <script src="{$asset_url}"></script>
 {/javascripts}
