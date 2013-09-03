@@ -36,6 +36,8 @@ use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Event\DefaultActionEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 
 /**
  *
@@ -199,5 +201,15 @@ class BaseController extends ContainerAware
         echo "url=$url";
 
         if (null !== $url) $this->redirect($url);
+    }
+
+    /**
+     * Return a 404 error
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function pageNotFound()
+    {
+
     }
 }

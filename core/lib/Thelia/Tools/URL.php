@@ -30,12 +30,26 @@ use Thelia\Rewriting\RewritingRetriever;
 
 class URL
 {
+    protected $resolver = null;
+    protected $retriever = null;
+
     const PATH_TO_FILE = true;
     const WITH_INDEX_PAGE = false;
+
+    public function __construct()
+    {
+        $this->retriever = new RewritingRetriever();
+        $this->resolver = new RewritingResolver();
+    }
 
     public static function getIndexPage()
     {
         return ConfigQuery::read('base_url', '/') . "index_dev.php"; // FIXME !
+    }
+
+    public static function init()
+    {
+        return new URL();
     }
 
     /**
@@ -104,7 +118,7 @@ class URL
      */
      public static function viewUrl($viewName, array $parameters = array())
      {
-         $path = sprintf("%s?view=%s", self::getIndexPage(), $viewName);
+         $path = sprintf("?view=%s", $viewName);
 
          return self::absoluteUrl($path, $parameters);
      }
@@ -116,18 +130,17 @@ class URL
      *
      * @return null|string
      */
-    public static function retrieve($view, $viewId, $viewLocale)
+    public function retrieve($view, $viewId, $viewLocale)
     {
         $rewrittenUrl = null;
         if(ConfigQuery::isRewritingEnable()) {
-            $retriever = new RewritingRetriever();
-            $rewrittenUrl = $retriever->getViewUrl($view, $viewLocale, $viewId);
+            $rewrittenUrl = $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
         }
 
         return $rewrittenUrl === null ? self::viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
     }
 
-    public static function retrieveCurrent(Request $request, $rewrittenUrlOnly = false)
+    public function retrieveCurrent(Request $request)
     {
         $rewrittenUrl = null;
         if(ConfigQuery::isRewritingEnable()) {
@@ -135,12 +148,10 @@ class URL
             $viewLocale = $request->query->get('locale', null);
             $viewId = $view === null ? null : $request->query->get($view . '_id', null);
 
-            $allParameters = $request->query->all();
-            $allParametersWithoutView = $allParameters;
+            $allOtherParameters = $request->query->all();
             if($view !== null) {
-                unset($allParametersWithoutView['view']);
+                unset($allOtherParameters['view']);
             }
-            $allOtherParameters = $allParametersWithoutView;
             if($viewLocale !== null) {
                 unset($allOtherParameters['locale']);
             }
@@ -148,29 +159,15 @@ class URL
                 unset($allOtherParameters[$view . '_id']);
             }
 
-            $retriever = new RewritingRetriever();
-            $rewrittenUrl = $retriever->getSpecificUrl($view, $viewLocale, $viewId, $allOtherParameters);
+            $this->retriever->loadSpecificUrl($view, $viewLocale, $viewId, $allOtherParameters);
         }
 
-        if($rewrittenUrlOnly) {
-            return $rewrittenUrl !== null ? $rewrittenUrl : null;
-        } else {
-            return $rewrittenUrl !== null ? $rewrittenUrl : self::viewUrl($view, $allParametersWithoutView);
-        }
+        return $this->retriever;
     }
 
-    public static function resolve($url)
+    public function resolve($url)
     {
-        $resolver = new RewritingResolver($url);
-        return $resolver;
-    }
-
-    public static function resolveCurrent(Request $request)
-    {
-        if(ConfigQuery::isRewritingEnable()) {
-            return self::resolve($request->get('rewritten_url'));
-        }
-
-        return null;
+        $this->resolver->load($url);
+        return $this->resolver;
     }
 }

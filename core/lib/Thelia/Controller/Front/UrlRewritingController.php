@@ -22,13 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Front;
 
-//use Propel\Runtime\Exception\PropelException;
-//use Thelia\Form\Exception\FormValidationException;
-//use Thelia\Core\Event\CartEvent;
-//use Thelia\Core\Event\TheliaEvents;
-//use Symfony\Component\HttpFoundation\Request;
-//use Thelia\Form\CartAdd;
-
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
@@ -36,36 +29,40 @@ use Thelia\Tools\URL;
 
 class UrlRewritingController extends BaseFrontController
 {
-    public function check(Request $request)
+    public function check(Request $request, $rewritten_url)
     {
         if(ConfigQuery::isRewritingEnable()) {
             try {
-                $rewrittentUrlData = URL::resolveCurrent($request);
+                $rewrittenUrlData = URL::init()->resolve($rewritten_url);
             } catch(UrlRewritingException $e) {
-                $code = $e->getCode();
                 switch($e->getCode()) {
                     case UrlRewritingException::URL_NOT_FOUND :
-                        /* TODO : redirect 404 */
-                        throw $e;
+                        return $this->pageNotFound();
                         break;
                     default:
                         throw $e;
                 }
             }
 
+            /* is the URL redirected ? */
+
+            if(null !== $rewrittenUrlData->redirectedToUrl) {
+                $this->redirect($rewrittenUrlData->redirectedToUrl, 301);
+            }
+
             /* define GET arguments in request */
 
-            if(null !== $rewrittentUrlData->view) {
-                $request->query->set('view', $rewrittentUrlData->view);
-                if(null !== $rewrittentUrlData->viewId) {
-                    $request->query->set($rewrittentUrlData->view . '_id', $rewrittentUrlData->viewId);
+            if(null !== $rewrittenUrlData->view) {
+                $request->query->set('view', $rewrittenUrlData->view);
+                if(null !== $rewrittenUrlData->viewId) {
+                    $request->query->set($rewrittenUrlData->view . '_id', $rewrittenUrlData->viewId);
                 }
             }
-            if(null !== $rewrittentUrlData->locale) {
-                $request->query->set('locale', $rewrittentUrlData->locale);
+            if(null !== $rewrittenUrlData->locale) {
+                $request->query->set('locale', $rewrittenUrlData->locale);
             }
 
-            foreach($rewrittentUrlData->otherParameters as $parameter => $value) {
+            foreach($rewrittenUrlData->otherParameters as $parameter => $value) {
                 $request->query->set($parameter, $value);
             }
         }

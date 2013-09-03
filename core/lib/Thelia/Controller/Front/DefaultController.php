@@ -49,10 +49,10 @@ class DefaultController extends BaseFrontController
         if(ConfigQuery::isRewritingEnable()) {
 
             /* Does the query GET parameters match a rewritten URL ? */
-            $rewrittenUrl = URL::retrieveCurrent($request, true);
-            if($rewrittenUrl !== null) {
+            $rewrittenUrl = URL::init()->retrieveCurrent($request);
+            if($rewrittenUrl->rewrittenUrl !== null) {
                 /* 301 redirection to rewritten URL */
-                $this->redirect($rewrittenUrl, 301);
+                $this->redirect($rewrittenUrl->url, 301);
             }
         }
 

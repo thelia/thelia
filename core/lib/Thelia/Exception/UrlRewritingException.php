@@ -31,6 +31,8 @@ class UrlRewritingException extends \Exception
 
     const URL_NOT_FOUND = 404;
 
+    const RESOLVER_NULL_SEARCH = 800;
+
     public function __construct($message, $code = null, $previous = null) {
         if($code === null) {
             $code = self::UNKNOWN_EXCEPTION;
