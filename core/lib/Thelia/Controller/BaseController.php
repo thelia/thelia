@@ -179,7 +179,7 @@ class BaseController extends ContainerAware
      */
     public function redirect($url)
     {
-        Redirect::exec($url);
+        Redirect::exec(URL::absoluteUrl($url));
     }
 
     /**
