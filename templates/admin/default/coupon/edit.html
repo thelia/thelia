@@ -35,6 +35,13 @@
 				  	</div>
 
 				  	<div class="control-group">
+						<label for="enabled" class="checkbox">
+							<input id="enabled" type="checkbox" name="isEnabled" value="1" checked>
+							Is enabled ?
+						</label>
+					</div>
+
+				  	<div class="control-group">
 						<label for="available-on-special-offers" class="checkbox">
 							<input id="available-on-special-offers" type="checkbox" name="isAvailableOnSpecialOffers" value="1">
 							Is available on special offers ?
@@ -66,7 +73,7 @@
 					<div class="control-group">
 					    <label for="max-usage">Max usage :</label>
 					    <label for="is-unlimited" class="checkbox">
-							<input id="is-unlimited" type="checkbox" name="isUnlimited" value="1">
+							<input id="is-unlimited" type="checkbox" name="isUnlimited" value="1" checked>
 							Is unlimited ?
 						</label>
 					    <input id="max-usage" type="text" name="maxUsage" placeholder="max usage">					
@@ -105,7 +112,7 @@
 
 					<div class="control-group">
 					    <label for="short-description">Short description :</label>
-					    <textarea id="short-description" name="short-description" placeholder="short description" class="span12" rows="5"></textarea>				
+					    <textarea id="short-description" name="shortDescription" placeholder="short description" class="span12" rows="5"></textarea>				
 				  	</div>
 				</div>
 				
@@ -113,7 +120,7 @@
 			  	
 				<div class="control-group">
 				    <label for="long-description">Long description :</label>
-				    <textarea id="long-description" name="long-description" placeholder="long description" class="span12 wysiwyg" rows="10"></textarea>				
+				    <textarea id="long-description" name="longDescription" placeholder="long description" class="span12 wysiwyg" rows="10"></textarea>				
 			  	</div>
 
 			  	<button type="submit" class="btn btn-primary">Save</button>

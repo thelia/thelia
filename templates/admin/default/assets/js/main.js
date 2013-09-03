@@ -55,15 +55,15 @@
         if($('#is-unlimited').length){
 
             if($('#is-unlimited').is(':checked')){
-                $('#max-usage').hide().val('');
+                $('#max-usage').hide().attr('value', '-1');
             }
 
             $('#is-unlimited').change(function(){
                 if($('#is-unlimited').is(':checked')){
-                    $('#max-usage').hide().val('');
+                    $('#max-usage').hide().attr('value', '-1');
                 }
                 else{
-                    $('#max-usage').show();
+                    $('#max-usage').show().val('').attr('value', '');
                 }
             });
             
