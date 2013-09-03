@@ -51,6 +51,24 @@
             });
         }
 
+        // -- Max usage --
+        if($('#is-unlimited').length){
+
+            if($('#is-unlimited').is(':checked')){
+                $('#max-usage').hide().val('');
+            }
+
+            $('#is-unlimited').change(function(){
+                if($('#is-unlimited').is(':checked')){
+                    $('#max-usage').hide().val('');
+                }
+                else{
+                    $('#max-usage').show();
+                }
+            });
+            
+        }
+
         // -- Confirm Box --
         if($('[data-toggle="confirm"]').length){
             $('[data-toggle="confirm"]').click(function(e){		
