@@ -87,14 +87,35 @@ class CouponController extends BaseAdminController
 
         if ($this->getRequest()->isMethod('POST')) {
             try {
-                $couponCreationForm = new CouponCreationForm($this->getRequest());
-                $couponBeingCreated = $this->buildCouponFromForm(
-                    $this->validateForm($couponCreationForm, "POST")->getData()
-                );
+                // Create the form from the request
+                $creationForm = new CouponCreationForm(Form($this->getRequest()));
 
-                $couponCreateEvent = new CouponCreateEvent(
-                    $couponBeingCreated
+                // Check the form against constraints violations
+                $form = $this->validateForm($creationForm, "POST");
+
+                // Get the form field values
+                $data = $form->getData();
+
+                var_dump($data);
+
+                $couponCreateEvent = new CouponCreateEvent();
+                $couponCreateEvent->setTitle($data['title']);
+                $couponCreateEvent->setShortDescription($data['shortDescription']);
+                $couponCreateEvent->setDescription($data['longDescription']);
+                $couponCreateEvent->setCode($data['code']);
+                $couponCreateEvent->setAmount($data['amount']);
+
+                $couponCreateEvent->setExpirationDate(
+                    new \DateTime($data['expirationDate'])
                 );
+                $couponCreateEvent->setMaxUsage($data['maxUsage']);
+                $couponCreateEvent->setIsCumulative($data['isCumulative']);
+                $couponCreateEvent->setIsRemovingPostage($data['isRemovingPostage']);
+                $couponCreateEvent->setIsAvailableOnSpecialOffers($data['isAvailableOnSpecialOffers']);
+
+                $couponCreateEvent->setIsEnabled($data['isEnabled']);
+
+//                $couponCreateEvent->setRules($data['rules']);
 
                 $this->dispatch(
                     TheliaEvents::CREATE_COUPON,
@@ -103,14 +124,14 @@ class CouponController extends BaseAdminController
                 $this->adminLogAppend(
                     sprintf(
                         'Coupon %s (ID %s) created',
-                        $couponBeingCreated->getTitle(),
-                        $couponBeingCreated->getId()
+                        $couponCreateEvent->getTitle(),
+                        $couponCreateEvent->getId()
                     )
                 );
                 // @todo redirect if successful
             } catch (FormValidationException $e) {
-                $couponCreationForm->setErrorMessage($e->getMessage());
-                    $this->getParserContext()->setErrorForm($couponCreationForm);
+                $creationForm->setErrorMessage($e->getMessage());
+                    $this->getParserContext()->setErrorForm($creationForm);
             } catch (\Exception $e) {
                 Tlog::getInstance()->error(
                     sprintf(
@@ -124,7 +145,7 @@ class CouponController extends BaseAdminController
 
         }
 
-        return $this->render('coupon/edit', array());
+        return $this->render('coupon/create', array('action' => 'create'));
     }
 
     /**
@@ -138,7 +159,7 @@ class CouponController extends BaseAdminController
     {
         $this->checkAuth("ADMIN", "admin.coupon.view");
 
-        return $this->render('coupon/edit', $args);
+        return $this->render('coupon/update', $args);
     }
 
     /**
