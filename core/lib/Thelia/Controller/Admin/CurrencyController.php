@@ -125,10 +125,6 @@ class CurrencyController extends BaseAdminController
         catch (\Exception $ex) {
             // Any other error
             $error_msg = sprintf("Sorry, an error occured: %s", $ex->getMessage());
-
-            var_dump($ex);
-
-            exit;
         }
 
         if ($error_msg !== false) {

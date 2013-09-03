@@ -39,12 +39,12 @@ VALUES
 
 INSERT INTO `currency_i18n` (`id` ,`locale` ,`name`)
 VALUES
-(1, 'fr_FR', 'euro'),
-(1, 'en_UK', 'euro'),
-(2, 'fr_FR', 'dollar'),
-(2, 'en_UK', 'dollar'),
-(3, 'fr_FR', 'livre'),
-(3, 'en_UK', 'pound');
+(1, 'fr_FR', 'Euro'),
+(1, 'en_UK', 'Euro'),
+(2, 'fr_FR', 'Dollar Américain'),
+(2, 'en_UK', 'United States Dollar'),
+(3, 'fr_FR', 'Livre anglaise'),
+(3, 'en_UK', 'UK Pound');
 
 
 INSERT INTO `country` (`id`, `area_id`, `isocode`, `isoalpha2`, `isoalpha3`, `created_at`, `updated_at`) VALUES

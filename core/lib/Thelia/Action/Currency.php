@@ -60,6 +60,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             ->save()
         ;
 
+
         $event->setCurrency($currency);
     }
 
