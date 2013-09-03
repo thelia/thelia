@@ -36,4 +36,8 @@
         <default key="_controller">Thelia\Controller\Front\CartController::changeItem</default>
         <default key="_view">cart</default>
     </route>
+
+    <route id="url-rewriting.check" path="/{rewritten_url}" methods="GET">
+        <default key="_controller">Thelia\Controller\Front\UrlRewritingController::check</default>
+    </route>
 </routes>

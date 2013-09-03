@@ -79,6 +79,10 @@ class RewritingRetriever
      */
     public function getSpecificUrl($view, $viewLocale, $viewId = null, $viewOtherParameters = array())
     {
+        if(empty($viewOtherParameters)) {
+            return $this->getViewUrl($view, $viewLocale, $viewId);
+        }
+
         $urlQuery = RewritingUrlQuery::create()
             ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
             ->withColumn('`ra`.REWRITING_URL_ID', 'ra_REWRITING_URL_ID')

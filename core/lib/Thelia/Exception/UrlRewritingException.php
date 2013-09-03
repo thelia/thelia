@@ -20,49 +20,21 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Controller\Front;
 
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Model\ConfigQuery;
-use Thelia\Tools\Redirect;
-use Thelia\Tools\URL;
+namespace Thelia\Exception;
 
-/**
- *
- * Must be the last controller call. It fixes default values
- *
- * @author Manuel Raynaud <mraynadu@openstudio.fr>
- */
+use Thelia\Log\Tlog;
 
-class DefaultController extends BaseFrontController
+class UrlRewritingException extends \Exception
 {
-    /**
-     *
-     * set the default value for thelia
-     *
-     * In this case there is no action so we have to verify if some needed params are not missing
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     */
-    public function noAction(Request $request)
-    {
-        if(ConfigQuery::isRewritingEnable()) {
+    const UNKNOWN_EXCEPTION = 0;
 
-            /* Does the query GET parameters match a rewritten URL ? */
-            $rewrittenUrl = URL::retrieveCurrent($request, true);
-            if($rewrittenUrl !== null) {
-                /* 301 redirection to rewritten URL */
-                $this->redirect($rewrittenUrl, 301);
-            }
+    const URL_NOT_FOUND = 404;
+
+    public function __construct($message, $code = null, $previous = null) {
+        if($code === null) {
+            $code = self::UNKNOWN_EXCEPTION;
         }
-
-        if (! $view = $request->query->get('view')) {
-            $view = "index";
-            if ($request->request->has('view')) {
-                $view = $request->request->get('view');
-            }
-        }
-
-        $request->attributes->set('_view', $view);
+        parent::__construct($message, $code, $previous);
     }
 }

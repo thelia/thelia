@@ -22,6 +22,11 @@
 /*************************************************************************************/
 namespace Thelia\Rewriting;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Exception\RewritingUrlException;
+use Thelia\Exception\UrlRewritingException;
+use Thelia\Model\RewritingArgumentQuery;
+
 /**
  * Class RewritingResolver
  * @package Thelia\Rewriting
@@ -31,5 +36,47 @@ namespace Thelia\Rewriting;
  */
 class RewritingResolver
 {
+    public $view;
+    public $viewId;
+    public $locale;
+    public $otherParameters;
 
+    public function __construct($url = null)
+    {
+        if($url !== null) {
+            $this->load($url);
+        }
+    }
+
+    public function load($rewrittenUrl)
+    {
+        $search = RewritingArgumentQuery::create()
+            //->filterByUrl($rewrittenUrl)
+            ->joinRewritingUrl('ru', Criteria::RIGHT_JOIN)
+            ->where('`ru`.URL = ?', $rewrittenUrl, \PDO::PARAM_STR)
+            ->withColumn('`ru`.URL', 'ru_url')
+            ->withColumn('`ru`.VIEW', 'ru_view')
+            ->withColumn('`ru`.VIEW_LOCALE', 'ru_locale')
+            ->withColumn('`ru`.VIEW_ID', 'ru_viewId')
+            ->find();
+
+        if($search->count() == 0) {
+            throw new UrlRewritingException('URL NOT FOUND', UrlRewritingException::URL_NOT_FOUND);
+        }
+
+        $otherParameters = array();
+        foreach($search as $result) {
+            $parameter = $result->getParameter();
+            $value = $result->getValue();
+
+            if(null !== $parameter) {
+                $otherParameters[$parameter] = $value;
+            }
+        }
+
+        $this->view = $search->getFirst()->getVirtualColumn('ru_view');
+        $this->viewId = $search->getFirst()->getVirtualColumn('ru_viewId');
+        $this->locale = $search->getFirst()->getVirtualColumn('ru_locale');
+        $this->otherParameters = $otherParameters;
+    }
 }

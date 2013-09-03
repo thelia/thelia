@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -22,37 +22,51 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Front;
 
-use Symfony\Component\HttpFoundation\Request;
+//use Propel\Runtime\Exception\PropelException;
+//use Thelia\Form\Exception\FormValidationException;
+//use Thelia\Core\Event\CartEvent;
+//use Thelia\Core\Event\TheliaEvents;
+//use Symfony\Component\HttpFoundation\Request;
+//use Thelia\Form\CartAdd;
+
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
-use Thelia\Tools\Redirect;
 use Thelia\Tools\URL;
 
-/**
- *
- * Must be the last controller call. It fixes default values
- *
- * @author Manuel Raynaud <mraynadu@openstudio.fr>
- */
-
-class DefaultController extends BaseFrontController
+class UrlRewritingController extends BaseFrontController
 {
-    /**
-     *
-     * set the default value for thelia
-     *
-     * In this case there is no action so we have to verify if some needed params are not missing
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     */
-    public function noAction(Request $request)
+    public function check(Request $request)
     {
         if(ConfigQuery::isRewritingEnable()) {
+            try {
+                $rewrittentUrlData = URL::resolveCurrent($request);
+            } catch(UrlRewritingException $e) {
+                $code = $e->getCode();
+                switch($e->getCode()) {
+                    case UrlRewritingException::URL_NOT_FOUND :
+                        /* TODO : redirect 404 */
+                        throw $e;
+                        break;
+                    default:
+                        throw $e;
+                }
+            }
 
-            /* Does the query GET parameters match a rewritten URL ? */
-            $rewrittenUrl = URL::retrieveCurrent($request, true);
-            if($rewrittenUrl !== null) {
-                /* 301 redirection to rewritten URL */
-                $this->redirect($rewrittenUrl, 301);
+            /* define GET arguments in request */
+
+            if(null !== $rewrittentUrlData->view) {
+                $request->query->set('view', $rewrittentUrlData->view);
+                if(null !== $rewrittentUrlData->viewId) {
+                    $request->query->set($rewrittentUrlData->view . '_id', $rewrittentUrlData->viewId);
+                }
+            }
+            if(null !== $rewrittentUrlData->locale) {
+                $request->query->set('locale', $rewrittentUrlData->locale);
+            }
+
+            foreach($rewrittentUrlData->otherParameters as $parameter => $value) {
+                $request->query->set($parameter, $value);
             }
         }
 
@@ -64,5 +78,7 @@ class DefaultController extends BaseFrontController
         }
 
         $request->attributes->set('_view', $view);
+
     }
+
 }

@@ -25,6 +25,7 @@ namespace Thelia\Tools;
 
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Model\ConfigQuery;
+use Thelia\Rewriting\RewritingResolver;
 use Thelia\Rewriting\RewritingRetriever;
 
 class URL
@@ -126,7 +127,7 @@ class URL
         return $rewrittenUrl === null ? self::viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
     }
 
-    public static function retrieveCurrent(Request $request)
+    public static function retrieveCurrent(Request $request, $rewrittenUrlOnly = false)
     {
         $rewrittenUrl = null;
         if(ConfigQuery::isRewritingEnable()) {
@@ -151,6 +152,25 @@ class URL
             $rewrittenUrl = $retriever->getSpecificUrl($view, $viewLocale, $viewId, $allOtherParameters);
         }
 
-        return $rewrittenUrl === null ? self::viewUrl($view, $allParametersWithoutView) : $rewrittenUrl;
+        if($rewrittenUrlOnly) {
+            return $rewrittenUrl !== null ? $rewrittenUrl : null;
+        } else {
+            return $rewrittenUrl !== null ? $rewrittenUrl : self::viewUrl($view, $allParametersWithoutView);
+        }
+    }
+
+    public static function resolve($url)
+    {
+        $resolver = new RewritingResolver($url);
+        return $resolver;
+    }
+
+    public static function resolveCurrent(Request $request)
+    {
+        if(ConfigQuery::isRewritingEnable()) {
+            return self::resolve($request->get('rewritten_url'));
+        }
+
+        return null;
     }
 }
