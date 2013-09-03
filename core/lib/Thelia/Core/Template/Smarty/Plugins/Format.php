@@ -118,6 +118,7 @@ class Format extends AbstractSmartyPlugin
      *  dec_point => separator for the decimal point
      *  thousands_sep => thousands separator
      *
+     *  ex : {format_number number="1246.12" decimals="1" dec_point="," thousands_sep=" "} will output "1 246,1"
      *
      * @param $params
      * @param null $template

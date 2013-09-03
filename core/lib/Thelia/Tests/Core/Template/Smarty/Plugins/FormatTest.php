@@ -152,6 +152,8 @@ class FormatTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * test formatDate without mandatory parameters
+     *
      * @covers ::formatDate
      * @expectedException \Thelia\Core\Template\Smarty\Exception\SmartyPluginException
      */
@@ -166,6 +168,62 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dateTime->format("Y-m-d H:i:s"), $render);
     }
 
+
+    /**
+     * test formatNumber without mandatory parameters
+     *
+     * @covers ::formatNumber
+     * @expectedException \Thelia\Core\Template\Smarty\Exception\SmartyPluginException
+     */
+    public function testFormatNumberWithoutParams()
+    {
+        $formatClass = new Format($this->request);
+
+        $render = $formatClass->formatNumber(array());
+    }
+
+    /**
+     * test formatDate specifying all parameters
+     *
+     * @covers ::formatNumber
+     */
+    public function testFormatNumberWithAllParams()
+    {
+        $formatClass = new Format($this->request);
+
+        $number = 1256.12;
+        $decimals = 1;
+        $decPoint = ",";
+        $thousandsSep  = " ";
+
+        $render = $formatClass->formatNumber(array(
+            "number" => $number,
+            "decimals" => $decimals,
+            "dec_point" => $decPoint,
+            "thousands_sep" => $thousandsSep
+        ));
+
+        $this->assertEquals($render, "1 256,1");
+    }
+
+    /**
+     * @covers ::formatNumber
+     */
+    public function testFormatNumberWithDefaultParameters()
+    {
+        $number = 1234.56;
+        $langMock = $this->getLangMock();
+        $this->request->getSession()->setLang($langMock);
+
+        $formatClass = new Format($this->request);
+
+        $render = $formatClass->formatNumber(array(
+            "number" => $number
+        ));
+
+        $this->assertEquals( $render, number_format($number, 2, ",", " "));
+    }
+
     /**
      * create a mock for Thelia\Model\Lang class
      * @return \Thelia\Model\Lang instance
@@ -177,7 +235,10 @@ class FormatTest extends \PHPUnit_Framework_TestCase
             array(
                 "getDateFormat",
                 "getTimeFormat",
-                "getDateTimeFormat"
+                "getDateTimeFormat",
+                "getDecimalSeparator",
+                "getThousandsSeparator",
+                "getDecimals"
             )
         );
 
@@ -192,6 +253,18 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $mock->expects($this->any())
             ->method("getDateTimeFormat")
             ->will($this->returnValue("Y-m-d H:i:s"));
+
+        $mock->expects($this->any())
+            ->method("getDecimals")
+            ->will($this->returnValue(2));
+
+        $mock->expects($this->any())
+            ->method("getDecimalSeparator")
+            ->will($this->returnValue(","));
+
+        $mock->expects($this->any())
+            ->method("getThousandsSeparator")
+            ->will($this->returnValue(" "));
 
         return $mock;
     }
