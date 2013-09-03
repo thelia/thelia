@@ -1,9 +1,10 @@
-{check_auth roles="ADMIN" permissions="admin.configuration.view" login_tpl="/admin/login"}
+{extends file="admin-layout.tpl"}
 
-{$page_title={intl l='Configuration'}}
+{block name="page-title"}{intl l='Configuration'}{/block}
 
-{include file='includes/header.inc.html'}
+{block name="check-permissions"}admin.configuration.view{/block}
 
+{block name="main-content"}
 <div class="configuration">
 
     <div id="wrapper" class="container">
@@ -168,7 +169,4 @@
 	    </div>
 	</div>
 </div>
-
-{include file='includes/js.inc.html'}
-
-{include file='includes/footer.inc.html'}
+{/block}

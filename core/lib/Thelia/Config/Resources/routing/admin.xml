@@ -83,6 +83,28 @@
         <default key="_controller">Thelia\Controller\Admin\MessageController::deleteAction</default>
     </route>
 
+    <!-- Routes to the Currencies controller -->
+
+    <route id="admin.configuration.currencies.default" path="/admin/configuration/currencies">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.create" path="/admin/configuration/currencies/create">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.change" path="/admin/configuration/currencies/change">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::changeAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.save-change" path="/admin/configuration/currencies/save-change">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::saveChangeAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.delete" path="/admin/configuration/currencies/delete">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::deleteAction</default>
+    </route>
+
 	<!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">

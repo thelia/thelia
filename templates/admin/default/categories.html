@@ -1,11 +1,16 @@
-{check_auth roles="ADMIN" permissions="admin.catalog.view" login_tpl="/admin/login"}
+{extends file="admin-layout.tpl"}
 
-{$page_title={intl l='Catalog'}}
+{block name="page-title"}{intl l='Catalog'}{/block}
 
-{$thelia_page_css_file = "assets/bootstrap-editable/css/bootstrap-editable.css"}
+{block name="check-permissions"}admin.catalog.view{/block}
 
-{include file='includes/header.inc.html'}
+{block name="after-admin-css"}
+    {stylesheets file='assets/bootstrap-editable/css/bootstrap-editable.css' filters='cssembed'}
+        <link rel="stylesheet" href="{$asset_url}">
+    {/stylesheets}
+{/block}
 
+{block name="main-content"}
 <div class="catalog">
 	<div id="wrapper" class="container">
 
@@ -256,13 +261,15 @@
 
 {include file="includes/add-category-dialog.html"}
 {include file="includes/delete-category-dialog.html"}
+{/block}
 
-{include file='includes/js.inc.html'}
+{block name="after-javascript-include"}
+	{javascripts file='assets/bootstrap-editable/js/bootstrap-editable.js'}
+	    <script src="{$asset_url}"></script>
+	{/javascripts}
+{/block}
 
-{javascripts file='assets/bootstrap-editable/js/bootstrap-editable.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-
+{block name="javascript-initialization"}
 <script>
 $(function() {
 
@@ -327,5 +334,4 @@ $(function() {
 
 })
 </script>
-
-{include file='includes/footer.inc.html'}
+{/block}
