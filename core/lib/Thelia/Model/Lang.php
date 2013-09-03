@@ -44,7 +44,7 @@ class Lang extends BaseLang {
         return ".";
     }
 
-    public function getThousandSeparator()
+    public function getThousandsSeparator()
     {
         return " ";
     }
