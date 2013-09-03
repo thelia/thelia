@@ -27,6 +27,9 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Smarty\Plugins\Format;
 
+/**
+ * @coversDefaultClass \Thelia\Core\Template\Smarty\Plugins\Format
+ */
 class FormatTest extends \PHPUnit_Framework_TestCase
 {
     protected $request;
@@ -38,6 +41,12 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $this->request->setSession(new Session(new MockArraySessionStorage()));
     }
 
+    /**
+     *
+     * test formatDate method with expected format
+     *
+     * @covers ::formatDate
+     */
     public function testFormatDateWithSpecificFormat()
     {
         $dateTime = new \DateTime();
@@ -53,6 +62,12 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dateTime->format($format), $render);
     }
 
+    /**
+     *
+     * test formatDate method with date default format
+     *
+     * @covers ::formatDate
+     */
     public function testFormatDateWithDefaultSessionParam()
     {
         $dateTime = new \DateTime();
@@ -67,6 +82,12 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dateTime->format("Y-m-d H:i:s"), $render);
     }
 
+    /**
+     *
+     * test formatDate method with time default format
+     *
+     * @covers ::formatDate
+     */
     public function testFormatDateWithDateSessionParam()
     {
         $dateTime = new \DateTime();
@@ -84,6 +105,12 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dateTime->format("Y-m-d"), $render);
     }
 
+    /**
+     *
+     * test formatDate method with datetime default format
+     *
+     * @covers ::formatDate
+     */
     public function testFormatDateWithTimeSessionParam()
     {
         $dateTime = new \DateTime();
@@ -101,6 +128,12 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dateTime->format("H:i:s"), $render);
     }
 
+    /**
+     *
+     * test formatDate method without output or expected format. datetime format must be return
+     *
+     * @covers ::formatDate
+     */
     public function testFormatDateWithDateTimeSessionParam()
     {
         $dateTime = new \DateTime();
@@ -118,6 +151,25 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dateTime->format("Y-m-d H:i:s"), $render);
     }
 
+    /**
+     * @covers ::formatDate
+     * @expectedException \Thelia\Core\Template\Smarty\Exception\SmartyPluginException
+     */
+    public function testFormatDateWithoutDate()
+    {
+        $dateTime = new \DateTime();
+
+        $formatClass = new Format($this->request);
+
+        $render = $formatClass->formatDate(array());
+
+        $this->assertEquals($dateTime->format("Y-m-d H:i:s"), $render);
+    }
+
+    /**
+     * create a mock for Thelia\Model\Lang class
+     * @return \Thelia\Model\Lang instance
+     */
     public function getLangMock()
     {
         $mock = $this->getMock(
