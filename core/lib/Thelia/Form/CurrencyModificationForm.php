@@ -34,8 +34,8 @@ class CurrencyModificationForm extends CurrencyCreationForm
         parent::buildForm(true);
 
         $this->formBuilder
-            ->add("id"     , "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
-            ;
+            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
+        ;
     }
 
     public function getName()

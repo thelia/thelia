@@ -6,14 +6,15 @@ INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`by_default`,`created_at`,
 
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 ('session_config.default', '1', 1, 1, NOW(), NOW()),
-('verifyStock', '1', 1, 0, NOW(), NOW()),
-('default_lang_without_translation', '1', 1, 0, NOW(), NOW()),
-('rewriting_enable', '0', 1, 0, NOW(), NOW()),
-('imagine_graphic_driver', 'gd', 1, 0, NOW(), NOW()),
-('default_images_quality_percent', '75', 1, 0, NOW(), NOW()),
-('original_image_delivery_mode', 'symlink', 1, 0, NOW(), NOW()),
-('images_library_path', 'local/media/images', 1, 0, NOW(), NOW()),
-('image_cache_dir_from_web_root', 'cache/images', 1, 0, NOW(), NOW());
+('verifyStock', '1', 0, 0, NOW(), NOW()),
+('default_lang_without_translation', '1', 0, 0, NOW(), NOW()),
+('rewriting_enable', '0', 0, 0, NOW(), NOW()),
+('imagine_graphic_driver', 'gd', 0, 0, NOW(), NOW()),
+('default_images_quality_percent', '75', 0, 0, NOW(), NOW()),
+('original_image_delivery_mode', 'symlink', 0, 0, NOW(), NOW()),
+('images_library_path', 'local/media/images', 0, 0, NOW(), NOW()),
+('image_cache_dir_from_web_root', 'cache/images', 0, 0, NOW(), NOW()),
+('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', 0, 0, NOW(), NOW());
 
 INSERT INTO `module` (`code`, `type`, `activate`, `position`, `created_at`, `updated_at`) VALUES ('test', '1', '1', '1', NOW(), NOW());
 

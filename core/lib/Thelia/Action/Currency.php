@@ -34,6 +34,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\CurrencyChangeEvent;
 use Thelia\Core\Event\CurrencyCreateEvent;
 use Thelia\Core\Event\CurrencyDeleteEvent;
+use Thelia\Model\Map\CurrencyTableMap;
+use Thelia\Model\ConfigQuery;
 
 class Currency extends BaseAction implements EventSubscriberInterface
 {
@@ -53,7 +55,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             ->setName($event->getCurrencyName())
             ->setSymbol($event->getSymbol())
             ->setRate($event->getRate())
-            ->setCode($event->getCode())
+            ->setCode(strtoupper($event->getCode()))
 
             ->save()
         ;
@@ -79,9 +81,35 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 ->setName($event->getCurrencyName())
                 ->setSymbol($event->getSymbol())
                 ->setRate($event->getRate())
-                ->setCode($event->getCode())
+                ->setCode(strtoupper($event->getCode()))
 
                 ->save();
+
+            $event->setCurrency($currency);
+        }
+    }
+
+    /**
+     * Set the default currency
+     *
+     * @param CurrencyChangeEvent $event
+     */
+    public function setDefault(CurrencyChangeEvent $event)
+    {
+        $search = CurrencyQuery::create();
+
+        if (null !== $currency = CurrencyQuery::create()->findOneById($event->getCurrencyId())) {
+
+            if ($currency->getByDefault() != $event->getIsDefault()) {
+
+                // Reset default status
+                CurrencyQuery::create()->filterByByDefault(true)->update(array('ByDefault' => false));
+
+                $currency
+                    ->setByDefault($event->getIsDefault())
+                    ->save()
+                ;
+            }
 
             $event->setCurrency($currency);
         }
@@ -106,15 +134,41 @@ class Currency extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function updateRates() {
+
+        $rates_url = ConfigQuery::read('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml');
+
+        $rate_data = file_get_contents($rates_url);
+
+        if ($rate_data && $sxe = new \SimpleXMLElement($rate_data)) {
+
+            foreach ($sxe->Cube[0]->Cube[0]->Cube as $last)
+            {
+                $code = strtoupper($last["currency"]);
+                $rate = floatval($last['rate']);
+
+                if (null !== $currency = CurrencyQuery::create()->findOneByCode($code)) {
+                    $currency->setRate($rate)->save();
+                }
+            }
+        }
+        else {
+            throw new \RuntimeException(sprintf("Failed to get currency rates data from URL %s", $url));
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::CURRENCY_CREATE   => array("create", 128),
-            TheliaEvents::CURRENCY_MODIFY   => array("modify", 128),
-            TheliaEvents::CURRENCY_DELETE   => array("delete", 128),
+            TheliaEvents::CURRENCY_CREATE       => array("create", 128),
+            TheliaEvents::CURRENCY_MODIFY       => array("modify", 128),
+            TheliaEvents::CURRENCY_DELETE       => array("delete", 128),
+            TheliaEvents::CURRENCY_SET_DEFAULT  => array("setDefault", 128),
+            TheliaEvents::CURRENCY_UPDATE_RATES => array("updateRates", 128),
+
         );
     }
 }

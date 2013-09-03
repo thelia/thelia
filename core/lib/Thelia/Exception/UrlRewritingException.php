@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia                                                                       */
+/*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,44 +17,26 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
-use Thelia\Model\Currency;
+namespace Thelia\Exception;
 
-class CurrencyChangeEvent extends CurrencyCreateEvent
+use Thelia\Log\Tlog;
+
+class UrlRewritingException extends \Exception
 {
-    protected $currency_id;
-    protected $is_default;
+    const UNKNOWN_EXCEPTION = 0;
 
-    public function __construct($currency_id)
-    {
-        $this->setCurrencyId($currency_id);
-    }
+    const URL_NOT_FOUND = 404;
 
-    public function getCurrencyId()
-    {
-        return $this->currency_id;
-    }
+    const RESOLVER_NULL_SEARCH = 800;
 
-    public function setCurrencyId($currency_id)
-    {
-        $this->currency_id = $currency_id;
-
-        return $this;
-    }
-
-    public function getIsDefault()
-    {
-        return $this->is_default;
-    }
-
-    public function setIsDefault($is_default)
-    {
-        $this->is_default = $is_default;
-
-        return $this;
+    public function __construct($message, $code = null, $previous = null) {
+        if($code === null) {
+            $code = self::UNKNOWN_EXCEPTION;
+        }
+        parent::__construct($message, $code, $previous);
     }
 }

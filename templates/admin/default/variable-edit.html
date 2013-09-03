@@ -108,7 +108,7 @@
 
                                     <div class="control-group">
                                         <div class="controls">
-                                            <p>{intl l='Variable created on %date_create. Last modification: %date_change' df=$datetime_format date_create=$CREATE_DATE->format($datetime_format) date_change=$UPDATE_DATE->format($datetime_format)}</p>
+                                            <p>{intl l='Variable created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
                                         </div>
                                     </div>
 

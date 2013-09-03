@@ -151,6 +151,27 @@ class BaseAdminController extends BaseController
     }
 
     /**
+     * Return the route path defined for the givent route ID
+     *
+     * @param string $routeId a route ID, as defines in Config/Resources/routing/admin.xml
+     *
+     * @see \Thelia\Controller\BaseController::getRouteFromRouter()
+     */
+    protected function getRoute($routeId) {
+        return $this->getRouteFromRouter('router.admin', $routeId);
+    }
+
+    /**
+     * Redirect to à route ID related URL
+     *
+     * @param unknown $routeId the route ID, as found in Config/Resources/routing/admin.xml
+     * @param unknown $urlParameters the URL parametrs, as a var/value pair array
+     */
+    public function redirectToRoute($routeId, $urlParameters = array()) {
+        $this->redirect(URL::absoluteUrl($this->getRoute($routeId), $urlParameters));
+    }
+
+    /**
      * Get the current edition lang ID, checking if a change was requested in the current request
      */
     protected function getCurrentEditionLangId() {

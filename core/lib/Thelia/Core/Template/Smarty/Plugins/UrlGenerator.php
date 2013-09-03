@@ -147,7 +147,7 @@ class UrlGenerator extends AbstractSmartyPlugin
     {
         return array(
             "current"   => "getCurrentUrl",
-            "return_to"      => "getReturnToUrl",
+            "return_to" => "getReturnToUrl",
             "index"     => "getIndexUrl",
         );
     }
@@ -169,7 +169,9 @@ class UrlGenerator extends AbstractSmartyPlugin
 
     protected function getCurrentUrl()
     {
-        return URL::retrieveCurrent($this->request);
+        $retriever = URL::init()->retrieveCurrent($this->request);
+
+        return $retriever->rewrittenUrl === null ? $retriever->url : $retriever->rewrittenUrl ;
     }
 
     protected function getReturnToUrl()

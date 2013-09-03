@@ -22,7 +22,7 @@ class Category extends BaseCategory
 
     public function getUrl($locale)
     {
-        return URL::retrieve('category', $this->getId(), $locale);
+        return URL::init()->retrieve('category', $this->getId(), $locale);
     }
 
     /**

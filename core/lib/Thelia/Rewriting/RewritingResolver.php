@@ -22,6 +22,13 @@
 /*************************************************************************************/
 namespace Thelia\Rewriting;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
+use Thelia\Exception\RewritingUrlException;
+use Thelia\Exception\UrlRewritingException;
+use Thelia\Model\RewritingUrlQuery;
+use Thelia\Model\Map\RewritingUrlTableMap;
+
 /**
  * Class RewritingResolver
  * @package Thelia\Rewriting
@@ -31,5 +38,58 @@ namespace Thelia\Rewriting;
  */
 class RewritingResolver
 {
+    protected $search = null;
+    protected $rewritingUrlQuery = null;
+
+    public $view;
+    public $viewId;
+    public $locale;
+    public $otherParameters;
+    public $redirectedToUrl;
+
+    public function __construct($url = null)
+    {
+        $this->rewritingUrlQuery = new RewritingUrlQuery();
+
+        if($url !== null) {
+            $this->load($url);
+        }
+    }
+
+    public function load($rewrittenUrl)
+    {
+        $this->search = $this->rewritingUrlQuery->getResolverSearch($rewrittenUrl);
+
+        if($this->search->count() == 0) {
+            throw new UrlRewritingException('URL NOT FOUND', UrlRewritingException::URL_NOT_FOUND);
+        }
+
+        $this->view = $this->search->getFirst()->getVirtualColumn('ru_view');
+        $this->viewId = $this->search->getFirst()->getVirtualColumn('ru_viewId');
+        $this->locale = $this->search->getFirst()->getVirtualColumn('ru_locale');
+        $this->redirectedToUrl = $this->search->getFirst()->getVirtualColumn('ru_redirected_to_url');
+
+        $this->otherParameters = $this->getOtherParameters();
+    }
+
+    protected function getOtherParameters()
+    {
+        if($this->search === null) {
+            throw new UrlRewritingException('RESOLVER NULL SEARCH', UrlRewritingException::RESOLVER_NULL_SEARCH);
+        }
+
+        $otherParameters = array();
+        foreach($this->search as $result) {
+            $parameter = $result->getParameter();
+            $value = $result->getValue();
+
+            if(null !== $parameter) {
+                $otherParameters[$parameter] = $value;
+            }
+        }
+
+        return $otherParameters;
+    }
+
 
 }

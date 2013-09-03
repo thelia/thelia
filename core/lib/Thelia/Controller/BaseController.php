@@ -37,6 +37,7 @@ use Thelia\Form\Exception\FormValidationException;
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Event\DefaultActionEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  *
@@ -178,9 +179,9 @@ class BaseController extends ContainerAware
      *
      * @param string $url
      */
-    public function redirect($url)
+    public function redirect($url, $status = 302)
     {
-        Redirect::exec($url);
+        Redirect::exec($url, $status);
     }
 
     /**
@@ -216,5 +217,14 @@ class BaseController extends ContainerAware
         }
 
         return $route->getPath();
+    }
+
+    /**
+     * Return a 404 error
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function pageNotFound()
+    {
     }
 }

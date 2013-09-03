@@ -40,8 +40,8 @@ class CurrencyCreationForm extends BaseForm
         }
 
         $this->formBuilder
-            ->add("name"   , "text"  , array("constraints" => array($name_constraints)))
-            ->add("locale" , "text"  , array())
+            ->add("name"   , "text"  , array("constraints" => $name_constraints))
+            ->add("locale" , "text"  , array("constraints" => array(new NotBlank())))
             ->add("symbol" , "text"  , array("constraints" => array(new NotBlank())))
             ->add("rate"   , "text"  , array("constraints" => array(new NotBlank())))
             ->add("code"   , "text"  , array("constraints" => array(new NotBlank())))

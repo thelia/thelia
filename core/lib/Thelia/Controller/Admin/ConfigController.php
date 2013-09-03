@@ -239,10 +239,11 @@ class ConfigController extends BaseAdminController
             // If we have to stay on the same page, do not redirect to the succesUrl,
             // just redirect to the edit page again.
             if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirect(URL::absoluteUrl(
-                        "admin/configuration/variables/change",
+
+                $this->redirectToRoute(
+                        "admin.configuration.variables.change",
                         array('variable_id' => $variable_id)
-                ));
+                );
             }
 
             // Redirect to the success URL
@@ -295,7 +296,7 @@ class ConfigController extends BaseAdminController
             $this->dispatch(TheliaEvents::CONFIG_SETVALUE, $event);
         }
 
-        $this->redirect(URL::absoluteUrl('/admin/configuration/variables'));
+        $this->redirectToRoute('admin.configuration.variables.default');
     }
 
     /**
@@ -313,6 +314,6 @@ class ConfigController extends BaseAdminController
 
         $this->dispatch(TheliaEvents::CONFIG_DELETE, $event);
 
-        $this->redirect(URL::absoluteUrl('/admin/configuration/variables'));
+        $this->redirectToRoute('admin.configuration.variables.default');
     }
 }
