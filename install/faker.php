@@ -406,7 +406,7 @@ function createCategory($faker, $parent, $position, &$categoryIdList, $contentId
 
     //add random associated content
     $alreadyPicked = array();
-    for($i=1; $i<rand(0, 3); $i++) {
+    for ($i=1; $i<rand(0, 3); $i++) {
         $categoryAssociatedContent = new Thelia\Model\CategoryAssociatedContent();
         do {
             $pick = array_rand($contentIdList, 1);

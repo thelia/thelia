@@ -5,7 +5,7 @@
 echo -e "\033[47m\033[1;31m\n[WARN] This script will reset this Thelia2 install\n\033[0m"
 
 echo -e "\n\e[01;34m[INFO] Downloading vendors\e[00m\n"
-php composer install --prefer-dist --no-dev
+composer install --prefer-dist
 
 cd local/config/
 
