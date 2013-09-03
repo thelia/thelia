@@ -36,6 +36,7 @@ use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Event\DefaultActionEvent;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  *
@@ -199,5 +200,21 @@ class BaseController extends ContainerAware
         echo "url=$url";
 
         if (null !== $url) $this->redirect($url);
+    }
+
+    /**
+     * Get a route path from the route id.
+     *
+     * @param unknown $routerName either admin.router or front.router
+     * @param unknown $routeName the route ID
+     */
+    protected function getRouteFromRouter($routerName, $routeId) {
+        $route = $this->container->get($routerName)->getRouteCollection()->get($routeId);
+
+        if ($route == null) {
+            throw new InvalidArgumentException(sprintf("Route ID '%s' does not exists.", $routeId));
+        }
+
+        return $route->getPath();
     }
 }
