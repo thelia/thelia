@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Event\Coupon;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Model\Coupon;
 
 /**
@@ -38,44 +39,232 @@ use Thelia\Model\Coupon;
  */
 class CouponCreateEvent extends ActionEvent
 {
-    /**
-     * @var Coupon Coupon being created
-     */
-    protected $createdCoupon;
+    /** @var CouponRuleCollection Array of CouponRuleInterface */
+    protected $rules = null;
 
     /**
-     * Constructor
-     *
-     * @param Coupon $coupon Coupon being created
+     * @param float $amount
      */
-    public function __construct(Coupon $coupon)
+    public function setAmount($amount)
     {
-        $this->createdCoupon = $coupon;
+        $this->amount = $amount;
     }
 
     /**
-     * Modify Coupon being created
-     *
-     * @param Coupon $createdCoupon Coupon being created
-     *
-     * @return $this
+     * @return float
      */
-    public function setCreatedCoupon(Coupon $createdCoupon)
+    public function getAmount()
     {
-        $this->createdCoupon = $createdCoupon;
-
-        return $this;
+        return $this->amount;
     }
 
     /**
-     * Get Coupon being created
-     *
-     * @return Coupon
+     * @param string $code
      */
-    public function getCreatedCoupon()
+    public function setCode($code)
     {
-        return clone $this->createdCoupon;
+        $this->code = $code;
     }
 
+    /**
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param \DateTime $expirationDate
+     */
+    public function setExpirationDate($expirationDate)
+    {
+        $this->expirationDate = $expirationDate;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getExpirationDate()
+    {
+        return $this->expirationDate;
+    }
+
+    /**
+     * @param boolean $isAvailableOnSpecialOffers
+     */
+    public function setIsAvailableOnSpecialOffers($isAvailableOnSpecialOffers)
+    {
+        $this->isAvailableOnSpecialOffers = $isAvailableOnSpecialOffers;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getIsAvailableOnSpecialOffers()
+    {
+        return $this->isAvailableOnSpecialOffers;
+    }
+
+    /**
+     * @param boolean $isCumulative
+     */
+    public function setIsCumulative($isCumulative)
+    {
+        $this->isCumulative = $isCumulative;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getIsCumulative()
+    {
+        return $this->isCumulative;
+    }
+
+    /**
+     * @param boolean $isEnabled
+     */
+    public function setIsEnabled($isEnabled)
+    {
+        $this->isEnabled = $isEnabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getIsEnabled()
+    {
+        return $this->isEnabled;
+    }
+
+    /**
+     * @param boolean $isRemovingPostage
+     */
+    public function setIsRemovingPostage($isRemovingPostage)
+    {
+        $this->isRemovingPostage = $isRemovingPostage;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getIsRemovingPostage()
+    {
+        return $this->isRemovingPostage;
+    }
+
+    /**
+     * @param int $maxUsage
+     */
+    public function setMaxUsage($maxUsage)
+    {
+        $this->maxUsage = $maxUsage;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxUsage()
+    {
+        return $this->maxUsage;
+    }
+
+    /**
+     * @param \Thelia\Coupon\CouponRuleCollection $rules
+     */
+    public function setRules($rules)
+    {
+        $this->rules = $rules;
+    }
+
+    /**
+     * @return \Thelia\Coupon\CouponRuleCollection
+     */
+    public function getRules()
+    {
+        return $this->rules;
+    }
+
+    /**
+     * @param string $shortDescription
+     */
+    public function setShortDescription($shortDescription)
+    {
+        $this->shortDescription = $shortDescription;
+    }
+
+    /**
+     * @return string
+     */
+    public function getShortDescription()
+    {
+        return $this->shortDescription;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /** @var string Coupon code (ex: XMAS) */
+    protected $code = null;
+
+    /** @var string Coupon title (ex: Coupon for XMAS) */
+    protected $title = null;
+
+    /** @var string Coupon short description */
+    protected $shortDescription = null;
+
+    /** @var string Coupon description */
+    protected $description = null;
+
+    /** @var bool if Coupon is enabled */
+    protected $isEnabled = false;
+
+    /** @var \DateTime Coupon expiration date */
+    protected $expirationDate = null;
+
+    /** @var bool if Coupon is cumulative */
+    protected $isCumulative = false;
+
+    /** @var bool if Coupon is removing postage */
+    protected $isRemovingPostage = false;
+
+    /** @var float Amount that will be removed from the Checkout (Coupon Effect)  */
+    protected $amount = 0;
+
+    /** @var int Max time a Coupon can be used (-1 = unlimited) */
+    protected $maxUsage = -1;
+
+    /** @var bool if Coupon is available for Products already on special offers */
+    protected $isAvailableOnSpecialOffers = false;
 
 }

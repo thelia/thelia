@@ -78,7 +78,7 @@ class CouponController extends BaseAdminController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function createAction($args)
+    public function createAction($args)
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.coupon.create")) return $response;
@@ -150,7 +150,7 @@ class CouponController extends BaseAdminController
      */
     public function readAction($id)
     {
-        $this->checkAuth("ADMIN", "admin.coupon.view");
+        $this->checkAuth("ADMIN", "admin.coupon.read");
 
         // Database request repeated in the loop but cached
         $search = CouponQuery::create();
@@ -188,7 +188,7 @@ class CouponController extends BaseAdminController
                 case 'browse' : // Browse coupon
                     return $this->browseCoupons($args);
                 case 'create' : // Create a new coupon
-                    return $this->createCoupon($args);
+//                    return $this->createCoupon($args);
                 case 'edit' : // Edit an existing coupon
                     return $this->editCoupon($args);
                 case 'read' : // Read an existing coupon
