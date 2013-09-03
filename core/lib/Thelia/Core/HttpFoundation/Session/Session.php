@@ -55,12 +55,15 @@ class Session extends BaseSession
         return $this;
     }
 
+    /**
+     * @return \Thelia\Model\Lang|null
+     */
     public function getLang()
     {
-        return $this->get("lang", substr($this->getLocale(), 0, 2));
+        return $this->get("lang");
     }
 
-    public function setLang($lang)
+    public function setLang(Lang $lang)
     {
         $this->set("lang", $lang);
 

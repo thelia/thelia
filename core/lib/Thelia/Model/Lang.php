@@ -24,15 +24,33 @@ class Lang extends BaseLang {
         return $default_lang;
     }
 
-    public function getDateFormat() {
+    public function getDateFormat()
+    {
         return "d/m/Y";
     }
 
-    public function getTimeFormat() {
+    public function getTimeFormat()
+    {
         return "H:i:s";
     }
 
-    public function getDateTimeFormat() {
+    public function getDateTimeFormat()
+    {
         return "d/m/Y H:i:s";
+    }
+
+    public function getDecimalSeparator()
+    {
+        return ".";
+    }
+
+    public function getThousandsSeparator()
+    {
+        return " ";
+    }
+
+    public function getDecimals()
+    {
+        return 2;
     }
 }

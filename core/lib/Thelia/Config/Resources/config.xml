@@ -124,6 +124,11 @@
             <tag name="thelia.parser.register_plugin"/>
         </service>
 
+        <service id="smarty.plugin.format" class="Thelia\Core\Template\Smarty\Plugins\Format" scope="request">
+            <argument type="service" id="request"/>
+            <tag name="thelia.parser.register_plugin"/>
+        </service>
+
         <service id="smarty.plugin.thelialoop" class="Thelia\Core\Template\Smarty\Plugins\TheliaLoop" scope="request">
             <tag name="thelia.parser.register_plugin"/>
 
