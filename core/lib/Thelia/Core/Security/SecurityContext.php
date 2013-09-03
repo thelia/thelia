@@ -67,7 +67,7 @@ class SecurityContext
      */
     public function hasAdminUser()
     {
-        return $this->getSession()->getAdminUser() != null;
+        return $this->getSession()->getAdminUser() !== null;
     }
 
     /**
@@ -87,7 +87,7 @@ class SecurityContext
      */
     public function hasCustomerUser()
     {
-        return $this->getSession()->getCustomerUser() != null;
+        return $this->getSession()->getCustomerUser() !== null;
     }
 
     /**

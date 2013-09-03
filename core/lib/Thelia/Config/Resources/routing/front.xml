@@ -29,7 +29,7 @@
     <!-- end customer routes -->
 
     <!-- customer address routes -->
-    <route id="customer.adress.create" path="/customer/address/create" method="post">
+    <route id="customer.adress.create" path="/customer/address/create" >
         <default key="_controller">Thelia\Controller\Front\CustomerAddressController::createAction</default>
     </route>
     <!-- end customer address routes -->

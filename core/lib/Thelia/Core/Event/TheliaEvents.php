@@ -94,6 +94,10 @@ final class TheliaEvents
      */
     const AFTER_CHANGECUSTOMER 	= "action.after_changecustomer";
 
+    /**
+     * sent for address creation
+     */
+    const ADDRESS_CREATE = "action.addressCreate";
 
     /**
      * Sent once the category creation form has been successfully validated, and before category insertion in the database.
@@ -223,4 +227,6 @@ final class TheliaEvents
 
     const BEFORE_DELETECURRENCY = "action.before_deleteCurrency";
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
+
+
 }

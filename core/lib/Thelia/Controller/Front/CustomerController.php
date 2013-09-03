@@ -71,10 +71,10 @@ class CustomerController extends BaseFrontController
                 $this->redirectSuccess($customerCreation);
             }
             catch (FormValidationException $e) {
-                $message = sprintf("Please check your input: %s", $ex->getMessage());
+                $message = sprintf("Please check your input: %s", $e->getMessage());
             }
             catch (\Exception $e) {
-                $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
 
             if ($message !== false) {
@@ -119,14 +119,14 @@ class CustomerController extends BaseFrontController
 
             }
             catch (FormValidationException $e) {
-                $message = sprintf("Please check your input: %s", $ex->getMessage());
+                $message = sprintf("Please check your input: %s", $e->getMessage());
             }
             catch (\Exception $e) {
-                $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
 
             if ($message !== false) {
-                Tlog::getInstance()->error(sprintf("Error during customer modification process : %s. Exception was %s", $message, $e->getMessage()));
+                Tlog::getInstance()->error(sprintf("Error during customer modification process : %s.", $message));
 
                 $customerModification->setErrorMessage($message);
 
@@ -167,7 +167,7 @@ class CustomerController extends BaseFrontController
 
             }
             catch (FormValidationException $e) {
-                $message = sprintf("Please check your input: %s", $ex->getMessage());
+                $message = sprintf("Please check your input: %s", $e->getMessage());
             }
             catch(UsernameNotFoundException $e) {
                 $message = "This customer email was not found.";
@@ -179,7 +179,7 @@ class CustomerController extends BaseFrontController
                 $message = "Sorry, we failed to authentify you. Please try again.";
             }
             catch (\Exception $e) {
-                $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
 
             if ($message !== false) {
