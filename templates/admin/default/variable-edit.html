@@ -1,14 +1,15 @@
-{check_auth roles="ADMIN" permissions="admin.configuration.variables.edit" login_tpl="/admin/login"}
+{extends file="admin-layout.tpl"}
 
-{$page_title={intl l='Edit a system variable'}}
+{block name="page-title"}{intl l='Edit a system variable'}{/block}
 
-{include file='includes/header.inc.html'}
+{block name="check-permissions"}admin.configuration.variables.edit{/block}
 
+{block name="main-content"}
 <div class="variables edit-variable">
 
     <div id="wrapper" class="container">
 
-        {loop name="config_edit" type="config" hidden="*" id="$variable_id" backend_context="1" lang="$edition_language"}
+        {loop name="config_edit" type="config" hidden="*" id="$variable_id" backend_context="1" lang="$edit_language_id"}
 
         <ul class="breadcrumb">
 			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a> <span class="divider">/</span></li>
@@ -27,11 +28,9 @@
 
                     <div class="form-container">
                          <div class="form-horizontal span12">
-                             <fieldset>
-
-							    {form name="thelia.admin.config.modification"}
-							    <form method="POST" action="{url path='/admin/configuration/variables/save-change'}" {form_enctype form=$form}>
-
+						    {form name="thelia.admin.config.modification"}
+						    <form method="POST" action="{url path='/admin/configuration/variables/save-change'}" {form_enctype form=$form}>
+                                <fieldset>
                                     {* Be sure to get the variable ID, even if the form could not be validated *}
                                     <input type="hidden" name="variable_id" value="{$variable_id}" />
 
@@ -54,7 +53,7 @@
 			                        {/form_field}
 
 			                        {form_field form=$form field='locale'}
-			                        <input type="hidden" name="{$name}" value="{$value|htmlspecialchars}" />
+			                        <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
 			                        {/form_field}
 
 						            {if #form_error}<div class="alert alert-block alert-error">#form_error_message</div>{/if}
@@ -107,15 +106,22 @@
 
                                     {include file="includes/standard-description-form-fields.html"}
 
-								</form>
-								{/form}
-							</fieldset>
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <p>{intl l='Variable created on %date_create. Last modification: %date_change' df=$datetime_format date_create=$CREATE_DATE->format($datetime_format) date_change=$UPDATE_DATE->format($datetime_format)}</p>
+                                        </div>
+                                    </div>
+
+                                </fieldset>
+							</form>
+							{/form}
 						</div>
 					</div>
 				</div>
 			</div>
 
 		</div>
+
 		{/loop}
 
         {elseloop rel="config_edit"}
@@ -130,7 +136,4 @@
 
     </div>
 </div>
-
-{include file='includes/js.inc.html'}
-
-{include file='includes/footer.inc.html'}
+{/block}

@@ -1,11 +1,16 @@
-{check_auth roles="ADMIN" permissions="admin.catalog.view" login_tpl="/admin/login"}
+{extends file="admin-layout.tpl"}
 
-{$page_title={intl l='Catalog'}}
+{block name="page-title"}{intl l='Catalog'}{/block}
 
-{$thelia_page_css_file = "assets/bootstrap-editable/css/bootstrap-editable.css"}
+{block name="check-permissions"}admin.catalog.view{/block}
 
-{include file='includes/header.inc.html'}
+{block name="after-admin-css"}
+    {stylesheets file='assets/bootstrap-editable/css/bootstrap-editable.css' filters='cssembed'}
+        <link rel="stylesheet" href="{$asset_url}">
+    {/stylesheets}
+{/block}
 
+{block name="main-content"}
 <div class="catalog">
 	<div id="wrapper" class="container">
 
@@ -42,54 +47,40 @@
 		                    <thead>
 		                        <tr>
                                     <th class="object-image">&nbsp;</th>
+
                                     <th class="object-title">
-                                        {if $category_order == 'alpha'}
-                                            <i class="icon  icon-chevron-up"></i>
-                                            {$order_change = 'alpha_reverse'}
-                                        {elseif $category_order == 'alpha_reverse'}
-                                            <i class="icon  icon-chevron-down"></i>
-                                            {$order_change = 'alpha'}
-                                        {else}
-                                            {$order_change = 'alpha'}
-                                        {/if}
-                                        <a href="{url path='/admin/catalog/category' id="{$current_category_id}" category_order="$order_change"}">
-                                            {intl l="Category title"}
-                                        </a>
-                                     </th>
+                                    {admin_sortable_header
+                                       current_order=$category_order
+                                       order='alpha'
+                                       reverse_order='alpha_reverse'
+                                       path={url path='/admin/catalog/category' id="{$current_category_id}"}
+                                       label={intl l='Category title'}
+                                    }
+                                    </th>
 
 		                            {module_include location='category_list_header'}
 
 		                            <th>
-                                        {if $category_order == 'visible'}
-                                            <i class="icon  icon-chevron-up"></i>
-                                            {$order_change = 'visible_reverse'}
-                                        {elseif $category_order == 'visible_reverse'}
-                                            <i class="icon  icon-chevron-down"></i>
-                                            {$order_change = 'visible'}
-                                        {else}
-                                            {$order_change = 'visible'}
-                                        {/if}
-
-		                                <a href="{url path='admin/catalog/category' id="{$current_category_id}" category_order="$order_change"}">
-		                                   {intl l="Online"}
-		                                </a>
+                                    {admin_sortable_header
+                                       current_order=$category_order
+                                       order='visible'
+                                       reverse_order='visible_reverse'
+                                       path={url path='/admin/catalog/category' id="{$current_category_id}"}
+                                       label={intl l='Online'}
+                                    }
 		                            </th>
 
 		                            <th>
-		                                {if $category_order == 'manual'}
-                                            <i class="icon  icon-chevron-up"></i>
-                                            {$order_change = 'manual_reverse'}
-                                        {elseif $category_order == 'manual_reverse'}
-                                            <i class="icon  icon-chevron-down"></i>
-                                            {$order_change = 'manual'}
-                                        {else}
-                                            {$order_change = 'manual'}
-                                        {/if}
-
-		                                <a href="{url path='admin/catalog/category' id="{$current_category_id}" category_order="$order_change"}">{intl l="Position"}</a>
+                                    {admin_sortable_header
+                                       current_order=$category_order
+                                       order='manual'
+                                       reverse_order='manual_reverse'
+                                       path={url path='/admin/catalog/category' id="{$current_category_id}"}
+                                       label={intl l='Position'}
+                                    }
 		                            </th>
 
-		                            <th>{intl l="Actions"}</th>
+		                            <th>&nbsp;</th>
 		                        </tr>
 		                    </thead>
 
@@ -121,15 +112,14 @@
 		                    	</td>
 
 		                    	<td>
-		                    	    {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
-			                        	<a href="{url path='admin/catalog/category' category_id="{$ID}" action='positionUp'}"><i class="icon-arrow-up"></i></a>
-			                            <span class="categoryPositionChange" data-id="{$ID}">{$POSITION}</span>
-			                          	<a href="{url path='admin/catalog/category' category_id="{$ID}" action='positionDown'}"><i class="icon-arrow-down"></i></a>
-		                          	{/loop}
-
-		                          	{elseloop rel="can_change"}
-		                          	   {$POSITION}
-		                          	{/elseloop}
+                                {admin_position_block
+                                    permission="admin.category.edit"
+                                    path={url path='admin/catalog/category' category_id="{$ID}"}
+                                    url_parameter="category_id"
+                                    in_place_edit_class="categoryPositionChange"
+                                    position="$POSITION"
+                                    id="$ID"
+                                 }
 		                    	</td>
 
 		                        <td>
@@ -195,13 +185,38 @@
 		                        <tr>
 		                            <th>&nbsp;</th>
 
-		                            <th class="object-title">{intl l="Product title"}</th>
+		                            <th class="object-title">
+                                    {admin_sortable_header
+                                       current_order=$product_order
+                                       order='alpha'
+                                       reverse_order='alpha_reverse'
+                                       path={url path='/admin/catalog/product' id="{$current_category_id}"}
+                                       label={intl l='Product title'}
+                                    }
 
 		                            {module_include location='product_list_header'}
 
-		                            <th>{intl l="Online"}</th>
-		                            <th>{intl l="Position"}</th>
-		                            <th>{intl l="Actions"}</th>
+		                            <th>
+                                    {admin_sortable_header
+                                       current_order=$product_order
+                                       order='visible'
+                                       reverse_order='visible_reverse'
+                                       path={url path='/admin/catalog/product' id="{$current_category_id}"}
+                                       label={intl l='Online'}
+                                    }
+		                            </th>
+
+		                            <th>
+                                    {admin_sortable_header
+                                       current_order=$product_order
+                                       order='manual'
+                                       reverse_order='manual_reverse'
+                                       path={url path='/admin/catalog/product' id="{$current_category_id}"}
+                                       label={intl l='Position'}
+                                    }
+		                            </th>
+
+		                            <th>&nbsp;</th>
 		                        </tr>
 		                    </thead>
 
@@ -224,13 +239,18 @@
 		                    	</td>
 
 		                    	<td>
-		                        	<a href="{url path='admin/catalog/product' id="$ID" action='positionUn'}"><i class="icon-arrow-up"></i></a>
-		                            <span class="object_classement_editable" data-action="changeProductPosition" data-name="product_id" data-id="{$ID}">{$POSITION}</span>
-		                          	<a href="{url path='admin/catalog/product' id="$ID" action='positionDown'}"><i class="icon-arrow-down"></i></a>
+                                {admin_position_block
+                                    permission="admin.product.edit"
+                                    path={url path='admin/catalog/product' category_id="{$ID}"}
+                                    url_parameter="product_id"
+                                    in_place_edit_class="productPositionChange"
+                                    position="$POSITION"
+                                    id="$ID"
+                                 }
 		                    	</td>
 
 		                        <td>
-	                                <a class="btn btn-mini" title="{intl l='Edit this category'}" href="{url path='admin/catalog/product' id="$ID" action='edit'}"><i class="icon-edit"></i></a>
+	                                <a class="btn btn-mini" title="{intl l='Edit this product'}" href="{url path='admin/catalog/product' id="$ID" action='edit'}"><i class="icon-edit"></i></a>
 	                                <a class="btn btn-mini product-delete" title="{intl l='Delete this product'}" href="{url path='admin/catalog/product' id="$ID" action='delete'}"><i class="icon-trash"></i></a>
 		                         </td>
 		                    </tr>
@@ -256,13 +276,15 @@
 
 {include file="includes/add-category-dialog.html"}
 {include file="includes/delete-category-dialog.html"}
+{/block}
 
-{include file='includes/js.inc.html'}
+{block name="after-javascript-include"}
+	{javascripts file='assets/bootstrap-editable/js/bootstrap-editable.js'}
+	    <script src="{$asset_url}"></script>
+	{/javascripts}
+{/block}
 
-{javascripts file='assets/bootstrap-editable/js/bootstrap-editable.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-
+{block name="javascript-initialization"}
 <script>
 $(function() {
 
@@ -327,5 +349,4 @@ $(function() {
 
 })
 </script>
-
-{include file='includes/footer.inc.html'}
+{/block}

@@ -584,6 +584,10 @@ form .info .input-append .add-on {
     .actions {
         text-align: right;
     }
+
+    .form {
+        margin-bottom: 0;
+    }
 }
 
 // Reduce bottom margin of admin tabs.
@@ -617,6 +621,7 @@ form .info .input-append .add-on {
             li.active a {
                 opacity: 1;
                 background-color: #E7E7E7;
+                border: 1px solid #E9720F;
             }
         }
     }
@@ -721,6 +726,17 @@ label {
 
 	td, th {
 		text-align: center;
+
+        &.text-center {
+            text-align: center;
+        }
+        &.text-left {
+            text-align: left;
+        }
+        &.text-right {
+            text-align: right;
+        }
+
 	}
 
 	td.object-title, th.object-title {

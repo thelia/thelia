@@ -23,24 +23,24 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ConfigDeleteEvent;
+use Thelia\Core\Event\CurrencyDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Tools\URL;
-use Thelia\Core\Event\ConfigChangeEvent;
-use Thelia\Core\Event\ConfigCreateEvent;
+use Thelia\Core\Event\CurrencyChangeEvent;
+use Thelia\Core\Event\CurrencyCreateEvent;
 use Thelia\Log\Tlog;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
-use Thelia\Model\ConfigQuery;
-use Thelia\Form\ConfigModificationForm;
-use Thelia\Form\ConfigCreationForm;
+use Thelia\Model\CurrencyQuery;
+use Thelia\Form\CurrencyModificationForm;
+use Thelia\Form\CurrencyCreationForm;
 
 /**
- * Manages Thelmia system variables, aka Config objects.
+ * Manages currencies sent by mail
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class ConfigController extends BaseAdminController
+class CurrencyController extends BaseAdminController
 {
     /**
      * Render the currencies list, ensuring the sort order is set.
@@ -52,65 +52,64 @@ class ConfigController extends BaseAdminController
         // Find the current order
         $order = $this->getRequest()->get(
                 'order',
-                $this->getSession()->get('admin.variables_order', 'name')
+                $this->getSession()->get('admin.currency_order', 'manual')
         );
 
         // Store the current sort order in session
-        $this->getSession()->set('admin.variables_order', $order);
+        $this->getSession()->set('admin.currency_order', $order);
 
-        return $this->render('variables', array('order' => $order));
+        return $this->render('currencies', array('order' => $order));
     }
 
     /**
-     * The default action is displaying the variables list.
+     * The default action is displaying the currencies list.
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
     public function defaultAction() {
 
-        if (null !== $response = $this->checkAuth("admin.configuration.variables.view")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.currencies.view")) return $response;
 
         return $this->renderList();
     }
 
     /**
-     * Create a new config object
+     * Create a new currency object
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
     public function createAction() {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.variables.create")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.currencies.create")) return $response;
 
-        $message = false;
+        $currency = false;
 
         // Create the Creation Form
-        $creationForm = new ConfigCreationForm($this->getRequest());
+        $creationForm = new CurrencyCreationForm($this->getRequest());
 
         try {
 
-            // Validate the form, create the ConfigCreation event and dispatch it.
+            // Validate the form, create the CurrencyCreation event and dispatch it.
             $form = $this->validateForm($creationForm, "POST");
 
             $data = $form->getData();
 
-            $createEvent = new ConfigCreateEvent();
+            $createEvent = new CurrencyCreateEvent();
 
             $createEvent
-                ->setEventName($data['name'])
-                ->setValue($data['value'])
+                ->setCurrencyName($data['name'])
                 ->setLocale($data["locale"])
-                ->setTitle($data['title'])
-                ->setHidden($data['hidden'])
-                ->setSecured($data['secured'])
-                ;
+                ->setSymbol($data['symbol'])
+                ->setCode($data['code'])
+                ->setRate($data['rate'])
+            ;
 
-            $this->dispatch(TheliaEvents::CONFIG_CREATE, $createEvent);
+            $this->dispatch(TheliaEvents::CURRENCY_CREATE, $createEvent);
 
-            $createdObject = $createEvent->getConfig();
+            $createdObject = $createEvent->getCurrency();
 
-            // Log config creation
+            // Log currency creation
             $this->adminLogAppend(sprintf("Variable %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
 
             // Substitute _ID_ in the URL with the ID of the created object
@@ -121,24 +120,24 @@ class ConfigController extends BaseAdminController
         }
         catch (FormValidationException $ex) {
             // Form cannot be validated
-            $message = sprintf("Please check your input: %s", $ex->getMessage());
+            $currency = sprintf("Please check your input: %s", $ex->getCurrency());
         }
         catch (\Exception $ex) {
             // Any other error
-            $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+            $currency = sprintf("Sorry, an error occured: %s", $ex->getCurrency());
         }
 
-        if ($message !== false) {
+        if ($currency !== false) {
             // An error has been detected: log it
-            Tlog::getInstance()->error(sprintf("Error during variable creation process : %s. Exception was %s", $message, $ex->getMessage()));
+            Tlog::getInstance()->error(sprintf("Error during currency creation process : %s. Exception was %s", $currency, $ex->getCurrency()));
 
             // Mark the form as errored
-            $creationForm->setErrorMessage($message);
+            $creationForm->setErrorCurrency($currency);
 
-            // Pass it to the parser, along with the error message
+            // Pass it to the parser, along with the error currency
             $this->getParserContext()
                 ->addForm($creationForm)
-                ->setGeneralError($message)
+                ->setGeneralError($currency)
             ;
         }
 
@@ -147,64 +146,60 @@ class ConfigController extends BaseAdminController
     }
 
     /**
-     * Load a config object for modification, and display the edit template.
+     * Load a currency object for modification, and display the edit template.
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
     public function changeAction() {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.variables.change")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.currencies.change")) return $response;
 
-        // Load the config object
-        $config = ConfigQuery::create()
+        // Load the currency object
+        $currency = CurrencyQuery::create()
                     ->joinWithI18n($this->getCurrentEditionLocale())
-                    ->findOneById($this->getRequest()->get('variable_id'));
+                    ->findOneById($this->getRequest()->get('currency_id'));
 
-        if ($config != null) {
+        if ($currency != null) {
 
             // Prepare the data that will hydrate the form
             $data = array(
-                'id'           => $config->getId(),
-                'name'         => $config->getName(),
-                'value'        => $config->getValue(),
-                'hidden'       => $config->getHidden(),
-                'secured'      => $config->getSecured(),
-                'locale'       => $config->getLocale(),
-                'title'        => $config->getTitle(),
-                'chapo'        => $config->getChapo(),
-                'description'  => $config->getDescription(),
-                'postscriptum' => $config->getPostscriptum()
+                'id'     => $currency->getId(),
+                'name'   => $currency->getName(),
+                'locale' => $currency->getLocale(),
+                'code'   => $currency->getCode(),
+                'symbol' => $currency->getSymbol(),
+                'rate'   => $currency->getSubject()
             );
 
             // Setup the object form
-            $changeForm = new ConfigModificationForm($this->getRequest(), "form", $data);
+            $changeForm = new CurrencyModificationForm($this->getRequest(), "form", $data);
 
             // Pass it to the parser
             $this->getParserContext()->addForm($changeForm);
         }
 
         // Render the edition template.
-        return $this->render('variable-edit', array('variable_id' => $this->getRequest()->get('variable_id')));
+        return $this->render('currency-edit', array('currency_id' => $this->getRequest()->get('currency_id')));
     }
 
     /**
-     * Save changes on a modified config object, and either go back to the variable list, or stay on the edition page.
+     * Save changes on a modified currency object, and either go back to the currency list, or stay on the edition page.
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
     public function saveChangeAction() {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.variables.change")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.currencies.change")) return $response;
 
-        $message = false;
+        $currency = false;
 
         // Create the form from the request
-        $changeForm = new ConfigModificationForm($this->getRequest());
+        $changeForm = new CurrencyModificationForm($this->getRequest());
 
-        // Get the variable ID
-        $variable_id = $this->getRequest()->get('variable_id');
+        // Get the currency ID
+        $currency_id = $this->getRequest()->get('currency_id');
 
         try {
 
@@ -214,25 +209,21 @@ class ConfigController extends BaseAdminController
             // Get the form field values
             $data = $form->getData();
 
-            $changeEvent = new ConfigChangeEvent($data['id']);
+            $changeEvent = new CurrencyChangeEvent($data['id']);
 
             // Create and dispatch the change event
             $changeEvent
-                ->setEventName($data['name'])
-                ->setValue($data['value'])
-                ->setHidden($data['hidden'])
-                ->setSecured($data['secured'])
+                ->setCurrencyName($data['name'])
                 ->setLocale($data["locale"])
-                ->setTitle($data['title'])
-                ->setChapo($data['chapo'])
-                ->setDescription($data['description'])
-                ->setPostscriptum($data['postscriptum'])
+                ->setSymbol($data['symbol'])
+                ->setCode($data['code'])
+                ->setRate($data['rate'])
             ;
 
-            $this->dispatch(TheliaEvents::CONFIG_MODIFY, $changeEvent);
+            $this->dispatch(TheliaEvents::CURRENCY_MODIFY, $changeEvent);
 
-            // Log config modification
-            $changedObject = $changeEvent->getConfig();
+            // Log currency modification
+            $changedObject = $changeEvent->getCurrency();
 
             $this->adminLogAppend(sprintf("Variable %s (ID %s) modified", $changedObject->getName(), $changedObject->getId()));
 
@@ -240,8 +231,8 @@ class ConfigController extends BaseAdminController
             // just redirect to the edit page again.
             if ($this->getRequest()->get('save_mode') == 'stay') {
                 $this->redirect(URL::absoluteUrl(
-                        "admin/configuration/variables/change",
-                        array('variable_id' => $variable_id)
+                        "admin/configuration/currencies/change",
+                        array('currency_id' => $currency_id)
                 ));
             }
 
@@ -250,69 +241,46 @@ class ConfigController extends BaseAdminController
         }
         catch (FormValidationException $ex) {
             // Invalid data entered
-            $message = sprintf("Please check your input: %s", $ex->getMessage());
+            $currency = sprintf("Please check your input: %s", $ex->getCurrency());
         }
         catch (\Exception $ex) {
             // Any other error
-            $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+            $currency = sprintf("Sorry, an error occured: %s", $ex->getCurrency());
         }
 
-        if ($message !== false) {
-            // Log error message
-            Tlog::getInstance()->error(sprintf("Error during variable modification process : %s. Exception was %s", $message, $ex->getMessage()));
+        if ($currency !== false) {
+            // Log error currency
+            Tlog::getInstance()->error(sprintf("Error during currency modification process : %s. Exception was %s", $currency, $ex->getCurrency()));
 
             // Mark the form as errored
-            $changeForm->setErrorMessage($message);
+            $changeForm->setErrorCurrency($currency);
 
             // Pas the form and the error to the parser
             $this->getParserContext()
                 ->addForm($changeForm)
-                ->setGeneralError($message)
+                ->setGeneralError($currency)
             ;
         }
 
         // At this point, the form has errors, and should be redisplayed.
-        return $this->render('variable-edit', array('variable_id' => $variable_id));
+        return $this->render('currency-edit', array('currency_id' => $currency_id));
     }
 
     /**
-     * Change values modified directly from the variable list
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    public function changeValuesAction() {
-
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.variables.change")) return $response;
-
-        $variables = $this->getRequest()->get('variable', array());
-
-        // Process all changed variables
-        foreach($variables as $id => $value) {
-            $event = new ConfigChangeEvent($id);
-            $event->setValue($value);
-
-            $this->dispatch(TheliaEvents::CONFIG_SETVALUE, $event);
-        }
-
-        $this->redirect(URL::absoluteUrl('/admin/configuration/variables'));
-    }
-
-    /**
-     * Delete a config object
+     * Delete a currency object
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
     public function deleteAction() {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.variables.delete")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.currencies.delete")) return $response;
 
-        // Get the config id, and dispatch the delet request
-        $event = new ConfigDeleteEvent($this->getRequest()->get('variable_id'));
+        // Get the currency id, and dispatch the delet request
+        $event = new CurrencyDeleteEvent($this->getRequest()->get('currency_id'));
 
-        $this->dispatch(TheliaEvents::CONFIG_DELETE, $event);
+        $this->dispatch(TheliaEvents::CURRENCY_DELETE, $event);
 
-        $this->redirect(URL::absoluteUrl('/admin/configuration/variables'));
+        $this->redirect(URL::adminViewUrl('currencies'));
     }
 }

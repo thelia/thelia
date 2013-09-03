@@ -51,6 +51,60 @@ class Image extends BaseI18nLoop
     protected $possible_sources = array('category', 'product', 'folder', 'content');
 
     /**
+     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
+     */
+    protected function getArgDefinitions()
+    {
+        $collection = new ArgumentCollection(
+
+                Argument::createIntListTypeArgument('id'),
+                Argument::createIntListTypeArgument('exclude'),
+                new Argument(
+                        'order',
+                        new TypeCollection(
+                                new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
+                        ),
+                        'manual'
+                ),
+                Argument::createIntTypeArgument('lang'),
+
+                Argument::createIntTypeArgument('width'),
+                Argument::createIntTypeArgument('height'),
+                Argument::createIntTypeArgument('rotation', 0),
+                Argument::createAnyTypeArgument('background_color'),
+                Argument::createIntTypeArgument('quality'),
+                new Argument(
+                        'resize_mode',
+                        new TypeCollection(
+                                new EnumType(array('crop', 'borders', 'none'))
+                        ),
+                        'none'
+                ),
+                Argument::createAnyTypeArgument('effects'),
+
+                Argument::createIntTypeArgument('category'),
+                Argument::createIntTypeArgument('product'),
+                Argument::createIntTypeArgument('folder'),
+                Argument::createIntTypeArgument('content'),
+
+                new Argument(
+                        'source',
+                        new TypeCollection(
+                                new EnumType($this->possible_sources)
+                        )
+                ),
+                Argument::createIntTypeArgument('source_id')
+        );
+
+        // Add possible image sources
+        foreach($this->possible_sources as $source) {
+            $collection->addArgument(Argument::createIntTypeArgument($source));
+        }
+
+        return $collection;
+    }
+
+    /**
      * Dynamically create the search query, and set the proper filter and order
      *
      * @param string $source a valid source identifier (@see $possible_sources)
@@ -244,19 +298,19 @@ class Image extends BaseI18nLoop
                 $loopResultRow = new LoopResultRow();
 
                 $loopResultRow
-                    ->set("ID", $result->getId())
-                    ->set("LOCALE",$locale)
-                    ->set("IMAGE_URL", $event->getFileUrl())
-                    ->set("ORIGINAL_IMAGE_URL", $event->getOriginalFileUrl())
-                    ->set("IMAGE_PATH", $event->getCacheFilepath())
-                    ->set("ORIGINAL_IMAGE_PATH", $source_filepath)
-                    ->set("TITLE",$folder->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO", $folder->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                    ->set("POSITION", $result->getPosition())
-                    ->set("OBJECT_TYPE", $object_type)
-                    ->set("OBJECT_ID", $object_id)
+                    ->set("ID"                  , $result->getId())
+                    ->set("LOCALE"              ,$locale)
+                    ->set("IMAGE_URL"           , $event->getFileUrl())
+                    ->set("ORIGINAL_IMAGE_URL"  , $event->getOriginalFileUrl())
+                    ->set("IMAGE_PATH"          , $event->getCacheFilepath())
+                    ->set("ORIGINAL_IMAGE_PATH" , $source_filepath)
+                    ->set("TITLE"               , $result->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO"               , $result->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION"         , $result->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM"        , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set("POSITION"            , $result->getPosition())
+                    ->set("OBJECT_TYPE"         , $object_type)
+                    ->set("OBJECT_ID"           , $object_id)
                 ;
 
                 $loopResult->addRow($loopResultRow);
@@ -268,59 +322,5 @@ class Image extends BaseI18nLoop
         }
 
         return $loopResult;
-    }
-
-    /**
-     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
-     */
-    protected function getArgDefinitions()
-    {
-        $collection = new ArgumentCollection(
-
-            Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('exclude'),
-            new Argument(
-                    'order',
-                    new TypeCollection(
-                            new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
-                    ),
-                    'manual'
-            ),
-            Argument::createIntTypeArgument('lang'),
-
-            Argument::createIntTypeArgument('width'),
-            Argument::createIntTypeArgument('height'),
-            Argument::createIntTypeArgument('rotation', 0),
-            Argument::createAnyTypeArgument('background_color'),
-            Argument::createIntTypeArgument('quality'),
-            new Argument(
-                'resize_mode',
-                new TypeCollection(
-                        new EnumType(array('crop', 'borders', 'none'))
-                ),
-                'none'
-            ),
-            Argument::createAnyTypeArgument('effects'),
-
-            Argument::createIntTypeArgument('category'),
-            Argument::createIntTypeArgument('product'),
-            Argument::createIntTypeArgument('folder'),
-            Argument::createIntTypeArgument('content'),
-
-            new Argument(
-                'source',
-                new TypeCollection(
-                        new EnumType($this->possible_sources)
-                )
-            ),
-            Argument::createIntTypeArgument('source_id')
-        );
-
-        // Add possible image sources
-        foreach($this->possible_sources as $source) {
-            $collection->addArgument(Argument::createIntTypeArgument($source));
-        }
-
-        return $collection;
     }
 }
