@@ -162,9 +162,9 @@ class RewritingUrlTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('URL', 'Url', 'VARCHAR', true, 255, null);
-        $this->addColumn('VIEW', 'View', 'VARCHAR', true, 255, null);
+        $this->addColumn('VIEW', 'View', 'VARCHAR', false, 255, null);
         $this->addColumn('VIEW_ID', 'ViewId', 'VARCHAR', false, 255, null);
-        $this->addColumn('VIEW_LOCALE', 'ViewLocale', 'VARCHAR', true, 255, null);
+        $this->addColumn('VIEW_LOCALE', 'ViewLocale', 'VARCHAR', false, 255, null);
         $this->addForeignKey('REDIRECTED', 'Redirected', 'INTEGER', 'rewriting_url', 'ID', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);

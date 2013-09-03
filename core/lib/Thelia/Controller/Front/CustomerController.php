@@ -71,10 +71,10 @@ class CustomerController extends BaseFrontController
                 $this->redirectSuccess($customerCreation);
             }
             catch (FormValidationException $e) {
-                $message = "Invalid or missing data. Please check your input";
+                $message = sprintf("Please check your input: %s", $ex->getMessage());
             }
             catch (\Exception $e) {
-                $message = "Sorry, an unknown error occured.";
+                $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
             }
 
             if ($message !== false) {
@@ -119,10 +119,10 @@ class CustomerController extends BaseFrontController
 
             }
             catch (FormValidationException $e) {
-                $message = "Invalid or missing data. Please check your input";
+                $message = sprintf("Please check your input: %s", $ex->getMessage());
             }
             catch (\Exception $e) {
-                $message = "Sorry, an unknown error occured.";
+                $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
             }
 
             if ($message !== false) {
@@ -167,7 +167,7 @@ class CustomerController extends BaseFrontController
 
             }
             catch (FormValidationException $e) {
-                $message = "Invalid or missing data. Please check your input";
+                $message = sprintf("Please check your input: %s", $ex->getMessage());
             }
             catch(UsernameNotFoundException $e) {
                 $message = "This customer email was not found.";
@@ -179,7 +179,7 @@ class CustomerController extends BaseFrontController
                 $message = "Sorry, we failed to authentify you. Please try again.";
             }
             catch (\Exception $e) {
-                $message = "Sorry, an unknown error occured.";
+                $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
             }
 
             if ($message !== false) {

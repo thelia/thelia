@@ -122,7 +122,7 @@ abstract class FeatureAv implements ActiveRecordInterface
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -1900,7 +1900,7 @@ abstract class FeatureAv implements ActiveRecordInterface
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collFeatureProducts instanceof Collection) {
@@ -1947,7 +1947,7 @@ abstract class FeatureAv implements ActiveRecordInterface
      *
      * @return    ChildFeatureAv The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -1971,7 +1971,7 @@ abstract class FeatureAv implements ActiveRecordInterface
      * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildFeatureAvI18n */
-    public function getTranslation($locale = 'en_EN', ConnectionInterface $con = null)
+    public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collFeatureAvI18ns) {
@@ -2006,7 +2006,7 @@ abstract class FeatureAv implements ActiveRecordInterface
      *
      * @return    ChildFeatureAv The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', ConnectionInterface $con = null)
+    public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
         if (!$this->isNew()) {
             ChildFeatureAvI18nQuery::create()

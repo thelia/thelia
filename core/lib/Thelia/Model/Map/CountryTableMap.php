@@ -116,7 +116,7 @@ class CountryTableMap extends TableMap
      *
      * @var string
      */
-    const DEFAULT_LOCALE = 'en_EN';
+    const DEFAULT_LOCALE = 'en_US';
 
     /**
      * holds an array of fieldnames

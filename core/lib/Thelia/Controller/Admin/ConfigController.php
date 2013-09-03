@@ -240,7 +240,7 @@ class ConfigController extends BaseAdminController
 
         if ($message !== false) {
             // Log error message
-            Tlog::getInstance()->error(sprintf("Error during variable creation process : %s. Exception was %s", $message, $ex->getMessage()));
+            Tlog::getInstance()->error(sprintf("Error during variable modification process : %s. Exception was %s", $message, $ex->getMessage()));
 
             // Mark the form as errored
             $changeForm->setErrorMessage($message);
