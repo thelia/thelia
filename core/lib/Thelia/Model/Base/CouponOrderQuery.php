@@ -23,14 +23,12 @@ use Thelia\Model\Map\CouponOrderTableMap;
  *
  * @method     ChildCouponOrderQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCouponOrderQuery orderByOrderId($order = Criteria::ASC) Order by the order_id column
- * @method     ChildCouponOrderQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method     ChildCouponOrderQuery orderByValue($order = Criteria::ASC) Order by the value column
  * @method     ChildCouponOrderQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCouponOrderQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildCouponOrderQuery groupById() Group by the id column
  * @method     ChildCouponOrderQuery groupByOrderId() Group by the order_id column
- * @method     ChildCouponOrderQuery groupByCode() Group by the code column
  * @method     ChildCouponOrderQuery groupByValue() Group by the value column
  * @method     ChildCouponOrderQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCouponOrderQuery groupByUpdatedAt() Group by the updated_at column
@@ -43,23 +41,17 @@ use Thelia\Model\Map\CouponOrderTableMap;
  * @method     ChildCouponOrderQuery rightJoinOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Order relation
  * @method     ChildCouponOrderQuery innerJoinOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the Order relation
  *
- * @method     ChildCouponOrderQuery leftJoinCoupon($relationAlias = null) Adds a LEFT JOIN clause to the query using the Coupon relation
- * @method     ChildCouponOrderQuery rightJoinCoupon($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Coupon relation
- * @method     ChildCouponOrderQuery innerJoinCoupon($relationAlias = null) Adds a INNER JOIN clause to the query using the Coupon relation
- *
  * @method     ChildCouponOrder findOne(ConnectionInterface $con = null) Return the first ChildCouponOrder matching the query
  * @method     ChildCouponOrder findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCouponOrder matching the query, or a new ChildCouponOrder object populated from the query conditions when no match is found
  *
  * @method     ChildCouponOrder findOneById(int $id) Return the first ChildCouponOrder filtered by the id column
  * @method     ChildCouponOrder findOneByOrderId(int $order_id) Return the first ChildCouponOrder filtered by the order_id column
- * @method     ChildCouponOrder findOneByCode(string $code) Return the first ChildCouponOrder filtered by the code column
  * @method     ChildCouponOrder findOneByValue(double $value) Return the first ChildCouponOrder filtered by the value column
  * @method     ChildCouponOrder findOneByCreatedAt(string $created_at) Return the first ChildCouponOrder filtered by the created_at column
  * @method     ChildCouponOrder findOneByUpdatedAt(string $updated_at) Return the first ChildCouponOrder filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildCouponOrder objects filtered by the id column
  * @method     array findByOrderId(int $order_id) Return ChildCouponOrder objects filtered by the order_id column
- * @method     array findByCode(string $code) Return ChildCouponOrder objects filtered by the code column
  * @method     array findByValue(double $value) Return ChildCouponOrder objects filtered by the value column
  * @method     array findByCreatedAt(string $created_at) Return ChildCouponOrder objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCouponOrder objects filtered by the updated_at column
@@ -151,7 +143,7 @@ abstract class CouponOrderQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, ORDER_ID, CODE, VALUE, CREATED_AT, UPDATED_AT FROM coupon_order WHERE ID = :p0';
+        $sql = 'SELECT ID, ORDER_ID, VALUE, CREATED_AT, UPDATED_AT FROM coupon_order WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -322,35 +314,6 @@ abstract class CouponOrderQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CouponOrderTableMap::ORDER_ID, $orderId, $comparison);
-    }
-
-    /**
-     * Filter the query on the code column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCode('fooValue');   // WHERE code = 'fooValue'
-     * $query->filterByCode('%fooValue%'); // WHERE code LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $code The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponOrderQuery The current query, for fluid interface
-     */
-    public function filterByCode($code = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($code)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $code)) {
-                $code = str_replace('*', '%', $code);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CouponOrderTableMap::CODE, $code, $comparison);
     }
 
     /**
@@ -553,81 +516,6 @@ abstract class CouponOrderQuery extends ModelCriteria
         return $this
             ->joinOrder($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Order', '\Thelia\Model\OrderQuery');
-    }
-
-    /**
-     * Filter the query by a related \Thelia\Model\Coupon object
-     *
-     * @param \Thelia\Model\Coupon|ObjectCollection $coupon The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponOrderQuery The current query, for fluid interface
-     */
-    public function filterByCoupon($coupon, $comparison = null)
-    {
-        if ($coupon instanceof \Thelia\Model\Coupon) {
-            return $this
-                ->addUsingAlias(CouponOrderTableMap::CODE, $coupon->getCode(), $comparison);
-        } elseif ($coupon instanceof ObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(CouponOrderTableMap::CODE, $coupon->toKeyValue('PrimaryKey', 'Code'), $comparison);
-        } else {
-            throw new PropelException('filterByCoupon() only accepts arguments of type \Thelia\Model\Coupon or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Coupon relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildCouponOrderQuery The current query, for fluid interface
-     */
-    public function joinCoupon($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Coupon');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Coupon');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Coupon relation Coupon object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\CouponQuery A secondary query class using the current class as primary query
-     */
-    public function useCouponQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinCoupon($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Coupon', '\Thelia\Model\CouponQuery');
     }
 
     /**

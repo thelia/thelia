@@ -25,9 +25,6 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCouponQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCouponQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method     ChildCouponQuery orderByType($order = Criteria::ASC) Order by the type column
- * @method     ChildCouponQuery orderByTitle($order = Criteria::ASC) Order by the title column
- * @method     ChildCouponQuery orderByShortDescription($order = Criteria::ASC) Order by the short_description column
- * @method     ChildCouponQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method     ChildCouponQuery orderByAmount($order = Criteria::ASC) Order by the amount column
  * @method     ChildCouponQuery orderByIsUsed($order = Criteria::ASC) Order by the is_used column
  * @method     ChildCouponQuery orderByIsEnabled($order = Criteria::ASC) Order by the is_enabled column
@@ -44,9 +41,6 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCouponQuery groupById() Group by the id column
  * @method     ChildCouponQuery groupByCode() Group by the code column
  * @method     ChildCouponQuery groupByType() Group by the type column
- * @method     ChildCouponQuery groupByTitle() Group by the title column
- * @method     ChildCouponQuery groupByShortDescription() Group by the short_description column
- * @method     ChildCouponQuery groupByDescription() Group by the description column
  * @method     ChildCouponQuery groupByAmount() Group by the amount column
  * @method     ChildCouponQuery groupByIsUsed() Group by the is_used column
  * @method     ChildCouponQuery groupByIsEnabled() Group by the is_enabled column
@@ -64,10 +58,6 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCouponQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildCouponQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildCouponQuery leftJoinCouponOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the CouponOrder relation
- * @method     ChildCouponQuery rightJoinCouponOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponOrder relation
- * @method     ChildCouponQuery innerJoinCouponOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the CouponOrder relation
- *
  * @method     ChildCouponQuery leftJoinCouponI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CouponI18n relation
  * @method     ChildCouponQuery rightJoinCouponI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponI18n relation
  * @method     ChildCouponQuery innerJoinCouponI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the CouponI18n relation
@@ -82,9 +72,6 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCoupon findOneById(int $id) Return the first ChildCoupon filtered by the id column
  * @method     ChildCoupon findOneByCode(string $code) Return the first ChildCoupon filtered by the code column
  * @method     ChildCoupon findOneByType(string $type) Return the first ChildCoupon filtered by the type column
- * @method     ChildCoupon findOneByTitle(string $title) Return the first ChildCoupon filtered by the title column
- * @method     ChildCoupon findOneByShortDescription(string $short_description) Return the first ChildCoupon filtered by the short_description column
- * @method     ChildCoupon findOneByDescription(string $description) Return the first ChildCoupon filtered by the description column
  * @method     ChildCoupon findOneByAmount(double $amount) Return the first ChildCoupon filtered by the amount column
  * @method     ChildCoupon findOneByIsUsed(int $is_used) Return the first ChildCoupon filtered by the is_used column
  * @method     ChildCoupon findOneByIsEnabled(int $is_enabled) Return the first ChildCoupon filtered by the is_enabled column
@@ -101,9 +88,6 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     array findById(int $id) Return ChildCoupon objects filtered by the id column
  * @method     array findByCode(string $code) Return ChildCoupon objects filtered by the code column
  * @method     array findByType(string $type) Return ChildCoupon objects filtered by the type column
- * @method     array findByTitle(string $title) Return ChildCoupon objects filtered by the title column
- * @method     array findByShortDescription(string $short_description) Return ChildCoupon objects filtered by the short_description column
- * @method     array findByDescription(string $description) Return ChildCoupon objects filtered by the description column
  * @method     array findByAmount(double $amount) Return ChildCoupon objects filtered by the amount column
  * @method     array findByIsUsed(int $is_used) Return ChildCoupon objects filtered by the is_used column
  * @method     array findByIsEnabled(int $is_enabled) Return ChildCoupon objects filtered by the is_enabled column
@@ -211,7 +195,7 @@ abstract class CouponQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, TYPE, TITLE, SHORT_DESCRIPTION, DESCRIPTION, AMOUNT, IS_USED, IS_ENABLED, EXPIRATION_DATE, SERIALIZED_RULES, IS_CUMULATIVE, IS_REMOVING_POSTAGE, MAX_USAGE, IS_AVAILABLE_ON_SPECIAL_OFFERS, CREATED_AT, UPDATED_AT, VERSION FROM coupon WHERE ID = :p0';
+        $sql = 'SELECT ID, CODE, TYPE, AMOUNT, IS_USED, IS_ENABLED, EXPIRATION_DATE, SERIALIZED_RULES, IS_CUMULATIVE, IS_REMOVING_POSTAGE, MAX_USAGE, IS_AVAILABLE_ON_SPECIAL_OFFERS, CREATED_AT, UPDATED_AT, VERSION FROM coupon WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -397,93 +381,6 @@ abstract class CouponQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CouponTableMap::TYPE, $type, $comparison);
-    }
-
-    /**
-     * Filter the query on the title column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByTitle('fooValue');   // WHERE title = 'fooValue'
-     * $query->filterByTitle('%fooValue%'); // WHERE title LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $title The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponQuery The current query, for fluid interface
-     */
-    public function filterByTitle($title = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($title)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $title)) {
-                $title = str_replace('*', '%', $title);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CouponTableMap::TITLE, $title, $comparison);
-    }
-
-    /**
-     * Filter the query on the short_description column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByShortDescription('fooValue');   // WHERE short_description = 'fooValue'
-     * $query->filterByShortDescription('%fooValue%'); // WHERE short_description LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $shortDescription The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponQuery The current query, for fluid interface
-     */
-    public function filterByShortDescription($shortDescription = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($shortDescription)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $shortDescription)) {
-                $shortDescription = str_replace('*', '%', $shortDescription);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CouponTableMap::SHORT_DESCRIPTION, $shortDescription, $comparison);
-    }
-
-    /**
-     * Filter the query on the description column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByDescription('fooValue');   // WHERE description = 'fooValue'
-     * $query->filterByDescription('%fooValue%'); // WHERE description LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $description The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponQuery The current query, for fluid interface
-     */
-    public function filterByDescription($description = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($description)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $description)) {
-                $description = str_replace('*', '%', $description);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CouponTableMap::DESCRIPTION, $description, $comparison);
     }
 
     /**
@@ -959,79 +856,6 @@ abstract class CouponQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\CouponOrder object
-     *
-     * @param \Thelia\Model\CouponOrder|ObjectCollection $couponOrder  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponQuery The current query, for fluid interface
-     */
-    public function filterByCouponOrder($couponOrder, $comparison = null)
-    {
-        if ($couponOrder instanceof \Thelia\Model\CouponOrder) {
-            return $this
-                ->addUsingAlias(CouponTableMap::CODE, $couponOrder->getCode(), $comparison);
-        } elseif ($couponOrder instanceof ObjectCollection) {
-            return $this
-                ->useCouponOrderQuery()
-                ->filterByPrimaryKeys($couponOrder->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByCouponOrder() only accepts arguments of type \Thelia\Model\CouponOrder or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the CouponOrder relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildCouponQuery The current query, for fluid interface
-     */
-    public function joinCouponOrder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('CouponOrder');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'CouponOrder');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the CouponOrder relation CouponOrder object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\CouponOrderQuery A secondary query class using the current class as primary query
-     */
-    public function useCouponOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinCouponOrder($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'CouponOrder', '\Thelia\Model\CouponOrderQuery');
-    }
-
-    /**
      * Filter the query by a related \Thelia\Model\CouponI18n object
      *
      * @param \Thelia\Model\CouponI18n|ObjectCollection $couponI18n  the related object to use as filter
@@ -1345,7 +1169,7 @@ abstract class CouponQuery extends ModelCriteria
      *
      * @return    ChildCouponQuery The current query, for fluid interface
      */
-    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'CouponI18n';
 
@@ -1363,7 +1187,7 @@ abstract class CouponQuery extends ModelCriteria
      *
      * @return    ChildCouponQuery The current query, for fluid interface
      */
-    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
@@ -1384,7 +1208,7 @@ abstract class CouponQuery extends ModelCriteria
      *
      * @return    ChildCouponI18nQuery A secondary query class using the current class as primary query
      */
-    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)

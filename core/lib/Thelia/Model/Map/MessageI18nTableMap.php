@@ -57,7 +57,7 @@ class MessageI18nTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class MessageI18nTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the ID field
@@ -85,14 +85,19 @@ class MessageI18nTableMap extends TableMap
     const TITLE = 'message_i18n.TITLE';
 
     /**
-     * the column name for the DESCRIPTION field
+     * the column name for the SUBJECT field
      */
-    const DESCRIPTION = 'message_i18n.DESCRIPTION';
+    const SUBJECT = 'message_i18n.SUBJECT';
 
     /**
-     * the column name for the DESCRIPTION_HTML field
+     * the column name for the TEXT_MESSAGE field
      */
-    const DESCRIPTION_HTML = 'message_i18n.DESCRIPTION_HTML';
+    const TEXT_MESSAGE = 'message_i18n.TEXT_MESSAGE';
+
+    /**
+     * the column name for the HTML_MESSAGE field
+     */
+    const HTML_MESSAGE = 'message_i18n.HTML_MESSAGE';
 
     /**
      * The default string format for model objects of the related table
@@ -106,12 +111,12 @@ class MessageI18nTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Locale', 'Title', 'Description', 'DescriptionHtml', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'locale', 'title', 'description', 'descriptionHtml', ),
-        self::TYPE_COLNAME       => array(MessageI18nTableMap::ID, MessageI18nTableMap::LOCALE, MessageI18nTableMap::TITLE, MessageI18nTableMap::DESCRIPTION, MessageI18nTableMap::DESCRIPTION_HTML, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', 'TITLE', 'DESCRIPTION', 'DESCRIPTION_HTML', ),
-        self::TYPE_FIELDNAME     => array('id', 'locale', 'title', 'description', 'description_html', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id', 'Locale', 'Title', 'Subject', 'TextMessage', 'HtmlMessage', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'locale', 'title', 'subject', 'textMessage', 'htmlMessage', ),
+        self::TYPE_COLNAME       => array(MessageI18nTableMap::ID, MessageI18nTableMap::LOCALE, MessageI18nTableMap::TITLE, MessageI18nTableMap::SUBJECT, MessageI18nTableMap::TEXT_MESSAGE, MessageI18nTableMap::HTML_MESSAGE, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', 'TITLE', 'SUBJECT', 'TEXT_MESSAGE', 'HTML_MESSAGE', ),
+        self::TYPE_FIELDNAME     => array('id', 'locale', 'title', 'subject', 'text_message', 'html_message', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -121,12 +126,12 @@ class MessageI18nTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, 'Title' => 2, 'Description' => 3, 'DescriptionHtml' => 4, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, 'descriptionHtml' => 4, ),
-        self::TYPE_COLNAME       => array(MessageI18nTableMap::ID => 0, MessageI18nTableMap::LOCALE => 1, MessageI18nTableMap::TITLE => 2, MessageI18nTableMap::DESCRIPTION => 3, MessageI18nTableMap::DESCRIPTION_HTML => 4, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, 'TITLE' => 2, 'DESCRIPTION' => 3, 'DESCRIPTION_HTML' => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, 'description_html' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, 'Title' => 2, 'Subject' => 3, 'TextMessage' => 4, 'HtmlMessage' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, 'title' => 2, 'subject' => 3, 'textMessage' => 4, 'htmlMessage' => 5, ),
+        self::TYPE_COLNAME       => array(MessageI18nTableMap::ID => 0, MessageI18nTableMap::LOCALE => 1, MessageI18nTableMap::TITLE => 2, MessageI18nTableMap::SUBJECT => 3, MessageI18nTableMap::TEXT_MESSAGE => 4, MessageI18nTableMap::HTML_MESSAGE => 5, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, 'TITLE' => 2, 'SUBJECT' => 3, 'TEXT_MESSAGE' => 4, 'HTML_MESSAGE' => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, 'title' => 2, 'subject' => 3, 'text_message' => 4, 'html_message' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -146,10 +151,11 @@ class MessageI18nTableMap extends TableMap
         $this->setUseIdGenerator(false);
         // columns
         $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'message', 'ID', true, null, null);
-        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_EN');
+        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_US');
         $this->addColumn('TITLE', 'Title', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('DESCRIPTION', 'Description', 'CLOB', false, null, null);
-        $this->addColumn('DESCRIPTION_HTML', 'DescriptionHtml', 'CLOB', false, null, null);
+        $this->addColumn('SUBJECT', 'Subject', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('TEXT_MESSAGE', 'TextMessage', 'CLOB', false, null, null);
+        $this->addColumn('HTML_MESSAGE', 'HtmlMessage', 'CLOB', false, null, null);
     } // initialize()
 
     /**
@@ -350,14 +356,16 @@ class MessageI18nTableMap extends TableMap
             $criteria->addSelectColumn(MessageI18nTableMap::ID);
             $criteria->addSelectColumn(MessageI18nTableMap::LOCALE);
             $criteria->addSelectColumn(MessageI18nTableMap::TITLE);
-            $criteria->addSelectColumn(MessageI18nTableMap::DESCRIPTION);
-            $criteria->addSelectColumn(MessageI18nTableMap::DESCRIPTION_HTML);
+            $criteria->addSelectColumn(MessageI18nTableMap::SUBJECT);
+            $criteria->addSelectColumn(MessageI18nTableMap::TEXT_MESSAGE);
+            $criteria->addSelectColumn(MessageI18nTableMap::HTML_MESSAGE);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.LOCALE');
             $criteria->addSelectColumn($alias . '.TITLE');
-            $criteria->addSelectColumn($alias . '.DESCRIPTION');
-            $criteria->addSelectColumn($alias . '.DESCRIPTION_HTML');
+            $criteria->addSelectColumn($alias . '.SUBJECT');
+            $criteria->addSelectColumn($alias . '.TEXT_MESSAGE');
+            $criteria->addSelectColumn($alias . '.HTML_MESSAGE');
         }
     }
 

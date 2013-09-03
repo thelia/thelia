@@ -61,10 +61,28 @@ abstract class CouponI18n implements ActiveRecordInterface
 
     /**
      * The value for the locale field.
-     * Note: this column has a database default value of: 'en_EN'
+     * Note: this column has a database default value of: 'en_US'
      * @var        string
      */
     protected $locale;
+
+    /**
+     * The value for the title field.
+     * @var        string
+     */
+    protected $title;
+
+    /**
+     * The value for the short_description field.
+     * @var        string
+     */
+    protected $short_description;
+
+    /**
+     * The value for the description field.
+     * @var        string
+     */
+    protected $description;
 
     /**
      * @var        Coupon
@@ -87,7 +105,7 @@ abstract class CouponI18n implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->locale = 'en_EN';
+        $this->locale = 'en_US';
     }
 
     /**
@@ -248,7 +266,7 @@ abstract class CouponI18n implements ActiveRecordInterface
      */
     public function hasVirtualColumn($name)
     {
-        return isset($this->virtualColumns[$name]);
+        return array_key_exists($name, $this->virtualColumns);
     }
 
     /**
@@ -369,6 +387,39 @@ abstract class CouponI18n implements ActiveRecordInterface
     }
 
     /**
+     * Get the [title] column value.
+     *
+     * @return   string
+     */
+    public function getTitle()
+    {
+
+        return $this->title;
+    }
+
+    /**
+     * Get the [short_description] column value.
+     *
+     * @return   string
+     */
+    public function getShortDescription()
+    {
+
+        return $this->short_description;
+    }
+
+    /**
+     * Get the [description] column value.
+     *
+     * @return   string
+     */
+    public function getDescription()
+    {
+
+        return $this->description;
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
@@ -415,6 +466,69 @@ abstract class CouponI18n implements ActiveRecordInterface
     } // setLocale()
 
     /**
+     * Set the value of [title] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\CouponI18n The current object (for fluent API support)
+     */
+    public function setTitle($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->title !== $v) {
+            $this->title = $v;
+            $this->modifiedColumns[] = CouponI18nTableMap::TITLE;
+        }
+
+
+        return $this;
+    } // setTitle()
+
+    /**
+     * Set the value of [short_description] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\CouponI18n The current object (for fluent API support)
+     */
+    public function setShortDescription($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->short_description !== $v) {
+            $this->short_description = $v;
+            $this->modifiedColumns[] = CouponI18nTableMap::SHORT_DESCRIPTION;
+        }
+
+
+        return $this;
+    } // setShortDescription()
+
+    /**
+     * Set the value of [description] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\CouponI18n The current object (for fluent API support)
+     */
+    public function setDescription($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->description !== $v) {
+            $this->description = $v;
+            $this->modifiedColumns[] = CouponI18nTableMap::DESCRIPTION;
+        }
+
+
+        return $this;
+    } // setDescription()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -424,7 +538,7 @@ abstract class CouponI18n implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->locale !== 'en_EN') {
+            if ($this->locale !== 'en_US') {
                 return false;
             }
 
@@ -460,6 +574,15 @@ abstract class CouponI18n implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CouponI18nTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
             $this->locale = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CouponI18nTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->title = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CouponI18nTableMap::translateFieldName('ShortDescription', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->short_description = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CouponI18nTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->description = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -468,7 +591,7 @@ abstract class CouponI18n implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 2; // 2 = CouponI18nTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = CouponI18nTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\CouponI18n object", 0, $e);
@@ -695,6 +818,15 @@ abstract class CouponI18n implements ActiveRecordInterface
         if ($this->isColumnModified(CouponI18nTableMap::LOCALE)) {
             $modifiedColumns[':p' . $index++]  = 'LOCALE';
         }
+        if ($this->isColumnModified(CouponI18nTableMap::TITLE)) {
+            $modifiedColumns[':p' . $index++]  = 'TITLE';
+        }
+        if ($this->isColumnModified(CouponI18nTableMap::SHORT_DESCRIPTION)) {
+            $modifiedColumns[':p' . $index++]  = 'SHORT_DESCRIPTION';
+        }
+        if ($this->isColumnModified(CouponI18nTableMap::DESCRIPTION)) {
+            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
+        }
 
         $sql = sprintf(
             'INSERT INTO coupon_i18n (%s) VALUES (%s)',
@@ -711,6 +843,15 @@ abstract class CouponI18n implements ActiveRecordInterface
                         break;
                     case 'LOCALE':
                         $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
+                        break;
+                    case 'TITLE':
+                        $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
+                        break;
+                    case 'SHORT_DESCRIPTION':
+                        $stmt->bindValue($identifier, $this->short_description, PDO::PARAM_STR);
+                        break;
+                    case 'DESCRIPTION':
+                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -773,6 +914,15 @@ abstract class CouponI18n implements ActiveRecordInterface
             case 1:
                 return $this->getLocale();
                 break;
+            case 2:
+                return $this->getTitle();
+                break;
+            case 3:
+                return $this->getShortDescription();
+                break;
+            case 4:
+                return $this->getDescription();
+                break;
             default:
                 return null;
                 break;
@@ -804,6 +954,9 @@ abstract class CouponI18n implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getLocale(),
+            $keys[2] => $this->getTitle(),
+            $keys[3] => $this->getShortDescription(),
+            $keys[4] => $this->getDescription(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -855,6 +1008,15 @@ abstract class CouponI18n implements ActiveRecordInterface
             case 1:
                 $this->setLocale($value);
                 break;
+            case 2:
+                $this->setTitle($value);
+                break;
+            case 3:
+                $this->setShortDescription($value);
+                break;
+            case 4:
+                $this->setDescription($value);
+                break;
         } // switch()
     }
 
@@ -881,6 +1043,9 @@ abstract class CouponI18n implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setLocale($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setTitle($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setShortDescription($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setDescription($arr[$keys[4]]);
     }
 
     /**
@@ -894,6 +1059,9 @@ abstract class CouponI18n implements ActiveRecordInterface
 
         if ($this->isColumnModified(CouponI18nTableMap::ID)) $criteria->add(CouponI18nTableMap::ID, $this->id);
         if ($this->isColumnModified(CouponI18nTableMap::LOCALE)) $criteria->add(CouponI18nTableMap::LOCALE, $this->locale);
+        if ($this->isColumnModified(CouponI18nTableMap::TITLE)) $criteria->add(CouponI18nTableMap::TITLE, $this->title);
+        if ($this->isColumnModified(CouponI18nTableMap::SHORT_DESCRIPTION)) $criteria->add(CouponI18nTableMap::SHORT_DESCRIPTION, $this->short_description);
+        if ($this->isColumnModified(CouponI18nTableMap::DESCRIPTION)) $criteria->add(CouponI18nTableMap::DESCRIPTION, $this->description);
 
         return $criteria;
     }
@@ -966,6 +1134,9 @@ abstract class CouponI18n implements ActiveRecordInterface
     {
         $copyObj->setId($this->getId());
         $copyObj->setLocale($this->getLocale());
+        $copyObj->setTitle($this->getTitle());
+        $copyObj->setShortDescription($this->getShortDescription());
+        $copyObj->setDescription($this->getDescription());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -1051,6 +1222,9 @@ abstract class CouponI18n implements ActiveRecordInterface
     {
         $this->id = null;
         $this->locale = null;
+        $this->title = null;
+        $this->short_description = null;
+        $this->description = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();

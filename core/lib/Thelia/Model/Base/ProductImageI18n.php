@@ -61,7 +61,7 @@ abstract class ProductImageI18n implements ActiveRecordInterface
 
     /**
      * The value for the locale field.
-     * Note: this column has a database default value of: 'en_EN'
+     * Note: this column has a database default value of: 'en_US'
      * @var        string
      */
     protected $locale;
@@ -111,7 +111,7 @@ abstract class ProductImageI18n implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->locale = 'en_EN';
+        $this->locale = 'en_US';
     }
 
     /**
@@ -272,7 +272,7 @@ abstract class ProductImageI18n implements ActiveRecordInterface
      */
     public function hasVirtualColumn($name)
     {
-        return isset($this->virtualColumns[$name]);
+        return array_key_exists($name, $this->virtualColumns);
     }
 
     /**
@@ -576,7 +576,7 @@ abstract class ProductImageI18n implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->locale !== 'en_EN') {
+            if ($this->locale !== 'en_US') {
                 return false;
             }
 
