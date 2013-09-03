@@ -59,8 +59,7 @@
         <default key="action">edit</default>
     </route>
     <route id="admin.coupon.read" path="/admin/coupon/read/{id}">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::processAction</default>
-        <default key="action">read</default>
+        <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
     </route>
 
 

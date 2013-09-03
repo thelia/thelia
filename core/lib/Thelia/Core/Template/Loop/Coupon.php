@@ -72,7 +72,7 @@ class Coupon extends BaseI18nLoop
         $search = CouponQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search, array());
+        $locale = $this->configureI18nProcessing($search, array('TITLE', 'DESCRIPTION', 'SHORT_DESCRIPTION'));
 
         $id = $this->getId();
 
@@ -91,9 +91,17 @@ class Coupon extends BaseI18nLoop
             $loopResultRow->set("ID", $coupon->getId())
                 ->set("IS_TRANSLATED", $coupon->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE", $locale)
+                ->set("CODE", $coupon->getCode())
                 ->set("TITLE", $coupon->getVirtualColumn('i18n_TITLE'))
-                ->set("CODE", $coupon->getVirtualColumn('i18n_CODE'));
-
+                ->set("SHORT_DESCRIPTION", $coupon->getVirtualColumn('i18n_SHORT_DESCRIPTION'))
+                ->set("DESCRIPTION", $coupon->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("EXPIRATION_DATE", $coupon->getExpirationDate())
+                ->set("USAGE_LEFT", $coupon->getMaxUsage())
+                ->set("IS_CUMULATIVE", $coupon->getIsCumulative())
+                ->set("IS_REMOVING_POSTAGE", $coupon->getIsRemovingPostage())
+                ->set("IS_ENABLED", $coupon->getIsEnabled())
+                ->set("AMOUNT", $coupon->getAmount())
+                ->set("APPLICATION_CONDITIONS", $coupon->getRules());
             $loopResult->addRow($loopResultRow);
         }
 

@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\Coupon\CouponCreateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Exception\AuthenticationException;
@@ -143,15 +144,23 @@ class CouponController extends BaseAdminController
     /**
      * Manage Coupons read display
      *
-     * @param array $args GET arguments
+     * @param int $id Coupon Id
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function readCoupon($args)
+    public function readAction($id)
     {
         $this->checkAuth("ADMIN", "admin.coupon.view");
 
-        return $this->render('coupon/read', $args);
+        // Database request repeated in the loop but cached
+        $search = CouponQuery::create();
+        $coupon = $search->findOneById($id);
+
+        if ($coupon === null) {
+            return $this->pageNotFound();
+        }
+
+        return $this->render('coupon/read', array('couponId' => $id));
     }
 
     /**

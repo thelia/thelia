@@ -18,42 +18,78 @@
         <h1>Coupons : <small>Read coupon n°1</small></h1>
     </div>
 
+
     <section class="row-fluid">
 		<div class="span12 general-block-decorator">
-			
+            {loop type="coupon" name="read_coupon" id=1 backend_context="true"}
 			<div class="alert alert-info">				
-				<span class="icon-question-sign"></span> This coupon is disabled, you can enable to the bottom of this form.
+				<span class="icon-question-sign"></span>
+                {if #IS_ENABLED}{else}This coupon is disabled, you can enable to the bottom of this form.{/if}
 			</div>
 
-			<table class="table table-striped">
+            <table class="table table-striped">
 				<tbody>
 					<tr>
 						<td>Code</td>
-						<td>XMAS13</td>
+						<td>#CODE</td>
 					</tr>
 					<tr>
 						<td>Title</td>
-						<td>Coupon for XMAS -30 &euro;</td>
+						<td>#TITLE</td>
 					</tr>
 					<tr>
 						<td>Expiration date</td>
-						<td>25/12/2013</td>
+						<td>EXPIRATION_DATE</td>
 					</tr>
 	    			<tr>
 	    				<td>Usage left</td>
-	    				<td>49 times</td>
+	    				<td>
+                            {if #USAGE_LEFT}
+                            <span class="label label-success">
+                                #USAGE_LEFT
+                            </span>
+                            {else}
+                            <span class="label label-important">
+                                0
+                            </span>
+                            {/if}
+                        </td>
+	    			</tr>
+                    <tr>
+                        <td colspan="2">#SHORT_DESCRIPTION</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">#DESCRIPTION</td>
+                    </tr>
+	    			<tr>
+                        <td colspan="2">
+                        {if #IS_CUMULATIVE}
+                            <span class="label label-success">
+                                {intl l="May be cumulative"}
+                            </span>
+                        {else}
+                            <span class="label label-important">
+                                {intl l="Can't be cumulative"}
+                            </span>
+                        {/if}
+	    				</td>
 	    			</tr>
 	    			<tr>
-	    				<td>May be combined</td>
-	    				<td><span class="label label-success">Yes</span></td>
+	    				<td colspan="2">
+                            {if #IS_REMOVING_POSTAGE}
+                                <span class="label label-important">
+                                    {intl l="Will remove postage"}
+                                </span>
+                            {else}
+                                <span class="label label-success">
+                                    {intl l="Won't remove postage"}
+                                </span>
+                            {/if}
+                        </td>
 	    			</tr>
 	    			<tr>
-	    				<td>Cancel shipping</td>
-	    				<td><span class="label label-important">No</span></td>
-	    			</tr>
-	    			<tr>
-	    				<td>Effect</td>
-	    				<td>Remove 30 &euro; to the cart price</td>
+	    				<td>Amount</td>
+	    				<td>#AMOUNT</td>
 	    			</tr>
 	    			<tr>
 	    				<td>Conditions of application</td>
@@ -73,10 +109,12 @@
 	    				</td>
 	    			</tr>    		
 				</tbody>
-			</table>				
-
+			</table>
+            {/loop}
 		</div>
 	</section>
+
+
 </section> <!-- #wrapper -->
 
 <aside id="enable" class="modal hide fade" role="dialog">
@@ -91,14 +129,6 @@
         <a href="#" class="btn btn-success" data-confirm="confirm">Confirm</a>
     </div>
 </aside> <!-- #enable / Enable confirmation -->
-
-boucle coupon
-{loop type="coupon" name="read_coupon" backend_context="true"}
-        inside
-        #ID
-        #CODE
-        #TITLE
-{/loop}
 
 {include file='includes/js.inc.html'}
 
