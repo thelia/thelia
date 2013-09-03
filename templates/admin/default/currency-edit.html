@@ -1,0 +1,147 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a currency'}{/block}
+
+{block name="check-permissions"}admin.configuration.currencies.edit{/block}
+
+{block name="main-content"}
+<div class="currencies edit-currency">
+
+    <div id="wrapper" class="container">
+
+        {loop name="currency_edit" type="currency" id="$currency_id" backend_context="1" lang="$edit_language_id"}
+
+        <ul class="breadcrumb">
+			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a> <span class="divider">/</span></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a> <span class="divider">/</span></li>
+            <li><a href="{url path='/admin/configuration/currencies'}">{intl l="Currencies"}</a> <span class="divider">/</span></li>
+            <li>{intl l='Editing currency "%name"' name="{$NAME}"}</li>
+        </ul>
+
+		<div class="row-fluid">
+			<div class="span12 general-block-decorator">
+				<div class="row-fluid">
+
+					<div class="span12 title title-without-tabs">
+					   {intl l="Edit currency $NAME"}
+					</div>
+
+                    <div class="form-container">
+                         <div class="form-horizontal span12">
+						    {form name="thelia.admin.currency.modification"}
+						    <form method="POST" action="{url path='/admin/configuration/currencies/save-change'}" {form_enctype form=$form}>
+                                <fieldset>
+                                    {* Be sure to get the currency ID, even if the form could not be validated *}
+                                    <input type="hidden" name="currency_id" value="{$currency_id}" />
+
+                                    {include file="includes/inner-form-toolbar.html"}
+
+							        {form_hidden_fields form=$form}
+
+							        {form_field form=$form field='success_url'}
+							        <input type="hidden" name="{$name}" value="{url path='/admin/configuration/currencies'}" />
+							        {/form_field}
+
+			                        {form_field form=$form field='locale'}
+			                        <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+			                        {/form_field}
+
+						            {if $form_error}<div class="alert alert-block alert-error">{$form_error_message}</div>{/if}
+
+                                    <div class="row-fluid">
+                                        <div class="span6">
+								            <div class="control-group">
+								                <label class="control-label">
+								                   {intl l='Name *'}
+								                </label>
+
+								                <div class="controls">
+								                    {form_field form=$form field='name'}
+								                    <span {if $error}class="error"{/if}>
+								                       <input type="text" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Currency name'}" placeholder="{intl l='Currency name'}" class="input-medium">
+								                    </span>
+								                    {/form_field}
+								                </div>
+								            </div>
+
+		                                    <div class="control-group">
+		                                        <label class="control-label">
+		                                           {intl l='ISO 4217 Code *'}
+		                                           <span class="label-help-block"><a title="{intl l='More information about ISO 4217'}" href="http://fr.wikipedia.org/wiki/ISO_4217" target="_blank">List of ISO 4217 code</a></span>
+		                                        </label>
+
+		                                        <div class="controls">
+		                                            {form_field form=$form field='code'}
+		                                            <span {if $error}class="error"{/if}>
+		                                               <input type="text" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Currency ISO 4217 Code'}" placeholder="{intl l='Code'}" class="input-mini">
+		                                            </span>
+		                                            {/form_field}
+		                                        </div>
+		                                    </div>
+		                                </div>
+
+                                       <div class="span6">
+		                                    <div class="control-group">
+		                                        <label class="control-label">
+		                                           {intl l='Symbol *'}
+		                                           <span class="label-help-block">The symbol, sur as $, £, &euro;...</span>
+		                                        </label>
+
+		                                        <div class="controls">
+		                                            {form_field form=$form field='symbol'}
+		                                            <span {if $error}class="error"{/if}>
+		                                               <input type="text" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Currency symbol'}" placeholder="{intl l='Symbol'}" class="input-mini">
+		                                            </span>
+		                                            {/form_field}
+		                                        </div>
+		                                    </div>
+
+		                                    <div class="control-group">
+		                                        <label class="control-label">
+		                                           {intl l='Rate from &euro; *'}
+		                                           <span class="label-help-block">The rate from Euro</span>
+		                                        </label>
+
+		                                        <div class="controls">
+		                                            {form_field form=$form field='rate'}
+		                                            <span {if $error}class="error"{/if}>
+		                                               <input type="text" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Rate from Euro'}" placeholder="{intl l='Rate'}" class="input-mini">
+		                                            </span>
+		                                            {/form_field}
+                                                   <span class="label-help-block">Price in Euro * rate = Price in this currency</span>
+		                                        </div>
+		                                    </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <p>{intl l='Currency created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
+                                        </div>
+                                    </div>
+
+                                </fieldset>
+							</form>
+							{/form}
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		{/loop}
+
+        {elseloop rel="currency_edit"}
+        <div class="row-fluid">
+            <div class="span12">
+                <div class="alert alert-error">
+                    {intl l="Sorry, currency ID=$currency_id was not found."}
+                </div>
+            </div>
+        </div>
+        {/elseloop}
+
+    </div>
+</div>
+{/block}
