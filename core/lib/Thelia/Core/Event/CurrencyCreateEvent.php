@@ -65,6 +65,8 @@ class CurrencyCreateEvent extends CurrencyEvent
     public function setSymbol($symbol)
     {
         $this->symbol = $symbol;
+
+        return $this;
     }
 
     public function getCode()

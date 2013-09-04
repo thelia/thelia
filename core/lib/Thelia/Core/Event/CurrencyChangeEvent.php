@@ -27,6 +27,7 @@ use Thelia\Model\Currency;
 class CurrencyChangeEvent extends CurrencyCreateEvent
 {
     protected $currency_id;
+    protected $is_default;
 
     public function __construct($currency_id)
     {
@@ -41,6 +42,18 @@ class CurrencyChangeEvent extends CurrencyCreateEvent
     public function setCurrencyId($currency_id)
     {
         $this->currency_id = $currency_id;
+
+        return $this;
+    }
+
+    public function getIsDefault()
+    {
+        return $this->is_default;
+    }
+
+    public function setIsDefault($is_default)
+    {
+        $this->is_default = $is_default;
 
         return $this;
     }

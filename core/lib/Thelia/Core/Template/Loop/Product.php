@@ -519,6 +519,12 @@ class Product extends BaseI18nLoop
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))
                 ->set("POSITION", $product->getPosition())
+
+                ->set("CREATE_DATE", $category->getCreatedAt())
+                ->set("UPDATE_DATE", $category->getUpdatedAt())
+                ->set("VERSION", $category->getVersion())
+                ->set("VERSION_DATE", $category->getVersionCreatedAt())
+                ->set("VERSION_AUTHOR", $category->getVersionCreatedBy())
             ;
 
             $loopResult->addRow($loopResultRow);

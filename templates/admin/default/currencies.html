@@ -26,7 +26,7 @@
         <div class="row-fluid">
 
             <div class="span12">
-                <form action="{url path='/admin/configuration/currencies/change-values'}" method="post">
+                <form action="{url path='/admin/configuration/currencies/update-rates'}" method="post">
 	                <div class="general-block-decorator">
 	                    <table class="table table-striped table-condensed table-left-aligned">
 	                        <caption>
@@ -35,6 +35,7 @@
                                 <a class="btn btn-primary action-btn" title="{intl l='Add a new currency'}" href="#add_currency_dialog" data-toggle="modal">
                                     <i class="icon-plus-sign icon-white"></i>
                                 </a>
+                                <button class="btn btn-info action-btn" title="{intl l='Update rates'}">{intl l='Update rates'} <i class="icon icon-white icon-globe"></i></button>
                             {/loop}
 
 	                        </caption>
@@ -117,25 +118,24 @@
 
 	                        {loop name="currencies" type="currency" backend_context="1" lang=$lang_id order=$order}
                                 <tr>
+									<td>{$ID}</td>
 
-                                   <td>{$ID}</td>
+									<td>
+									{loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.currencies.change"}
+									    <a title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/change' currency_id="$ID"}">{$NAME}</a>
+									{/loop}
+									{elseloop rel="can_change"}
+									    {$NAME}
+									{/elseloop}
+									</td>
 
-                                   <td>
-                                   {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.currencies.change"}
-                                       <a title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/change' currency_id="$ID"}">{$NAME}</a>
-                                   {/loop}
-                                   {elseloop rel="can_change"}
-                                       {$NAME}
-                                   {/elseloop}
-                                   </td>
+									<td class="text-center">{$ISOCODE}</td>
 
-                                   <td class="text-center">{$ISOCODE}</td>
+									<td class="text-center">{$SYMBOL}</td>
 
-                                   <td class="text-center">{$SYMBOL}</td>
+									<td class="text-right">{format_number number="$RATE" decimals="4"}</td>
 
-                                   <td class="text-right">{$RATE|string_format:"%.4f"}</td>
-
-	                               <td class="text-center">
+                                    <td class="text-center">
 	                                   {admin_position_block
 	                                       permission="admin.currencies.edit"
 	                                       path="/admin/configuration/currencies"
@@ -144,9 +144,11 @@
 	                                       position="$POSITION"
 	                                       id="$ID"
 	                                    }
-	                               </td>
+	                                </td>
 
-                                   <td class="text-center"><input type="radio" name="default[{$ID}]" value="1" {if $IS_DEFAULT}checked="checked"{/if}/></td>
+                                    <td class="text-center">
+                                        <input class="change-default" type="radio" name="is_default" value="{$ID}" {if $IS_DEFAULT}checked="checked"{/if}/>
+                                    </td>
 
 	                                {module_include location='currencies_table_row'}
 
@@ -208,7 +210,7 @@
 
         <div class="modal-body">
 
-            {if #form_error}<div class="alert alert-block alert-error" id="add_currency_dialog_error">#form_error_currency</div>{/if}
+            {if $form_error}<div class="alert alert-block alert-error" id="add_currency_dialog_error">{$form_error_message}</div>{/if}
 
             <div class="control-group">
 
@@ -246,7 +248,7 @@
                 </label>
 
                 <div class="controls">
-                    {form_field form=$form field='symbol'}
+                    {form_field form=$form field='code'}
                     <span {if $error}class="error"{/if}>
                        <input type="text" required="required" name="{$name}" value="{$value}" title="{intl l='ISO 4217 code'}" placeholder="{intl l='Code'}">
                     </span>
@@ -278,11 +280,11 @@
                 </label>
 
                 <div class="controls">
-                    {form_field form=$form field='symbol'}
+                    {form_field form=$form field='rate'}
                     <span {if $error}class="error"{/if}>
                        <input type="text" required="required" name="{$name}" value="{$value}" title="{intl l='Currency rate'}" placeholder="{intl l='Rate'}">
                     </span>
-                    <div class="help-block">{intl l="Currency rate, in Euro"}</div>
+                    <div class="help-block">{intl l="The rate from Euro (Price in Euro * rate = Price in this currency)"}</div>
                     {/form_field}
                 </div>
             </div>
@@ -379,6 +381,18 @@
                 location.href = url;
             }
         });
+
+        {* Change default status *}
+
+        $('.change-default').click(function(ev) {
+        	var url = "{url path='/admin/configuration/currencies/set-default' currency_id='__ID__'}";
+
+            // Perform ID subtitutions
+            url = url.replace('__ID__', $(this).val());
+
+            // Reload the page
+            location.href = url;
+         });
 
     });
 </script>

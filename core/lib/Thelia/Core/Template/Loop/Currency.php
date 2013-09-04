@@ -177,7 +177,11 @@ class Currency extends BaseI18nLoop
                 ->set("SYMBOL"        , $currency->getSymbol())
                 ->set("RATE"          , $currency->getRate())
                 ->set("POSITION"      , $currency->getPosition())
-                ->set("IS_DEFAULT"    , $currency->getByDefault());
+                ->set("IS_DEFAULT"    , $currency->getByDefault())
+
+                ->set("CREATE_DATE"    , $currency->getCreatedAt())
+                ->set("UPDATE_DATE"    , $currency->getUpdatedAt())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

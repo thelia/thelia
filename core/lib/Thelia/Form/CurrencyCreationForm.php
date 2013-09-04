@@ -31,20 +31,20 @@ class CurrencyCreationForm extends BaseForm
 {
     protected function buildForm($change_mode = false)
     {
-        $name_constraints = array(new Constraints\NotBlank());
+        $code_constraints = array(new Constraints\NotBlank());
 
         if (!$change_mode) {
-            $name_constraints[] = new Constraints\Callback(array(
-                "methods" => array(array($this, "checkDuplicateName"))
+            $code_constraints[] = new Constraints\Callback(array(
+                "methods" => array(array($this, "checkDuplicateCode"))
             ));
         }
 
         $this->formBuilder
-            ->add("name"   , "text"  , array("constraints" => array($name_constraints)))
-            ->add("locale" , "text"  , array())
+            ->add("name"   , "text"  , array("constraints" => array(new NotBlank())))
+            ->add("locale" , "text"  , array("constraints" => array(new NotBlank())))
             ->add("symbol" , "text"  , array("constraints" => array(new NotBlank())))
             ->add("rate"   , "text"  , array("constraints" => array(new NotBlank())))
-            ->add("code"   , "text"  , array("constraints" => array(new NotBlank())))
+            ->add("code"   , "text"  , array("constraints" => $code_constraints))
         ;
     }
 
@@ -53,12 +53,12 @@ class CurrencyCreationForm extends BaseForm
         return "thelia_currency_creation";
     }
 
-    public function checkDuplicateName($value, ExecutionContextInterface $context)
+    public function checkDuplicateCode($value, ExecutionContextInterface $context)
     {
-        $currency = CurrencyQuery::create()->findOneByName($value);
+        $currency = CurrencyQuery::create()->findOneByCode($value);
 
         if ($currency) {
-            $context->addViolation(sprintf("A currency with name \"%s\" already exists.", $value));
+            $context->addViolation(sprintf("A currency with code \"%s\" already exists.", $value));
         }
     }
 
