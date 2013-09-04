@@ -252,6 +252,7 @@ class AddressCreateOrUpdateEvent extends Event
     public function setAddress(Address $address)
     {
         $this->address = $address;
+        $this->setCustomer($address->getCustomer());
     }
 
     /**

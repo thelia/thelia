@@ -43,10 +43,21 @@ class Address extends BaseAction implements EventSubscriberInterface
         $this->createOrUpdate($address, $event);
     }
 
+    public function update(AddressCreateOrUpdateEvent $event)
+    {
+        $addressModel = $event->getAddress();
+
+        $this->createOrUpdate($addressModel, $event);
+    }
+
 
     protected function createOrUpdate(AddressModel $addressModel, AddressCreateOrUpdateEvent $event)
     {
         $addressModel->setDispatcher($this->getDispatcher());
+
+        if ($addressModel->isNew()) {
+            $addressModel->setLabel($event->getLabel());
+        }
 
         $addressModel
             ->setTitleId($event->getTitle())
