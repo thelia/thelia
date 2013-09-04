@@ -27,5 +27,5 @@ php install/faker.php
 echo -e "\n\e[01;34m[INFO] Adding admin\e[00m\n"
 php Thelia thelia:create-admin --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2
 
-echo -e "\n\e[00;32m[SUCCESS] Reset done\e[00m\n"
-
+    echo -e "\n\e[00;32m[SUCCESS] Reset done\e[00m\n"
+fi
