@@ -43,10 +43,21 @@ class Address extends BaseAction implements EventSubscriberInterface
         $this->createOrUpdate($address, $event);
     }
 
+    public function update(AddressCreateOrUpdateEvent $event)
+    {
+        $addressModel = $event->getAddress();
+
+        $this->createOrUpdate($addressModel, $event);
+    }
+
 
     protected function createOrUpdate(AddressModel $addressModel, AddressCreateOrUpdateEvent $event)
     {
         $addressModel->setDispatcher($this->getDispatcher());
+
+        if ($addressModel->isNew()) {
+            $addressModel->setLabel($event->getLabel());
+        }
 
         $addressModel
             ->setTitleId($event->getTitle())
@@ -63,6 +74,8 @@ class Address extends BaseAction implements EventSubscriberInterface
             ->setCompany($event->getCompany())
             ->save()
         ;
+
+        $event->setAddress($addressModel);
     }
 
     /**
@@ -88,7 +101,8 @@ class Address extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::ADDRESS_CREATE => array("create", 128)
+            TheliaEvents::ADDRESS_CREATE => array("create", 128),
+            TheliaEvents::ADDRESS_UPDATE => array("update", 128)
         );
     }
 }

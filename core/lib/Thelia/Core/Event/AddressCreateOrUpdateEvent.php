@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Event;
 use Symfony\Component\EventDispatcher\Event;
+use Thelia\Model\Address;
 use Thelia\Model\Customer;
 
 
@@ -103,7 +104,12 @@ class AddressCreateOrUpdateEvent extends Event
      */
     protected $customer;
 
-    function __construct($label, $title, $firstname, $lastname, $address1, $address2, $address3, $zipcode, $city, $country, $cellphone, $phone, $company, Customer $customer)
+    /**
+     * @var \Thelia\Model\Address
+     */
+    protected $address;
+
+    function __construct($label, $title, $firstname, $lastname, $address1, $address2, $address3, $zipcode, $city, $country, $cellphone, $phone, $company)
     {
         $this->address1 = $address1;
         $this->address2 = $address2;
@@ -118,7 +124,6 @@ class AddressCreateOrUpdateEvent extends Event
         $this->phone = $phone;
         $this->title = $title;
         $this->zipcode = $zipcode;
-        $this->customer = $customer;
     }
 
     /**
@@ -226,11 +231,37 @@ class AddressCreateOrUpdateEvent extends Event
     }
 
     /**
+     * @param \Thelia\Model\Customer $customer
+     */
+    public function setCustomer(Customer $customer)
+    {
+        $this->customer = $customer;
+    }
+
+    /**
      * @return \Thelia\Model\Customer
      */
     public function getCustomer()
     {
         return $this->customer;
     }
+
+    /**
+     * @param \Thelia\Model\Address $address
+     */
+    public function setAddress(Address $address)
+    {
+        $this->address = $address;
+        $this->setCustomer($address->getCustomer());
+    }
+
+    /**
+     * @return \Thelia\Model\Address
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
 
 }

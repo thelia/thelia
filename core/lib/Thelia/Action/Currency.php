@@ -69,7 +69,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
      *
      * @param CurrencyChangeEvent $event
      */
-    public function modify(CurrencyChangeEvent $event)
+    public function update(CurrencyChangeEvent $event)
     {
         $search = CurrencyQuery::create();
 
@@ -165,7 +165,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::CURRENCY_CREATE       => array("create", 128),
-            TheliaEvents::CURRENCY_MODIFY       => array("modify", 128),
+            TheliaEvents::CURRENCY_UPDATE       => array("update", 128),
             TheliaEvents::CURRENCY_DELETE       => array("delete", 128),
             TheliaEvents::CURRENCY_SET_DEFAULT  => array("setDefault", 128),
             TheliaEvents::CURRENCY_UPDATE_RATES => array("updateRates", 128),

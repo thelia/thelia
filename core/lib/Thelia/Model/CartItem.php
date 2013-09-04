@@ -32,7 +32,7 @@ class CartItem extends BaseCartItem
         if ($this->dispatcher) {
             $cartEvent = new CartEvent($this->getCart());
 
-            $this->dispatcher->dispatch(TheliaEvents::AFTER_CARTCHANGEITEM, $cartEvent);
+            $this->dispatcher->dispatch(TheliaEvents::AFTER_CARTUPDATEITEM, $cartEvent);
         }
     }
 

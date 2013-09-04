@@ -204,7 +204,7 @@ class MessageController extends BaseAdminController
                 ->setTextMessage($data['text_message'])
             ;
 
-            $this->dispatch(TheliaEvents::MESSAGE_MODIFY, $changeEvent);
+            $this->dispatch(TheliaEvents::MESSAGE_UPDATE, $changeEvent);
 
             // Log message modification
             $changedObject = $changeEvent->getMessage();
