@@ -136,7 +136,22 @@ class TheliaLoop extends AbstractSmartyPlugin
         }
 
         if ($loopResults->valid()) {
+
             $loopResultRow = $loopResults->current();
+
+            // On first iteration, save variables that may be overwritten by this loop
+            if (! isset($this->varstack[$name])) {
+
+                $saved_vars = array();
+
+                $varlist = $loopResultRow->getVars();
+
+                foreach ($varlist as $var) {
+                    $saved_vars[$var] = $template->getTemplateVars($var);
+                }
+
+                $this->varstack[$name] = $saved_vars;
+            }
 
             foreach ($loopResultRow->getVarVal() as $var => $val) {
                 $template->assign($var, $val);

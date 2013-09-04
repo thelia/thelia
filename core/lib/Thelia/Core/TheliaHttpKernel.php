@@ -122,7 +122,9 @@ class TheliaHttpKernel extends HttpKernel
      */
     protected function initParam(Request $request)
     {
-        // Ensure an instaciation of URL service
+        // Ensure an instaciation of URL service, which is accessed as a pseudo-singleton
+        // in the rest of the application.
+        // See Thelia\Tools\URL class.
         $this->container->get('thelia.url.manager');
 
         $lang = $this->detectLang($request);

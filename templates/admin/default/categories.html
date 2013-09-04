@@ -85,17 +85,17 @@
 		                    </thead>
 
 		                    <tbody>
-		                    {loop name="category_list" type="category" visible="*" parent="{$current_category_id}" order="$category_order"}
+		                    {loop name="category_list" type="category" visible="*" parent=$current_category_id order=$category_order backend_context="1" lang=$lang_id}
 		                    <tr>
 		                        <td>
-		                        {loop type="image" name="cat_image" source="category" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
+		                        i={$ID} {loop type="image" name="cat_image" source="category" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
 		                          <a href="{url path='admin/catalog/category' id="$ID" action='browse'}" title="{intl l='Browse this category'}"><img src="#IMAGE_URL" alt="#TITLE" /></a>
 		                        {/loop}
 		                        </td>
 
 		                    	<td class="object-title">
 		                    	     <a href="{url path='admin/catalog/category' id="$ID" action='browse'}" title="{intl l='Browse this category'}">
-		                    	        {$TITLE}
+		                    	       {$ID} p={$POSITION} {$TITLE}
 		                    	     </a>
 		                    	</td>
 

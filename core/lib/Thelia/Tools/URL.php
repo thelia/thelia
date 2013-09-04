@@ -48,6 +48,8 @@ class URL
     public function __construct(ContainerInterface $container, $environment)
     {
         // Allow singleton style calls once intanciated.
+        // For this to work, the URL service has to be instanciated very early. This is done manually
+        // in TheliaHttpKernel, by calling $this->container->get('thelia.url.manager');
         self::$instance = $this;
 
         $this->container = $container;

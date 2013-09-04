@@ -155,7 +155,7 @@
 	                                <td class="actions">
 	                                    <div class="btn-group">
                                               {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.currencies.change"}
-                                                  <a class="btn btn-default btn-xs currency-change" title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/change' currency_id="$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                  <a class="btn btn-default btn-xs currency-change" title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id="$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
                                               {/loop}
 
                                               {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.currencies.delete"}

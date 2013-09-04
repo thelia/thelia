@@ -53,7 +53,7 @@
         <default key="_controller">Thelia\Controller\Admin\ConfigController::changeAction</default>
     </route>
 
-    <route id="admin.configuration.variables.save-change" path="/admin/configuration/variables/save-change">
+    <route id="admin.configuration.variables.save" path="/admin/configuration/variables/save">
         <default key="_controller">Thelia\Controller\Admin\ConfigController::saveChangeAction</default>
     </route>
 
@@ -75,7 +75,7 @@
         <default key="_controller">Thelia\Controller\Admin\MessageController::changeAction</default>
     </route>
 
-    <route id="admin.configuration.messages.save-change" path="/admin/configuration/messages/save-change">
+    <route id="admin.configuration.messages.save" path="/admin/configuration/messages/save">
         <default key="_controller">Thelia\Controller\Admin\MessageController::saveChangeAction</default>
     </route>
 
@@ -97,7 +97,7 @@
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::changeAction</default>
     </route>
 
-    <route id="admin.configuration.currencies.save-change" path="/admin/configuration/currencies/save-change">
+    <route id="admin.configuration.currencies.save" path="/admin/configuration/currencies/save">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::saveChangeAction</default>
     </route>
 

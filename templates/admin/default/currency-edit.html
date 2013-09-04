@@ -29,7 +29,7 @@
                     <div class="form-container">
                          <div class="form-horizontal col-md-12">
 						    {form name="thelia.admin.currency.modification"}
-						    <form method="POST" action="{url path='/admin/configuration/currencies/save-change'}" {form_enctype form=$form}>
+						    <form method="POST" action="{url path='/admin/configuration/currencies/save'}" {form_enctype form=$form}>
                                 <fieldset>
                                     {* Be sure to get the currency ID, even if the form could not be validated *}
                                     <input type="hidden" name="currency_id" value="{$currency_id}" />
