@@ -122,7 +122,7 @@
 
 									<td>
 									{loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.currencies.change"}
-									    <a title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/change' currency_id="$ID"}">{$NAME}</a>
+									    <a title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id="$ID"}">{$NAME}</a>
 									{/loop}
 									{elseloop rel="can_change"}
 									    {$NAME}
@@ -155,7 +155,7 @@
 	                                <td class="actions">
 	                                    <div class="btn-group">
                                               {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.currencies.change"}
-                                                  <a class="btn btn-mini currency-change" title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/change' currency_id="$ID"}"><i class="icon-edit"></i></a>
+                                                  <a class="btn btn-mini currency-change" title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id="$ID"}"><i class="icon-edit"></i></a>
                                               {/loop}
 
                                               {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.currencies.delete"}
@@ -203,7 +203,7 @@
 
         {form_field form=$form field='success_url'}
         {* on success, redirect to the edition page, _ID_ is replaced with the created currency ID, see controller  *}
-        <input type="hidden" name="{$name}" value="{url path='/admin/configuration/currencies/change' currency_id='_ID_'}" />
+        <input type="hidden" name="{$name}" value="{url path='/admin/configuration/currencies/update' currency_id='_ID_'}" />
         {/form_field}
 
         {* We do not allow users to create secured currencies from here *}
@@ -371,7 +371,7 @@
             placement   : 'left',
             success     : function(response, newValue) {
                 // The URL template
-                var url = "{url path='/admin/configuration/currencies/changePosition' currency_id='__ID__' position='__POS__'}";
+                var url = "{url path='/admin/configuration/currencies/updatePosition' currency_id='__ID__' position='__POS__'}";
 
                 // Perform subtitutions
                 url = url.replace('__ID__', $(this).data('id'))

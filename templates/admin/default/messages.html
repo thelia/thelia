@@ -20,7 +20,7 @@
         <div class="row-fluid">
 
             <div class="span12">
-                <form action="{url path='/admin/configuration/messages/change-values'}" method="post">
+                <form action="{url path='/admin/configuration/messages/update-values'}" method="post">
 	                <div class="general-block-decorator">
 	                    <table class="table table-striped table-condensed table-left-aligned">
 	                        <caption>
@@ -49,7 +49,7 @@
                                    <td>
                                    {if ! $SECURED}
                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.messages.change"}
-                                           <a title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/change' message_id="$ID"}">{$NAME}</a>
+                                           <a title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}">{$NAME}</a>
                                        {/loop}
                                        {elseloop rel="can_change"}
                                            {$NAME}
@@ -65,7 +65,7 @@
 	                                    {if ! $SECURED}
 		                                    <div class="btn-group">
                                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.messages.change"}
-                                                   <a class="btn btn-mini message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/change' message_id="$ID"}"><i class="icon-edit"></i></a>
+                                                   <a class="btn btn-mini message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><i class="icon-edit"></i></a>
                                                {/loop}
 
                                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.messages.delete"}
@@ -116,7 +116,7 @@
 
         {form_field form=$form field='success_url'}
         {* on success, redirect to the edition page, _ID_ is replaced with the created message ID, see controller  *}
-        <input type="hidden" name="{$name}" value="{url path='/admin/configuration/messages/change' message_id='_ID_'}" />
+        <input type="hidden" name="{$name}" value="{url path='/admin/configuration/messages/update' message_id='_ID_'}" />
         {/form_field}
 
         {* We do not allow users to create secured messages from here *}

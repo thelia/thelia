@@ -167,9 +167,6 @@ class Config extends BaseI18nLoop
 
                 ->set("CREATE_DATE"    , $result->getCreatedAt())
                 ->set("UPDATE_DATE"    , $result->getUpdatedAt())
-                ->set("VERSION"        , $result->getVersion())
-                ->set("VERSION_DATE"   , $result->getVersionCreatedAt())
-                ->set("VERSION_AUTHOR" , $result->getVersionCreatedBy())
                 ;
 
             $loopResult->addRow($loopResultRow);

@@ -31,11 +31,11 @@ use Thelia\Model\Currency as CurrencyModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\CurrencyChangeEvent;
+use Thelia\Core\Event\CurrencyUpdateEvent;
 use Thelia\Core\Event\CurrencyCreateEvent;
 use Thelia\Core\Event\CurrencyDeleteEvent;
-use Thelia\Model\Map\CurrencyTableMap;
 use Thelia\Model\ConfigQuery;
+use Thelia\Core\Event\CurrencyUpdatePositionEvent;
 
 class Currency extends BaseAction implements EventSubscriberInterface
 {
@@ -67,9 +67,9 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Change a currency
      *
-     * @param CurrencyChangeEvent $event
+     * @param CurrencyUpdateEvent $event
      */
-    public function update(CurrencyChangeEvent $event)
+    public function update(CurrencyUpdateEvent $event)
     {
         $search = CurrencyQuery::create();
 
@@ -93,9 +93,9 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Set the default currency
      *
-     * @param CurrencyChangeEvent $event
+     * @param CurrencyUpdateEvent $event
      */
-    public function setDefault(CurrencyChangeEvent $event)
+    public function setDefault(CurrencyUpdateEvent $event)
     {
         $search = CurrencyQuery::create();
 
@@ -159,17 +159,33 @@ class Currency extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param CategoryChangePositionEvent $event
+     */
+    public function updatePosition(CurrencyUpdatePositionEvent $event)
+    {
+        if (null !== $category = CurrencyQuery::create()->findOneById($event->getObjectId())) {
+
+            if ($event->getMode() == BaseChangePositionEvent::POSITION_ABSOLUTE)
+                return $category->changeAbsolutePosition($event->getPosition());
+            else
+                return $this->exchangePosition($event->getMode());
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::CURRENCY_CREATE       => array("create", 128),
-            TheliaEvents::CURRENCY_UPDATE       => array("update", 128),
-            TheliaEvents::CURRENCY_DELETE       => array("delete", 128),
-            TheliaEvents::CURRENCY_SET_DEFAULT  => array("setDefault", 128),
-            TheliaEvents::CURRENCY_UPDATE_RATES => array("updateRates", 128),
-
+            TheliaEvents::CURRENCY_CREATE          => array("create", 128),
+            TheliaEvents::CURRENCY_UPDATE          => array("update", 128),
+            TheliaEvents::CURRENCY_DELETE          => array("delete", 128),
+            TheliaEvents::CURRENCY_SET_DEFAULT     => array("setDefault", 128),
+            TheliaEvents::CURRENCY_UPDATE_RATES    => array("updateRates", 128),
+            TheliaEvents::CURRENCY_UPDATE_POSITION => array("updatePosition", 128)
         );
     }
 }

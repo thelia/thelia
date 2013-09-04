@@ -124,7 +124,7 @@ final class TheliaEvents
     /**
      * Change category position
      */
-    const CATEGORY_CHANGE_POSITION = "action.changeCategoryPosition";
+    const CATEGORY_CHANGE_POSITION = "action.updateCategoryPosition";
 
     /**
      * Sent just after a successful insert of a new category in the database.
@@ -220,12 +220,12 @@ final class TheliaEvents
 
     // -- Currencies management ---------------------------------------------
 
-    const CURRENCY_CREATE       = "action.createCurrency";
-    const CURRENCY_UPDATE       = "action.updateCurrency";
-    const CURRENCY_DELETE       = "action.deleteCurrency";
-    const CURRENCY_SET_DEFAULT  = "action.setDefaultCurrency";
-    const CURRENCY_UPDATE_RATES = "action.updateCurrencyRates";
-
+    const CURRENCY_CREATE          = "action.createCurrency";
+    const CURRENCY_UPDATE          = "action.updateCurrency";
+    const CURRENCY_DELETE          = "action.deleteCurrency";
+    const CURRENCY_SET_DEFAULT     = "action.setDefaultCurrency";
+    const CURRENCY_UPDATE_RATES    = "action.updateCurrencyRates";
+    const CURRENCY_UPDATE_POSITION = "action.updateCurrencyPosition";
 
     const BEFORE_CREATECURRENCY = "action.before_createCurrency";
     const AFTER_CREATECURRENCY  = "action.after_createCurrency";

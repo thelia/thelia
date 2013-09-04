@@ -23,38 +23,100 @@
 
 namespace Thelia\Tools;
 
-use Symfony\Component\HttpFoundation\Request;
 use Thelia\Model\ConfigQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Rewriting\RewritingRetriever;
 
-class URL
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\ContainerAware;
+
+class URL extends ContainerAware
 {
+    protected $container;
+    protected $request;
+
     protected $resolver = null;
     protected $retriever = null;
 
     const PATH_TO_FILE = true;
     const WITH_INDEX_PAGE = false;
 
-    public function __construct()
+    private static $instance = null;
+
+    public function __construct(Request $request)
     {
+        $this->request = $request;
+
         $this->retriever = new RewritingRetriever();
         $this->resolver = new RewritingResolver();
+
+        self::instance = $this;
     }
 
-    public static function getIndexPage()
-    {
-        return ConfigQuery::read('base_url', '/') . "index_dev.php"; // FIXME !
+    /**
+     * Give this class a singleton behavior
+     */
+    public static getInstance() {
+
+        return self::$instance;
     }
 
-    public static function init()
+    /**
+     * Return the base URL, either the base_url defined in Config, or the URL
+     * of the current language, if 'one_domain_foreach_lang' is enabled.
+     *
+     * @return string the base URL, with a trailing '/'
+     */
+    public function getBaseUrl()
     {
-        return new URL();
+        // Check if we have a specific URL for each lang.
+        $one_domain_foreach_lang = ConfigQuery::read("one_domain_foreach_lang", false);
+
+        if ($one_domain_foreach_lang == true) {
+            // If it's the case, get the current lang URL
+            $base_url = $this->request->getSession()->getLang()->getUrl();
+
+            $err_msg = 'base_url';
+        }
+        else {
+            // Get the base URL
+            $base_url = ConfigQuery::read('base_url', null);
+
+            $err_msg = sprintf('base_url for lang %s', $this->request->getSession()->getCode());
+        }
+
+        // Be sure that base-url starts with http, give up if it's not the case.
+        if (substr($base_url, 0, 4) != 'http') {
+            throw new \InvalidArgumentException("The 'base_url' configuration parameter shoud contains the URL of your shop, starting with http or https.");
+        }
+
+        // Normalize the base_url
+        return rtrim($base_url, '/').'/';
+    }
+
+    /**
+     * @return string the index page, which is basically the base_url in prod environment.
+     */
+    public function getIndexPage()
+    {
+        // Get the base URL
+        $base_url = $this->getBaseUrl();
+
+        // Check if we're in dev or prod
+        $env = $this->container->get(‘kernel’)->getEnvironment();
+
+        // For dev, add the proper page.
+        if ($env == 'dev') {
+            $base_url .= "index_dev.php";
+        }
+
+        return $base_url;
     }
 
     /**
      * Returns the Absolute URL for a given path relative to web root. By default,
-     * the index.php (or index_dev.php) script name is added to the URL, use
+     * the script name (index_dev.php) is added to the URL in dev_environment, use
      * $path_only = true to get a path without the index script.
      *
      * @param string  $path       the relative path
@@ -63,7 +125,7 @@ class URL
      *
      * @return string The generated URL
      */
-    public static function absoluteUrl($path, array $parameters = null, $path_only = self::WITH_INDEX_PAGE)
+    public function absoluteUrl($path, array $parameters = null, $path_only = self::WITH_INDEX_PAGE)
     {
          // Already absolute ?
         if (substr($path, 0, 4) != 'http') {
@@ -72,9 +134,9 @@ class URL
              * @etienne : can't be done here for it's already done in ::viewUrl / ::adminViewUrl
              * @franck : should be done, as absoluteUrl() is sometimes called directly (see UrlGenerator::generateUrlFunction())
              */
-            $root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
-            //$root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : '';
+            $root = $path_only == self::PATH_TO_FILE ? $this->getBaseUrl() : $this->getIndexPage();
 
+            // Normalize root path
             $base = rtrim($root, '/') . '/' . ltrim($path, '/');
         } else
             $base = $path;
@@ -90,6 +152,7 @@ class URL
         $sepChar = strstr($base, '?') === false ? '?' : '&';
 
         if ('' !== $queryString = rtrim($queryString, "&")) $queryString = $sepChar . $queryString;
+
         return $base . $queryString;
     }
 
@@ -101,11 +164,11 @@ class URL
      *
      * @return string The generated URL
      */
-    public static function adminViewUrl($viewName, array $parameters = array())
+    public function adminViewUrl($viewName, array $parameters = array())
     {
-        $path = sprintf("%s/admin/%s", self::getIndexPage(), $viewName); // FIXME ! view= should not be required, check routing parameters
+        $path = sprintf("%s/admin/%s", $this->getIndexPage(), $viewName);
 
-        return self::absoluteUrl($path, $parameters);
+        return $this->absoluteUrl($path, $parameters);
     }
 
     /**
@@ -116,11 +179,11 @@ class URL
      *
      * @return string The generated URL
      */
-     public static function viewUrl($viewName, array $parameters = array())
+     public function viewUrl($viewName, array $parameters = array())
      {
          $path = sprintf("?view=%s", $viewName);
 
-         return self::absoluteUrl($path, $parameters);
+         return $this>absoluteUrl($path, $parameters);
      }
 
     /**
@@ -137,7 +200,7 @@ class URL
             $rewrittenUrl = $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
         }
 
-        return $rewrittenUrl === null ? self::viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
+        return $rewrittenUrl === null ? $this->viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
     }
 
     public function retrieveCurrent(Request $request)

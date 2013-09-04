@@ -31,7 +31,7 @@ use Thelia\Model\Config as ConfigModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\ConfigChangeEvent;
+use Thelia\Core\Event\ConfigUpdateEvent;
 use Thelia\Core\Event\ConfigCreateEvent;
 use Thelia\Core\Event\ConfigDeleteEvent;
 
@@ -65,9 +65,9 @@ class Config extends BaseAction implements EventSubscriberInterface
     /**
      * Change a configuration entry value
      *
-     * @param ConfigChangeEvent $event
+     * @param ConfigUpdateEvent $event
      */
-    public function setValue(ConfigChangeEvent $event)
+    public function setValue(ConfigUpdateEvent $event)
     {
         $search = ConfigQuery::create();
 
@@ -90,9 +90,9 @@ class Config extends BaseAction implements EventSubscriberInterface
     /**
      * Change a configuration entry
      *
-     * @param ConfigChangeEvent $event
+     * @param ConfigUpdateEvent $event
      */
-    public function modify(ConfigChangeEvent $event)
+    public function modify(ConfigUpdateEvent $event)
     {
         $search = ConfigQuery::create();
 

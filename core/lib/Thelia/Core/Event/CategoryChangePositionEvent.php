@@ -22,64 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
-use Thelia\Model\Category;
 
-class CategoryChangePositionEvent extends ActionEvent
+class CurrencyUpdatePositionEvent extends BaseUpdatePositionEvent
 {
-    const POSITION_UP = 1;
-    const POSITION_DOWN = 2;
-    const POSITION_ABSOLUTE = 3;
-
-    protected $category_id;
-    protected $mode;
-    protected $position;
-    protected $category;
-
-    public function __construct($category_id, $mode, $position = null)
-    {
-        $this->category_id = $category_id;
-        $this->mode = $mode;
-        $this->position = $position;
-    }
-
-    public function getMode()
-    {
-        return $this->mode;
-    }
-
-    public function setMode($mode)
-    {
-        $this->mode = $mode;
-    }
-
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    public function setPosition($position)
-    {
-        $this->position = $position;
-    }
-
-    public function getCategory()
-    {
-        return $this->category;
-    }
-
-    public function setCategory($category)
-    {
-        $this->category = $category;
-    }
-
-    public function getCategoryId()
-    {
-        return $this->category_id;
-    }
-
-    public function setCategoryId($category_id)
-    {
-        $this->category_id = $category_id;
-    }
-
 }

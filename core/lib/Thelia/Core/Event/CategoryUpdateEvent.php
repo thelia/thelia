@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia                                                                       */
+/*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,72 +17,28 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
 
-use Thelia\Model\Config;
+use Thelia\Model\Category;
 
-class ConfigChangeEvent extends ConfigCreateEvent
+class CategoryUpdateEvent extends ActionEvent
 {
-    protected $config_id;
-
-    protected $description;
+    protected $category_id;
+    protected $locale;
+    protected $title;
     protected $chapo;
+    protected $description;
     protected $postscriptum;
+    protected $url;
+    protected $visibility;
+    protected $parent;
 
-    public function __construct($config_id)
+    public function __construct($category_id)
     {
-        $this->setConfigId($config_id);
-    }
-
-    public function getConfigId()
-    {
-        return $this->config_id;
-    }
-
-    public function setConfigId($config_id)
-    {
-        $this->config_id = $config_id;
-
-        return $this;
-    }
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getChapo()
-    {
-        return $this->chapo;
-    }
-
-    public function setChapo($chapo)
-    {
-        $this->chapo = $chapo;
-
-        return $this;
-    }
-
-    public function getPostscriptum()
-    {
-        return $this->postscriptum;
-    }
-
-    public function setPostscriptum($postscriptum)
-    {
-        $this->postscriptum = $postscriptum;
-
-        return $this;
+        $this->category_id = $category_id;
     }
 }
