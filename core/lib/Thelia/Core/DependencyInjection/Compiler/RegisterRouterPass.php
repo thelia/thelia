@@ -84,7 +84,7 @@ class RegisterRouterPass implements CompilerPassInterface
 
                     $container->setDefinition("router.".$moduleCode, $definition);
 
-                    $chainRouter->addMethodCall("add", array(new Reference("router.".$moduleCode), -1));
+                    $chainRouter->addMethodCall("add", array(new Reference("router.".$moduleCode), 1));
                 }
             }
         }

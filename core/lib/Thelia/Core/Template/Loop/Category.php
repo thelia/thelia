@@ -64,6 +64,9 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Category extends BaseI18nLoop
 {
+    public $timestampable = true;
+    public $versionable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -165,7 +168,7 @@ class Category extends BaseI18nLoop
         /* @todo */
         $notEmpty  = $this->getNot_empty();
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($categories);
 
         foreach ($categories as $category) {
             /*
@@ -173,7 +176,7 @@ class Category extends BaseI18nLoop
              * if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
              */
 
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $category, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow
             	->set("ID", $category->getId())
@@ -188,12 +191,6 @@ class Category extends BaseI18nLoop
 	            ->set("PRODUCT_COUNT", $category->countChild())
 	            ->set("VISIBLE", $category->getVisible() ? "1" : "0")
 	            ->set("POSITION", $category->getPosition())
-
-	            ->set("CREATE_DATE", $category->getCreatedAt())
-	            ->set("UPDATE_DATE", $category->getUpdatedAt())
-	            ->set("VERSION", $category->getVersion())
-	            ->set("VERSION_DATE", $category->getVersionCreatedAt())
-	            ->set("VERSION_AUTHOR", $category->getVersionCreatedBy())
 			;
 
             $loopResult->addRow($loopResultRow);

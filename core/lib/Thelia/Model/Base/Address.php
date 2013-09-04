@@ -70,10 +70,10 @@ abstract class Address implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the name field.
+     * The value for the label field.
      * @var        string
      */
-    protected $name;
+    protected $label;
 
     /**
      * The value for the customer_id field.
@@ -498,14 +498,14 @@ abstract class Address implements ActiveRecordInterface
     }
 
     /**
-     * Get the [name] column value.
+     * Get the [label] column value.
      *
      * @return   string
      */
-    public function getName()
+    public function getLabel()
     {
 
-        return $this->name;
+        return $this->label;
     }
 
     /**
@@ -724,25 +724,25 @@ abstract class Address implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [name] column.
+     * Set the value of [label] column.
      *
      * @param      string $v new value
      * @return   \Thelia\Model\Address The current object (for fluent API support)
      */
-    public function setName($v)
+    public function setLabel($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->name !== $v) {
-            $this->name = $v;
-            $this->modifiedColumns[] = AddressTableMap::NAME;
+        if ($this->label !== $v) {
+            $this->label = $v;
+            $this->modifiedColumns[] = AddressTableMap::LABEL;
         }
 
 
         return $this;
-    } // setName()
+    } // setLabel()
 
     /**
      * Set the value of [customer_id] column.
@@ -1136,8 +1136,8 @@ abstract class Address implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AddressTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AddressTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->name = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AddressTableMap::translateFieldName('Label', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->label = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AddressTableMap::translateFieldName('CustomerId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->customer_id = (null !== $col) ? (int) $col : null;
@@ -1501,8 +1501,8 @@ abstract class Address implements ActiveRecordInterface
         if ($this->isColumnModified(AddressTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(AddressTableMap::NAME)) {
-            $modifiedColumns[':p' . $index++]  = 'NAME';
+        if ($this->isColumnModified(AddressTableMap::LABEL)) {
+            $modifiedColumns[':p' . $index++]  = 'LABEL';
         }
         if ($this->isColumnModified(AddressTableMap::CUSTOMER_ID)) {
             $modifiedColumns[':p' . $index++]  = 'CUSTOMER_ID';
@@ -1566,8 +1566,8 @@ abstract class Address implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'NAME':
-                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                    case 'LABEL':
+                        $stmt->bindValue($identifier, $this->label, PDO::PARAM_STR);
                         break;
                     case 'CUSTOMER_ID':
                         $stmt->bindValue($identifier, $this->customer_id, PDO::PARAM_INT);
@@ -1683,7 +1683,7 @@ abstract class Address implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getName();
+                return $this->getLabel();
                 break;
             case 2:
                 return $this->getCustomerId();
@@ -1763,7 +1763,7 @@ abstract class Address implements ActiveRecordInterface
         $keys = AddressTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getName(),
+            $keys[1] => $this->getLabel(),
             $keys[2] => $this->getCustomerId(),
             $keys[3] => $this->getTitleId(),
             $keys[4] => $this->getCompany(),
@@ -1841,7 +1841,7 @@ abstract class Address implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setName($value);
+                $this->setLabel($value);
                 break;
             case 2:
                 $this->setCustomerId($value);
@@ -1916,7 +1916,7 @@ abstract class Address implements ActiveRecordInterface
         $keys = AddressTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
+        if (array_key_exists($keys[1], $arr)) $this->setLabel($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setCustomerId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setTitleId($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setCompany($arr[$keys[4]]);
@@ -1945,7 +1945,7 @@ abstract class Address implements ActiveRecordInterface
         $criteria = new Criteria(AddressTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(AddressTableMap::ID)) $criteria->add(AddressTableMap::ID, $this->id);
-        if ($this->isColumnModified(AddressTableMap::NAME)) $criteria->add(AddressTableMap::NAME, $this->name);
+        if ($this->isColumnModified(AddressTableMap::LABEL)) $criteria->add(AddressTableMap::LABEL, $this->label);
         if ($this->isColumnModified(AddressTableMap::CUSTOMER_ID)) $criteria->add(AddressTableMap::CUSTOMER_ID, $this->customer_id);
         if ($this->isColumnModified(AddressTableMap::TITLE_ID)) $criteria->add(AddressTableMap::TITLE_ID, $this->title_id);
         if ($this->isColumnModified(AddressTableMap::COMPANY)) $criteria->add(AddressTableMap::COMPANY, $this->company);
@@ -2025,7 +2025,7 @@ abstract class Address implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setName($this->getName());
+        $copyObj->setLabel($this->getLabel());
         $copyObj->setCustomerId($this->getCustomerId());
         $copyObj->setTitleId($this->getTitleId());
         $copyObj->setCompany($this->getCompany());
@@ -2804,7 +2804,7 @@ abstract class Address implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->name = null;
+        $this->label = null;
         $this->customer_id = null;
         $this->title_id = null;
         $this->company = null;

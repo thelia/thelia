@@ -98,4 +98,12 @@ class RewritingRetriever
             $this->rewrittenUrl = $this->search->getUrl();
         }
     }
+
+    /**
+     * @return mixed
+     */
+    public function toString()
+    {
+        return $this->rewrittenUrl === null ? $this->url : $this->rewrittenUrl;
+    }
 }

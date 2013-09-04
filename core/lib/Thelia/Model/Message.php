@@ -34,7 +34,7 @@ class Message extends BaseMessage {
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGEMESSAGE, new MessageEvent($this));
+        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEMESSAGE, new MessageEvent($this));
 
         return true;
     }
@@ -44,7 +44,7 @@ class Message extends BaseMessage {
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::AFTER_CHANGEMESSAGE, new MessageEvent($this));
+        $this->dispatchEvent(TheliaEvents::AFTER_UPDATEMESSAGE, new MessageEvent($this));
     }
 
     /**

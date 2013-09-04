@@ -227,7 +227,7 @@ class Category extends BaseAction implements EventSubscriberInterface
 
             $categoryEvent = new CategoryEvent($category);
 
-            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECATEGORY, $categoryEvent);
+            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_UPDATECATEGORY, $categoryEvent);
         }
     }
 

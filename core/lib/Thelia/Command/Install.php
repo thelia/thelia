@@ -28,6 +28,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Command\ContainerAwareCommand;
+use Thelia\Install\Database;
 
 /**
  * try to install a new instance of Thelia
@@ -97,14 +98,16 @@ class Install extends ContainerAwareCommand
                 $connectionInfo = $this->getConnectionInfo($input, $output);
         }
 
-        $this->createDatabase($connection, $connectionInfo["dbName"]);
+        $database = new Database($connection);
+
+        $database->createDatabase($connectionInfo["dbName"]);
 
         $output->writeln(array(
             "",
             "<info>Creating Thelia database, please wait</info>",
             ""
         ));
-        $this->insertSql($connection, $connectionInfo["dbName"]);
+        $database->insertSql($connectionInfo["dbName"]);
 
         $output->writeln(array(
             "",
@@ -201,65 +204,6 @@ class Install extends ContainerAwareCommand
 
         $fs->remove($this->getContainer()->getParameter("kernel.cache_dir"));
 
-    }
-
-    /**
-     * Insert all sql needed in database
-     *
-     * @param \PDO $connection
-     * @param $dbName
-     */
-    protected function insertSql(\PDO $connection, $dbName)
-    {
-        $connection->query(sprintf("use %s", $dbName));
-        $sql = array();
-        $sql = array_merge(
-            $sql,
-            $this->prepareSql(file_get_contents(THELIA_ROOT . "/install/thelia.sql")),
-            $this->prepareSql(file_get_contents(THELIA_ROOT . "/install/insert.sql"))
-        );
-
-        for ($i = 0; $i < count($sql); $i ++) {
-            $connection->query($sql[$i]);
-        }
-    }
-
-    /**
-     * Separate each sql instruction in an array
-     *
-     * @param $sql
-     * @return array
-     */
-    protected function prepareSql($sql)
-    {
-        $sql = str_replace(";',", "-CODE-", $sql);
-        $query = array();
-
-        $tab = explode(";", $sql);
-
-        for ($i=0; $i<count($tab); $i++) {
-            $queryTemp = str_replace("-CODE-", ";',", $tab[$i]);
-            $queryTemp = str_replace("|", ";", $queryTemp);
-            $query[] = $queryTemp;
-        }
-
-        return $query;
-    }
-
-    /**
-     * create database if not exists
-     *
-     * @param \PDO $connection
-     * @param $dbName
-     */
-    protected function createDatabase(\PDO $connection, $dbName)
-    {
-        $connection->query(
-            sprintf(
-                "CREATE DATABASE IF NOT EXISTS %s CHARACTER SET utf8",
-                $dbName
-            )
-        );
     }
 
     /**

@@ -45,6 +45,8 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
  */
 class Lang extends BaseLoop
 {
+    public $timestampable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -84,11 +86,11 @@ class Lang extends BaseLoop
 
         $results = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($results);
 
         foreach ($results as $result) {
 
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $result, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow
                 ->set("ID", $result->getId())
@@ -99,9 +101,6 @@ class Lang extends BaseLoop
                 ->set("IS_DEFAULT", $result->getByDefault())
                 ->set("URL", $result->getUrl())
                 ->set("POSITION", $result->getPosition())
-
-                ->set("CREATE_DATE", $result->getCreatedAt())
-                ->set("UPDATE_DATE", $result->getUpdatedAt())
             ;
 
             $loopResult->addRow($loopResultRow);

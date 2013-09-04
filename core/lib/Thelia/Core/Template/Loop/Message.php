@@ -49,6 +49,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Message extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -101,11 +103,11 @@ class Message extends BaseI18nLoop
 
         $results = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($results);
 
         foreach ($results as $result) {
 
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $result, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow
                 ->set("ID"           , $result->getId())
@@ -117,8 +119,6 @@ class Message extends BaseI18nLoop
                 ->set("TEXT_MESSAGE" , $result->getVirtualColumn('i18n_TEXT_MESSAGE'))
                 ->set("HTML_MESSAGE" , $result->getVirtualColumn('i18n_HTML_MESSAGE'))
                 ->set("SECURED"      , $result->getSecured())
-                ->set("CREATE_DATE"  , $result->getCreatedAt())
-                ->set("UPDATE_DATE"  , $result->getUpdatedAt())
             ;
 
             $loopResult->addRow($loopResultRow);

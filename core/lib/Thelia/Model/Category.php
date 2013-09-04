@@ -23,7 +23,7 @@ class Category extends BaseCategory
 
     public function getUrl($locale)
     {
-        return URL::init()->retrieve('category', $this->getId(), $locale);
+        return URL::init()->retrieve('category', $this->getId(), $locale)->toString();
     }
 
     /**
@@ -95,14 +95,14 @@ class Category extends BaseCategory
 
     public function preUpdate(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECATEGORY, new CategoryEvent($this));
+        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECATEGORY, new CategoryEvent($this));
 
         return true;
     }
 
     public function postUpdate(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECATEGORY, new CategoryEvent($this));
+        $this->dispatchEvent(TheliaEvents::AFTER_UPDATECATEGORY, new CategoryEvent($this));
     }
 
     public function preDelete(ConnectionInterface $con = null)

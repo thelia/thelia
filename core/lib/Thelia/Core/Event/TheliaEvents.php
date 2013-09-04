@@ -64,7 +64,7 @@ final class TheliaEvents
     /**
      * sent on customer account update
      */
-    const CUSTOMER_UPDATEACCOUNT = "action.modifyCustomer";
+    const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
 
     /**
      * Sent before the logout of the administrator.
@@ -88,12 +88,21 @@ final class TheliaEvents
     /**
      * Sent once the customer change form has been successfully validated, and before customer update in the database.
      */
-    const BEFORE_CHANGECUSTOMER = "action.before_changecustomer";
+    const BEFORE_CHANGECUSTOMER = "action.before_updateCustomer";
     /**
      * Sent just after a successful update of a customer in the database.
      */
-    const AFTER_CHANGECUSTOMER 	= "action.after_changecustomer";
+    const AFTER_CHANGECUSTOMER 	= "action.after_updateCustomer";
 
+    /**
+     * sent for address creation
+     */
+    const ADDRESS_CREATE = "action.createAddress";
+
+    /**
+     * sent for address creation
+     */
+    const ADDRESS_UPDATE = "action.updateAddress";
 
     /**
      * Sent once the category creation form has been successfully validated, and before category insertion in the database.
@@ -104,7 +113,7 @@ final class TheliaEvents
      * Create, change or delete a category
      */
     const CATEGORY_CREATE = "action.createCategory";
-    const CATEGORY_MODIFY = "action.modifyCategory";
+    const CATEGORY_UPDATE = "action.updateCategory";
     const CATEGORY_DELETE = "action.deleteCategory";
 
     /**
@@ -134,12 +143,12 @@ final class TheliaEvents
     /**
      * Sent just before a successful change of a category in the database.
      */
-    const BEFORE_CHANGECATEGORY = "action.before_changecategory";
+    const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
 
     /**
      * Sent just after a successful change of a category in the database.
      */
-    const AFTER_CHANGECATEGORY 	= "action.after_changecategory";
+    const AFTER_UPDATECATEGORY 	= "action.after_updateCategory";
 
     /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart
@@ -154,7 +163,7 @@ final class TheliaEvents
     /**
      * sent when a cart item is modify
      */
-    const AFTER_CARTCHANGEITEM = "cart.modifyItem";
+    const AFTER_CARTUPDATEITEM = "cart.updateItem";
 
     /**
      * sent for addArticle action
@@ -164,7 +173,7 @@ final class TheliaEvents
     /**
      * sent on modify article action
      */
-    const CART_CHANGEITEM = "action.changeArticle";
+    const CART_UPDATEITEM = "action.updateArticle";
 
     const CART_DELETEITEM = "action.deleteArticle";
 
@@ -182,14 +191,14 @@ final class TheliaEvents
 
     const CONFIG_CREATE   = "action.createConfig";
     const CONFIG_SETVALUE = "action.setConfigValue";
-    const CONFIG_MODIFY   = "action.changeConfig";
+    const CONFIG_UPDATE   = "action.updateConfig";
     const CONFIG_DELETE   = "action.deleteConfig";
 
     const BEFORE_CREATECONFIG = "action.before_createConfig";
     const AFTER_CREATECONFIG  = "action.after_createConfig";
 
-    const BEFORE_CHANGECONFIG = "action.before_changeConfig";
-    const AFTER_CHANGECONFIG  = "action.after_changeConfig";
+    const BEFORE_UPDATECONFIG = "action.before_updateConfig";
+    const AFTER_UPDATECONFIG  = "action.after_updateConfig";
 
     const BEFORE_DELETECONFIG = "action.before_deleteConfig";
     const AFTER_DELETECONFIG  = "action.after_deleteConfig";
@@ -197,14 +206,14 @@ final class TheliaEvents
     // -- Messages management ---------------------------------------------
 
     const MESSAGE_CREATE   = "action.createMessage";
-    const MESSAGE_MODIFY   = "action.changeMessage";
+    const MESSAGE_UPDATE   = "action.updateMessage";
     const MESSAGE_DELETE   = "action.deleteMessage";
 
     const BEFORE_CREATEMESSAGE = "action.before_createMessage";
     const AFTER_CREATEMESSAGE  = "action.after_createMessage";
 
-    const BEFORE_CHANGEMESSAGE = "action.before_changeMessage";
-    const AFTER_CHANGEMESSAGE  = "action.after_changeMessage";
+    const BEFORE_UPDATEMESSAGE = "action.before_updateMessage";
+    const AFTER_UPDATEMESSAGE  = "action.after_updateMessage";
 
     const BEFORE_DELETEMESSAGE = "action.before_deleteMessage";
     const AFTER_DELETEMESSAGE  = "action.after_deleteMessage";
@@ -212,17 +221,20 @@ final class TheliaEvents
     // -- Currencies management ---------------------------------------------
 
     const CURRENCY_CREATE       = "action.createCurrency";
-    const CURRENCY_MODIFY       = "action.changeCurrency";
+    const CURRENCY_UPDATE       = "action.updateCurrency";
     const CURRENCY_DELETE       = "action.deleteCurrency";
     const CURRENCY_SET_DEFAULT  = "action.setDefaultCurrency";
     const CURRENCY_UPDATE_RATES = "action.updateCurrencyRates";
 
+
     const BEFORE_CREATECURRENCY = "action.before_createCurrency";
     const AFTER_CREATECURRENCY  = "action.after_createCurrency";
 
-    const BEFORE_CHANGECURRENCY = "action.before_changeCurrency";
-    const AFTER_CHANGECURRENCY  = "action.after_changeCurrency";
+    const BEFORE_UPDATECURRENCY = "action.before_updateCurrency";
+    const AFTER_UPDATECURRENCY  = "action.after_updateCurrency";
 
     const BEFORE_DELETECURRENCY = "action.before_deleteCurrency";
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
+
+
 }

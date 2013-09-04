@@ -9,6 +9,7 @@
         <default key="_view">index</default>
     </route>
 
+    <!-- Customer routes -->
     <route id="customer.create.process" path="/customer/create" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::createAction</default>
         <default key="_view">connexion</default>
@@ -25,7 +26,15 @@
     <route id="customer.logout.process" path="/customer/logout">
         <default key="_controller">Thelia\Controller\Front\CustomerController::logoutAction</default>
     </route>
+    <!-- end customer routes -->
 
+    <!-- customer address routes -->
+    <route id="customer.adress.create" path="/customer/address/create" >
+        <default key="_controller">Thelia\Controller\Front\CustomerAddressController::createAction</default>
+    </route>
+    <!-- end customer address routes -->
+
+    <!-- cart routes -->
     <route id="cart.add.process" path="/cart/add">
         <default key="_controller">Thelia\Controller\Front\CartController::addItem</default>
         <default key="_view">cart</default>
@@ -41,7 +50,9 @@
         <default key="_view">cart</default>
     </route>
 
-<!--     <route id="url-rewriting.check" path="/{rewritten_url}" methods="GET">
+    <route id="url-rewriting.check" path="/{rewritten_url}" methods="GET">
         <default key="_controller">Thelia\Controller\Front\UrlRewritingController::check</default>
-    </route> -->
+        <requirement key="rewritten_url">.*</requirement>
+    </route>
+    
 </routes>

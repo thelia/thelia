@@ -50,6 +50,8 @@ use Thelia\Type;
  */
 class ProductSaleElements extends BaseLoop
 {
+    public $timestampable = true;
+    
     /**
      * @return ArgumentCollection
      */
@@ -117,10 +119,10 @@ class ProductSaleElements extends BaseLoop
 
         $PSEValues = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($PSEValues);
 
         foreach ($PSEValues as $PSEValue) {
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $PSEValue, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow->set("ID", $PSEValue->getId())
                 ->set("QUANTITY", $PSEValue->getQuantity())
