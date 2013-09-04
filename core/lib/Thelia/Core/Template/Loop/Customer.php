@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -46,6 +47,8 @@ use Thelia\Type;
  */
 class Customer extends BaseLoop
 {
+    public $timestampable = true;
+    
     /**
      * @return ArgumentCollection
      */
@@ -113,10 +116,10 @@ class Customer extends BaseLoop
 
         $customers = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($customers);
 
         foreach ($customers as $customer) {
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $customer, $this->versionable, $this->timestampable, $this->countable);
             $loopResultRow->set("ID", $customer->getId());
             $loopResultRow->set("REF", $customer->getRef());
             $loopResultRow->set("TITLE", $customer->getTitleId());

@@ -41,7 +41,7 @@
         <default key="_controller">Thelia\Controller\Admin\ConfigController::defaultAction</default>
     </route>
 
-    <route id="admin.configuration.variables.change-values" path="/admin/configuration/variables/change-values">
+    <route id="admin.configuration.variables.update-values" path="/admin/configuration/variables/update-values">
         <default key="_controller">Thelia\Controller\Admin\ConfigController::changeValuesAction</default>
     </route>
 
@@ -49,7 +49,7 @@
         <default key="_controller">Thelia\Controller\Admin\ConfigController::createAction</default>
     </route>
 
-    <route id="admin.configuration.variables.change" path="/admin/configuration/variables/change">
+    <route id="admin.configuration.variables.update" path="/admin/configuration/variables/update">
         <default key="_controller">Thelia\Controller\Admin\ConfigController::changeAction</default>
     </route>
 
@@ -71,7 +71,7 @@
         <default key="_controller">Thelia\Controller\Admin\MessageController::createAction</default>
     </route>
 
-    <route id="admin.configuration.messages.change" path="/admin/configuration/messages/change">
+    <route id="admin.configuration.messages.update" path="/admin/configuration/messages/update">
         <default key="_controller">Thelia\Controller\Admin\MessageController::changeAction</default>
     </route>
 
@@ -93,7 +93,7 @@
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::createAction</default>
     </route>
 
-    <route id="admin.configuration.currencies.change" path="/admin/configuration/currencies/change">
+    <route id="admin.configuration.currencies.update" path="/admin/configuration/currencies/update">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::changeAction</default>
     </route>
 
@@ -111,6 +111,10 @@
 
     <route id="admin.configuration.currencies.delete" path="/admin/configuration/currencies/delete">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.delete" path="/admin/configuration/currencies/update-position">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
     </route>
 
 	<!-- The default route, to display a template -->

@@ -11,6 +11,8 @@ class Currency extends BaseCurrency {
 
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
+    use \Thelia\Model\Tools\PositionManagementTrait;
+
     /**
      * {@inheritDoc}
      */

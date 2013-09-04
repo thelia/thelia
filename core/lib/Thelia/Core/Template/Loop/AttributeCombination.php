@@ -50,6 +50,8 @@ use Thelia\Type;
  */
 class AttributeCombination extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -111,10 +113,10 @@ class AttributeCombination extends BaseI18nLoop
 
         $attributeCombinations = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($attributeCombinations);
 
         foreach ($attributeCombinations as $attributeCombination) {
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $attributeCombination, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow
                 ->set("LOCALE",$locale)

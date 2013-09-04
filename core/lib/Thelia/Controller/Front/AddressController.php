@@ -49,7 +49,7 @@ class AddressController extends BaseFrontController
     public function createAction()
     {
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirect(URL::getIndexPage());
+            $this->redirect(URL::getInstance()->getIndexPage());
         }
 
         $addressCreate = new AddressCreateForm($this->getRequest());

@@ -71,20 +71,20 @@ class Cart extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $result = new LoopResult();
+        $cartItems = $cart->getCartItems();
+
+        $result = new LoopResult($cartItems);
         $cart = $this->getCart($this->request);
 
         if ($cart === null) {
             return $result;
         }
 
-        $cartItems = $cart->getCartItems();
-
         foreach ($cartItems as $cartItem) {
             $product = $cartItem->getProduct();
             //$product->setLocale($this->request->getSession()->getLocale());
 
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($result, $cartItem, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow->set("ITEM_ID", $cartItem->getId());
             $loopResultRow->set("TITLE", $product->getTitle());

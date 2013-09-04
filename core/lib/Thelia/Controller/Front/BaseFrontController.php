@@ -45,6 +45,6 @@ class BaseFrontController extends BaseController
      * @param unknown $urlParameters the URL parametrs, as a var/value pair array
      */
     public function redirectToRoute($routeId, $urlParameters = array()) {
-        $this->redirect(URL::absoluteUrl($this->getRoute($routeId), $urlParameters));
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId), $urlParameters));
     }
 }

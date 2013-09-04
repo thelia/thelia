@@ -71,7 +71,7 @@ class RewritingRetrieverTest extends \PHPUnit_Framework_TestCase
         $retriever->loadViewUrl('view', 'fr_FR', 1);
 
         $this->assertEquals('foo.html', $retriever->rewrittenUrl);
-        $this->assertEquals(URL::viewUrl('view', array('locale' => 'fr_FR', 'view_id' => 1)), $retriever->url);
+        $this->assertEquals(URL::getInstance()->viewUrl('view', array('locale' => 'fr_FR', 'view_id' => 1)), $retriever->url);
     }
 
     public function testLoadSpecificUrl()
@@ -93,6 +93,6 @@ class RewritingRetrieverTest extends \PHPUnit_Framework_TestCase
         $retriever->loadSpecificUrl('view', 'fr_FR', 1, array('foo0' => 'bar0', 'foo1' => 'bar1'));
 
         $this->assertEquals('foo.html', $retriever->rewrittenUrl);
-        $this->assertEquals(URL::viewUrl('view', array('foo0' => 'bar0', 'foo1' => 'bar1', 'locale' => 'fr_FR', 'view_id' => 1)), $retriever->url);
+        $this->assertEquals(URL::getInstance()->viewUrl('view', array('foo0' => 'bar0', 'foo1' => 'bar1', 'locale' => 'fr_FR', 'view_id' => 1)), $retriever->url);
     }
 }

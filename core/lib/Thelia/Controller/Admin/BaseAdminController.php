@@ -85,10 +85,16 @@ class BaseAdminController extends BaseController
     /**
      * Return a general error page
      *
+     * @param mixed $message a message string, or an exception instance
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function errorPage($message)
     {
+        if ($message instanceof \Exception) {
+            $message = sprintf("Sorry, an error occured: %s", $message->getMessage());
+        }
+
         return $this->render('general_error', array(
                 "error_message" => $message)
         );
@@ -168,24 +174,31 @@ class BaseAdminController extends BaseController
      * @param unknown $urlParameters the URL parametrs, as a var/value pair array
      */
     public function redirectToRoute($routeId, $urlParameters = array()) {
-        $this->redirect(URL::absoluteUrl($this->getRoute($routeId), $urlParameters));
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId), $urlParameters));
     }
 
     /**
-     * Get the current edition lang ID, checking if a change was requested in the current request
+     * Get the current edition lang ID, checking if a change was requested in the current request.
      */
-    protected function getCurrentEditionLangId() {
-        return $this->getRequest()->get(
-                'edit_language_id',
-                $this->getSession()->getAdminEditionLangId()
-        );
+    protected function getCurrentEditionLang() {
+
+        // Return the new language if a change is required.
+        if (null !== $edit_language_id = $this->getRequest()->get('edit_language_id', null)) {
+
+            if (null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
+                return $edit_language;
+            }
+        }
+
+        // Otherwise return the lang stored in session.
+        return $this->getSession()->getAdminEditionLang();
     }
 
     /**
-     * A simple helper to get the current edition locale, from the session edition language ID
+     * A simple helper to get the current edition locale.
      */
     protected function getCurrentEditionLocale() {
-        return LangQuery::create()->findOneById($this->getCurrentEditionLangId())->getLocale();
+        return $this->getCurrentEditionLang()->getLocale();
     }
 
     /**
@@ -217,23 +230,14 @@ class BaseAdminController extends BaseController
 
         $session = $this->getSession();
 
-        $edition_language = $this->getCurrentEditionLangId();
-
-        // Current back-office (not edition) language
-        $current_lang     = LangQuery::create()->findOneById($session->getLangId());
-
         // Find the current edit language ID
-        $edition_language = LangQuery::create()->findOneById($this->getCurrentEditionLangId());
+        $edition_language = $this->getCurrentEditionLang();
 
         // Prepare common template variables
         $args = array_merge($args, array(
-            'locale'               => $session->getLocale(),
-            'lang_code'            => $session->getLang(),
-            'lang_id'              => $session->getLangId(),
-
-            'datetime_format'      => $current_lang->getDateTimeFormat(),
-            'date_format'          => $current_lang->getDateFormat(),
-            'time_format'          => $current_lang->getTimeFormat(),
+            'locale'               => $session->getLang()->getLocale(),
+            'lang_code'            => $session->getLang()->getCode(),
+            'lang_id'              => $session->getLang()->getId(),
 
             'edit_language_id'     => $edition_language->getId(),
             'edit_language_locale' => $edition_language->getLocale(),
@@ -242,7 +246,7 @@ class BaseAdminController extends BaseController
         ));
 
         // Update the current edition language in session
-        $this->getSession()->setAdminEditionLangId($edition_language->getId());
+        $this->getSession()->setAdminEditionLang($edition_language);
 
         // Render the template.
         try {
@@ -253,7 +257,7 @@ class BaseAdminController extends BaseController
         catch (AuthenticationException $ex) {
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.
-            Redirect::exec(URL::absoluteUrl($ex->getLoginTemplate()));
+            Redirect::exec(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
         }
         catch (AuthorizationException $ex) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.

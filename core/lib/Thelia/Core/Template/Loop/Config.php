@@ -51,6 +51,8 @@ use Thelia\Type\EnumListType;
  */
 class Config extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -146,11 +148,11 @@ class Config extends BaseI18nLoop
 
         $results = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($results);
 
         foreach ($results as $result) {
 
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $result, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow
                 ->set("ID"           , $result->getId())
@@ -164,13 +166,7 @@ class Config extends BaseI18nLoop
                 ->set("POSTSCRIPTUM" , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("HIDDEN"       , $result->getHidden())
                 ->set("SECURED"      , $result->getSecured())
-
-                ->set("CREATE_DATE"    , $result->getCreatedAt())
-                ->set("UPDATE_DATE"    , $result->getUpdatedAt())
-                ->set("VERSION"        , $result->getVersion())
-                ->set("VERSION_DATE"   , $result->getVersionCreatedAt())
-                ->set("VERSION_AUTHOR" , $result->getVersionCreatedBy())
-                ;
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

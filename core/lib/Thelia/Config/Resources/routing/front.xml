@@ -50,7 +50,7 @@
         <default key="_view">cart</default>
     </route>
 
-    <route id="cart.change.process" path="/cart/delete/{cart_item}">
+    <route id="cart.update.process" path="/cart/delete/{cart_item}">
         <default key="_controller">Thelia\Controller\Front\CartController::deleteItem</default>
         <default key="_view">cart</default>
     </route>
@@ -60,7 +60,13 @@
         <default key="_view">cart</default>
     </route>
 
-<!--    <route id="url-rewriting.check" path="/{rewritten_url}" methods="GET">
+
+<!-- Empêche l'accès àl'admin, genre: http://localhost/thelia2/index_dev.php/admin/login amène sur l'accueuil de la boutique
+
+    <route id="url-rewriting.check" path="/{rewritten_url}" methods="GET">
         <default key="_controller">Thelia\Controller\Front\UrlRewritingController::check</default>
-    </route>-->
+        <requirement key="rewritten_url">.*</requirement>
+    </route>
+
+-->
 </routes>

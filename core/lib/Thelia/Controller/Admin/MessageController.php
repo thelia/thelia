@@ -26,7 +26,7 @@ namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\MessageDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Tools\URL;
-use Thelia\Core\Event\MessageChangeEvent;
+use Thelia\Core\Event\MessageUpdateEvent;
 use Thelia\Core\Event\MessageCreateEvent;
 use Thelia\Log\Tlog;
 use Thelia\Form\Exception\FormValidationException;
@@ -133,7 +133,7 @@ class MessageController extends BaseAdminController
     public function changeAction() {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.messages.change")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.messages.update")) return $response;
 
         // Load the message object
         $message = MessageQuery::create()
@@ -173,7 +173,7 @@ class MessageController extends BaseAdminController
     public function saveChangeAction() {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.messages.change")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.messages.update")) return $response;
 
         $message = false;
 
@@ -191,7 +191,7 @@ class MessageController extends BaseAdminController
             // Get the form field values
             $data = $form->getData();
 
-            $changeEvent = new MessageChangeEvent($data['id']);
+            $changeEvent = new MessageUpdateEvent($data['id']);
 
             // Create and dispatch the change event
             $changeEvent
@@ -215,7 +215,7 @@ class MessageController extends BaseAdminController
             // just redirect to the edit page again.
             if ($this->getRequest()->get('save_mode') == 'stay') {
                 $this->redirectToRoute(
-                        "admin.configuration.messages.change",
+                        "admin.configuration.messages.update",
                         array('message_id' => $message_id)
                 );
             }
@@ -265,6 +265,6 @@ class MessageController extends BaseAdminController
 
         $this->dispatch(TheliaEvents::MESSAGE_DELETE, $event);
 
-        $this->redirect(URL::adminViewUrl('messages'));
+        $this->redirect(URL::getInstance()->adminViewUrl('messages'));
     }
 }
