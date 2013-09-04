@@ -25,8 +25,10 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\Coupon\CouponCreateEvent;
+use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Coupon\CouponRuleCollection;
@@ -35,6 +37,8 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
+use Thelia\Model\Lang;
+use Thelia\Tools\I18n;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -56,7 +60,7 @@ class CouponController extends BaseAdminController
      */
     public function browseAction()
     {
-        $this->checkAuth("ADMIN", "admin.coupon.view");
+        $this->checkAuth('ADMIN', 'admin.coupon.view');
 
         return $this->render('coupon-list');
     }
@@ -71,7 +75,7 @@ class CouponController extends BaseAdminController
     public function createAction()
     {
         // Check current user authorization
-        $response = $this->checkAuth("admin.coupon.create");
+        $response = $this->checkAuth('admin.coupon.create');
         if ($response !==  null) {
             return $response;
         }
@@ -84,11 +88,14 @@ class CouponController extends BaseAdminController
         if ($this->getRequest()->isMethod('POST')) {
             try {
                 // Check the form against constraints violations
-                $form = $this->validateForm($creationForm, "POST");
+                $form = $this->validateForm($creationForm, 'POST');
+                $i18n = new I18n();
+                /** @var Lang $lang */
+                $lang = $this->getSession()->get('lang');
 
                 // Get the form field values
                 $data = $form->getData();
-                $couponEvent = new CouponEvent(
+                $couponEvent = new CouponCreateOrUpdateEvent(
                     $data['code'],
                     $data['title'],
                     $data['amount'],
@@ -96,12 +103,13 @@ class CouponController extends BaseAdminController
                     $data['shortDescription'],
                     $data['description'],
                     $data['isEnabled'],
-                    new \DateTime($data['expirationDate']),
+                    $i18n->getDateTimeFromForm($lang, $data['expirationDate']),
                     $data['isAvailableOnSpecialOffers'],
                     $data['isCumulative'],
                     $data['isRemovingPostage'],
                     $data['maxUsage'],
-                    array()
+                    array(),
+                    $data['locale']
                 );
 
                 $this->dispatch(
@@ -112,39 +120,34 @@ class CouponController extends BaseAdminController
                     sprintf(
                         'Coupon %s (ID %s) created',
                         $couponEvent->getTitle(),
-                        $couponEvent->getId()
+                        $couponEvent->getCoupon()->getId()
                     )
                 );
                 // @todo redirect if successful
             } catch (FormValidationException $e) {
                 // Invalid data entered
                 $message = 'Please check your input:';
+                $this->logError('creation', $message, $e);
+
             } catch (\Exception $e) {
                 // Any other error
-                $message = 'Sorry, an error occured:';
+                $message = 'Sorry, an error occurred:';
+                $this->logError('creation', $message, $e);
             }
 
             if ($message !== false) {
-                // Log error message
-                Tlog::getInstance()->error(
-                    sprintf(
-                        "Error during variable modification process : %s. Exception was %s",
-                        $message, $e->getMessage()
-                    )
-                );
-
-                // Mark the form as errored
+                // Mark the form as with error
                 $creationForm->setErrorMessage($message);
 
-                // Pas the form and the error to the parser
+                // Send the form and the error to the parser
                 $this->getParserContext()
                     ->addForm($creationForm)
-                    ->setGeneralError($message)
-                ;
+                    ->setGeneralError($message);
             }
         }
 
         $formAction = 'admin/coupon/create';
+
         return $this->render(
             'coupon-create',
             array(
@@ -162,7 +165,7 @@ class CouponController extends BaseAdminController
      */
     public function editAction($couponId)
     {
-        $this->checkAuth("ADMIN", "admin.coupon.edit");
+        $this->checkAuth('ADMIN', 'admin.coupon.edit');
 
         $formAction = 'admin/coupon/edit/' . $couponId;
 
@@ -178,7 +181,7 @@ class CouponController extends BaseAdminController
      */
     public function readAction($couponId)
     {
-        $this->checkAuth("ADMIN", "admin.coupon.read");
+        $this->checkAuth('ADMIN', 'admin.coupon.read');
 
         // Database request repeated in the loop but cached
         $search = CouponQuery::create();
@@ -201,28 +204,51 @@ class CouponController extends BaseAdminController
     protected function buildCouponFromForm(array $data)
     {
         $couponBeingCreated = new Coupon();
-        $couponBeingCreated->setCode($data["code"]);
-        $couponBeingCreated->setType($data["type"]);
-        $couponBeingCreated->setTitle($data["title"]);
-        $couponBeingCreated->setShortDescription($data["shortDescription"]);
-        $couponBeingCreated->setDescription($data["description"]);
-        $couponBeingCreated->setAmount($data["amount"]);
-        $couponBeingCreated->setIsEnabled($data["isEnabled"]);
-        $couponBeingCreated->setExpirationDate($data["expirationDate"]);
+        $couponBeingCreated->setCode($data['code']);
+        $couponBeingCreated->setType($data['type']);
+        $couponBeingCreated->setTitle($data['title']);
+        $couponBeingCreated->setShortDescription($data['shortDescription']);
+        $couponBeingCreated->setDescription($data['description']);
+        $couponBeingCreated->setAmount($data['amount']);
+        $couponBeingCreated->setIsEnabled($data['isEnabled']);
+        $couponBeingCreated->setExpirationDate($data['expirationDate']);
         $couponBeingCreated->setSerializedRules(
             new CouponRuleCollection(
                 array()
             )
         );
-        $couponBeingCreated->setIsCumulative($data["isCumulative"]);
+        $couponBeingCreated->setIsCumulative($data['isCumulative']);
         $couponBeingCreated->setIsRemovingPostage(
-            $data["isRemovingPostage"]
+            $data['isRemovingPostage']
         );
-        $couponBeingCreated->setMaxUsage($data["maxUsage"]);
+        $couponBeingCreated->setMaxUsage($data['maxUsage']);
         $couponBeingCreated->setIsAvailableOnSpecialOffers(
-            $data["isAvailableOnSpecialOffers"]
+            $data['isAvailableOnSpecialOffers']
         );
 
         return $couponBeingCreated;
     }
+
+    /**
+     * Log error message
+     *
+     * @param string     $action  Creation|Update|Delete
+     * @param string     $message Message to log
+     * @param \Exception $e       Exception to log
+     *
+     * @return $this
+     */
+    protected function logError($action, $message, $e)
+    {
+        Tlog::getInstance()->error(
+            sprintf(
+                'Error during Coupon ' . $action . ' process : %s. Exception was %s',
+                $message,
+                $e->getMessage()
+            )
+        );
+
+        return $this;
+    }
+
 }

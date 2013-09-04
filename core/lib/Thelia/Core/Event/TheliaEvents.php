@@ -207,17 +207,17 @@ final class TheliaEvents
     /**
      * Sent when editing a Coupon
      */
-    const COUPON_EDIT = "action.edit_coupon";
+    const COUPON_UPDATE = "action.update_coupon";
 
     /**
      * Sent just before a successful update of a new Coupon in the database.
      */
-    const BEFORE_EDIT_COUPON 	= "action.before_edit_coupon";
+    const BEFORE_UPDATE_COUPON 	= "action.before_update_coupon";
 
     /**
      * Sent just after a successful update of a new Coupon in the database.
      */
-    const AFTER_EDIT_COUPON 	= "action.after_edit_coupon";
+    const AFTER_UPDATE_COUPON 	= "action.after_update_coupon";
 
     /**
      * Sent when disabling a Coupon
