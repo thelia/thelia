@@ -64,7 +64,7 @@ final class TheliaEvents
     /**
      * sent on customer account update
      */
-    const CUSTOMER_UPDATEACCOUNT = "action.modifyCustomer";
+    const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
 
     /**
      * Sent before the logout of the administrator.
@@ -88,16 +88,21 @@ final class TheliaEvents
     /**
      * Sent once the customer change form has been successfully validated, and before customer update in the database.
      */
-    const BEFORE_CHANGECUSTOMER = "action.before_changecustomer";
+    const BEFORE_CHANGECUSTOMER = "action.before_updateCustomer";
     /**
      * Sent just after a successful update of a customer in the database.
      */
-    const AFTER_CHANGECUSTOMER 	= "action.after_changecustomer";
+    const AFTER_CHANGECUSTOMER 	= "action.after_updateCustomer";
 
     /**
      * sent for address creation
      */
-    const ADDRESS_CREATE = "action.addressCreate";
+    const ADDRESS_CREATE = "action.createAddress";
+
+    /**
+     * sent for address creation
+     */
+    const ADDRESS_UPDATE = "action.updateAddress";
 
     /**
      * Sent once the category creation form has been successfully validated, and before category insertion in the database.
