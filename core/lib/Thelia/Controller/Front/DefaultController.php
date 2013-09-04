@@ -23,6 +23,9 @@
 namespace Thelia\Controller\Front;
 
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Model\ConfigQuery;
+use Thelia\Tools\Redirect;
+use Thelia\Tools\URL;
 
 /**
  *
@@ -43,6 +46,16 @@ class DefaultController extends BaseFrontController
      */
     public function noAction(Request $request)
     {
+        if(ConfigQuery::isRewritingEnable()) {
+
+            /* Does the query GET parameters match a rewritten URL ? */
+            $rewrittenUrl = URL::init()->retrieveCurrent($request);
+            if($rewrittenUrl->rewrittenUrl !== null) {
+                /* 301 redirection to rewritten URL */
+                $this->redirect($rewrittenUrl->rewrittenUrl, 301);
+            }
+        }
+
         if (! $view = $request->query->get('view')) {
             $view = "index";
             if ($request->request->has('view')) {

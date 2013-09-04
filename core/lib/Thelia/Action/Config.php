@@ -148,7 +148,7 @@ class Config extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::CONFIG_CREATE   => array("create", 128),
             TheliaEvents::CONFIG_SETVALUE => array("setValue", 128),
-            TheliaEvents::CONFIG_MODIFY   => array("modify", 128),
+            TheliaEvents::CONFIG_UPDATE   => array("modify", 128),
             TheliaEvents::CONFIG_DELETE   => array("delete", 128),
         );
     }

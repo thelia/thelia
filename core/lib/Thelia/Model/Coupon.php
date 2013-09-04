@@ -23,8 +23,10 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\Propel;
 use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Model\Base\Coupon as BaseCoupon;
+use Thelia\Model\Map\CouponTableMap;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -41,6 +43,58 @@ use Thelia\Model\Base\Coupon as BaseCoupon;
  */
 class Coupon extends BaseCoupon
 {
+
+    /**
+     * Constructor
+     *
+     * @param string               $code                       Coupon Code
+     * @param string               $title                      Coupon title
+     * @param float                $amount                     Amount removed from the Total Checkout
+     * @param string               $effect                     Coupon effect
+     * @param string               $shortDescription           Coupon short description
+     * @param string               $description                Coupon description
+     * @param boolean              $isEnabled                  Enable/Disable
+     * @param \DateTime            $expirationDate             Coupon expiration date
+     * @param boolean              $isAvailableOnSpecialOffers Is available on special offers
+     * @param boolean              $isCumulative               Is cumulative
+     * @param boolean              $isRemovingPostage          Is removing Postage
+     * @param int                  $maxUsage                   Coupon quantity
+     * @param CouponRuleCollection $rules                      CouponRuleInterface to add
+     * @param string               $lang                       Coupon Language code ISO (ex: fr_FR)
+     */
+    function createOrUpdate($code, $title, $amount, $effect, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $rules, $lang = null)
+    {
+        $this->setCode($code)
+            ->setTitle($title)
+            ->setShortDescription($shortDescription)
+            ->setDescription($description)
+            ->setType($effect)
+            ->setAmount($amount)
+            ->setType($amount)
+            ->setIsEnabled($isEnabled)
+            ->setExpirationDate($expirationDate)
+            ->setIsAvailableOnSpecialOffers($isAvailableOnSpecialOffers)
+            ->setIsCumulative($isCumulative)
+            ->setMaxUsage($maxUsage)
+            ->setRules($rules);
+
+        // Set object language (i18n)
+        if (!is_null($lang)) {
+            $this->setLang($lang);
+        }
+
+        $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+        try {
+            $this->save($con);
+            $con->commit();
+
+        } catch(\Exception $e) {
+            $con->rollback();
+            throw $e;
+        }
+    }
+
     /**
      * Set the value of [serialized_rules] column.
      *
@@ -50,19 +104,19 @@ class Coupon extends BaseCoupon
      */
     public function setRules(CouponRuleCollection $rules)
     {
+        $serializedRules = null;
         if ($rules !== null) {
 
-            $v = (string) base64_encode(serialize($rules));
+            $serializedRules = (string) base64_encode(serialize($rules));
         }
 
-        if ($this->serialized_rules !== $v) {
-            $this->serialized_rules = $v;
+        if ($this->serialized_rules !== $serializedRules) {
+            $this->serialized_rules = $serializedRules;
             $this->modifiedColumns[] = CouponTableMap::SERIALIZED_RULES;
         }
 
-
         return $this;
-    } // setSerializedRules()
+    }
 
 
     /**

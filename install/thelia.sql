@@ -455,7 +455,7 @@ DROP TABLE IF EXISTS `address`;
 CREATE TABLE `address`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255),
+    `label` VARCHAR(255),
     `customer_id` INTEGER NOT NULL,
     `title_id` INTEGER NOT NULL,
     `company` VARCHAR(255),

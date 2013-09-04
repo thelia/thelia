@@ -114,22 +114,24 @@ class Address extends BaseLoop
 
         foreach ($addresses as $address) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $address->getId());
-            $loopResultRow->set("NAME", $address->getName());
-            $loopResultRow->set("CUSTOMER", $address->getCustomerId());
-            $loopResultRow->set("TITLE", $address->getTitleId());
-            $loopResultRow->set("COMPANY", $address->getCompany());
-            $loopResultRow->set("FIRSTNAME", $address->getFirstname());
-            $loopResultRow->set("LASTNAME", $address->getLastname());
-            $loopResultRow->set("ADDRESS1", $address->getAddress1());
-            $loopResultRow->set("ADDRESS2", $address->getAddress2());
-            $loopResultRow->set("ADDRESS3", $address->getAddress3());
-            $loopResultRow->set("ZIPCODE", $address->getZipcode());
-            $loopResultRow->set("CITY", $address->getCity());
-            $loopResultRow->set("COUNTRY", $address->getCountryId());
-            $loopResultRow->set("PHONE", $address->getPhone());
-            $loopResultRow->set("CELLPHONE", $address->getCellphone());
-            $loopResultRow->set("DEFAULT", $address->getIsDefault());
+            $loopResultRow
+                ->set("ID", $address->getId())
+                ->set("NAME", $address->getName())
+                ->set("CUSTOMER", $address->getCustomerId())
+                ->set("TITLE", $address->getTitleId())
+                ->set("COMPANY", $address->getCompany())
+                ->set("FIRSTNAME", $address->getFirstname())
+                ->set("LASTNAME", $address->getLastname())
+                ->set("ADDRESS1", $address->getAddress1())
+                ->set("ADDRESS2", $address->getAddress2())
+                ->set("ADDRESS3", $address->getAddress3())
+                ->set("ZIPCODE", $address->getZipcode())
+                ->set("CITY", $address->getCity())
+                ->set("COUNTRY", $address->getCountryId())
+                ->set("PHONE", $address->getPhone())
+                ->set("CELLPHONE", $address->getCellphone())
+                ->set("DEFAULT", $address->getIsDefault())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

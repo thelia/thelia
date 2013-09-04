@@ -136,6 +136,15 @@ class CouponCreationForm extends BaseForm
                         new NotBlank()
                     )
                 )
+            )
+            ->add(
+                'locale',
+                'hidden', 
+                array(
+                    'constraints' => array(
+                        new NotBlank()
+                    )
+                )
             );
     }
 

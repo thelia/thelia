@@ -40,6 +40,11 @@ use Thelia\Tools\URL;
 use Thelia\Log\Tlog;
 use Thelia\Core\Security\Exception\WrongPasswordException;
 
+/**
+ * Class CustomerController
+ * @package Thelia\Controller\Front
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class CustomerController extends BaseFrontController
 {
     /**
@@ -66,10 +71,10 @@ class CustomerController extends BaseFrontController
                 $this->redirectSuccess($customerCreation);
             }
             catch (FormValidationException $e) {
-                $message = sprintf("Please check your input: %s", $ex->getMessage());
+                $message = sprintf("Please check your input: %s", $e->getMessage());
             }
             catch (\Exception $e) {
-                $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
 
             if ($message !== false) {
@@ -114,14 +119,14 @@ class CustomerController extends BaseFrontController
 
             }
             catch (FormValidationException $e) {
-                $message = sprintf("Please check your input: %s", $ex->getMessage());
+                $message = sprintf("Please check your input: %s", $e->getMessage());
             }
             catch (\Exception $e) {
-                $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
 
             if ($message !== false) {
-                Tlog::getInstance()->error(sprintf("Error during customer modification process : %s. Exception was %s", $message, $e->getMessage()));
+                Tlog::getInstance()->error(sprintf("Error during customer modification process : %s.", $message));
 
                 $customerModification->setErrorMessage($message);
 
@@ -146,10 +151,9 @@ class CustomerController extends BaseFrontController
             $message = false;
 
             $request = $this->getRequest();
+            $customerLoginForm = new CustomerLogin($request);
 
             try {
-
-                $customerLoginForm = new CustomerLogin($request);
 
                 $form = $this->validateForm($customerLoginForm, "post");
 
@@ -163,7 +167,7 @@ class CustomerController extends BaseFrontController
 
             }
             catch (FormValidationException $e) {
-                $message = sprintf("Please check your input: %s", $ex->getMessage());
+                $message = sprintf("Please check your input: %s", $e->getMessage());
             }
             catch(UsernameNotFoundException $e) {
                 $message = "This customer email was not found.";
@@ -175,7 +179,7 @@ class CustomerController extends BaseFrontController
                 $message = "Sorry, we failed to authentify you. Please try again.";
             }
             catch (\Exception $e) {
-                $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
 
             if ($message !== false) {
@@ -190,8 +194,6 @@ class CustomerController extends BaseFrontController
 
     /**
      * Perform customer logout.
-     *
-     * @param Customer $customer
      */
     public function logoutAction()
     {
@@ -203,6 +205,11 @@ class CustomerController extends BaseFrontController
         $this->redirect(URL::getIndexPage());
     }
 
+    /**
+     * Dispatch event for customer login action
+     *
+     * @param Customer $customer
+     */
     protected function processLogin(Customer $customer)
     {
         $this->dispatch(TheliaEvents::CUSTOMER_LOGIN, new CustomerLoginEvent($customer));

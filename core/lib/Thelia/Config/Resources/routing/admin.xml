@@ -130,6 +130,14 @@
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::saveChangeAction</default>
     </route>
 
+    <route id="admin.configuration.currencies.set-default" path="/admin/configuration/currencies/set-default">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::setDefaultAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.update-rates" path="/admin/configuration/currencies/update-rates">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::updateRatesAction</default>
+    </route>
+
     <route id="admin.configuration.currencies.delete" path="/admin/configuration/currencies/delete">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::deleteAction</default>
     </route>

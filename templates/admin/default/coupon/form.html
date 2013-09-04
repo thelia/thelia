@@ -6,6 +6,10 @@
 
             {form_hidden_fields form=$form}
 
+            {form_field form=$form field='locale'}
+                <input type="hidden" name="{$name}" value="{if $value}{$value}{else}{$edit_language_locale}{/if}" />
+            {/form_field}
+
             <div class="span4">
                 <div class="control-group">
                     <label for="code">Code :</label>

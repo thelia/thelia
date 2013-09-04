@@ -38,11 +38,8 @@ use Thelia\Model\Coupon;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponEvent extends ActionEvent
+class CouponCreateOrUpdateEvent extends ActionEvent
 {
-    /** @var int Coupon Id  */
-    protected $id = null;
-
     /** @var CouponRuleCollection Array of CouponRuleInterface */
     protected $rules = null;
 
@@ -85,6 +82,9 @@ class CouponEvent extends ActionEvent
     /** @var string Coupon effect */
     protected $effect;
 
+    /** @var string Language code ISO (ex: fr_FR) */
+    protected $lang = null;
+
     /**
      * Constructor
      *
@@ -101,7 +101,7 @@ class CouponEvent extends ActionEvent
      * @param boolean              $isRemovingPostage          Is removing Postage
      * @param int                  $maxUsage                   Coupon quantity
      * @param CouponRuleCollection $rules                      CouponRuleInterface to add
-     * @param int                  $id                         Coupon id
+     * @param string               $lang                       Coupon Language code ISO (ex: fr_FR)
      */
     function __construct(
         $code,
@@ -111,19 +111,18 @@ class CouponEvent extends ActionEvent
         $shortDescription,
         $description,
         $isEnabled,
-        $expirationDate,
+        \DateTime $expirationDate,
         $isAvailableOnSpecialOffers,
         $isCumulative,
         $isRemovingPostage,
         $maxUsage,
         $rules,
-        $id = null
+        $lang
     ) {
         $this->amount = $amount;
         $this->code = $code;
         $this->description = $description;
         $this->expirationDate = $expirationDate;
-        $this->id = $id;
         $this->isAvailableOnSpecialOffers = $isAvailableOnSpecialOffers;
         $this->isCumulative = $isCumulative;
         $this->isEnabled = $isEnabled;
@@ -133,16 +132,7 @@ class CouponEvent extends ActionEvent
         $this->shortDescription = $shortDescription;
         $this->title = $title;
         $this->effect = $effect;
-    }
-
-    /**
-     * Return Coupon Id
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
+        $this->lang = $lang;
     }
 
     /**
@@ -242,7 +232,7 @@ class CouponEvent extends ActionEvent
      *
      * @return boolean
      */
-    public function getIsAvailableOnSpecialOffers()
+    public function isAvailableOnSpecialOffers()
     {
         return $this->isAvailableOnSpecialOffers;
     }
@@ -278,7 +268,15 @@ class CouponEvent extends ActionEvent
         return $this->effect;
     }
 
-
+    /**
+     * Coupon Language code ISO (ex: fr_FR)
+     *
+     * @return string
+     */
+    public function getLang()
+    {
+        return $this->lang;
+    }
 
     /**
      * @param \Thelia\Model\Coupon $coupon

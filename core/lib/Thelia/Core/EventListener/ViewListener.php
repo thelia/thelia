@@ -86,7 +86,7 @@ class ViewListener implements EventSubscriberInterface
         } catch (AuthenticationException $ex) {
 
             // Redirect to the login template
-            $event->setResponse(Redirect::exec(URL::viewUrl($ex->getLoginTemplate())));
+            Redirect::exec(URL::viewUrl($ex->getLoginTemplate()));
         }
     }
 

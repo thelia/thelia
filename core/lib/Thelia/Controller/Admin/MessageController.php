@@ -204,7 +204,7 @@ class MessageController extends BaseAdminController
                 ->setTextMessage($data['text_message'])
             ;
 
-            $this->dispatch(TheliaEvents::MESSAGE_MODIFY, $changeEvent);
+            $this->dispatch(TheliaEvents::MESSAGE_UPDATE, $changeEvent);
 
             // Log message modification
             $changedObject = $changeEvent->getMessage();
@@ -214,10 +214,10 @@ class MessageController extends BaseAdminController
             // If we have to stay on the same page, do not redirect to the succesUrl,
             // just redirect to the edit page again.
             if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirect(URL::absoluteUrl(
-                        "admin/configuration/messages/change",
+                $this->redirectToRoute(
+                        "admin.configuration.messages.change",
                         array('message_id' => $message_id)
-                ));
+                );
             }
 
             // Redirect to the success URL

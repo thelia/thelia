@@ -34,7 +34,7 @@ class Currency extends BaseCurrency {
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECURRENCY, new CurrencyEvent($this));
+        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECURRENCY, new CurrencyEvent($this));
 
         return true;
     }
@@ -44,7 +44,7 @@ class Currency extends BaseCurrency {
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECURRENCY, new CurrencyEvent($this));
+        $this->dispatchEvent(TheliaEvents::AFTER_UPDATECURRENCY, new CurrencyEvent($this));
     }
 
     /**
