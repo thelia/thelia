@@ -1,18 +1,18 @@
-{check_auth roles="ADMIN" login_tpl="/admin/login"}
-{$page_title={intl l='Home'}}
-{include file='includes/header.inc.html'}
+{extends file="admin-layout.tpl"}
 
-<div class="homepage">
-      <div id="wrapper" class="container">
+{block name="page-title"}{intl l='Back-office home'}{/block}
 
-	    {module_include location='home_top'}
+{block name="main-content"}
+	<div class="homepage">
+	      <div id="wrapper" class="container">
 
-		<div class="span12">
-		This is the administration home page. Put some interesting statistics here, and display useful information :)
+		    {module_include location='home_top'}
+
+			<div class="span12">
+			This is the administration home page. Put some interesting statistics here, and display useful information :)
+			</div>
+
+			{module_include location='home_bottom'}
 		</div>
-
-		{module_include location='home_bottom'}
 	</div>
-</div>
-
-{include file='includes/footer.inc.html'}
+{/block}

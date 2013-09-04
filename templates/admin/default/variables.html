@@ -1,9 +1,10 @@
-{check_auth roles="ADMIN" permissions="admin.configuration.variables.view" login_tpl="/admin/login"}
+{extends file="admin-layout.tpl"}
 
-{$page_title={intl l='Thelia System Variables'}}
+{block name="page-title"}{intl l='Thelia System Variables'}{/block}
 
-{include file='includes/header.inc.html'}
+{block name="check-permissions"}admin.configuration.variables.view{/block}
 
+{block name="main-content"}
 <div class="variables">
 
     <div id="wrapper" class="container">
@@ -223,9 +224,9 @@
 	    </div>
     </form>
 </div>
+{/block}
 
-{include file='includes/js.inc.html'}
-
+{block name="javascript-initialization"}
 <script>
     $(function() {
 
@@ -280,5 +281,4 @@
 
     });
 </script>
-
-{include file='includes/footer.inc.html'}
+{/block}

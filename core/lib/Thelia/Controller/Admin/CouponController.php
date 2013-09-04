@@ -25,12 +25,14 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\Coupon\CouponCreateEvent;
+use Thelia\Core\Event\Coupon\CouponEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Form\CouponCreationForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Log\Tlog;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 
@@ -48,27 +50,15 @@ use Thelia\Model\CouponQuery;
 class CouponController extends BaseAdminController
 {
     /**
-     * List all Coupons Action
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function indexAction()
-    {
-        return $this->process();
-    }
-
-    /**
      * Manage Coupons list display
      *
-     * @param array $args GET arguments
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function browseCoupons($args)
+    public function browseAction()
     {
         $this->checkAuth("ADMIN", "admin.coupon.view");
 
-        return $this->render('coupon/list', $args);
+        return $this->render('coupon-list');
     }
 
     /**
@@ -78,74 +68,89 @@ class CouponController extends BaseAdminController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function createAction($args)
+    public function createAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.coupon.create")) return $response;
+        $response = $this->checkAuth("admin.coupon.create");
+        if ($response !==  null) {
+            return $response;
+        }
 
         $message = false;
 
+        // Create the form from the request
+        $creationForm = new CouponCreationForm($this->getRequest());
+
         if ($this->getRequest()->isMethod('POST')) {
             try {
-                // Create the form from the request
-                $creationForm = new CouponCreationForm(Form($this->getRequest()));
-
                 // Check the form against constraints violations
                 $form = $this->validateForm($creationForm, "POST");
 
                 // Get the form field values
                 $data = $form->getData();
-
-                var_dump($data);
-
-                $couponCreateEvent = new CouponCreateEvent();
-                $couponCreateEvent->setTitle($data['title']);
-                $couponCreateEvent->setShortDescription($data['shortDescription']);
-                $couponCreateEvent->setDescription($data['longDescription']);
-                $couponCreateEvent->setCode($data['code']);
-                $couponCreateEvent->setAmount($data['amount']);
-
-                $couponCreateEvent->setExpirationDate(
-                    new \DateTime($data['expirationDate'])
+                $couponEvent = new CouponEvent(
+                    $data['code'],
+                    $data['title'],
+                    $data['amount'],
+                    $data['effect'],
+                    $data['shortDescription'],
+                    $data['description'],
+                    $data['isEnabled'],
+                    new \DateTime($data['expirationDate']),
+                    $data['isAvailableOnSpecialOffers'],
+                    $data['isCumulative'],
+                    $data['isRemovingPostage'],
+                    $data['maxUsage'],
+                    array()
                 );
-                $couponCreateEvent->setMaxUsage($data['maxUsage']);
-                $couponCreateEvent->setIsCumulative($data['isCumulative']);
-                $couponCreateEvent->setIsRemovingPostage($data['isRemovingPostage']);
-                $couponCreateEvent->setIsAvailableOnSpecialOffers($data['isAvailableOnSpecialOffers']);
-
-                $couponCreateEvent->setIsEnabled($data['isEnabled']);
-
-//                $couponCreateEvent->setRules($data['rules']);
 
                 $this->dispatch(
-                    TheliaEvents::CREATE_COUPON,
-                    $couponCreateEvent
+                    TheliaEvents::COUPON_CREATE,
+                    $couponEvent
                 );
                 $this->adminLogAppend(
                     sprintf(
                         'Coupon %s (ID %s) created',
-                        $couponCreateEvent->getTitle(),
-                        $couponCreateEvent->getId()
+                        $couponEvent->getTitle(),
+                        $couponEvent->getId()
                     )
                 );
                 // @todo redirect if successful
             } catch (FormValidationException $e) {
-                $creationForm->setErrorMessage($e->getMessage());
-                    $this->getParserContext()->setErrorForm($creationForm);
+                // Invalid data entered
+                $message = 'Please check your input:';
             } catch (\Exception $e) {
+                // Any other error
+                $message = 'Sorry, an error occured:';
+            }
+
+            if ($message !== false) {
+                // Log error message
                 Tlog::getInstance()->error(
                     sprintf(
-                        "Failed to create coupon: %s",
-                        $e->getMessage()
+                        "Error during variable modification process : %s. Exception was %s",
+                        $message, $e->getMessage()
                     )
                 );
-                $this->getParserContext()->setGeneralError($e->getMessage());
-            }
-        } else {
 
+                // Mark the form as errored
+                $creationForm->setErrorMessage($message);
+
+                // Pas the form and the error to the parser
+                $this->getParserContext()
+                    ->addForm($creationForm)
+                    ->setGeneralError($message)
+                ;
+            }
         }
 
-        return $this->render('coupon/create', array('action' => 'create'));
+        $formAction = 'admin/coupon/create';
+        return $this->render(
+            'coupon-create',
+            array(
+                'formAction' => $formAction
+            )
+        );
     }
 
     /**
@@ -155,74 +160,35 @@ class CouponController extends BaseAdminController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function editCoupon($args)
+    public function editAction($couponId)
     {
-        $this->checkAuth("ADMIN", "admin.coupon.view");
+        $this->checkAuth("ADMIN", "admin.coupon.edit");
 
-        return $this->render('coupon/update', $args);
+        $formAction = 'admin/coupon/edit/' . $couponId;
+
+        return $this->render('coupon-edit', array('formAction' => $formAction));
     }
 
     /**
      * Manage Coupons read display
      *
-     * @param int $id Coupon Id
+     * @param int $couponId Coupon Id
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function readAction($id)
+    public function readAction($couponId)
     {
         $this->checkAuth("ADMIN", "admin.coupon.read");
 
         // Database request repeated in the loop but cached
         $search = CouponQuery::create();
-        $coupon = $search->findOneById($id);
+        $coupon = $search->findOneById($couponId);
 
         if ($coupon === null) {
             return $this->pageNotFound();
         }
 
-        return $this->render('coupon/read', array('couponId' => $id));
-    }
-
-    /**
-     * Process all Actions
-     *
-     * @param string $action Action to process
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function processAction()
-    {
-        // Get the current action
-        $action = $this->getRequest()->get('action', 'browse');
-
-        // Get the category ID
-//        $id = $this->getRequest()->get('id', 0);
-
-        $args = array(
-            'action' 			  => $action,
-//            'current_coupon_id'   => $id
-        );
-
-        try {
-            switch ($action) {
-                case 'browse' : // Browse coupon
-                    return $this->browseCoupons($args);
-                case 'create' : // Create a new coupon
-//                    return $this->createCoupon($args);
-                case 'edit' : // Edit an existing coupon
-                    return $this->editCoupon($args);
-                case 'read' : // Read an existing coupon
-                    return $this->readCoupon($args);
-            }
-        } catch (AuthorizationException $ex) {
-            return $this->errorPage($ex->getMessage());
-        } catch (AuthenticationException $ex) {
-            return $this->errorPage($ex->getMessage());
-        }
-
-        // We did not recognized the action -> return a 404 page
-        return $this->pageNotFound();
+        return $this->render('coupon-read', array('couponId' => $couponId));
     }
 
     /**

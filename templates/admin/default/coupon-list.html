@@ -1,12 +1,8 @@
-{check_auth context="admin" roles="ADMIN" permissions="admin.coupon.view" login_tpl="/admin/login"}
+{extends file="admin-layout.tpl"}
+{block name="check-permissions"}admin.coupon.view{/block}
+{block name="page-title"}{intl l='Coupons'}{/block}
 
-{$page_title={intl l='Coupon'}}
-
-{$thelia_page_css_file = "assets/bootstrap-editable/css/bootstrap-editable.css"}
-
-{include file='includes/header.inc.html'}
-
-
+{block name="main-content"}
 <section id="wrapper" class="container">
 
     <nav>
@@ -142,64 +138,41 @@
     </section>
 
 </section> <!-- #wrapper -->
+{/block}
 
-<aside id="disable" class="modal hide fade" role="dialog">
-    <div class="modal-header">                                    
-        <h3>Confirmation</h3>
-    </div>
-    <div class="modal-body">
-        <p>Do you really want to disable this element?</p>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-inverse" data-dismiss="modal">Cancel</button>
-        <a href="#" class="btn btn-success" data-confirm="confirm">Confirm</a>
-    </div>
-</aside> <!-- #disable / Disable confirmation -->
+{include file='includes/confirmation-modal.html' id="disable" message="{intl l='Do you really want to disable this element ?'}"}
+{include file='includes/confirmation-modal.html' id="enable" message="{intl l='Do you really want to enable this element ?'}"}
 
-<aside id="enable" class="modal hide fade" role="dialog">
-    <div class="modal-header">                                    
-        <h3>Confirmation</h3>
-    </div>
-    <div class="modal-body">
-        <p>Do you really want to enable this element?</p>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-inverse" data-dismiss="modal">Cancel</button>
-        <a href="#" class="btn btn-success" data-confirm="confirm">Confirm</a>
-    </div>
-</aside> <!-- #enable / Enable confirmation -->
+{block name="javascript-initialization"}
+    {include file='includes/js.inc.html'}
 
+    {stylesheets file='../assets/css/jqueryui/custom-theme/*' filters='less,cssembed'}
+        <link rel="stylesheet" href="{$asset_url}">
+    {/stylesheets}
 
-{include file='includes/js.inc.html'}
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
 
-{stylesheets file='../assets/css/jqueryui/custom-theme/*' filters='less,cssembed'}
-	<link rel="stylesheet" href="{$asset_url}">
-{/stylesheets}
+    {javascripts file='../assets/bootstrap-editable/js/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
+    {javascripts file='../assets/js/tablesorter/jquery.tablesorter.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
-{javascripts file='../assets/bootstrap-editable/js/bootstrap-editable.js'}
-<script src="{$asset_url}"></script>
-{/javascripts}
+    {javascripts file='../assets/js/tablesorter/jquery.metadata.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
-{javascripts file='../assets/js/tablesorter/jquery.tablesorter.min.js'}
-	<script src="{$asset_url}"></script>
-{/javascripts}
+    {javascripts file='../assets/js/tablesorter/jquery.tablesorter.widgets.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
-{javascripts file='../assets/js/tablesorter/jquery.metadata.js'}
-	<script src="{$asset_url}"></script>
-{/javascripts}
+    {javascripts file='../assets/js/tablesorter/jquery.tablesorter.widgets-filter-formatter.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
-{javascripts file='../assets/js/tablesorter/jquery.tablesorter.widgets.js'}
-	<script src="{$asset_url}"></script>
-{/javascripts}
-
-{javascripts file='../assets/js/tablesorter/jquery.tablesorter.widgets-filter-formatter.js'}
-	<script src="{$asset_url}"></script>
-{/javascripts}
-
-{javascripts file='../assets/js/main.js'}
-	<script src="{$asset_url}"></script>
-{/javascripts}
-
-{include file='includes/footer.inc.html'}
+    {javascripts file='../assets/js/main.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+{/block}

@@ -126,7 +126,7 @@ class TheliaHttpKernel extends HttpKernel
 
         if ($lang) {
             $request->getSession()
-                ->setLang($lang->getCode())
+                ->setLang($lang)
                 ->setLocale($lang->getLocale())
             ;
         }

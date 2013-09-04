@@ -199,12 +199,21 @@ class BaseAdminController extends BaseController
         // Find the current edit language ID
         $edition_language = $this->getCurrentEditionLangId();
 
+        // Current back-office (not edition) language
+        $current_lang = LangQuery::create()->findOneById($session->getLangId());
+
         // Prepare common template variables
         $args = array_merge($args, array(
             'locale'           => $session->getLocale(),
             'lang_code'        => $session->getLang(),
             'lang_id'          => $session->getLangId(),
+
+            'datetime_format'  => $current_lang->getDateTimeFormat(),
+            'date_format'      => $current_lang->getDateFormat(),
+            'time_format'      => $current_lang->getTimeFormat(),
+
             'edition_language' => $edition_language,
+
             'current_url'      => htmlspecialchars($this->getRequest()->getUri())
         ));
 

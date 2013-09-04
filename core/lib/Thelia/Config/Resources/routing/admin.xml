@@ -47,18 +47,15 @@
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
     <route id="admin.coupon.list" path="/admin/coupon">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::processAction</default>
-        <default key="action">browse</default>
+        <default key="_controller">Thelia\Controller\Admin\CouponController::browseAction</default>
     </route>
     <route id="admin.coupon.create" path="/admin/coupon/create">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::processAction</default>
-        <default key="action">create</default>
+        <default key="_controller">Thelia\Controller\Admin\CouponController::createAction</default>
     </route>
-    <route id="admin.coupon.edit" path="/admin/coupon/edit/{id}">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::processAction</default>
-        <default key="action">edit</default>
+    <route id="admin.coupon.edit" path="/admin/coupon/edit/{couponId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::editAction</default>
     </route>
-    <route id="admin.coupon.read" path="/admin/coupon/read/{id}">
+    <route id="admin.coupon.read" path="/admin/coupon/read/{couponId}">
         <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
     </route>
 
@@ -113,6 +110,28 @@
 
     <route id="admin.configuration.messages.delete" path="/admin/configuration/messages/delete">
         <default key="_controller">Thelia\Controller\Admin\MessageController::deleteAction</default>
+    </route>
+
+    <!-- Routes to the Currencies controller -->
+
+    <route id="admin.configuration.currencies.default" path="/admin/configuration/currencies">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.create" path="/admin/configuration/currencies/create">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.change" path="/admin/configuration/currencies/change">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::changeAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.save-change" path="/admin/configuration/currencies/save-change">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::saveChangeAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.delete" path="/admin/configuration/currencies/delete">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::deleteAction</default>
     </route>
 
 	<!-- The default route, to display a template -->

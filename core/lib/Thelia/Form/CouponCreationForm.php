@@ -47,109 +47,92 @@ class CouponCreationForm extends BaseForm
     {
         $this->formBuilder
             ->add(
-                "code",
-                "text",
+                'code',
+                'text',
                 array(
-                    "constraints" => array(
+                    'constraints' => array(
                         new NotBlank()
                     )
                 )
             )
             ->add(
-                "type",
-                "text",
+                'title',
+                'text',
                 array(
-                    "constraints" => array(
+                    'constraints' => array(
                         new NotBlank()
                     )
                 )
             )
             ->add(
-                "title",
-                "text",
+                'shortDescription',
+                'text',
                 array(
-                    "constraints" => array(
+                    'invalid_message' => 'test',
+                    'constraints' => array(
                         new NotBlank()
                     )
                 )
             )
             ->add(
-                "shortDescription",
-                "text",
+                'description',
+                'textarea',
                 array(
-                    "constraints" => array(
+                    'invalid_message' => 'test',
+                    'constraints' => array(
                         new NotBlank()
                     )
                 )
             )
             ->add(
-                "description",
-                "text",
+                'effect',
+                'text',
                 array(
-                    "constraints" => array(
+                    'invalid_message' => 'test',
+                    'constraints' => array(
                         new NotBlank()
                     )
                 )
             )
             ->add(
-                "amount",
-                "text",
+                'amount',
+                'money',
+                array()
+            )
+            ->add(
+                'isEnabled',
+                'checkbox',
+                array()
+            )
+            ->add(
+                'expirationDate',
+                'text',
                 array(
-                    "constraints" => array(
+                    'constraints' => array(
                         new NotBlank()
                     )
                 )
             )
             ->add(
-                "isEnabled",
-                "text",
-                array(
-                    "constraints" => array(
-                        new NotBlank()
-                    )
-                )
+                'isCumulative',
+                'checkbox',
+                array()
             )
             ->add(
-                "expirationDate",
-                "text",
-                array(
-                    "constraints" => array(
-                        new NotBlank()
-                    )
-                )
+                'isRemovingPostage',
+                'checkbox',
+                array()
             )
             ->add(
-                "isCumulative",
-                "text",
-                array(
-                    "constraints" => array(
-                        new NotBlank()
-                    )
-                )
+                'isAvailableOnSpecialOffers',
+                'checkbox',
+                array()
             )
             ->add(
-                "isRemovingPostage",
-                "text",
+                'maxUsage',
+                'text',
                 array(
-                    "constraints" => array(
-                        new NotBlank()
-                    )
-                )
-            )
-            ->add(
-                "maxUsage",
-                "text",
-                array(
-                    "constraints" => array(
-                        new NotBlank()
-                    )
-                )
-            )
-            ->add(
-                "isAvailableOnSpecialOffers",
-                "text",
-                array(
-                    "constraints" => array(
+                    'constraints' => array(
                         new NotBlank()
                     )
                 )
@@ -163,6 +146,6 @@ class CouponCreationForm extends BaseForm
      */
     public function getName()
     {
-        return "thelia_coupon_creation";
+        return 'thelia_coupon_creation';
     }
 }

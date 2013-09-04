@@ -266,7 +266,6 @@ final class TheliaEvents
     const BEFORE_DELETECONFIG = "action.before_deleteConfig";
     const AFTER_DELETECONFIG  = "action.after_deleteConfig";
 
-
     // -- Messages management ---------------------------------------------
 
     const MESSAGE_CREATE   = "action.createMessage";
@@ -282,4 +281,18 @@ final class TheliaEvents
     const BEFORE_DELETEMESSAGE = "action.before_deleteMessage";
     const AFTER_DELETEMESSAGE  = "action.after_deleteMessage";
 
+    // -- Currencies management ---------------------------------------------
+
+    const CURRENCY_CREATE   = "action.createCurrency";
+    const CURRENCY_MODIFY   = "action.changeCurrency";
+    const CURRENCY_DELETE   = "action.deleteCurrency";
+
+    const BEFORE_CREATECURRENCY = "action.before_createCurrency";
+    const AFTER_CREATECURRENCY  = "action.after_createCurrency";
+
+    const BEFORE_CHANGECURRENCY = "action.before_changeCurrency";
+    const AFTER_CHANGECURRENCY  = "action.after_changeCurrency";
+
+    const BEFORE_DELETECURRENCY = "action.before_deleteCurrency";
+    const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
 }

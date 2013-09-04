@@ -1,9 +1,10 @@
-{check_auth roles="ADMIN" permissions="admin.catalog.view" login_tpl="/admin/login"}
+{extends file="admin-layout.tpl"}
 
-{$page_title={intl l='Edit category'}}
+{block name="check-permissions"}admin.catalog.view{/block}
 
-{include file='includes/header.inc.html'}
+{block name="page-title"}{intl l='Edit category'}{/block}
 
+{block name="main-content"}
 <div class="catalog edit-category">
 	<div id="wrapper" class="container">
 		<ul class="breadcrumb">
@@ -210,9 +211,9 @@
  		</div>
 	</div>
 </div>
+{/block}
 
-{include file='includes/js.inc.html'}
-
+{block name="javascript-initialization"}
 <script>
 
 $(function() {
@@ -229,5 +230,4 @@ $(function() {
 })
 
 </script>
-
-{include file='includes/footer.inc.html'}
+{/block}

@@ -71,6 +71,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event
         );
 
+        $couponModel = CouponQuery::create();
         $event->getCreatedCoupon()->save();
 
         $this->dispatch(

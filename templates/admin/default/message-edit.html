@@ -1,9 +1,10 @@
-{check_auth roles="ADMIN" permissions="admin.configuration.messages.edit" login_tpl="/admin/login"}
+{extends file="admin-layout.tpl"}
 
-{$page_title={intl l='Edit a mailing template'}}
+{block name="page-title"}{intl l='Edit a mailing template'}{/block}
 
-{include file='includes/header.inc.html'}
+{block name="check-permissions"}admin.configuration.messages.edit{/block}
 
+{block name="main-content"}
 <div class="messages edit-message">
 
     <div id="wrapper" class="container">
@@ -27,11 +28,9 @@
 
                     <div class="form-container">
                          <div class="form-horizontal span12">
-                             <fieldset>
-
-							    {form name="thelia.admin.message.modification"}
-							    <form method="POST" action="{url path='/admin/configuration/messages/save-change'}" {form_enctype form=$form}>
-
+						    {form name="thelia.admin.message.modification"}
+						    <form method="POST" action="{url path='/admin/configuration/messages/save-change'}" {form_enctype form=$form}>
+                                <fieldset>
                                     {* Be sure to get the message ID, even if the form could not be validated *}
                                     <input type="hidden" name="message_id" value="{$message_id}" />
 
@@ -142,9 +141,15 @@
                                         </div>
                                     </div>
                                     {/form_field}
-								</form>
-								{/form}
-							</fieldset>
+
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <p>{intl l='Message created on %date_create. Last modification: %date_change' df=$datetime_format date_create=$CREATE_DATE->format($datetime_format) date_change=$UPDATE_DATE->format($datetime_format)}</p>
+                                        </div>
+                                    </div>
+                                </fieldset>
+							</form>
+							{/form}
 						</div>
 					</div>
 				</div>
@@ -165,7 +170,4 @@
 
     </div>
 </div>
-
-{include file='includes/js.inc.html'}
-
-{include file='includes/footer.inc.html'}
+{/block}
