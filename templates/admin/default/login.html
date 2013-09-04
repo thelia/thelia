@@ -12,7 +12,7 @@
 
 		    {module_include location='index_top'}
 
-		   	<div class="hero-unit">
+		   	<div class="jumbotron">
 		        <h1>{intl l='Thelia Back Office'}</h1>
 
 				{form name="thelia.admin.login"}
@@ -42,15 +42,15 @@
 					<label class="checkbox"> <input type="checkbox" name="{$name}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {intl l='Remember me'}</label>
 					{/form_field}
 
-					<span class="pull-right"><button type="submit" class="btn btn-primary">{intl l='Login'} <i class="icon-play icon-white"></i></button></span>
+					<span class="pull-right"><button type="submit" class="btn btn-default btn-primary">{intl l='Login'} <span class="glyphicon glyphicon-play"></span></button></span>
 				</form>
 				{/form}
 			</div>
 
 			{module_include location='index_middle'}
 
-			<div class="row-fluid feed-list">
-				<div class="span6 offset3">
+			<div class="row feed-list">
+				<div class="col-md-6 col-md-offset-3">
 					<div class="alert alert-info">{intl l="Loading Thelia lastest news..."}</div>
 				</div>
 			</div>

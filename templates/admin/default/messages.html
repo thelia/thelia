@@ -10,24 +10,23 @@
     <div id="wrapper" class="container">
 
         <ul class="breadcrumb">
-            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a> <span class="divider">/</span></li>
-            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a> <span class="divider">/</span></li>
+            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/messages'}">{intl l="Mailing templates"}</a></li>
         </ul>
 
         {module_include location='messages_top'}
 
-        <div class="row-fluid">
-
-            <div class="span12">
-                <form action="{url path='/admin/configuration/messages/update-values'}" method="post">
+        <div class="row">
+            <div class="col-md-12">
+                <form action="{url path='/admin/configuration/messages/change-values'}" method="post">
 	                <div class="general-block-decorator">
 	                    <table class="table table-striped table-condensed table-left-aligned">
 	                        <caption>
 	                           {intl l='Thelia mailing templates'}
 	                           {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.messages.create"}
-                                <a class="btn btn-primary action-btn" title="{intl l='Add a new mailing template'}" href="#add_message_dialog" data-toggle="modal">
-                                    <i class="icon-plus-sign icon-white"></i>
+                                <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new mailing template'}" href="#add_message_dialog" data-toggle="modal">
+                                    <span class="glyphicon glyphicon-plus-sign"></span>
                                 </a>
                             {/loop}
 
@@ -65,15 +64,15 @@
 	                                    {if ! $SECURED}
 		                                    <div class="btn-group">
                                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.messages.change"}
-                                                   <a class="btn btn-mini message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><i class="icon-edit"></i></a>
+                                                   <a class="btn btn-default btn-xs message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/change' message_id="$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
                                                {/loop}
 
                                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.messages.delete"}
-                                                   <a class="btn btn-mini message-delete" title="{intl l='Delete this mailing template'}" href="#delete_message_dialog" data-id="{$ID}" data-toggle="modal"><i class="icon-trash"></i></a>
+                                                   <a class="btn btn-default btn-xs message-delete" title="{intl l='Delete this mailing template'}" href="#delete_message_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
                                                {/loop}
 		                                    </div>
 		                                {else}
-		                                    <i title="{intl l='This mailing template could not be changed.'}" class="icon icon-ban-circle"></i>
+		                                    <i title="{intl l='This mailing template could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
 	                                    {/if}
 	                                </td>
 	                            </tr>
@@ -159,13 +158,13 @@
                         <input type="hidden" name="{$name}" value="{$LOCALE}" />
                         {/form_field}
 
-                        <div class="input-append input-block-level">
+                        <div class="input-group input-block-level">
                             {form_field form=$form field='title'}
                             <span {if $error}class="error"{/if}>
                                <input type="text" required="required" name="{$name}" value="{$value}" title="{intl l='Mailing template purpose'}" placeholder="{intl l='Mailing template purpose'}" class="input-block-level">
                             </span>
                             {/form_field}
-                            <span class="add-on"><img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="{intl l=$TITLE}" /></span>
+                            <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="{intl l=$TITLE}" /></span>
                         </div>
 
                         <div class="help-block">{intl l="Enter here the mailing template purpose in the default language ($TITLE)"}</div>
@@ -176,8 +175,8 @@
         </div>
 
         <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">{intl l="Create this mailing template"}</button>
-            <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">{intl l="Cancel"}</button>
+            <button type="submit" class="btn btn-default btn-primary">{intl l="Create this mailing template"}</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">{intl l="Cancel"}</button>
         </div>
 
     </form>
@@ -202,8 +201,8 @@
         <input type="hidden" name="message_id" id="message_delete_id" value="" />
 
 	    <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">{intl l="Yes"}</button>
-	        <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">{intl l="No"}</button>
+            <button type="submit" class="btn btn-default btn-primary">{intl l="Yes"}</button>
+	        <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">{intl l="No"}</button>
 	    </div>
     </form>
 </div>
