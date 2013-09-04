@@ -24,33 +24,41 @@
 namespace Thelia\Controller\Front;
 use Thelia\Core\Event\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Form\AddressForm;
+use Thelia\Form\AddressCreateForm;
+use Thelia\Form\AddressUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\Base\AddressQuery;
 use Thelia\Model\Customer;
 use Thelia\Tools\URL;
 
 
 /**
- * Class CustomerAddressController
+ * Class AddressController
  * @package Thelia\Controller\Front
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CustomerAddressController extends BaseFrontController
+class AddressController extends BaseFrontController
 {
 
+    /**
+     * Create controller.
+     * Check if customer is logged in
+     *
+     * Dispatch TheliaEvents::ADDRESS_CREATE event
+     */
     public function createAction()
     {
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
             $this->redirect(URL::getIndexPage());
         }
 
-        $addressCreate = new AddressForm($this->getRequest());
+        $addressCreate = new AddressCreateForm($this->getRequest());
 
         try {
             $customer = $this->getSecurityContext()->getCustomerUser();
 
             $form = $this->validateForm($addressCreate, "post");
-            $event = $this->createAddressEvent($form->getData());
+            $event = $this->createAddressEvent($form);
             $event->setCustomer($customer);
 
             $this->dispatch(TheliaEvents::ADDRESS_CREATE, $event);
@@ -77,25 +85,74 @@ class CustomerAddressController extends BaseFrontController
 
     public function updateAction()
     {
+        $request = $this->getRequest();
 
+        if ($this->getSecurityContext()->hasCustomerUser() === false) {
+            $this->redirectToRoute("home");
+        }
+
+        if(null === $address_id =  $request->get("address_id")) {
+            $this->redirectToRoute("home");
+        }
+
+        $addressUpdate = new AddressUpdateForm($request);
+
+        try {
+            $customer = $this->getSecurityContext()->getCustomerUser();
+
+            $form = $this->validateForm($addressUpdate);
+
+            $address = AddressQuery::create()->findPk($address_id);
+
+            if (null === $address) {
+                $this->redirectToRoute("home");
+            }
+
+            if($address->getCustomer()->getId() != $customer->getId()) {
+                $this->redirectToRoute("home");
+            }
+
+            $event = $this->createAddressEvent($form);
+            $event->setAddress($address);
+
+            $this->dispatch(TheliaEvents::ADDRESS_UPDATE, $event);
+
+            $this->redirectSuccess($addressUpdate);
+        }catch (FormValidationException $e) {
+            $message = sprintf("Please check your input: %s", $e->getMessage());
+        }
+        catch (\Exception $e) {
+            $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+        }
+
+        if ($message !== false) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during address creation process : %s", $message));
+
+            $addressUpdate->setErrorMessage($message);
+
+            $this->getParserContext()
+                ->addForm($addressUpdate)
+                ->setGeneralError($message)
+            ;
+        }
     }
 
-    protected function createAddressEvent($data)
+    protected function createAddressEvent($form)
     {
         return new AddressCreateOrUpdateEvent(
-            $data["label"],
-            $data["title"],
-            $data["firstname"],
-            $data["lastname"],
-            $data["address1"],
-            $data["address2"],
-            $data["address3"],
-            $data["zipcode"],
-            $data["city"],
-            $data["country"],
-            $data["cellpone"],
-            $data["phone"],
-            $data["company"]
+            $form->get("label")->getData(),
+            $form->get("title")->getData(),
+            $form->get("firstname")->getData(),
+            $form->get("lastname")->getData(),
+            $form->get("address1")->getData(),
+            $form->get("address2")->getData(),
+            $form->get("address3")->getData(),
+            $form->get("zipcode")->getData(),
+            $form->get("city")->getData(),
+            $form->get("country")->getData(),
+            $form->get("cellphone")->getData(),
+            $form->get("phone")->getData(),
+            $form->get("company")->getData()
         );
     }
 }

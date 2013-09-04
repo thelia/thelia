@@ -30,7 +30,17 @@
 
     <!-- customer address routes -->
     <route id="address.create" path="/address/create" >
-        <default key="_controller">Thelia\Controller\Front\CustomerAddressController::createAction</default>
+        <default key="_controller">Thelia\Controller\Front\AddressController::createAction</default>
+        <default key="_view">address</default>
+    </route>
+
+    <route id="address.edit" path="/address/edit/{address_id}">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">address_edit</default>
+    </route>
+
+    <route id="address.update" path="/address/update" >
+        <default key="_controller">Thelia\Controller\Front\AddressController::updateAction</default>
     </route>
     <!-- end customer address routes -->
 
@@ -50,7 +60,7 @@
         <default key="_view">cart</default>
     </route>
 
-    <route id="url-rewriting.check" path="/{rewritten_url}" methods="GET">
+<!--    <route id="url-rewriting.check" path="/{rewritten_url}" methods="GET">
         <default key="_controller">Thelia\Controller\Front\UrlRewritingController::check</default>
-    </route>
+    </route>-->
 </routes>

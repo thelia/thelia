@@ -61,7 +61,7 @@ class Address extends BaseLoop
                 ),
                 'current'
             ),
-            Argument::createBooleanTypeArgument('default'),
+            Argument::createBooleanTypeArgument('default', false),
             Argument::createIntListTypeArgument('exclude')
         );
     }
@@ -96,10 +96,9 @@ class Address extends BaseLoop
 
         $default = $this->getDefault();
 
+
         if ($default === true) {
             $search->filterByIsDefault(1, Criteria::EQUAL);
-        } elseif ($default === false) {
-            $search->filterByIsDefault(1, Criteria::NOT_EQUAL);
         }
 
         $exclude = $this->getExclude();
@@ -116,7 +115,7 @@ class Address extends BaseLoop
             $loopResultRow = new LoopResultRow();
             $loopResultRow
                 ->set("ID", $address->getId())
-                ->set("NAME", $address->getName())
+                ->set("LABEL", $address->getLabel())
                 ->set("CUSTOMER", $address->getCustomerId())
                 ->set("TITLE", $address->getTitleId())
                 ->set("COMPANY", $address->getCompany())

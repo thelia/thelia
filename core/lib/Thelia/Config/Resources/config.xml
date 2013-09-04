@@ -43,6 +43,9 @@
         <form name="thelia.customer.login" class="Thelia\Form\CustomerLogin"/>
         <form name="thelia.admin.login" class="Thelia\Form\AdminLogin"/>
 
+        <form name="thelia.address.create" class="Thelia\Form\AddressCreateForm" />
+        <form name="thelia.address.update" class="Thelia\Form\AddressUpdateForm" />
+
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
         <form name="thelia.admin.category.deletion" class="Thelia\Form\CategoryDeletionForm"/>
 

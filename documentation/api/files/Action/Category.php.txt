@@ -109,7 +109,7 @@ class Category extends BaseAction implements EventSubscriberInterface
                 $customer = CustomerQuery::create()->findPk(1);
                 try {
                     $customerEvent = new CustomerEvent($customer);
-                    $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECUSTOMER, $customerEvent);
+                    $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_UPDATECUSTOMER, $customerEvent);
 
                     $data = $form->getData();
 
@@ -127,7 +127,7 @@ class Category extends BaseAction implements EventSubscriberInterface
                     );
 
                     $customerEvent->customer = $customer;
-                    $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECUSTOMER, $customerEvent);
+                    $event->getDispatcher()->dispatch(TheliaEvents::AFTER_UPDATECUSTOMER, $customerEvent);
 
                     // Update the logged-in user, and redirect to the success URL (exits)
                     // We don-t send the login event, as the customer si already logged.

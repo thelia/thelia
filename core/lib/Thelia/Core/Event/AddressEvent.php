@@ -20,52 +20,35 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Controller\Front;
 
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Model\ConfigQuery;
-use Thelia\Tools\Redirect;
-use Thelia\Tools\URL;
+namespace Thelia\Core\Event;
+use Symfony\Component\EventDispatcher\Event;
+use Thelia\Model\Address;
+
 
 /**
- *
- * Must be the last controller call. It fixes default values
- *
- * @author Manuel Raynaud <mraynadu@openstudio.fr>
+ * Class AddressEvent
+ * @package Thelia\Core\Event
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-
-class DefaultController extends BaseFrontController
+class AddressEvent extends ActionEvent
 {
     /**
-     *
-     * set the default value for thelia
-     *
-     * In this case there is no action so we have to verify if some needed params are not missing
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @var \Thelia\Model\Address
      */
-    public function noAction(Request $request)
+    protected $address;
+
+    function __construct(Address $address)
     {
-        if(ConfigQuery::isRewritingEnable()) {
+        $this->address = $address;
+    }
 
-            /* Does the query GET parameters match a rewritten URL ? */
-            $rewrittenUrl = URL::init()->retrieveCurrent($request);
-            if($rewrittenUrl->rewrittenUrl !== null) {
-                /* 301 redirection to rewritten URL */
-                $this->redirect($rewrittenUrl->rewrittenUrl, 301);
-            }
-        }
 
-        $view = null;
-
-        if (! $view = $request->query->get('view')) {
-            if ($request->request->has('view')) {
-                $view = $request->request->get('view');
-            }
-        }
-        if(!is_null($view)) {
-            $request->attributes->set('_view', $view);
-        }
-
+    /**
+     * @return \Thelia\Model\Address
+     */
+    public function getAddress()
+    {
+        return $this->address;
     }
 }

@@ -4,21 +4,12 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\AddressEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Address as BaseAddress;
 
 class Address extends BaseAddress {
-
-    protected $dispatcher;
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**
      * Code to be run before inserting to database
@@ -27,6 +18,7 @@ class Address extends BaseAddress {
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        $this->dispatchEvent(TheliaEvents::BEFORE_CREATEADDRESS, new AddressEvent($this));
         return true;
     }
 
@@ -36,7 +28,7 @@ class Address extends BaseAddress {
      */
     public function postInsert(ConnectionInterface $con = null)
     {
-
+        $this->dispatchEvent(TheliaEvents::AFTER_CREATEADDRESS, new AddressEvent($this));
     }
 
     /**
@@ -46,6 +38,7 @@ class Address extends BaseAddress {
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
+        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEADDRESS, new AddressEvent($this));
         return true;
     }
 
@@ -55,7 +48,7 @@ class Address extends BaseAddress {
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
-
+        $this->dispatchEvent(TheliaEvents::AFTER_UPDATEADDRESS, new AddressEvent($this));
     }
 
     /**
@@ -65,6 +58,7 @@ class Address extends BaseAddress {
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        $this->dispatchEvent(TheliaEvents::BEFORE_DELETEADDRESS, new AddressEvent($this));
         return true;
     }
 
@@ -74,7 +68,7 @@ class Address extends BaseAddress {
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-
+        $this->dispatchEvent(TheliaEvents::AFTER_DELETEADDRESS, new AddressEvent($this));
     }
 
 }

@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
+use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\Customer as BaseCustomer;
 
@@ -115,7 +115,7 @@ class Customer extends BaseCustomer implements UserInterface
 
             $con->commit();
 
-        } catch(Exception $e) {
+        } catch(PropelException $e) {
             $con->rollback();
             throw $e;
         }
@@ -225,7 +225,7 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECUSTOMER, new CustomerEvent($this));
+        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECUSTOMER, new CustomerEvent($this));
         return true;
     }
 
@@ -234,7 +234,7 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECUSTOMER, new CustomerEvent($this));
+        $this->dispatchEvent(TheliaEvents::AFTER_UPDATECUSTOMER, new CustomerEvent($this));
     }
 
     /**
