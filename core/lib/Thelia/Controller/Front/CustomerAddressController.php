@@ -50,7 +50,8 @@ class CustomerAddressController extends BaseFrontController
             $customer = $this->getSecurityContext()->getCustomerUser();
 
             $form = $this->validateForm($addressCreate, "post");
-            $event = $this->createAddressEvent($form->getData(), $customer);
+            $event = $this->createAddressEvent($form->getData());
+            $event->setCustomer($customer);
 
             $this->dispatch(TheliaEvents::ADDRESS_CREATE, $event);
             $this->redirectSuccess($addressCreate);
@@ -74,7 +75,12 @@ class CustomerAddressController extends BaseFrontController
         }
     }
 
-    protected function createAddressEvent($data, Customer $customer)
+    public function updateAction()
+    {
+
+    }
+
+    protected function createAddressEvent($data)
     {
         return new AddressCreateOrUpdateEvent(
             $data["label"],
@@ -89,8 +95,7 @@ class CustomerAddressController extends BaseFrontController
             $data["country"],
             $data["cellpone"],
             $data["phone"],
-            $data["company"],
-            $customer
+            $data["company"]
         );
     }
 }
