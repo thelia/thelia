@@ -11,18 +11,18 @@
 			{include file="includes/category_breadcrumb.html"}
 		</ul>
 
-        <div class="row-fluid">
+        <div class="row">
             {loop name="category_edit" type="category" visible="*" id="{$current_category_id}" backend_context="1" lang="$edit_language_id"}
-            <div class="span12 general-block-decorator">
-                <div class="row-fluid">
-                    <div class="span7 title">
+            <div class="col-md-12 general-block-decorator">
+                <div class="row">
+                    <div class="col-md-7 title">
 						{intl l='Edit category'}
 		            </div>
 
-	                <div class="span5 actions">
-		                <button class="btn" title="{intl l='Edit previous category'}"><i class="icon icon-arrow-left"></i></button>
-		                <button class="btn" title="{intl l='Preview category page'}"><i class="icon icon-eye-open"></i></button>
-		                <button class="btn" title="{intl l='Edit next category'}"><i class="icon icon-arrow-right"></i></button>
+	                <div class="col-md-5 actions">
+		                <button class="btn btn-default" title="{intl l='Edit previous category'}"><i class="glyphicon glyphicon-arrow-left"></i></button>
+		                <button class="btn btn-default" title="{intl l='Preview category page'}"><i class="glyphicon glyphicon-eye-open"></i></button>
+		                <button class="btn btn-default" title="{intl l='Edit next category'}"><i class="glyphicon glyphicon-arrow-right"></i></button>
 	                </div>
                 </div>
 
@@ -50,13 +50,13 @@
 						<div class="tab-content">
 
 						   <div class="tab-pane active form-container" id="general_description">
-								<div class="form-horizontal span12">
+								<div class="form-horizontal col-md-12">
 	                                <fieldset>
 
 	                                    {include file="includes/inner-form-toolbar.html"}
 
-	                                    <div class="row-fluid">
-	                                        <div class="span12">
+	                                    <div class="row">
+	                                        <div class="col-md-12">
 										        <div class="control-group">
 										            <label class="control-label">
 										               {intl l='Title *'}
@@ -107,9 +107,9 @@
 	                                                </label>
 
 	                                                <div class="controls">
-	                                                    <div class="input-append input-block-level">
+	                                                    <div class="input-group input-block-level">
 	                                                        <input type="text" required="required" title="{intl l='Rewriten URL'}" placeholder="{intl l='Rewriten URL'}" class="input-block-level" value="{$URL|htmlspecialchars}">
-	                                                         <a class="btn add-on use_default_rewriten_url" href="#">{intl l='Use default'}</a>
+	                                                         <a class="btn btn-default input-group-addon use_default_rewriten_url" href="#">{intl l='Use default'}</a>
 	                                                    </div>
 	                                                    <div class="help-block">{intl l="The rewritten URL to the category page. Click \"Use Default\" button to use the default URL. Use only digits, letters, - and _ characters."}</div>
 	                                                </div>
@@ -118,8 +118,8 @@
 			                                </div>
 			                            </div>
 
-	                                    <div class="row-fluid">
-	                                        <div class="span12">
+	                                    <div class="row">
+	                                        <div class="col-md-12">
 	                                            <div class="control-group">
 	                                                <lablel>&nbsp;</lablel>
 	                                                <div class="controls">
@@ -134,12 +134,12 @@
 						   </div>
 
 	                       <div class="tab-pane form-container" id="details">
-                                <div class="form-horizontal span12">
+                                <div class="form-horizontal col-md-12">
                                     <fieldset>
                                         {include file="includes/inner-form-toolbar.html"}
 
-                                        <div class="row-fluid">
-                                            <div class="span6">
+                                        <div class="row">
+                                            <div class="col-md-6">
                                                 <div class="control-group">
                                                     <label class="control-label">
                                                       {intl l='Category ID'}
@@ -151,7 +151,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="span6">
+                                            <div class="col-md-6">
                                                 <div class="control-group">
                                                     <label class="control-label">
                                                       {intl l='Parent category *'}
@@ -171,8 +171,8 @@
                                             </div>
                                          </div>
 
-                                         <div class="row-fluid">
-                                            <div class="span12">
+                                         <div class="row">
+                                            <div class="col-md-12">
                                                 <div class="control-group">
                                                     <label class="control-label">
                                                       {intl l='Visibility'}
