@@ -1,0 +1,168 @@
+//
+// Forms
+// --------------------------------------------------
+
+
+// GENERAL STYLES
+// --------------
+
+// Form controls
+// -------------------------
+
+// Everything else
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input {
+
+  // Focus state
+  &:focus {
+    border-color: #E9730F;
+    .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px #E9730F");
+  }
+}
+
+label {
+    font-weight: bold;
+
+    &.checkbox {
+        font-weight: normal;
+    }
+}
+
+// FORM FIELD FEEDBACK STATES
+// --------------------------
+
+// Warning
+form .warning {
+  .formFieldState(@warningText, @warningText, @warningBackground);
+}
+// Error
+form .error {
+  .formFieldState(@errorText, @errorText, @errorBackground);
+}
+// Success
+form .success {
+  .formFieldState(@successText, @successText, @successBackground);
+}
+// Success
+form .info {
+  .formFieldState(@infoText, @infoText, @infoBackground);
+}
+
+
+// Form search
+.form-search {
+	margin-bottom: 0;
+
+	.control-group {
+		margin-bottom: 0px;
+	}
+
+	.search-query {
+		outline: none;
+		.rounded(0px);			
+
+		&:focus {
+			box-shadow: none;			
+		}
+	}
+
+}
+
+.input-append{
+    &.input-block-level{
+    .add-on{
+        img {
+            max-height: 16px;
+        }
+    }
+  }
+}
+
+// Information in field label
+.label-help-block, .help-block {
+    color: lighten(#595959, 20);
+    display: block;
+    font-size: 80%;
+    font-style: italic;
+    line-height: 130%;
+    font-weight: normal;
+}
+
+.form-horizontal input + .help-block,
+.form-horizontal select + .help-block,
+.form-horizontal textarea + .help-block,
+.form-horizontal .uneditable-input + .help-block,
+.form-horizontal .input-prepend + .help-block,
+.form-horizontal .input-append + .help-block
+.help-block, .form-horizontal .help-block {
+    margin-top: 0px;
+}
+
+// Fix for append-fields shorter than others
+// see http://stackoverflow.com/questions/13306670/bootstrap-prepended-and-appended-input-how-to-max-input-field-width
+.input-append.input-block-level,
+.input-prepend.input-block-level {
+  display: table;
+}
+
+.input-append.input-block-level .add-on,
+.input-prepend.input-block-level .add-on {
+  display: table-cell;
+  width: 1%; /* remove this if you want default bootstrap button width */
+}
+
+.input-append.input-block-level > input,
+.input-prepend.input-block-level > input {
+  box-sizing: border-box; /* use bootstrap mixin or include vendor variants */
+  display: table; /* table-cell is not working well in Chrome for small widths */
+  min-height: inherit;
+  width: 100%;
+}
+
+.input-append.input-block-level > input {
+  border-right: 0;
+}
+
+.input-prepend.input-block-level > input {
+  border-left: 0;
+}
+
+.input-append{
+  button.add-on{
+    height: auto;
+  }
+
+  th {
+      a {
+          color: inherit;
+      }
+  }
+
+    td {
+        vertical-align: middle;
+
+        img {
+            border: 2px solid white;
+            border-radius: 4px 4px 4px 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        &.actions {
+            text-align: right;
+        }
+    }
+}

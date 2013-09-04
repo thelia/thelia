@@ -9,12 +9,12 @@
     <div id="wrapper" class="container">
 
         <div class="row">
-            <div class="span12">
+            <div class="col-md-12">
                 <h1>{intl l="Oops! An Error Occurred"}</h1>
 
                 {block name="error-message"}<div class="alert alert-error">{$error_message}</div>{/block}
 
-                <p><i class="icon icon-backward"></i> <a href="{url path='/admin/home'}">{intl l="Go to administration home"}</a></p>
+                <p><i class="glyphicon glyphicon-backward"></i> <a href="{url path='/admin/home'}">{intl l="Go to administration home"}</a></p>
             </div>
         </div>
 

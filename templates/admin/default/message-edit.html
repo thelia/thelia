@@ -18,16 +18,16 @@
             <li>{intl l='Editing mailing template "%name"' name="{$NAME}"}</li>
         </ul>
 
-		<div class="row-fluid">
-			<div class="span12 general-block-decorator">
-				<div class="row-fluid">
+		<div class="row">
+			<div class="col-md-12 general-block-decorator">
+				<div class="row">
 
-					<div class="span12 title title-without-tabs">
+					<div class="col-md-12 title title-without-tabs">
 					   {intl l="Edit mailing template $NAME"}
 					</div>
 
                     <div class="form-container">
-                         <div class="form-horizontal span12">
+                         <div class="form-horizontal col-md-12">
 						    {form name="thelia.admin.message.modification"}
 						    <form method="POST" action="{url path='/admin/configuration/messages/save-change'}" {form_enctype form=$form}>
                                 <fieldset>
@@ -159,8 +159,8 @@
 		{/loop}
 
         {elseloop rel="message_edit"}
-        <div class="row-fluid">
-            <div class="span12">
+        <div class="row">
+            <div class="col-md-12">
                 <div class="alert alert-error">
                     {intl l="Sorry, message ID=$message_id was not found."}
                 </div>

@@ -18,14 +18,18 @@
     {* -- Bootstrap CSS section --------------------------------------------- *}
 
     {block name="before-bootstrap-css"}{/block}
+	
+	{stylesheets file='assets/less/*' filters='less,cssembed'}
+        <link rel="stylesheet" href="{$asset_url}">
+    {/stylesheets}
 
-    {stylesheets file='assets/bootstrap/css/bootstrap.css' filters='cssembed'}
+    <!-- {stylesheets file='assets/bootstrap/css/bootstrap.css' filters='cssembed'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
     {stylesheets file='assets/bootstrap/css/bootstrap-responsive.css' filters='cssembed'}
         <link rel="stylesheet" href="{$asset_url}">
-    {/stylesheets}
+    {/stylesheets} -->
 
     {block name="after-bootstrap-css"}{/block}
 
@@ -33,9 +37,9 @@
 
     {block name="before-admin-css"}{/block}
 
-    {stylesheets file='assets/css/*' filters='less,cssembed'}
+    <!-- {stylesheets file='assets/css/*' filters='less,cssembed'}
         <link rel="stylesheet" href="{$asset_url}">
-    {/stylesheets}
+    {/stylesheets} -->
 
     {block name="after-admin-css"}{/block}
 
@@ -67,15 +71,15 @@
 		        {loop name="top-bar-search" type="auth" roles="ADMIN" permissions="admin.search"}
 		        <form class="form-search pull-right" action="{url path='/admin/search'}">
 		             <div class="control-group">
-		                 <div class="input-append">
+		                 <div class="input-group">
 		                     <input type="text" class="input-medium search-query" id="search_term" name="search_term" placeholder="{intl l='Search'}" />
-		                     <button class="btn"><i class="icon-search"></i></button>
+		                     <button class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 		                 </div>
 		             </div>
 		        </form>
 		        {/loop}
 
-		        <div class="view-shop"><a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank"><i class="icon-white icon-eye-open"></i> {intl l="View shop"}</a></div>
+		        <div class="view-shop"><a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank"><span class="glyphicon glyphicon-white glyphicon-eye-open"></span> {intl l="View shop"}</a></div>
 		    </div>
 		</div>
 
@@ -88,7 +92,7 @@
 		<div class="navbar">
 		    <div class="navbar-inner">
 		        <div class="container">
-		            <div class="nav-collapse">
+		            <div class="navbar-collapse">
 
 		                <ul class="nav">
 
@@ -171,7 +175,7 @@
 
 	{elseloop rel="top-bar-auth"}
 	    <div class="brandbar brandbar-wide container">
-	        <a class="brand" href="{url path='/admin'}">{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}</a>
+	        <a class="navbar-brand" href="{url path='/admin'}">{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}</a>
 	    </div>
 	{/elseloop}
 

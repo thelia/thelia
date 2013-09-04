@@ -1,0 +1,29 @@
+//
+// Navbars (Redux)
+// --------------------------------------------------
+
+
+// COMMON STYLES
+// -------------
+
+// Base class and wrapper
+.navbar {
+    margin-bottom: 0;
+}
+
+// Inner for background effects
+// Gradient is applied to its own element because overflow visible is not honored by IE when filter is present
+.navbar-inner {
+    border-top: none;
+    .border-radius(0);
+
+    .container{
+        width: 1170px;
+    }
+}
+
+// Navbar button for toggling navbar items in responsive layouts
+// These definitions need to come after '.navbar .btn'
+.navbar .btn-navbar {
+  .buttonBackground(darken(@btnPrimaryBackground, 5%), darken(@btnPrimaryBackgroundHighlight, 5%));
+}
