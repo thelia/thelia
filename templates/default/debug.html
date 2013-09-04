@@ -1,14 +1,11 @@
-<h2>ALL ATTRIBUTES AND THEIR AVAILABILITY</h2>
+<h2>ALL ATTRIBUTES</h2>
 
 <ul>
-    {loop name="attr" type="attribute" order="manual" lang="2" backend_context="true"}
+    {loop name="attr" type="attribute"}
     <li>
-        {if #IS_TRANSLATED == 1}#TITLE{else}to be translated{/if}
-        <ul>
-            {loop name="attrav" type="attribute_availability" order="manual" attribute="#ID" lang="3"}
-            <li>{if #IS_TRANSLATED == 1}#TITLE{else}to be translated{/if}</li>
-            {/loop}
-        </ul>
+        #TITLE - (#LOOP_COUNT / #LOOP_TOTAL)<br />
+        created at {format_date date=$CREATE_DATE} - updated at {format_date date=$UPDATE_DATE}
+        <hr />
     </li>
     {/loop}
 </ul>

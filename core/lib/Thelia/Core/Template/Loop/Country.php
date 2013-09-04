@@ -45,6 +45,8 @@ use Thelia\Model\ConfigQuery;
  */
 class Country extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -101,10 +103,10 @@ class Country extends BaseI18nLoop
         /* perform search */
         $countries = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($countries);
 
         foreach ($countries as $country) {
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $country, $this->versionable, $this->timestampable, $this->countable);
             $loopResultRow->set("ID", $country->getId())
                 ->set("IS_TRANSLATED",$country->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE",$locale)

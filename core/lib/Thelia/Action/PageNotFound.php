@@ -27,6 +27,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Model\ConfigQuery;
 
@@ -40,7 +41,7 @@ class PageNotFound extends BaseAction implements EventSubscriberInterface
 {
     public function display404(GetResponseForExceptionEvent $event)
     {
-        if(is_a($event->getException(), 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException')) {
+        if($event->getException() instanceof NotFoundHttpException) {
 
             $parser = $this->container->get("thelia.parser");
 

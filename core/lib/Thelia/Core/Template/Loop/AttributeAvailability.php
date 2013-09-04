@@ -48,6 +48,8 @@ use Thelia\Type;
  */
 class AttributeAvailability extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -119,10 +121,10 @@ class AttributeAvailability extends BaseI18nLoop
         /* perform search */
         $attributesAv = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($attributesAv);
 
         foreach ($attributesAv as $attributeAv) {
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $attributeAv, $this->versionable, $this->timestampable, $this->countable);
             $loopResultRow->set("ID", $attributeAv->getId())
                 ->set("IS_TRANSLATED",$attributeAv->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE",$locale)
