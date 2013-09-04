@@ -63,6 +63,8 @@ class Address extends BaseAction implements EventSubscriberInterface
             ->setCompany($event->getCompany())
             ->save()
         ;
+
+        $event->setAddress($addressModel);
     }
 
     /**
