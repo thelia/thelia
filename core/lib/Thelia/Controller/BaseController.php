@@ -205,11 +205,10 @@ class BaseController extends ContainerAware
 
     /**
      * Return a 404 error
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function pageNotFound()
     {
-
+        throw new NotFoundHttpException();
     }
 }
