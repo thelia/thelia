@@ -22,128 +22,33 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
-
 use Symfony\Component\EventDispatcher\Event;
-use Thelia\Model\Cart;
+use Thelia\Model\Address;
 
-class CartEvent extends ActionEvent
+
+/**
+ * Class AddressEvent
+ * @package Thelia\Core\Event
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+class AddressEvent extends ActionEvent
 {
-    protected $cart;
-    protected $quantity;
-    protected $append;
-    protected $newness;
-    protected $productSaleElementsId;
-    protected $product;
-    protected $cartItem;
+    /**
+     * @var \Thelia\Model\Address
+     */
+    protected $address;
 
-    public function __construct(Cart $cart)
+    function __construct(Address $address)
     {
-        $this->cart = $cart;
+        $this->address = $address;
     }
+
 
     /**
-     * @param mixed $append
+     * @return \Thelia\Model\Address
      */
-    public function setAppend($append)
+    public function getAddress()
     {
-        $this->append = $append;
+        return $this->address;
     }
-
-    /**
-     * @return mixed
-     */
-    public function getAppend()
-    {
-        return $this->append;
-    }
-
-    /**
-     * @param mixed $cartItem
-     */
-    public function setCartItem($cartItem)
-    {
-        $this->cartItem = $cartItem;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCartItem()
-    {
-        return $this->cartItem;
-    }
-
-    /**
-     * @param mixed $newness
-     */
-    public function setNewness($newness)
-    {
-        $this->newness = $newness;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getNewness()
-    {
-        return $this->newness;
-    }
-
-    /**
-     * @param mixed $product
-     */
-    public function setProduct($product)
-    {
-        $this->product = $product;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getProduct()
-    {
-        return $this->product;
-    }
-
-    /**
-     * @param mixed $productSaleElementsId
-     */
-    public function setProductSaleElementsId($productSaleElementsId)
-    {
-        $this->productSaleElementsId = $productSaleElementsId;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getProductSaleElementsId()
-    {
-        return $this->productSaleElementsId;
-    }
-
-    /**
-     * @param mixed $quantity
-     */
-    public function setQuantity($quantity)
-    {
-        $this->quantity = $quantity;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getQuantity()
-    {
-        return $this->quantity;
-    }
-
-    /**
-     * @return \Thelia\Model\Cart
-     */
-    public function getCart()
-    {
-        return $this->cart;
-    }
-
-
 }

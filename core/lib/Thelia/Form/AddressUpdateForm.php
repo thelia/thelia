@@ -20,52 +20,50 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Controller\Front;
 
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Model\ConfigQuery;
-use Thelia\Tools\Redirect;
-use Thelia\Tools\URL;
+namespace Thelia\Form;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 
 /**
- *
- * Must be the last controller call. It fixes default values
- *
- * @author Manuel Raynaud <mraynadu@openstudio.fr>
+ * Class AddressUpdateForm
+ * @package Thelia\Form
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
+class AddressUpdateForm extends AddressCreateForm {
 
-class DefaultController extends BaseFrontController
-{
     /**
      *
-     * set the default value for thelia
+     * in this function you add all the fields you need for your Form.
+     * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * In this case there is no action so we have to verify if some needed params are not missing
+     * $this->formBuilder->add("name", "text")
+     *   ->add("email", "email", array(
+     *           "attr" => array(
+     *               "class" => "field"
+     *           ),
+     *           "label" => "email",
+     *           "constraints" => array(
+     *               new \Symfony\Component\Validator\Constraints\NotBlank()
+     *           )
+     *       )
+     *   )
+     *   ->add('age', 'integer');
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return null
      */
-    public function noAction(Request $request)
+    protected function buildForm()
     {
-        if(ConfigQuery::isRewritingEnable()) {
+        parent::buildForm();
 
-            /* Does the query GET parameters match a rewritten URL ? */
-            $rewrittenUrl = URL::getInstance()->retrieveCurrent();
-            if($rewrittenUrl->rewrittenUrl !== null) {
-                /* 301 redirection to rewritten URL */
-                $this->redirect($rewrittenUrl->rewrittenUrl, 301);
-            }
-        }
 
-        $view = null;
+    }
 
-        if (! $view = $request->query->get('view')) {
-            if ($request->request->has('view')) {
-                $view = $request->request->get('view');
-            }
-        }
-        if(!is_null($view)) {
-            $request->attributes->set('_view', $view);
-        }
-
+    /**
+     * @return string the name of you form. This name must be unique
+     */
+    public function getName()
+    {
+        return "thelia_address_update";
     }
 }

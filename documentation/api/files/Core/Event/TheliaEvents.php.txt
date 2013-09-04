@@ -78,11 +78,11 @@ final class TheliaEvents
     /**
      * Sent once the customer change form has been successfully validated, and before customer update in the database.
      */
-    const BEFORE_CHANGECUSTOMER = "action.before_changecustomer";
+    const BEFORE_UPDATECUSTOMER = "action.before_changecustomer";
     /**
      * Sent just after a successful update of a customer in the database.
      */
-    const AFTER_CHANGECUSTOMER 	= "action.after_changecustomer";
+    const AFTER_UPDATECUSTOMER 	= "action.after_changecustomer";
 
     /**
      * Sent once the category creation form has been successfully validated, and before category insertion in the database.

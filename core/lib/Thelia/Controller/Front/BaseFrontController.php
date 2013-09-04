@@ -23,6 +23,7 @@
 namespace Thelia\Controller\Front;
 
 use Thelia\Controller\BaseController;
+use Thelia\Tools\URL;
 
 class BaseFrontController extends BaseController
 {

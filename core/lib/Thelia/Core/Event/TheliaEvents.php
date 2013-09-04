@@ -88,12 +88,13 @@ final class TheliaEvents
     /**
      * Sent once the customer change form has been successfully validated, and before customer update in the database.
      */
-    const BEFORE_CHANGECUSTOMER = "action.before_updateCustomer";
+    const BEFORE_UPDATECUSTOMER = "action.before_updateCustomer";
     /**
      * Sent just after a successful update of a customer in the database.
      */
-    const AFTER_CHANGECUSTOMER 	= "action.after_updateCustomer";
+    const AFTER_UPDATECUSTOMER 	= "action.after_updateCustomer";
 
+    // -- ADDRESS MANAGEMENT ---------------------------------------------------------
     /**
      * sent for address creation
      */
@@ -103,6 +104,17 @@ final class TheliaEvents
      * sent for address creation
      */
     const ADDRESS_UPDATE = "action.updateAddress";
+
+    const BEFORE_CREATEADDRESS = "action.before_createAddress";
+    const AFTER_CREATEADDRESS  = "action.after_createAddress";
+
+    const BEFORE_UPDATEADDRESS = "action.before_updateAddress";
+    const AFTER_UPDATEADDRESS = "action.after_updateAddress";
+
+    const BEFORE_DELETEADDRESS = "action.before_deleteAddress";
+    const AFTER_DELETEADDRESS = "action.after_deleteAddress";
+
+    // -- END ADDRESS MANAGEMENT ---------------------------------------------------------
 
     /**
      * Sent once the category creation form has been successfully validated, and before category insertion in the database.

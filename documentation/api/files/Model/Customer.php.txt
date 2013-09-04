@@ -125,7 +125,7 @@ class Customer extends BaseCustomer implements UserInterface
     public function preUpdate(ConnectionInterface $con = null)
     {
         $customerEvent = new CustomerEvent($this);
-        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECUSTOMER, $customerEvent);
+        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECUSTOMER, $customerEvent);
 
         return true;
     }
@@ -133,7 +133,7 @@ class Customer extends BaseCustomer implements UserInterface
     public function postUpdate(ConnectionInterface $con = null)
     {
         $customerEvent = new CustomerEvent($this);
-        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECUSTOMER, $customerEvent);
+        $this->dispatchEvent(TheliaEvents::AFTER_UPDATECUSTOMER, $customerEvent);
     }
 
     protected function dispatchEvent($eventName, CustomerEvent $customerEvent)

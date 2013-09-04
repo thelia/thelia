@@ -1,0 +1,99 @@
+{check_auth context="front" roles="CUSTOMER" login_tpl="login"}
+{include file="includes/header.html"}
+{$page_title="{intl l='My Account'}"}
+
+
+{form name="thelia.address.create"}
+{if $form_error}<div class="alert alert-block alert-error">{$form_error_message}</div>{/if}
+{* We use {navigate to="index"} as form action to avoid mixing post and get data *}
+<form action="{url path="/address/create" }" method="post" {form_enctype form=$form}>
+    {form_field form=$form field='success_url'}
+        <input type="hidden" name="{$name}" value="{viewurl view="address_list"}" />
+    {/form_field}
+    {form_hidden_fields form=$form}
+
+    {form_field form=$form field="label"}
+    {if $error}{$message}{/if}
+
+        <label> <span>{intl l="{$label}"} : </span></label>
+        <input type="text" name="{$name}" value="{$value}" {$attr}>
+        <br />
+    {/form_field}
+
+    {form_field form=$form field="title"}
+    {if $error}{$message}{/if}
+
+        <label> <span>{intl l="{$label}"} : </span></label>
+        <select name="{$name}">
+            {loop type="title" name="title1"}
+                <option value="#ID">#LONG</option>
+            {/loop}
+
+        </select>
+        <br />
+    {/form_field}
+
+    {form_field form=$form field="firstname"}
+    {if $error}{$message}{/if}
+
+        <label> <span>{intl l="{$label}"} : </span></label>
+        <input type="text" name="{$name}" value="{$value}" {$attr}>
+        <br />
+    {/form_field}
+
+    {form_field form=$form field="lastname"}
+    {if $error}{$message}{/if}
+
+        <label> <span>{intl l="{$label}"} : </span></label>
+        <input type="text" name="{$name}" value="{$value}" {$attr}>
+        <br />
+    {/form_field}
+
+    {form_field form=$form field="address1"}
+    {if $error}{$message}{/if}
+
+        <label> <span>{intl l="{$label}"} : </span></label>
+        <input type="text" name="{$name}" value="{$value}" {$attr}>
+        <br />
+    {/form_field}
+    {form_field form=$form field="zipcode"}
+    {if $error}{$message}{/if}
+
+        <label> <span>{intl l="{$label}"} : </span></label>
+        <input type="text" name="{$name}" value="{$value}" {$attr}>
+        <br />
+    {/form_field}
+
+    {form_field form=$form field="city"}
+    {if $error}{$message}{/if}
+
+        <label> <span>{intl l="{$label}"} : </span></label>
+        <input type="text" name="{$name}" value="{$value}" {$attr}>
+        <br />
+    {/form_field}
+
+    {form_field form=$form field="country"}
+    {if $error}{$message}{/if}
+
+        <label> <span>{intl l="{$label}"} : </span></label>
+        <select name="{$name}">
+            {loop type="country" name="country1"}
+            <option value="#ID">#TITLE</option>
+            {/loop}
+
+        </select>
+        <br />
+    {/form_field}
+    {form_field form=$form field="phone"}
+    {if $error}{$message}{/if}
+
+        <label> <span>{intl l="{$label}"} : </span></label>
+        <input type="text" name="{$name}" value="{$value}" {$attr}>
+        <br />
+    {/form_field}
+    <input type="submit" value="submit">
+</form>
+{/form}
+
+
+{include file="includes/footer.html"}
