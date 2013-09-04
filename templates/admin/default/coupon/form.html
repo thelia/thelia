@@ -72,7 +72,7 @@
                     <label for="expiration-date">Expiration date :</label>
                     <div class="input-append date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
                         {form_field form=$form field='expirationDate'}
-                            <input type="text" id="expiration-date" name="expiration-date" value="{$value}">
+                            <input type="text" id="expiration-date" name="{$name}" value="{$value}">
                             {if $error}{$message}{/if}
                         {/form_field}
                         <span class="add-on"><span class="icon-th"></span></span>

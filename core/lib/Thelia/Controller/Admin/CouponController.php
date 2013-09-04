@@ -118,9 +118,9 @@ class CouponController extends BaseAdminController
                 );
                 $this->adminLogAppend(
                     sprintf(
-                        'Coupon %s (ID %s) created',
-                        $couponEvent->getTitle(),
-                        $couponEvent->getCoupon()->getId()
+                        'Coupon %s (ID ) created',
+                        $couponEvent->getTitle()
+//                        $couponEvent->getCoupon()->getId()
                     )
                 );
                 // @todo redirect if successful
