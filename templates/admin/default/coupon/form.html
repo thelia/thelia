@@ -10,6 +10,10 @@
                 <input type="hidden" name="{$name}" value="{if $value}{$value}{else}{$edit_language_locale}{/if}" />
             {/form_field}
 
+            {form_field form=$form field='success_url'}
+                <input type="hidden" name="{$name}" value="{url path='/admin/coupon/read/{id}'}" />
+            {/form_field}
+
             <div class="span4">
                 <div class="control-group">
                     <label for="code">Code :</label>
@@ -30,9 +34,8 @@
                 <div class="control-group">
                     <label for="enabled" class="checkbox">
                         {form_field form=$form field='isEnabled'}
-                            <input id="enabled" type="checkbox" name="{$name}" {if $value}checked{/if} >
+                            <input id="enabled" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
                             {if $error}{$message}{/if}
-                        value = {$value}
                         {/form_field}
                         Is enabled ?
                     </label>
@@ -41,7 +44,7 @@
                 <div class="control-group">
                     <label for="available-on-special-offers" class="checkbox">
                         {form_field form=$form field='isAvailableOnSpecialOffers'}
-                            <input id="available-on-special-offers" type="checkbox" name="{$name}" {if $value}checked{/if} >
+                            <input id="available-on-special-offers" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
                             {if $error}{$message}{/if}
                         {/form_field}
                         Is available on special offers ?
@@ -51,7 +54,7 @@
                 <div class="control-group">
                     <label for="cumulative" class="checkbox">
                         {form_field form=$form field='isCumulative'}
-                            <input id="cumulative" type="checkbox" name="{$name}" {if $value}checked{/if} >
+                            <input id="cumulative" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
                             {if $error}{$message}{/if}
                         {/form_field}
                         Is cumulative ?
@@ -61,7 +64,7 @@
                 <div class="control-group">
                     <label for="renoving-postage" class="checkbox">
                         {form_field form=$form field='isRemovingPostage'}
-                            <input id="renoving-postage" type="checkbox" name="{$name}" {if $value}checked{/if} >
+                            <input id="renoving-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
                             {if $error}{$message}{/if}
                         {/form_field}
                         Is removing postage ?
@@ -72,7 +75,7 @@
                     <label for="expiration-date">Expiration date :</label>
                     <div class="input-append date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
                         {form_field form=$form field='expirationDate'}
-                            <input type="text" id="expiration-date" name="{$name}" value="{$value}">
+                            <input type="text" id="expiration-date" name="{$name}" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}">
                             {if $error}{$message}{/if}
                         {/form_field}
                         <span class="add-on"><span class="icon-th"></span></span>
@@ -82,7 +85,7 @@
                 <div class="control-group">
                     <label for="max-usage">Max usage :</label>
                     <label for="is-unlimited" class="checkbox">
-                        <input id="is-unlimited" type="checkbox" name="{$name}" {if $value}checked{/if} >
+                        <input id="is-unlimited" type="checkbox" name="is-unlimited" checked >
                         Is unlimited ?
                     </label>
                     {form_field form=$form field='maxUsage'}
@@ -117,24 +120,24 @@
                                 {if $error}{$message}{/if}
                             {/form_field}
                         </div>
-                        <div class="control-group">
-                            <label for="category">Category :</label>
+                        {*<div class="control-group">*}
+                            {*<label for="category">Category :</label>*}
                             {*form_field form=$form field='category'*}
-                                <select name="{$name}" value="{$value}" id="category">
-                                    <option value="1">Category 1</option>
-                                    <option value="1">Category 2</option>
-                                    <option value="1">Category 3</option>
-                                </select>
+                                {*<select name="{$name}" value="{$value}" id="category">*}
+                                    {*<option value="1">Category 1</option>*}
+                                    {*<option value="1">Category 2</option>*}
+                                    {*<option value="1">Category 3</option>*}
+                                {*</select>*}
                                 {*if $error}{$message}{/if}*}
                             {*/form_field*}
-                        </div>
+                        {*</div>*}
                     </div>
                 </div>
 
                 <div class="control-group">
                     <label for="short-description">Short description :</label>
                     {form_field form=$form field='shortDescription'}
-                        <textarea id="short-description" name="{$name}" value="{$value}" placeholder="short description" class="span12" rows="5"></textarea>
+                        <textarea id="short-description" name="{$name}" placeholder="short description" class="span12" rows="5">{$value nofilter}</textarea>
                         {if $error}{$message}{/if}
                     {/form_field}
                 </div>

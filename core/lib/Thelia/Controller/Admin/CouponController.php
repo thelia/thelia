@@ -68,8 +68,6 @@ class CouponController extends BaseAdminController
     /**
      * Manage Coupons creation display
      *
-     * @param array $args GET arguments
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction()
@@ -80,96 +78,106 @@ class CouponController extends BaseAdminController
             return $response;
         }
 
-        $message = false;
+        // Parameters given to the template
+        $args = array();
 
-        // Create the form from the request
-        $creationForm = new CouponCreationForm($this->getRequest());
+        $i18n = new I18n();
+        /** @var Lang $lang */
+        $lang = $this->getSession()->get('lang');
+        $eventToDispatch = TheliaEvents::COUPON_CREATE;
 
         if ($this->getRequest()->isMethod('POST')) {
-            try {
-                // Check the form against constraints violations
-                $form = $this->validateForm($creationForm, 'POST');
-                $i18n = new I18n();
-                /** @var Lang $lang */
-                $lang = $this->getSession()->get('lang');
-
-                // Get the form field values
-                $data = $form->getData();
-                $couponEvent = new CouponCreateOrUpdateEvent(
-                    $data['code'],
-                    $data['title'],
-                    $data['amount'],
-                    $data['effect'],
-                    $data['shortDescription'],
-                    $data['description'],
-                    $data['isEnabled'],
-                    $i18n->getDateTimeFromForm($lang, $data['expirationDate']),
-                    $data['isAvailableOnSpecialOffers'],
-                    $data['isCumulative'],
-                    $data['isRemovingPostage'],
-                    $data['maxUsage'],
-                    array(),
-                    $data['locale']
-                );
-
-                $this->dispatch(
-                    TheliaEvents::COUPON_CREATE,
-                    $couponEvent
-                );
-                $this->adminLogAppend(
-                    sprintf(
-                        'Coupon %s (ID ) created',
-                        $couponEvent->getTitle()
-//                        $couponEvent->getCoupon()->getId()
-                    )
-                );
-                // @todo redirect if successful
-            } catch (FormValidationException $e) {
-                // Invalid data entered
-                $message = 'Please check your input:';
-                $this->logError('creation', $message, $e);
-
-            } catch (\Exception $e) {
-                // Any other error
-                $message = 'Sorry, an error occurred:';
-                $this->logError('creation', $message, $e);
-            }
-
-            if ($message !== false) {
-                // Mark the form as with error
-                $creationForm->setErrorMessage($message);
-
-                // Send the form and the error to the parser
-                $this->getParserContext()
-                    ->addForm($creationForm)
-                    ->setGeneralError($message);
-            }
+            $this->validateCreateOrUpdateForm(
+                $i18n,
+                $lang,
+                $eventToDispatch,
+                'created',
+                'creation'
+            );
+        } else {
+            // If no input for expirationDate, now + 2 months
+            $defaultDate = new \DateTime();
+            $args['defaultDate'] = $defaultDate->modify('+2 month')
+                ->format($lang->getDateFormat());
         }
 
-        $formAction = 'admin/coupon/create';
+        $args['formAction'] = 'admin/coupon/create';
 
         return $this->render(
             'coupon-create',
-            array(
-                'formAction' => $formAction
-            )
+            $args
         );
     }
 
     /**
      * Manage Coupons edition display
      *
-     * @param array $args GET arguments
+     * @param int $couponId Coupon id
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function editAction($couponId)
+    public function updateAction($couponId)
     {
-        $this->checkAuth('ADMIN', 'admin.coupon.edit');
+        // Check current user authorization
+        $response = $this->checkAuth('admin.coupon.update');
+        if ($response !==  null) {
+            return $response;
+        }
 
-        $formAction = 'admin/coupon/edit/' . $couponId;
+        /** @var Coupon $coupon */
+        $coupon = CouponQuery::create()->findOneById($couponId);
+        if (!$coupon) {
+            $this->pageNotFound();
+        }
 
-        return $this->render('coupon-edit', array('formAction' => $formAction));
+        // Parameters given to the template
+        $args = array();
+
+        $i18n = new I18n();
+        /** @var Lang $lang */
+        $lang = $this->getSession()->get('lang');
+        $eventToDispatch = TheliaEvents::COUPON_UPDATE;
+
+        if ($this->getRequest()->isMethod('POST')) {
+            $this->validateCreateOrUpdateForm(
+                $i18n,
+                $lang,
+                $eventToDispatch,
+                'updated',
+                'update'
+            );
+        } else {
+            // Prepare the data that will hydrate the form
+            $data = array(
+                'code' => $coupon->getCode(),
+                'title' => $coupon->getTitle(),
+                'amount' => $coupon->getAmount(),
+                'effect' => $coupon->getType(),
+                'shortDescription' => $coupon->getShortDescription(),
+                'description' => $coupon->getDescription(),
+                'isEnabled' => ($coupon->getIsEnabled() == 1),
+                'expirationDate' => $coupon->getExpirationDate($lang->getDateFormat()),
+                'isAvailableOnSpecialOffers' => ($coupon->getIsAvailableOnSpecialOffers() == 1),
+                'isCumulative' => ($coupon->getIsCumulative() == 1),
+                'isRemovingPostage' => ($coupon->getIsRemovingPostage() == 1),
+                'maxUsage' => $coupon->getMaxUsage(),
+                'rules' => new CouponRuleCollection(array()),
+                'locale' => $coupon->getLocale(),
+            );
+
+            // Setup the object form
+            $changeForm = new CouponCreationForm($this->getRequest(), 'form', $data);
+
+            // Pass it to the parser
+            $this->getParserContext()->addForm($changeForm);
+        }
+
+        $args['formAction'] = 'admin/coupon/update/' . $couponId;
+
+        return $this->render(
+            'coupon-update',
+            $args
+        );
     }
 
     /**
@@ -247,6 +255,92 @@ class CouponController extends BaseAdminController
                 $e->getMessage()
             )
         );
+
+        return $this;
+    }
+
+    /**
+     * Validate the CreateOrUpdate form
+     *
+     * @param string $i18n            Local code (fr_FR)
+     * @param Lang   $lang            Local variables container
+     * @param string $eventToDispatch Event which will activate actions
+     * @param string $log             created|edited
+     * @param string $action          creation|edition
+     *
+     * @return $this
+     */
+    protected function validateCreateOrUpdateForm($i18n, $lang, $eventToDispatch, $log, $action)
+    {
+        // Create the form from the request
+        $creationForm = new CouponCreationForm($this->getRequest());
+
+        $message = false;
+        try {
+            // Check the form against constraints violations
+            $form = $this->validateForm($creationForm, 'POST');
+
+            // Get the form field values
+            $data = $form->getData();
+            $couponEvent = new CouponCreateOrUpdateEvent(
+                $data['code'],
+                $data['title'],
+                $data['amount'],
+                $data['effect'],
+                $data['shortDescription'],
+                $data['description'],
+                $data['isEnabled'],
+                $i18n->getDateTimeFromForm($lang, $data['expirationDate']),
+                $data['isAvailableOnSpecialOffers'],
+                $data['isCumulative'],
+                $data['isRemovingPostage'],
+                $data['maxUsage'],
+                new CouponRuleCollection(array()),
+                $data['locale']
+            );
+
+            // Dispatch Event to the Action
+            $this->dispatch(
+                $eventToDispatch,
+                $couponEvent
+            );
+
+            $this->adminLogAppend(
+                sprintf(
+                    'Coupon %s (ID ) ' . $log,
+                    $couponEvent->getTitle(),
+                    $couponEvent->getCoupon()->getId()
+                )
+            );
+
+            $this->redirect(
+                str_replace(
+                    '{id}',
+                    $couponEvent->getCoupon()->getId(),
+                    $creationForm->getSuccessUrl()
+                )
+            );
+
+        } catch (FormValidationException $e) {
+            // Invalid data entered
+            $message = 'Please check your input:';
+            $this->logError($action, $message, $e);
+
+        } catch (\Exception $e) {
+            // Any other error
+            $message = 'Sorry, an error occurred:';
+            $this->logError($action, $message, $e);
+        }
+
+        if ($message !== false) {
+            // Mark the form as with error
+            $creationForm->setErrorMessage($message);
+
+            // Send the form and the error to the parser
+            $this->getParserContext()
+                ->addForm($creationForm)
+                ->setGeneralError($message);
+        }
 
         return $this;
     }

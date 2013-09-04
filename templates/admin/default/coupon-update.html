@@ -1,6 +1,6 @@
 {extends file="admin-layout.tpl"}
-{block name="check-permissions"}admin.coupon.edit{/block}
-{block name="page-title"}{intl l='Edit coupon'}{/block}
+{block name="check-permissions"}admin.coupon.update{/block}
+{block name="page-title"}{intl l='Update coupon'}{/block}
 
 {block name="main-content"}
 <section id="wrapper" class="container">
@@ -12,10 +12,10 @@
     </nav>
 
     <div class="page-header">
-        <h1>Coupons : <small>Add a coupon</small></h1>
+        <h1>Coupons : <small>Update a coupon</small></h1>
     </div>
 
-    {form name="thelia.admin.coupon.edit"}
+    {form name="thelia.admin.coupon.creation"}
         {include file='coupon/form.html' formAction={url path={$formAction}} form=$form}
     {/form}
 

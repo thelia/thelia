@@ -44,6 +44,9 @@ use Thelia\Model\Map\CouponTableMap;
 class Coupon extends BaseCoupon
 {
 
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
+
     /**
      * Constructor
      *
@@ -60,9 +63,9 @@ class Coupon extends BaseCoupon
      * @param boolean              $isRemovingPostage          Is removing Postage
      * @param int                  $maxUsage                   Coupon quantity
      * @param CouponRuleCollection $rules                      CouponRuleInterface to add
-     * @param string               $lang                       Coupon Language code ISO (ex: fr_FR)
+     * @param string               $locale                       Coupon Language code ISO (ex: fr_FR)
      */
-    function createOrUpdate($code, $title, $amount, $effect, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $rules, $lang = null)
+    function createOrUpdate($code, $title, $amount, $effect, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $rules, $locale = null)
     {
         $this->setCode($code)
             ->setTitle($title)
@@ -79,8 +82,8 @@ class Coupon extends BaseCoupon
             ->setRules($rules);
 
         // Set object language (i18n)
-        if (!is_null($lang)) {
-            $this->setLang($lang);
+        if (!is_null($locale)) {
+            $this->setLocale($locale);
         }
 
         $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);

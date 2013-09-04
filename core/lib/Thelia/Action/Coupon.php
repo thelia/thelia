@@ -92,7 +92,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->isCumulative(),
             $event->getMaxUsage(),
             $event->getRules(),
-            $event->getLang()
+            $event->getLocale()
         );
 
         $event->setCoupon($coupon);

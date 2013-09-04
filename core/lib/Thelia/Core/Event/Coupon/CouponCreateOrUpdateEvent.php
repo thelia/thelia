@@ -22,7 +22,6 @@
 /**********************************************************************************/
 
 namespace Thelia\Core\Event\Coupon;
-use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Model\Coupon;
@@ -83,7 +82,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     protected $effect;
 
     /** @var string Language code ISO (ex: fr_FR) */
-    protected $lang = null;
+    protected $locale = null;
 
     /**
      * Constructor
@@ -101,7 +100,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param boolean              $isRemovingPostage          Is removing Postage
      * @param int                  $maxUsage                   Coupon quantity
      * @param CouponRuleCollection $rules                      CouponRuleInterface to add
-     * @param string               $lang                       Coupon Language code ISO (ex: fr_FR)
+     * @param string               $locale                     Coupon Language code ISO (ex: fr_FR)
      */
     function __construct(
         $code,
@@ -117,7 +116,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         $isRemovingPostage,
         $maxUsage,
         $rules,
-        $lang
+        $locale
     ) {
         $this->amount = $amount;
         $this->code = $code;
@@ -132,7 +131,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         $this->shortDescription = $shortDescription;
         $this->title = $title;
         $this->effect = $effect;
-        $this->lang = $lang;
+        $this->locale = $locale;
     }
 
     /**
@@ -214,7 +213,13 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      */
     public function getRules()
     {
-        return clone $this->rules;
+        if ($this->rules === null || !is_object($this->rules)) {
+            $rules = $this->rules;
+        } else {
+            $rules =  clone $this->rules;
+        }
+
+        return $rules;
     }
 
     /**
@@ -273,20 +278,28 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @return string
      */
-    public function getLang()
+    public function getLocale()
     {
-        return $this->lang;
+        return $this->locale;
     }
 
     /**
-     * @param \Thelia\Model\Coupon $coupon
+     * Set Coupon Model
+     *
+     * @param \Thelia\Model\Coupon $coupon Coupon Model
+     *
+     * @return $this
      */
     public function setCoupon($coupon)
     {
         $this->coupon = $coupon;
+
+        return $this;
     }
 
     /**
+     * Return Coupon Model
+     *
      * @return \Thelia\Model\Coupon
      */
     public function getCoupon()

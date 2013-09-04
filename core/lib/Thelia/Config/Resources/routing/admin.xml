@@ -52,8 +52,8 @@
     <route id="admin.coupon.create" path="/admin/coupon/create">
         <default key="_controller">Thelia\Controller\Admin\CouponController::createAction</default>
     </route>
-    <route id="admin.coupon.edit" path="/admin/coupon/edit/{couponId}">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::editAction</default>
+    <route id="admin.coupon.update" path="/admin/coupon/update/{couponId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::updateAction</default>
     </route>
     <route id="admin.coupon.read" path="/admin/coupon/read/{couponId}">
         <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
