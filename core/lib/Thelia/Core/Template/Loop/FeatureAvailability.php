@@ -46,6 +46,8 @@ use Thelia\Type;
  */
 class FeatureAvailability extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -117,10 +119,10 @@ class FeatureAvailability extends BaseI18nLoop
         /* perform search */
         $featuresAv = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($featuresAv);
 
         foreach ($featuresAv as $featureAv) {
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $featureAv, $this->versionable, $this->timestampable, $this->countable);
             $loopResultRow->set("ID", $featureAv->getId())
                 ->set("IS_TRANSLATED",$featureAv->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE",$locale)

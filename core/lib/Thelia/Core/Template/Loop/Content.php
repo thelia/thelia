@@ -51,6 +51,9 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Content extends BaseI18nLoop
 {
+    public $timestampable = true;
+    public $versionable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -207,10 +210,10 @@ class Content extends BaseI18nLoop
 
         $contents = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($contents);
 
         foreach ($contents as $content) {
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $content, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow->set("ID", $content->getId())
                 ->set("IS_TRANSLATED",$content->getVirtualColumn('IS_TRANSLATED'))
