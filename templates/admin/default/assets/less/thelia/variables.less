@@ -8,6 +8,11 @@
 @imgDir : '../img';
 @topBarHeight: 50px;
 
+// Brand colors
+// -------------------------
+
+@brand-primary:         #f39922;
+
 
 // Links
 // -------------------------
@@ -21,7 +26,7 @@
 
 // Buttons
 // -------------------------
-@btn-primary-bg:              #f39922;
+@btn-primary-bg:              @brand-primary;
 
 
 // Iconography
@@ -29,3 +34,14 @@
 
 @icon-font-path:          "../fonts/bootstrap/";
 @icon-font-name:          "glyphicons-halflings-regular";
+
+// COMPONENT VARIABLES
+// --------------------------------------------------
+
+
+// Z-index master list
+// -------------------------
+// Used for a bird's eye view of components dependent on the z-axis
+// Try to avoid customizing these :)
+
+@zindex-dropdown:          1005;

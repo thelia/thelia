@@ -10,8 +10,8 @@
     <div id="wrapper" class="container">
 
         <ul class="breadcrumb">
-            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a> <span class="divider">/</span></li>
-            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a> <span class="divider">/</span></li>
+            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/messages'}">{intl l="Mailing templates"}</a></li>
         </ul>
 
@@ -27,7 +27,7 @@
 	                           {intl l='Thelia mailing templates'}
 	                           {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.messages.create"}
                                 <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new mailing template'}" href="#add_message_dialog" data-toggle="modal">
-                                    <i class="glyphicon glyphicon-plus-sign glyphicon-white"></i>
+                                    <span class="glyphicon glyphicon-plus-sign"></span>
                                 </a>
                             {/loop}
 

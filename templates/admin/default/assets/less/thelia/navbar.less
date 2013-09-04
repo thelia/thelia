@@ -24,6 +24,10 @@
 
 // Navbar button for toggling navbar items in responsive layouts
 // These definitions need to come after '.navbar .btn'
-.navbar .btn-navbar {
-  .buttonBackground(darken(@btnPrimaryBackground, 5%), darken(@btnPrimaryBackgroundHighlight, 5%));
+.navbar .btn {
+	.button-variant(@btn-primary-color; @btn-primary-bg; @btn-primary-border); 
+}
+
+.navbar-default .navbar-toggle .icon-bar{
+	background-color: @btn-primary-color;
 }
