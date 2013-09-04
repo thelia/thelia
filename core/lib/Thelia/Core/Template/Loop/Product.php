@@ -520,11 +520,11 @@ class Product extends BaseI18nLoop
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))
                 ->set("POSITION", $product->getPosition())
 
-                ->set("CREATE_DATE", $category->getCreatedAt())
-                ->set("UPDATE_DATE", $category->getUpdatedAt())
-                ->set("VERSION", $category->getVersion())
-                ->set("VERSION_DATE", $category->getVersionCreatedAt())
-                ->set("VERSION_AUTHOR", $category->getVersionCreatedBy())
+                ->set("CREATE_DATE", $product->getCreatedAt())
+                ->set("UPDATE_DATE", $product->getUpdatedAt())
+                ->set("VERSION", $product->getVersion())
+                ->set("VERSION_DATE", $product->getVersionCreatedAt())
+                ->set("VERSION_AUTHOR", $product->getVersionCreatedBy())
             ;
 
             $loopResult->addRow($loopResultRow);
