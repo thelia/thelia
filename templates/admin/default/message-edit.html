@@ -9,7 +9,7 @@
 
     <div id="wrapper" class="container">
 
-        {loop name="message_edit" type="message" secured="*" id="$message_id" backend_context="1" lang="$edition_language"}
+        {loop name="message_edit" type="message" secured="*" id="$message_id" backend_context="1" lang="$edit_language_id"}
 
         <ul class="breadcrumb">
 			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a> <span class="divider">/</span></li>
@@ -47,7 +47,7 @@
                                     {/form_field}
 
 			                        {form_field form=$form field='locale'}
-			                        <input type="hidden" name="{$name}" value="{$value|htmlspecialchars}" />
+			                        <input type="hidden" name="{$name}" value="{{$edit_language_locale}}" />
 			                        {/form_field}
 
 						            {if #form_error}<div class="alert alert-block alert-error">#form_error_message</div>{/if}
@@ -144,7 +144,7 @@
 
                                     <div class="control-group">
                                         <div class="controls">
-                                            <p>{intl l='Message created on %date_create. Last modification: %date_change' df=$datetime_format date_create=$CREATE_DATE->format($datetime_format) date_change=$UPDATE_DATE->format($datetime_format)}</p>
+                                            <p>{intl l='Message created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}}</p>
                                         </div>
                                     </div>
                                 </fieldset>

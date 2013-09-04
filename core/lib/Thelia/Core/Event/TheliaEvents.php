@@ -215,9 +215,11 @@ final class TheliaEvents
 
     // -- Currencies management ---------------------------------------------
 
-    const CURRENCY_CREATE   = "action.createCurrency";
-    const CURRENCY_MODIFY   = "action.changeCurrency";
-    const CURRENCY_DELETE   = "action.deleteCurrency";
+    const CURRENCY_CREATE       = "action.createCurrency";
+    const CURRENCY_MODIFY       = "action.changeCurrency";
+    const CURRENCY_DELETE       = "action.deleteCurrency";
+    const CURRENCY_SET_DEFAULT  = "action.setDefaultCurrency";
+    const CURRENCY_UPDATE_RATES = "action.updateCurrencyRates";
 
     const BEFORE_CREATECURRENCY = "action.before_createCurrency";
     const AFTER_CREATECURRENCY  = "action.after_createCurrency";

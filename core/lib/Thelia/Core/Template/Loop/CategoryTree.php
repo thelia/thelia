@@ -107,8 +107,6 @@ class CategoryTree extends BaseI18nLoop
         $visible = $this->getVisible();
         $exclude = $this->getExclude();
 
-        //echo "exclude=".print_r($exclude);
-
         $loopResult = new LoopResult();
 
         $this->buildCategoryTree($id, $visible, 0, $depth, $exclude, $loopResult);

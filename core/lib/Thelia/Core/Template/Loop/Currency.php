@@ -66,8 +66,9 @@ class Currency extends BaseI18nLoop
                             'code', 'code_reverse',
                             'symbol', 'symbol_reverse',
                             'rate', 'rate_reverse',
+                            'is_default', 'is_default_reverse',
                             'manual', 'manual_reverse')
-                        )
+                    )
                     ),
                 'manual'
             )
@@ -143,6 +144,13 @@ class Currency extends BaseI18nLoop
                     $search->orderByRate(Criteria::DESC);
                     break;
 
+                case 'is_default':
+                    $search->orderByByDefault(Criteria::ASC);
+                    break;
+                case 'is_default_reverse':
+                    $search->orderByByDefault(Criteria::DESC);
+                    break;
+
                 case 'manual':
                     $search->orderByPosition(Criteria::ASC);
                     break;
@@ -169,7 +177,11 @@ class Currency extends BaseI18nLoop
                 ->set("SYMBOL"        , $currency->getSymbol())
                 ->set("RATE"          , $currency->getRate())
                 ->set("POSITION"      , $currency->getPosition())
-                ->set("IS_DEFAULT"    , $currency->getByDefault());
+                ->set("IS_DEFAULT"    , $currency->getByDefault())
+
+                ->set("CREATE_DATE"    , $currency->getCreatedAt())
+                ->set("UPDATE_DATE"    , $currency->getUpdatedAt())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

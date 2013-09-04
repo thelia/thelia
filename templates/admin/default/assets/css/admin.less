@@ -621,6 +621,7 @@ form .info .input-append .add-on {
             li.active a {
                 opacity: 1;
                 background-color: #E7E7E7;
+                border: 1px solid #E9720F;
             }
         }
     }
@@ -657,6 +658,7 @@ label {
     font-weight: normal;
 }
 
+
 .form-horizontal input + .help-block,
 .form-horizontal select + .help-block,
 .form-horizontal textarea + .help-block,
@@ -664,8 +666,9 @@ label {
 .form-horizontal .input-prepend + .help-block,
 .form-horizontal .input-append + .help-block
 .help-block, .form-horizontal .help-block {
-    margin-top: 0px;
+    margin-top: 5px;
 }
+
 
 // Fix for append-fields shorter than others
 // see http://stackoverflow.com/questions/13306670/bootstrap-prepended-and-appended-input-how-to-max-input-field-width
@@ -725,6 +728,17 @@ label {
 
 	td, th {
 		text-align: center;
+
+        &.text-center {
+            text-align: center;
+        }
+        &.text-left {
+            text-align: left;
+        }
+        &.text-right {
+            text-align: right;
+        }
+
 	}
 
 	td.object-title, th.object-title {

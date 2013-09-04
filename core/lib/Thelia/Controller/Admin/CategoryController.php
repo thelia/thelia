@@ -188,7 +188,7 @@ class CategoryController extends BaseAdminController
 
         // Find the current order
         $category_order = $this->getRequest()->get(
-                'category_order',
+                'order',
                 $this->getSession()->get('admin.category_order', 'manual')
         );
 

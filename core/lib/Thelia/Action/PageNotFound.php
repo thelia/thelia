@@ -20,49 +20,65 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Controller\Front;
+
+namespace Thelia\Action;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Model\ConfigQuery;
-use Thelia\Tools\Redirect;
-use Thelia\Tools\URL;
 
 /**
  *
- * Must be the last controller call. It fixes default values
- *
- * @author Manuel Raynaud <mraynadu@openstudio.fr>
+ * Class PageNotFound
+ * @package Thelia\Action
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-
-class DefaultController extends BaseFrontController
+class PageNotFound extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     *
-     * set the default value for thelia
-     *
-     * In this case there is no action so we have to verify if some needed params are not missing
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     */
-    public function noAction(Request $request)
+    public function display404(GetResponseForExceptionEvent $event)
     {
-        if(ConfigQuery::isRewritingEnable()) {
+        if(is_a($event->getException(), 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException')) {
 
-            /* Does the query GET parameters match a rewritten URL ? */
-            $rewrittenUrl = URL::init()->retrieveCurrent($request);
-            if($rewrittenUrl->rewrittenUrl !== null) {
-                /* 301 redirection to rewritten URL */
-                $this->redirect($rewrittenUrl->rewrittenUrl, 301);
-            }
+            $parser = $this->container->get("thelia.parser");
+
+            // Define the template thant shoud be used
+            $parser->setTemplate(ConfigQuery::getActiveTemplate());
+
+            //$event->getRequest()->attributes->set('_view', ConfigQuery::getPageNotFoundView());
+
+            $response = new Response($parser->render(ConfigQuery::getPageNotFoundView()), 404);
+
+            $event->setResponse($response);
         }
+    }
 
-        if (! $view = $request->query->get('view')) {
-            $view = "index";
-            if ($request->request->has('view')) {
-                $view = $request->request->get('view');
-            }
-        }
-
-        $request->attributes->set('_view', $view);
+    /**
+     * Returns an array of event names this subscriber wants to listen to.
+     *
+     * The array keys are event names and the value can be:
+     *
+     *  * The method name to call (priority defaults to 0)
+     *  * An array composed of the method name to call and the priority
+     *  * An array of arrays composed of the method names to call and respective
+     *    priorities, or 0 if unset
+     *
+     * For instance:
+     *
+     *  * array('eventName' => 'methodName')
+     *  * array('eventName' => array('methodName', $priority))
+     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
+     *
+     * @return array The event names to listen to
+     *
+     * @api
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::EXCEPTION => array("display404", 128),
+        );
     }
 }

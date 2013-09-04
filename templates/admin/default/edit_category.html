@@ -12,7 +12,7 @@
 		</ul>
 
         <div class="row-fluid">
-            {loop name="category_edit" type="category" visible="*" id="{$current_category_id}" backend_context="1" lang="$edition_language"}
+            {loop name="category_edit" type="category" visible="*" id="{$current_category_id}" backend_context="1" lang="$edit_language_id"}
             <div class="span12 general-block-decorator">
                 <div class="row-fluid">
                     <div class="span7 title">
@@ -123,7 +123,7 @@
 	                                            <div class="control-group">
 	                                                <lablel>&nbsp;</lablel>
 	                                                <div class="controls">
-	                                                    <p>{intl l='Category created on %date_create. Last modification: %date_change' date_create=$CREATE_DATE->format($datetime_format) date_change=$UPDATE_DATE->format($datetime_format)}</p>
+	                                                    <p>{intl l='Category created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}}</p>
 	                                                </div>
 	                                             </div>
 	                                        </div>

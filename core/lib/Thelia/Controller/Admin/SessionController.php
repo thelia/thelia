@@ -46,7 +46,7 @@ class SessionController extends BaseAdminController
         $this->getSecurityContext()->clearAdminUser();
 
         // Go back to login page.
-        return Redirect::exec(URL::absoluteUrl('/admin/login')); // FIXME - should be a parameter
+        $this->redirectToRoute('admin.login');
     }
 
     public function checkLoginAction()

@@ -31,11 +31,12 @@ use Thelia\Tools\Redirect;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Event\ActionEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Thelia\Core\Factory\ActionEventFactory;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Event\DefaultActionEvent;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  *
@@ -177,9 +178,9 @@ class BaseController extends ContainerAware
      *
      * @param string $url
      */
-    public function redirect($url)
+    public function redirect($url, $status = 302)
     {
-        Redirect::exec($url);
+        Redirect::exec($url, $status);
     }
 
     /**
@@ -199,5 +200,33 @@ class BaseController extends ContainerAware
         echo "url=$url";
 
         if (null !== $url) $this->redirect($url);
+    }
+
+    /**
+     * Get a route path from the route id.
+     *
+     * @param $routerName
+     * @param $routeId
+     *
+     * @return mixed
+     * @throws InvalidArgumentException
+     */
+    protected function getRouteFromRouter($routerName, $routeId) {
+        $route = $this->container->get($routerName)->getRouteCollection()->get($routeId);
+
+        if ($route == null) {
+            throw new InvalidArgumentException(sprintf("Route ID '%s' does not exists.", $routeId));
+        }
+
+        return $route->getPath();
+    }
+
+    /**
+     * Return a 404 error
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    protected function pageNotFound()
+    {
+        throw new NotFoundHttpException();
     }
 }
