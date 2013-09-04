@@ -57,7 +57,7 @@ class CouponOrderTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class CouponOrderTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the ID field
@@ -78,11 +78,6 @@ class CouponOrderTableMap extends TableMap
      * the column name for the ORDER_ID field
      */
     const ORDER_ID = 'coupon_order.ORDER_ID';
-
-    /**
-     * the column name for the CODE field
-     */
-    const CODE = 'coupon_order.CODE';
 
     /**
      * the column name for the VALUE field
@@ -111,12 +106,12 @@ class CouponOrderTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'OrderId', 'Code', 'Value', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'orderId', 'code', 'value', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CouponOrderTableMap::ID, CouponOrderTableMap::ORDER_ID, CouponOrderTableMap::CODE, CouponOrderTableMap::VALUE, CouponOrderTableMap::CREATED_AT, CouponOrderTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_ID', 'CODE', 'VALUE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'order_id', 'code', 'value', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'OrderId', 'Value', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'orderId', 'value', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CouponOrderTableMap::ID, CouponOrderTableMap::ORDER_ID, CouponOrderTableMap::VALUE, CouponOrderTableMap::CREATED_AT, CouponOrderTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_ID', 'VALUE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'order_id', 'value', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -126,12 +121,12 @@ class CouponOrderTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderId' => 1, 'Code' => 2, 'Value' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderId' => 1, 'code' => 2, 'value' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(CouponOrderTableMap::ID => 0, CouponOrderTableMap::ORDER_ID => 1, CouponOrderTableMap::CODE => 2, CouponOrderTableMap::VALUE => 3, CouponOrderTableMap::CREATED_AT => 4, CouponOrderTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_ID' => 1, 'CODE' => 2, 'VALUE' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'order_id' => 1, 'code' => 2, 'value' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderId' => 1, 'Value' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderId' => 1, 'value' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(CouponOrderTableMap::ID => 0, CouponOrderTableMap::ORDER_ID => 1, CouponOrderTableMap::VALUE => 2, CouponOrderTableMap::CREATED_AT => 3, CouponOrderTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_ID' => 1, 'VALUE' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'order_id' => 1, 'value' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -152,7 +147,6 @@ class CouponOrderTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('ORDER_ID', 'OrderId', 'INTEGER', 'order', 'ID', true, null, null);
-        $this->addForeignKey('CODE', 'Code', 'VARCHAR', 'coupon', 'CODE', true, 45, null);
         $this->addColumn('VALUE', 'Value', 'FLOAT', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -164,7 +158,6 @@ class CouponOrderTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('order_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Coupon', '\\Thelia\\Model\\Coupon', RelationMap::MANY_TO_ONE, array('code' => 'code', ), null, null);
     } // buildRelations()
 
     /**
@@ -320,14 +313,12 @@ class CouponOrderTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(CouponOrderTableMap::ID);
             $criteria->addSelectColumn(CouponOrderTableMap::ORDER_ID);
-            $criteria->addSelectColumn(CouponOrderTableMap::CODE);
             $criteria->addSelectColumn(CouponOrderTableMap::VALUE);
             $criteria->addSelectColumn(CouponOrderTableMap::CREATED_AT);
             $criteria->addSelectColumn(CouponOrderTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.ORDER_ID');
-            $criteria->addSelectColumn($alias . '.CODE');
             $criteria->addSelectColumn($alias . '.VALUE');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');

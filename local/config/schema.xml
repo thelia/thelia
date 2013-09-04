@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -337,7 +337,7 @@
   </table>
   <table name="address" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="name" size="255" type="VARCHAR" />
+    <column name="label" size="255" type="VARCHAR" />
     <column name="customer_id" required="true" type="INTEGER" />
     <column name="title_id" required="true" type="INTEGER" />
     <column name="company" size="255" type="VARCHAR" />
@@ -808,25 +808,20 @@
       <index-column name="is_available_on_special_offers" />
     </index>
     <behavior name="timestampable" />
-    <behavior name="i18n" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, short_description, description" />
+    </behavior>
     <behavior name="versionable" />
   </table>
   <table name="coupon_order" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="order_id" required="true" type="INTEGER" />
-    <column name="code" required="true" size="45" type="VARCHAR" />
     <column name="value" required="true" type="FLOAT" />
     <foreign-key foreignTable="order" name="fk_coupon_order_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_id" />
     </foreign-key>
-    <foreign-key foreignTable="coupon" name="fk_coupon_order_coupon">
-      <reference foreign="code" local="code" />
-    </foreign-key>
     <index name="idx_coupon_order_order_id">
       <index-column name="order_id" />
-    </index>
-    <index name="fk_coupon_order_coupon_idx">
-      <index-column name="code" />
     </index>
     <behavior name="timestampable" />
   </table>

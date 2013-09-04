@@ -52,6 +52,18 @@ class RewritingResolverTest extends \PHPUnit_Framework_TestCase
         return $property;
     }
 
+    /**
+     * @expectedException \Thelia\Exception\UrlRewritingException
+     * @expectedExceptionCode 800
+     */
+    public function testGetOtherParametersException()
+    {
+        $resolver = new RewritingResolver();
+
+        $method = $this->getMethod('getOtherParameters');
+        $actual = $method->invoke($resolver);
+    }
+
     public function testGetOtherParameters()
     {
         $rewritingArguments = array(
@@ -78,6 +90,29 @@ class RewritingResolverTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @expectedException \Thelia\Exception\UrlRewritingException
+     * @expectedExceptionCode 404
+     */
+    public function testLoadException()
+    {
+        $collection = new ObjectCollection();
+        $collection->setModel('\Thelia\Model\RewritingArgument');
+
+        $resolverQuery = $this->getMock('\Thelia\Model\RewritingUrlQuery', array('getResolverSearch'));
+        $resolverQuery->expects($this->any())
+            ->method('getResolverSearch')
+            ->with('foo.html')
+            ->will($this->returnValue($collection));
+
+        $resolver = new RewritingResolver();
+
+        $rewritingUrlQuery = $this->getProperty('rewritingUrlQuery');
+        $rewritingUrlQuery->setValue($resolver, $resolverQuery);
+
+        $resolver->load('foo.html');
     }
 
     public function testLoad()

@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\Customer as BaseCustomer;
 
 use Thelia\Model\Exception\InvalidArgumentException;
@@ -74,27 +75,45 @@ class Customer extends BaseCustomer implements UserInterface
         $con = Propel::getWriteConnection(CustomerTableMap::DATABASE_NAME);
         $con->beginTransaction();
         try {
+            if ($this->isNew()) {
+                $address = new Address();
+
+                $address
+                    ->setTitleId($titleId)
+                    ->setFirstname($firstname)
+                    ->setLastname($lastname)
+                    ->setAddress1($address1)
+                    ->setAddress2($address2)
+                    ->setAddress3($address3)
+                    ->setPhone($phone)
+                    ->setCellphone($cellphone)
+                    ->setZipcode($zipcode)
+                    ->setCountryId($countryId)
+                    ->setIsDefault(1)
+                    ;
+
+                $this->addAddress($address);
+
+            } else {
+                $address = $this->getDefaultAddress();
+
+                $address
+                    ->setTitleId($titleId)
+                    ->setFirstname($firstname)
+                    ->setLastname($lastname)
+                    ->setAddress1($address1)
+                    ->setAddress2($address2)
+                    ->setAddress3($address3)
+                    ->setPhone($phone)
+                    ->setCellphone($cellphone)
+                    ->setZipcode($zipcode)
+                    ->setCountryId($countryId)
+                    ->save($con)
+                ;
+            }
             $this->save($con);
 
-            $address = new Address();
-
-            $address
-                ->setTitleId($titleId)
-                ->setFirstname($firstname)
-                ->setLastname($lastname)
-                ->setAddress1($address1)
-                ->setAddress2($address2)
-                ->setAddress3($address3)
-                ->setPhone($phone)
-                ->setCellphone($cellphone)
-                ->setZipcode($zipcode)
-                ->setCountryId($countryId)
-                ->setIsDefault(1)
-                ->setCustomer($this)
-                ->save($con);
-
             $con->commit();
-
 
         } catch(Exception $e) {
             $con->rollback();
@@ -108,11 +127,22 @@ class Customer extends BaseCustomer implements UserInterface
     }
 
     /**
+     * @return Address
+     */
+    public function getDefaultAddress()
+    {
+        return AddressQuery::create()
+            ->filterByCustomer($this)
+            ->filterByIsDefault(1)
+            ->findOne();
+    }
+
+    /**
      * create hash for plain password and set it in Customer object
      *
      * @param string $password plain password before hashing
+     * @throws Exception\InvalidArgumentException
      * @return $this|Customer
-     * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      */
     public function setPassword($password)
     {

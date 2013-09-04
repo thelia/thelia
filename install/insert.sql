@@ -14,7 +14,8 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('original_image_delivery_mode', 'symlink', 0, 0, NOW(), NOW()),
 ('images_library_path', 'local/media/images', 0, 0, NOW(), NOW()),
 ('image_cache_dir_from_web_root', 'cache/images', 0, 0, NOW(), NOW()),
-('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', 0, 0, NOW(), NOW());
+('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', 0, 0, NOW(), NOW()),
+('page_not_found_view', '404.html', 0, 0, NOW(), NOW());
 
 INSERT INTO `module` (`code`, `type`, `activate`, `position`, `created_at`, `updated_at`) VALUES ('test', '1', '1', '1', NOW(), NOW());
 

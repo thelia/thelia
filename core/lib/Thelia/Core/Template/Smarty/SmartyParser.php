@@ -36,6 +36,7 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * @param Request                  $request
      * @param EventDispatcherInterface $dispatcher
+     * @param ParserContext            $parserContext
      * @param bool                     $template
      * @param string                   $env
      * @param bool                     $debug

@@ -220,7 +220,7 @@ class CurrencyController extends BaseAdminController
                 ->setRate($data['rate'])
             ;
 
-            $this->dispatch(TheliaEvents::CURRENCY_MODIFY, $changeEvent);
+            $this->dispatch(TheliaEvents::CURRENCY_UPDATE, $changeEvent);
 
             // Log currency modification
             $changedObject = $changeEvent->getCurrency();

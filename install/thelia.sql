@@ -455,7 +455,7 @@ DROP TABLE IF EXISTS `address`;
 CREATE TABLE `address`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255),
+    `label` VARCHAR(255),
     `customer_id` INTEGER NOT NULL,
     `title_id` INTEGER NOT NULL,
     `company` VARCHAR(255),
@@ -1040,9 +1040,6 @@ CREATE TABLE `coupon`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45) NOT NULL,
     `type` VARCHAR(255) NOT NULL,
-    `title` VARCHAR(255) NOT NULL,
-    `short_description` TEXT NOT NULL,
-    `description` LONGTEXT NOT NULL,
     `amount` FLOAT NOT NULL,
     `is_used` TINYINT NOT NULL,
     `is_enabled` TINYINT NOT NULL,
@@ -1078,21 +1075,16 @@ CREATE TABLE `coupon_order`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `order_id` INTEGER NOT NULL,
-    `code` VARCHAR(45) NOT NULL,
     `value` FLOAT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_coupon_order_order_id` (`order_id`),
-    INDEX `fk_coupon_order_coupon_idx` (`code`),
     CONSTRAINT `fk_coupon_order_order_id`
         FOREIGN KEY (`order_id`)
         REFERENCES `order` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_coupon_order_coupon`
-        FOREIGN KEY (`code`)
-        REFERENCES `coupon` (`code`)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1923,6 +1915,9 @@ CREATE TABLE `coupon_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `short_description` TEXT NOT NULL,
+    `description` LONGTEXT NOT NULL,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `coupon_i18n_FK_1`
         FOREIGN KEY (`id`)
@@ -2186,9 +2181,6 @@ CREATE TABLE `coupon_version`
     `id` INTEGER NOT NULL,
     `code` VARCHAR(45) NOT NULL,
     `type` VARCHAR(255) NOT NULL,
-    `title` VARCHAR(255) NOT NULL,
-    `short_description` TEXT NOT NULL,
-    `description` LONGTEXT NOT NULL,
     `amount` FLOAT NOT NULL,
     `is_used` TINYINT NOT NULL,
     `is_enabled` TINYINT NOT NULL,

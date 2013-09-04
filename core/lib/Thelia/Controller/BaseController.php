@@ -31,7 +31,6 @@ use Thelia\Tools\Redirect;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Event\ActionEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Thelia\Core\Factory\ActionEventFactory;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Symfony\Component\EventDispatcher\Event;
@@ -206,8 +205,11 @@ class BaseController extends ContainerAware
     /**
      * Get a route path from the route id.
      *
-     * @param unknown $routerName either admin.router or front.router
-     * @param unknown $routeName the route ID
+     * @param $routerName
+     * @param $routeId
+     *
+     * @return mixed
+     * @throws InvalidArgumentException
      */
     protected function getRouteFromRouter($routerName, $routeId) {
         $route = $this->container->get($routerName)->getRouteCollection()->get($routeId);
@@ -221,10 +223,10 @@ class BaseController extends ContainerAware
 
     /**
      * Return a 404 error
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     protected function pageNotFound()
     {
+        throw new NotFoundHttpException();
     }
 }

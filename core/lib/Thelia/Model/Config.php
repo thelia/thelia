@@ -55,7 +55,7 @@ class Config extends BaseConfig {
      */
     public function preUpdate(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECONFIG, new ConfigEvent($this));
+        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECONFIG, new ConfigEvent($this));
 
         return true;
     }
@@ -65,7 +65,7 @@ class Config extends BaseConfig {
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECONFIG, new ConfigEvent($this));
+        $this->dispatchEvent(TheliaEvents::AFTER_UPDATECONFIG, new ConfigEvent($this));
     }
 
     /**
