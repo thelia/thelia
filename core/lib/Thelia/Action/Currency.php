@@ -113,7 +113,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::CURRENCY_CREATE   => array("create", 128),
-            TheliaEvents::CURRENCY_MODIFY   => array("modify", 128),
+            TheliaEvents::CURRENCY_UPDATE   => array("modify", 128),
             TheliaEvents::CURRENCY_DELETE   => array("delete", 128),
         );
     }

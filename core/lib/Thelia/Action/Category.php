@@ -53,7 +53,7 @@ class Category extends BaseAction implements EventSubscriberInterface
          );
     }
 
-    public function modify(CategoryChangeEvent $event)
+    public function update(CategoryChangeEvent $event)
     {
     }
 
@@ -242,7 +242,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::CATEGORY_CREATE => array("create", 128),
-            TheliaEvents::CATEGORY_MODIFY => array("modify", 128),
+            TheliaEvents::CATEGORY_UPDATE => array("update", 128),
             TheliaEvents::CATEGORY_DELETE => array("delete", 128),
 
             TheliaEvents::CATEGORY_TOGGLE_VISIBILITY => array("toggleVisibility", 128),

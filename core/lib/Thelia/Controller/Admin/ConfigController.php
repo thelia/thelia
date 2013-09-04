@@ -210,7 +210,7 @@ class ConfigController extends BaseAdminController
                 ->setPostscriptum($data['postscriptum'])
             ;
 
-            $this->dispatch(TheliaEvents::CONFIG_MODIFY, $changeEvent);
+            $this->dispatch(TheliaEvents::CONFIG_UPDATE, $changeEvent);
 
             // Log config modification
             $changedObject = $changeEvent->getConfig();

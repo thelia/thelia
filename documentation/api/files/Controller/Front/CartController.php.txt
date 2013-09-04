@@ -74,7 +74,7 @@ class CartController extends BaseFrontController
         $cartEvent->setQuantity($this->getRequest()->get("quantity"));
 
         try {
-            $this->getDispatcher()->dispatch(TheliaEvents::CART_CHANGEITEM, $cartEvent);
+            $this->getDispatcher()->dispatch(TheliaEvents::CART_UPDATEITEM, $cartEvent);
 
             $this->redirectSuccess();
         } catch(PropelException $e) {

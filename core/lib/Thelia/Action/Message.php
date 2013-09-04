@@ -118,7 +118,7 @@ class Message extends BaseAction implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::MESSAGE_CREATE   => array("create", 128),
-            TheliaEvents::MESSAGE_MODIFY   => array("modify", 128),
+            TheliaEvents::MESSAGE_UPDATE   => array("modify", 128),
             TheliaEvents::MESSAGE_DELETE   => array("delete", 128),
         );
     }
