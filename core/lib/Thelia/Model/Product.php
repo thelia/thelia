@@ -9,6 +9,6 @@ class Product extends BaseProduct
 {
     public function getUrl($locale)
     {
-        return URL::init()->retrieve('product', $this->getId(), $locale);
+        return URL::getInstance()->retrieve('product', $this->getId(), $locale);
     }
 }

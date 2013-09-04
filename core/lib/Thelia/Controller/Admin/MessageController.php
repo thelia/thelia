@@ -265,6 +265,6 @@ class MessageController extends BaseAdminController
 
         $this->dispatch(TheliaEvents::MESSAGE_DELETE, $event);
 
-        $this->redirect(URL::adminViewUrl('messages'));
+        $this->redirect(URL::getInstance()->adminViewUrl('messages'));
     }
 }

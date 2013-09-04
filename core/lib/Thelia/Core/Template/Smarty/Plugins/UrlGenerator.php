@@ -51,7 +51,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         $target = $this->getParam($params, 'target', null);
 
-        $url = URL::absoluteUrl($path, $this->getArgsFromParam($params, array('path', 'target')));
+        $url = URL::getInstance()->absoluteUrl($path, $this->getArgsFromParam($params, array('path', 'target')));
 
         if ($target != null) $url .= '#'.$target;
 
@@ -102,7 +102,7 @@ class UrlGenerator extends AbstractSmartyPlugin
          $args = $this->getArgsFromParam($params, array('view', 'action', 'target'));
 
          if (! empty($action)) $args['action'] = $action;
-         return $forAdmin ? URL::adminViewUrl($view, $args) : URL::viewUrl($view, $args);
+         return $forAdmin ? URL::getInstance()->adminViewUrl($view, $args) : URL::getInstance()->viewUrl($view, $args);
      }
 
      /**
@@ -169,18 +169,16 @@ class UrlGenerator extends AbstractSmartyPlugin
 
     protected function getCurrentUrl()
     {
-        $retriever = URL::init()->retrieveCurrent($this->request);
-
-        return $retriever->rewrittenUrl === null ? $retriever->url : $retriever->rewrittenUrl ;
+        return URL::getInstance()->retrieveCurrent()->toString();
     }
 
     protected function getReturnToUrl()
     {
-        return URL::absoluteUrl($this->request->getSession()->getReturnToUrl());
+        return URL::getInstance()->absoluteUrl($this->request->getSession()->getReturnToUrl());
     }
 
     protected function getIndexUrl()
     {
-        return Url::getIndexPage();
+        return URL::getInstance()->getIndexPage();
     }
 }

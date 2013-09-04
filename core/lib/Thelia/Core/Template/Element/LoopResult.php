@@ -23,6 +23,8 @@
 
 namespace Thelia\Core\Template\Element;
 
+use Propel\Runtime\Collection\ObjectCollection;
+use Propel\Runtime\Util\PropelModelPager;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 class LoopResult implements \Iterator
@@ -30,9 +32,14 @@ class LoopResult implements \Iterator
     private $position;
     protected $collection = array();
 
-    public function __construct()
+    public $modelCollection = null;
+
+    public function __construct($modelCollection = null)
     {
         $this->position = 0;
+        if($modelCollection instanceof ObjectCollection || $modelCollection instanceof PropelModelPager) {
+            $this->modelCollection = $modelCollection;
+        }
     }
 
     public function isEmpty()

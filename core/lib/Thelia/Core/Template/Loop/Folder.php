@@ -46,6 +46,9 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Folder extends BaseI18nLoop
 {
+    public $timestampable = true;
+    public $versionable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -142,7 +145,7 @@ class Folder extends BaseI18nLoop
         /* @todo */
         $notEmpty  = $this->getNot_empty();
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($folders);
 
         foreach ($folders as $folder) {
 
@@ -151,7 +154,7 @@ class Folder extends BaseI18nLoop
              * if ($notEmpty && $folder->countAllProducts() == 0) continue;
              */
 
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $folder, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow
             	->set("ID", $folder->getId())
@@ -166,12 +169,6 @@ class Folder extends BaseI18nLoop
 	            ->set("CONTENT_COUNT", $folder->countChild())
 	            ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
 	            ->set("POSITION", $folder->getPosition())
-
-	            ->set("CREATE_DATE", $folder->getCreatedAt())
-	            ->set("UPDATE_DATE", $folder->getUpdatedAt())
-	            ->set("VERSION", $folder->getVersion())
-	            ->set("VERSION_DATE", $folder->getVersionCreatedAt())
-	            ->set("VERSION_AUTHOR", $folder->getVersionCreatedBy())
 			;
 
             $loopResult->addRow($loopResultRow);

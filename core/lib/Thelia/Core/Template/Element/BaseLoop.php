@@ -54,6 +54,10 @@ abstract class BaseLoop
 
     protected $args;
 
+    public $countable = true;
+    public $timestampable = false;
+    public $versionable = false;
+
     /**
      * Create a new Loop
      *

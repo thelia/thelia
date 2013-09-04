@@ -30,34 +30,43 @@ use Thelia\Rewriting\RewritingRetriever;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class URL extends ContainerAware
+class URL
 {
-    protected $container;
-    protected $request;
-
     protected $resolver = null;
     protected $retriever = null;
+
+    protected $container;
+    protected $environment;
 
     const PATH_TO_FILE = true;
     const WITH_INDEX_PAGE = false;
 
     private static $instance = null;
 
-    public function __construct(Request $request)
+    public function __construct(ContainerInterface $container, $environment)
     {
-        $this->request = $request;
+        // Allow singleton style calls once intanciated.
+        self::$instance = $this;
+
+        $this->container = $container;
+        $this->environment = $environment;
 
         $this->retriever = new RewritingRetriever();
         $this->resolver = new RewritingResolver();
 
-        self::instance = $this;
+        echo "instanciation ok !";
     }
 
     /**
-     * Give this class a singleton behavior
+     * Return this class instance, only once instanciated.
+     *
+     * @throws \RuntimeException if the class has not been instanciated.
+     * @return \Thelia\Tools\URL the instance.
      */
-    public static getInstance() {
+    public static function getInstance() {
+        if (self::$instance == null) throw new \RuntimeException("URL instance is not initialized.");
 
         return self::$instance;
     }
@@ -70,25 +79,31 @@ class URL extends ContainerAware
      */
     public function getBaseUrl()
     {
+        $lang = $this->container
+        ->get('request')
+        ->getSession()
+        ->getLang();
+
         // Check if we have a specific URL for each lang.
         $one_domain_foreach_lang = ConfigQuery::read("one_domain_foreach_lang", false);
 
         if ($one_domain_foreach_lang == true) {
             // If it's the case, get the current lang URL
-            $base_url = $this->request->getSession()->getLang()->getUrl();
+            $base_url = $lang->getUrl();
 
-            $err_msg = 'base_url';
+            $err_msg_part = 'base_url';
         }
         else {
             // Get the base URL
             $base_url = ConfigQuery::read('base_url', null);
 
-            $err_msg = sprintf('base_url for lang %s', $this->request->getSession()->getCode());
+            $err_msg_part = sprintf('base_url for lang %s', $lang->getCode());
         }
 
         // Be sure that base-url starts with http, give up if it's not the case.
         if (substr($base_url, 0, 4) != 'http') {
-            throw new \InvalidArgumentException("The 'base_url' configuration parameter shoud contains the URL of your shop, starting with http or https.");
+            throw new \InvalidArgumentException(
+                    sprintf("The %s configuration parameter shoud contains the URL of your shop, starting with http or https.", $err_msg_part));
         }
 
         // Normalize the base_url
@@ -103,11 +118,8 @@ class URL extends ContainerAware
         // Get the base URL
         $base_url = $this->getBaseUrl();
 
-        // Check if we're in dev or prod
-        $env = $this->container->get(‘kernel’)->getEnvironment();
-
-        // For dev, add the proper page.
-        if ($env == 'dev') {
+        // For dev environment, add the proper page.
+        if ($this->environment == 'dev') {
             $base_url .= "index_dev.php";
         }
 
@@ -183,35 +195,45 @@ class URL extends ContainerAware
      {
          $path = sprintf("?view=%s", $viewName);
 
-         return $this>absoluteUrl($path, $parameters);
+         return $this->absoluteUrl($path, $parameters);
      }
 
     /**
+     * Retrieve a rewritten URL from a view, a view id and a locale
+     *
      * @param $view
      * @param $viewId
      * @param $viewLocale
      *
-     * @return null|string
+     * @return RewritingRetriever You can access $url and $rewrittenUrl properties
      */
     public function retrieve($view, $viewId, $viewLocale)
     {
-        $rewrittenUrl = null;
         if(ConfigQuery::isRewritingEnable()) {
-            $rewrittenUrl = $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
+            $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
         }
 
-        return $rewrittenUrl === null ? $this->viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
+        // Bug: $rewrittenUrl n'est pas initialisé
+        //return $rewrittenUrl === null ? $this->viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
+        return $this->viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale));
     }
 
-    public function retrieveCurrent(Request $request)
+    /**
+     * Retrieve a rewritten URL from the current request GET parameters
+     *
+     * @return RewritingRetriever You can access $url and $rewrittenUrl properties or use toString method
+     */
+    public function retrieveCurrent()
     {
-        $rewrittenUrl = null;
-        if(ConfigQuery::isRewritingEnable()) {
-            $view = $request->query->get('view', null);
-            $viewLocale = $request->query->get('locale', null);
-            $viewId = $view === null ? null : $request->query->get($view . '_id', null);
+        if (ConfigQuery::isRewritingEnable()) {
 
-            $allOtherParameters = $request->query->all();
+            $query = $this->container->get('request')->query;
+
+            $view = $query->get('view', null);
+            $viewLocale = $query->get('locale', null);
+            $viewId = $view === null ? null : $query->get($view . '_id', null);
+
+            $allOtherParameters = $query->all();
             if($view !== null) {
                 unset($allOtherParameters['view']);
             }
@@ -228,9 +250,17 @@ class URL extends ContainerAware
         return $this->retriever;
     }
 
+    /**
+     * Retrieve a rewritten URL from the current GET parameters or use toString method
+     *
+     * @param $url
+     *
+     * @return RewritingResolver
+     */
     public function resolve($url)
     {
         $this->resolver->load($url);
+
         return $this->resolver;
     }
 }

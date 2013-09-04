@@ -41,7 +41,7 @@ class CustomerAddressController extends BaseFrontController
     public function createAction()
     {
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirect(URL::getIndexPage());
+            $this->redirect(URL::getInstance()->getIndexPage());
         }
 
         $addressCreate = new AddressForm($this->getRequest());

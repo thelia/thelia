@@ -49,8 +49,11 @@
         <default key="_controller">Thelia\Controller\Front\CartController::changeItem</default>
         <default key="_view">cart</default>
     </route>
-
+<!--
+Empêche l'accès àl'admin, genre: http://localhost/thelia2/index_dev.php/admin/login amène sur l'accueuil de la boutique
     <route id="url-rewriting.check" path="/{rewritten_url}" methods="GET">
         <default key="_controller">Thelia\Controller\Front\UrlRewritingController::check</default>
+        <requirement key="rewritten_url">.*</requirement>
     </route>
+-->
 </routes>

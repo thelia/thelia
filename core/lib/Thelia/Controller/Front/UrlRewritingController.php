@@ -33,7 +33,7 @@ class UrlRewritingController extends BaseFrontController
     {
         if(ConfigQuery::isRewritingEnable()) {
             try {
-                $rewrittenUrlData = URL::init()->resolve($rewritten_url);
+                $rewrittenUrlData = URL::getInstance()->resolve($rewritten_url);
             } catch(UrlRewritingException $e) {
                 switch($e->getCode()) {
                     case UrlRewritingException::URL_NOT_FOUND :

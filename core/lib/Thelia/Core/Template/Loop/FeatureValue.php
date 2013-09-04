@@ -51,6 +51,8 @@ use Thelia\Type;
  */
 class FeatureValue extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -135,10 +137,10 @@ class FeatureValue extends BaseI18nLoop
 
         $featureValues = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($featureValues);
 
         foreach ($featureValues as $featureValue) {
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $featureValue, $this->versionable, $this->timestampable, $this->countable);
             $loopResultRow->set("ID", $featureValue->getId());
 
             $loopResultRow

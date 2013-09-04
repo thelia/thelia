@@ -174,7 +174,7 @@ class BaseAdminController extends BaseController
      * @param unknown $urlParameters the URL parametrs, as a var/value pair array
      */
     public function redirectToRoute($routeId, $urlParameters = array()) {
-        $this->redirect(URL::absoluteUrl($this->getRoute($routeId), $urlParameters));
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId), $urlParameters));
     }
 
     /**
@@ -257,7 +257,7 @@ class BaseAdminController extends BaseController
         catch (AuthenticationException $ex) {
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.
-            Redirect::exec(URL::absoluteUrl($ex->getLoginTemplate()));
+            Redirect::exec(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
         }
         catch (AuthorizationException $ex) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.

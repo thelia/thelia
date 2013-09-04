@@ -58,6 +58,9 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Product extends BaseI18nLoop
 {
+    public $timestampable = true;
+    public $versionable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -501,10 +504,10 @@ class Product extends BaseI18nLoop
         /* perform search */
         $products = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($products);
 
         foreach ($products as $product) {
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $product, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow->set("ID", $product->getId())
                 ->set("REF",$product->getRef())
@@ -519,12 +522,6 @@ class Product extends BaseI18nLoop
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))
                 ->set("POSITION", $product->getPosition())
-
-                ->set("CREATE_DATE", $product->getCreatedAt())
-                ->set("UPDATE_DATE", $product->getUpdatedAt())
-                ->set("VERSION", $product->getVersion())
-                ->set("VERSION_DATE", $product->getVersionCreatedAt())
-                ->set("VERSION_AUTHOR", $product->getVersionCreatedBy())
             ;
 
             $loopResult->addRow($loopResultRow);

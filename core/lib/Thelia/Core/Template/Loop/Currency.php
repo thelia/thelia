@@ -47,6 +47,8 @@ use Thelia\Type\EnumListType;
  */
 class Currency extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -163,11 +165,11 @@ class Currency extends BaseI18nLoop
         /* perform search */
         $currencies = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($currencies);
 
         foreach ($currencies as $currency) {
 
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $currency, $this->versionable, $this->timestampable, $this->countable);
             $loopResultRow
                 ->set("ID"            , $currency->getId())
                 ->set("IS_TRANSLATED" , $currency->getVirtualColumn('IS_TRANSLATED'))
@@ -178,9 +180,6 @@ class Currency extends BaseI18nLoop
                 ->set("RATE"          , $currency->getRate())
                 ->set("POSITION"      , $currency->getPosition())
                 ->set("IS_DEFAULT"    , $currency->getByDefault())
-
-                ->set("CREATE_DATE"    , $currency->getCreatedAt())
-                ->set("UPDATE_DATE"    , $currency->getUpdatedAt())
             ;
 
             $loopResult->addRow($loopResultRow);

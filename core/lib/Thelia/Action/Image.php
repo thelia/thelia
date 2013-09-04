@@ -269,8 +269,8 @@ class Image extends BaseAction implements EventSubscriberInterface
         $event->setCacheFilepath($cacheFilePath);
         $event->setCacheOriginalFilepath($originalImagePathInCache);
 
-        $event->setFileUrl(URL::absoluteUrl($processed_image_url, null, URL::PATH_TO_FILE));
-        $event->setOriginalFileUrl(URL::absoluteUrl($original_image_url, null, URL::PATH_TO_FILE));
+        $event->setFileUrl(URL::getInstance()->absoluteUrl($processed_image_url, null, URL::PATH_TO_FILE));
+        $event->setOriginalFileUrl(URL::getInstance()->absoluteUrl($original_image_url, null, URL::PATH_TO_FILE));
     }
 
     /**
@@ -382,7 +382,7 @@ class Image extends BaseAction implements EventSubscriberInterface
     {
         $path = $this->getCachePathFromWebRoot($subdir);
 
-        return URL::absoluteUrl(sprintf("%s/%s", $path, $safe_filename), null, URL::PATH_TO_FILE);
+        return URL::getInstance()->absoluteUrl(sprintf("%s/%s", $path, $safe_filename), null, URL::PATH_TO_FILE);
     }
 
     /**

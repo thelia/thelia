@@ -118,7 +118,7 @@ class Session extends BaseSession
      */
     public function getReturnToUrl()
     {
-        return $this->get('thelia.return_to_url', URL::getIndexPage());
+        return $this->get('thelia.return_to_url', URL::getInstance()->getIndexPage());
     }
 
     // -- Cart ------------------------------------------------------------------

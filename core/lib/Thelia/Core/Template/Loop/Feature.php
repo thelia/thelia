@@ -51,6 +51,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Feature extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -142,10 +144,10 @@ class Feature extends BaseI18nLoop
         /* perform search */
         $features = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($features);
 
         foreach ($features as $feature) {
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $feature, $this->versionable, $this->timestampable, $this->countable);
             $loopResultRow->set("ID", $feature->getId())
                 ->set("IS_TRANSLATED",$feature->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE",$locale)
