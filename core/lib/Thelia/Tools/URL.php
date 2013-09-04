@@ -55,8 +55,6 @@ class URL
 
         $this->retriever = new RewritingRetriever();
         $this->resolver = new RewritingResolver();
-
-        echo "instanciation ok !";
     }
 
     /**
@@ -79,10 +77,7 @@ class URL
      */
     public function getBaseUrl()
     {
-        $lang = $this->container
-        ->get('request')
-        ->getSession()
-        ->getLang();
+        $lang = $this->container->get('request')->getSession()->getLang();
 
         // Check if we have a specific URL for each lang.
         $one_domain_foreach_lang = ConfigQuery::read("one_domain_foreach_lang", false);
@@ -197,70 +192,65 @@ class URL
 
          return $this->absoluteUrl($path, $parameters);
      }
+     /**
+      * Retrieve a rewritten URL from a view, a view id and a locale
+      *
+      * @param $view
+      * @param $viewId
+      * @param $viewLocale
+      *
+      * @return RewritingRetriever You can access $url and $rewrittenUrl properties
+      */
+     public function retrieve($view, $viewId, $viewLocale)
+     {
+         if(ConfigQuery::isRewritingEnable()) {
+             $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
+         }
 
-    /**
-     * Retrieve a rewritten URL from a view, a view id and a locale
-     *
-     * @param $view
-     * @param $viewId
-     * @param $viewLocale
-     *
-     * @return RewritingRetriever You can access $url and $rewrittenUrl properties
-     */
-    public function retrieve($view, $viewId, $viewLocale)
-    {
-        if(ConfigQuery::isRewritingEnable()) {
-            $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
-        }
+         return $this->retriever;
+     }
 
-        // Bug: $rewrittenUrl n'est pas initialisé
-        //return $rewrittenUrl === null ? $this->viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
-        return $this->viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale));
-    }
+     /**
+      * Retrieve a rewritten URL from the current GET parameters
+      *
+      * @param Request $request
+      *
+      * @return RewritingRetriever You can access $url and $rewrittenUrl properties or use toString method
+      */
+     public function retrieveCurrent(Request $request)
+     {
+         if(ConfigQuery::isRewritingEnable()) {
+             $view = $request->query->get('view', null);
+             $viewLocale = $request->query->get('locale', null);
+             $viewId = $view === null ? null : $request->query->get($view . '_id', null);
 
-    /**
-     * Retrieve a rewritten URL from the current request GET parameters
-     *
-     * @return RewritingRetriever You can access $url and $rewrittenUrl properties or use toString method
-     */
-    public function retrieveCurrent()
-    {
-        if (ConfigQuery::isRewritingEnable()) {
+             $allOtherParameters = $request->query->all();
+             if($view !== null) {
+                 unset($allOtherParameters['view']);
+             }
+             if($viewLocale !== null) {
+                 unset($allOtherParameters['locale']);
+             }
+             if($viewId !== null) {
+                 unset($allOtherParameters[$view . '_id']);
+             }
 
-            $query = $this->container->get('request')->query;
+             $this->retriever->loadSpecificUrl($view, $viewLocale, $viewId, $allOtherParameters);
+         }
 
-            $view = $query->get('view', null);
-            $viewLocale = $query->get('locale', null);
-            $viewId = $view === null ? null : $query->get($view . '_id', null);
+         return $this->retriever;
+     }
 
-            $allOtherParameters = $query->all();
-            if($view !== null) {
-                unset($allOtherParameters['view']);
-            }
-            if($viewLocale !== null) {
-                unset($allOtherParameters['locale']);
-            }
-            if($viewId !== null) {
-                unset($allOtherParameters[$view . '_id']);
-            }
-
-            $this->retriever->loadSpecificUrl($view, $viewLocale, $viewId, $allOtherParameters);
-        }
-
-        return $this->retriever;
-    }
-
-    /**
-     * Retrieve a rewritten URL from the current GET parameters or use toString method
-     *
-     * @param $url
-     *
-     * @return RewritingResolver
-     */
-    public function resolve($url)
-    {
-        $this->resolver->load($url);
-
-        return $this->resolver;
-    }
+     /**
+      * Retrieve a rewritten URL from the current GET parameters or use toString method
+      *
+      * @param $url
+      *
+      * @return RewritingResolver
+      */
+     public function resolve($url)
+     {
+         $this->resolver->load($url);
+         return $this->resolver;
+     }
 }

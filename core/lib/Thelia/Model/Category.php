@@ -25,7 +25,7 @@ class Category extends BaseCategory
 
     public function getUrl($locale)
     {
-        return URL::getInstance()->retrieve('category', $this->getId(), $locale);
+        return URL::getInstance()->retrieve('category', $this->getId(), $locale)->toString();
     }
 
     /**
