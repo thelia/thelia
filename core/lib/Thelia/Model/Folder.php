@@ -17,7 +17,7 @@ class Folder extends BaseFolder
 
     public function getUrl($locale)
     {
-        return URL::init()->retrieve('folder', $this->getId(), $locale);
+        return URL::init()->retrieve('folder', $this->getId(), $locale)->toString();
     }
 
     /**

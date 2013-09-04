@@ -45,6 +45,8 @@ use Thelia\Log\Tlog;
  */
 class Image extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @var array Possible image sources
      */
@@ -264,7 +266,7 @@ class Image extends BaseI18nLoop
 
         $results = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($results);
 
         foreach ($results as $result) {
 
@@ -295,7 +297,7 @@ class Image extends BaseI18nLoop
                 // Dispatch image processing event
                 $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
 
-                $loopResultRow = new LoopResultRow();
+                $loopResultRow = new LoopResultRow($loopResult, $result, $this->versionable, $this->timestampable, $this->countable);
 
                 $loopResultRow
                     ->set("ID"                  , $result->getId())

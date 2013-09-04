@@ -124,25 +124,32 @@ class URL
      }
 
     /**
+     * Retrieve a rewritten URL from a view, a view id and a locale
+     *
      * @param $view
      * @param $viewId
      * @param $viewLocale
      *
-     * @return null|string
+     * @return RewritingRetriever You can access $url and $rewrittenUrl properties
      */
     public function retrieve($view, $viewId, $viewLocale)
     {
-        $rewrittenUrl = null;
         if(ConfigQuery::isRewritingEnable()) {
-            $rewrittenUrl = $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
+            $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
         }
 
-        return $rewrittenUrl === null ? self::viewUrl($view, array($view . '_id' => $viewId, 'locale' => $viewLocale)) : $rewrittenUrl;
+        return $this->retriever;
     }
 
+    /**
+     * Retrieve a rewritten URL from the current GET parameters
+     *
+     * @param Request $request
+     *
+     * @return RewritingRetriever You can access $url and $rewrittenUrl properties or use toString method
+     */
     public function retrieveCurrent(Request $request)
     {
-        $rewrittenUrl = null;
         if(ConfigQuery::isRewritingEnable()) {
             $view = $request->query->get('view', null);
             $viewLocale = $request->query->get('locale', null);
@@ -165,6 +172,13 @@ class URL
         return $this->retriever;
     }
 
+    /**
+     * Retrieve a rewritten URL from the current GET parameters or use toString method
+     *
+     * @param $url
+     *
+     * @return RewritingResolver
+     */
     public function resolve($url)
     {
         $this->resolver->load($url);
