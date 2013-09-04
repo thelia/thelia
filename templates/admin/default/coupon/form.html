@@ -1,8 +1,8 @@
 {$thelia_page_css_file = "assets/bootstrap-editable/css/bootstrap-editable.css"}
 {include file='includes/notifications.html' message=$general_error}
 <form action="{$formAction}" {form_enctype form=$form} method="POST" >
-    <section class="row-fluid">
-        <div class="span12 general-block-decorator">
+    <section class="row">
+        <div class="col-md-12 general-block-decorator">
 
             {form_hidden_fields form=$form}
 
@@ -16,22 +16,24 @@
 
             <div class="span4">
                 <div class="control-group">
+            <div class="col-md-4">
+                <div class="form-group">
                     <label for="code">Code :</label>
                     {form_field form=$form field='code'}
-                        <input id="code" type="text" name="{$name}" value="{$value}" placeholder="code">
+                        <input id="code" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="code">
                         {if $error}{$message}{/if}
                     {/form_field}
                 </div>
 
-                <div class="control-group">
+                <div class="form-group">
                     <label for="title">Title :</label>
                     {form_field form=$form field='title'}
-                        <input id="title" type="text" name="{$name}" value="{$value}" placeholder="title">
+                        <input id="title" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="title">
                         {if $error}{$message}{/if}
                     {/form_field}
                 </div>
 
-                <div class="control-group">
+                <div class="form-group">
                     <label for="enabled" class="checkbox">
                         {form_field form=$form field='isEnabled'}
                             <input id="enabled" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
@@ -41,7 +43,7 @@
                     </label>
                 </div>
 
-                <div class="control-group">
+                <div class="form-group">
                     <label for="available-on-special-offers" class="checkbox">
                         {form_field form=$form field='isAvailableOnSpecialOffers'}
                             <input id="available-on-special-offers" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
@@ -51,7 +53,7 @@
                     </label>
                 </div>
 
-                <div class="control-group">
+                <div class="form-group">
                     <label for="cumulative" class="checkbox">
                         {form_field form=$form field='isCumulative'}
                             <input id="cumulative" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
@@ -61,7 +63,7 @@
                     </label>
                 </div>
 
-                <div class="control-group">
+                <div class="form-group">
                     <label for="renoving-postage" class="checkbox">
                         {form_field form=$form field='isRemovingPostage'}
                             <input id="renoving-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
@@ -71,7 +73,7 @@
                     </label>
                 </div>
 
-                <div class="control-group">
+                <div class="form-group">
                     <label for="expiration-date">Expiration date :</label>
                     <div class="input-append date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
                         {form_field form=$form field='expirationDate'}
@@ -82,26 +84,26 @@
                     </div>
                 </div>
 
-                <div class="control-group">
+                <div class="form-group">
                     <label for="max-usage">Max usage :</label>
                     <label for="is-unlimited" class="checkbox">
                         <input id="is-unlimited" type="checkbox" name="is-unlimited" checked >
                         Is unlimited ?
                     </label>
                     {form_field form=$form field='maxUsage'}
-                        <input id="max-usage" type="text" name="{$name}" value="{$value}" placeholder="max usage">
+                        <input id="max-usage" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="max usage">
                         {if $error}{$message}{/if}
                     {/form_field}
                 </div>
             </div>
 
-            <div class="span8">
+            <div class="col-md-8">
                 <div class="well clearfix">
-                    <div class="span6">
-                        <div class="control-group">
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <label for="effect">Effect :</label>
                             {form_field form=$form field='effect'}
-                                <select name="{$name}" value="{$value}" id="effect" class="span12">
+                                <select name="{$name}" value="{$value}" id="effect" class="col-md-12 form-control">
                                     <option value="1" data-description="More description n°1 about item">Remove x percents for category Y</option>
                                     <option value="2" data-description="More description n°2 about item">Remove x percents</option>
                                     <option value="3" data-description="More description n°3 about item">Remove x amount</option>
@@ -112,29 +114,29 @@
                         </div>
                     </div>
 
-                    <div class="span6">
-                        <div class="control-group">
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <label for="amount">Amount :</label>
                             {form_field form=$form field='amount'}
-                                <input id="amount" type="text" name="{$name}" value="{$value}" placeholder="amount">
+                                <input id="amount" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="amount">
                                 {if $error}{$message}{/if}
                             {/form_field}
                         </div>
-                        {*<div class="control-group">*}
-                            {*<label for="category">Category :</label>*}
+                        <div class="form-group">
+                            <label for="category">Category :</label>
                             {*form_field form=$form field='category'*}
-                                {*<select name="{$name}" value="{$value}" id="category">*}
-                                    {*<option value="1">Category 1</option>*}
-                                    {*<option value="1">Category 2</option>*}
-                                    {*<option value="1">Category 3</option>*}
-                                {*</select>*}
+                                <select name="{$name}" value="{$value}" id="category" class="form-control">
+                                    <option value="1">Category 1</option>
+                                    <option value="1">Category 2</option>
+                                    <option value="1">Category 3</option>
+                                </select>
                                 {*if $error}{$message}{/if}*}
                             {*/form_field*}
-                        {*</div>*}
+                        </div>
                     </div>
                 </div>
 
-                <div class="control-group">
+                <div class="form-group">
                     <label for="short-description">Short description :</label>
                     {form_field form=$form field='shortDescription'}
                         <textarea id="short-description" name="{$name}" placeholder="short description" class="span12" rows="5">{$value nofilter}</textarea>
@@ -142,29 +144,31 @@
                     {/form_field}
                 </div>
             </div>
-
+            
             <div class="clearfix"></div>
+            <div class="col-md-12">
 
-            <div class="control-group">
-                <label for="description">Long description :</label>
-                {form_field form=$form field='description'}
-                    <textarea id="description" name="{$name}" placeholder="long description" class="span12 wysiwyg" rows="10">{$value nofilter}</textarea>
-                    {if $error}{$message}{/if}
-                {/form_field}
+                <div class="form-group">
+                    <label for="description">Long description :</label>
+                    {form_field form=$form field='description'}
+                        <textarea id="description" name="{$name}" placeholder="long description" class="form-control wysiwyg" rows="10">{$value nofilter}</textarea>
+                        {if $error}{$message}{/if}
+                    {/form_field}
+                </div>
+
+                <button type="submit" class="btn btn-default btn-primary">Save</button>
             </div>
-
-            <button type="submit" class="btn btn-primary">Save</button>
 
         </div>
     </section>
 
-    <section class="row-fluid">
-        <div class="span12 general-block-decorator">
+    <section class="row">
+        <div class="col-md-12 general-block-decorator">
             <table class="table table-striped">
                 <caption class="clearfix">
                     Rules
-                    <a class="btn btn-primary pull-right" title="Add a new rule">
-                        <span class="icon-plus-sign icon-white"></span>
+                    <a class="btn btn-default btn-primary pull-right" title="Add a new rule">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
                     </a>
                 </caption>
                 <thead>
@@ -181,8 +185,8 @@
                     <td><span class="label">is superior or equals to</span></td>
                     <td>300 &euro;</td>
                     <td>
-                        <a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
-                        <a href="#url" class="btn btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="icon-remove icon-white"></span> Delete</a>
+                        <a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+                        <a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="glyphicon glyphicon-remove"></span> Delete</a>
                     </td>
                 </tr>
                 <tr>
@@ -190,8 +194,8 @@
                     <td><span class="label">is equals to</span></td>
                     <td>12 - <a href="#" target="_blank">Chaussettes rouges</a></td>
                     <td>
-                        <a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
-                        <a href="#url" class="btn btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="icon-remove icon-white"></span> Delete</a>
+                        <a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+                        <a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="glyphicon glyphicon-remove"></span> Delete</a>
                     </td>
                 </tr>
                 <tr>
@@ -199,8 +203,8 @@
                     <td><span class="label">is inferior or equals to</span></td>
                     <td>12/02/2014</td>
                     <td>
-                        <a href="#url" class="btn btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
-                        <a href="#url" class="btn btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="icon-remove icon-white"></span> Delete</a>
+                        <a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+                        <a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="glyphicon glyphicon-remove"></span> Delete</a>
                     </td>
                 </tr>
                 </tbody>
@@ -208,10 +212,10 @@
         </div>
     </section>
 
-    <section class="row-fluid">
-        <div class="span12 general-block-decorator">
+    <section class="row">
+        <div class="col-md-12 general-block-decorator clearfix">
 
-            <div class="control-group span2">
+            <div class="form-group col-md-2">
                 <label for="type">Condition type :</label>
                 <label class="radio">
                     <input type="radio" name="type" id="type" value="1" checked> And
@@ -221,84 +225,94 @@
                 </label>
             </div>
 
-            <div class="control-group span4">
+            <div class="form-group col-md-4">
                 <label for="category-rule">Rule's category :</label>
-                <select name="categoryRule" id="category-rule">
+                <select name="categoryRule" id="category-rule" class="form-control">
                     <option value="1" selected>Total amount</option>
                     <option value="2">Date</option>
                     <option value="3">NbArtFromCategory</option>
                 </select>
 
                 <label for="category-rule">Rule's category :</label>
-                <select name="categoryRule" id="category-rule">
+                <select name="categoryRule" id="category-rule" class="form-control">
                     <option value="1">Total amount</option>
                     <option value="2" selected>Date</option>
                     <option value="3">NbArtFromCategory</option>
                 </select>
 
                 <label for="category-rule">Rule's category :</label>
-                <select name="categoryRule" id="category-rule">
+                <select name="categoryRule" id="category-rule" class="form-control">
                     <option value="1">Total amount</option>
                     <option value="2">Date</option>
                     <option value="3" selected>NbArtFromCategory</option>
                 </select>
             </div>
 
-            <div class="control-group span6">
+            <div class="form-group col-md-6">
                 <label for="operator">Operator :</label>
-                <div class="controls">
-                    <select name="operator" id="operator">
-                        <option value="1">is superior to</option>
-                        <option value="2">equals to</option>
-                        <option value="3">is inferior to</option>
-                        <option value="4">is inferior or equals to</option>
-                        <option value="5">is superior or equals to</option>
-                    </select>
-                    <div class="input-append input-prepend">
-                        <span class="add-on">&euro;</span>
-                        <input type="text" name="value" class="input-mini">
-                        <button class="add-on btn btn-primary"><span class="icon-plus icon-white"></span></button>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <select name="operator" id="operator" class="form-control">
+                            <option value="1">is superior to</option>
+                            <option value="2">equals to</option>
+                            <option value="3">is inferior to</option>
+                            <option value="4">is inferior or equals to</option>
+                            <option value="5">is superior or equals to</option>
+                        </select>
+                    </div>
+                    <div class="input-group col-lg-6">
+                        <input type="text" name="value" class="form-control">
+                        <span class="input-group-addon">&euro;</span>
+                    </div>
+                </div>
+                
+
+                <label for="operator">Operator :</label>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <select name="operator" id="operator" class="form-control">
+                            <option value="1">is superior to</option>
+                            <option value="2">equals to</option>
+                            <option value="3">is inferior to</option>
+                            <option value="4">is inferior or equals to</option>
+                            <option value="5">is superior or equals to</option>
+                        </select>
+                    </div>
+                    <div class="input-group col-lg-6 date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
+                        <input type="text" name="value" class="form-control">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
                     </div>
                 </div>
 
                 <label for="operator">Operator :</label>
-                <div class="controls">
-                    <select name="operator" id="operator">
-                        <option value="1">is superior to</option>
-                        <option value="2">equals to</option>
-                        <option value="3">is inferior to</option>
-                        <option value="4">is inferior or equals to</option>
-                        <option value="5">is superior or equals to</option>
-                    </select>
-                    <div class="input-append input-prepend date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
-                        <span class="add-on"><span class="icon-th"></span></span>
-                        <input type="text" name="value" class="input-mini">
-                        <button class="add-on btn btn-primary"><span class="icon-plus icon-white"></span></button>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <select name="operator" id="operator" class="form-control">
+                            <option value="1">is superior to</option>
+                            <option value="2">equals to</option>
+                            <option value="3">is inferior to</option>
+                            <option value="4">is inferior or equals to</option>
+                            <option value="5">is superior or equals to</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-6">
+                        <input type="text" name="value" class="form-control">
                     </div>
                 </div>
-
-                <label for="operator">Operator :</label>
-                <div class="controls">
-                    <select name="operator" id="operator">
-                        <option value="1">is superior to</option>
-                        <option value="2">equals to</option>
-                        <option value="3">is inferior to</option>
-                        <option value="4">is inferior or equals to</option>
-                        <option value="5">is superior or equals to</option>
-                    </select>
-                    <input type="text" name="value" class="input-mini">
-
-                    <table class="table table-bordered">
-                        <tr>
-                            <td id="minibrowser-breadcrumb"></td>
-                        </tr>
-                        <tr>
-                            <th><span class="icon-th-list"></span> Categories list</th>
-                        </tr>
-                        <tr>
-                            <td id="minibrowser-categories"></td>
-                        </tr>
-                    </table>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td id="minibrowser-breadcrumb"></td>
+                            </tr>
+                            <tr>
+                                <th><span class="icon-th-list"></span> Categories list</th>
+                            </tr>
+                            <tr>
+                                <td id="minibrowser-categories"></td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

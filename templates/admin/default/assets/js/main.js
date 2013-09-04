@@ -4,16 +4,16 @@
 
         // -- Init datepicker --
         if($('.date').length){
-            $('.date').datepicker();
+            //$('.date').datepicker();
         }
 
         // -- Init tablesorter --
-        if($('.tablesorter').length){
+        /*if($('.tablesorter').length){
             $('.tablesorter').tablesorter({                
                 widgets: ["filter", "stickyHeaders"],
                 widthFixed : false,
                 widgetOptions : {
-                    filter_cssFilter : 'input-medium',
+                    filter_cssFilter : 'input-medium form-control',
                     filter_formatter : {
                         
                         2 : function($cell, indx){                            
@@ -38,7 +38,7 @@
                     }
                 }
             });
-        }
+        }*/
 
         // -- Effect description
         if($('[name=effect]').length){
