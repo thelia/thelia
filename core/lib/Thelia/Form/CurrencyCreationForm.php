@@ -40,11 +40,47 @@ class CurrencyCreationForm extends BaseForm
         }
 
         $this->formBuilder
-            ->add("name"   , "text"  , array("constraints" => array(new NotBlank())))
-            ->add("locale" , "text"  , array("constraints" => array(new NotBlank())))
-            ->add("symbol" , "text"  , array("constraints" => array(new NotBlank())))
-            ->add("rate"   , "text"  , array("constraints" => array(new NotBlank())))
-            ->add("code"   , "text"  , array("constraints" => $code_constraints))
+            ->add("name"   , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => "Name *",
+                "label_attr" => array(
+                    "for" => "name"
+                ))
+            )
+            ->add("locale" , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ))
+            )
+            ->add("symbol" , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => "Symbol *",
+                "label_attr" => array(
+                    "for" => "symbol"
+                ))
+            )
+            ->add("rate"   , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => "Rate from &euro; *",
+                "label_attr" => array(
+                    "for" => "rate"
+                ))
+            )
+            ->add("code"   , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => "ISO 4217 code *",
+                "label_attr" => array(
+                    "for" => "iso_4217_code"
+                ))
+            )
         ;
     }
 
