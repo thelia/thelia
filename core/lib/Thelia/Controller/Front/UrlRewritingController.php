@@ -53,7 +53,7 @@ class UrlRewritingController extends BaseFrontController
             /* define GET arguments in request */
 
             if(null !== $rewrittenUrlData->view) {
-                $request->query->set('view', $rewrittenUrlData->view);
+                $request->attributes->set('_view', $rewrittenUrlData->view);
                 if(null !== $rewrittenUrlData->viewId) {
                     $request->query->set($rewrittenUrlData->view . '_id', $rewrittenUrlData->viewId);
                 }
@@ -66,16 +66,6 @@ class UrlRewritingController extends BaseFrontController
                 $request->query->set($parameter, $value);
             }
         }
-
-        if (! $view = $request->query->get('view')) {
-            $view = "index";
-            if ($request->request->has('view')) {
-                $view = $request->request->get('view');
-            }
-        }
-
-        $request->attributes->set('_view', $view);
-
     }
 
 }
