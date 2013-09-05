@@ -41,7 +41,8 @@
     },
     "require-dev" : {
         "phpunit/phpunit": "3.7.*",
-        "fzaninotto/faker": "dev-master"
+        "fzaninotto/faker": "dev-master",
+        "maximebf/debugbar": "1.*"
     },
     "minimum-stability": "stable",
     "config" : {

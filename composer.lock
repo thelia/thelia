@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "db69990b239a4056558bfd694115d01b",
+    "hash": "4add17e0d3f6275417122481707e9f52",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -1661,6 +1661,55 @@
                 "fixtures"
             ],
             "time": "2013-08-29 19:11:59"
+        },
+        {
+            "name": "maximebf/debugbar",
+            "version": "1.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/maximebf/php-debugbar.git",
+                "reference": "37dccc40da52bf9f85571c30cf302da696db0d05"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/37dccc40da52bf9f85571c30cf302da696db0d05",
+                "reference": "37dccc40da52bf9f85571c30cf302da696db0d05",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "psr/log": "~1.0"
+            },
+            "require-dev": {
+                "php": ">=5.3.0"
+            },
+            "suggest": {
+                "kriswallsmith/assetic": "The best way to manage assets",
+                "monolog/monolog": "Log using Monolog"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "DebugBar": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maxime Bouroumeau-Fuseau",
+                    "email": "maxime.bouroumeau@gmail.com",
+                    "homepage": "http://maximebf.com"
+                }
+            ],
+            "description": "Debug bar in the browser for php application",
+            "homepage": "https://github.com/maximebf/php-debugbar",
+            "keywords": [
+                "debug"
+            ],
+            "time": "2013-08-17 02:02:49"
         },
         {
             "name": "phpunit/php-code-coverage",
