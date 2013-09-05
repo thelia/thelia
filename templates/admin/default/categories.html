@@ -4,12 +4,6 @@
 
 {block name="check-permissions"}admin.catalog.view{/block}
 
-{block name="after-admin-css"}
-    {stylesheets file='assets/bootstrap-editable/css/bootstrap-editable.css' filters='cssembed'}
-        <link rel="stylesheet" href="{$asset_url}">
-    {/stylesheets}
-{/block}
-
 {block name="main-content"}
 <div class="catalog">
 	<div id="wrapper" class="container">
@@ -278,13 +272,11 @@
 {include file="includes/delete-category-dialog.html"}
 {/block}
 
-{block name="after-javascript-include"}
-	{javascripts file='assets/bootstrap-editable/js/bootstrap-editable.js'}
+{block name="javascript-initialization"}
+	{javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
 	    <script src="{$asset_url}"></script>
 	{/javascripts}
-{/block}
 
-{block name="javascript-initialization"}
 <script>
 $(function() {
 
