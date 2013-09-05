@@ -79,37 +79,7 @@ class URL
      */
     public function getBaseUrl()
     {
-        /*
-        $request = $this->container->get('request');
-        $lang = $request->getSession()->getLang();
-
-        // Check if we have a specific URL for each lang.
-        $one_domain_foreach_lang = ConfigQuery::read("one_domain_foreach_lang", false);
-
-        if ($one_domain_foreach_lang == true) {
-            // If it's the case, get the current lang URL
-            $base_url = $lang->getUrl();
-
-            $err_msg_part = 'base_url';
-        }
-        else {
-            // Get the base URL
-            $base_url = ConfigQuery::read('base_url', $request->getSchemeAndHttpHost());
-
-            $err_msg_part = sprintf('base_url for lang %s', $lang->getCode());
-        }
-
-        // Be sure that base-url starts with http, give up if it's not the case.
-        if (substr($base_url, 0, 4) != 'http') {
-            throw new \InvalidArgumentException(
-                    sprintf("The %s configuration parameter shoud contains the URL of your shop, starting with http or https.", $err_msg_part));
-        }
-
-        // Normalize the base_url
-        return rtrim($base_url, '/').'/';
-        */
-
-        $requestContext = $this->container->get('router.admin')->getGenerator()->getContext();
+        $requestContext = $this->container->get('router.admin')->getContext();
 
         if ($host = $requestContext->getHost()) {
 

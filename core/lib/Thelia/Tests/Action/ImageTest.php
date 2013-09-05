@@ -59,6 +59,17 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
         $container->set("request", $request);
 
+        $router = $this->getMock("Symfony\Component\Routing\Router");
+        $container->set("router.admin", $router);
+
+        $context = $this->getMock("Symfony\Component\Routing\RequestContext");
+        $context->setHost('localhost');
+        $context->setPort(80);
+        $context->setScheme('http');
+        $context->getBaseUrl('/tagada/tsointsoin/');
+
+        $router->setContext($context);
+
         return $container;
     }
 

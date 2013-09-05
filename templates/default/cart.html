@@ -24,7 +24,7 @@
         {form_error form=$form field="product"}
         {$message}
         {/form_error}
-            <label>{intl l="product"}: </label><input type="text" name="{$name}" value="{$value}" {$attr} ><br />
+            <label for="{$label_attr.for}">{intl l="{$label}"}: </label><input id="{$label_attr.for}" type="text" name="{$name}" value="{$value}" {$attr} ><br />
         {/form_field}
 
         {form_field form=$form field='product_sale_elements_id'}

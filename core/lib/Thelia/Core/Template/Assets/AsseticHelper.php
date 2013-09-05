@@ -106,17 +106,50 @@ class AsseticHelper
 
         $factory->setDebug($debug);
 
-        $factory->addWorker(new CacheBustingWorker());
+        $factory->addWorker(new CacheBustingWorker('-'));
 
-        // Prepare the assets writer
-        $writer = new AssetWriter($output_path);
+        // We do not pass the filter list here, juste to get the asset file name
+        $asset = $factory->createAsset($asset_name);
 
-        $asset = $factory->createAsset($asset_name, $filter_list);
+        $asset_target_path = $asset->getTargetPath();
+        $target_file = sprintf("%s/%s", $output_path, $asset_target_path);
 
-        $cache = new AssetCache($asset, new FilesystemCache($output_path));
+        // As it seems that assetic cannot handle a real file cache, let's do the job ourselves.
+        // It works only if the CacheBustingWorker is used, as a new file name is generated for each version.
+        //
+        // the previous version of the file is deleted, by getting the first part of the ouput file name
+        // (the one before '-'), and delete aby file beginning with the same string. Example:
+        //     old name: 3bc974a-dfacc1f.css
+        //     new name: 3bc974a-ad3ef47.css
+        //
+        //     before generating 3bc974a-ad3ef47.css, delete 3bc974a-* files.
+        //
+        if (! file_exists($target_file)) {
 
-        $writer->writeAsset($cache);
+            // Delete previous version of the file
+            list($commonPart, $dummy) = explode('-', $asset_target_path);
 
-        return rtrim($output_url, '/').'/'.$asset->getTargetPath();
+            foreach (glob("$output_path/$commonPart-*") as $filename) {
+                @unlink($filename);
+            }
+
+            // Apply filters now
+            foreach ($filter_list as $filter) {
+                if ('?' != $filter[0]) {
+                    $asset->ensureFilter($fm->get($filter));
+                }
+                elseif (!$debug) {
+                    $asset->ensureFilter($fm->get(substr($filter, 1)));
+                }
+            }
+
+            //$cache = new AssetCache($asset, new FilesystemCache($output_path));
+
+            $writer = new AssetWriter($output_path);
+
+            $writer->writeAsset($asset);
+        }
+
+        return rtrim($output_url, '/').'/'.$asset_target_path;
     }
 }

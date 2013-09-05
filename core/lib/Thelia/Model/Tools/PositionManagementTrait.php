@@ -49,15 +49,15 @@ trait PositionManagementTrait {
     /**
      * Get the position of the next inserted object
      */
-    public function getNextPosition($parent) {
+    public function getNextPosition($parent = null) {
 
-        $last = $this->createQuery()
+         $query = $this->createQuery()
             ->orderByPosition(Criteria::DESC)
             ->limit(1);
 
             if ($parent !== null) $last->filterByParent($parent);
 
-            $last->findOne()
+            $last = $query->findOne()
         ;
 
         return $last != null ? $last->getPosition() + 1 : 1;
@@ -107,11 +107,7 @@ trait PositionManagementTrait {
         // If we found the proper object, exchange their positions
         if ($result) {
 
-            // Find DATABASE_NAME constant
-            $mapClassName = self::TABLE_MAP;
-            $database_name = $mapClassName::DATABASE_NAME;
-
-            $cnx = Propel::getWriteConnection($database_name);
+            $cnx = Propel::getWriteConnection($this->getDatabaseName());
 
             $cnx->beginTransaction();
 
@@ -128,6 +124,16 @@ trait PositionManagementTrait {
                 $cnx->rollback();
             }
         }
+    }
+
+    /**
+     * Simply return the database name, from the constant in the MAP class.
+     */
+    protected function getDatabaseName() {
+        // Find DATABASE_NAME constant
+        $mapClassName = self::TABLE_MAP;
+
+        return $mapClassName::DATABASE_NAME;
     }
 
     /**
@@ -161,7 +167,7 @@ trait PositionManagementTrait {
 
             $results = $search->find();
 
-            $cnx = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
+            $cnx = Propel::getWriteConnection($this->getDatabaseName());
 
             $cnx->beginTransaction();
 

@@ -123,6 +123,7 @@ class Form extends AbstractSmartyPlugin
             $template->assign("name", $formFieldView->vars["full_name"]);
             $template->assign("value", $formFieldView->vars["value"]);
             $template->assign("label", $formFieldView->vars["label"]);
+            $template->assign("label_attr", $formFieldView->vars["label_attr"]);
 
             $errors = $formFieldView->vars["errors"];
 
