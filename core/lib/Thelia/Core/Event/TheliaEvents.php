@@ -250,14 +250,66 @@ final class TheliaEvents
     const AFTER_ENABLE_COUPON 	= "action.after_enable_coupon";
 
     /**
+     * Sent when attempting to use a Coupon
+     */
+    const COUPON_CONSUME 	= "action.consume_coupon";
+
+    /**
      * Sent just before an attempt to use a Coupon
      */
-    const BEFORE_USE_COUPON 	= "action.before_use_coupon";
+    const BEFORE_CONSUME_COUPON 	= "action.before_consume_coupon";
 
     /**
      * Sent just after an attempt to use a Coupon
      */
-    const AFTER_USE_COUPON 	= "action.after_use_coupon";
+    const AFTER_CONSUME_COUPON 	= "action.after_consume_coupon";
+
+
+    /**
+     * Sent when attempting to create Coupon Rule
+     */
+    const COUPON_RULE_CREATE 	= "action.create_coupon_rule";
+
+    /**
+     * Sent just before an attempt to create a Coupon Rule
+     */
+    const BEFORE_COUPON_RULE_CREATE 	= "action.before_create_coupon_rule";
+
+    /**
+     * Sent just after an attempt to create a Coupon Rule
+     */
+    const AFTER_COUPON_RULE_CREATE 	= "action.after_create_coupon_rule";
+
+    /**
+     * Sent when attempting to update Coupon Rule
+     */
+    const COUPON_RULE_UPDATE 	= "action.update_coupon_rule";
+
+    /**
+     * Sent just before an attempt to update a Coupon Rule
+     */
+    const BEFORE_COUPON_RULE_UPDATE 	= "action.before_update_coupon_rule";
+
+    /**
+     * Sent just after an attempt to update a Coupon Rule
+     */
+    const AFTER_COUPON_RULE_UPDATE 	= "action.after_update_coupon_rule";
+
+    /**
+     * Sent when attempting to delete Coupon Rule
+     */
+    const COUPON_RULE_DELETE 	= "action.delete_coupon_rule";
+
+    /**
+     * Sent just before an attempt to delete a Coupon Rule
+     */
+    const BEFORE_COUPON_RULE_DELETE 	= "action.before_delete_coupon_rule";
+
+    /**
+     * Sent just after an attempt to delete a Coupon Rule
+     */
+    const AFTER_COUPON_RULE_DELETE 	= "action.after_delete_coupon_rule";
+
 
     // -- Configuration management ---------------------------------------------
 

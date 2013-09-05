@@ -23,6 +23,8 @@
 
 namespace Thelia\Constraint\Rule;
 
+use InvalidArgumentException;
+use Symfony\Component\Translation\Translator;
 use Thelia\Constraint\Validator\QuantityParam;
 use Thelia\Constraint\Validator\RuleValidator;
 use Thelia\Coupon\CouponAdapterInterface;
@@ -51,7 +53,7 @@ class AvailableForXArticles extends CouponRuleAbstract
         Operators::SUPERIOR,
     );
 
-    /** @var RuleValidator Quantity Validator */
+    /** @var QuantityParam Quantity Validator */
     protected $quantityValidator = null;
 
     /**
@@ -64,7 +66,7 @@ class AvailableForXArticles extends CouponRuleAbstract
      *
      * @throws InvalidRuleException
      */
-    public function __construct(CouponAdapterInterface $adapter, array $validators)
+    public function __construct(CouponAdapterInterface $adapter, array $validators = null)
     {
         parent::__construct($adapter, $validators);
 
@@ -160,7 +162,7 @@ class AvailableForXArticles extends CouponRuleAbstract
         $quantityValidator = $this->quantityValidator;
         try {
             $quantityValidator->getParam()->compareTo($quantity);
-        } catch(\InvalidArgumentException $e) {
+        } catch(InvalidArgumentException $e) {
             throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
         }
 
@@ -174,9 +176,14 @@ class AvailableForXArticles extends CouponRuleAbstract
      */
     public function getName()
     {
-        return $this->adapter
-            ->getTranslator()
-            ->trans('Number of articles in cart', null, 'constraint');
+        /** @var Translator $translator */
+        $translator = $this->adapter->get('thelia.translator');
+
+        return $translator->trans(
+            'Number of articles in cart',
+            array(),
+            'constraint'
+        );
     }
 
     /**
@@ -186,22 +193,68 @@ class AvailableForXArticles extends CouponRuleAbstract
      */
     public function getToolTip()
     {
+        /** @var Translator $translator */
+        $translator = $this->adapter->get('thelia.translator');
+
         $i18nOperator = Operators::getI18n(
-            $this->adapter, $this->priceValidator->getOperator()
+            $translator, $this->priceValidator->getOperator()
         );
 
-        $toolTip = $this->adapter
-            ->getTranslator()
-            ->trans(
-                'If cart products quantity is %operator% %quantity%',
-                array(
-                    '%operator%' => $i18nOperator,
-                    '%quantity%' => $this->quantityValidator->getParam()->getInteger(),
-                ),
-                'constraint'
-            );
+        $toolTip = $translator->trans(
+            'If cart products quantity is <strong>%operator%</strong> %quantity%',
+            array(
+                '%operator%' => $i18nOperator,
+                '%quantity%' => $this->quantityValidator->getParam()->getInteger(),
+            ),
+            'constraint'
+        );
 
         return $toolTip;
     }
+
+    /**
+     * Populate a Rule from a form admin
+     *
+     * @param array $operators Rule Operator set by the Admin
+     * @param array $values    Rule Values set by the Admin
+     *
+     * @throws InvalidArgumentException
+     * @return $this
+     */
+    public function populateFromForm(array $operators, array $values)
+    {
+        if ($values[self::PARAM1_QUANTITY] === null) {
+            throw new InvalidArgumentException(
+                'The Rule ' . get_class() . 'needs at least a quantity set (' . self::PARAM1_QUANTITY. ')'
+            );
+        }
+
+        $this->quantityValidator = new QuantityParam(
+            $this->adapter,
+            $values[self::PARAM1_QUANTITY]
+        );
+
+        return $this;
+    }
+
+    /**
+     * Return a serializable Rule
+     *
+     * @return SerializableRule
+     */
+    public function getSerializableRule()
+    {
+        $serializableRule = new SerializableRule();
+        $serializableRule->operators = array(
+            self::PARAM1_QUANTITY => $this->quantityValidator->getOperator()
+        );
+
+        $serializableRule->values = array(
+            self::PARAM1_QUANTITY => $this->quantityValidator->getInteger()
+        );
+
+        return $serializableRule;
+    }
+
 
 }

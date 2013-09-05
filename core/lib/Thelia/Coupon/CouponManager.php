@@ -23,6 +23,8 @@
 
 namespace Thelia\Coupon;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Coupon\Type\CouponInterface;
 
 /**
@@ -39,21 +41,23 @@ use Thelia\Coupon\Type\CouponInterface;
 class CouponManager
 {
     /** @var CouponAdapterInterface Provides necessary value from Thelia */
-    protected $adapter;
+    protected $adapter = null;
+
+    /** @var ContainerInterface Service Container */
+    protected $container = null;
 
     /** @var array CouponInterface to process*/
     protected $coupons = array();
 
     /**
      * Constructor
-     * Gather Coupons from Adapter
-     * via $adapter->getCurrentCoupons();
      *
-     * @param CouponAdapterInterface $adapter Provide necessary value from Thelia
+     * @param ContainerInterface $container  Service container
      */
-    function __construct(CouponAdapterInterface $adapter)
+    function __construct(ContainerInterface $container)
     {
-        $this->adapter = $adapter;
+        $this->container = $container;
+        $this->adapter = $container->get('thelia.adapter');
         $this->coupons = $this->adapter->getCurrentCoupons();
     }
 
@@ -177,5 +181,31 @@ class CouponManager
         }
 
         return $discount;
+    }
+
+    /**
+     * Build a CouponRuleInterface from data coming from a form
+     *
+     * @param string $ruleServiceId Rule service id you want to instantiate
+     * @param array  $operators     Rule Operator set by the Admin
+     * @param array  $values        Rule Values set by the Admin
+     *
+     * @return CouponRuleInterface
+     */
+    public function buildRuleFromForm($ruleServiceId, array $operators, array $values)
+    {
+        $rule = false;
+        try {
+
+            if ($this->container->has($ruleServiceId)) {
+                /** @var CouponRuleInterface $rule */
+                $rule = $this->container->get($ruleServiceId);
+                $rule->populateFromForm($operators, $values);
+            }
+        } catch (\InvalidArgumentException $e) {
+
+        }
+
+        return $rule;
     }
 }

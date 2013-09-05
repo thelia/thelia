@@ -24,6 +24,7 @@
 namespace Thelia\Constraint\Rule;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
+use Symfony\Component\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Constraint\Validator\PriceParam;
 use Thelia\Constraint\Validator\RuleValidator;
@@ -48,6 +49,9 @@ class AvailableForTotalAmount extends CouponRuleAbstract
     /** Rule 1st parameter : price */
     CONST PARAM1_PRICE = 'price';
 
+    /** Rule 1st parameter : currency */
+    CONST PARAM1_CURRENCY = 'currency';
+
     /** @var array Available Operators (Operators::CONST) */
     protected $availableOperators = array(
         Operators::INFERIOR,
@@ -55,7 +59,7 @@ class AvailableForTotalAmount extends CouponRuleAbstract
         Operators::SUPERIOR,
     );
 
-    /** @var RuleValidator Price Validator */
+    /** @var PriceParam Price Validator */
     protected $priceValidator = null;
 
     /**
@@ -185,9 +189,11 @@ class AvailableForTotalAmount extends CouponRuleAbstract
      */
     public function getName()
     {
-        return $this->adapter
-            ->getTranslator()
-            ->trans('Cart total amount', null, 'constraint');
+        return $this->adapter->get('thelia.translator')->trans(
+            'Cart total amount',
+            array(),
+            'constraint'
+        );
     }
 
     /**
@@ -197,23 +203,73 @@ class AvailableForTotalAmount extends CouponRuleAbstract
      */
     public function getToolTip()
     {
+        /** @var Translator $translator */
+        $translator = $this->get('thelia.translator');
         $i18nOperator = Operators::getI18n(
-            $this->adapter, $this->priceValidator->getOperator()
+            $translator, $this->priceValidator->getOperator()
         );
 
-        $toolTip = $this->adapter
-            ->getTranslator()
-            ->trans(
-                'If cart total amount is %operator% %amount% %currency%',
-                array(
-                    '%operator%' => $i18nOperator,
-                    '%amount%' => $this->priceValidator->getParam()->getPrice(),
-                    '%currency%' => $this->priceValidator->getParam()->getCurrency()
-                ),
-                'constraint'
-            );
+        $toolTip = $translator->trans(
+            'If cart total amount is <strong>%operator%</strong> %amount% %currency%',
+            array(
+                '%operator%' => $i18nOperator,
+                '%amount%' => $this->priceValidator->getParam()->getPrice(),
+                '%currency%' => $this->priceValidator->getParam()->getCurrency()
+            ),
+            'constraint'
+        );
 
         return $toolTip;
     }
+
+    /**
+     * Populate a Rule from a form admin
+     *
+     * @param array $operators Rule Operator set by the Admin
+     * @param array $values    Rule Values set by the Admin
+     *
+     * @throws InvalidArgumentException
+     * @return $this
+     */
+    public function populateFromForm(array $operators, array $values)
+    {
+        if ($values[self::PARAM1_PRICE] === null
+            || $values[self::PARAM1_CURRENCY] === null
+        ) {
+            throw new InvalidArgumentException(
+                'The Rule ' . get_class() . 'needs at least a quantity set (' . self::PARAM1_PRICE . ', ' . self::PARAM1_CURRENCY . ')'
+            );
+        }
+
+        $this->priceValidator = new PriceParam(
+            $this->adapter,
+            $values[self::PARAM1_PRICE],
+            $values[self::PARAM1_CURRENCY]
+        );
+
+        return $this;
+    }
+
+    /**
+     * Return a serializable Rule
+     *
+     * @return SerializableRule
+     */
+    public function getSerializableRule()
+    {
+        $serializableRule = new SerializableRule();
+        $serializableRule->operators = array(
+            self::PARAM1_PRICE => $this->priceValidator->getOperator()
+        );
+
+        $serializableRule->values = array(
+            self::PARAM1_PRICE => $this->priceValidator->getPrice(),
+            self::PARAM1_CURRENCY => $this->priceValidator->getCurrency()
+        );
+
+        return $serializableRule;
+    }
+
+
 
 }

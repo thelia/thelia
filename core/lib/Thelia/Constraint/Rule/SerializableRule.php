@@ -21,18 +21,29 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Type;
+namespace Thelia\Constraint\Rule;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * @package Coupon
+ * A rule set by an admin ready to be serialized and stored in DataBase
+ *
+ * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveXAmountForCategoryY extends RemoveXAmount
+class SerializableRule
 {
+    /** @var string Rule Service id  */
+    public $ruleClassName = null;
+
+    /** @var array Operators set by Admin for this Rule */
+    public $operators = array();
+
+    /** @var array Values set by Admin for this Rule */
+    public $values = array();
+
 
 }

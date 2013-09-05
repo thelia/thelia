@@ -21,92 +21,49 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Constraint\Rule;
+namespace Thelia\Core\DependencyInjection\Compiler;
 
-use Symfony\Component\Translation\Translator;
-use Thelia\Coupon\CouponAdapterInterface;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Created by JetBrains PhpStorm.
- * Date: 8/19/13
+ * Date: 9/05/13
  * Time: 3:24 PM
  *
- * Represents a condition of whether the Rule is applied or not
+ * Class RegisterListenersPass
+ * Source code come from Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass class
  *
- * @package Constraint
+ * @package Thelia\Core\DependencyInjection\Compiler
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-interface CouponRuleInterface
+class RegisterCouponPass implements CompilerPassInterface
 {
     /**
-     * Check if backoffice inputs are relevant or not
+     * You can modify the container here before it is dumped to PHP code.
      *
-     * @return bool
+     * @param ContainerBuilder $container Container
+     *
+     * @api
      */
-    public function checkBackOfficeInput();
+    public function process(ContainerBuilder $container)
+    {
+        if (!$container->hasDefinition('thelia.coupon.manager')) {
+            return;
+        }
 
-    /**
-     * Check if Checkout inputs are relevant or not
-     *
-     * @return bool
-     */
-    public function checkCheckoutInput();
+        $couponManager = $container->getDefinition('thelia.coupon.manager');
+        $services = $container->findTaggedServiceIds("thelia.coupon.addCoupon");
 
-    /**
-     * Check if the current Checkout matches this condition
-     *
-     * @return bool
-     */
-    public function isMatching();
-
-    /**
-     * Return all available Operators for this Rule
-     *
-     * @return array Operators::CONST
-     */
-    public function getAvailableOperators();
-
-
-    /**
-     * Get I18n name
-     *
-     * @return string
-     */
-    public function getName();
-
-    /**
-     * Get I18n tooltip
-     *
-     * @return string
-     */
-    public function getToolTip();
-
-    /**
-     * Get validators
-     *
-     * @return array
-     */
-    public function getValidators();
-
-    /**
-     * Populate a Rule from a form admin
-     *
-     * @param array $operators Rule Operator set by the Admin
-     * @param array $values    Rule Values set by the Admin
-     *
-     * @return bool
-     */
-    public function populateFromForm(array$operators, array $values);
-
-
-    /**
-     * Return a serializable Rule
-     *
-     * @return SerializableRule
-     */
-    public function getSerializableRule();
-
-
-
+        foreach ($services as $id => $rule) {
+            $couponManager->addMethodCall(
+                'addAvailableCoupon',
+                array(
+                    new Reference($id)
+                )
+            );
+        }
+    }
 }

@@ -24,6 +24,8 @@
 namespace Thelia\Coupon;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
@@ -41,6 +43,22 @@ use Thelia\Model\CouponQuery;
  */
 class CouponBaseAdapter implements CouponAdapterInterface
 {
+    /** @var ContainerInterface Service Container */
+    protected $container = null;
+
+    /** @var Translator Service Translator  */
+    protected $translator = null;
+
+    /**
+     * Constructor
+     *
+     * @param ContainerInterface $container  Service container
+     */
+    function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
     /**
      * Return a Cart a CouponManager can process
      *
@@ -189,7 +207,7 @@ class CouponBaseAdapter implements CouponAdapterInterface
      */
     public function getTranslator()
     {
-        return $this->getContainer()->get('thelia.translator');
+        return $this->container->get('thelia.translator');
     }
 
 

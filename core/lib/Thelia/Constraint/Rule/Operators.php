@@ -23,6 +23,7 @@
 
 namespace Thelia\Constraint\Rule;
 
+use Symfony\Component\Translation\Translator;
 use Thelia\Constraint\Validator\ComparableInterface;
 
 /**
@@ -110,56 +111,54 @@ abstract class Operators
     /**
      * Get operator translation
      *
-     * @param CouponAdapterInterface $adapter  Provide necessary value from Thelia
-     * @param string                 $operator Operator const
+     * @param Translator $translator Provide necessary value from Thelia
+     * @param string     $operator   Operator const
      *
      * @return string
      */
-    public static function getI18n(CouponAdapterInterface $adapter, $operator)
+    public static function getI18n(Translator $translator, $operator)
     {
-        $translator = $adapter->getTranslator();
-
         $ret = $operator;
         switch ($operator) {
         case self::INFERIOR:
             $ret = $translator->trans(
                 'inferior to',
-                null,
+                array(),
                 'constraint'
             );
             break;
         case self::INFERIOR_OR_EQUAL:
             $ret = $translator->trans(
                 'inferior or equals to',
-                null,
+                array(),
                 'constraint'
             );
             break;
         case self::EQUAL:
             $ret = $translator->trans(
                 'equals to',
-                null,
+                array(),
                 'constraint'
             );
             break;
         case self::SUPERIOR_OR_EQUAL:
             $ret = $translator->trans(
                 'superior or equals to',
-                null,
+                array(),
                 'constraint'
             );
             break;
         case self::SUPERIOR:
             $ret = $translator->trans(
                 'superior to',
-                null,
+                array(),
                 'constraint'
             );
             break;
         case self::DIFFERENT:
             $ret = $translator->trans(
                 'different from',
-                null,
+                array(),
                 'constraint'
             );
             break;

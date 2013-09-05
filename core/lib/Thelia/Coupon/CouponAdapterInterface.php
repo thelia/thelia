@@ -24,6 +24,8 @@
 namespace Thelia\Coupon;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
@@ -41,6 +43,13 @@ use Thelia\Model\Coupon;
  */
 interface CouponAdapterInterface
 {
+
+    /**
+     * Constructor
+     *
+     * @param ContainerInterface $container  Service container
+     */
+    function __construct(ContainerInterface $container);
 
     /**
      * Return a Cart a CouponManager can process

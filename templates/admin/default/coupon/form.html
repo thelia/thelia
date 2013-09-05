@@ -18,17 +18,17 @@
                 <div class="control-group">
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="code">Code :</label>
+                    <label for="code">{intl l='Code :'}</label>
                     {form_field form=$form field='code'}
-                        <input id="code" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="code">
+                        <input id="code" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='code'}">
                         {if $error}{$message}{/if}
                     {/form_field}
                 </div>
 
                 <div class="form-group">
-                    <label for="title">Title :</label>
+                    <label for="title">{intl l='Title :'}</label>
                     {form_field form=$form field='title'}
-                        <input id="title" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="title">
+                        <input id="title" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='title'}">
                         {if $error}{$message}{/if}
                     {/form_field}
                 </div>
@@ -39,7 +39,7 @@
                             <input id="enabled" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
                             {if $error}{$message}{/if}
                         {/form_field}
-                        Is enabled ?
+                        {intl l='Is enabled ?'}
                     </label>
                 </div>
 
@@ -49,7 +49,7 @@
                             <input id="available-on-special-offers" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
                             {if $error}{$message}{/if}
                         {/form_field}
-                        Is available on special offers ?
+                        {intl l='Is available on special offers ?'}
                     </label>
                 </div>
 
@@ -59,7 +59,7 @@
                             <input id="cumulative" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
                             {if $error}{$message}{/if}
                         {/form_field}
-                        Is cumulative ?
+                        {intl l='Is cumulative ?'}
                     </label>
                 </div>
 
@@ -69,12 +69,12 @@
                             <input id="renoving-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
                             {if $error}{$message}{/if}
                         {/form_field}
-                        Is removing postage ?
+                        {intl l='Is removing postage ?'}
                     </label>
                 </div>
 
                 <div class="form-group">
-                    <label for="expiration-date">Expiration date :</label>
+                    <label for="expiration-date">{intl l='Expiration date :'}</label>
                     <div class="input-append date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
                         {form_field form=$form field='expirationDate'}
                             <input type="text" id="expiration-date" name="{$name}" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}">
@@ -85,13 +85,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="max-usage">Max usage :</label>
+                    <label for="max-usage">{intl l='Max usage :'}</label>
                     <label for="is-unlimited" class="checkbox">
                         <input id="is-unlimited" type="checkbox" name="is-unlimited" checked >
-                        Is unlimited ?
+                        {intl l='Is unlimited ?'}
                     </label>
                     {form_field form=$form field='maxUsage'}
-                        <input id="max-usage" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="max usage">
+                        <input id="max-usage" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="{intl l='max usage'}">
                         {if $error}{$message}{/if}
                     {/form_field}
                 </div>
@@ -101,7 +101,7 @@
                 <div class="well clearfix">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="effect">Effect :</label>
+                            <label for="effect">{intl l='Effect :'}</label>
                             {form_field form=$form field='effect'}
                                 <select name="{$name}" value="{$value}" id="effect" class="col-md-12 form-control">
                                     <option value="1" data-description="More description n°1 about item">Remove x percents for category Y</option>
@@ -116,9 +116,9 @@
 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="amount">Amount :</label>
+                            <label for="amount">{intl l='Amount :'}</label>
                             {form_field form=$form field='amount'}
-                                <input id="amount" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="amount">
+                                <input id="amount" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="{intl l='14.50'}">
                                 {if $error}{$message}{/if}
                             {/form_field}
                         </div>
@@ -137,9 +137,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="short-description">Short description :</label>
+                    <label for="short-description">{intl l='Short description :'}</label>
                     {form_field form=$form field='shortDescription'}
-                        <textarea id="short-description" name="{$name}" placeholder="short description" class="span12" rows="5">{$value nofilter}</textarea>
+                        <textarea id="short-description" name="{$name}" placeholder="{intl l='short description'}" class="span12" rows="5">{$value nofilter}</textarea>
                         {if $error}{$message}{/if}
                     {/form_field}
                 </div>
@@ -149,14 +149,14 @@
             <div class="col-md-12">
 
                 <div class="form-group">
-                    <label for="description">Long description :</label>
+                    <label for="description">{intl l='Long description :'}</label>
                     {form_field form=$form field='description'}
-                        <textarea id="description" name="{$name}" placeholder="long description" class="form-control wysiwyg" rows="10">{$value nofilter}</textarea>
+                        <textarea id="description" name="{$name}" placeholder="{intl l='long description'}" class="form-control wysiwyg" rows="10">{$value nofilter}</textarea>
                         {if $error}{$message}{/if}
                     {/form_field}
                 </div>
 
-                <button type="submit" class="btn btn-default btn-primary">Save</button>
+                <button type="submit" class="btn btn-default btn-primary">{intl l='Save'}</button>
             </div>
 
         </div>
@@ -166,47 +166,27 @@
         <div class="col-md-12 general-block-decorator">
             <table class="table table-striped">
                 <caption class="clearfix">
-                    Rules
-                    <a class="btn btn-default btn-primary pull-right" title="Add a new rule">
+                    {intl l='Rules'}
+                    <a class="btn btn-default btn-primary pull-right" title="{intl l='Add a new rule'}">
                         <span class="glyphicon glyphicon-plus-sign"></span>
                     </a>
                 </caption>
                 <thead>
                 <tr>
-                    <th>Conditions</th>
-                    <th>Operator</th>
-                    <th>Value</th>
-                    <th>Actions</th>
+                    <th>{intl l='Conditions'}</th>
+                    <th>{intl l='Actions'}</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>Total Amount</td>
-                    <td><span class="label">is superior or equals to</span></td>
-                    <td>300 &euro;</td>
-                    <td>
-                        <a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-                        <a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="glyphicon glyphicon-remove"></span> Delete</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="label">AND</span> NbArticleFromCategory</td>
-                    <td><span class="label">is equals to</span></td>
-                    <td>12 - <a href="#" target="_blank">Chaussettes rouges</a></td>
-                    <td>
-                        <a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-                        <a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="glyphicon glyphicon-remove"></span> Delete</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td><span class="label label-info">OR</span> Date</td>
-                    <td><span class="label">is inferior or equals to</span></td>
-                    <td>12/02/2014</td>
-                    <td>
-                        <a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-                        <a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="glyphicon glyphicon-remove"></span> Delete</a>
-                    </td>
-                </tr>
+                    {foreach from=$rulesObject item=rule}
+                        <tr>
+                            <td>{$rule.tooltip}</td>
+                            <td>
+                                <a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}</a>
+                                <a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="glyphicon glyphicon-remove"></span> {intl l='Delete'}</a>
+                            </td>
+                        </tr>
+                    {/foreach}
                 </tbody>
             </table>
         </div>
@@ -216,17 +196,17 @@
         <div class="col-md-12 general-block-decorator clearfix">
 
             <div class="form-group col-md-2">
-                <label for="type">Condition type :</label>
+                <label for="type">{intl l='Condition type :'}</label>
                 <label class="radio">
-                    <input type="radio" name="type" id="type" value="1" checked> And
+                    <input type="radio" name="type" id="type" value="1" checked> {intl l='And'}
                 </label>
                 <label class="radio">
-                    <input type="radio" name="type" value="2"> Or
+                    <input type="radio" name="type" value="2"> {intl l='Or'}
                 </label>
             </div>
 
             <div class="form-group col-md-4">
-                <label for="category-rule">Rule's category :</label>
+                <label for="category-rule">{intl l='Rule\'s category :'}</label>
                 <select name="categoryRule" id="category-rule" class="form-control">
                     <option value="1" selected>Total amount</option>
                     <option value="2">Date</option>
@@ -249,7 +229,7 @@
             </div>
 
             <div class="form-group col-md-6">
-                <label for="operator">Operator :</label>
+                <label for="operator">{intl l='Operator :'}</label>
                 <div class="row">
                     <div class="col-lg-6">
                         <select name="operator" id="operator" class="form-control">

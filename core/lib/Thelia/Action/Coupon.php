@@ -69,6 +69,52 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Occurring when a Coupon rule is about to be created
+     *
+     * @param CouponCreateOrUpdateEvent $event Event creation or update Event
+     */
+    public function createRule(CouponCreateOrUpdateEvent $event)
+    {
+        $coupon = $event->getCoupon();
+
+        $this->createOrUpdate($coupon, $event);
+    }
+
+    /**
+     * Occurring when a Coupon rule is about to be updated
+     *
+     * @param CouponCreateOrUpdateEvent $event Event creation or update Event
+     */
+    public function updateRule(CouponCreateOrUpdateEvent $event)
+    {
+        $coupon = $event->getCoupon();
+
+        $this->createOrUpdate($coupon, $event);
+    }
+
+    /**
+     * Occurring when a Coupon rule is about to be deleted
+     *
+     * @param CouponCreateOrUpdateEvent $event Event creation or update Event
+     */
+    public function deleteRule(CouponCreateOrUpdateEvent $event)
+    {
+        $coupon = $event->getCoupon();
+
+        $this->createOrUpdate($coupon, $event);
+    }
+
+    /**
+     * Occurring when a Coupon rule is about to be consumed
+     *
+     * @param CouponCreateOrUpdateEvent $event Event creation or update Event
+     */
+    public function consume(CouponCreateOrUpdateEvent $event)
+    {
+        // @todo implements
+    }
+
+    /**
      * Call the Model and delegate the create or delete action
      * Feed the Event with the updated model
      *
@@ -123,6 +169,12 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::COUPON_CREATE => array("create", 128),
             TheliaEvents::COUPON_UPDATE => array("update", 128),
+            TheliaEvents::COUPON_DISABLE => array("disable", 128),
+            TheliaEvents::COUPON_ENABLE => array("enable", 128),
+            TheliaEvents::COUPON_CONSUME => array("consume", 128),
+            TheliaEvents::COUPON_RULE_CREATE => array("createRule", 128),
+            TheliaEvents::COUPON_RULE_UPDATE => array("updateRule", 128),
+            TheliaEvents::COUPON_RULE_DELETE => array("deleteRule", 128)
         );
     }
 }

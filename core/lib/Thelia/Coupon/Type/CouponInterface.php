@@ -176,4 +176,5 @@ interface CouponInterface
      * @return string
      */
     public function getToolTip();
+
 }

@@ -21,43 +21,49 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Core\DependencyInjection\Compiler;
+
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Created by JetBrains PhpStorm.
- * Date: 8/19/13
+ * Date: 9/05/13
  * Time: 3:24 PM
  *
- * Unit Test RemoveXAmountForCategoryY Class
+ * Class RegisterListenersPass
+ * Source code come from Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass class
  *
- * @package Coupon
+ * @package Thelia\Core\DependencyInjection\Compiler
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveXAmountForCategoryYTest extends \PHPUnit_Framework_TestCase
+class RegisterRulePass implements CompilerPassInterface
 {
-
     /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
+     * You can modify the container here before it is dumped to PHP code.
+     *
+     * @param ContainerBuilder $container Container
+     *
+     * @api
      */
-    protected function setUp()
+    public function process(ContainerBuilder $container)
     {
-    }
+        if (!$container->hasDefinition('thelia.coupon.manager')) {
+            return;
+        }
 
-    public function incompleteTest()
-    {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-    }
+        $couponManager = $container->getDefinition('thelia.coupon.manager');
+        $services = $container->findTaggedServiceIds("thelia.coupon.addCoupon");
 
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
+        foreach ($services as $id => $rule) {
+            $couponManager->addMethodCall(
+                'addAvailableCoupon',
+                array(
+                    new Reference($id)
+                )
+            );
+        }
     }
-
 }

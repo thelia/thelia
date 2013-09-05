@@ -198,6 +198,33 @@
         <service id="service_container" synthetic="true" />
 
         <service id="kernel" synthetic="true" />
+
+        <!-- Coupon module -->
+        <service id="thelia.adapter" class="Thelia\Coupon\CouponBaseAdapter">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="thelia.coupon.manager" class="Thelia\Coupon\CouponManager">
+            <argument type="service" id="thelia.adapter" />
+        </service>
+        <service id="thelia.constraint.rule.available_for_x_articles" class="Thelia\Constraint\Rule\AvailableForXArticles">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.coupon.addRule"/>
+        </service>
+        <service id="thelia.constraint.rule.available_for_total_amount" class="Thelia\Constraint\Rule\AvailableForTotalAmount">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.coupon.addRule"/>
+        </service>
+
+        <service id="thelia.coupon.type.remove_x_amount" class="Thelia\Coupon\Type\RemoveXAmount">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.coupon.addCoupon"/>
+        </service>
+        <service id="thelia.coupon.type.remove_x_percent" class="Thelia\Coupon\Type\RemoveXPercent">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.coupon.addCoupon"/>
+        </service>
+
+
     </services>
 
 </config>
