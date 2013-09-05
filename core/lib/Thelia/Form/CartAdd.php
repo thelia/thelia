@@ -67,6 +67,10 @@ class CartAdd extends BaseForm
                     new Constraints\Callback(array("methods" => array(
                             array($this, "checkProduct")
                     )))
+                ),
+                "label" => "product",
+                "label_attr" => array(
+                    "for" => "cart_product"
                 )
             ))
             ->add("product_sale_elements_id", "text", array(

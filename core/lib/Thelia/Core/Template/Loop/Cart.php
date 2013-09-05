@@ -71,10 +71,12 @@ class Cart extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $cartItems = $cart->getCartItems();
 
-        $result = new LoopResult($cartItems);
+
+
         $cart = $this->getCart($this->request);
+        $cartItems = $cart->getCartItems();
+        $result = new LoopResult($cartItems);
 
         if ($cart === null) {
             return $result;
