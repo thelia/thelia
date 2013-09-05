@@ -37,7 +37,7 @@ use Thelia\Tools\URL;
  *
  * @package Thelia\Tests\Action\ImageTest
  */
-class ImageTest extends \PHPUnit_Framework_TestCase
+class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 {
     protected $request;
 
@@ -49,26 +49,12 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
-        $url = new URL($container, 'dev');
-
         $container->set("event_dispatcher", $dispatcher);
-        $container->set("thelia.url.manager", $dispatcher);
 
         $request = new Request();
         $request->setSession($this->session);
 
         $container->set("request", $request);
-
-        $router = $this->getMock("Symfony\Component\Routing\Router");
-        $container->set("router.admin", $router);
-
-        $context = $this->getMock("Symfony\Component\Routing\RequestContext");
-        $context->setHost('localhost');
-        $context->setPort(80);
-        $context->setScheme('http');
-        $context->getBaseUrl('/tagada/tsointsoin/');
-
-        $router->setContext($context);
 
         return $container;
     }

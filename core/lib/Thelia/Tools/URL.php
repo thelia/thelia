@@ -27,33 +27,30 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Rewriting\RewritingRetriever;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Thelia\Core\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\RequestContext;
 
 class URL
 {
     protected $resolver = null;
     protected $retriever = null;
 
-    protected $container;
-    protected $environment;
+    protected $requestContext;
 
     const PATH_TO_FILE = true;
     const WITH_INDEX_PAGE = false;
 
-    private static $instance = null;
+    protected static $instance = null;
 
-    public function __construct(ContainerInterface $container, $environment)
+    public function __construct(ContainerInterface $container)
     {
         // Allow singleton style calls once intanciated.
         // For this to work, the URL service has to be instanciated very early. This is done manually
         // in TheliaHttpKernel, by calling $this->container->get('thelia.url.manager');
         self::$instance = $this;
 
-        $this->container = $container;
-        $this->environment = $environment;
+        $this->requestContext = $container->get('router.admin')->getContext();
 
         $this->retriever = new RewritingRetriever();
         $this->resolver = new RewritingResolver();
@@ -79,28 +76,26 @@ class URL
      */
     public function getBaseUrl()
     {
-        $requestContext = $this->container->get('router.admin')->getContext();
+        if ($host = $this->requestContext->getHost()) {
 
-        if ($host = $requestContext->getHost()) {
-
-            $scheme = $requestContext->getScheme();
+            $scheme = $this->requestContext->getScheme();
 
             $port = '';
 
-            if ('http' === $scheme && 80 != $requestContext->getHttpPort()) {
-                $port = ':'.$requestContext->getHttpPort();
-            } elseif ('https' === $scheme && 443 != $requestContext->getHttpsPort()) {
-                $port = ':'.$requestContext->getHttpsPort();
+            if ('http' === $scheme && 80 != $this->requestContext->getHttpPort()) {
+                $port = ':'.$this->requestContext->getHttpPort();
+            } elseif ('https' === $scheme && 443 != $this->requestContext->getHttpsPort()) {
+                $port = ':'.$this->requestContext->getHttpsPort();
             }
 
             $schemeAuthority = "$scheme://$host"."$port";
         }
 
-        return $schemeAuthority.$requestContext->getBaseUrl().'/';
+        return $schemeAuthority.$this->requestContext->getBaseUrl();
     }
 
     /**
-     * @return string the index page, which is basically the base_url in prod environment.
+     * @return string the index page, which is in fact the base URL.
      */
     public function getIndexPage()
     {
@@ -133,7 +128,7 @@ class URL
             }
 
             // Normalize the given path
-            $base = $base_url . ltrim($path, '/');
+            $base = rtrim($base_url, '/') . '/' . ltrim($path, '/');
         } else
             $base = $path;
 
