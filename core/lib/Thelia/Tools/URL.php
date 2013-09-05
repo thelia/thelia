@@ -79,6 +79,7 @@ class URL
      */
     public function getBaseUrl()
     {
+        /*
         $request = $this->container->get('request');
         $lang = $request->getSession()->getLang();
 
@@ -106,6 +107,26 @@ class URL
 
         // Normalize the base_url
         return rtrim($base_url, '/').'/';
+        */
+
+        $requestContext = $this->container->get('router.admin')->getGenerator()->getContext();
+
+        if ($host = $requestContext->getHost()) {
+
+            $scheme = $requestContext->getScheme();
+
+            $port = '';
+
+            if ('http' === $scheme && 80 != $requestContext->getHttpPort()) {
+                $port = ':'.$requestContext->getHttpPort();
+            } elseif ('https' === $scheme && 443 != $requestContext->getHttpsPort()) {
+                $port = ':'.$requestContext->getHttpsPort();
+            }
+
+            $schemeAuthority = "$scheme://$host"."$port";
+        }
+
+        return $schemeAuthority.$requestContext->getBaseUrl().'/';
     }
 
     /**
@@ -113,15 +134,8 @@ class URL
      */
     public function getIndexPage()
     {
-        // Get the base URL
-        $base_url = $this->getBaseUrl();
-
-        // For dev environment, add the proper page.
-        if ($this->environment == 'dev') {
-            $base_url .= "index_dev.php";
-        }
-
-        return $base_url;
+        // The index page is the base URL :)
+        return $this->getBaseUrl();
     }
 
     /**
@@ -140,14 +154,16 @@ class URL
          // Already absolute ?
         if (substr($path, 0, 4) != 'http') {
 
-            /**
-             * @etienne : can't be done here for it's already done in ::viewUrl / ::adminViewUrl
-             * @franck : should be done, as absoluteUrl() is sometimes called directly (see UrlGenerator::generateUrlFunction())
-             */
-            $root = $path_only == self::PATH_TO_FILE ? $this->getBaseUrl() : $this->getIndexPage();
+            $base_url = $this->getBaseUrl();
 
-            // Normalize root path
-            $base = rtrim($root, '/') . '/' . ltrim($path, '/');
+            // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
+            if ($path_only == self::PATH_TO_FILE) {
+                // As the base_url always ends with '/', if we don't find / at the end, we have a script.
+                if (substr($base_url, -1) != '/') $base_url = dirname($base_url);
+            }
+
+            // Normalize the given path
+            $base = $base_url . ltrim($path, '/');
         } else
             $base = $path;
 
