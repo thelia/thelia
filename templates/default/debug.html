@@ -1,11 +1,2 @@
-<h2>ALL ATTRIBUTES</h2>
-
-<ul>
-    {loop name="attr" type="attribute"}
-    <li>
-        #TITLE - (#LOOP_COUNT / #LOOP_TOTAL)<br />
-        created at {format_date date=$CREATE_DATE} - updated at {format_date date=$UPDATE_DATE}
-        <hr />
-    </li>
-    {/loop}
-</ul>
+::{customer attr="firstname"};;
+::{customer attr="titleId"};;
