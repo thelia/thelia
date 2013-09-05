@@ -23,8 +23,14 @@ use Thelia\Model\Map\LangTableMap;
  * @method     ChildLangQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method     ChildLangQuery orderByLocale($order = Criteria::ASC) Order by the locale column
  * @method     ChildLangQuery orderByUrl($order = Criteria::ASC) Order by the url column
- * @method     ChildLangQuery orderByPosition($order = Criteria::ASC) Order by the position column
+ * @method     ChildLangQuery orderByDateFormat($order = Criteria::ASC) Order by the date_format column
+ * @method     ChildLangQuery orderByTimeFormat($order = Criteria::ASC) Order by the time_format column
+ * @method     ChildLangQuery orderByDatetimeFormat($order = Criteria::ASC) Order by the datetime_format column
+ * @method     ChildLangQuery orderByDecimalSeparator($order = Criteria::ASC) Order by the decimal_separator column
+ * @method     ChildLangQuery orderByThousandsSeparator($order = Criteria::ASC) Order by the thousands_separator column
+ * @method     ChildLangQuery orderByDecimals($order = Criteria::ASC) Order by the decimals column
  * @method     ChildLangQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
+ * @method     ChildLangQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildLangQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildLangQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -33,8 +39,14 @@ use Thelia\Model\Map\LangTableMap;
  * @method     ChildLangQuery groupByCode() Group by the code column
  * @method     ChildLangQuery groupByLocale() Group by the locale column
  * @method     ChildLangQuery groupByUrl() Group by the url column
- * @method     ChildLangQuery groupByPosition() Group by the position column
+ * @method     ChildLangQuery groupByDateFormat() Group by the date_format column
+ * @method     ChildLangQuery groupByTimeFormat() Group by the time_format column
+ * @method     ChildLangQuery groupByDatetimeFormat() Group by the datetime_format column
+ * @method     ChildLangQuery groupByDecimalSeparator() Group by the decimal_separator column
+ * @method     ChildLangQuery groupByThousandsSeparator() Group by the thousands_separator column
+ * @method     ChildLangQuery groupByDecimals() Group by the decimals column
  * @method     ChildLangQuery groupByByDefault() Group by the by_default column
+ * @method     ChildLangQuery groupByPosition() Group by the position column
  * @method     ChildLangQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildLangQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -50,8 +62,14 @@ use Thelia\Model\Map\LangTableMap;
  * @method     ChildLang findOneByCode(string $code) Return the first ChildLang filtered by the code column
  * @method     ChildLang findOneByLocale(string $locale) Return the first ChildLang filtered by the locale column
  * @method     ChildLang findOneByUrl(string $url) Return the first ChildLang filtered by the url column
- * @method     ChildLang findOneByPosition(int $position) Return the first ChildLang filtered by the position column
+ * @method     ChildLang findOneByDateFormat(string $date_format) Return the first ChildLang filtered by the date_format column
+ * @method     ChildLang findOneByTimeFormat(string $time_format) Return the first ChildLang filtered by the time_format column
+ * @method     ChildLang findOneByDatetimeFormat(string $datetime_format) Return the first ChildLang filtered by the datetime_format column
+ * @method     ChildLang findOneByDecimalSeparator(string $decimal_separator) Return the first ChildLang filtered by the decimal_separator column
+ * @method     ChildLang findOneByThousandsSeparator(string $thousands_separator) Return the first ChildLang filtered by the thousands_separator column
+ * @method     ChildLang findOneByDecimals(string $decimals) Return the first ChildLang filtered by the decimals column
  * @method     ChildLang findOneByByDefault(int $by_default) Return the first ChildLang filtered by the by_default column
+ * @method     ChildLang findOneByPosition(int $position) Return the first ChildLang filtered by the position column
  * @method     ChildLang findOneByCreatedAt(string $created_at) Return the first ChildLang filtered by the created_at column
  * @method     ChildLang findOneByUpdatedAt(string $updated_at) Return the first ChildLang filtered by the updated_at column
  *
@@ -60,8 +78,14 @@ use Thelia\Model\Map\LangTableMap;
  * @method     array findByCode(string $code) Return ChildLang objects filtered by the code column
  * @method     array findByLocale(string $locale) Return ChildLang objects filtered by the locale column
  * @method     array findByUrl(string $url) Return ChildLang objects filtered by the url column
- * @method     array findByPosition(int $position) Return ChildLang objects filtered by the position column
+ * @method     array findByDateFormat(string $date_format) Return ChildLang objects filtered by the date_format column
+ * @method     array findByTimeFormat(string $time_format) Return ChildLang objects filtered by the time_format column
+ * @method     array findByDatetimeFormat(string $datetime_format) Return ChildLang objects filtered by the datetime_format column
+ * @method     array findByDecimalSeparator(string $decimal_separator) Return ChildLang objects filtered by the decimal_separator column
+ * @method     array findByThousandsSeparator(string $thousands_separator) Return ChildLang objects filtered by the thousands_separator column
+ * @method     array findByDecimals(string $decimals) Return ChildLang objects filtered by the decimals column
  * @method     array findByByDefault(int $by_default) Return ChildLang objects filtered by the by_default column
+ * @method     array findByPosition(int $position) Return ChildLang objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildLang objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildLang objects filtered by the updated_at column
  *
@@ -152,7 +176,7 @@ abstract class LangQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, TITLE, CODE, LOCALE, URL, POSITION, BY_DEFAULT, CREATED_AT, UPDATED_AT FROM lang WHERE ID = :p0';
+        $sql = 'SELECT ID, TITLE, CODE, LOCALE, URL, DATE_FORMAT, TIME_FORMAT, DATETIME_FORMAT, DECIMAL_SEPARATOR, THOUSANDS_SEPARATOR, DECIMALS, BY_DEFAULT, POSITION, CREATED_AT, UPDATED_AT FROM lang WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -399,44 +423,177 @@ abstract class LangQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the position column
+     * Filter the query on the date_format column
      *
      * Example usage:
      * <code>
-     * $query->filterByPosition(1234); // WHERE position = 1234
-     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * $query->filterByDateFormat('fooValue');   // WHERE date_format = 'fooValue'
+     * $query->filterByDateFormat('%fooValue%'); // WHERE date_format LIKE '%fooValue%'
      * </code>
      *
-     * @param     mixed $position The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $dateFormat The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildLangQuery The current query, for fluid interface
      */
-    public function filterByPosition($position = null, $comparison = null)
+    public function filterByDateFormat($dateFormat = null, $comparison = null)
     {
-        if (is_array($position)) {
-            $useMinMax = false;
-            if (isset($position['min'])) {
-                $this->addUsingAlias(LangTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($position['max'])) {
-                $this->addUsingAlias(LangTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
+        if (null === $comparison) {
+            if (is_array($dateFormat)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $dateFormat)) {
+                $dateFormat = str_replace('*', '%', $dateFormat);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(LangTableMap::POSITION, $position, $comparison);
+        return $this->addUsingAlias(LangTableMap::DATE_FORMAT, $dateFormat, $comparison);
+    }
+
+    /**
+     * Filter the query on the time_format column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByTimeFormat('fooValue');   // WHERE time_format = 'fooValue'
+     * $query->filterByTimeFormat('%fooValue%'); // WHERE time_format LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $timeFormat The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildLangQuery The current query, for fluid interface
+     */
+    public function filterByTimeFormat($timeFormat = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($timeFormat)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $timeFormat)) {
+                $timeFormat = str_replace('*', '%', $timeFormat);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(LangTableMap::TIME_FORMAT, $timeFormat, $comparison);
+    }
+
+    /**
+     * Filter the query on the datetime_format column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDatetimeFormat('fooValue');   // WHERE datetime_format = 'fooValue'
+     * $query->filterByDatetimeFormat('%fooValue%'); // WHERE datetime_format LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $datetimeFormat The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildLangQuery The current query, for fluid interface
+     */
+    public function filterByDatetimeFormat($datetimeFormat = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($datetimeFormat)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $datetimeFormat)) {
+                $datetimeFormat = str_replace('*', '%', $datetimeFormat);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(LangTableMap::DATETIME_FORMAT, $datetimeFormat, $comparison);
+    }
+
+    /**
+     * Filter the query on the decimal_separator column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDecimalSeparator('fooValue');   // WHERE decimal_separator = 'fooValue'
+     * $query->filterByDecimalSeparator('%fooValue%'); // WHERE decimal_separator LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $decimalSeparator The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildLangQuery The current query, for fluid interface
+     */
+    public function filterByDecimalSeparator($decimalSeparator = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($decimalSeparator)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $decimalSeparator)) {
+                $decimalSeparator = str_replace('*', '%', $decimalSeparator);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(LangTableMap::DECIMAL_SEPARATOR, $decimalSeparator, $comparison);
+    }
+
+    /**
+     * Filter the query on the thousands_separator column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByThousandsSeparator('fooValue');   // WHERE thousands_separator = 'fooValue'
+     * $query->filterByThousandsSeparator('%fooValue%'); // WHERE thousands_separator LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $thousandsSeparator The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildLangQuery The current query, for fluid interface
+     */
+    public function filterByThousandsSeparator($thousandsSeparator = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($thousandsSeparator)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $thousandsSeparator)) {
+                $thousandsSeparator = str_replace('*', '%', $thousandsSeparator);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(LangTableMap::THOUSANDS_SEPARATOR, $thousandsSeparator, $comparison);
+    }
+
+    /**
+     * Filter the query on the decimals column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDecimals('fooValue');   // WHERE decimals = 'fooValue'
+     * $query->filterByDecimals('%fooValue%'); // WHERE decimals LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $decimals The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildLangQuery The current query, for fluid interface
+     */
+    public function filterByDecimals($decimals = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($decimals)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $decimals)) {
+                $decimals = str_replace('*', '%', $decimals);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(LangTableMap::DECIMALS, $decimals, $comparison);
     }
 
     /**
@@ -478,6 +635,47 @@ abstract class LangQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(LangTableMap::BY_DEFAULT, $byDefault, $comparison);
+    }
+
+    /**
+     * Filter the query on the position column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPosition(1234); // WHERE position = 1234
+     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
+     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * </code>
+     *
+     * @param     mixed $position The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildLangQuery The current query, for fluid interface
+     */
+    public function filterByPosition($position = null, $comparison = null)
+    {
+        if (is_array($position)) {
+            $useMinMax = false;
+            if (isset($position['min'])) {
+                $this->addUsingAlias(LangTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($position['max'])) {
+                $this->addUsingAlias(LangTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(LangTableMap::POSITION, $position, $comparison);
     }
 
     /**

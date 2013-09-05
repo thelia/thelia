@@ -49,7 +49,7 @@ class DefaultController extends BaseFrontController
         if(ConfigQuery::isRewritingEnable()) {
 
             /* Does the query GET parameters match a rewritten URL ? */
-            $rewrittenUrl = URL::getInstance()->retrieveCurrent();
+            $rewrittenUrl = URL::getInstance()->retrieveCurrent($request);
             if($rewrittenUrl->rewrittenUrl !== null) {
                 /* 301 redirection to rewritten URL */
                 $this->redirect($rewrittenUrl->rewrittenUrl, 301);
@@ -63,8 +63,12 @@ class DefaultController extends BaseFrontController
                 $view = $request->request->get('view');
             }
         }
-        if(!is_null($view)) {
+        if(null !== $view) {
             $request->attributes->set('_view', $view);
+        }
+
+        if (null === $view && null === $request->attributes->get("_view")) {
+            $request->attributes->set("_view", "index");
         }
 
     }

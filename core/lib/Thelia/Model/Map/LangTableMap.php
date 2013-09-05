@@ -57,7 +57,7 @@ class LangTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 15;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class LangTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 15;
 
     /**
      * the column name for the ID field
@@ -95,14 +95,44 @@ class LangTableMap extends TableMap
     const URL = 'lang.URL';
 
     /**
-     * the column name for the POSITION field
+     * the column name for the DATE_FORMAT field
      */
-    const POSITION = 'lang.POSITION';
+    const DATE_FORMAT = 'lang.DATE_FORMAT';
+
+    /**
+     * the column name for the TIME_FORMAT field
+     */
+    const TIME_FORMAT = 'lang.TIME_FORMAT';
+
+    /**
+     * the column name for the DATETIME_FORMAT field
+     */
+    const DATETIME_FORMAT = 'lang.DATETIME_FORMAT';
+
+    /**
+     * the column name for the DECIMAL_SEPARATOR field
+     */
+    const DECIMAL_SEPARATOR = 'lang.DECIMAL_SEPARATOR';
+
+    /**
+     * the column name for the THOUSANDS_SEPARATOR field
+     */
+    const THOUSANDS_SEPARATOR = 'lang.THOUSANDS_SEPARATOR';
+
+    /**
+     * the column name for the DECIMALS field
+     */
+    const DECIMALS = 'lang.DECIMALS';
 
     /**
      * the column name for the BY_DEFAULT field
      */
     const BY_DEFAULT = 'lang.BY_DEFAULT';
+
+    /**
+     * the column name for the POSITION field
+     */
+    const POSITION = 'lang.POSITION';
 
     /**
      * the column name for the CREATED_AT field
@@ -126,12 +156,12 @@ class LangTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Title', 'Code', 'Locale', 'Url', 'Position', 'ByDefault', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'title', 'code', 'locale', 'url', 'position', 'byDefault', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(LangTableMap::ID, LangTableMap::TITLE, LangTableMap::CODE, LangTableMap::LOCALE, LangTableMap::URL, LangTableMap::POSITION, LangTableMap::BY_DEFAULT, LangTableMap::CREATED_AT, LangTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'TITLE', 'CODE', 'LOCALE', 'URL', 'POSITION', 'BY_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'title', 'code', 'locale', 'url', 'position', 'by_default', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id', 'Title', 'Code', 'Locale', 'Url', 'DateFormat', 'TimeFormat', 'DatetimeFormat', 'DecimalSeparator', 'ThousandsSeparator', 'Decimals', 'ByDefault', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'title', 'code', 'locale', 'url', 'dateFormat', 'timeFormat', 'datetimeFormat', 'decimalSeparator', 'thousandsSeparator', 'decimals', 'byDefault', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(LangTableMap::ID, LangTableMap::TITLE, LangTableMap::CODE, LangTableMap::LOCALE, LangTableMap::URL, LangTableMap::DATE_FORMAT, LangTableMap::TIME_FORMAT, LangTableMap::DATETIME_FORMAT, LangTableMap::DECIMAL_SEPARATOR, LangTableMap::THOUSANDS_SEPARATOR, LangTableMap::DECIMALS, LangTableMap::BY_DEFAULT, LangTableMap::POSITION, LangTableMap::CREATED_AT, LangTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'TITLE', 'CODE', 'LOCALE', 'URL', 'DATE_FORMAT', 'TIME_FORMAT', 'DATETIME_FORMAT', 'DECIMAL_SEPARATOR', 'THOUSANDS_SEPARATOR', 'DECIMALS', 'BY_DEFAULT', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'title', 'code', 'locale', 'url', 'date_format', 'time_format', 'datetime_format', 'decimal_separator', 'thousands_separator', 'decimals', 'by_default', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
     );
 
     /**
@@ -141,12 +171,12 @@ class LangTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Title' => 1, 'Code' => 2, 'Locale' => 3, 'Url' => 4, 'Position' => 5, 'ByDefault' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'title' => 1, 'code' => 2, 'locale' => 3, 'url' => 4, 'position' => 5, 'byDefault' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
-        self::TYPE_COLNAME       => array(LangTableMap::ID => 0, LangTableMap::TITLE => 1, LangTableMap::CODE => 2, LangTableMap::LOCALE => 3, LangTableMap::URL => 4, LangTableMap::POSITION => 5, LangTableMap::BY_DEFAULT => 6, LangTableMap::CREATED_AT => 7, LangTableMap::UPDATED_AT => 8, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TITLE' => 1, 'CODE' => 2, 'LOCALE' => 3, 'URL' => 4, 'POSITION' => 5, 'BY_DEFAULT' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'title' => 1, 'code' => 2, 'locale' => 3, 'url' => 4, 'position' => 5, 'by_default' => 6, 'created_at' => 7, 'updated_at' => 8, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Title' => 1, 'Code' => 2, 'Locale' => 3, 'Url' => 4, 'DateFormat' => 5, 'TimeFormat' => 6, 'DatetimeFormat' => 7, 'DecimalSeparator' => 8, 'ThousandsSeparator' => 9, 'Decimals' => 10, 'ByDefault' => 11, 'Position' => 12, 'CreatedAt' => 13, 'UpdatedAt' => 14, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'title' => 1, 'code' => 2, 'locale' => 3, 'url' => 4, 'dateFormat' => 5, 'timeFormat' => 6, 'datetimeFormat' => 7, 'decimalSeparator' => 8, 'thousandsSeparator' => 9, 'decimals' => 10, 'byDefault' => 11, 'position' => 12, 'createdAt' => 13, 'updatedAt' => 14, ),
+        self::TYPE_COLNAME       => array(LangTableMap::ID => 0, LangTableMap::TITLE => 1, LangTableMap::CODE => 2, LangTableMap::LOCALE => 3, LangTableMap::URL => 4, LangTableMap::DATE_FORMAT => 5, LangTableMap::TIME_FORMAT => 6, LangTableMap::DATETIME_FORMAT => 7, LangTableMap::DECIMAL_SEPARATOR => 8, LangTableMap::THOUSANDS_SEPARATOR => 9, LangTableMap::DECIMALS => 10, LangTableMap::BY_DEFAULT => 11, LangTableMap::POSITION => 12, LangTableMap::CREATED_AT => 13, LangTableMap::UPDATED_AT => 14, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TITLE' => 1, 'CODE' => 2, 'LOCALE' => 3, 'URL' => 4, 'DATE_FORMAT' => 5, 'TIME_FORMAT' => 6, 'DATETIME_FORMAT' => 7, 'DECIMAL_SEPARATOR' => 8, 'THOUSANDS_SEPARATOR' => 9, 'DECIMALS' => 10, 'BY_DEFAULT' => 11, 'POSITION' => 12, 'CREATED_AT' => 13, 'UPDATED_AT' => 14, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'title' => 1, 'code' => 2, 'locale' => 3, 'url' => 4, 'date_format' => 5, 'time_format' => 6, 'datetime_format' => 7, 'decimal_separator' => 8, 'thousands_separator' => 9, 'decimals' => 10, 'by_default' => 11, 'position' => 12, 'created_at' => 13, 'updated_at' => 14, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, )
     );
 
     /**
@@ -170,8 +200,14 @@ class LangTableMap extends TableMap
         $this->addColumn('CODE', 'Code', 'VARCHAR', false, 10, null);
         $this->addColumn('LOCALE', 'Locale', 'VARCHAR', false, 45, null);
         $this->addColumn('URL', 'Url', 'VARCHAR', false, 255, null);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
+        $this->addColumn('DATE_FORMAT', 'DateFormat', 'VARCHAR', false, 45, null);
+        $this->addColumn('TIME_FORMAT', 'TimeFormat', 'VARCHAR', false, 45, null);
+        $this->addColumn('DATETIME_FORMAT', 'DatetimeFormat', 'VARCHAR', false, 45, null);
+        $this->addColumn('DECIMAL_SEPARATOR', 'DecimalSeparator', 'VARCHAR', false, 45, null);
+        $this->addColumn('THOUSANDS_SEPARATOR', 'ThousandsSeparator', 'VARCHAR', false, 45, null);
+        $this->addColumn('DECIMALS', 'Decimals', 'VARCHAR', false, 45, null);
         $this->addColumn('BY_DEFAULT', 'ByDefault', 'TINYINT', false, null, null);
+        $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -339,8 +375,14 @@ class LangTableMap extends TableMap
             $criteria->addSelectColumn(LangTableMap::CODE);
             $criteria->addSelectColumn(LangTableMap::LOCALE);
             $criteria->addSelectColumn(LangTableMap::URL);
-            $criteria->addSelectColumn(LangTableMap::POSITION);
+            $criteria->addSelectColumn(LangTableMap::DATE_FORMAT);
+            $criteria->addSelectColumn(LangTableMap::TIME_FORMAT);
+            $criteria->addSelectColumn(LangTableMap::DATETIME_FORMAT);
+            $criteria->addSelectColumn(LangTableMap::DECIMAL_SEPARATOR);
+            $criteria->addSelectColumn(LangTableMap::THOUSANDS_SEPARATOR);
+            $criteria->addSelectColumn(LangTableMap::DECIMALS);
             $criteria->addSelectColumn(LangTableMap::BY_DEFAULT);
+            $criteria->addSelectColumn(LangTableMap::POSITION);
             $criteria->addSelectColumn(LangTableMap::CREATED_AT);
             $criteria->addSelectColumn(LangTableMap::UPDATED_AT);
         } else {
@@ -349,8 +391,14 @@ class LangTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.CODE');
             $criteria->addSelectColumn($alias . '.LOCALE');
             $criteria->addSelectColumn($alias . '.URL');
-            $criteria->addSelectColumn($alias . '.POSITION');
+            $criteria->addSelectColumn($alias . '.DATE_FORMAT');
+            $criteria->addSelectColumn($alias . '.TIME_FORMAT');
+            $criteria->addSelectColumn($alias . '.DATETIME_FORMAT');
+            $criteria->addSelectColumn($alias . '.DECIMAL_SEPARATOR');
+            $criteria->addSelectColumn($alias . '.THOUSANDS_SEPARATOR');
+            $criteria->addSelectColumn($alias . '.DECIMALS');
             $criteria->addSelectColumn($alias . '.BY_DEFAULT');
+            $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

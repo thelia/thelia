@@ -79,7 +79,8 @@ class URL
      */
     public function getBaseUrl()
     {
-        $lang = $this->container->get('request')->getSession()->getLang();
+        $request = $this->container->get('request');
+        $lang = $request->getSession()->getLang();
 
         // Check if we have a specific URL for each lang.
         $one_domain_foreach_lang = ConfigQuery::read("one_domain_foreach_lang", false);
@@ -92,7 +93,7 @@ class URL
         }
         else {
             // Get the base URL
-            $base_url = ConfigQuery::read('base_url', null);
+            $base_url = ConfigQuery::read('base_url', $request->getSchemeAndHttpHost());
 
             $err_msg_part = sprintf('base_url for lang %s', $lang->getCode());
         }
