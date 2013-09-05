@@ -47,26 +47,26 @@
         			                        	<input type="hidden" name="{$name}" value="{$edit_language_locale}" />
         			                        {/form_field}
 
-        					            	{if $form_error}<div class="alert alert-block alert-error">{$form_error_message}</div>{/if}                                
+        					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}                                
                                         	
         	                                <div class="col-md-6">
         										
         										{form_field form=$form field='name'}
         								            <div class="form-group {if $error}has-error{/if}">
-        								                <label>{intl l='Name *'}</label>
-        												<input type="text" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Currency name'}" placeholder="{intl l='Currency name'}" class="form-control">							                
+        								                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+        												<input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Currency name'}" placeholder="{intl l='Currency name'}" class="form-control">							                
         								            </div>
         							            {/form_field}
         										
         										{form_field form=$form field='code'}
         		                                    <div class="form-group {if $error}has-error{/if}">
-        		                                        <label>
-                                                            {intl l='ISO 4217 Code *'}    
+        		                                        <label for="{$label_attr.for}" class="control-label">
+                                                            {intl l="{$label}"} : 
                                                             <span class="label-help-block">
                                                                 <a title="{intl l='More information about ISO 4217'}" href="http://fr.wikipedia.org/wiki/ISO_4217" target="_blank">List of ISO 4217 code</a>
                                                             </span>
         		                                       	</label>
-                                                        <input type="text" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Currency ISO 4217 Code'}" placeholder="{intl l='Code'}" class="form-control">
+                                                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Currency ISO 4217 Code'}" placeholder="{intl l='Code'}" class="form-control">
         		                                    </div>
         		                               	{/form_field}
 
@@ -76,21 +76,21 @@
 
                                                 {form_field form=$form field='symbol'}
             	                                    <div class="form-group {if $error}has-error{/if}">
-            	                                        <label>
-            	                                           {intl l='Symbol *'}
+            	                                        <label for="{$label_attr.for}" class="control-label">
+            	                                           {intl l="{$label}"} : 
             	                                           <span class="label-help-block">The symbol, sur as $, £, &euro;...</span>
             	                                        </label>
-                                                        <input type="text" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Currency symbol'}" placeholder="{intl l='Symbol'}" class="form-control">
+                                                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Currency symbol'}" placeholder="{intl l='Symbol'}" class="form-control">
             	                                    </div>
                                                 {/form_field}
                                                 
                                                 {form_field form=$form field='rate'}
             	                                    <div class="form-group {if $error}has-error{/if}">
-            	                                        <label>
-            	                                           {intl l='Rate from &euro; *'}
+            	                                        <label for="{$label_attr.for}" class="control-label">
+            	                                           {intl l="{$label}"} : 
             	                                           <span class="label-help-block">The rate from Euro</span>
             	                                        </label>
-                                                        <input type="text" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Rate from Euro'}" placeholder="{intl l='Rate'}" class="form-control">
+                                                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Rate from Euro'}" placeholder="{intl l='Rate'}" class="form-control">
                                                         <span class="help-block">Price in Euro x rate = Price in this currency</span>        	                                        
             	                                    </div>
                                                 {/form_field}
