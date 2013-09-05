@@ -138,7 +138,7 @@
                                     <td class="text-center">
 	                                   {admin_position_block
 	                                       permission="admin.currencies.edit"
-	                                       path="/admin/configuration/currencies"
+	                                       path="/admin/configuration/currencies/update-position"
 	                                       url_parameter="currency_id"
 	                                       in_place_edit_class="currencyPositionChange"
 	                                       position="$POSITION"
@@ -371,7 +371,7 @@
             placement   : 'left',
             success     : function(response, newValue) {
                 // The URL template
-                var url = "{url path='/admin/configuration/currencies/updatePosition' currency_id='__ID__' position='__POS__'}";
+                var url = "{url path='/admin/configuration/currencies/update-position' currency_id='__ID__' position='__POS__'}";
 
                 // Perform subtitutions
                 url = url.replace('__ID__', $(this).data('id'))

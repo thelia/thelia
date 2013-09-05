@@ -74,14 +74,4 @@ class BaseUpdatePositionEvent extends ActionEvent
         $this->object_id = $object_id;
         return $this;
     }
-
-    public function getObjectId()
-    {
-        return $this->object_id;
-    }
-
-    public function setObjectId($object_id)
-    {
-        $this->object_id = $object_id;
-    }
 }

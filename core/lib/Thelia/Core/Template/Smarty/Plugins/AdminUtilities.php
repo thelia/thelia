@@ -71,11 +71,11 @@ class AdminUtilities extends AbstractSmartyPlugin
         if ($permissions == null || $this->securityContext->isGranted("ADMIN", array($permission))) {
             return sprintf(
                 '<a href="%s"><i class="glyphicon glyphicon-arrow-up"></i></a><span class="%s" data-id="%s">%s</span><a href="%s"><i class="glyphicon glyphicon-arrow-down"></i></a>',
-                URL::getInstance()->absoluteUrl("$path/positionUp", array($url_parameter => $id)),
+                URL::getInstance()->absoluteUrl($path, array('mode' => 'up', $url_parameter => $id)),
                 $in_place_edit_class,
                 $id,
                 $position,
-                URL::getInstance()->absoluteUrl("$path/positionDown", array($url_parameter => $id))
+                URL::getInstance()->absoluteUrl($path, array('mode' => 'down', $url_parameter => $id))
             );
         }
         else {

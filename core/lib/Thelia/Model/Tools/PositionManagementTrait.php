@@ -25,6 +25,7 @@ namespace Thelia\Model\Tools;
 
 use Propel\Runtime\ActiveQuery\PropelQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Propel;
 
 trait PositionManagementTrait {
 
@@ -51,10 +52,12 @@ trait PositionManagementTrait {
     public function getNextPosition($parent) {
 
         $last = $this->createQuery()
-            ->filterByParent($parent)
             ->orderByPosition(Criteria::DESC)
-            ->limit(1)
-            ->findOne()
+            ->limit(1);
+
+            if ($parent !== null) $last->filterByParent($parent);
+
+            $last->findOne()
         ;
 
         return $last != null ? $last->getPosition() + 1 : 1;
@@ -63,14 +66,14 @@ trait PositionManagementTrait {
     /**
      * Move up a object
      */
-    protected function movePositionUp() {
+    public function movePositionUp() {
         $this->movePositionUpOrDown(true);
     }
 
     /**
      * Move down a object
      */
-    protected function movePositionDown() {
+    public function movePositionDown() {
         $this->movePositionUpOrDown(false);
     }
 
@@ -85,8 +88,9 @@ trait PositionManagementTrait {
         $my_position = $this->getPosition();
 
         // Find object to exchange position with
-        $search = $this->createQuery()
-            ->filterByParent($this->getParent());
+        $search = $this->createQuery();
+
+        if (method_exists($this, 'getParent')) $search->filterByParent($this->getParent());
 
         // Up or down ?
         if ($up === true) {
@@ -103,18 +107,21 @@ trait PositionManagementTrait {
         // If we found the proper object, exchange their positions
         if ($result) {
 
-            $cnx = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
+            // Find DATABASE_NAME constant
+            $mapClassName = self::TABLE_MAP;
+            $database_name = $mapClassName::DATABASE_NAME;
+
+            $cnx = Propel::getWriteConnection($database_name);
 
             $cnx->beginTransaction();
 
             try {
                 $this
-                    ->setDispatcher($this->getDispatcher())
                     ->setPosition($result->getPosition())
                     ->save()
                 ;
 
-                $result->setPosition($my_position)->save();
+                $result->setDispatcher($this->getDispatcher())->setPosition($my_position)->save();
 
                 $cnx->commit();
             } catch (Exception $e) {
@@ -128,7 +135,7 @@ trait PositionManagementTrait {
      *
      * @param newPosition
      */
-    protected function changeAbsolutePosition($newPosition)
+    public function changeAbsolutePosition($newPosition)
     {
         // The current position
         $current_position = $this->getPosition();
@@ -136,7 +143,9 @@ trait PositionManagementTrait {
         if ($newPosition != null && $newPosition > 0 && $newPosition != $current_position) {
 
              // Find categories to offset
-            $search = $this->createQuery()->filterByParent($this->getParent());
+            $search = $this->createQuery();
+
+            if (method_exists($this, 'getParent')) $search->filterByParent($this->getParent());
 
             if ($newPosition > $current_position) {
                 // The new position is after the current position -> we will offset + 1 all categories located between us and the new position
@@ -158,11 +167,10 @@ trait PositionManagementTrait {
 
             try {
                 foreach ($results as $result) {
-                    $result->setPosition($result->getPosition() + $delta)->save($cnx);
+                    $result->setDispatcher($this->getDispatcher())->setPosition($result->getPosition() + $delta)->save($cnx);
                 }
 
                 $this
-                    ->setDispatcher($this->getDispatcher())
                     ->setPosition($newPosition)
                     ->save($cnx)
                 ;
