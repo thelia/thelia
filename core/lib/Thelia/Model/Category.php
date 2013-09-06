@@ -13,6 +13,8 @@ class Category extends BaseCategory
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
+    use \Thelia\Model\Tools\PositionManagementTrait;
+
     /**
      * @return int number of child for the current category
      */
@@ -23,7 +25,7 @@ class Category extends BaseCategory
 
     public function getUrl($locale)
     {
-        return URL::init()->retrieve('category', $this->getId(), $locale)->toString();
+        return URL::getInstance()->retrieve('category', $this->getId(), $locale)->toString();
     }
 
     /**
@@ -44,18 +46,6 @@ class Category extends BaseCategory
     	;
 
     	$this->save();
-     }
-
-     public function getNextPosition($parent) {
-
-		$last = CategoryQuery::create()
-			->filterByParent($parent)
-			->orderByPosition(Criteria::DESC)
-			->limit(1)
-			->findOne()
-		;
-
-		return $last != null ? $last->getPosition() + 1 : 1;
      }
 
     /**

@@ -248,9 +248,9 @@ class Category extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CATEGORY_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
             TheliaEvents::CATEGORY_CHANGE_POSITION   => array("changePosition", 128),
 
-            "action.changeCategoryPositionU" 	=> array("changePositionUp", 128),
-            "action.changeCategoryPositionDown" => array("changePositionDown", 128),
-            "action.changeCategoryPosition" 	=> array("changePosition", 128),
+            "action.updateCategoryPositionU" 	=> array("changePositionUp", 128),
+            "action.updateCategoryPositionDown" => array("changePositionDown", 128),
+            "action.updateCategoryPosition" 	=> array("changePosition", 128),
         );
     }
 }

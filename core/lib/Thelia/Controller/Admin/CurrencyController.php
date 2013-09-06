@@ -26,7 +26,7 @@ namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\CurrencyDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Tools\URL;
-use Thelia\Core\Event\CurrencyChangeEvent;
+use Thelia\Core\Event\CurrencyUpdateEvent;
 use Thelia\Core\Event\CurrencyCreateEvent;
 use Thelia\Log\Tlog;
 use Thelia\Form\Exception\FormValidationException;
@@ -34,6 +34,7 @@ use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Form\CurrencyModificationForm;
 use Thelia\Form\CurrencyCreationForm;
+use Thelia\Core\Event\CurrencyUpdatePositionEvent;
 
 /**
  * Manages currencies sent by mail
@@ -124,7 +125,7 @@ class CurrencyController extends BaseAdminController
         }
         catch (\Exception $ex) {
             // Any other error
-            $error_msg = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+            $error_msg = $ex;
         }
 
         if ($error_msg !== false) {
@@ -153,7 +154,7 @@ class CurrencyController extends BaseAdminController
     public function changeAction() {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.currencies.change")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
 
         // Load the currency object
         $currency = CurrencyQuery::create()
@@ -191,7 +192,7 @@ class CurrencyController extends BaseAdminController
     public function saveChangeAction() {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.currencies.change")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
 
         $error_msg = false;
 
@@ -209,7 +210,7 @@ class CurrencyController extends BaseAdminController
             // Get the form field values
             $data = $form->getData();
 
-            $changeEvent = new CurrencyChangeEvent($data['id']);
+            $changeEvent = new CurrencyUpdateEvent($data['id']);
 
             // Create and dispatch the change event
             $changeEvent
@@ -231,7 +232,7 @@ class CurrencyController extends BaseAdminController
             // just redirect to the edit page again.
             if ($this->getRequest()->get('save_mode') == 'stay') {
                 $this->redirectToRoute(
-                        "admin.configuration.currencies.change",
+                        "admin.configuration.currencies.update",
                         array('currency_id' => $currency_id)
                 );
             }
@@ -245,7 +246,7 @@ class CurrencyController extends BaseAdminController
         }
         catch (\Exception $ex) {
             // Any other error
-            $error_msg = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+            $error_msg = $ex;
         }
 
         if ($error_msg !== false) {
@@ -271,9 +272,9 @@ class CurrencyController extends BaseAdminController
      */
     public function setDefaultAction() {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.currencies.change")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
 
-        $changeEvent = new CurrencyChangeEvent($this->getRequest()->get('currency_id', 0));
+        $changeEvent = new CurrencyUpdateEvent($this->getRequest()->get('currency_id', 0));
 
         // Create and dispatch the change event
         $changeEvent->setIsDefault(true);
@@ -283,7 +284,7 @@ class CurrencyController extends BaseAdminController
         }
         catch (\Exception $ex) {
             // Any error
-            return $this->errorPage(sprintf("Sorry, an error occured: %s", $ex->getMessage()));
+            return $this->errorPage($ex);
         }
 
         $this->redirectToRoute('admin.configuration.currencies.default');
@@ -294,18 +295,54 @@ class CurrencyController extends BaseAdminController
      */
     public function updateRatesAction() {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.currencies.change")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
 
         try {
             $this->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES);
         }
         catch (\Exception $ex) {
             // Any error
-            return $this->errorPage(sprintf("Sorry, an error occured: %s", $ex->getMessage()));
+            return $this->errorPage($ex);
         }
 
         $this->redirectToRoute('admin.configuration.currencies.default');
     }
+
+    /**
+     * Update currencyposition
+     */
+    public function updatePositionAction() {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
+
+        try {
+            $mode = $this->getRequest()->get('mode', null);
+
+            if ($mode == 'up')
+                $mode = CurrencyUpdatePositionEvent::POSITION_UP;
+            else if ($mode == 'down')
+                $mode = CurrencyUpdatePositionEvent::POSITION_DOWN;
+            else
+                $mode = CurrencyUpdatePositionEvent::POSITION_ABSOLUTE;
+
+            $position = $this->getRequest()->get('position', null);
+
+            $event = new CurrencyUpdatePositionEvent(
+                    $this->getRequest()->get('currency_id', null),
+                    $mode,
+                    $this->getRequest()->get('position', null)
+            );
+
+            $this->dispatch(TheliaEvents::CURRENCY_UPDATE_POSITION, $event);
+        }
+        catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        $this->redirectToRoute('admin.configuration.currencies.default');
+    }
+
 
     /**
      * Delete a currency object

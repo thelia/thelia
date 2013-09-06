@@ -44,6 +44,9 @@
         <form name="thelia.customer.login" class="Thelia\Form\CustomerLogin"/>
         <form name="thelia.admin.login" class="Thelia\Form\AdminLogin"/>
 
+        <form name="thelia.address.create" class="Thelia\Form\AddressCreateForm" />
+        <form name="thelia.address.update" class="Thelia\Form\AddressUpdateForm" />
+
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
         <form name="thelia.admin.category.deletion" class="Thelia\Form\CategoryDeletionForm"/>
 
@@ -74,6 +77,13 @@
     </commands>
 
     <services>
+
+        <!--  URL maganement -->
+
+        <service id="thelia.url.manager" class="Thelia\Tools\URL">
+            <argument type="service" id="service_container" />
+            <argument >%kernel.environment%</argument>
+        </service>
 
         <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher">
             <argument type="service" id="service_container" />
@@ -122,6 +132,7 @@
 
         <service id="smarty.plugin.assetic" class="Thelia\Core\Template\Smarty\Plugins\Assetic" >
             <tag name="thelia.parser.register_plugin"/>
+            <argument>%kernel.environment%</argument>
         </service>
 
         <service id="smarty.plugin.theliasyntax" class="Thelia\Core\Template\Smarty\Plugins\TheliaSyntax" >

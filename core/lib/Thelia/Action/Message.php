@@ -31,7 +31,7 @@ use Thelia\Model\Message as MessageModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\MessageChangeEvent;
+use Thelia\Core\Event\MessageUpdateEvent;
 use Thelia\Core\Event\MessageCreateEvent;
 use Thelia\Core\Event\MessageDeleteEvent;
 
@@ -65,9 +65,9 @@ class Message extends BaseAction implements EventSubscriberInterface
     /**
      * Change a message
      *
-     * @param MessageChangeEvent $event
+     * @param MessageUpdateEvent $event
      */
-    public function modify(MessageChangeEvent $event)
+    public function modify(MessageUpdateEvent $event)
     {
         $search = MessageQuery::create();
 

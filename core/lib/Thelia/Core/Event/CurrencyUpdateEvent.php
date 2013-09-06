@@ -22,66 +22,38 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
+use Thelia\Model\Currency;
 
-use Thelia\Model\Message;
-
-class MessageChangeEvent extends MessageCreateEvent
+class CurrencyUpdateEvent extends CurrencyCreateEvent
 {
-    protected $message_id;
+    protected $currency_id;
+    protected $is_default;
 
-    protected $text_message;
-    protected $html_message;
-    protected $subject;
-
-    public function __construct($message_id)
+    public function __construct($currency_id)
     {
-        $this->setMessageId($message_id);
+        $this->setCurrencyId($currency_id);
     }
 
-    public function getMessageId()
+    public function getCurrencyId()
     {
-        return $this->message_id;
+        return $this->currency_id;
     }
 
-    public function setMessageId($message_id)
+    public function setCurrencyId($currency_id)
     {
-        $this->message_id = $message_id;
+        $this->currency_id = $currency_id;
 
         return $this;
     }
 
-    public function getTextMessage()
+    public function getIsDefault()
     {
-        return $this->text_message;
+        return $this->is_default;
     }
 
-    public function setTextMessage($text_message)
+    public function setIsDefault($is_default)
     {
-        $this->text_message = $text_message;
-
-        return $this;
-    }
-
-    public function getHtmlMessage()
-    {
-        return $this->html_message;
-    }
-
-    public function setHtmlMessage($html_message)
-    {
-        $this->html_message = $html_message;
-
-        return $this;
-    }
-
-    public function getSubject()
-    {
-        return $this->subject;
-    }
-
-    public function setSubject($subject)
-    {
-        $this->subject = $subject;
+        $this->is_default = $is_default;
 
         return $this;
     }

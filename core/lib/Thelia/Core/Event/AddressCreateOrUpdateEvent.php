@@ -32,7 +32,7 @@ use Thelia\Model\Customer;
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class AddressCreateOrUpdateEvent extends Event
+class AddressCreateOrUpdateEvent extends ActionEvent
 {
     /**
      * @var string address label

@@ -202,7 +202,7 @@ class CustomerController extends BaseFrontController
         }
 
         // Redirect to home page
-        $this->redirect(URL::getIndexPage());
+        $this->redirect(URL::getInstance()->getIndexPage());
     }
 
     /**

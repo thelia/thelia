@@ -23,22 +23,55 @@
 
 namespace Thelia\Core\Event;
 
-use Thelia\Model\Category;
-
-class CategoryCreateEvent extends ActionEvent
+class BaseUpdatePositionEvent extends ActionEvent
 {
-    protected $category_id;
-    protected $locale;
-    protected $title;
-    protected $chapo;
-    protected $description;
-    protected $postscriptum;
-    protected $url;
-    protected $visibility;
-    protected $parent;
+    const POSITION_UP = 1;
+    const POSITION_DOWN = 2;
+    const POSITION_ABSOLUTE = 3;
 
-    public function __construct($category_id)
+    protected $object_id;
+    protected $mode;
+    protected $position;
+
+    protected $object;
+
+    public function __construct($object_id, $mode, $position = null)
     {
-        $this->category_id = $category_id;
+        $this->object_id = $object_id;
+        $this->mode = $mode;
+        $this->position = $position;
+    }
+
+    public function getMode()
+    {
+        return $this->mode;
+    }
+
+    public function setMode($mode)
+    {
+        $this->mode = $mode;
+        return $this;
+    }
+
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    public function setPosition($position)
+    {
+        $this->position = $position;
+        return $this;
+    }
+
+    public function getObjectId()
+    {
+        return $this->object_id;
+    }
+
+    public function setObjectId($object_id)
+    {
+        $this->object_id = $object_id;
+        return $this;
     }
 }

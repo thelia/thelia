@@ -26,7 +26,7 @@ namespace Thelia\Core\Event;
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Model\Cart;
 
-class CartEvent extends Event
+class CartEvent extends ActionEvent
 {
     protected $cart;
     protected $quantity;

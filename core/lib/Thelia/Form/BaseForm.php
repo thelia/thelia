@@ -135,7 +135,7 @@ abstract class BaseForm
             $successUrl = $default;
         }
 
-        return URL::absoluteUrl($successUrl);
+        return URL::getInstance()->absoluteUrl($successUrl);
     }
 
     public function createView()

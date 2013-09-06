@@ -210,9 +210,7 @@
 
 	{block name="before-javascript-include"}{/block}
 
-	{javascripts file='assets/js/jquery.min.js'}
-	    <script src="{$asset_url}"></script>
-	{/javascripts}
+	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 
 	{block name="after-javascript-include"}{/block}	
 

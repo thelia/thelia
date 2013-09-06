@@ -166,7 +166,7 @@ class Config extends BaseI18nLoop
                 ->set("POSTSCRIPTUM" , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("HIDDEN"       , $result->getHidden())
                 ->set("SECURED"      , $result->getSecured())
-                ;
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

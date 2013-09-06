@@ -30,13 +30,14 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Action\Image;
 use Thelia\Core\Event\ImageEvent;
 use Thelia\Model\ConfigQuery;
+use Thelia\Tools\URL;
 
 /**
  * Class ImageTest
  *
  * @package Thelia\Tests\Action\ImageTest
  */
-class ImageTest extends \PHPUnit_Framework_TestCase
+class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 {
     protected $request;
 
@@ -49,6 +50,11 @@ class ImageTest extends \PHPUnit_Framework_TestCase
         $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
         $container->set("event_dispatcher", $dispatcher);
+
+        $request = new Request();
+        $request->setSession($this->session);
+
+        $container->set("request", $request);
 
         return $container;
     }

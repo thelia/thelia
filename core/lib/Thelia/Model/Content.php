@@ -9,6 +9,6 @@ class Content extends BaseContent
 {
     public function getUrl($locale)
     {
-        return URL::init()->retrieve('content', $this->getId(), $locale)->toString();
+        return URL::getInstance()->retrieve('content', $this->getId(), $locale)->toString();
     }
 }

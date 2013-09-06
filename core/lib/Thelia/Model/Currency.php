@@ -11,12 +11,17 @@ class Currency extends BaseCurrency {
 
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
+    use \Thelia\Model\Tools\PositionManagementTrait;
+
     /**
      * {@inheritDoc}
      */
     public function preInsert(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECURRENCY, new CurrencyEvent($this));
+
+        // Set the current position for the new object
+        $this->setPosition($this->getNextPosition());
 
         return true;
     }

@@ -26,11 +26,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 
 /**
- * Class AddressForm
+ * Class AddressCreateForm
  * @package Thelia\Form
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class AddressForm extends BaseForm
+class AddressCreateForm extends BaseForm
 {
 
     /**
@@ -60,7 +60,8 @@ class AddressForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "address name"
+                "label" => "address name",
+                "required" => true
             ))
             ->add("title", "text", array(
                 "constraints" => array(

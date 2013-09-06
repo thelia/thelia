@@ -26,7 +26,7 @@ namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\ConfigDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Tools\URL;
-use Thelia\Core\Event\ConfigChangeEvent;
+use Thelia\Core\Event\ConfigUpdateEvent;
 use Thelia\Core\Event\ConfigCreateEvent;
 use Thelia\Log\Tlog;
 use Thelia\Form\Exception\FormValidationException;
@@ -154,7 +154,7 @@ class ConfigController extends BaseAdminController
     public function changeAction() {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.variables.change")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.variables.update")) return $response;
 
         // Load the config object
         $config = ConfigQuery::create()
@@ -196,7 +196,7 @@ class ConfigController extends BaseAdminController
     public function saveChangeAction() {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.variables.change")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.variables.update")) return $response;
 
         $message = false;
 
@@ -214,7 +214,7 @@ class ConfigController extends BaseAdminController
             // Get the form field values
             $data = $form->getData();
 
-            $changeEvent = new ConfigChangeEvent($data['id']);
+            $changeEvent = new ConfigUpdateEvent($data['id']);
 
             // Create and dispatch the change event
             $changeEvent
@@ -284,13 +284,13 @@ class ConfigController extends BaseAdminController
     public function changeValuesAction() {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.variables.change")) return $response;
+        if (null !== $response = $this->checkAuth("admin.configuration.variables.update")) return $response;
 
         $variables = $this->getRequest()->get('variable', array());
 
         // Process all changed variables
         foreach($variables as $id => $value) {
-            $event = new ConfigChangeEvent($id);
+            $event = new ConfigUpdateEvent($id);
             $event->setValue($value);
 
             $this->dispatch(TheliaEvents::CONFIG_SETVALUE, $event);

@@ -29,8 +29,18 @@
     <!-- end customer routes -->
 
     <!-- customer address routes -->
-    <route id="customer.adress.create" path="/customer/address/create" >
-        <default key="_controller">Thelia\Controller\Front\CustomerAddressController::createAction</default>
+    <route id="address.create" path="/address/create" >
+        <default key="_controller">Thelia\Controller\Front\AddressController::createAction</default>
+        <default key="_view">address</default>
+    </route>
+
+    <route id="address.edit" path="/address/edit/{address_id}">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">address_edit</default>
+    </route>
+
+    <route id="address.update" path="/address/update" >
+        <default key="_controller">Thelia\Controller\Front\AddressController::updateAction</default>
     </route>
     <!-- end customer address routes -->
 
@@ -40,7 +50,7 @@
         <default key="_view">cart</default>
     </route>
 
-    <route id="cart.change.process" path="/cart/delete/{cart_item}">
+    <route id="cart.delete.process" path="/cart/delete/{cart_item}">
         <default key="_controller">Thelia\Controller\Front\CartController::deleteItem</default>
         <default key="_view">cart</default>
     </route>
@@ -50,9 +60,4 @@
         <default key="_view">cart</default>
     </route>
 
-    <!--<route id="url-rewriting.check" path="/{rewritten_url}" methods="GET">-->
-        <!--<default key="_controller">Thelia\Controller\Front\UrlRewritingController::check</default>-->
-        <!--<requirement key="rewritten_url">.*</requirement>-->
-    <!--</route>-->
-    
 </routes>

@@ -47,6 +47,7 @@ class CacheClearTest extends \PHPUnit_Framework_TestCase
         $fs = new Filesystem();
 
         $fs->mkdir($this->cache_dir);
+        $fs->mkdir(THELIA_WEB_DIR . "/assets");
     }
 
     public function testCacheClear()

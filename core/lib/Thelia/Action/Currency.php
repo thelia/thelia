@@ -31,11 +31,11 @@ use Thelia\Model\Currency as CurrencyModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\CurrencyChangeEvent;
+use Thelia\Core\Event\CurrencyUpdateEvent;
 use Thelia\Core\Event\CurrencyCreateEvent;
 use Thelia\Core\Event\CurrencyDeleteEvent;
-use Thelia\Model\Map\CurrencyTableMap;
 use Thelia\Model\ConfigQuery;
+use Thelia\Core\Event\CurrencyUpdatePositionEvent;
 
 class Currency extends BaseAction implements EventSubscriberInterface
 {
@@ -67,9 +67,9 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Change a currency
      *
-     * @param CurrencyChangeEvent $event
+     * @param CurrencyUpdateEvent $event
      */
-    public function update(CurrencyChangeEvent $event)
+    public function update(CurrencyUpdateEvent $event)
     {
         $search = CurrencyQuery::create();
 
@@ -93,9 +93,9 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Set the default currency
      *
-     * @param CurrencyChangeEvent $event
+     * @param CurrencyUpdateEvent $event
      */
-    public function setDefault(CurrencyChangeEvent $event)
+    public function setDefault(CurrencyUpdateEvent $event)
     {
         $search = CurrencyQuery::create();
 
@@ -107,6 +107,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 CurrencyQuery::create()->filterByByDefault(true)->update(array('ByDefault' => false));
 
                 $currency
+                    ->setDispatcher($this->getDispatcher())
                     ->setByDefault($event->getIsDefault())
                     ->save()
                 ;
@@ -139,7 +140,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
         $rates_url = ConfigQuery::read('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml');
 
-        $rate_data = file_get_contents($rates_url);
+        $rate_data = @file_get_contents($rates_url);
 
         if ($rate_data && $sxe = new \SimpleXMLElement($rate_data)) {
 
@@ -149,12 +150,38 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 $rate = floatval($last['rate']);
 
                 if (null !== $currency = CurrencyQuery::create()->findOneByCode($code)) {
-                    $currency->setRate($rate)->save();
+                    $currency
+                        ->setDispatcher($this->getDispatcher())
+                        ->setRate($rate)
+                        ->save()
+                    ;
                 }
             }
         }
         else {
-            throw new \RuntimeException(sprintf("Failed to get currency rates data from URL %s", $url));
+            throw new \RuntimeException(sprintf("Failed to get currency rates data from URL %s", $rates_url));
+        }
+    }
+
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param CategoryChangePositionEvent $event
+     */
+    public function updatePosition(CurrencyUpdatePositionEvent $event)
+    {
+        if (null !== $currency = CurrencyQuery::create()->findOneById($event->getObjectId())) {
+
+            $currency->setDispatcher($this->getDispatcher());
+
+            $mode = $event->getMode();
+
+            if ($mode == CurrencyUpdatePositionEvent::POSITION_ABSOLUTE)
+                return $currency->changeAbsolutePosition($event->getPosition());
+            else if ($mode == CurrencyUpdatePositionEvent::POSITION_UP)
+                return $currency->movePositionUp();
+            else if ($mode == CurrencyUpdatePositionEvent::POSITION_DOWN)
+                return $currency->movePositionDown();
         }
     }
 
@@ -164,12 +191,12 @@ class Currency extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::CURRENCY_CREATE       => array("create", 128),
-            TheliaEvents::CURRENCY_UPDATE       => array("update", 128),
-            TheliaEvents::CURRENCY_DELETE       => array("delete", 128),
-            TheliaEvents::CURRENCY_SET_DEFAULT  => array("setDefault", 128),
-            TheliaEvents::CURRENCY_UPDATE_RATES => array("updateRates", 128),
-
+            TheliaEvents::CURRENCY_CREATE          => array("create", 128),
+            TheliaEvents::CURRENCY_UPDATE          => array("update", 128),
+            TheliaEvents::CURRENCY_DELETE          => array("delete", 128),
+            TheliaEvents::CURRENCY_SET_DEFAULT     => array("setDefault", 128),
+            TheliaEvents::CURRENCY_UPDATE_RATES    => array("updateRates", 128),
+            TheliaEvents::CURRENCY_UPDATE_POSITION => array("updatePosition", 128)
         );
     }
 }

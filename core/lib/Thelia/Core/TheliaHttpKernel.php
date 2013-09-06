@@ -122,6 +122,11 @@ class TheliaHttpKernel extends HttpKernel
      */
     protected function initParam(Request $request)
     {
+        // Ensure an instaciation of URL service, which is accessed as a pseudo-singleton
+        // in the rest of the application.
+        // See Thelia\Tools\URL class.
+        $this->container->get('thelia.url.manager');
+
         $lang = $this->detectLang($request);
 
         if ($lang) {
@@ -139,6 +144,7 @@ class TheliaHttpKernel extends HttpKernel
     protected function detectLang(Request $request)
     {
         $lang = null;
+
         //first priority => lang parameter present in request (get or post)
         if ($request->query->has("lang")) {
             $lang = Model\LangQuery::create()->findOneByCode($request->query->get("lang"));

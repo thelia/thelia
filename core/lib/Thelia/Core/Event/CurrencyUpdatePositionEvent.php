@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia                                                                       */
+/*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,72 +17,12 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
 
-use Thelia\Model\Config;
-
-class ConfigChangeEvent extends ConfigCreateEvent
+class CurrencyUpdatePositionEvent extends BaseUpdatePositionEvent
 {
-    protected $config_id;
-
-    protected $description;
-    protected $chapo;
-    protected $postscriptum;
-
-    public function __construct($config_id)
-    {
-        $this->setConfigId($config_id);
-    }
-
-    public function getConfigId()
-    {
-        return $this->config_id;
-    }
-
-    public function setConfigId($config_id)
-    {
-        $this->config_id = $config_id;
-
-        return $this;
-    }
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getChapo()
-    {
-        return $this->chapo;
-    }
-
-    public function setChapo($chapo)
-    {
-        $this->chapo = $chapo;
-
-        return $this;
-    }
-
-    public function getPostscriptum()
-    {
-        return $this->postscriptum;
-    }
-
-    public function setPostscriptum($postscriptum)
-    {
-        $this->postscriptum = $postscriptum;
-
-        return $this;
-    }
 }

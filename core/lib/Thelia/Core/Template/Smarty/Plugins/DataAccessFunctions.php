@@ -68,14 +68,14 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      }
 
     /**
-     * Provides access to user attributes using the accessors.
+     * @param $objectLabel
+     * @param $user
+     * @param $params
      *
-     * @param  array                    $params
-     * @param  unknown                  $smarty
-     * @return string                   the value of the requested attribute
-     * @throws InvalidArgumentException if the object does not have the requested attribute.
+     * @return string
+     * @throws \InvalidArgumentException
      */
-     protected function userDataAccess($objectLabel, $user, $params)
+    protected function userDataAccess($objectLabel, $user, $params)
      {
          $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
 

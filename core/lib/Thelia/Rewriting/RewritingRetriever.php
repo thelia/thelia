@@ -66,7 +66,8 @@ class RewritingRetriever
             $allParametersWithoutView[$view . '_id'] = $viewId;
         }
 
-        $this->url = URL::viewUrl($view, $allParametersWithoutView);
+        $this->rewrittenUrl = null;
+        $this->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
         if($this->search !== null) {
             $this->rewrittenUrl = $this->search->getUrl();
         }
@@ -93,7 +94,8 @@ class RewritingRetriever
             $allParametersWithoutView[$view . '_id'] = $viewId;
         }
 
-        $this->url = URL::viewUrl($view, $allParametersWithoutView);
+        $this->rewrittenUrl = null;
+        $this->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
         if($this->search !== null) {
             $this->rewrittenUrl = $this->search->getUrl();
         }

@@ -41,55 +41,29 @@ use Thelia\Model\Lang;
  */
 class Session extends BaseSession
 {
-    // -- Language ------------------------------------------------------------
-
-    public function getLocale()
-    {
-        return $this->get("locale", "en_US");
-    }
-
-    public function setLocale($locale)
-    {
-        $this->set("locale", $locale);
-
-        return $this;
-    }
-
     /**
      * @return \Thelia\Model\Lang|null
      */
     public function getLang()
     {
-        return $this->get("lang");
+        return $this->get("thelia.current.lang", Lang::getDefaultLanguage());
     }
 
     public function setLang(Lang $lang)
     {
-        $this->set("lang", $lang);
+        $this->set("thelia.current.lang", $lang);
 
         return $this;
     }
 
-    public function getLangId()
+    public function getAdminEditionLang()
     {
-        return $this->get("lang_id", Lang::getDefaultLanguage()->getId());
+        return $this->get('thelia.admin.edition.lang', Lang::getDefaultLanguage());
     }
 
-    public function setLangId($langId)
+    public function setAdminEditionLang($langId)
     {
-        $this->set("lang_id", $langId);
-
-        return $this;
-    }
-
-    public function getAdminEditionLangId()
-    {
-        return $this->get('admin.edition_language', Lang::getDefaultLanguage()->getId());
-    }
-
-    public function setAdminEditionLangId($langId)
-    {
-        $this->set('admin.edition_language', $langId);
+        $this->set('thelia.admin.edition.lang', $langId);
 
         return $this;
     }
@@ -98,43 +72,43 @@ class Session extends BaseSession
 
     public function setCustomerUser(UserInterface $user)
     {
-        $this->set('customer_user', $user);
+        $this->set('thelia.customer_user', $user);
         return $this;
     }
 
     public function getCustomerUser()
     {
-        return $this->get('customer_user');
+        return $this->get('thelia.customer_user');
     }
 
     public function clearCustomerUser()
     {
-        return $this->remove('customer_user');
+        return $this->remove('thelia.customer_user');
     }
 
     // -- Admin user -----------------------------------------------------------
 
     public function setAdminUser(UserInterface $user)
     {
-        $this->set('admin_user', $user);
+        $this->set('thelia.admin_user', $user);
         return $this;
     }
 
     public function getAdminUser()
     {
-        return $this->get('admin_user');
+        return $this->get('thelia.admin_user');
     }
 
     public function clearAdminUser()
     {
-        return $this->remove('admin_user');
+        return $this->remove('thelia.admin_user');
     }
 
     // -- Return page ----------------------------------------------------------
 
     public function setReturnToUrl($url)
     {
-        $this->set('return_to_url', $url);
+        $this->set('thelia.return_to_url', $url);
         return $this;
     }
 
@@ -144,7 +118,7 @@ class Session extends BaseSession
      */
     public function getReturnToUrl()
     {
-        return $this->get('return_to_url', URL::getIndexPage());
+        return $this->get('thelia.return_to_url', URL::getInstance()->getIndexPage());
     }
 
     // -- Cart ------------------------------------------------------------------
@@ -156,7 +130,7 @@ class Session extends BaseSession
      */
     public function getCart()
     {
-        $cart_id =  $this->get("cart_id");
+        $cart_id =  $this->get("thelia.cart_id");
         $cart = null;
         if ($cart_id) {
             $cart = CartQuery::create()->findPk($cart_id);
@@ -193,7 +167,7 @@ class Session extends BaseSession
      */
     public function setCart($cart_id)
     {
-        $this->set("cart_id", $cart_id);
+        $this->set("thelia.cart_id", $cart_id);
         return $this;
     }
 }
