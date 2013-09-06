@@ -2,8 +2,13 @@
 
 <ul>
 {loop type="delivery" name="delivery.list"}
-    <li>id : #ID</li>
-    <li>prix : #PRICE</li>
+    <li>
+        <ul>
+            <li>id : {#ID}</li>
+            <li>prix : {#PRICE}</li>
+            <li>Choisir : <a href="{url path="/delivery/choose/{#ID}"}">Choisir</a></li>
+        </ul>
+    </li>
 {/loop}
 </ul>
 

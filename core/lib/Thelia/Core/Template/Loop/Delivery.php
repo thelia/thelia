@@ -60,6 +60,9 @@ class Delivery extends BaseSpecificModule
             $loopResultRow = new LoopResultRow($loopResult, $deliveryModule, $this->versionable, $this->timestampable, $this->countable);
 
             $moduleReflection = new \ReflectionClass($deliveryModule->getFullNamespace());
+            if($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
+                throw new \RuntimeException(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $deliveryModule->getCode()));
+            }
             $moduleInstance = $moduleReflection->newInstance();
 
             $moduleInstance->setRequest($this->request);

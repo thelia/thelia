@@ -33,7 +33,7 @@ use Thelia\Tools\URL;
  */
 class DeliveryController extends BaseFrontController
 {
-    public function select()
+    public function select($delivery_id)
     {
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
             $this->redirect(URL::getInstance()->getIndexPage());
@@ -41,15 +41,16 @@ class DeliveryController extends BaseFrontController
 
         $request = $this->getRequest();
 
-        $deliveryId = $request->query->get("delivery_id");
+        $deliveryModule = ModuleQuery::create()
+            ->filterById($delivery_id)
+            ->filterByActivate(1)
+            ->findOne()
+        ;
 
-        if($deliveryId)
-        {
-            $deliveryModule = ModuleQuery::create()->findPk($deliveryId);
-
-            if ($deliveryModule) {
-                $request->getSession()->setDelivery($deliveryId);
-            }
+        if ($deliveryModule) {
+            $request->getSession()->setDelivery($delivery_id);
+        } else {
+            $this->pageNotFound();
         }
     }
 }
