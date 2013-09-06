@@ -32,5 +32,5 @@ interface DeliveryModuleInterface extends BaseModuleInterface {
      *
      * @return mixed
      */
-    public function calculate();
+    public function calculate($country = null);
 }
