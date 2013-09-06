@@ -43,6 +43,7 @@ use Thelia\Tools\URL;
  * Class RewritingRouter
  * @package Thelia\Core\Routing
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class RewritingRouter implements RouterInterface, RequestMatcherInterface
 {
@@ -170,7 +171,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
         if(ConfigQuery::isRewritingEnable()) {
             try {
                 $rewrittenUrlData = URL::getInstance()->resolve($request->getPathInfo());
-                var_dump($rewrittenUrlData); exit;
             } catch(UrlRewritingException $e) {
                 switch($e->getCode()) {
                     case UrlRewritingException::URL_NOT_FOUND :
@@ -205,13 +205,14 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
             return array (
                 '_controller' => 'Thelia\\Controller\\Front\\DefaultController::noAction',
-                '_route' => 'rewrite'
+                '_route' => 'rewrite',
+                '_rewritten' => true,
             );
         }
         throw new ResourceNotFoundException();
     }
 
-    protected function redirect($url, $code = 302)
+    protected function redirect($url, $status = 302)
     {
         Redirect::exec($url, $status);
     }
