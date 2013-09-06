@@ -113,9 +113,18 @@
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::deleteAction</default>
     </route>
 
-    <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
+    <route id="admin.configuration.attribute" path="/admin/configuration/product_attributes">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::defaultAction</default>
+    </route>
+
+    <!-- attribute and feature routes  management -->
+        
+    <route id="admin.configuration.currencies.update-position" path="/admin/configuration/product_attributes">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
     </route>
+
+
+    <!-- end attribute and feature routes  management -->
 
 	<!-- The default route, to display a template -->
 
