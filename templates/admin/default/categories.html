@@ -327,18 +327,12 @@
 
     {* Adding a new Category *}
 
-    {* Capture the dialog body, to pass it to the generic dialog *}
 
-    {capture "category_creation_dialog"}
-        {form name="thelia.admin.category.creation"}
+    {form name="thelia.admin.category.creation"}
 
-            {* Assign form enctype *}
-            {$creation_form_enctype={form_enctype form=$form}}
+        {* Capture the dialog body, to pass it to the generic dialog *}
 
-            {* Assign form error message, if any *}
-            {if $form_error}
-                {$creation_form_error=$form_error_message}
-            {/if}
+        {capture "category_creation_dialog"}
 
             {form_hidden_fields form=$form}
 
@@ -373,23 +367,23 @@
 			         {/loop}
 			     </div>
 			{/form_field}
-        {/form}
-    {/capture}
+	    {/capture}
 
-	{include
-	    file = "includes/generic-create-dialog.html"
+		{include
+		    file = "includes/generic-create-dialog.html"
 
-	    dialog_id    = "add_category_dialog"
-	    dialog_title = {intl l="Create a new category"}
-	    dialog_body  = {$smarty.capture.category_creation_dialog nofilter}
+		    dialog_id    = "add_category_dialog"
+		    dialog_title = {intl l="Create a new category"}
+		    dialog_body  = {$smarty.capture.category_creation_dialog nofilter}
 
-	    dialog_ok_label     = {intl l="Create this category"}
-	    dialog_cancel_label = {intl l="Cancel"}
+		    dialog_ok_label     = {intl l="Create this category"}
+		    dialog_cancel_label = {intl l="Cancel"}
 
-	    form_action        = {url path='/admin/categories/create'}
-	    form_enctype       = $creation_form_enctype
-	    form_error_message = {$creation_form_error|default:''}
-	}
+		    form_action        = {url path='/admin/categories/create'}
+		    form_enctype       = {form_enctype form=$form}
+		    form_error_message = $form_error_message
+		}
+    {/form}
 
     {* Delete category confirmation dialog *}
 
@@ -423,43 +417,22 @@
 <script>
 $(function() {
 
-	{* display the form creation dialog if it contains errors *}
+	// JS stuff for category creation form
+    {include
+        file      = "includes/generic-js-dialog.html"
 
-    {form name="thelia.admin.category.creation"}
-        {if #form_error}
-			$('#add_category_dialog').modal();
-        {/if}
-	{/form}
+        dialog_id = "add_category_dialog"
+        form_name = "thelia.admin.category.creation"
+    }
 
-    {form name="thelia.admin.product.creation"}
-        {if #form_error}
-            $('#add_category_dialog').modal();
-        {/if}
-    {/form}
+    // JS stuff for product creation form
+    {include
+        file      = "includes/generic-js-dialog.html"
 
-	{* Always reset create dialog on close *}
+        dialog_id = "add_product_dialog"
+        form_name = "thelia.admin.product.creation"
+    }
 
-    $('#add_category_dialog').on('hidden',function() {
-        // Hide error message
-        $('#add_category_dialog_error').remove();
-
-        // Clear error status
-        $("#add_category_dialog .error").removeClass('error');
-
-        // Empty field values
-        $("#add_category_dialog input[type=text]").val('');
-    });
-
-    $('#add_product_dialog').on('hidden',function() {
-        // Hide error message
-        $('#add_product_dialog_error').remove();
-
-        // Clear error status
-        $("#add_product_dialog .error").removeClass('error');
-
-        // Empty field values
-        $("#add_product_dialog input[type=text]").val('');
-    });
 
     {* Set the proper ID in the delete confirmation dialog *}
 
