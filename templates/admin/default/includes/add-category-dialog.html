@@ -15,17 +15,17 @@
 		    <form method="POST" action="{url path='/admin/catalog/category'}" {form_enctype form=$form}>
 
 		        {* the action processed by the controller *}
-			    <input type="hidden" name="action" value="create" />
+			    	<input type="hidden" name="action" value="create" />
 
 		        {form_hidden_fields form=$form}
 
 		        {form_field form=$form field='parent'}
-		        <input type="hidden" name="{$name}" value="{$current_category_id}" />
+		        	<input type="hidden" name="{$name}" value="{$current_category_id}" />
 		        {/form_field}
 
 		        {form_field form=$form field='success_url'}
 		        {* on success, redirect to category change page. _ID_ is replaced with the ID of the created category (see Thelia\Action\Category.php)  *}
-		        <input type="hidden" name="{$name}" value="{url path='admin/catalog/category' id="_ID_" action='edit'}" />
+		        	<input type="hidden" name="{$name}" value="{url path='admin/catalog/category' id="_ID_" action='edit'}" />
 		        {/form_field}
 
 			    <div class="modal-body">
