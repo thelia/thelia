@@ -23,6 +23,9 @@
 
 namespace Thelia\Constraint;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Constraint\Rule\CouponRuleInterface;
+use Thelia\Constraint\Rule\SerializableRule;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Coupon\CouponRuleCollection;
 
@@ -40,6 +43,9 @@ use Thelia\Coupon\CouponRuleCollection;
  */
 class ConstraintManager
 {
+    /** @var ContainerInterface Service Container */
+    protected $container = null;
+
     /** @var  CouponAdapterInterface Provide necessary value from Thelia*/
     protected $adapter;
 
@@ -49,27 +55,28 @@ class ConstraintManager
     /**
      * Constructor
      *
-     * @param CouponAdapterInterface $adapter Provide necessary value from Thelia
-     * @param CouponRuleCollection   $rules   Rules associated with the Constraint
+     * @param ContainerInterface $container Service container
      */
-    function __construct(CouponAdapterInterface $adapter, CouponRuleCollection $rules)
+    function __construct(ContainerInterface $container)
     {
-        $this->adapter = $adapter;
-        $this->rule = $rules;
+        $this->container = $container;
+        $this->adapter = $container->get('thelia.adapter');
     }
 
     /**
      * Check if the current Coupon is matching its conditions (Rules)
      * Thelia variables are given by the CouponAdapterInterface
      *
+     * @param CouponRuleCollection $collection A collection of rules
+     *
      * @return bool
      */
-    public function isMatching()
+    public function isMatching(CouponRuleCollection $collection)
     {
         $isMatching = true;
 
         /** @var CouponRuleInterface $rule */
-        foreach ($this->rules->getRules() as $rule) {
+        foreach ($collection->getRules() as $rule) {
             if (!$rule->isMatching($this->adapter)) {
                 $isMatching = false;
             }
@@ -78,5 +85,53 @@ class ConstraintManager
         return $isMatching;
     }
 
+    /**
+     * Serialize a collection of rules
+     *
+     * @param CouponRuleCollection $collection A collection of rules
+     *
+     * @return string A ready to be stored Rule collection
+     */
+    public function serializeCouponRuleCollection(CouponRuleCollection $collection)
+    {
+        $serializableRules = array();
+        $rules = $collection->getRules();
+        if ($rules !== null) {
+            /** @var $rule CouponRuleInterface */
+            foreach ($rules as $rule) {
+                $serializableRules[] = $rule->getSerializableRule();
+            }
+        }
+        return (string) base64_encode(serialize($serializableRules));
+    }
 
+    /**
+     * Unserialize a collection of rules
+     *
+     * @param string $serializedRules Serialized Rules
+     *
+     * @return CouponRuleCollection Rules ready to be processed
+     */
+    public function unserializeCouponRuleCollection($serializedRules)
+    {
+        $unserializedRules = unserialize(base64_decode($serializedRules));
+        $collection = new CouponRuleCollection();
+
+        if (!empty($serializedRules) && !empty($unserializedRules)) {
+            /** @var SerializableRule $rule */
+            foreach ($unserializedRules as $rule) {
+                if ($this->container->has($rule->ruleServiceId)) {
+                    /** @var CouponRuleInterface $couponRule */
+                    $couponRule = $this->container->get($rule->ruleServiceId);
+                    $couponRule->populateFromForm(
+                        $rule->operators,
+                        $rule->values
+                    );
+                    $collection->add($couponRule);
+                }
+            }
+        }
+
+        return $collection;
+    }
 }

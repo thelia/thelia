@@ -23,9 +23,9 @@
 
 namespace Thelia\Coupon;
 
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Exception\InvalidRuleException;
+use Thelia\Constraint\Rule\SerializableRule;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -45,19 +45,10 @@ class CouponRuleCollection
 
     /**
      * Constructor
-     *
-     * @param array $rules Array of CouponRuleInterface
-     *
-     * @throws \Thelia\Exception\InvalidRuleException
      */
-    function __construct(array $rules)
+    function __construct()
     {
-        foreach ($rules as $rule) {
-            if (!$rule instanceof CouponRuleInterface) {
-                throw new InvalidRuleException(get_class());
-            }
-        }
-        $this->rules = $rules;
+
     }
 
     /**

@@ -37,7 +37,7 @@ namespace Thelia\Constraint\Rule;
 class SerializableRule
 {
     /** @var string Rule Service id  */
-    public $ruleClassName = null;
+    public $ruleServiceId = null;
 
     /** @var array Operators set by Admin for this Rule */
     public $operators = array();

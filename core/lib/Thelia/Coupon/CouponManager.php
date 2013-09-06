@@ -52,7 +52,7 @@ class CouponManager
     /**
      * Constructor
      *
-     * @param ContainerInterface $container  Service container
+     * @param ContainerInterface $container Service container
      */
     function __construct(ContainerInterface $container)
     {

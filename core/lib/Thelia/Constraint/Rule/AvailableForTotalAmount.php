@@ -63,30 +63,6 @@ class AvailableForTotalAmount extends CouponRuleAbstract
     protected $priceValidator = null;
 
     /**
-     * Constructor
-     *
-     * @param CouponAdapterInterface $adapter    allowing to gather
-     *                                           all necessary Thelia variables
-     * @param array                  $validators Array of RuleValidator
-     *                                           validating $paramsToValidate against
-     *
-     * @throws \Thelia\Exception\InvalidRuleException
-     */
-    public function __construct(CouponAdapterInterface $adapter, array $validators)
-    {
-        parent::__construct($adapter, $validators);
-
-        if (isset($validators[self::PARAM1_PRICE])
-            && $validators[self::PARAM1_PRICE] instanceof RuleValidator
-        ) {
-            $this->priceValidator = $validators[self::PARAM1_PRICE];
-        } else {
-            throw new InvalidRuleException(get_class());
-        }
-    }
-
-
-    /**
      * Check if backoffice inputs are relevant or not
      *
      * @throws InvalidRuleOperatorException if Operator is not allowed
@@ -172,17 +148,6 @@ class AvailableForTotalAmount extends CouponRuleAbstract
     }
 
     /**
-     * Return all validators
-     * Serialization purpose
-     *
-     * @return array
-     */
-    public function getValidators()
-    {
-        return $this->validators;
-    }
-
-    /**
      * Get I18n name
      *
      * @return string
@@ -203,13 +168,11 @@ class AvailableForTotalAmount extends CouponRuleAbstract
      */
     public function getToolTip()
     {
-        /** @var Translator $translator */
-        $translator = $this->get('thelia.translator');
         $i18nOperator = Operators::getI18n(
-            $translator, $this->priceValidator->getOperator()
+            $this->translator, $this->priceValidator->getOperator()
         );
 
-        $toolTip = $translator->trans(
+        $toolTip = $this->translator->trans(
             'If cart total amount is <strong>%operator%</strong> %amount% %currency%',
             array(
                 '%operator%' => $i18nOperator,

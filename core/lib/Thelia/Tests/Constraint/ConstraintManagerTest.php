@@ -23,6 +23,8 @@
 
 namespace Thelia\Constraint;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Thelia\Constraint\Rule\AvailableForXArticles;
 use Thelia\Constraint\Validator\PriceParam;
 use Thelia\Constraint\Validator\RuleValidator;
 use Thelia\Constraint\Rule\AvailableForTotalAmount;
@@ -50,17 +52,71 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    public function setUp()
     {
     }
-
-
 
     public function incompleteTest()
     {
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
+    }
+
+    /**
+     * Check the Rules serialization module
+     */
+    public function testRuleSerialisation()
+    {
+        $translator = $this->getMock('\Thelia\Core\Translation\Translator');
+
+        $rule1 = new AvailableForTotalAmount($translator);
+        $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::SUPERIOR);
+        $values = array(
+            AvailableForTotalAmount::PARAM1_PRICE => 40.00,
+            AvailableForTotalAmount::PARAM1_CURRENCY => 'EUR'
+        );
+        $rule1->populateFromForm($operators, $values);
+
+        $rule2 = new AvailableForTotalAmount($translator);
+        $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::INFERIOR);
+        $values = array(
+            AvailableForTotalAmount::PARAM1_PRICE => 400.00,
+            AvailableForTotalAmount::PARAM1_CURRENCY => 'EUR'
+        );
+        $rule2->populateFromForm($operators, $values);
+
+        $rules = new CouponRuleCollection(array($rule1, $rule2));
+
+        /** @var ConstraintManager $constraintManager */
+        $constraintManager = new ConstraintManager($this->getContainer());
+
+        $serializedRules = $constraintManager->serializeCouponRuleCollection($rules);
+        $unserializedRules = $constraintManager->unserializeCouponRuleCollection($serializedRules);
+
+        $expected = $rules;
+        $actual = $unserializedRules;
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Get Mocked Container with 2 Rules
+     *
+     * @return ContainerBuilder
+     */
+    public function getContainer()
+    {
+        $container = new ContainerBuilder();
+
+        $translator = $this->getMock('\Thelia\Core\Translation\Translator');
+        $rule1 = new AvailableForTotalAmount($translator);
+        $rule2 = new AvailableForXArticles($translator);
+
+        $container->set('thelia.constraint.rule.available_for_total_amount', $rule1);
+        $container->set('thelia.constraint.rule.available_for_x_articles', $rule2);
+
+        return $container;
     }
 
     /**

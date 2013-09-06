@@ -24,6 +24,7 @@
 namespace Thelia\Constraint\Rule;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
+use Symfony\Component\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Constraint\Validator\ComparableInterface;
 use Thelia\Constraint\Validator\RuleValidator;
@@ -60,29 +61,17 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     /** @var  CouponAdapterInterface Provide necessary value from Thelia */
     protected $adapter = null;
 
+    /** @var Translator Service Translator */
+    protected $translator = null;
+
     /**
      * Constructor
-     * Ex:
-     *     Param 1 :
-     *     $priceValidator = new RuleValidator(
-     *         Operators::INFERIOR,
-     *         new IntegerParam(10)
-     *     )
-     *     $validators[AvailableForTotalAmount::PARAM1_PRICE] = $priceValidator
      *
-     *     Param 2 :
-     *     $paramsToValidate[AvailableForTotalAmount::PARAM1_PRICE] = 9
-     *
-     * @param CouponAdapterInterface $adapter    allowing to gather
-     *                                           all necessary Thelia variables
-     * @param array                  $validators Array of RuleValidator
-     *                                           validating $paramsToValidate against
+     * @param Translator $translator Service translator
      */
-    public function __construct(CouponAdapterInterface $adapter, array $validators)
+    function __construct(Translator $translator)
     {
-        $this->setValidators($validators);
-        $this->adapter = $adapter;
-        $this->setParametersToValidate($this->adapter);
+        $this->translator($translator);
     }
 
     /**
@@ -178,6 +167,17 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     protected function setParametersToValidate()
     {
         throw new \Thelia\Exception\NotImplementedException();
+    }
+
+    /**
+     * Return all validators
+     * Serialization purpose
+     *
+     * @return array
+     */
+    public function getValidators()
+    {
+        return $this->validators;
     }
 
 }

@@ -206,6 +206,9 @@
         <service id="thelia.coupon.manager" class="Thelia\Coupon\CouponManager">
             <argument type="service" id="thelia.adapter" />
         </service>
+        <service id="thelia.constraint.manager" class="Thelia\Constraint\ConstraintManager">
+            <argument type="service" id="service_container" />
+        </service>
         <service id="thelia.constraint.rule.available_for_x_articles" class="Thelia\Constraint\Rule\AvailableForXArticles">
             <argument type="service" id="thelia.translator" />
             <tag name="thelia.coupon.addRule"/>

@@ -40,6 +40,13 @@ use Thelia\Coupon\CouponAdapterInterface;
 interface CouponRuleInterface
 {
     /**
+     * Constructor
+     *
+     * @param Translator $translator Service translator
+     */
+    function __construct(Translator $translator);
+
+    /**
      * Check if backoffice inputs are relevant or not
      *
      * @return bool

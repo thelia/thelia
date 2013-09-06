@@ -24,6 +24,7 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Propel;
+use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Model\Base\Coupon as BaseCoupon;
 use Thelia\Model\Map\CouponTableMap;
@@ -98,37 +99,34 @@ class Coupon extends BaseCoupon
         }
     }
 
-    /**
-     * Set the value of [serialized_rules] column.
-     *
-     * @param CouponRuleCollection $rules A set of Rules
-     *
-     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
-     */
-    public function setRules(CouponRuleCollection $rules)
-    {
-        $serializedRules = null;
-        if ($rules !== null) {
+//    /**
+//     * Set the value of [serialized_rules] column.
+//     * Convert a CouponRuleCollection into a serialized array of SerializableRule
+//     *
+//     * @param CouponRuleCollection $rules A set of Rules
+//     *
+//     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
+//     */
+//    public function setRules(CouponRuleCollection $rules)
+//    {
+//        $serializedRules = null;
+//        if ($rules !== null) {
+//            /** @var $rule CouponRuleInterface */
+//            foreach ($rules->getRules() as $rule) {
+//                $serializedRules[] = $rule->getSerializableRule();
+//            }
+//
+//            $serializedRules = (string) base64_encode(serialize($serializedRules));
+//        }
+//
+//        if ($this->serialized_rules !== $serializedRules) {
+//            $this->serialized_rules = $serializedRules;
+//            $this->modifiedColumns[] = CouponTableMap::SERIALIZED_RULES;
+//        }
+//
+//        return $this;
+//    }
 
-            $serializedRules = (string) base64_encode(serialize($rules));
-        }
-
-        if ($this->serialized_rules !== $serializedRules) {
-            $this->serialized_rules = $serializedRules;
-            $this->modifiedColumns[] = CouponTableMap::SERIALIZED_RULES;
-        }
-
-        return $this;
-    }
 
 
-    /**
-     * Get the [serialized_rules] column value.
-     *
-     * @return CouponRuleCollection Rules ready to be processed
-     */
-    public function getRules()
-    {
-        return unserialize(base64_decode($this->serialized_rules));
-    }
 }

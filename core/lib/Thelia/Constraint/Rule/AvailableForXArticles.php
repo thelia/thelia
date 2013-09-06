@@ -57,31 +57,6 @@ class AvailableForXArticles extends CouponRuleAbstract
     protected $quantityValidator = null;
 
     /**
-     * Constructor
-     *
-     * @param CouponAdapterInterface $adapter    allowing to gather
-     *                                           all necessary Thelia variables
-     * @param array                  $validators Array of RuleValidator
-     *                                           validating $paramsToValidate against
-     *
-     * @throws InvalidRuleException
-     */
-    public function __construct(CouponAdapterInterface $adapter, array $validators = null)
-    {
-        parent::__construct($adapter, $validators);
-
-        if (isset($validators[self::PARAM1_QUANTITY])
-            && $validators[self::PARAM1_QUANTITY] instanceof RuleValidator
-        ) {
-            $this->quantityValidator = $validators[self::PARAM1_QUANTITY];
-        } else {
-            throw new InvalidRuleException(get_class());
-        }
-
-        $this->adapter = $adapter;
-    }
-
-    /**
      * Check if backoffice inputs are relevant or not
      *
      * @throws InvalidRuleOperatorException if Operator is not allowed
@@ -176,10 +151,7 @@ class AvailableForXArticles extends CouponRuleAbstract
      */
     public function getName()
     {
-        /** @var Translator $translator */
-        $translator = $this->adapter->get('thelia.translator');
-
-        return $translator->trans(
+        return $this->translator->trans(
             'Number of articles in cart',
             array(),
             'constraint'
@@ -193,14 +165,11 @@ class AvailableForXArticles extends CouponRuleAbstract
      */
     public function getToolTip()
     {
-        /** @var Translator $translator */
-        $translator = $this->adapter->get('thelia.translator');
-
         $i18nOperator = Operators::getI18n(
-            $translator, $this->priceValidator->getOperator()
+            $this->translator, $this->priceValidator->getOperator()
         );
 
-        $toolTip = $translator->trans(
+        $toolTip = $this->translator->trans(
             'If cart products quantity is <strong>%operator%</strong> %quantity%',
             array(
                 '%operator%' => $i18nOperator,
@@ -255,6 +224,5 @@ class AvailableForXArticles extends CouponRuleAbstract
 
         return $serializableRule;
     }
-
 
 }

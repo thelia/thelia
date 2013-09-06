@@ -137,7 +137,7 @@ class CouponFactory
 //     *
 //     * @return CouponRuleInterface Ready to use Rule or false
 //     */
-//    public function buildCouponRuleFromForm($ruleClassName, $operator, array $values)
+//    public function buildCouponRuleFromForm($ruleServiceId, $operator, array $values)
 //    {
 //        /** @var CouponAdapterInterface $adapter */
 //        $adapter = $this->container->get('thelia.adapter');
