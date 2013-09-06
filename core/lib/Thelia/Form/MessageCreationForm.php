@@ -40,11 +40,19 @@ class MessageCreationForm extends BaseForm
 
         $this->formBuilder
             ->add("name", "text", array(
-                "constraints" => $name_constraints
+                "constraints" => $name_constraints,
+                "label" => "Name *",
+                "label_attr" => array(
+                    "for" => "name"
+                )
             ))
             ->add("title", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
+                ),
+                "label" => "Purpose *",
+                "label_attr" => array(
+                    "for" => "purpose"
                 )
             ))
             ->add("locale", "hidden", array(
