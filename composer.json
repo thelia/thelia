@@ -9,7 +9,6 @@
     },
     "require":{
         "php": ">=5.4",
-        "ezyang/htmlpurifier": "dev-master",
         "ircmaxell/password-compat": "dev-master",
         "propel/propel": "dev-master",
         "psr/log" : "1.0",

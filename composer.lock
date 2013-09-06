@@ -3,52 +3,8 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "db69990b239a4056558bfd694115d01b",
+    "hash": "8e587529653e78cd92e2a4aa7121bf36",
     "packages": [
-        {
-            "name": "ezyang/htmlpurifier",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "fac747bdbdba6aeaba4bed91ef49b2378c1798e4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/fac747bdbdba6aeaba4bed91ef49b2378c1798e4",
-                "reference": "fac747bdbdba6aeaba4bed91ef49b2378c1798e4",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "HTMLPurifier": "library/"
-                },
-                "files": [
-                    "library/HTMLPurifier.composer.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL"
-            ],
-            "authors": [
-                {
-                    "name": "Edward Z. Yang",
-                    "email": "admin@htmlpurifier.org",
-                    "homepage": "http://ezyang.com"
-                }
-            ],
-            "description": "Standards compliant HTML filter written in PHP",
-            "homepage": "http://htmlpurifier.org/",
-            "keywords": [
-                "html"
-            ],
-            "time": "2013-08-18 02:27:26"
-        },
         {
             "name": "imagine/imagine",
             "version": "dev-master",
@@ -2035,7 +1991,6 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "ezyang/htmlpurifier": 20,
         "ircmaxell/password-compat": 20,
         "propel/propel": 20,
         "kriswallsmith/assetic": 20,
