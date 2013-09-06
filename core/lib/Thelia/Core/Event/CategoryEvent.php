@@ -28,11 +28,15 @@ use Thelia\Core\Event\ActionEvent;
 
 class CategoryEvent extends ActionEvent
 {
-    public $category;
+    public $category = null;
 
-    public function __construct(Category $category)
+    public function __construct(Category $category = null)
     {
         $this->category = $category;
+    }
+
+    public function hasCategory() {
+        return ! is_null($this->category);
     }
 
     public function getCategory()

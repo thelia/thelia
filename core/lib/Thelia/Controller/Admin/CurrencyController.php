@@ -108,6 +108,8 @@ class CurrencyController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::CURRENCY_CREATE, $createEvent);
 
+            if (! $createEvent->hasCurrency()) throw new \LogicException($this->getTranslator()->trans("No currency was created."));
+
             $createdObject = $createEvent->getCurrency();
 
             // Log currency creation
@@ -210,6 +212,8 @@ class CurrencyController extends BaseAdminController
             ;
 
             $this->dispatch(TheliaEvents::CURRENCY_UPDATE, $changeEvent);
+
+            if (! $changeEvent->hasCurrency()) throw new \LogicException($this->getTranslator()->trans("No currency was updated."));
 
             // Log currency modification
             $changedObject = $changeEvent->getCurrency();
@@ -334,6 +338,9 @@ class CurrencyController extends BaseAdminController
         $event = new CurrencyDeleteEvent($this->getRequest()->get('currency_id'));
 
         $this->dispatch(TheliaEvents::CURRENCY_DELETE, $event);
+
+        if ($event->hasCurrency())
+            $this->adminLogAppend(sprintf("Currency %s (ID %s) modified", $event->getCurrency()->getName(), $event->getCurrency()->getId()));
 
         $this->redirectToRoute('admin.configuration.currencies.default');
     }

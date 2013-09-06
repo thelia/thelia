@@ -33,27 +33,31 @@
 
     <!-- Categories management -->
 
-    <route id="admin.configuration.categories.create" path="/admin/categories/create">
+    <route id="admin.categories.default" path="/admin/categories">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::defaultAction</default>
+    </route>
+
+    <route id="admin.categories.create" path="/admin/categories/create">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::createAction</default>
     </route>
 
-    <route id="admin.configuration.categories.update" path="/admin/categories/update">
+    <route id="admin.categories.update" path="/admin/categories/update">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::changeAction</default>
     </route>
 
-    <route id="admin.configuration.categories.save" path="/admin/categories/save">
+    <route id="admin.categories.save" path="/admin/categories/save">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::saveChangeAction</default>
     </route>
 
-    <route id="admin.configuration.categories.set-default" path="/admin/categories/toggle-online">
+    <route id="admin.categories.set-default" path="/admin/categories/toggle-online">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::toggleOnlineAction</default>
     </route>
 
-    <route id="admin.configuration.categories.delete" path="/admin/categories/delete">
+    <route id="admin.categories.delete" path="/admin/categories/delete">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::deleteAction</default>
     </route>
 
-    <route id="admin.configuration.categories.update-position" path="/admin/categories/update-position">
+    <route id="admin.categories.update-position" path="/admin/categories/update-position">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::updatePositionAction</default>
     </route>
 
@@ -127,6 +131,10 @@
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::setDefaultAction</default>
     </route>
 
+    <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
+    </route>
+
     <route id="admin.configuration.currencies.update-rates" path="/admin/configuration/currencies/update-rates">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::updateRatesAction</default>
     </route>
@@ -140,8 +148,8 @@
     </route>
 
     <!-- attribute and feature routes  management -->
-        
-    <route id="admin.configuration.currencies.update-position" path="/admin/configuration/product_attributes">
+
+    <route id="admin.configuration.product-attributes" path="/admin/configuration/product-attributes">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
     </route>
 

@@ -23,6 +23,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
 
 class CategoryCreationForm extends BaseForm
 {
@@ -33,7 +34,7 @@ class CategoryCreationForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "Category title *",
+                "label" => Translator::getInstance()->trans("Category title *"),
                 "label_attr" => array(
                     "for" => "title"
                 )

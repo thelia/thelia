@@ -68,7 +68,7 @@ class BaseAdminController extends BaseController
             }
         }
         catch (\Exception $ex) {
-            return new Response($this->errorPage($ex->getMessage()));
+            return $this->errorPage($ex->getMessage());
         }
 
         return $this->pageNotFound();

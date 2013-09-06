@@ -108,6 +108,8 @@ class ConfigController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::CONFIG_CREATE, $createEvent);
 
+            if (! $createEvent->hasConfig()) throw new \LogicException($this->getTranslator()->trans("No variable was created."));
+
             $createdObject = $createEvent->getConfig();
 
             // Log config creation
@@ -219,6 +221,8 @@ class ConfigController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::CONFIG_UPDATE, $changeEvent);
 
+            if (! $changeEvent->hasConfig()) throw new \LogicException($this->getTranslator()->trans("No variable was updated."));
+
             // Log config modification
             $changedObject = $changeEvent->getConfig();
 
@@ -289,6 +293,9 @@ class ConfigController extends BaseAdminController
         $event = new ConfigDeleteEvent($this->getRequest()->get('variable_id'));
 
         $this->dispatch(TheliaEvents::CONFIG_DELETE, $event);
+
+        if ($event->hasConfig())
+            $this->adminLogAppend(sprintf("Variable %s (ID %s) modified", $event->getConfig()->getName(), $event->getConfig()->getId()));
 
         $this->redirectToRoute('admin.configuration.variables.default');
     }

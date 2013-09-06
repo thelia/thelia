@@ -46,6 +46,7 @@ class CategoryCreateEvent extends CategoryEvent
     public function setTitle($title)
     {
         $this->title = $title;
+        return $this;
     }
 
     public function getParent()
@@ -56,6 +57,7 @@ class CategoryCreateEvent extends CategoryEvent
     public function setParent($parent)
     {
         $this->parent = $parent;
+        return $this;
     }
 
     public function getLocale()
@@ -66,5 +68,6 @@ class CategoryCreateEvent extends CategoryEvent
     public function setLocale($locale)
     {
         $this->locale = $locale;
+        return $this;
     }
 }

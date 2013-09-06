@@ -43,6 +43,15 @@ use Thelia\Form\MessageCreationForm;
 class MessageController extends BaseAdminController
 {
     /**
+     * Render the messages list
+     *
+     * @return Symfony\Component\HttpFoundation\Response the response
+     */
+    protected function renderList() {
+        return $this->render('messages');
+    }
+
+    /**
      * The default action is displaying the messages list.
      *
      * @return Symfony\Component\HttpFoundation\Response the response
@@ -51,7 +60,7 @@ class MessageController extends BaseAdminController
 
         if (null !== $response = $this->checkAuth("admin.configuration.messages.view")) return $response;
 
-        return $this->render('messages');
+        return $this->renderList();
     }
 
     /**
@@ -66,7 +75,7 @@ class MessageController extends BaseAdminController
 
         $message = false;
 
-        // Create the Creation Form
+        // Create the creation Form
         $creationForm = new MessageCreationForm($this->getRequest());
 
         try {
@@ -87,10 +96,11 @@ class MessageController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::MESSAGE_CREATE, $createEvent);
 
+            if (! $createEvent->hasMessage()) throw new \LogicException($this->getTranslator()->trans("No message was created."));
+
             $createdObject = $createEvent->getMessage();
 
-            // Log message creation
-            $this->adminLogAppend(sprintf("Variable %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
+            $this->adminLogAppend(sprintf("Message %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
 
             // Substitute _ID_ in the URL with the ID of the created object
             $successUrl = str_replace('_ID_', $createdObject->getId(), $creationForm->getSuccessUrl());
@@ -194,7 +204,8 @@ class MessageController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::MESSAGE_UPDATE, $changeEvent);
 
-            // Log message modification
+            if (! $changeEvent->hasMessage()) throw new \LogicException($this->getTranslator()->trans("No message was updated."));
+
             $changedObject = $changeEvent->getMessage();
 
             $this->adminLogAppend(sprintf("Variable %s (ID %s) modified", $changedObject->getName(), $changedObject->getId()));
@@ -241,6 +252,9 @@ class MessageController extends BaseAdminController
 
         $this->dispatch(TheliaEvents::MESSAGE_DELETE, $event);
 
-        $this->redirect(URL::getInstance()->adminViewUrl('messages'));
+        if ($event->hasMessage())
+            $this->adminLogAppend(sprintf("Message %s (ID %s) modified", $event->getMessage()->getName(), $event->getMessage()->getId()));
+
+        $this->redirectToRoute('admin.configuration.messages.default');
     }
 }
