@@ -89,7 +89,7 @@ class BaseController extends ContainerAware
      */
     public function getTranslator()
     {
-        return $this->getContainer()->get('thelia.translator');
+        return $this->container->get('thelia.translator');
     }
 
     /**
