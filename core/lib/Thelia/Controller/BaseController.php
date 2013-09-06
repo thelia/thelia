@@ -82,6 +82,17 @@ class BaseController extends ContainerAware
     }
 
     /**
+     *
+     * return the Translator
+     *
+     * @return mixed \Thelia\Core\Translation\Translator
+     */
+    public function getTranslator()
+    {
+        return $this->container->get('thelia.translator');
+    }
+
+    /**
      * Return the parser context,
      *
      * @return ParserContext
