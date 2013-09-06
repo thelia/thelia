@@ -44,11 +44,22 @@ class ConfigModificationForm extends BaseDescForm
             ->add("name", "text", array(
                 "constraints" => array(
                     new NotBlank()
+                ),
+                "label" => "Name",
+                "label_attr" => array(
+                    "for" => "name"
                 )
             ))
-            ->add("value", "text", array())
+            ->add("value", "text", array(
+                "label" => "Value",
+                "label_attr" => array(
+                    "for" => "value"
+                )
+            ))
             ->add("hidden", "hidden", array())
-            ->add("secured", "hidden", array())
+            ->add("secured", "hidden", array(
+                "label" => "Prevent variable modification or deletion, except for super-admin"
+            ))
          ;
     }
 

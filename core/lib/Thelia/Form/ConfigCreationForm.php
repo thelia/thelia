@@ -67,7 +67,9 @@ class ConfigCreationForm extends BaseForm
                 )
             ))
             ->add("hidden", "hidden", array())
-            ->add("secured", "hidden", array())
+            ->add("secured", "hidden", array(
+                "label" => "Prevent variable modification or deletion, except for super-admin"
+            ))
         ;
     }
 
