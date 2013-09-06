@@ -75,6 +75,10 @@
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
             <argument type="service" id="request.context"/>
+            <tag name="router.register" priority="254"/>
+        </service>
+
+        <service id="router.rewrite" class="Thelia\Core\Routing\RewritingRouter">
             <tag name="router.register" priority="255"/>
         </service>
 

@@ -204,19 +204,19 @@ class URL
      public function retrieveCurrent(Request $request)
      {
          if(ConfigQuery::isRewritingEnable()) {
-             $view = $request->query->get('view', null);
+             $view = $request->attributes->get('_view', null);
              $viewLocale = $request->query->get('locale', null);
              $viewId = $view === null ? null : $request->query->get($view . '_id', null);
 
              $allOtherParameters = $request->query->all();
              if($view !== null) {
                  unset($allOtherParameters['view']);
+                 if($viewId !== null) {
+                     unset($allOtherParameters[$view . '_id']);
+                 }
              }
              if($viewLocale !== null) {
                  unset($allOtherParameters['locale']);
-             }
-             if($viewId !== null) {
-                 unset($allOtherParameters[$view . '_id']);
              }
 
              $this->retriever->loadSpecificUrl($view, $viewLocale, $viewId, $allOtherParameters);

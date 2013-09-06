@@ -46,16 +46,6 @@ class DefaultController extends BaseFrontController
      */
     public function noAction(Request $request)
     {
-        if(ConfigQuery::isRewritingEnable()) {
-
-            /* Does the query GET parameters match a rewritten URL ? */
-            $rewrittenUrl = URL::getInstance()->retrieveCurrent($request);
-            if($rewrittenUrl->rewrittenUrl !== null) {
-                /* 301 redirection to rewritten URL */
-                $this->redirect($rewrittenUrl->rewrittenUrl, 301);
-            }
-        }
-
         $view = null;
 
         if (! $view = $request->query->get('view')) {
@@ -71,5 +61,15 @@ class DefaultController extends BaseFrontController
             $request->attributes->set("_view", "index");
         }
 
+        if(ConfigQuery::isRewritingEnable()) {
+            if($request->attributes->get('_rewritten', false) === false) {
+                /* Does the query GET parameters match a rewritten URL ? */
+                $rewrittenUrl = URL::getInstance()->retrieveCurrent($request);
+                if($rewrittenUrl->rewrittenUrl !== null) {
+                    /* 301 redirection to rewritten URL */
+                    $this->redirect($rewrittenUrl->rewrittenUrl, 301);
+                }
+            }
+        }
     }
 }
