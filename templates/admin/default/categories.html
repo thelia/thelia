@@ -235,7 +235,9 @@
 	 							{module_include location='product_list_row'}
 
 		                    	<td>
-		                    		<input type="checkbox" data-id="{$ID}" class="displayToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    		<div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+		                    			<input type="checkbox" data-id="{$ID}" class="displayToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    		</div>
 		                    	</td>
 
 		                    	<td>
