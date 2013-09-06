@@ -20,6 +20,9 @@ class Currency extends BaseCurrency {
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECURRENCY, new CurrencyEvent($this));
 
+        // Set the current position for the new object
+        $this->setPosition($this->getNextPosition());
+
         return true;
     }
 

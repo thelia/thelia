@@ -107,6 +107,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 CurrencyQuery::create()->filterByByDefault(true)->update(array('ByDefault' => false));
 
                 $currency
+                    ->setDispatcher($this->getDispatcher())
                     ->setByDefault($event->getIsDefault())
                     ->save()
                 ;
@@ -139,7 +140,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
         $rates_url = ConfigQuery::read('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml');
 
-        $rate_data = file_get_contents($rates_url);
+        $rate_data = @file_get_contents($rates_url);
 
         if ($rate_data && $sxe = new \SimpleXMLElement($rate_data)) {
 
@@ -149,12 +150,16 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 $rate = floatval($last['rate']);
 
                 if (null !== $currency = CurrencyQuery::create()->findOneByCode($code)) {
-                    $currency->setRate($rate)->save();
+                    $currency
+                        ->setDispatcher($this->getDispatcher())
+                        ->setRate($rate)
+                        ->save()
+                    ;
                 }
             }
         }
         else {
-            throw new \RuntimeException(sprintf("Failed to get currency rates data from URL %s", $url));
+            throw new \RuntimeException(sprintf("Failed to get currency rates data from URL %s", $rates_url));
         }
     }
 
@@ -165,12 +170,18 @@ class Currency extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(CurrencyUpdatePositionEvent $event)
     {
-        if (null !== $category = CurrencyQuery::create()->findOneById($event->getObjectId())) {
+        if (null !== $currency = CurrencyQuery::create()->findOneById($event->getObjectId())) {
 
-            if ($event->getMode() == BaseChangePositionEvent::POSITION_ABSOLUTE)
-                return $category->changeAbsolutePosition($event->getPosition());
-            else
-                return $this->exchangePosition($event->getMode());
+            $currency->setDispatcher($this->getDispatcher());
+
+            $mode = $event->getMode();
+
+            if ($mode == CurrencyUpdatePositionEvent::POSITION_ABSOLUTE)
+                return $currency->changeAbsolutePosition($event->getPosition());
+            else if ($mode == CurrencyUpdatePositionEvent::POSITION_UP)
+                return $currency->movePositionUp();
+            else if ($mode == CurrencyUpdatePositionEvent::POSITION_DOWN)
+                return $currency->movePositionDown();
         }
     }
 

@@ -27,33 +27,30 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Rewriting\RewritingRetriever;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Thelia\Core\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\RequestContext;
 
 class URL
 {
     protected $resolver = null;
     protected $retriever = null;
 
-    protected $container;
-    protected $environment;
+    protected $requestContext;
 
     const PATH_TO_FILE = true;
     const WITH_INDEX_PAGE = false;
 
-    private static $instance = null;
+    protected static $instance = null;
 
-    public function __construct(ContainerInterface $container, $environment)
+    public function __construct(ContainerInterface $container)
     {
         // Allow singleton style calls once intanciated.
         // For this to work, the URL service has to be instanciated very early. This is done manually
         // in TheliaHttpKernel, by calling $this->container->get('thelia.url.manager');
         self::$instance = $this;
 
-        $this->container = $container;
-        $this->environment = $environment;
+        $this->requestContext = $container->get('router.admin')->getContext();
 
         $this->retriever = new RewritingRetriever();
         $this->resolver = new RewritingResolver();
@@ -79,49 +76,31 @@ class URL
      */
     public function getBaseUrl()
     {
-        $request = $this->container->get('request');
-        $lang = $request->getSession()->getLang();
+        if ($host = $this->requestContext->getHost()) {
 
-        // Check if we have a specific URL for each lang.
-        $one_domain_foreach_lang = ConfigQuery::read("one_domain_foreach_lang", false);
+            $scheme = $this->requestContext->getScheme();
 
-        if ($one_domain_foreach_lang == true) {
-            // If it's the case, get the current lang URL
-            $base_url = $lang->getUrl();
+            $port = '';
 
-            $err_msg_part = 'base_url';
-        }
-        else {
-            // Get the base URL
-            $base_url = ConfigQuery::read('base_url', $request->getSchemeAndHttpHost());
+            if ('http' === $scheme && 80 != $this->requestContext->getHttpPort()) {
+                $port = ':'.$this->requestContext->getHttpPort();
+            } elseif ('https' === $scheme && 443 != $this->requestContext->getHttpsPort()) {
+                $port = ':'.$this->requestContext->getHttpsPort();
+            }
 
-            $err_msg_part = sprintf('base_url for lang %s', $lang->getCode());
+            $schemeAuthority = "$scheme://$host"."$port";
         }
 
-        // Be sure that base-url starts with http, give up if it's not the case.
-        if (substr($base_url, 0, 4) != 'http') {
-            throw new \InvalidArgumentException(
-                    sprintf("The %s configuration parameter shoud contains the URL of your shop, starting with http or https.", $err_msg_part));
-        }
-
-        // Normalize the base_url
-        return rtrim($base_url, '/').'/';
+        return $schemeAuthority.$this->requestContext->getBaseUrl();
     }
 
     /**
-     * @return string the index page, which is basically the base_url in prod environment.
+     * @return string the index page, which is in fact the base URL.
      */
     public function getIndexPage()
     {
-        // Get the base URL
-        $base_url = $this->getBaseUrl();
-
-        // For dev environment, add the proper page.
-        if ($this->environment == 'dev') {
-            $base_url .= "index_dev.php";
-        }
-
-        return $base_url;
+        // The index page is the base URL :)
+        return $this->getBaseUrl();
     }
 
     /**
@@ -140,14 +119,16 @@ class URL
          // Already absolute ?
         if (substr($path, 0, 4) != 'http') {
 
-            /**
-             * @etienne : can't be done here for it's already done in ::viewUrl / ::adminViewUrl
-             * @franck : should be done, as absoluteUrl() is sometimes called directly (see UrlGenerator::generateUrlFunction())
-             */
-            $root = $path_only == self::PATH_TO_FILE ? $this->getBaseUrl() : $this->getIndexPage();
+            $base_url = $this->getBaseUrl();
 
-            // Normalize root path
-            $base = rtrim($root, '/') . '/' . ltrim($path, '/');
+            // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
+            if ($path_only == self::PATH_TO_FILE) {
+                // As the base_url always ends with '/', if we don't find / at the end, we have a script.
+                if (substr($base_url, -1) != '/') $base_url = dirname($base_url);
+            }
+
+            // Normalize the given path
+            $base = rtrim($base_url, '/') . '/' . ltrim($path, '/');
         } else
             $base = $path;
 

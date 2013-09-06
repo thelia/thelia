@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -21,38 +21,44 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Model\Tools;
-
-use Thelia\Core\Event\ActionEvent;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+namespace Thelia\Tests;
 
 /**
- * A trait to provide event dispatching mechanism to Model objects
+ * This class provides URL Tool class initialisation
+ *
+ * @package Thelia\Tests\TestCaseWithURLSetup
  */
-trait ModelEventDispatcherTrait {
-
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    protected $dispatcher = null;
+class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase {
 
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-
-        return $this;
+    public function __construct() {
+        $this->setupURLTool();
     }
 
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
+    protected function setupURLTool() {
 
-    protected function dispatchEvent($eventName, ActionEvent $event)
-    {
-        if (!is_null($this->dispatcher)) {
-            $this->dispatcher->dispatch($eventName, $event);
-        }
+        $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
+
+        $context = new \Symfony\Component\Routing\RequestContext(
+                '/thelia/index.php',
+                'GET',
+                'localhost',
+                'http',
+                80,
+                443,
+                '/path/to/action'
+        );
+
+        $router = $this->getMockBuilder("Symfony\Component\Routing\Router")
+        ->disableOriginalConstructor()
+        ->getMock();
+
+        $router->expects($this->any())
+            ->method('getContext')
+            ->will($this->returnValue($context));
+
+        $container->set("router.admin", $router);
+
+        new \Thelia\Tools\URL($container);
     }
 }
