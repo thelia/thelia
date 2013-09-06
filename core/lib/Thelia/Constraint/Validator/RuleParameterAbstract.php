@@ -23,6 +23,7 @@
 
 namespace Thelia\Constraint\Validator;
 
+use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Exception\NotImplementedException;
 
@@ -39,8 +40,8 @@ use Thelia\Exception\NotImplementedException;
  */
 abstract class RuleParameterAbstract implements ComparableInterface
 {
-    /** @var  CouponAdapterInterface Provide necessary value from Thelia*/
-    protected $adapter;
+    /** @var Translator Service Translator */
+    protected $translator = null;
 
     /**
      * Get Parameter value to test against

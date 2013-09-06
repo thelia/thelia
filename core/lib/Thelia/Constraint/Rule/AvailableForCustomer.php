@@ -54,31 +54,6 @@ class AvailableForCustomer extends CouponRuleAbstract
     protected $customerValidator = null;
 
     /**
-     * Constructor
-     *
-     * @param CouponAdapterInterface $adapter    allowing to gather
-     *                                           all necessary Thelia variables
-     * @param array                  $validators Array of RuleValidator
-     *                                           validating $paramsToValidate against
-     *
-     * @throws InvalidRuleException
-     */
-    public function __construct(CouponAdapterInterface $adapter, array $validators)
-    {
-        parent::__construct($adapter, $validators);
-
-        if (isset($validators[self::PARAM1])
-            && $validators[self::PARAM1] instanceof RuleValidator
-        ) {
-            $this->customerValidator = $validators[self::PARAM1];
-        } else {
-            throw new InvalidRuleException(get_class());
-        }
-
-        $this->adapter = $adapter;
-    }
-
-    /**
      * Check if backoffice inputs are relevant or not
      *
      * @throws InvalidRuleOperatorException if Operator is not allowed

@@ -4,6 +4,9 @@
 
 echo -e "\033[47m\033[1;31m\n[WARN] This script will reset this Thelia2 install\n\033[0m"
 
+echo -e "\n\e[01;34m[INFO] Clearing caches\e[00m\n"
+php Thelia cache:clear
+
 echo -e "\n\e[01;34m[INFO] Downloading vendors\e[00m\n"
 composer install --prefer-dist
 
@@ -25,5 +28,8 @@ php install/faker.php
 
 echo -e "\n\e[01;34m[INFO] Adding admin\e[00m\n"
 php Thelia thelia:create-admin --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2
+
+echo -e "\n\e[01;34m[INFO] Clearing caches\e[00m\n"
+php Thelia cache:clear
 
 echo -e "\n\e[00;32m[SUCCESS] Reset done\e[00m\n"

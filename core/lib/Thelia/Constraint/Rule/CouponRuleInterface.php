@@ -23,7 +23,7 @@
 
 namespace Thelia\Constraint\Rule;
 
-use Symfony\Component\Translation\Translator;
+use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
 
 /**
@@ -42,9 +42,9 @@ interface CouponRuleInterface
     /**
      * Constructor
      *
-     * @param Translator $translator Service translator
+     * @param CouponAdapterInterface $adapter Service adapter
      */
-    function __construct(Translator $translator);
+    function __construct(CouponAdapterInterface $adapter);
 
     /**
      * Check if backoffice inputs are relevant or not

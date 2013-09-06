@@ -23,6 +23,7 @@
 
 namespace Thelia\Constraint\Validator;
 
+use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
 
 /**
@@ -48,15 +49,15 @@ class PriceParam extends RuleParameterAbstract
     /**
      * Constructor
      *
-     * @param CouponAdapterInterface $adapter  Provide necessary value from Thelia
-     * @param float                  $price    Positive float
-     * @param string                 $currency Currency Code ISO 4217 EUR|USD|GBP
+     * @param Translator $translator Service translator
+     * @param float      $price      Positive float
+     * @param string     $currency   Currency Code ISO 4217 EUR|USD|GBP
      */
-    public function __construct(CouponAdapterInterface $adapter, $price, $currency)
+    public function __construct(Translator $translator, $price, $currency)
     {
         $this->price = $price;
         $this->currency = $currency;
-        $this->adapter = $adapter;
+        $this->translator = $translator;
     }
 
     /**
@@ -132,8 +133,7 @@ class PriceParam extends RuleParameterAbstract
      */
     public function getToolTip()
     {
-        return $this->adapter
-            ->getTranslator()
+        return $this->translator
             ->trans(
                 'A price in %currency% (ex: 14.50)',
                 array(

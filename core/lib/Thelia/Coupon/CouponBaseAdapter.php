@@ -120,6 +120,17 @@ class CouponBaseAdapter implements CouponAdapterInterface
     }
 
     /**
+     * Return the Checkout currency EUR|USD
+     *
+     * @return string
+     */
+    public function getCheckoutCurrency()
+    {
+        // TODO: Implement getCheckoutCurrency() method.
+    }
+
+
+    /**
      * Return the number of Products in the Cart
      *
      * @return int

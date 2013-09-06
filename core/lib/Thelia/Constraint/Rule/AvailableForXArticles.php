@@ -46,6 +46,9 @@ class AvailableForXArticles extends CouponRuleAbstract
     /** Rule 1st parameter : quantity */
     CONST PARAM1_QUANTITY = 'quantity';
 
+    /** @var string Service Id from Resources/config.xml  */
+    protected $serviceId = 'thelia.constraint.rule.available_for_x_articles';
+
     /** @var array Available Operators (Operators::CONST) */
     protected $availableOperators = array(
         Operators::INFERIOR,
@@ -198,10 +201,15 @@ class AvailableForXArticles extends CouponRuleAbstract
             );
         }
 
-        $this->quantityValidator = new QuantityParam(
-            $this->adapter,
-            $values[self::PARAM1_QUANTITY]
+        $this->quantityValidator = new RuleValidator(
+            $operators[self::PARAM1_QUANTITY],
+            new QuantityParam(
+                $this->adapter,
+                $values[self::PARAM1_QUANTITY]
+            )
         );
+
+        $this->validators = array(self::PARAM1_QUANTITY => $this->quantityValidator);
 
         return $this;
     }
@@ -214,6 +222,7 @@ class AvailableForXArticles extends CouponRuleAbstract
     public function getSerializableRule()
     {
         $serializableRule = new SerializableRule();
+        $serializableRule->ruleServiceId = $this->serviceId;
         $serializableRule->operators = array(
             self::PARAM1_QUANTITY => $this->quantityValidator->getOperator()
         );

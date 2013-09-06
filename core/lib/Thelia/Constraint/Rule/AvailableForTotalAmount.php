@@ -52,6 +52,9 @@ class AvailableForTotalAmount extends CouponRuleAbstract
     /** Rule 1st parameter : currency */
     CONST PARAM1_CURRENCY = 'currency';
 
+    /** @var string Service Id from Resources/config.xml  */
+    protected $serviceId = 'thelia.constraint.rule.available_for_total_amount';
+
     /** @var array Available Operators (Operators::CONST) */
     protected $availableOperators = array(
         Operators::INFERIOR,
@@ -59,7 +62,7 @@ class AvailableForTotalAmount extends CouponRuleAbstract
         Operators::SUPERIOR,
     );
 
-    /** @var PriceParam Price Validator */
+    /** @var RuleValidator Price Validator */
     protected $priceValidator = null;
 
     /**
@@ -90,7 +93,7 @@ class AvailableForTotalAmount extends CouponRuleAbstract
 
         $this->checkBackOfficeInputsOperators();
 
-        return $this->isPriceValid($price->getPrice());
+        return $this->isPriceValid($price->getPrice(), $price->getCurrency());
     }
 
     /**
@@ -101,33 +104,51 @@ class AvailableForTotalAmount extends CouponRuleAbstract
      */
     public function checkCheckoutInput()
     {
-        if (!isset($this->paramsToValidate)
-            || empty($this->paramsToValidate)
-            ||!isset($this->paramsToValidate[self::PARAM1_PRICE])
-        ) {
-            throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
+        $currency = $this->adapter->getCheckoutCurrency();
+        if (empty($currency)) {
+            throw new InvalidRuleValueException(
+                get_class(), self::PARAM1_CURRENCY
+            );
         }
 
-        $price = $this->paramsToValidate[self::PARAM1_PRICE];
+        $price = $this->adapter->getCartTotalPrice();
+        if (empty($price)) {
+            throw new InvalidRuleValueException(
+                get_class(), self::PARAM1_PRICE
+            );
+        }
 
-        return $this->isPriceValid($price);
+        $this->paramsToValidate = array(
+            self::PARAM1_PRICE => $this->adapter->getCartTotalPrice(),
+            self::PARAM1_CURRENCY => $this->adapter->getCheckoutCurrency()
+        );
+
+        return $this->isPriceValid($price, $currency);
     }
 
     /**
      * Check if a price is valid
      *
-     * @param float $price Price to check
+     * @param float  $price    Price to check
+     * @param string $currency Price currency
      *
      * @throws InvalidRuleValueException if Value is not allowed
      * @return bool
      */
-    protected function isPriceValid($price)
+    protected function isPriceValid($price, $currency)
     {
         $priceValidator = $this->priceValidator;
-        try {
-            $priceValidator->getParam()->compareTo($price);
-        } catch(\InvalidArgumentException $e) {
-            throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
+
+        /** @var PriceParam $param */
+        $param = $priceValidator->getParam();
+        if ($currency == $param->getCurrency()) {
+            try {
+                $priceValidator->getParam()->compareTo($price);
+            } catch(\InvalidArgumentException $e) {
+                throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
+            }
+        } else {
+            throw new InvalidRuleValueException(get_class(), self::PARAM1_CURRENCY);
         }
 
         return true;
@@ -141,7 +162,8 @@ class AvailableForTotalAmount extends CouponRuleAbstract
     protected function setParametersToValidate()
     {
         $this->paramsToValidate = array(
-            self::PARAM1_PRICE => $this->adapter->getCartTotalPrice()
+            self::PARAM1_PRICE => $this->adapter->getCartTotalPrice(),
+            self::PARAM1_CURRENCY => $this->adapter->getCheckoutCurrency()
         );
 
         return $this;
@@ -191,7 +213,7 @@ class AvailableForTotalAmount extends CouponRuleAbstract
      * @param array $operators Rule Operator set by the Admin
      * @param array $values    Rule Values set by the Admin
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @return $this
      */
     public function populateFromForm(array $operators, array $values)
@@ -199,16 +221,21 @@ class AvailableForTotalAmount extends CouponRuleAbstract
         if ($values[self::PARAM1_PRICE] === null
             || $values[self::PARAM1_CURRENCY] === null
         ) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 'The Rule ' . get_class() . 'needs at least a quantity set (' . self::PARAM1_PRICE . ', ' . self::PARAM1_CURRENCY . ')'
             );
         }
 
-        $this->priceValidator = new PriceParam(
-            $this->adapter,
-            $values[self::PARAM1_PRICE],
-            $values[self::PARAM1_CURRENCY]
+        $this->priceValidator = new RuleValidator(
+            $operators[self::PARAM1_PRICE],
+            new PriceParam(
+                $this->translator,
+                $values[self::PARAM1_PRICE],
+                $values[self::PARAM1_CURRENCY]
+            )
         );
+
+        $this->validators = array(self::PARAM1_PRICE => $this->priceValidator);
 
         return $this;
     }
@@ -221,13 +248,14 @@ class AvailableForTotalAmount extends CouponRuleAbstract
     public function getSerializableRule()
     {
         $serializableRule = new SerializableRule();
+        $serializableRule->ruleServiceId = $this->serviceId;
         $serializableRule->operators = array(
             self::PARAM1_PRICE => $this->priceValidator->getOperator()
         );
 
         $serializableRule->values = array(
-            self::PARAM1_PRICE => $this->priceValidator->getPrice(),
-            self::PARAM1_CURRENCY => $this->priceValidator->getCurrency()
+            self::PARAM1_PRICE => $this->priceValidator->getParam()->getPrice(),
+            self::PARAM1_CURRENCY => $this->priceValidator->getParam()->getCurrency()
         );
 
         return $serializableRule;

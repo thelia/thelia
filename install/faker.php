@@ -1,4 +1,8 @@
 <?php
+use Thelia\Constraint\ConstraintManager;
+use Thelia\Constraint\Rule\AvailableForTotalAmount;
+use Thelia\Constraint\Rule\Operators;
+use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Model\ProductImage;
 use Thelia\Model\CategoryImage;
 use Thelia\Model\FolderImage;
@@ -6,13 +10,10 @@ use Thelia\Model\ContentImage;
 use Imagine\Image\Color;
 use Imagine\Image\Point;
 
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 require __DIR__ . '/../core/bootstrap.php';
 
 $thelia = new Thelia\Core\Thelia("dev", true);
+$thelia->boot();
 
 $faker = Faker\Factory::create();
 
@@ -364,7 +365,7 @@ try {
         }
     }
 
-    generateCouponFixtures();
+    generateCouponFixtures($thelia);
 
     $con->commit();
 } catch (Exception $e) {
@@ -493,9 +494,11 @@ function setI18n($faker, &$object)
 /**
  * Generate Coupon fixtures
  */
-function generateCouponFixtures()
+function generateCouponFixtures($thelia)
 {
-    $adapter = new \Thelia\Coupon\CouponBaseAdapter();
+    $container = $thelia->getContainer();
+    $adapter = $container->get('thelia.adapter');
+    $translator = $container->get('thelia.translator');
 
     // Coupons
     $coupon1 = new Thelia\Model\Coupon();
@@ -518,35 +521,31 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $date = new \DateTime();
     $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
 
-    $rule1 = new Thelia\Constraint\Rule\AvailableForTotalAmount(
-        $adapter,
-        array(
-            Thelia\Constraint\Rule\AvailableForTotalAmount::PARAM1_PRICE => new Thelia\Constraint\Validator\RuleValidator(
-                Thelia\Constraint\Rule\Operators::SUPERIOR,
-                new Thelia\Constraint\Validator\PriceParam(
-                    $adapter,
-                    40.00,
-                    'EUR'
-                )
-            )
-        )
+    $rule1 = new AvailableForTotalAmount($adapter);
+    $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::SUPERIOR);
+    $values = array(
+        AvailableForTotalAmount::PARAM1_PRICE => 40.00,
+        AvailableForTotalAmount::PARAM1_CURRENCY => 'EUR'
     );
-    $rule2 = new Thelia\Constraint\Rule\AvailableForTotalAmount(
-        $adapter,
-        array(
-            Thelia\Constraint\Rule\AvailableForTotalAmount::PARAM1_PRICE => new Thelia\Constraint\Validator\RuleValidator(
-                Thelia\Constraint\Rule\Operators::INFERIOR,
-                new Thelia\Constraint\Validator\PriceParam(
-                    $adapter,
-                    400.00,
-                    'EUR'
-                )
-            )
-        )
-    );
-    $rules = new \Thelia\Coupon\CouponRuleCollection(array($rule1, $rule2));
+    $rule1->populateFromForm($operators, $values);
 
-    $coupon1->setSerializedRules(base64_encode(serialize($rules)));
+    $rule2 = new AvailableForTotalAmount($adapter);
+    $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::INFERIOR);
+    $values = array(
+        AvailableForTotalAmount::PARAM1_PRICE => 400.00,
+        AvailableForTotalAmount::PARAM1_CURRENCY => 'EUR'
+    );
+    $rule2->populateFromForm($operators, $values);
+
+    $rules = new CouponRuleCollection();
+    $rules->add($rule1);
+    $rules->add($rule2);
+
+    /** @var ConstraintManager $constraintManager */
+    $constraintManager = new ConstraintManager($container);
+
+    $serializedRules = $constraintManager->serializeCouponRuleCollection($rules);
+    $coupon1->setSerializedRules($serializedRules);
 
     $coupon1->setIsCumulative(1);
     $coupon1->setIsRemovingPostage(0);

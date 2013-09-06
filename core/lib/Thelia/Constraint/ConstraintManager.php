@@ -24,6 +24,10 @@
 namespace Thelia\Constraint;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Constraint\Rule\SerializableRule;
 use Thelia\Coupon\CouponAdapterInterface;
@@ -102,7 +106,8 @@ class ConstraintManager
                 $serializableRules[] = $rule->getSerializableRule();
             }
         }
-        return (string) base64_encode(serialize($serializableRules));
+
+        return base64_encode(json_encode($serializableRules));
     }
 
     /**
@@ -114,7 +119,8 @@ class ConstraintManager
      */
     public function unserializeCouponRuleCollection($serializedRules)
     {
-        $unserializedRules = unserialize(base64_decode($serializedRules));
+        $unserializedRules = json_decode(base64_decode($serializedRules));
+
         $collection = new CouponRuleCollection();
 
         if (!empty($serializedRules) && !empty($unserializedRules)) {
@@ -124,10 +130,10 @@ class ConstraintManager
                     /** @var CouponRuleInterface $couponRule */
                     $couponRule = $this->container->get($rule->ruleServiceId);
                     $couponRule->populateFromForm(
-                        $rule->operators,
-                        $rule->values
+                        (array) $rule->operators,
+                        (array) $rule->values
                     );
-                    $collection->add($couponRule);
+                    $collection->add(clone $couponRule);
                 }
             }
         }

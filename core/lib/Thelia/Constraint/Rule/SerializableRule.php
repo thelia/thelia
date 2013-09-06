@@ -45,5 +45,37 @@ class SerializableRule
     /** @var array Values set by Admin for this Rule */
     public $values = array();
 
+    /**
+     * Get Operators set by Admin for this Rule
+     *
+     * @return array
+     */
+    public function getOperators()
+    {
+        return $this->operators;
+    }
+
+    /**
+     * Get Rule Service id
+     *
+     * @return string
+     */
+    public function getRuleServiceId()
+    {
+        return $this->ruleServiceId;
+    }
+
+    /**
+     * Get Values set by Admin for this Rule
+     *
+     * @return array
+     */
+    public function getValues()
+    {
+        return $this->values;
+    }
+
+
+
 
 }

@@ -88,6 +88,13 @@ interface CouponAdapterInterface
     public function getCartTotalPrice();
 
     /**
+     * Return the Checkout currency EUR|USD
+     *
+     * @return string
+     */
+    public function getCheckoutCurrency();
+
+    /**
      * Return Checkout total postage (only) price
      *
      * @return float

@@ -29,6 +29,8 @@ use Thelia\Constraint\Validator\PriceParam;
 use Thelia\Constraint\Validator\RuleValidator;
 use Thelia\Constraint\Rule\AvailableForTotalAmount;
 use Thelia\Constraint\Rule\Operators;
+use Thelia\Coupon\CouponBaseAdapter;
+use Thelia\Coupon\CouponBaseAdapterTest;
 use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Coupon\Type\RemoveXAmount;
@@ -56,11 +58,58 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    public function incompleteTest()
+    /**
+     * Check the if the Constraint Manager is able to check RuleValidators
+     */
+    public function testIsMatching()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+
+        $stubAdapter->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue(321.98));
+
+        $stubAdapter->expects($this->any())
+            ->method('getCheckoutCurrency')
+            ->will($this->returnValue('USD'));
+
+        $rule1 = new AvailableForTotalAmount($stubAdapter);
+        $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::SUPERIOR);
+        $values = array(
+            AvailableForTotalAmount::PARAM1_PRICE => 40.00,
+            AvailableForTotalAmount::PARAM1_CURRENCY => 'USD'
         );
+        $rule1->populateFromForm($operators, $values);
+
+        $rule2 = new AvailableForTotalAmount($stubAdapter);
+        $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::INFERIOR);
+        $values = array(
+            AvailableForTotalAmount::PARAM1_PRICE => 400.00,
+            AvailableForTotalAmount::PARAM1_CURRENCY => 'USD'
+        );
+        $rule2->populateFromForm($operators, $values);
+
+        $rules = new CouponRuleCollection();
+        $rules->add($rule1);
+        $rules->add($rule2);
+
+        /** @var ConstraintManager $constraintManager */
+        $constraintManager = new ConstraintManager($this->getContainer());
+
+        $expected = true;
+        $actual = $constraintManager->isMatching($rules);
+
+        $this->assertEquals($expected, $actual, 'The ConstraintManager is no more able to check if a Rule is matching');
     }
 
     /**
@@ -68,9 +117,19 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testRuleSerialisation()
     {
-        $translator = $this->getMock('\Thelia\Core\Translation\Translator');
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $rule1 = new AvailableForTotalAmount($translator);
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+
+        $rule1 = new AvailableForTotalAmount($stubAdapter);
         $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::SUPERIOR);
         $values = array(
             AvailableForTotalAmount::PARAM1_PRICE => 40.00,
@@ -78,7 +137,7 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
         );
         $rule1->populateFromForm($operators, $values);
 
-        $rule2 = new AvailableForTotalAmount($translator);
+        $rule2 = new AvailableForTotalAmount($stubAdapter);
         $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::INFERIOR);
         $values = array(
             AvailableForTotalAmount::PARAM1_PRICE => 400.00,
@@ -86,7 +145,9 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
         );
         $rule2->populateFromForm($operators, $values);
 
-        $rules = new CouponRuleCollection(array($rule1, $rule2));
+        $rules = new CouponRuleCollection();
+        $rules->add($rule1);
+        $rules->add($rule2);
 
         /** @var ConstraintManager $constraintManager */
         $constraintManager = new ConstraintManager($this->getContainer());
@@ -94,8 +155,8 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
         $serializedRules = $constraintManager->serializeCouponRuleCollection($rules);
         $unserializedRules = $constraintManager->unserializeCouponRuleCollection($serializedRules);
 
-        $expected = $rules;
-        $actual = $unserializedRules;
+        $expected = (string)$rules;
+        $actual = (string)$unserializedRules;
 
         $this->assertEquals($expected, $actual);
     }
@@ -109,12 +170,26 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $translator = $this->getMock('\Thelia\Core\Translation\Translator');
-        $rule1 = new AvailableForTotalAmount($translator);
-        $rule2 = new AvailableForXArticles($translator);
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+
+        $rule1 = new AvailableForTotalAmount($stubAdapter);
+        $rule2 = new AvailableForXArticles($stubAdapter);
+
+        $adapter = new CouponBaseAdapter($container);
 
         $container->set('thelia.constraint.rule.available_for_total_amount', $rule1);
         $container->set('thelia.constraint.rule.available_for_x_articles', $rule2);
+        $container->set('thelia.adapter', $adapter);
 
         return $container;
     }

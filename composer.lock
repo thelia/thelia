@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "db69990b239a4056558bfd694115d01b",
+    "hash": "3f5204c6eb90cd0dc23fad39555eff6c",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -128,7 +128,7 @@
             "authors": [
                 {
                     "name": "Anthony Ferrara",
-                    "email": "ircmaxell@php.net",
+                    "email": "ircmaxell@ircmaxell.com",
                     "homepage": "http://blog.ircmaxell.com"
                 }
             ],
@@ -1452,6 +1452,53 @@
             "time": "2013-08-23 14:06:02"
         },
         {
+            "name": "symfony/serializer",
+            "version": "dev-master",
+            "target-dir": "Symfony/Component/Serializer",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Serializer.git",
+                "reference": "ac373bb2cc40385031b50758f479d413679bb18c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Serializer/zipball/ac373bb2cc40385031b50758f479d413679bb18c",
+                "reference": "ac373bb2cc40385031b50758f479d413679bb18c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Serializer\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Serializer Component",
+            "homepage": "http://symfony.com",
+            "time": "2013-08-09 06:59:22"
+        },
+        {
             "name": "symfony/translation",
             "version": "v2.2.6",
             "target-dir": "Symfony/Component/Translation",
@@ -2043,6 +2090,7 @@
         "ptachoire/cssembed": 20,
         "simplepie/simplepie": 20,
         "imagine/imagine": 20,
+        "symfony/serializer": 20,
         "fzaninotto/faker": 20
     },
     "platform": {

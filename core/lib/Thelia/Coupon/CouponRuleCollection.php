@@ -85,5 +85,21 @@ class CouponRuleCollection
         return isEmpty($this->rules);
     }
 
+    /**
+     * Allow to compare 2 set of rules
+     *
+     * @return string Jsoned data
+     */
+    public function __toString()
+    {
+        $arrayToSerialize = array();
+        /** @var CouponRuleInterface $rule */
+        foreach ($this->getRules() as $rule) {
+            $arrayToSerialize[] = $rule->getSerializableRule();
+        }
+
+        return json_encode($arrayToSerialize);
+    }
+
 
 }

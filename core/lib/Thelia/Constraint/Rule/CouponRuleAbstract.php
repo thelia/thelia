@@ -24,7 +24,7 @@
 namespace Thelia\Constraint\Rule;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
-use Symfony\Component\Translation\Translator;
+use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Constraint\Validator\ComparableInterface;
 use Thelia\Constraint\Validator\RuleValidator;
@@ -49,6 +49,9 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     /** Value key in $validators */
     CONST VALUE = 'value';
 
+    /** @var string Service Id from Resources/config.xml  */
+    protected $serviceId = null;
+
     /** @var array Available Operators (Operators::CONST) */
     protected $availableOperators = array();
 
@@ -67,11 +70,12 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     /**
      * Constructor
      *
-     * @param Translator $translator Service translator
+     * @param CouponAdapterInterface $adapter Service adapter
      */
-    function __construct(Translator $translator)
+    function __construct(CouponAdapterInterface $adapter)
     {
-        $this->translator($translator);
+        $this->adapter = $adapter;
+        $this->translator = $adapter->getTranslator();
     }
 
     /**
@@ -179,5 +183,17 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     {
         return $this->validators;
     }
+
+    /**
+     * Get Rule Service id
+     *
+     * @return string
+     */
+    public function getServiceId()
+    {
+        return $this->serviceId;
+    }
+
+
 
 }
