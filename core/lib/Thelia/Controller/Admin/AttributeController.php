@@ -51,7 +51,7 @@ class AttributeController extends BaseAdminController
 
         if (null !== $response = $this->checkAuth("admin.configuration.attributes.view")) return $response;
 
-        return $this->render('product_attributes');
+        return $this->render('product-attributes');
     }
 
 }
