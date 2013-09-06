@@ -249,14 +249,25 @@ abstract class BaseLoop
      *
      * public function defineArgs()
      * {
-     *  return array (
-     *      "ref",
-     *      "id" => "optional",
-     *      "stock" => array(
-     *          "optional",
-     *          "default" => 10
-     *          )
-     *  );
+     *  return new ArgumentCollection(
+     *       Argument::createIntListTypeArgument('id'),
+     *           new Argument(
+     *           'ref',
+     *           new TypeCollection(
+     *               new Type\AlphaNumStringListType()
+     *           )
+     *       ),
+     *       Argument::createIntListTypeArgument('category'),
+     *       Argument::createBooleanTypeArgument('new'),
+     *       Argument::createBooleanTypeArgument('promo'),
+     *       Argument::createFloatTypeArgument('min_price'),
+     *       Argument::createFloatTypeArgument('max_price'),
+     *       Argument::createIntTypeArgument('min_stock'),
+     *       Argument::createFloatTypeArgument('min_weight'),
+     *       Argument::createFloatTypeArgument('max_weight'),
+     *       Argument::createBooleanTypeArgument('current'),
+     *
+     *   );
      * }
      *
      * you can retrieve ref value using $this->ref
