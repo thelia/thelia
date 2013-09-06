@@ -40,11 +40,19 @@ class ConfigCreationForm extends BaseForm
 
         $this->formBuilder
             ->add("name", "text", array(
-                "constraints" => $name_constraints
+                "constraints" => $name_constraints,
+                "label" => "Name *",
+                "label_attr" => array(
+                    "for" => "name"
+                )
             ))
             ->add("title", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
+                ),
+                "label" => "Purpose *",
+                "label_attr" => array(
+                    "for" => "purpose"
                 )
             ))
             ->add("locale", "hidden", array(
@@ -52,7 +60,12 @@ class ConfigCreationForm extends BaseForm
                     new Constraints\NotBlank()
                 )
             ))
-            ->add("value", "text", array())
+            ->add("value", "text", array(                
+                "label" => "Value *",
+                "label_attr" => array(
+                    "for" => "value"
+                )
+            ))
             ->add("hidden", "hidden", array())
             ->add("secured", "hidden", array())
         ;
