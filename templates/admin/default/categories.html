@@ -74,7 +74,7 @@
                                     }
 		                            </th>
 
-		                            <th>&nbsp;</th>
+		                            <th>{intl l='Actions'}</th>
 		                        </tr>
 		                    </thead>
 
@@ -83,7 +83,7 @@
 		                    <tr>
 		                        <td>
 		                        i={$ID} {loop type="image" name="cat_image" source="category" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-		                          <a href="{url path='admin/catalog/category' id="$ID" action='browse'}" title="{intl l='Browse this category'}"><img src="#IMAGE_URL" alt="#TITLE" /></a>
+		                          <a href="{url path='admin/catalog/category' id="$ID" action='browse'}" title="{intl l='Browse this category'}"><img class="img-thumbnail" src="#IMAGE_URL" alt="#TITLE" /></a>
 		                        {/loop}
 		                        </td>
 
@@ -97,11 +97,15 @@
 
 		                    	<td>
 		                    	    {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
-		                    		<input type="checkbox" data-id="{$ID}" class="categoryVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+										<div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+		                    				<input type="checkbox" data-id="{$ID}" class="categoryVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    			</div>
 		                    		{/loop}
 
 		                    		{elseloop rel="can_change"}
-                                       <input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    			<div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                       		<input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+                                       	</div>
                                     {/elseloop}
 		                    	</td>
 
@@ -117,15 +121,17 @@
 		                    	</td>
 
 		                        <td>
-	                                <a class="btn btn-default btn-xs" title="{intl l='Browse this category'}" href="{url path='admin/catalog/category' id="$ID" action='browse'}"><i class="glyphicon glyphicon-folder-open"></i></a>
+		                        	<div class="btn-group">
+		                                <a class="btn btn-default btn-xs" title="{intl l='Browse this category'}" href="{url path='admin/catalog/category' id="$ID" action='browse'}"><i class="glyphicon glyphicon-folder-open"></i></a>
 
-	                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
-	                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this category'}" href="{url path='admin/catalog/category' id="$ID" action='edit'}"><i class="glyphicon glyphicon-edit"></i></a>
-	                                {/loop}
+		                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
+		                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this category'}" href="{url path='admin/catalog/category' id="$ID" action='edit'}"><i class="glyphicon glyphicon-edit"></i></a>
+		                                {/loop}
 
-	                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.category.delete"}
-	                                   <a class="btn btn-default btn-xs category-delete" title="{intl l='Delete this category and all its contents'}"  href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
-	                                {/loop}
+		                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.category.delete"}
+		                                   <a class="btn btn-default btn-xs category-delete" title="{intl l='Delete this category and all its contents'}"  href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+		                                {/loop}
+		                            </div>
 		                         </td>
 		                    </tr>
 		                    {/loop}
@@ -273,6 +279,11 @@
 {/block}
 
 {block name="javascript-initialization"}
+
+	{javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+	    <script src="{$asset_url}"></script>
+	{/javascripts}
+
 	{javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
 	    <script src="{$asset_url}"></script>
 	{/javascripts}
