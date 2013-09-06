@@ -1,11 +1,10 @@
 <?php
-
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -22,37 +21,62 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Module;
+namespace Colissimo;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Thelia\Module\BaseModule;
+use Thelia\Module\DeliveryModuleInterface;
 
-abstract class BaseModule extends ContainerAware
+class Colissimo extends BaseModule implements DeliveryModuleInterface
 {
+    protected $request;
+    protected $dispatcher;
 
-    public function __construct()
+    public function setRequest(Request $request)
     {
-
+        $this->request = $request;
     }
 
-    protected function activate()
+    public function getRequest()
     {
-
+        return $this->request;
     }
 
-    public function hasContainer()
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
-        return null === $this->container;
+        $this->dispatcher = $dispatcher;
     }
 
-    public function getContainer()
+    public function getDispatcher()
     {
-        if($this->hasContainer() === false) {
-            throw new \RuntimeException("Sorry, container his not available in this context");
-        }
-        return $this->container;
+        return $this->dispatcher;
     }
 
-    abstract public function install();
-    abstract public function destroy();
+    /**
+     *
+     * calculate and return delivery price
+     *
+     * @return mixed
+     */
+    public function calculate()
+    {
+        // TODO: Implement calculate() method.
+        return 2;
+    }
+
+    /**
+     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
+     * Like install and destroy
+     */
+    public function install()
+    {
+        // TODO: Implement install() method.
+    }
+
+    public function destroy()
+    {
+        // TODO: Implement destroy() method.
+    }
 
 }

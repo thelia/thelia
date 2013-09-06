@@ -1,11 +1,10 @@
 <?php
-
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -22,37 +21,35 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Module;
+namespace Thelia\Controller\Front;
+use Thelia\Model\ModuleQuery;
+use Thelia\Tools\URL;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
 
-abstract class BaseModule extends ContainerAware
+/**
+ * Class DeliveryController
+ * @package Thelia\Controller\Front
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+class DeliveryController extends BaseFrontController
 {
-
-    public function __construct()
+    public function select()
     {
-
-    }
-
-    protected function activate()
-    {
-
-    }
-
-    public function hasContainer()
-    {
-        return null === $this->container;
-    }
-
-    public function getContainer()
-    {
-        if($this->hasContainer() === false) {
-            throw new \RuntimeException("Sorry, container his not available in this context");
+        if ($this->getSecurityContext()->hasCustomerUser() === false) {
+            $this->redirect(URL::getInstance()->getIndexPage());
         }
-        return $this->container;
+
+        $request = $this->getRequest();
+
+        $deliveryId = $request->query->get("delivery_id");
+
+        if($deliveryId)
+        {
+            $deliveryModule = ModuleQuery::create()->findPk($deliveryId);
+
+            if ($deliveryModule) {
+                $request->getSession()->setDelivery($deliveryId);
+            }
+        }
     }
-
-    abstract public function install();
-    abstract public function destroy();
-
 }
