@@ -57,9 +57,10 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
      *
      * calculate and return delivery price
      *
+     * @param null $country
      * @return mixed
      */
-    public function calculate()
+    public function calculate($country = null)
     {
         // TODO: Implement calculate() method.
         return 2;

@@ -605,6 +605,7 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <column name="full_namespace" size="255" type="VARCHAR" />
     <unique name="code_UNIQUE">
       <unique-column name="code" />
     </unique>
