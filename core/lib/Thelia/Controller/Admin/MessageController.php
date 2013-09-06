@@ -100,26 +100,14 @@ class MessageController extends BaseAdminController
         }
         catch (FormValidationException $ex) {
             // Form cannot be validated
-            $message = sprintf("Please check your input: %s", $ex->getMessage());
+            $message = $this->createStandardFormValidationErrorMessage($ex);
         }
         catch (\Exception $ex) {
             // Any other error
-            $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+            $message = $ex->getMessage();
         }
 
-        if ($message !== false) {
-            // An error has been detected: log it
-            Tlog::getInstance()->error(sprintf("Error during message creation process : %s. Exception was %s", $message, $ex->getMessage()));
-
-            // Mark the form as errored
-            $creationForm->setErrorMessage($message);
-
-            // Pass it to the parser, along with the error message
-            $this->getParserContext()
-                ->addForm($creationForm)
-                ->setGeneralError($message)
-            ;
-        }
+        $this->setupFormErrorContext("message modification", $message, $creationForm, $ex);
 
         // At this point, the form has error, and should be redisplayed.
         return $this->render('messages');
@@ -224,27 +212,15 @@ class MessageController extends BaseAdminController
             $this->redirect($changeForm->getSuccessUrl());
         }
         catch (FormValidationException $ex) {
-            // Invalid data entered
-            $message = sprintf("Please check your input: %s", $ex->getMessage());
+            // Form cannot be validated
+            $message = $this->createStandardFormValidationErrorMessage($ex);
         }
         catch (\Exception $ex) {
             // Any other error
-            $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+            $message = $ex->getMessage();
         }
 
-        if ($message !== false) {
-            // Log error message
-            Tlog::getInstance()->error(sprintf("Error during message modification process : %s. Exception was %s", $message, $ex->getMessage()));
-
-            // Mark the form as errored
-            $changeForm->setErrorMessage($message);
-
-            // Pas the form and the error to the parser
-            $this->getParserContext()
-                ->addForm($changeForm)
-                ->setGeneralError($message)
-            ;
-        }
+        $this->setupFormErrorContext("message modification", $message, $changeForm, $ex);
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->render('message-edit', array('message_id' => $message_id));

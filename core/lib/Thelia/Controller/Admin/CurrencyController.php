@@ -121,26 +121,14 @@ class CurrencyController extends BaseAdminController
         }
         catch (FormValidationException $ex) {
             // Form cannot be validated
-            $error_msg = sprintf("Please check your input: %s", $ex->getMessage());
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
         }
         catch (\Exception $ex) {
             // Any other error
-            $error_msg = $ex;
+            $error_msg = $ex->getMessage();
         }
 
-        if ($error_msg !== false) {
-            // An error has been detected: log it
-            Tlog::getInstance()->error(sprintf("Error during currency creation process : %s. Exception was %s", $error_msg, $ex->getMessage()));
-
-            // Mark the form as errored
-            $creationForm->setErrorMessage($error_msg);
-
-            // Pass it to the parser, along with the error currency
-            $this->getParserContext()
-                ->addForm($creationForm)
-                ->setGeneralError($error_msg)
-            ;
-        }
+        $this->setupFormErrorContext("currency creation", $error_msg, $creationForm, $ex);
 
         // At this point, the form has error, and should be redisplayed.
         return $this->renderList();
@@ -241,27 +229,15 @@ class CurrencyController extends BaseAdminController
             $this->redirect($changeForm->getSuccessUrl());
         }
         catch (FormValidationException $ex) {
-            // Invalid data entered
-            $error_msg = sprintf("Please check your input: %s", $ex->getMessage());
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
         }
         catch (\Exception $ex) {
             // Any other error
-            $error_msg = $ex;
+            $error_msg = $ex->getMessage();
         }
 
-        if ($error_msg !== false) {
-            // Log error currency
-            Tlog::getInstance()->error(sprintf("Error during currency modification process : %s. Exception was %s", $error_msg, $ex->getMessage()));
-
-            // Mark the form as errored
-            $changeForm->setErrorMessage($error_msg);
-
-            // Pas the form and the error to the parser
-            $this->getParserContext()
-                ->addForm($changeForm)
-                ->setGeneralError($error_msg)
-            ;
-        }
+        $this->setupFormErrorContext("currency modification", $error_msg, $changeForm, $ex);
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->render('currency-edit', array('currency_id' => $currency_id));

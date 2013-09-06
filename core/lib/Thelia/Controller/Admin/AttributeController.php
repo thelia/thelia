@@ -20,51 +20,38 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Model\LangQuery;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\Validator\Constraints\GreaterThan;
+namespace Thelia\Controller\Admin;
 
-class ConfigModificationForm extends BaseDescForm
+use Thelia\Core\Event\MessageDeleteEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Tools\URL;
+use Thelia\Core\Event\MessageUpdateEvent;
+use Thelia\Core\Event\MessageCreateEvent;
+use Thelia\Log\Tlog;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Core\Security\Exception\AuthorizationException;
+use Thelia\Model\MessageQuery;
+use Thelia\Form\MessageModificationForm;
+use Thelia\Form\MessageCreationForm;
+
+/**
+ * Manages messages sent by mail
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
+class AttributeController extends BaseAdminController
 {
-    protected function buildForm()
-    {
-        parent::buildForm(true);
+    /**
+     * The default action is displaying the messages list.
+     *
+     * @return Symfony\Component\HttpFoundation\Response the response
+     */
+    public function defaultAction() {
 
-        $this->formBuilder
-            ->add("id", "hidden", array(
-                    "constraints" => array(
-                        new GreaterThan(
-                            array('value' => 0)
-                        )
-                    )
-            ))
-            ->add("name", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Name",
-                "label_attr" => array(
-                    "for" => "name"
-                )
-            ))
-            ->add("value", "text", array(
-                "label" => "Value",
-                "label_attr" => array(
-                    "for" => "value"
-                )
-            ))
-            ->add("hidden", "hidden", array())
-            ->add("secured", "hidden", array(
-                "label" => "Prevent variable modification or deletion, except for super-admin"
-            ))
-         ;
+        if (null !== $response = $this->checkAuth("admin.configuration.attributes.view")) return $response;
+
+        return $this->render('product_attributes');
     }
 
-    public function getName()
-    {
-        return "thelia_config_modification";
-    }
 }

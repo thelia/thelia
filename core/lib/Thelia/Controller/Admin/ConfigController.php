@@ -229,7 +229,7 @@ class ConfigController extends BaseAdminController
             if ($this->getRequest()->get('save_mode') == 'stay') {
 
                 $this->redirectToRoute(
-                        "admin.configuration.variables.change",
+                        "admin.configuration.variables.update",
                         array('variable_id' => $variable_id)
                 );
             }
@@ -246,7 +246,7 @@ class ConfigController extends BaseAdminController
             $message = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext("variable edition", $message, $creationForm, $ex);
+        $this->setupFormErrorContext("variable edition", $message, $changeForm, $ex);
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->render('variable-edit', array('variable_id' => $variable_id));

@@ -24,7 +24,7 @@
 namespace Thelia\Core\Event;
 use Thelia\Model\Category;
 
-class CategoryToggleVisibilityEvent extends ActionEvent
+class CategoryToggleVisibilityEvent extends CategoryEvent
 {
     protected $category_id;
     protected $category;

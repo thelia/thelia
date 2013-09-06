@@ -132,7 +132,7 @@ class BaseAdminController extends BaseController
      * Create the standard message displayed to the user when the form cannot be validated.
      */
     protected function createStandardFormValidationErrorMessage(FormValidationException $exception) {
-        return Translator::getInstance()->trans(
+        return $this->getTranslator()->trans(
             "Please check your input: %error",
             array(
                 '%error' => $exception->getMessage()
@@ -154,7 +154,7 @@ class BaseAdminController extends BaseController
 
             // Log the error message
             Tlog::getInstance()->error(
-                Translator::getInstance()->trans(
+                $this->getTranslator()->trans(
                     "Error during %action process : %error. Exception was %exc",
                     array(
                         '%action' => $action,

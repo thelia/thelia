@@ -269,6 +269,7 @@
 	 							{module_include location='product_list_row'}
 
 		                    	<td>
+<<<<<<< HEAD
                                     {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.products.edit"}
                                         <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                             <input type="checkbox" data-id="{$ID}" class="productVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
@@ -280,6 +281,11 @@
                                             <input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
                                         </div>
                                     {/elseloop}
+=======
+		                    		<div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+		                    			<input type="checkbox" data-id="{$ID}" class="displayToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    		</div>
+>>>>>>> ebb350111a2c65929f8c61f621c9a8a6dd878984
 		                    	</td>
 
 		                    	<td>
@@ -312,7 +318,7 @@
 						{elseloop rel="product_list"}
 						<thead>
 							<tr>
-								<td class="message"><div class="alert alert-info">{intl l="This category doesn't have any products. To add a new product, click the + button above."}</div></td>
+								<td class="message"><div class="alert alert-info">{intl l="This category doesn't have any products. To add a new product, <strong>click the + button</strong> above."}</div></td>
 							</tr>
 						</thead>
 						{/elseloop}
@@ -436,6 +442,7 @@
 	    <script src="{$asset_url}"></script>
 	{/javascripts}
 
+<<<<<<< HEAD
 <script>
 $(function() {
 
@@ -530,4 +537,70 @@ $(function() {
 
 })
 </script>
+=======
+	<script>
+		$(function() {
+
+			{* display the form creation dialog if it contains errors *}
+
+		    {form name="thelia.admin.category.creation"}
+		        {if #form_error}
+					$('#add_category_dialog').modal();
+		        {/if}
+			{/form}
+
+			{* Always reset create dialog on close *}
+
+		    $('#add_category_dialog').on('hidden',function() {
+		        // Hide error message
+		        $('#add_category_dialog_error').remove();
+
+		        // Clear error status
+		        $("#add_category_dialog .error").removeClass('error');
+
+		        // Empty field values
+		        $("#add_category_dialog input[type=text]").val('');
+		    });
+
+		    {* Set the proper category ID in the delete confirmation dialog *}
+
+		    $(document).on("click", ".category-delete", function () {
+		    	$('#'+'delete-category-id').val($(this).data('id'));
+		    });
+
+		    // Toggle category visibility
+		    $(".categoryVisibleToggle").change(function() {
+		        $.ajax({
+		           url : "{url path='admin/catalog/category'}",
+		           data : {
+		               category_id : $(this).data('id'),
+		               action : 'visibilityToggle'
+		           }
+		        });
+		    });
+
+		    {* Inline editing of object position using bootstrap-editable *}
+
+		    $('.categoryPositionChange').editable({
+		        type        : 'text',
+		        title       : '{intl l="Enter new category position"}',
+		        mode        : 'popup',
+		        inputclass  : 'input-mini',
+		        placement   : 'left',
+		        success     : function(response, newValue) {
+		        	// The URL template
+		        	var url = "{url path='admin/catalog/category' action='changePosition' category_id='__ID__' position='__POS__'}";
+
+		        	// Perform subtitutions
+		            url = url.replace('__ID__', $(this).data('id'))
+		                     .replace('__POS__', newValue);
+
+		        	// Reload the page
+		        	location.href = url;
+		        }
+		    });
+
+		});
+	</script>
+>>>>>>> ebb350111a2c65929f8c61f621c9a8a6dd878984
 {/block}

@@ -34,6 +34,7 @@ use Thelia\Core\Event\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\CategoryChangePositionEvent;
 use Thelia\Form\CategoryDeletionForm;
 use Thelia\Model\Lang;
+use Thelia\Core\Translation\Translator;
 
 class CategoryController extends BaseAdminController
 {
@@ -244,29 +245,51 @@ class CategoryController extends BaseAdminController
         }
         catch (FormValidationException $ex) {
             // Invalid data entered
-            $error_msg = sprintf("Please check your input: %s", $ex->getMessage());
+            $error_msg = $this->getTranslator()->trans(
+                    "Please check your input: %message", array("%message" => $ex->getMessage()));
         }
         catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex;
         }
 
-        if ($error_msg !== false) {
-            // Log error currency
-            Tlog::getInstance()->error(sprintf("Error during currency modification process : %s. Exception was %s", $error_msg, $ex->getMessage()));
+        $this->setupFormErrorContext(
+                $form,
+                $error_msg,
+                "category"
 
-            // Mark the form as errored
-            $changeForm->setErrorMessage($error_msg);
 
-            // Pas the form and the error to the parser
-            $this->getParserContext()
-            ->addForm($changeForm)
-            ->setGeneralError($error_msg)
-            ;
-        }
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->render('currency-edit', array('currency_id' => $currency_id));
+    }
+
+
+    protected function setupFormErrorContext($object_type, $form, $error_message, $exception) {
+
+        if ($error_message !== false) {
+            // Lot the error message
+            Tlog::getInstance()->error(
+                    $this->getTranslator()->trans(
+                            "Error during %type modification process : %error. Exception was %exc",
+                            array(
+                                    "%type"  => "category",
+                                    "%error" => $error_message,
+                                    "%exc"   => $exception->getMessage()
+                            )
+                    )
+            );
+
+            // Mark the form as errored
+            $form->setErrorMessage($error_message);
+
+            // Pas the form and the error to the parser
+            $this->getParserContext()
+                ->addForm($form)
+                ->setGeneralError($error_message)
+            ;
+        }
+
     }
 
     /**
@@ -293,25 +316,7 @@ class CategoryController extends BaseAdminController
     }
 
     /**
-     * Update categories rates
-     */
-    public function updateRatesAction() {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
-
-        try {
-            $this->dispatch(TheliaEvents::CATEGORY_UPDATE_RATES);
-        }
-        catch (\Exception $ex) {
-            // Any error
-            return $this->errorPage($ex);
-        }
-
-        $this->redirectToRoute('admin.categories.default');
-    }
-
-    /**
-     * Update currencyposition
+     * Update currency position
      */
     public function updatePositionAction() {
         // Check current user authorization
