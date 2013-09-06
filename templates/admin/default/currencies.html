@@ -51,8 +51,8 @@
                                         <th>
                                             {admin_sortable_header
                                             current_order=$order
-                                            order='alpha'
-                                            reverse_order='alpha_reverse'
+                                            order='name'
+                                            reverse_order='name_reverse'
                                             path='/admin/configuration/currencies'
                                             label="{intl l='Name'}"
                                             }
@@ -147,7 +147,9 @@
                                             </td>
 
                                             <td class="text-center">
-                                                <input class="change-default" type="radio" name="is_default" value="{$ID}" {if $IS_DEFAULT}checked="checked"{/if}/>
+                                                <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                    <input class="change-default" type="radio" name="is_default" value="{$ID}" {if $IS_DEFAULT}checked="checked"{/if}/>
+                                                </div>
                                             </td>
 
                                             {module_include location='currencies_table_row'}
@@ -311,6 +313,10 @@
 
 {block name="javascript-initialization"}
 
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
     {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
@@ -368,7 +374,7 @@
 
             {* Change default status *}
 
-            $('.change-default').click(function(ev) {
+            $('.change-default').change(function(ev) {
                 var url = "{url path='/admin/configuration/currencies/set-default' currency_id='__ID__'}";
 
                 // Perform ID subtitutions

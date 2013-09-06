@@ -32,6 +32,10 @@ class CategoryCreationForm extends BaseForm
             ->add("title", "text", array(
                 "constraints" => array(
                     new NotBlank()
+                ),
+                "label" => "Category title *",
+                "label_attr" => array(
+                    "for" => "title"
                 )
             ))
             ->add("parent", "integer", array(
