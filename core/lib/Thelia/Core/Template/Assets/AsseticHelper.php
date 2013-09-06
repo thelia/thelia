@@ -43,15 +43,16 @@ class AsseticHelper
      * Generates assets from $asset_path in $output_path, using $filters.
      *
      * @param  string                    $asset_path  the full path to the asset file (or file collection)
-     * @param  unknown                   $output_path the full disk path to the output directory (shoud be visible to web server)
-     * @param  unknown                   $output_url  the URL to the generated asset directory
-     * @param  unknown                   $asset_type  the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
-     * @param  unknown                   $filters     a list of filters, as defined below (see switch($filter_name) ...)
-     * @param  unknown                   $debug       true / false
+     * @param  string                    $output_path the full disk path to the output directory (shoud be visible to web server)
+     * @param  string                    $output_url  the URL to the generated asset directory
+     * @param  string                    $asset_type  the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
+     * @param  array                     $filters     a list of filters, as defined below (see switch($filter_name) ...)
+     * @param  boolean                   $debug       true / false
+     * @param  boolean                   $dev_mode    true / false. If true, assets are not cached and always compiled.
      * @throws \InvalidArgumentException if an invalid filter name is found
      * @return string                    The URL to the generated asset file.
      */
-    public function asseticize($asset_path, $output_path, $output_url, $asset_type, $filters, $debug)
+    public function asseticize($asset_path, $output_path, $output_url, $asset_type, $filters, $debug, $dev_mode = false)
     {
         $asset_name = basename($asset_path);
         $asset_dir = dirname($asset_path);
@@ -112,6 +113,7 @@ class AsseticHelper
         $asset = $factory->createAsset($asset_name);
 
         $asset_target_path = $asset->getTargetPath();
+
         $target_file = sprintf("%s/%s", $output_path, $asset_target_path);
 
         // As it seems that assetic cannot handle a real file cache, let's do the job ourselves.
@@ -124,7 +126,7 @@ class AsseticHelper
         //
         //     before generating 3bc974a-ad3ef47.css, delete 3bc974a-* files.
         //
-        if (! file_exists($target_file)) {
+        if ($dev_mode == true || ! file_exists($target_file)) {
 
             // Delete previous version of the file
             list($commonPart, $dummy) = explode('-', $asset_target_path);
@@ -142,8 +144,6 @@ class AsseticHelper
                     $asset->ensureFilter($fm->get(substr($filter, 1)));
                 }
             }
-
-            //$cache = new AssetCache($asset, new FilesystemCache($output_path));
 
             $writer = new AssetWriter($output_path);
 

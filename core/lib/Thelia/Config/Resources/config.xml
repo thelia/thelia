@@ -129,6 +129,7 @@
 
         <service id="smarty.plugin.assetic" class="Thelia\Core\Template\Smarty\Plugins\Assetic" >
             <tag name="thelia.parser.register_plugin"/>
+            <argument>%kernel.environment%</argument>
         </service>
 
         <service id="smarty.plugin.theliasyntax" class="Thelia\Core\Template\Smarty\Plugins\TheliaSyntax" >
