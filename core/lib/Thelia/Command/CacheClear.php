@@ -24,6 +24,7 @@
 namespace Thelia\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -44,7 +45,14 @@ class CacheClear extends ContainerAwareCommand
     {
         $this
             ->setName("cache:clear")
-            ->setDescription("Invalidate all caches");
+            ->setDescription("Invalidate all caches")
+            ->addOption(
+                "without-assets",
+                null,
+                InputOption::VALUE_NONE,
+                "remove cache assets"
+            )
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -52,20 +60,28 @@ class CacheClear extends ContainerAwareCommand
 
         $cacheDir = $this->getContainer()->getParameter("kernel.cache_dir");
 
-        if (!is_writable($cacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $cacheDir));
+        $this->clearCache($cacheDir, $output);
+        if(!$input->getOption("without-assets")) {
+            $this->clearCache(THELIA_WEB_DIR . "/assets", $output);
         }
 
-        $output->writeln(sprintf("Clearing cache in <info>%s</info> directory", $cacheDir));
+    }
+
+    protected function clearCache($dir, OutputInterface $output)
+    {
+        if (!is_writable($dir)) {
+            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $dir));
+        }
+
+        $output->writeln(sprintf("Clearing cache in <info>%s</info> directory", $dir));
 
         $fs = new Filesystem();
         try {
-            $fs->remove($cacheDir);
+            $fs->remove($dir);
 
-            $output->writeln("<info>cache cleared successfully</info>");
+            $output->writeln(sprintf("<info>%s cache dir cleared successfully</info>", $dir));
         } catch (IOException $e) {
             $output->writeln(sprintf("error during clearing cache : %s", $e->getMessage()));
         }
-
     }
 }
