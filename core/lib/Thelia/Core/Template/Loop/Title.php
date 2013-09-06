@@ -89,7 +89,8 @@ class Title extends BaseI18nLoop
                 ->set("LOCALE",$locale)
                 ->set("DEFAULT", $title->getByDefault())
                 ->set("SHORT", $title->getVirtualColumn('i18n_SHORT'))
-                ->set("LONG", $title->getVirtualColumn('i18n_LONG'));
+                ->set("LONG", $title->getVirtualColumn('i18n_LONG'))
+                ->set("POSITION", $title->getPosition());
 
             $loopResult->addRow($loopResultRow);
         }
