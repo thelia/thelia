@@ -1,11 +1,10 @@
 <?php
-
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -24,22 +23,15 @@
 
 namespace Thelia\Module;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
 
-abstract class BaseModule extends ContainerAware
-{
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 
-    public function __construct()
-    {
+interface BaseModuleInterface {
 
-    }
+    public function setRequest(Request $request);
+    public function getRequest();
 
-    protected function activate()
-    {
-
-    }
-
-    abstract public function install();
-    abstract public function destroy();
-
+    public function setDispatcher(EventDispatcherInterface $dispatcher);
+    public function getDispatcher();
 }
