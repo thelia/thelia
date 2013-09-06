@@ -126,7 +126,7 @@ class AsseticHelper
         //
         //     before generating 3bc974a-ad3ef47.css, delete 3bc974a-* files.
         //
-        if (/*$dev_mode == true || */! file_exists($target_file)) {
+        if ($dev_mode == true || ! file_exists($target_file)) {
 
             // Delete previous version of the file
             list($commonPart, $dummy) = explode('-', $asset_target_path);

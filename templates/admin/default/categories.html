@@ -327,94 +327,87 @@
 
     {* Adding a new Category *}
 
-    <div class="modal fade" id="add_category_dialog" tabindex="-1" role="dialog" aria-hidden="true">
+    {* Capture the dialog body, to pass it to the generic dialog *}
 
-        <div class="modal-dialog">
-            <div class="modal-content">
+    {capture "category_creation_dialog"}
+        {form name="thelia.admin.category.creation"}
 
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h3>{intl l="Create a new categiry"}</h3>
-                </div>
+            {* Assign form enctype *}
+            {$creation_form_enctype={form_enctype form=$form}}
 
-                {form name="thelia.admin.category.creation"}
-                    <form method="POST" action="{url path='/admin/configuration/categories/create'}" {form_enctype form=$form}>
+            {* Assign form error message, if any *}
+            {if $form_error}
+                {$creation_form_error=$form_error_message}
+            {/if}
 
-                        {form_hidden_fields form=$form}
+            {form_hidden_fields form=$form}
 
-                        {form_field form=$form field='success_url'}
-                              {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-                              <input type="hidden" name="{$name}" value="{url path='/admin/configuration/categories/update' category_id='_ID_'}" />
-                        {/form_field}
+			{form_field form=$form field='success_url'}
+			   {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+			   <input type="hidden" name="{$name}" value="{url path='/admin/categories/update' category_id='_ID_'}" />
+			{/form_field}
 
-                        <div class="modal-body">
+			{form_field form=$form field='parent'}
+			   <input type="hidden" name="{$name}" value="{$current_category_id}" />
+			{/form_field}
 
-                            {if $form_error}<div class="alert alert-block alert-error" id="add_category_dialog_error">{$form_error_message}</div>{/if}
+			{form_field form=$form field='title'}
+			     <div class="form-group {if $error}has-error{/if}">
+			         <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
-                            {form_field form=$form field='title'}
-                                <div class="form-group {if $error}has-error{/if}">
-                                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+			         {loop type="lang" name="default-lang" default_only="1"}
 
-                                    {loop type="lang" name="default-lang" default_only="1"}
-                                        <div class="input-group">
-                                            <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Currency name'}" placeholder="{intl l='Name'}">
-                                            <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="{intl l=$TITLE}" /></span>
-                                        </div>
+			             <div class="input-group">
+			                 <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Currency name'}" placeholder="{intl l='Name'}">
+			                 <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="$TITLE" /></span>
+			             </div>
 
-                                        <div class="help-block">{intl l="Enter here the category name in the default language ($TITLE)"}</div>
+			             <div class="help-block">{intl l='Enter here the category name in the default language (%title)' title="$TITLE"}</div>
 
-                                        {* Switch edition to the current locale *}
-                                        <input type="hidden" name="edit_language_id" value="{$ID}" />
+			             {* Switch edition to the current locale *}
+			             <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                                        {form_field form=$form field='locale'}
-                                            <input type="hidden" name="{$name}" value="{$LOCALE}" />
-                                        {/form_field}
-                                    {/loop}
-                                </div>
-                            {/form_field}
-                        </div>
+			             {form_field form=$form field='locale'}
+			                 <input type="hidden" name="{$name}" value="{$LOCALE}" />
+			             {/form_field}
+			         {/loop}
+			     </div>
+			{/form_field}
+        {/form}
+    {/capture}
 
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Create this category"}</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {intl l="Cancel"}</button>
-                        </div>
+	{include
+	    file = "includes/generic-create-dialog.html"
 
-                    </form>
-                {/form}
-            </div>
-        </div>
-    </div>
+	    dialog_id    = "add_category_dialog"
+	    dialog_title = {intl l="Create a new category"}
+	    dialog_body  = {$smarty.capture.category_creation_dialog nofilter}
+
+	    dialog_ok_label     = {intl l="Create this category"}
+	    dialog_cancel_label = {intl l="Cancel"}
+
+	    form_action        = {url path='/admin/categories/create'}
+	    form_enctype       = $creation_form_enctype
+	    form_error_message = {$creation_form_error|default:''}
+	}
 
     {* Delete category confirmation dialog *}
 
-    <div class="modal fade" id="delete_category_dialog" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+    {capture "category_delete_dialog"}
+        <input type="hidden" name="current_category_id" value="{$current_category_id}" />
+        <input type="hidden" name="category_id" id="delete_category_id" value"" />
+    {/capture}
 
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h3>{intl l="Delete a category"}</h3>
-                </div>
+    {include
+        file = "includes/generic-confirm-dialog.html"
 
-                <div class="modal-body">
-                    <p>{intl l="Do you really want to delete this category ?"}</p>
-                </div>
+        dialog_id       = "delete_category_dialog"
+        dialog_title    = {intl l="Delete a category"}
+        dialog_message  = {intl l="Do you really want to delete this category, and <strong>all</strong> its contents ?"}
 
-                <form method="post" action="{url path='/admin/categories/delete'}">
-                    <input type="hidden" name="current_category_id" value="{$current_category_id}" />
-
-                    <input type="hidden" name="category_id" id="delete_category_id" value="" />
-
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Yes"}</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {intl l="No"}</button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
-
+        form_action         = {url path='/admin/categories/delete'}
+        form_content        = {$smarty.capture.category_delete_dialog nofilter}
+    }
 {/block}
 
 {block name="javascript-initialization"}

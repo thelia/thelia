@@ -36,6 +36,7 @@ use Thelia\Form\CategoryDeletionForm;
 use Thelia\Model\Lang;
 use Thelia\Core\Translation\Translator;
 use Thelia\Core\Event\CategoryUpdatePositionEvent;
+use Thelia\Model\CategoryQuery;
 
 class CategoryController extends BaseAdminController
 {
@@ -107,8 +108,6 @@ class CategoryController extends BaseAdminController
 
             $data = $form->getData();
 
-            $createEvent = new CategoryCreateEvent();
-
             $createEvent = new CategoryCreateEvent(
                 $data["title"],
                 $data["parent"],
@@ -122,7 +121,7 @@ class CategoryController extends BaseAdminController
             $createdObject = $createEvent->getCategory();
 
             // Log category creation
-            $this->adminLogAppend(sprintf("Category %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
+            $this->adminLogAppend(sprintf("Category %s (ID %s) created", $createdObject->getTitle(), $createdObject->getId()));
 
             // Substitute _ID_ in the URL with the ID of the created object
             $successUrl = str_replace('_ID_', $createdObject->getId(), $creationForm->getSuccessUrl());
@@ -157,19 +156,17 @@ class CategoryController extends BaseAdminController
 
         // Load the category object
         $category = CategoryQuery::create()
-        ->joinWithI18n($this->getCurrentEditionLocale())
-        ->findOneById($this->getRequest()->get('category_id'));
+            ->joinWithI18n($this->getCurrentEditionLocale())
+            ->findOneById($this->getRequest()->get('category_id'));
 
         if ($category != null) {
 
             // Prepare the data that will hydrate the form
             $data = array(
                     'id'     => $category->getId(),
-                    'name'   => $category->getName(),
+                    'name'   => $category->getTitle(),
                     'locale' => $category->getLocale(),
-                    'code'   => $category->getCode(),
-                    'symbol' => $category->getSymbol(),
-                    'rate'   => $category->getRate()
+                    // tbc !!!
             );
 
             // Setup the object form
@@ -227,7 +224,7 @@ class CategoryController extends BaseAdminController
             // Log category modification
             $changedObject = $changeEvent->getCategory();
 
-            $this->adminLogAppend(sprintf("Category %s (ID %s) modified", $changedObject->getName(), $changedObject->getId()));
+            $this->adminLogAppend(sprintf("Category %s (ID %s) modified", $changedObject->getTitle(), $changedObject->getId()));
 
             // If we have to stay on the same page, do not redirect to the succesUrl,
             // just redirect to the edit page again.
