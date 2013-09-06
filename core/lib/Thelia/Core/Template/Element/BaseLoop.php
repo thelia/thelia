@@ -243,7 +243,7 @@ abstract class BaseLoop
      *
      * this function have to be implement in your own loop class.
      *
-     * All loops parameters can be accesible via getter.
+     * All loops parameters can be accessible via getter.
      *
      * for example, ref parameter is accessible through getRef method
      *
