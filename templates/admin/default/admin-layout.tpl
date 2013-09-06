@@ -165,13 +165,11 @@
                     </ul>
                     
                     {loop name="top-bar-search" type="auth" roles="ADMIN" permissions="admin.search"}
-                    <form class="navbar-form pull-right" action="{url path='/admin/search'}">
-                         <div class="form-group">
-                            <div class="form-group">
-                                <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
-                            </div>
-                            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>                       
-                         </div>
+                    <form class="navbar-form pull-right" action="{url path='/admin/search'}">                         
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
+                        </div>
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>                                                
                     </form>
                     {/loop}
 
