@@ -316,17 +316,22 @@ class CurrencyController extends BaseAdminController
         if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
 
         try {
-            $id = $this->getRequest()->get('currency_id', 0);
             $mode = $this->getRequest()->get('mode', null);
+
+            if ($mode == 'up')
+                $mode = CurrencyUpdatePositionEvent::POSITION_UP;
+            else if ($mode == 'down')
+                $mode = CurrencyUpdatePositionEvent::POSITION_DOWN;
+            else
+                $mode = CurrencyUpdatePositionEvent::POSITION_ABSOLUTE;
+
             $position = $this->getRequest()->get('position', null);
 
-            $event = new CurrencyUpdatePositionEvent();
-
-            $event
-                ->setObjectId($this->getRequest()->get('currency_id', 0))
-                ->setPosition($this->getRequest()->get('position', 0))
-                ->setMode($mode)
-            ;
+            $event = new CurrencyUpdatePositionEvent(
+                    $this->getRequest()->get('currency_id', null),
+                    $mode,
+                    $this->getRequest()->get('position', null)
+            );
 
             $this->dispatch(TheliaEvents::CURRENCY_UPDATE_POSITION, $event);
         }

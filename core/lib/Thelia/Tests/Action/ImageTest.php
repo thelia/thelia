@@ -37,7 +37,7 @@ use Thelia\Tools\URL;
  *
  * @package Thelia\Tests\Action\ImageTest
  */
-class ImageTest extends \PHPUnit_Framework_TestCase
+class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 {
     protected $request;
 
@@ -49,10 +49,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
-        $url = new URL($container, 'dev');
-
         $container->set("event_dispatcher", $dispatcher);
-        $container->set("thelia.url.manager", $dispatcher);
 
         $request = new Request();
         $request->setSession($this->session);

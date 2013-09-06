@@ -34,7 +34,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
+abstract class BaseLoopTestor extends \Thelia\Tests\TestCaseWithURLToolSetup
 {
     protected $request;
     protected $dispatcher;
