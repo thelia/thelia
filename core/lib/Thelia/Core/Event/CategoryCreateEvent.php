@@ -25,12 +25,11 @@ namespace Thelia\Core\Event;
 
 use Thelia\Model\Category;
 
-class CategoryCreateEvent extends ActionEvent
+class CategoryCreateEvent extends CategoryEvent
 {
     protected $title;
     protected $parent;
     protected $locale;
-    protected $created_category;
 
     public function __construct($title, $parent, $locale)
     {
@@ -67,15 +66,5 @@ class CategoryCreateEvent extends ActionEvent
     public function setLocale($locale)
     {
         $this->locale = $locale;
-    }
-
-    public function getCreatedCategory()
-    {
-        return $this->created_category;
-    }
-
-    public function setCreatedCategory(Category $created_category)
-    {
-        $this->created_category = $created_category;
     }
 }

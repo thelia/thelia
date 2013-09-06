@@ -23,6 +23,6 @@
 
 namespace Thelia\Core\Event;
 
-class CurrencyUpdatePositionEvent extends BaseUpdatePositionEvent
+class CategoryUpdatePositionEvent extends BaseUpdatePositionEvent
 {
 }

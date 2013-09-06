@@ -35,13 +35,15 @@ class CategoryEvent extends ActionEvent
         $this->category = $category;
     }
 
-    /**
-     * @return \Thelia\Model\Category
-     */
     public function getCategory()
     {
         return $this->category;
     }
 
+    public function setCategory(Category $category)
+    {
+        $this->category = $category;
 
+        return $this;
+    }
 }

@@ -37,14 +37,70 @@ use Thelia\Model\Lang;
 
 class CategoryController extends BaseAdminController
 {
-    protected function createNewCategory($args)
-    {
-         try {
-            $categoryCreationForm = new CategoryCreationForm($this->getRequest());
+    /**
+     * Render the categories list, ensuring the sort order is set.
+     *
+     * @return Symfony\Component\HttpFoundation\Response the response
+     */
+    protected function renderList() {
 
-            $form = $this->validateForm($categoryCreationForm, "POST");
+        $args = $this->setupArgs();
+
+        return $this->render('categories', $args);
+    }
+
+    protected function setupArgs() {
+
+        // Get the category ID
+        $id = $this->getRequest()->get('category_id', 0);
+
+        // Find the current category order
+        $category_order = $this->getRequest()->get(
+                'order',
+                $this->getSession()->get('admin.category_order', 'manual')
+        );
+
+        $args = array(
+            'current_category_id' => $id,
+            'category_order'      => $category_order,
+        );
+
+        // Store the current sort order in session
+        $this->getSession()->set('admin.category_order', $category_order);
+
+        return $args;
+    }
+
+    /**
+     * The default action is displaying the categories list.
+     *
+     * @return Symfony\Component\HttpFoundation\Response the response
+     */
+    public function defaultAction() {
+
+        if (null !== $response = $this->checkAuth("admin.categories.view")) return $response;
+
+        return $this->renderList();
+    }
+
+    protected function createAction($args)
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.categories.create")) return $response;
+
+        $error_msg = false;
+
+        // Create the Creation Form
+        $creationForm = new CategoryCreationForm($this->getRequest());
+
+        try {
+
+            // Validate the form, create the CategoryCreation event and dispatch it.
+            $form = $this->validateForm($creationForm, "POST");
 
             $data = $form->getData();
+
+            $createEvent = new CategoryCreateEvent();
 
             $categoryCreateEvent = new CategoryCreateEvent(
                 $data["title"],
@@ -52,208 +108,259 @@ class CategoryController extends BaseAdminController
                 $data["locale"]
             );
 
-            $this->dispatch(TheliaEvents::CATEGORY_CREATE, $categoryCreateEvent);
+            $this->dispatch(TheliaEvents::CATEGORY_CREATE, $createEvent);
 
-            $category = $categoryCreateEvent->getCreatedCategory();
+            $createdObject = $createEvent->getCategory();
 
-            $this->adminLogAppend(sprintf("Category %s (ID %s) created", $category->getTitle(), $category->getId()));
+            // Log currency creation
+            $this->adminLogAppend(sprintf("Category %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
 
-            // Substitute _ID_ in the URL with the ID of the created category
-            $successUrl = str_replace('_ID_', $category->getId(), $categoryCreationForm->getSuccessUrl());
+            // Substitute _ID_ in the URL with the ID of the created object
+            $successUrl = str_replace('_ID_', $createdObject->getId(), $creationForm->getSuccessUrl());
 
             // Redirect to the success URL
             $this->redirect($successUrl);
         }
-        catch (FormValidationException $e) {
-            $categoryCreationForm->setErrorMessage($e->getMessage());
-            $this->getParserContext()->addForm($categoryCreationForm);
+        catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = sprintf("Please check your input: %s", $ex->getMessage());
         }
-        catch (Exception $e) {
-           Tlog::getInstance()->error(sprintf("Failed to create category: %s", $e->getMessage()));
-            $this->getParserContext()->setGeneralError($e->getMessage());
+        catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex;
+        }
+
+        if ($error_msg !== false) {
+            // An error has been detected: log it
+            Tlog::getInstance()->error(sprintf("Error during category creation process : %s. Exception was %s", $error_msg, $ex->getMessage()));
+
+            // Mark the form as errored
+            $creationForm->setErrorMessage($error_msg);
+
+            // Pass it to the parser, along with the error currency
+            $this->getParserContext()
+                ->addForm($creationForm)
+                ->setGeneralError($error_msg)
+            ;
         }
 
         // At this point, the form has error, and should be redisplayed.
-        return $this->render('categories', $args);
+        return $this->renderList();
     }
 
-    protected function editCategory($args)
-    {
-        if (null !== $response = $this->checkAuth("admin.category.edit")) return $response;
+    /**
+     * Load a currency object for modification, and display the edit template.
+     *
+     * @return Symfony\Component\HttpFoundation\Response the response
+     */
+    public function changeAction() {
 
-        return $this->render('edit_category', $args);
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
+
+        // Load the currency object
+        $currency = CategoryQuery::create()
+        ->joinWithI18n($this->getCurrentEditionLocale())
+        ->findOneById($this->getRequest()->get('currency_id'));
+
+        if ($currency != null) {
+
+            // Prepare the data that will hydrate the form
+            $data = array(
+                    'id'     => $currency->getId(),
+                    'name'   => $currency->getName(),
+                    'locale' => $currency->getLocale(),
+                    'code'   => $currency->getCode(),
+                    'symbol' => $currency->getSymbol(),
+                    'rate'   => $currency->getRate()
+            );
+
+            // Setup the object form
+            $changeForm = new CategoryModificationForm($this->getRequest(), "form", $data);
+
+            // Pass it to the parser
+            $this->getParserContext()->addForm($changeForm);
+        }
+
+        // Render the edition template.
+        return $this->render('currency-edit', array('currency_id' => $this->getRequest()->get('currency_id')));
     }
 
-    protected function deleteCategory($args)
-    {
+    /**
+     * Save changes on a modified currency object, and either go back to the currency list, or stay on the edition page.
+     *
+     * @return Symfony\Component\HttpFoundation\Response the response
+     */
+    public function saveChangeAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
+
+        $error_msg = false;
+
+        // Create the form from the request
+        $changeForm = new CategoryModificationForm($this->getRequest());
+
+        // Get the currency ID
+        $currency_id = $this->getRequest()->get('currency_id');
+
         try {
-            $categoryDeletionForm = new CategoryDeletionForm($this->getRequest());
 
-            $data = $this->validateForm($categoryDeletionForm, "POST")->getData();
+            // Check the form against constraints violations
+            $form = $this->validateForm($changeForm, "POST");
 
-            $categoryDeleteEvent = new CategoryDeleteEvent($data['category_id']);
+            // Get the form field values
+            $data = $form->getData();
 
-            $this->dispatch(TheliaEvents::CATEGORY_DELETE, $categoryDeleteEvent);
+            $changeEvent = new CategoryUpdateEvent($data['id']);
 
-            $category = $categoryDeleteEvent->getDeletedCategory();
+            // Create and dispatch the change event
+            $changeEvent
+            ->setCategoryName($data['name'])
+            ->setLocale($data["locale"])
+            ->setSymbol($data['symbol'])
+            ->setCode($data['code'])
+            ->setRate($data['rate'])
+            ;
 
-            $this->adminLogAppend(sprintf("Category %s (ID %s) deleted", $category->getTitle(), $category->getId()));
+            $this->dispatch(TheliaEvents::CATEGORY_UPDATE, $changeEvent);
 
-            // Substitute _ID_ in the URL with the ID of the created category
-            $successUrl = str_replace('_ID_', $categoryDeleteEvent->getDeletedCategory()->getParent(), $categoryDeletionForm->getSuccessUrl());
+            // Log currency modification
+            $changedObject = $changeEvent->getCategory();
+
+            $this->adminLogAppend(sprintf("Category %s (ID %s) modified", $changedObject->getName(), $changedObject->getId()));
+
+            // If we have to stay on the same page, do not redirect to the succesUrl,
+            // just redirect to the edit page again.
+            if ($this->getRequest()->get('save_mode') == 'stay') {
+                $this->redirectToRoute(
+                        "admin.categories.update",
+                        array('currency_id' => $currency_id)
+                );
+            }
 
             // Redirect to the success URL
-            $this->redirect($successUrl);
+            $this->redirect($changeForm->getSuccessUrl());
         }
-        catch (FormValidationException $e) {
-            $categoryDeletionForm->setErrorMessage($e->getMessage());
-            $this->getParserContext()->addForm($categoryDeletionForm);
+        catch (FormValidationException $ex) {
+            // Invalid data entered
+            $error_msg = sprintf("Please check your input: %s", $ex->getMessage());
         }
-       catch (Exception $e) {
-            Tlog::getInstance()->error(sprintf("Failed to delete category: %s", $e->getMessage()));
-            $this->getParserContext()->setGeneralError($e->getMessage());
+        catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex;
         }
 
-        // At this point, something was wrong, category was not deleted. Display parent category list
-        return $this->render('categories', $args);
+        if ($error_msg !== false) {
+            // Log error currency
+            Tlog::getInstance()->error(sprintf("Error during currency modification process : %s. Exception was %s", $error_msg, $ex->getMessage()));
+
+            // Mark the form as errored
+            $changeForm->setErrorMessage($error_msg);
+
+            // Pas the form and the error to the parser
+            $this->getParserContext()
+            ->addForm($changeForm)
+            ->setGeneralError($error_msg)
+            ;
+        }
+
+        // At this point, the form has errors, and should be redisplayed.
+        return $this->render('currency-edit', array('currency_id' => $currency_id));
     }
 
-    protected function browseCategory($args)
-    {
-        if (null !== $response = $this->checkAuth("admin.catalog.view")) return $response;
+    /**
+     * Sets the default currency
+     */
+    public function setDefaultAction() {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
 
-        return $this->render('categories', $args);
-    }
+        $changeEvent = new CategoryUpdateEvent($this->getRequest()->get('currency_id', 0));
 
-    protected function visibilityToggle($args)
-    {
-        $event = new CategoryToggleVisibilityEvent($this->getRequest()->get('category_id', 0));
-
-        $this->dispatch(TheliaEvents::CATEGORY_TOGGLE_VISIBILITY, $event);
-
-        return $this->nullResponse();
-    }
-
-    protected function changePosition($args)
-    {
-        $request = $this->getRequest();
-
-        $event = new CategoryChangePositionEvent(
-                $request->get('category_id', 0),
-                CategoryChangePositionEvent::POSITION_ABSOLUTE,
-                $request->get('position', null)
-        );
-
-        $this->dispatch(TheliaEvents::CATEGORY_CHANGE_POSITION, $event);
-
-        return $this->render('categories', $args);
-    }
-
-    protected function positionDown($args)
-    {
-        $event = new CategoryChangePositionEvent(
-            $this->getRequest()->get('category_id', 0),
-            CategoryChangePositionEvent::POSITION_DOWN
-        );
-
-        $this->dispatch(TheliaEvents::CATEGORY_CHANGE_POSITION, $event);
-
-        return $this->render('categories', $args);
-    }
-
-    protected function positionUp($args)
-    {
-        $event = new CategoryChangePositionEvent(
-                $this->getRequest()->get('category_id', 0),
-                CategoryChangePositionEvent::POSITION_UP
-        );
-
-        $this->dispatch(TheliaEvents::CATEGORY_CHANGE_POSITION, $event);
-
-        return $this->render('categories', $args);
-    }
-
-    public function indexAction()
-    {
-        return $this->processAction();
-    }
-
-    public function processAction()
-    {
-        // Get the current action
-        $action = $this->getRequest()->get('action', 'browse');
-
-        // Get the category ID
-        $id = $this->getRequest()->get('id', 0);
-
-        // Find the current order
-        $category_order = $this->getRequest()->get(
-                'order',
-                $this->getSession()->get('admin.category_order', 'manual')
-        );
-
-        // Find the current edit language ID
-        $edition_language = $this->getRequest()->get(
-                'edition_language',
-                $this->getSession()->get('admin.edition_language', Lang::getDefaultLanguage()->getId())
-        );
-
-        $args = array(
-            'action' 			  => $action,
-            'current_category_id' => $id,
-            'category_order'      => $category_order,
-            'edition_language'    => $edition_language,
-        );
-
-        // Store the current sort order in session
-        $this->getSession()->set('admin.category_order', $category_order);
-
-        // Store the current edition language in session
-        $this->getSession()->set('admin.edition_language', $edition_language);
+        // Create and dispatch the change event
+        $changeEvent->setIsDefault(true);
 
         try {
-            switch ($action) {
-                case 'browse' : // Browse categories
-
-                    return $this->browseCategory($args);
-
-                case 'create' : // Create a new category
-
-                    return $this->createNewCategory($args);
-
-                case 'edit' : // Edit an existing category
-
-                    return $this->editCategory($args);
-
-                case 'delete' : // Delete an existing category
-
-                    return $this->deleteCategory($args);
-
-                case 'visibilityToggle' : // Toggle visibility
-
-                    return $this->visibilityToggle($id);
-
-                case 'changePosition' : // Change position
-
-                    return $this->changePosition($args);
-
-                case 'positionUp' : // Move up category
-
-                    return $this->positionUp($args);
-
-                case 'positionDown' : // Move down category
-
-                    return $this->positionDown($args);
-            }
+            $this->dispatch(TheliaEvents::CATEGORY_SET_DEFAULT, $changeEvent);
         }
-        catch (AuthorizationException $ex) {
-            return $this->errorPage($ex->getMessage());
-        }
-        catch (AuthenticationException $ex) {
-            return $this->errorPage($ex->getMessage());
+        catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
         }
 
-        // We did not recognized the action -> return a 404 page
-        return $this->pageNotFound();
+        $this->redirectToRoute('admin.categories.default');
+    }
+
+    /**
+     * Update categories rates
+     */
+    public function updateRatesAction() {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
+
+        try {
+            $this->dispatch(TheliaEvents::CATEGORY_UPDATE_RATES);
+        }
+        catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        $this->redirectToRoute('admin.categories.default');
+    }
+
+    /**
+     * Update currencyposition
+     */
+    public function updatePositionAction() {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
+
+        try {
+            $mode = $this->getRequest()->get('mode', null);
+
+            if ($mode == 'up')
+                $mode = CategoryUpdatePositionEvent::POSITION_UP;
+            else if ($mode == 'down')
+                $mode = CategoryUpdatePositionEvent::POSITION_DOWN;
+            else
+                $mode = CategoryUpdatePositionEvent::POSITION_ABSOLUTE;
+
+            $position = $this->getRequest()->get('position', null);
+
+            $event = new CategoryUpdatePositionEvent(
+                    $this->getRequest()->get('currency_id', null),
+                    $mode,
+                    $this->getRequest()->get('position', null)
+            );
+
+            $this->dispatch(TheliaEvents::CATEGORY_UPDATE_POSITION, $event);
+        }
+        catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        $this->redirectToRoute('admin.categories.default');
+    }
+
+
+    /**
+     * Delete a currency object
+     *
+     * @return Symfony\Component\HttpFoundation\Response the response
+     */
+    public function deleteAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.categories.delete")) return $response;
+
+        // Get the currency id, and dispatch the delet request
+        $event = new CategoryDeleteEvent($this->getRequest()->get('currency_id'));
+
+        $this->dispatch(TheliaEvents::CATEGORY_DELETE, $event);
+
+        $this->redirectToRoute('admin.categories.default');
     }
 }

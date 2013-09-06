@@ -122,7 +122,7 @@
 
                                             <td>
                                                 {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.currencies.change"}
-                                                    <a title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id="$ID"}">{$NAME}</a>
+                                                    <a title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id=$ID}">{$NAME}</a>
                                                 {/loop}
                                                 {elseloop rel="can_change"}
                                                     {$NAME}

@@ -111,7 +111,7 @@ class CurrencyController extends BaseAdminController
             $createdObject = $createEvent->getCurrency();
 
             // Log currency creation
-            $this->adminLogAppend(sprintf("Variable %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
+            $this->adminLogAppend(sprintf("Currency %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
 
             // Substitute _ID_ in the URL with the ID of the created object
             $successUrl = str_replace('_ID_', $createdObject->getId(), $creationForm->getSuccessUrl());
@@ -226,7 +226,7 @@ class CurrencyController extends BaseAdminController
             // Log currency modification
             $changedObject = $changeEvent->getCurrency();
 
-            $this->adminLogAppend(sprintf("Variable %s (ID %s) modified", $changedObject->getName(), $changedObject->getId()));
+            $this->adminLogAppend(sprintf("Currency %s (ID %s) modified", $changedObject->getName(), $changedObject->getId()));
 
             // If we have to stay on the same page, do not redirect to the succesUrl,
             // just redirect to the edit page again.

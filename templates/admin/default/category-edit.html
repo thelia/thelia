@@ -7,9 +7,8 @@
 {block name="main-content"}
 <div class="catalog edit-category">
 	<div id="wrapper" class="container">
-		<ul class="breadcrumb">
-			{include file="includes/category_breadcrumb.html"}
-		</ul>
+
+        {include file="includes/categories-breadcrumb.html"}
 
         <div class="row">
             {loop name="category_edit" type="category" visible="*" id="{$current_category_id}" backend_context="1" lang="$edit_language_id"}

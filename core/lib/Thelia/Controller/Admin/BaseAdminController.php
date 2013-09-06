@@ -34,6 +34,8 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\AdminLog;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Form\BaseForm;
+use Thelia\Form\Exception\FormValidationException;
 
 class BaseAdminController extends BaseController
 {
@@ -124,6 +126,55 @@ class BaseAdminController extends BaseController
          $response = new Response();
 
          return $response->setContent($this->errorPage("Sorry, you're not allowed to perform this action"));
+    }
+
+    /*
+     * Create the standard message displayed to the user when the form cannot be validated.
+     */
+    protected function createStandardFormValidationErrorMessage(FormValidationException $exception) {
+        return Translator::getInstance()->trans(
+            "Please check your input: %error",
+            array(
+                '%error' => $exception->getMessage()
+            )
+        );
+     }
+
+    /**
+     * Setup the error context when an error occurs in a action method.
+     *
+     * @param string $action the action that caused the error (category modification, variable creation, currency update, etc.)
+     * @param BaseForm $form the form where the error occured, or null if no form was involved
+     * @param string $error_message the error message
+     * @param Exception $exception the exception or null if no exception
+     */
+    protected function setupFormErrorContext($action,  $error_message, BaseForm $form = null, \Exception $exception = null) {
+
+        if ($error_message !== false) {
+
+            // Log the error message
+            Tlog::getInstance()->error(
+                Translator::getInstance()->trans(
+                    "Error during %action process : %error. Exception was %exc",
+                    array(
+                        '%action' => $action,
+                        '%error'  => $error_message,
+                        '%exc'    => $exception != null ? $exception->getMessage() : 'no exception'
+                    )
+                )
+            );
+
+            if ($fom != null) {
+                // Mark the form as errored
+                $form->setErrorMessage($error_message);
+
+                // Pass it to the parser context
+                $this->getParserContext()->addForm($form);
+            }
+
+            // Pass the error message to the parser.
+            $this->getParserContext()->setGeneralError($error_message);
+        }
     }
 
     /**

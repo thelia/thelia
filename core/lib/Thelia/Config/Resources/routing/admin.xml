@@ -25,14 +25,36 @@
     </route>
 
 
-	<!-- Route to the catalog controller (process category browsing) -->
+	<!-- Route to the catalog controller -->
 
     <route id="admin.catalog" path="/admin/catalog">
-        <default key="_controller">Thelia\Controller\Admin\CategoryController::indexAction</default>
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::defaultAction</default>
     </route>
 
-    <route id="admin.category" path="/admin/catalog/category">
-        <default key="_controller">Thelia\Controller\Admin\CategoryController::processAction</default>
+    <!-- Categories management -->
+
+    <route id="admin.configuration.categories.create" path="/admin/categories/create">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.categories.update" path="/admin/categories/update">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::changeAction</default>
+    </route>
+
+    <route id="admin.configuration.categories.save" path="/admin/categories/save">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::saveChangeAction</default>
+    </route>
+
+    <route id="admin.configuration.categories.set-default" path="/admin/categories/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::toggleOnlineAction</default>
+    </route>
+
+    <route id="admin.configuration.categories.delete" path="/admin/categories/delete">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.categories.update-position" path="/admin/categories/update-position">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::updatePositionAction</default>
     </route>
 
     <!-- Routes to the Config (system variables) controller -->
