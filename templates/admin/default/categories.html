@@ -74,7 +74,7 @@
                                     }
 		                            </th>
 
-		                            <th>&nbsp;</th>
+		                            <th>{intl l='Actions'}</th>
 		                        </tr>
 		                    </thead>
 
@@ -83,7 +83,7 @@
 		                    <tr>
 		                        <td>
 		                        i={$ID} {loop type="image" name="cat_image" source="category" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-		                          <a href="{url path='admin/catalog/category' id="$ID" action='browse'}" title="{intl l='Browse this category'}"><img src="#IMAGE_URL" alt="#TITLE" /></a>
+		                          <a href="{url path='admin/catalog/category' id="$ID" action='browse'}" title="{intl l='Browse this category'}"><img class="img-thumbnail" src="#IMAGE_URL" alt="#TITLE" /></a>
 		                        {/loop}
 		                        </td>
 
@@ -97,11 +97,15 @@
 
 		                    	<td>
 		                    	    {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
-		                    		<input type="checkbox" data-id="{$ID}" class="categoryVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+										<div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+		                    				<input type="checkbox" data-id="{$ID}" class="categoryVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    			</div>
 		                    		{/loop}
 
 		                    		{elseloop rel="can_change"}
-                                       <input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    			<div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                       		<input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+                                       	</div>
                                     {/elseloop}
 		                    	</td>
 
@@ -117,15 +121,17 @@
 		                    	</td>
 
 		                        <td>
-	                                <a class="btn btn-default btn-xs" title="{intl l='Browse this category'}" href="{url path='admin/catalog/category' id="$ID" action='browse'}"><i class="glyphicon glyphicon-folder-open"></i></a>
+		                        	<div class="btn-group">
+		                                <a class="btn btn-default btn-xs" title="{intl l='Browse this category'}" href="{url path='admin/catalog/category' id="$ID" action='browse'}"><i class="glyphicon glyphicon-folder-open"></i></a>
 
-	                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
-	                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this category'}" href="{url path='admin/catalog/category' id="$ID" action='edit'}"><i class="glyphicon glyphicon-edit"></i></a>
-	                                {/loop}
+		                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.category.edit"}
+		                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this category'}" href="{url path='admin/catalog/category' id="$ID" action='edit'}"><i class="glyphicon glyphicon-edit"></i></a>
+		                                {/loop}
 
-	                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.category.delete"}
-	                                   <a class="btn btn-default btn-xs category-delete" title="{intl l='Delete this category and all its contents'}"  href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
-	                                {/loop}
+		                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.category.delete"}
+		                                   <a class="btn btn-default btn-xs category-delete" title="{intl l='Delete this category and all its contents'}"  href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+		                                {/loop}
+		                            </div>
 		                         </td>
 		                    </tr>
 		                    {/loop}
@@ -229,7 +235,9 @@
 	 							{module_include location='product_list_row'}
 
 		                    	<td>
-		                    		<input type="checkbox" data-id="{$ID}" class="displayToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    		<div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+		                    			<input type="checkbox" data-id="{$ID}" class="displayToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    		</div>
 		                    	</td>
 
 		                    	<td>
@@ -255,7 +263,7 @@
 						{elseloop rel="product_list"}
 						<thead>
 							<tr>
-								<td class="message"><div class="alert alert-info">{intl l="This category doesn't have any products. To add a new product, click the + button above."}</div></td>
+								<td class="message"><div class="alert alert-info">{intl l="This category doesn't have any products. To add a new product, <strong>click the + button</strong> above."}</div></td>
 							</tr>
 						</thead>
 						{/elseloop}
@@ -273,72 +281,77 @@
 {/block}
 
 {block name="javascript-initialization"}
+
+	{javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+	    <script src="{$asset_url}"></script>
+	{/javascripts}
+
 	{javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
 	    <script src="{$asset_url}"></script>
 	{/javascripts}
 
-<script>
-$(function() {
+	<script>
+		$(function() {
 
-	{* display the form creation dialog if it contains errors *}
+			{* display the form creation dialog if it contains errors *}
 
-    {form name="thelia.admin.category.creation"}
-        {if #form_error}
-			$('#add_category_dialog').modal();
-        {/if}
-	{/form}
+		    {form name="thelia.admin.category.creation"}
+		        {if #form_error}
+					$('#add_category_dialog').modal();
+		        {/if}
+			{/form}
 
-	{* Always reset create dialog on close *}
+			{* Always reset create dialog on close *}
 
-    $('#add_category_dialog').on('hidden',function() {
-        // Hide error message
-        $('#add_category_dialog_error').remove();
+		    $('#add_category_dialog').on('hidden',function() {
+		        // Hide error message
+		        $('#add_category_dialog_error').remove();
 
-        // Clear error status
-        $("#add_category_dialog .error").removeClass('error');
+		        // Clear error status
+		        $("#add_category_dialog .error").removeClass('error');
 
-        // Empty field values
-        $("#add_category_dialog input[type=text]").val('');
-    });
+		        // Empty field values
+		        $("#add_category_dialog input[type=text]").val('');
+		    });
 
-    {* Set the proper category ID in the delete confirmation dialog *}
+		    {* Set the proper category ID in the delete confirmation dialog *}
 
-    $(document).on("click", ".category-delete", function () {
-    	$('#'+'delete-category-id').val($(this).data('id'));
-    });
+		    $(document).on("click", ".category-delete", function () {
+		    	$('#'+'delete-category-id').val($(this).data('id'));
+		    });
 
-    // Toggle category visibility
-    $(".categoryVisibleToggle").click(function() {
-        $.ajax({
-           url : "{url path='admin/catalog/category'}",
-           data : {
-               category_id : $(this).data('id'),
-               action : 'visibilityToggle'
-           }
-        });
-    });
+		    // Toggle category visibility
+		    $(".categoryVisibleToggle").change(function() {
+		        $.ajax({
+		           url : "{url path='admin/catalog/category'}",
+		           data : {
+		               category_id : $(this).data('id'),
+		               action : 'visibilityToggle'
+		           }
+		        });
+		    });
 
-    {* Inline editing of object position using bootstrap-editable *}
+		    {* Inline editing of object position using bootstrap-editable *}
 
-    $('.categoryPositionChange').editable({
-        type        : 'text',
-        title       : '{intl l="Enter new category position"}',
-        mode        : 'popup',
-        inputclass  : 'input-mini',
-        placement   : 'left',
-        success     : function(response, newValue) {
-        	// The URL template
-        	var url = "{url path='admin/catalog/category' action='changePosition' category_id='__ID__' position='__POS__'}";
+		    $('.categoryPositionChange').editable({
+		        type        : 'text',
+		        title       : '{intl l="Enter new category position"}',
+		        mode        : 'popup',
+		        inputclass  : 'input-mini',
+		        placement   : 'left',
+		        success     : function(response, newValue) {
+		        	// The URL template
+		        	var url = "{url path='admin/catalog/category' action='changePosition' category_id='__ID__' position='__POS__'}";
 
-        	// Perform subtitutions
-            url = url.replace('__ID__', $(this).data('id'))
-                     .replace('__POS__', newValue);
+		        	// Perform subtitutions
+		            url = url.replace('__ID__', $(this).data('id'))
+		                     .replace('__POS__', newValue);
 
-        	// Reload the page
-        	location.href = url;
-        }
-    });
+		        	// Reload the page
+		        	location.href = url;
+		        }
+		    });
 
-})
-</script>
+		});
+	</script>
 {/block}

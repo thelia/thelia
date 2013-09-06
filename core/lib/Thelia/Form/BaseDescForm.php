@@ -43,12 +43,31 @@ abstract class BaseDescForm extends BaseForm
             ->add("title", "text", array(
                     "constraints" => array(
                         new NotBlank()
+                    ),
+                    "label" => "Title",
+                    "label_attr" => array(
+                        "for" => "title"
                     )
                 )
             )
-            ->add("chapo", "text", array())
-            ->add("description", "text", array())
-            ->add("postscriptum", "text", array())
+            ->add("chapo", "text", array(    
+                "label" => "Summary",
+                "label_attr" => array(
+                    "for" => "summary"
+                )
+            ))
+            ->add("description", "text", array(
+                "label" => "Detailed description",
+                "label_attr" => array(
+                    "for" => "detailed_description"
+                )
+            ))
+            ->add("postscriptum", "text", array(
+                "label" => "Conclusion",
+                "label_attr" => array(
+                    "for" => "conclusion"
+                )
+            ))
         ;
      }
 }

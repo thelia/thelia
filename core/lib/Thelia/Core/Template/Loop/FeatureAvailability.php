@@ -129,7 +129,8 @@ class FeatureAvailability extends BaseI18nLoop
                 ->set("TITLE",$featureAv->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $featureAv->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $featureAv->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $featureAv->getVirtualColumn('i18n_POSTSCRIPTUM'));
+                ->set("POSTSCRIPTUM", $featureAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("POSITION", $featureAv->getPosition());
 
             $loopResult->addRow($loopResultRow);
         }

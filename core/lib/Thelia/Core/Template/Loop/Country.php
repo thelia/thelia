@@ -113,10 +113,10 @@ class Country extends BaseI18nLoop
                 ->set("TITLE",$country->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $country->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $country->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $country->getVirtualColumn('i18n_POSTSCRIPTUM'));
-            $loopResultRow->set("ISOCODE", $country->getIsocode());
-            $loopResultRow->set("ISOALPHA2", $country->getIsoalpha2());
-            $loopResultRow->set("ISOALPHA3", $country->getIsoalpha3());
+                ->set("POSTSCRIPTUM", $country->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("ISOCODE", $country->getIsocode())
+                ->set("ISOALPHA2", $country->getIsoalpha2())
+                ->set("ISOALPHA3", $country->getIsoalpha3());
 
             $loopResult->addRow($loopResultRow);
         }

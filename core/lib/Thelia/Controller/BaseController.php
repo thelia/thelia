@@ -226,7 +226,7 @@ class BaseController extends ContainerAware
         $route = $this->container->get($routerName)->getRouteCollection()->get($routeId);
 
         if ($route == null) {
-            throw new InvalidArgumentException(sprintf("Route ID '%s' does not exists.", $routeId));
+            throw new \InvalidArgumentException(sprintf("Route ID '%s' does not exists.", $routeId));
         }
 
         return $route->getPath();

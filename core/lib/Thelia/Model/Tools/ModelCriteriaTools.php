@@ -113,7 +113,7 @@ class ModelCriteriaTools
             $localeSearch = LangQuery::create()->findOneById($requestedLangId);
 
             if ($localeSearch === null) {
-                throw new \InvalidArgumentException(sprintf('Incorrect lang argument given in attribute loop: lang ID %d not found', $requestedLangId));
+                throw new \InvalidArgumentException(sprintf('Incorrect lang argument given : lang ID %d not found', $requestedLangId));
             }
 
             $locale = $localeSearch->getLocale();

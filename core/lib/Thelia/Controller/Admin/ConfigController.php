@@ -241,7 +241,7 @@ class ConfigController extends BaseAdminController
             if ($this->getRequest()->get('save_mode') == 'stay') {
 
                 $this->redirectToRoute(
-                        "admin.configuration.variables.change",
+                        "admin.configuration.variables.update",
                         array('variable_id' => $variable_id)
                 );
             }

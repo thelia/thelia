@@ -154,7 +154,8 @@ class Feature extends BaseI18nLoop
                 ->set("TITLE",$feature->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $feature->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $feature->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $feature->getVirtualColumn('i18n_POSTSCRIPTUM'));
+                ->set("POSTSCRIPTUM", $feature->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("POSITION", $feature->getPosition());
 
             $loopResult->addRow($loopResultRow);
         }

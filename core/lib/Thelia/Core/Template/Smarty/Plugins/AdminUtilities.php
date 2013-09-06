@@ -121,7 +121,7 @@ class AdminUtilities extends AbstractSmartyPlugin
         }
 
         if (! empty($icon))
-            $output = sprintf('<i class="icon icon-chevron-%s"></i> ', $icon);
+            $output = sprintf('<i class="glyphicon glyphicon-chevron-%s"></i> ', $icon);
         else
             $output = '';
 

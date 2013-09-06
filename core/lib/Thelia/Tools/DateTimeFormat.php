@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -20,51 +20,47 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Model\LangQuery;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\Validator\Constraints\GreaterThan;
+namespace Thelia\Tools;
 
-class ConfigModificationForm extends BaseDescForm
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+class DateTimeFormat
 {
-    protected function buildForm()
-    {
-        parent::buildForm(true);
+    protected $request;
 
-        $this->formBuilder
-            ->add("id", "hidden", array(
-                    "constraints" => array(
-                        new GreaterThan(
-                            array('value' => 0)
-                        )
-                    )
-            ))
-            ->add("name", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Name",
-                "label_attr" => array(
-                    "for" => "name"
-                )
-            ))
-            ->add("value", "text", array(
-                "label" => "Value",
-                "label_attr" => array(
-                    "for" => "value"
-                )
-            ))
-            ->add("hidden", "hidden", array())
-            ->add("secured", "hidden", array(
-                "label" => "Prevent variable modification or deletion, except for super-admin"
-            ))
-         ;
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
     }
 
-    public function getName()
+    public static function getInstance(Request $request)
     {
-        return "thelia_config_modification";
+        return new DateTimeFormat($request);
+    }
+
+    public function getFormat($output = null)
+    {
+        $lang = $this->request->getSession()->getLang();
+
+        $format = null;
+
+        if($lang) {
+            switch ($output) {
+                case "date" :
+                    $format = $lang->getDateFormat();
+                    break;
+                case "time" :
+                    $format = $lang->getTimeFormat();
+                    break;
+                default:
+                case "datetime" :
+                    $format = $lang->getDateTimeFormat();
+                    break;
+            }
+        }
+
+        return $format;
     }
 }
