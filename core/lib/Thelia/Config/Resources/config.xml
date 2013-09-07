@@ -129,6 +129,7 @@
 
         <service id="smarty.plugin.assetic" class="Thelia\Core\Template\Smarty\Plugins\Assetic" >
             <tag name="thelia.parser.register_plugin"/>
+            <argument>%kernel.environment%</argument>
         </service>
 
         <service id="smarty.plugin.theliasyntax" class="Thelia\Core\Template\Smarty\Plugins\TheliaSyntax" >
@@ -184,6 +185,7 @@
 
         <service id="smarty.plugin.dataAccess" class="Thelia\Core\Template\Smarty\Plugins\DataAccessFunctions" scope="request">
             <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="request" />
             <argument type="service" id="thelia.securityContext" />
             <argument type="service" id="thelia.parser.context"/>
         </service>

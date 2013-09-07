@@ -162,7 +162,8 @@ class Attribute extends BaseI18nLoop
                 ->set("TITLE",$attribute->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $attribute->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $attribute->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $attribute->getVirtualColumn('i18n_POSTSCRIPTUM'));
+                ->set("POSTSCRIPTUM", $attribute->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("POSITION", $attribute->getPosition());
 
             $loopResult->addRow($loopResultRow);
         }

@@ -20,62 +20,47 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Controller\Front;
 
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Exception\UrlRewritingException;
-use Thelia\Model\ConfigQuery;
-use Thelia\Tools\URL;
+namespace Thelia\Tools;
 
-class UrlRewritingController extends BaseFrontController
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+class DateTimeFormat
 {
-    public function check(Request $request, $rewritten_url)
+    protected $request;
+
+    public function __construct(Request $request)
     {
-        if(ConfigQuery::isRewritingEnable()) {
-            try {
-                $rewrittenUrlData = URL::getInstance()->resolve($rewritten_url);
-            } catch(UrlRewritingException $e) {
-                switch($e->getCode()) {
-                    case UrlRewritingException::URL_NOT_FOUND :
-                        return $this->pageNotFound();
-                        break;
-                    default:
-                        throw $e;
-                }
-            }
-
-            /* is the URL redirected ? */
-
-            if(null !== $rewrittenUrlData->redirectedToUrl) {
-                $this->redirect($rewrittenUrlData->redirectedToUrl, 301);
-            }
-
-            /* define GET arguments in request */
-
-            if(null !== $rewrittenUrlData->view) {
-                $request->query->set('view', $rewrittenUrlData->view);
-                if(null !== $rewrittenUrlData->viewId) {
-                    $request->query->set($rewrittenUrlData->view . '_id', $rewrittenUrlData->viewId);
-                }
-            }
-            if(null !== $rewrittenUrlData->locale) {
-                $request->query->set('locale', $rewrittenUrlData->locale);
-            }
-
-            foreach($rewrittenUrlData->otherParameters as $parameter => $value) {
-                $request->query->set($parameter, $value);
-            }
-        }
-
-        if (! $view = $request->query->get('view')) {
-            $view = "index";
-            if ($request->request->has('view')) {
-                $view = $request->request->get('view');
-            }
-        }
-
-        $request->attributes->set('_view', $view);
-
+        $this->request = $request;
     }
 
+    public static function getInstance(Request $request)
+    {
+        return new DateTimeFormat($request);
+    }
+
+    public function getFormat($output = null)
+    {
+        $lang = $this->request->getSession()->getLang();
+
+        $format = null;
+
+        if($lang) {
+            switch ($output) {
+                case "date" :
+                    $format = $lang->getDateFormat();
+                    break;
+                case "time" :
+                    $format = $lang->getTimeFormat();
+                    break;
+                default:
+                case "datetime" :
+                    $format = $lang->getDateTimeFormat();
+                    break;
+            }
+        }
+
+        return $format;
+    }
 }

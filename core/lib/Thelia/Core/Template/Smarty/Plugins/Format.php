@@ -27,6 +27,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\Exception\SmartyPluginException;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+use Thelia\Tools\DateTimeFormat;
 
 /**
  *
@@ -79,29 +80,10 @@ class Format extends AbstractSmartyPlugin
             return "";
         }
 
-        $format = null;
-        $output = array_key_exists("output", $params) ? $params["output"] : null;
-
         if (array_key_exists("format", $params)) {
             $format = $params["format"];
         } else {
-            $session = $this->request->getSession();
-            $lang = $session->getLang();
-
-            if($lang) {
-                switch ($output) {
-                    case "date" :
-                        $format = $lang->getDateFormat();
-                        break;
-                    case "time" :
-                        $format = $lang->getTimeFormat();
-                        break;
-                    default:
-                    case "datetime" :
-                        $format = $lang->getDateTimeFormat();
-                        break;
-                }
-            }
+            $format = DateTimeFormat::getInstance($this->request)->getFormat(array_key_exists("output", $params) ? $params["output"] : null);
         }
 
         return $date->format($format);

@@ -23,7 +23,7 @@
 
 namespace Thelia\Tests\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Controller\Front\DefaultController;
 
 /**

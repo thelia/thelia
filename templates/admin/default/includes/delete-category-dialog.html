@@ -1,42 +1,48 @@
 
 {* Adding a new Category *}
 
-<div class="modal hide fade" id="delete_category_dialog" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="delete_category_dialog" tabindex="-1" role="dialog" aria-hidden="true">
+    
+    <div class="modal-dialog">
+        <div class="modal-content">
 
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>{intl l="Delete a category"}</h3>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>{intl l="Delete a category"}</h3>
+            </div>
+
+            {form name="thelia.admin.category.deletion"}
+            <form method="POST" action="{url path='/admin/catalog/category'}" {form_enctype form=$form}>
+
+                {* the action processed by the controller *}
+                <input type="hidden" name="action" value="delete" />
+
+                {form_hidden_fields form=$form}
+
+                {form_field form=$form field='category_id'}
+                <input type="hidden" name="{$name}" id="delete-category-id" value="" />
+                {/form_field}
+
+                {form_field form=$form field='success_url'}
+                {* on success, redirect to catalog. _ID_ is replaced with the ID of the deleted category parent id (see Thelia\Action\Category.php)  *}
+                <input type="hidden" name="{$name}" value="{url path='admin/catalog/category' id="_ID_" action='browse'}" />
+                {/form_field}
+
+                <div class="modal-body">
+
+                    {if #form_error}<div class="alert alert-block alert-error" id="add_category_dialog_error">#form_error_message</div>{/if}
+
+                    <p>{intl l="Delete this category and all its contents ?"}</p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {intl l="No"}</button>
+                    <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Yes"}</button>
+                </div>
+
+            </form>
+            {/form}
+
+        </div>
     </div>
-
-    {form name="thelia.admin.category.deletion"}
-    <form method="POST" action="{url path='/admin/catalog/category'}" {form_enctype form=$form}>
-
-        {* the action processed by the controller *}
-        <input type="hidden" name="action" value="delete" />
-
-        {form_hidden_fields form=$form}
-
-        {form_field form=$form field='category_id'}
-        <input type="hidden" name="{$name}" id="delete-category-id" value="" />
-        {/form_field}
-
-        {form_field form=$form field='success_url'}
-        {* on success, redirect to catalog. _ID_ is replaced with the ID of the deleted category parent id (see Thelia\Action\Category.php)  *}
-        <input type="hidden" name="{$name}" value="{url path='admin/catalog/category' id="_ID_" action='browse'}" />
-        {/form_field}
-
-        <div class="modal-body">
-
-            {if #form_error}<div class="alert alert-block alert-error" id="add_category_dialog_error">#form_error_message</div>{/if}
-
-            <p>{intl l="Delete this category and all its contents ?"}</p>
-        </div>
-
-        <div class="modal-footer">
-            <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">{intl l="No"}</button>
-            <button type="submit" class="btn btn-primary">{intl l="Yes"}</button>
-        </div>
-
-    </form>
-    {/form}
 </div>

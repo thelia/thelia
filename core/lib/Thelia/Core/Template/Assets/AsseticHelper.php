@@ -43,15 +43,16 @@ class AsseticHelper
      * Generates assets from $asset_path in $output_path, using $filters.
      *
      * @param  string                    $asset_path  the full path to the asset file (or file collection)
-     * @param  unknown                   $output_path the full disk path to the output directory (shoud be visible to web server)
-     * @param  unknown                   $output_url  the URL to the generated asset directory
-     * @param  unknown                   $asset_type  the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
-     * @param  unknown                   $filters     a list of filters, as defined below (see switch($filter_name) ...)
-     * @param  unknown                   $debug       true / false
+     * @param  string                    $output_path the full disk path to the output directory (shoud be visible to web server)
+     * @param  string                    $output_url  the URL to the generated asset directory
+     * @param  string                    $asset_type  the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
+     * @param  array                     $filters     a list of filters, as defined below (see switch($filter_name) ...)
+     * @param  boolean                   $debug       true / false
+     * @param  boolean                   $dev_mode    true / false. If true, assets are not cached and always compiled.
      * @throws \InvalidArgumentException if an invalid filter name is found
      * @return string                    The URL to the generated asset file.
      */
-    public function asseticize($asset_path, $output_path, $output_url, $asset_type, $filters, $debug)
+    public function asseticize($asset_path, $output_path, $output_url, $asset_type, $filters, $debug, $dev_mode = false)
     {
         $asset_name = basename($asset_path);
         $asset_dir = dirname($asset_path);
@@ -106,17 +107,49 @@ class AsseticHelper
 
         $factory->setDebug($debug);
 
-        $factory->addWorker(new CacheBustingWorker());
+        $factory->addWorker(new CacheBustingWorker('-'));
 
-        // Prepare the assets writer
-        $writer = new AssetWriter($output_path);
+        // We do not pass the filter list here, juste to get the asset file name
+        $asset = $factory->createAsset($asset_name);
 
-        $asset = $factory->createAsset($asset_name, $filter_list);
+        $asset_target_path = $asset->getTargetPath();
 
-        $cache = new AssetCache($asset, new FilesystemCache($output_path));
+        $target_file = sprintf("%s/%s", $output_path, $asset_target_path);
 
-        $writer->writeAsset($cache);
+        // As it seems that assetic cannot handle a real file cache, let's do the job ourselves.
+        // It works only if the CacheBustingWorker is used, as a new file name is generated for each version.
+        //
+        // the previous version of the file is deleted, by getting the first part of the ouput file name
+        // (the one before '-'), and delete aby file beginning with the same string. Example:
+        //     old name: 3bc974a-dfacc1f.css
+        //     new name: 3bc974a-ad3ef47.css
+        //
+        //     before generating 3bc974a-ad3ef47.css, delete 3bc974a-* files.
+        //
+        if ($dev_mode == true || ! file_exists($target_file)) {
 
-        return rtrim($output_url, '/').'/'.$asset->getTargetPath();
+            // Delete previous version of the file
+            list($commonPart, $dummy) = explode('-', $asset_target_path);
+
+            foreach (glob("$output_path/$commonPart-*") as $filename) {
+                @unlink($filename);
+            }
+
+            // Apply filters now
+            foreach ($filter_list as $filter) {
+                if ('?' != $filter[0]) {
+                    $asset->ensureFilter($fm->get($filter));
+                }
+                elseif (!$debug) {
+                    $asset->ensureFilter($fm->get(substr($filter, 1)));
+                }
+            }
+
+            $writer = new AssetWriter($output_path);
+
+            $writer->writeAsset($asset);
+        }
+
+        return rtrim($output_url, '/').'/'.$asset_target_path;
     }
 }

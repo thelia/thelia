@@ -21,38 +21,37 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Model\Tools;
+namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ActionEvent;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\MessageDeleteEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Tools\URL;
+use Thelia\Core\Event\MessageUpdateEvent;
+use Thelia\Core\Event\MessageCreateEvent;
+use Thelia\Log\Tlog;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Core\Security\Exception\AuthorizationException;
+use Thelia\Model\MessageQuery;
+use Thelia\Form\MessageModificationForm;
+use Thelia\Form\MessageCreationForm;
 
 /**
- * A trait to provide event dispatching mechanism to Model objects
+ * Manages messages sent by mail
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
  */
-trait ModelEventDispatcherTrait {
-
+class AttributeController extends BaseAdminController
+{
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     * The default action is displaying the messages list.
+     *
+     * @return Symfony\Component\HttpFoundation\Response the response
      */
-    protected $dispatcher = null;
+    public function defaultAction() {
 
+        if (null !== $response = $this->checkAuth("admin.configuration.attributes.view")) return $response;
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-
-        return $this;
+        return $this->render('product_attributes');
     }
 
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
-    protected function dispatchEvent($eventName, ActionEvent $event)
-    {
-        if (!is_null($this->dispatcher)) {
-            $this->dispatcher->dispatch($eventName, $event);
-        }
-    }
 }

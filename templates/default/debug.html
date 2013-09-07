@@ -1,11 +1,5 @@
-<h2>ALL ATTRIBUTES</h2>
+{*loop type="product" name="fsdq"}
+    {format_date date=$CREATE_DATE}
+{/loop*}
 
-<ul>
-    {loop name="attr" type="attribute"}
-    <li>
-        #TITLE - (#LOOP_COUNT / #LOOP_TOTAL)<br />
-        created at {format_date date=$CREATE_DATE} - updated at {format_date date=$UPDATE_DATE}
-        <hr />
-    </li>
-    {/loop}
-</ul>
+::{product attr="createdAt" output="time" format='i'};;<br />

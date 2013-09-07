@@ -33,13 +33,43 @@ class MessageModificationForm extends BaseForm
     {
         $this->formBuilder
             ->add("id"           , "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
-            ->add("name"         , "text"  , array("constraints" => array(new NotBlank())))
-            ->add("secured"      , "text"  , array())
+            ->add("name"         , "text"  , array(
+                "constraints" => array(new NotBlank()),
+                "label" => "Name *",
+                "label_attr" => array(
+                    "for" => "name"
+                )
+            ))
+            ->add("secured"      , "text"  , array(
+                "label" => "Prevent mailing template modification or deletion, except for super-admin"                
+            ))
             ->add("locale"       , "text"  , array())
-            ->add("title"        , "text"  , array("constraints" => array(new NotBlank())))
-            ->add("subject"      , "text"  , array("constraints" => array(new NotBlank())))
-            ->add("html_message" , "text"  , array())
-            ->add("text_message" , "text"  , array())
+            ->add("title"        , "text"  , array(
+                "constraints" => array(new NotBlank()),
+                "label" => "Title *",
+                "label_attr" => array(
+                    "for" => "title"
+                )
+            ))
+            ->add("subject"      , "text"  , array(
+                "constraints" => array(new NotBlank()),
+                "label" => "Message subject *",
+                "label_attr" => array(
+                    "for" => "subject"
+                )
+            ))
+            ->add("html_message" , "text"  , array(
+                "label" => "HTML Message",
+                "label_attr" => array(
+                    "for" => "html_message"
+                )
+            ))
+            ->add("text_message" , "text"  , array(
+                "label" => "Text Message",
+                "label_attr" => array(
+                    "for" => "text_message"
+                )
+            ))
             ;
     }
 
