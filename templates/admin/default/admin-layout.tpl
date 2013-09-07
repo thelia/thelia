@@ -23,6 +23,8 @@
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
+    {debugbar_renderHead}
+
     {block name="after-bootstrap-css"}{/block}
 
     {* -- Admin CSS section ------------------------------------------------- *}
@@ -221,7 +223,7 @@
 	{/javascripts}
 
     {block name="javascript-initialization"}{/block}
-
+    {debugbar_render}
 	{* Modules scripts are included now *}
 	{module_include location='footer_js'}
 </body>

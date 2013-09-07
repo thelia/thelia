@@ -39,6 +39,7 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 use Thelia\Core\Bundle;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Log\Tlog;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
@@ -86,6 +87,16 @@ class Thelia extends Kernel
             $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
             $con->useDebug(true);
         }
+    }
+
+    /**
+     * dispatch an event when application is boot
+     */
+    public function boot()
+    {
+        parent::boot();
+
+        $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
     }
 
     /**
