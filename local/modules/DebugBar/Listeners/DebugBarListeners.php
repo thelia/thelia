@@ -22,9 +22,7 @@
 /*************************************************************************************/
 
 namespace DebugBar\Listeners;
-use DebugBar\DataCollector\PDO\PDOCollector;
-use DebugBar\DataCollector\PDO\TraceablePDO;
-use Propel\Runtime\Propel;
+use DebugBar\DataCollector\PropelCollector;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Action\BaseAction;
@@ -42,11 +40,7 @@ class DebugBarListeners extends BaseAction implements EventSubscriberInterface {
     {
         $debugBar = $this->container->get("debugBar");
 
-        $connection = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
-        $connection = $connection->getWrappedConnection();
-
-        $pdo = new TraceablePDO($connection);
-        $debugBar->addCollector(new PDOCollector($pdo));
+        $debugBar->addCollector(new PropelCollector());
     }
 
     /**
