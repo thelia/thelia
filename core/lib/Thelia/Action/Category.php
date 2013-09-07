@@ -51,6 +51,8 @@ class Category extends BaseAction implements EventSubscriberInterface
                $event->getParent(),
                $event->getLocale()
          );
+
+        $event->setCategory($category);
     }
 
     public function update(CategoryChangeEvent $event)

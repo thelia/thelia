@@ -34,6 +34,9 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\AdminLog;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Form\BaseForm;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Log\Tlog;
 
 class BaseAdminController extends BaseController
 {
@@ -66,7 +69,7 @@ class BaseAdminController extends BaseController
             }
         }
         catch (\Exception $ex) {
-            return new Response($this->errorPage($ex->getMessage()));
+            return $this->errorPage($ex->getMessage());
         }
 
         return $this->pageNotFound();
@@ -92,7 +95,7 @@ class BaseAdminController extends BaseController
     protected function errorPage($message)
     {
         if ($message instanceof \Exception) {
-            $message = sprintf("Sorry, an error occured: %s", $message->getMessage());
+            $message = sprintf($this->getTranslator()->trans("Sorry, an error occured: %msg"), array('msg' => $message->getMessage()));
         }
 
         return $this->render('general_error', array(
@@ -123,7 +126,56 @@ class BaseAdminController extends BaseController
          // Generate the proper response
          $response = new Response();
 
-         return $response->setContent($this->errorPage("Sorry, you're not allowed to perform this action"));
+         return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"));
+    }
+
+    /*
+     * Create the standard message displayed to the user when the form cannot be validated.
+     */
+    protected function createStandardFormValidationErrorMessage(FormValidationException $exception) {
+        return $this->getTranslator()->trans(
+            "Please check your input: %error",
+            array(
+                '%error' => $exception->getMessage()
+            )
+        );
+     }
+
+    /**
+     * Setup the error context when an error occurs in a action method.
+     *
+     * @param string $action the action that caused the error (category modification, variable creation, currency update, etc.)
+     * @param BaseForm $form the form where the error occured, or null if no form was involved
+     * @param string $error_message the error message
+     * @param Exception $exception the exception or null if no exception
+     */
+    protected function setupFormErrorContext($action,  $error_message, BaseForm $form = null, \Exception $exception = null) {
+
+        if ($error_message !== false) {
+
+            // Log the error message
+            Tlog::getInstance()->error(
+                $this->getTranslator()->trans(
+                    "Error during %action process : %error. Exception was %exc",
+                    array(
+                        '%action' => $action,
+                        '%error'  => $error_message,
+                        '%exc'    => $exception != null ? $exception->getMessage() : 'no exception'
+                    )
+                )
+            );
+
+            if ($form != null) {
+                // Mark the form as errored
+                $form->setErrorMessage($error_message);
+
+                // Pass it to the parser context
+                $this->getParserContext()->addForm($form);
+            }
+
+            // Pass the error message to the parser.
+            $this->getParserContext()->setGeneralError($error_message);
+        }
     }
 
     /**
@@ -261,7 +313,7 @@ class BaseAdminController extends BaseController
         }
         catch (AuthorizationException $ex) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.
-            return $this->errorPage("Sorry, you are not allowed to perform this action.");
+            return $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."));
         }
     }
 }

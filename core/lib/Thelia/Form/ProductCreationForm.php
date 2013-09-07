@@ -20,9 +20,48 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Form;
 
-namespace Thelia\Core\Event;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
-class CurrencyUpdatePositionEvent extends BaseUpdatePositionEvent
+class ProductCreationForm extends BaseForm
 {
+    protected function buildForm()
+    {
+        $this->formBuilder
+            ->add("ref", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => "Product reference *",
+                "label_attr" => array(
+                    "for" => "ref"
+                )
+            ))
+            ->add("title", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => "Product title *",
+                "label_attr" => array(
+                    "for" => "title"
+                )
+            ))
+            ->add("parent", "integer", array(
+                "constraints" => array(
+                    new NotBlank()
+                )
+            ))
+            ->add("locale", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                )
+            ))
+        ;
+    }
+
+    public function getName()
+    {
+        return "thelia_product_creation";
+    }
 }

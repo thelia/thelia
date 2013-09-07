@@ -20,54 +20,29 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Thelia\Core\Event;
 
-/**
- * A base form for all objects with standard contents.
- *
- * @author Franck Allimant <franck@cqfdev.fr>
- */
-abstract class BaseDescForm extends BaseForm
+
+class BaseToggleVisibilityEvent  extends ActionEvent
 {
-    protected function buildForm()
+    protected $object_id;
+
+    protected $object;
+
+    public function __construct($object_id)
     {
-        $this->formBuilder
-            ->add("locale", "hidden", array(
-                    "constraints" => array(
-                        new NotBlank()
-                    )
-                )
-            )
-            ->add("title", "text", array(
-                    "constraints" => array(
-                        new NotBlank()
-                    ),
-                    "label" => "Title",
-                    "label_attr" => array(
-                        "for" => "title"
-                    )
-                )
-            )
-            ->add("chapo", "text", array(    
-                "label" => "Summary",
-                "label_attr" => array(
-                    "for" => "summary"
-                )
-            ))
-            ->add("description", "text", array(
-                "label" => "Detailed description",
-                "label_attr" => array(
-                    "for" => "detailed_description"
-                )
-            ))
-            ->add("postscriptum", "text", array(
-                "label" => "Conclusion",
-                "label_attr" => array(
-                    "for" => "conclusion"
-                )
-            ))
-        ;
-     }
+        $this->object_id = $object_id;
+    }
+
+    public function getObjectId()
+    {
+        return $this->object_id;
+    }
+
+    public function setObjectId($object_id)
+    {
+        $this->object_id = $object_id;
+        return $this;
+    }
 }

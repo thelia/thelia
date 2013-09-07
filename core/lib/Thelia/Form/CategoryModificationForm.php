@@ -20,54 +20,36 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Form;
 
-namespace Thelia\Core\Event;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Model\LangQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Thelia\Core\Translation\Translator;
 
-use Thelia\Model\Category;
-
-class CategoryCreateEvent extends CategoryEvent
+class CategoryModificationForm extends CategoryCreationForm
 {
-    protected $title;
-    protected $parent;
-    protected $locale;
+    use StandardDescriptionFieldsTrait;
 
-    public function __construct($title, $parent, $locale)
+    protected function buildForm()
     {
-        $this->title = $title;
-        $this->parent = $parent;
-        $this->locale = $locale;
+        parent::buildForm(true);
+
+        $this->formBuilder
+            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
+
+            ->add("visible", "checkbox", array(
+                "label" => Translator::getInstance()->trans("This category is online on the front office.")
+            ))
+        ;
+
+        // Add standard description fields
+        $this->addStandardDescFields(array('title', 'locale'));
     }
 
-    public function getTitle()
+    public function getName()
     {
-        return $this->title;
-    }
-
-    public function setTitle($title)
-    {
-        $this->title = $title;
-        return $this;
-    }
-
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    public function setParent($parent)
-    {
-        $this->parent = $parent;
-        return $this;
-    }
-
-    public function getLocale()
-    {
-        return $this->locale;
-    }
-
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-        return $this;
+        return "thelia_category_modification";
     }
 }

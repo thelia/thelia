@@ -108,10 +108,12 @@ class CurrencyController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::CURRENCY_CREATE, $createEvent);
 
+            if (! $createEvent->hasCurrency()) throw new \LogicException($this->getTranslator()->trans("No currency was created."));
+
             $createdObject = $createEvent->getCurrency();
 
             // Log currency creation
-            $this->adminLogAppend(sprintf("Variable %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
+            $this->adminLogAppend(sprintf("Currency %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
 
             // Substitute _ID_ in the URL with the ID of the created object
             $successUrl = str_replace('_ID_', $createdObject->getId(), $creationForm->getSuccessUrl());
@@ -121,26 +123,14 @@ class CurrencyController extends BaseAdminController
         }
         catch (FormValidationException $ex) {
             // Form cannot be validated
-            $error_msg = sprintf("Please check your input: %s", $ex->getMessage());
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
         }
         catch (\Exception $ex) {
             // Any other error
-            $error_msg = $ex;
+            $error_msg = $ex->getMessage();
         }
 
-        if ($error_msg !== false) {
-            // An error has been detected: log it
-            Tlog::getInstance()->error(sprintf("Error during currency creation process : %s. Exception was %s", $error_msg, $ex->getMessage()));
-
-            // Mark the form as errored
-            $creationForm->setErrorMessage($error_msg);
-
-            // Pass it to the parser, along with the error currency
-            $this->getParserContext()
-                ->addForm($creationForm)
-                ->setGeneralError($error_msg)
-            ;
-        }
+        $this->setupFormErrorContext("currency creation", $error_msg, $creationForm, $ex);
 
         // At this point, the form has error, and should be redisplayed.
         return $this->renderList();
@@ -223,10 +213,12 @@ class CurrencyController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::CURRENCY_UPDATE, $changeEvent);
 
+            if (! $changeEvent->hasCurrency()) throw new \LogicException($this->getTranslator()->trans("No currency was updated."));
+
             // Log currency modification
             $changedObject = $changeEvent->getCurrency();
 
-            $this->adminLogAppend(sprintf("Variable %s (ID %s) modified", $changedObject->getName(), $changedObject->getId()));
+            $this->adminLogAppend(sprintf("Currency %s (ID %s) modified", $changedObject->getName(), $changedObject->getId()));
 
             // If we have to stay on the same page, do not redirect to the succesUrl,
             // just redirect to the edit page again.
@@ -241,27 +233,15 @@ class CurrencyController extends BaseAdminController
             $this->redirect($changeForm->getSuccessUrl());
         }
         catch (FormValidationException $ex) {
-            // Invalid data entered
-            $error_msg = sprintf("Please check your input: %s", $ex->getMessage());
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
         }
         catch (\Exception $ex) {
             // Any other error
-            $error_msg = $ex;
+            $error_msg = $ex->getMessage();
         }
 
-        if ($error_msg !== false) {
-            // Log error currency
-            Tlog::getInstance()->error(sprintf("Error during currency modification process : %s. Exception was %s", $error_msg, $ex->getMessage()));
-
-            // Mark the form as errored
-            $changeForm->setErrorMessage($error_msg);
-
-            // Pas the form and the error to the parser
-            $this->getParserContext()
-                ->addForm($changeForm)
-                ->setGeneralError($error_msg)
-            ;
-        }
+        $this->setupFormErrorContext("currency modification", $error_msg, $changeForm, $ex);
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->render('currency-edit', array('currency_id' => $currency_id));
@@ -358,6 +338,9 @@ class CurrencyController extends BaseAdminController
         $event = new CurrencyDeleteEvent($this->getRequest()->get('currency_id'));
 
         $this->dispatch(TheliaEvents::CURRENCY_DELETE, $event);
+
+        if ($event->hasCurrency())
+            $this->adminLogAppend(sprintf("Currency %s (ID %s) modified", $event->getCurrency()->getName(), $event->getCurrency()->getId()));
 
         $this->redirectToRoute('admin.configuration.currencies.default');
     }
