@@ -149,7 +149,8 @@ class FeatureValue extends BaseI18nLoop
                 ->set("TITLE",$featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
                 ->set("CHAPO", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
                 ->set("DESCRIPTION", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'));
+                ->set("POSTSCRIPTUM", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
+                ->set("POSITION", $featureValue->getPosition());
 
             $loopResult->addRow($loopResultRow);
         }

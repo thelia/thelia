@@ -18,10 +18,12 @@
     {* -- Bootstrap CSS section --------------------------------------------- *}
 
     {block name="before-bootstrap-css"}{/block}
-	
+
 	{stylesheets file='assets/less/*' filters='less,cssembed'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
+
+    {debugbar_renderHead}
 
     {block name="after-bootstrap-css"}{/block}
 
@@ -47,15 +49,15 @@
 
 		<div class="topbar">
 			<div class="container">
-		        
+
 		        <div class="row">
 		            <div class="col-md-6">
 		      		    <div class="version-info">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
 		            </div>
 
-		    		{module_include location='inside_topbar'}  		
-		            
-		            <div class="col-md-6 clearfix">                
+		    		{module_include location='inside_topbar'}
+
+		            <div class="col-md-6 clearfix">
 
 		                <div class="btn-group pull-right">
 		                    <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
@@ -64,14 +66,14 @@
 		                        <span class="caret"></span>
 		                    </button>
 		                    <ul class="dropdown-menu">
-		                        <li><a class="profile" href="{url path='admin/edit_profile'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>                        
+		                        <li><a class="profile" href="{url path='admin/edit_profile'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
 		                        <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
 		                    </ul>
-		                </div>               
+		                </div>
 
 		            </div>
 		        </div>
-		  		
+
 		    </div>
 		</div>
 
@@ -82,7 +84,7 @@
 		{module_include location='before_top_menu'}
 
 		<nav class="navbar navbar-default" role="navigation">
-			
+
             <div class="container">
 
     			<div class="navbar-header">
@@ -91,7 +93,7 @@
     					<span class="icon-bar"></span>
     					<span class="icon-bar"></span>
     					<span class="icon-bar"></span>
-    				</button>			
+    				</button>
     			</div>
 
     			<div class="collapse navbar-collapse navbar-collapse">
@@ -164,6 +166,15 @@
                         {/loop}
                     </ul>
 
+                    {loop name="top-bar-search" type="auth" roles="ADMIN" permissions="admin.search"}
+                    <form class="navbar-form pull-right" action="{url path='/admin/search'}">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
+                        </div>
+                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+                    </form>
+                    {/loop}
+
     			</div>
             </div>
 		</nav>
@@ -215,7 +226,7 @@
 	{block name="after-javascript-include"}{/block}	
 
     {block name="javascript-initialization"}{/block}
-
+    {debugbar_render}
 	{* Modules scripts are included now *}
 	{module_include location='footer_js'}
 

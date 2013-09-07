@@ -34,6 +34,11 @@ final class TheliaEvents
 {
 
     /**
+     * sent at the beginning
+     */
+    const BOOT = "thelia.boot";
+
+    /**
      * ACTION event
      *
      * Sent if no action are already present in Thelia action process ( see Thelia\Routing\Matcher\ActionMatcher)

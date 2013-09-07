@@ -25,7 +25,7 @@ namespace %%NAMESPACE%%;
 
 use Thelia\Module\BaseModule;
 
-class Class extends BaseModule
+class %%CLASSNAME%% extends BaseModule
 {
     /**
      * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class

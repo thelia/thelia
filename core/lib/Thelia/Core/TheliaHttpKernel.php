@@ -127,6 +127,9 @@ class TheliaHttpKernel extends HttpKernel
         // See Thelia\Tools\URL class.
         $this->container->get('thelia.url.manager');
 
+        // Same thing for the Translator service.
+        $this->container->get('thelia.translator');
+
         $lang = $this->detectLang($request);
 
         if ($lang) {

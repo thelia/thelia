@@ -1,0 +1,43 @@
+{*
+
+A generic modal creation dialog template. Parameters
+
+    dialog_id       = the dialog id attribute
+    dialog_title    = the dialog title
+    dialog_body     = the dialog body. In most cases, this is a creation form
+
+    dialog_ok_label     = The OK button label. Default create
+    dialog_cancel_label = The cancel button label. Default create
+
+    form_action        = The form action URL. Form is submitted when OK button is clicked
+    form_enctype       = The form encoding
+    form_error_message = The form error message (optional)
+*}
+<div class="modal fade" id="{$dialog_id}" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>{$dialog_title nofilter}</h3>
+            </div>
+
+            <form method="POST" action="{$form_action nofilter}" {$form_enctype nofilter}>
+
+                <div class="modal-body">
+
+                    {if ! empty($form_error_message)}<div class="alert alert-block alert-error" id="{$dialog_id}_error">{$form_error_message nofilter}</div>{/if}
+
+                    {$dialog_body nofilter}
+                </div>
+
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {$dialog_cancel_label|default:{intl l='Cancel'}}</button>
+                    <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {$dialog_ok_label|default:{intl l='OK'}}</button>
+	            </div>
+
+            </form>
+        </div>
+    </div>
+</div>

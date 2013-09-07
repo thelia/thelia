@@ -3,52 +3,9 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "3f5204c6eb90cd0dc23fad39555eff6c",
+    "hash": "ba2f3e0943f00c7c3bf0c086bc611b0f",
+
     "packages": [
-        {
-            "name": "ezyang/htmlpurifier",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "fac747bdbdba6aeaba4bed91ef49b2378c1798e4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/fac747bdbdba6aeaba4bed91ef49b2378c1798e4",
-                "reference": "fac747bdbdba6aeaba4bed91ef49b2378c1798e4",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "HTMLPurifier": "library/"
-                },
-                "files": [
-                    "library/HTMLPurifier.composer.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL"
-            ],
-            "authors": [
-                {
-                    "name": "Edward Z. Yang",
-                    "email": "admin@htmlpurifier.org",
-                    "homepage": "http://ezyang.com"
-                }
-            ],
-            "description": "Standards compliant HTML filter written in PHP",
-            "homepage": "http://htmlpurifier.org/",
-            "keywords": [
-                "html"
-            ],
-            "time": "2013-08-18 02:27:26"
-        },
         {
             "name": "imagine/imagine",
             "version": "dev-master",
@@ -128,7 +85,7 @@
             "authors": [
                 {
                     "name": "Anthony Ferrara",
-                    "email": "ircmaxell@ircmaxell.com",
+                    "email": "ircmaxell@php.net",
                     "homepage": "http://blog.ircmaxell.com"
                 }
             ],
@@ -1452,53 +1409,6 @@
             "time": "2013-08-23 14:06:02"
         },
         {
-            "name": "symfony/serializer",
-            "version": "dev-master",
-            "target-dir": "Symfony/Component/Serializer",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/Serializer.git",
-                "reference": "ac373bb2cc40385031b50758f479d413679bb18c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Serializer/zipball/ac373bb2cc40385031b50758f479d413679bb18c",
-                "reference": "ac373bb2cc40385031b50758f479d413679bb18c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.4-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Symfony\\Component\\Serializer\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Serializer Component",
-            "homepage": "http://symfony.com",
-            "time": "2013-08-09 06:59:22"
-        },
-        {
             "name": "symfony/translation",
             "version": "v2.2.6",
             "target-dir": "Symfony/Component/Translation",
@@ -1708,6 +1618,55 @@
                 "fixtures"
             ],
             "time": "2013-08-29 19:11:59"
+        },
+        {
+            "name": "maximebf/debugbar",
+            "version": "1.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/maximebf/php-debugbar.git",
+                "reference": "37dccc40da52bf9f85571c30cf302da696db0d05"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/37dccc40da52bf9f85571c30cf302da696db0d05",
+                "reference": "37dccc40da52bf9f85571c30cf302da696db0d05",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "psr/log": "~1.0"
+            },
+            "require-dev": {
+                "php": ">=5.3.0"
+            },
+            "suggest": {
+                "kriswallsmith/assetic": "The best way to manage assets",
+                "monolog/monolog": "Log using Monolog"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "DebugBar": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maxime Bouroumeau-Fuseau",
+                    "email": "maxime.bouroumeau@gmail.com",
+                    "homepage": "http://maximebf.com"
+                }
+            ],
+            "description": "Debug bar in the browser for php application",
+            "homepage": "https://github.com/maximebf/php-debugbar",
+            "keywords": [
+                "debug"
+            ],
+            "time": "2013-08-17 02:02:49"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -2082,7 +2041,6 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "ezyang/htmlpurifier": 20,
         "ircmaxell/password-compat": 20,
         "propel/propel": 20,
         "kriswallsmith/assetic": 20,
@@ -2090,7 +2048,6 @@
         "ptachoire/cssembed": 20,
         "simplepie/simplepie": 20,
         "imagine/imagine": 20,
-        "symfony/serializer": 20,
         "fzaninotto/faker": 20
     },
     "platform": {

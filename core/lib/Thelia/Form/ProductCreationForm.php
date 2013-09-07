@@ -24,31 +24,44 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * A base form for all objects with standard contents.
- *
- * @author Franck Allimant <franck@cqfdev.fr>
- */
-abstract class BaseDescForm extends BaseForm
+class ProductCreationForm extends BaseForm
 {
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("locale", "hidden", array(
-                    "constraints" => array(
-                        new NotBlank()
-                    )
+            ->add("ref", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => "Product reference *",
+                "label_attr" => array(
+                    "for" => "ref"
                 )
-            )
+            ))
             ->add("title", "text", array(
-                    "constraints" => array(
-                        new NotBlank()
-                    )
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => "Product title *",
+                "label_attr" => array(
+                    "for" => "title"
                 )
-            )
-            ->add("chapo", "text", array())
-            ->add("description", "text", array())
-            ->add("postscriptum", "text", array())
+            ))
+            ->add("parent", "integer", array(
+                "constraints" => array(
+                    new NotBlank()
+                )
+            ))
+            ->add("locale", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                )
+            ))
         ;
-     }
+    }
+
+    public function getName()
+    {
+        return "thelia_product_creation";
+    }
 }

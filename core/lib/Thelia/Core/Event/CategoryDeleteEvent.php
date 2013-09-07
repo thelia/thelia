@@ -22,13 +22,11 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
+
 use Thelia\Model\Category;
 
-class CategoryDeleteEvent extends ActionEvent
+class CategoryDeleteEvent extends CategoryEvent
 {
-    protected $category_id;
-    protected $deleted_category;
-
     public function __construct($category_id)
     {
         $this->category_id = $category_id;
@@ -42,15 +40,6 @@ class CategoryDeleteEvent extends ActionEvent
     public function setCategoryId($category_id)
     {
         $this->category_id = $category_id;
-    }
-
-    public function getDeletedCategory()
-    {
-        return $this->deleted_category;
-    }
-
-    public function setDeletedCategory(Category $deleted_category)
-    {
-        $this->deleted_category = $deleted_category;
+        return $this;
     }
 }

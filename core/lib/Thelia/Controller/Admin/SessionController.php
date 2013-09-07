@@ -73,30 +73,32 @@ class SessionController extends BaseAdminController
 
             // Redirect to the success URL
             return Redirect::exec($adminLoginForm->getSuccessUrl());
-         } catch (ValidatorException $ex) {
+
+         }
+         catch (FormValidationException $ex) {
 
              // Validation problem
-             $message = "Missing or invalid information. Please check your input.";
-         } catch (AuthenticationException $ex) {
+             $message = $this->createStandardFormValidationErrorMessage($ex);
+         }
+         catch (AuthenticationException $ex) {
 
              // Log authentication failure
              AdminLog::append(sprintf("Authentication failure for username '%s'", $authenticator->getUsername()), $request);
 
-             $message = "Login failed. Please check your username and password.";
-         } catch (\Exception $ex) {
+             $message =  $this->getTranslator()->trans("Login failed. Please check your username and password.");
+         }
+         catch (\Exception $ex) {
 
              // Log authentication failure
              AdminLog::append(sprintf("Undefined error: %s", $ex->getMessage()), $request);
 
-             $message = "Unable to process your request. Please try again.".$ex->getMessage();
+             $message = $this->getTranslator()->trans(
+                     "Unable to process your request. Please try again (%err).",
+                     array("%err" => $ex->getMessage())
+             );
          }
 
-         // Store error information in the form
-         $adminLoginForm->setError(true);
-         $adminLoginForm->setErrorMessage($message);
-
-         // Store the form name in session (see Form Smarty plugin to find usage of this parameter)
-         $this->getParserContext()->addForm($adminLoginForm);
+         $this->setupFormErrorContext("Login process", $message, $adminLoginForm, $ex);
 
           // Display the login form again
         return $this->render("login");
