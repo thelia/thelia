@@ -34,6 +34,7 @@
         <loop class="Thelia\Core\Template\Loop\Image" name="image"/>
         <loop class="Thelia\Core\Template\Loop\Config" name="config"/>
         <loop class="Thelia\Core\Template\Loop\Message" name="message"/>
+        <loop class="Thelia\Core\Template\Loop\Delivery" name="delivery"/>
     </loops>
 
     <forms>

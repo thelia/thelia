@@ -1,11 +1,10 @@
 <?php
-
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -24,35 +23,14 @@
 
 namespace Thelia\Module;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
 
-abstract class BaseModule extends ContainerAware
-{
+interface DeliveryModuleInterface extends BaseModuleInterface {
 
-    public function __construct()
-    {
-
-    }
-
-    protected function activate()
-    {
-
-    }
-
-    public function hasContainer()
-    {
-        return null === $this->container;
-    }
-
-    public function getContainer()
-    {
-        if($this->hasContainer() === false) {
-            throw new \RuntimeException("Sorry, container his not available in this context");
-        }
-        return $this->container;
-    }
-
-    abstract public function install();
-    abstract public function destroy();
-
+    /**
+     *
+     * calculate and return delivery price
+     *
+     * @return mixed
+     */
+    public function calculate($country = null);
 }

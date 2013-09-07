@@ -33,8 +33,10 @@ namespace Thelia\Core;
  */
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Validator\Tests\Fixtures\Reference;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
@@ -118,6 +120,16 @@ class Thelia extends Kernel
             foreach ($modules as $module) {
 
                 try {
+
+                    $defintion = new Definition();
+                    $defintion->setClass($module->getFullNamespace());
+                    $defintion->addMethodCall("setContainer", array('service_container'));
+
+                    $container->setDefinition(
+                        "module.".$module->getCode(),
+                        $defintion
+                    );
+
                     $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/Config"));
                     $loader->load("config.xml");
                 } catch (\InvalidArgumentException $e) {
