@@ -8,7 +8,7 @@
 <div class="catalog edit-category">
 	<div id="wrapper" class="container">
 
-        {include file="includes/categories-breadcrumb.html"}
+        {include file="includes/catalog-breadcrumb.html"}
 
         <div class="row">
             {loop name="category_edit" type="category" visible="*" id="{$current_category_id}" backend_context="1" lang="$edit_language_id"}
@@ -26,6 +26,7 @@
                 </div>
 
                 <form method="post">
+
 	                <div class="tabbable">
 		                <ul class="nav nav-tabs admin-tabs" id="tabbed_menu">
 						    <li class="active">

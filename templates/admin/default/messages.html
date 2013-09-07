@@ -25,7 +25,7 @@
 	                        <caption>
 	                           {intl l='Thelia mailing templates'}
 	                           {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.messages.create"}
-                                <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new mailing template'}" href="#add_message_dialog" data-toggle="modal">
+                                <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new mailing template'}" href="#creation_dialog" data-toggle="modal">
                                     <span class="glyphicon glyphicon-plus-sign"></span>
                                 </a>
                             {/loop}
@@ -41,7 +41,7 @@
                                    <th>&nbsp;</th>
     	                        </tr>
                             </thead>
-                            
+
                             <tbody>
     	                        {loop name="mailing-templates" type="message" secured="*" backend_context="1" lang="$lang_id"}
     	                            <tr>
@@ -71,7 +71,7 @@
                                                    {/loop}
 
                                                    {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.messages.delete"}
-                                                       <a class="btn btn-default btn-xs message-delete" title="{intl l='Delete this mailing template'}" href="#delete_message_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                       <a class="btn btn-default btn-xs message-delete" title="{intl l='Delete this mailing template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
                                                    {/loop}
     		                                    </div>
     		                                {else}
@@ -79,7 +79,7 @@
     	                                    {/if}
     	                                </td>
     	                            </tr>
-    	                        {/loop}                        
+    	                        {/loop}
     	                        {elseloop rel="mailing-templates"}
     	                        <tr>
     	                           <td colspan="3">
@@ -102,110 +102,89 @@
 </div>
 
 
-{* Adding a new message *}
-
-<div class="modal fade" id="add_message_dialog" tabindex="-1" role="dialog" aria-hidden="true">
-    
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>{intl l="Create a new mailing template"}</h3>
-            </div>
-
-            {form name="thelia.admin.message.creation"}
-            <form method="POST" action="{url path='/admin/configuration/messages/create'}" {form_enctype form=$form}>
-
-                {form_hidden_fields form=$form}
-
-                {form_field form=$form field='success_url'}
-                {* on success, redirect to the edition page, _ID_ is replaced with the created message ID, see controller  *}
-                <input type="hidden" name="{$name}" value="{url path='/admin/configuration/messages/update' message_id='_ID_'}" />
-                {/form_field}
-
-                {* We do not allow users to create secured messages from here *}
-
-                {form_field form=$form field='secured'}
-                <input type="hidden" name="{$name}" value="0" />
-                {/form_field}
-
-                <div class="modal-body">
-
-                    {if #form_error}<div class="alert alert-danger" id="add_message_dialog_error">#form_error_message</div>{/if}
-                        
-                    {form_field form=$form field='name'}
-                    <div class="form-group {if $error}has-error{/if}">
-                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Mailing template name'}" placeholder="{intl l='Mailing template name'}" class="form-control">
-                    </div>
-                    {/form_field}
-                        
-                    {form_field form=$form field='title'}
-                    <div class="form-group {if $error}has-error{/if}">
-                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                        
-                        {loop type="lang" name="default-lang" default_only="1"}
-
-                            {* Switch edition to the current locale *}
-                            <input type="hidden" name="edit_language_id" value="{$ID}" />
-
-                            <div class="input-group">
-                                <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Mailing template purpose'}" placeholder="{intl l='Mailing template purpose'}" class="form-control">
-                                <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="{intl l=$TITLE}" /></span>
-                            </div>
-
-                            <div class="help-block">{intl l="Enter here the mailing template purpose in the default language ($TITLE)"}</div>
-
-                            {form_field form=$form field='locale'}
-                                <input type="hidden" name="{$name}" value="{$LOCALE}" />
-                            {/form_field}
-                        {/loop}
-                        
-                    </div>
-                    {/form_field}
-
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {intl l="Cancel"}</button>
-                    <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Create this mailing template"}</button>
-                </div>
-
-            </form>
-            {/form}
-        </div>
-    </div>
-</div>
+    {* Adding a new message *}
 
 
-{* Delete confirmation dialog *}
+    {form name="thelia.admin.message.creation"}
 
-<div class="modal fade" id="delete_message_dialog" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+        {* Capture the dialog body, to pass it to the generic dialog *}
+        {capture "creation_dialog"}
+		    {form_hidden_fields form=$form}
 
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>{intl l="Delete a mailing template"}</h3>
-            </div>
+		    {form_field form=$form field='success_url'}
+		    {* on success, redirect to the edition page, _ID_ is replaced with the created message ID, see controller  *}
+		    <input type="hidden" name="{$name}" value="{url path='/admin/configuration/messages/update' message_id='_ID_'}" />
+		    {/form_field}
 
-            <div class="modal-body">
-                <p>{intl l="Do you really want to delete this mailing template ?"}</p>
-            </div>
+		    {* We do not allow users to create secured messages from here *}
 
-            <form method="post" action="{url path='/admin/configuration/messages/delete'}">
-                <input type="hidden" name="message_id" id="message_delete_id" value="" />
+		    {form_field form=$form field='secured'}
+		    <input type="hidden" name="{$name}" value="0" />
+		    {/form_field}
 
-        	    <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {intl l="No"}</button>
-                    <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Yes"}</button>
-        	    </div>
-            </form>
+	        {form_field form=$form field='name'}
+	        <div class="form-group {if $error}has-error{/if}">
+	            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+	            <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Mailing template name'}" placeholder="{intl l='Mailing template name'}" class="form-control">
+	        </div>
+	        {/form_field}
 
-        </div>
-    </div>
-</div>
+	        {form_field form=$form field='title'}
+	        <div class="form-group {if $error}has-error{/if}">
+	            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+
+	            {loop type="lang" name="default-lang" default_only="1"}
+
+	                {* Switch edition to the current locale *}
+	                <input type="hidden" name="edit_language_id" value="{$ID}" />
+
+	                <div class="input-group">
+	                    <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Mailing template purpose'}" placeholder="{intl l='Mailing template purpose'}" class="form-control">
+	                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="{intl l=$TITLE}" /></span>
+	                </div>
+
+	                <div class="help-block">{intl l="Enter here the mailing template purpose in the default language ($TITLE)"}</div>
+
+	                {form_field form=$form field='locale'}
+	                    <input type="hidden" name="{$name}" value="{$LOCALE}" />
+	                {/form_field}
+	            {/loop}
+
+	        </div>
+	        {/form_field}
+        {/capture}
+
+        {include
+            file = "includes/generic-create-dialog.html"
+
+            dialog_id    = "creation_dialog"
+            dialog_title = {intl l="Create a new mailing template"}
+            dialog_body  = {$smarty.capture.creation_dialog nofilter}
+
+            dialog_ok_label     = {intl l="Create this mailing template"}
+
+            form_action        = {url path='/admin/configuration/messages/create'}
+            form_enctype       = {form_enctype form=$form}
+            form_error_message = $form_error_message
+        }
+    {/form}
+
+    {* Delete confirmation dialog *}
+
+    {capture "delete_dialog"}
+        <input type="hidden" name="message_id" id="message_delete_id" value="" />
+    {/capture}
+
+    {include
+        file = "includes/generic-confirm-dialog.html"
+
+        dialog_id       = "delete_dialog"
+        dialog_title    = {intl l="Delete mailing template"}
+        dialog_message  = {intl l="Do you really want to delete this mailing template ?"}
+
+        form_action         = {url path='/admin/configuration/messages/delete'}
+        form_content        = {$smarty.capture.delete_dialog nofilter}
+    }
 {/block}
 
 {block name="javascript-initialization"}
@@ -217,26 +196,12 @@
     		$('#message_delete_id').val($(this).data('id'));
      	});
 
-        {* display the form creation dialog if it contains errors *}
-
-        {form name="thelia.admin.message.creation"}
-            {if #form_error}
-                $('#add_message_dialog').modal();
-            {/if}
-        {/form}
-
-        {* Always reset create dialog on close *}
-
-        $('#add_message_dialog').on('hidden',function() {
-            // Hide error message
-            $('#add_message_dialog_error').remove();
-
-            // Clear error status
-            $("#add_message_dialog .error").removeClass('error');
-
-            // Empty field values
-            $("#add_message_dialog input[type=text]").val('');
-        });
+        // JS stuff for creation form
+        {include
+            file      = "includes/generic-js-dialog.html"
+            dialog_id = "creation_dialog"
+            form_name = "thelia.admin.message.creation"
+        }
     });
 </script>
 {/block}

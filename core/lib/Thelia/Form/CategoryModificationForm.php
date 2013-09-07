@@ -23,51 +23,33 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Model\LangQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Thelia\Core\Translation\Translator;
 
-/**
- * A base form for all objects with standard contents.
- *
- * @author Franck Allimant <franck@cqfdev.fr>
- */
-abstract class BaseDescForm extends BaseForm
+class CategoryModificationForm extends CategoryCreationForm
 {
+    use StandardDescriptionFieldsTrait;
+
     protected function buildForm()
     {
+        parent::buildForm(true);
+
         $this->formBuilder
-            ->add("locale", "hidden", array(
-                    "constraints" => array(
-                        new NotBlank()
-                    )
-                )
-            )
-            ->add("title", "text", array(
-                    "constraints" => array(
-                        new NotBlank()
-                    ),
-                    "label" => "Title",
-                    "label_attr" => array(
-                        "for" => "title"
-                    )
-                )
-            )
-            ->add("chapo", "text", array(    
-                "label" => "Summary",
-                "label_attr" => array(
-                    "for" => "summary"
-                )
-            ))
-            ->add("description", "text", array(
-                "label" => "Detailed description",
-                "label_attr" => array(
-                    "for" => "detailed_description"
-                )
-            ))
-            ->add("postscriptum", "text", array(
-                "label" => "Conclusion",
-                "label_attr" => array(
-                    "for" => "conclusion"
-                )
+            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
+
+            ->add("visible", "checkbox", array(
+                "label" => Translator::getInstance()->trans("This category is online on the front office.")
             ))
         ;
-     }
+
+        // Add standard description fields
+        $this->addStandardDescFields(array('title', 'locale'));
+    }
+
+    public function getName()
+    {
+        return "thelia_category_modification";
+    }
 }

@@ -37,6 +37,7 @@ use Thelia\Model\Lang;
 use Thelia\Core\Translation\Translator;
 use Thelia\Core\Event\CategoryUpdatePositionEvent;
 use Thelia\Model\CategoryQuery;
+use Thelia\Form\CategoryModificationForm;
 
 class CategoryController extends BaseAdminController
 {
@@ -46,13 +47,10 @@ class CategoryController extends BaseAdminController
      * @return Symfony\Component\HttpFoundation\Response the response
      */
     protected function renderList() {
-
-        $args = $this->setupArgs();
-
-        return $this->render('categories', $args);
+        return $this->render('categories', $this->getTemplateArgs());
     }
 
-    protected function setupArgs() {
+    protected function getTemplateArgs() {
 
         // Get the category ID
         $category_id = $this->getRequest()->get('category_id', 0);
@@ -164,8 +162,14 @@ class CategoryController extends BaseAdminController
             // Prepare the data that will hydrate the form
             $data = array(
                     'id'     => $category->getId(),
-                    'name'   => $category->getTitle(),
                     'locale' => $category->getLocale(),
+                    'title' => $category->getTitle(),
+                    'chapo' => $category->getChapo(),
+                    'description' => $category->getDescription(),
+                    'postscriptum' => $category->getPostscriptum(),
+                    'parent' => $category->getParent(),
+                    'visible' => $category->getVisible() ? true : false,
+                    'url' => $category->getUrl($this->getCurrentEditionLocale())
                     // tbc !!!
             );
 
@@ -177,7 +181,7 @@ class CategoryController extends BaseAdminController
         }
 
         // Render the edition template.
-        return $this->render('category-edit', array('category_id' => $this->getRequest()->get('category_id')));
+        return $this->render('category-edit', $this->getTemplateArgs());
     }
 
     /**

@@ -24,35 +24,69 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+use Thelia\Core\Translation\Translator;
+
 /**
- * This form defines all standard description fields:
- *    - title
- *    - chapo
- *    - description
- *    - postscriptum
+ * A trait to add standard localized description fields to a form.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-Trait StandardDescriptionFieldsTrait
+trait StandardDescriptionFieldsTrait
 {
-    protected function addStandardDescriptionFields()
+    /**
+     * Add standard description fields + locale tot the form
+     *
+     * @param array $exclude name of the fields that should not be added to the form
+     */
+    protected function addStandardDescFields($exclude = array())
     {
-        $this->formBuilder
-            ->add("locale", "hidden", array(
+        if (! in_array('locale', $exclude))
+            $this->formBuilder
+                ->add("locale", "hidden", array(
+                        "constraints" => array(
+                            new NotBlank()
+                        )
+                    )
+                );
+
+        if (! in_array('title', $exclude))
+            $this->formBuilder
+                ->add("title", "text", array(
                     "constraints" => array(
                         new NotBlank()
+                    ),
+                    "label" => Translator::getInstance()->trans("Title"),
+                    "label_attr" => array(
+                        "for" => "title"
                     )
                 )
-            )
-            ->add("title", "text", array(
-                    "constraints" => array(
-                        new NotBlank()
+            );
+
+        if (! in_array('chapo', $exclude))
+            $this->formBuilder
+                ->add("chapo", "text", array(
+                    "label" => Translator::getInstance()->trans("Summary"),
+                    "label_attr" => array(
+                        "for" => "summary"
                     )
-                )
-            )
-            ->add("chapo", "text", array())
-            ->add("description", "text", array())
-            ->add("postscriptum", "text", array())
-        ;
+                ));
+
+        if (! in_array('description', $exclude))
+            $this->formBuilder
+                ->add("description", "text", array(
+                    "label" => Translator::getInstance()->trans("Detailed description"),
+                    "label_attr" => array(
+                        "for" => "detailed_description"
+                    )
+                ));
+
+        if (! in_array('postscriptum', $exclude))
+            $this->formBuilder
+                    ->add("postscriptum", "text", array(
+                    "label" => Translator::getInstance()->trans("Conclusion"),
+                    "label_attr" => array(
+                        "for" => "conclusion"
+                    )
+                ));
      }
 }

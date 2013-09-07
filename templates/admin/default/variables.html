@@ -26,7 +26,7 @@
 	                           {intl l='Thelia system variables'}
 	                           {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.variables.create"}
                                <div class="pull-right">
-                                  <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new variable'}" href="#add_variable_dialog" data-toggle="modal">
+                                  <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new variable'}" href="#creation_dialog" data-toggle="modal">
                                       <span class="glyphicon glyphicon-plus-sign"></span>
                                   </a>
                                   <button class="btn btn-default btn-primary" title="{intl l='Save chages'}"><span class="glyphicon glyphicon-ok"></span> {intl l='Save changes'}</button>
@@ -135,10 +135,10 @@
 
 {* Adding a new variable *}
 
-    {* Capture the dialog body, to pass it to the generic dialog *}
 
     {form name="thelia.admin.config.creation"}
 
+        {* Capture the dialog body, to pass it to the generic dialog *}
         {capture "creation_dialog"}
 
 			{form_hidden_fields form=$form}
@@ -199,7 +199,7 @@
 	    {include
 	        file = "includes/generic-create-dialog.html"
 
-	        dialog_id    = "add_variable_dialog"
+	        dialog_id    = "creation_dialog"
 	        dialog_title = {intl l="Create a new variable"}
 	        dialog_body  = {$smarty.capture.creation_dialog nofilter}
 
@@ -236,7 +236,7 @@
         // JS stuff for creation form
         {include
             file      = "includes/generic-js-dialog.html"
-            dialog_id = "add_variable_dialog"
+            dialog_id = "creation_dialog"
             form_name = "thelia.admin.config.creation"
         }
 
