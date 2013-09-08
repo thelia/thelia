@@ -67,6 +67,12 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     /** @var Translator Service Translator */
     protected $translator = null;
 
+    /** @var array Operators set by Admin in BackOffice */
+    protected $operators = array();
+
+    /** @var array Values set by Admin in BackOffice */
+    protected $values = array();
+
     /**
      * Constructor
      *
@@ -78,59 +84,61 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
         $this->translator = $adapter->getTranslator();
     }
 
-    /**
-     * Check validator relevancy and store them
-     *
-     * @param array $validators Array of RuleValidator
-     *                          validating $paramsToValidate against
-     *
-     * @return $this
-     * @throws InvalidRuleException
-     */
-    protected function setValidators(array $validators)
-    {
-        foreach ($validators as $validator) {
-            if (!$validator instanceof RuleValidator) {
-                throw new InvalidRuleException(get_class());
-            }
-            if (!in_array($validator->getOperator(), $this->availableOperators)) {
-                throw new InvalidRuleOperatorException(
-                    get_class(),
-                    $validator->getOperator()
-                );
-            }
-        }
-        $this->validators = $validators;
+//    /**
+//     * Check validator relevancy and store them
+//     *
+//     * @param array $validators Array of RuleValidator
+//     *                          validating $paramsToValidate against
+//     *
+//     * @return $this
+//     * @throws InvalidRuleException
+//     */
+//    protected function setValidators(array $validators)
+//    {
+//        foreach ($validators as $validator) {
+//            if (!$validator instanceof RuleValidator) {
+//                throw new InvalidRuleException(get_class());
+//            }
+//            if (!in_array($validator->getOperator(), $this->availableOperators)) {
+//                throw new InvalidRuleOperatorException(
+//                    get_class(),
+//                    $validator->getOperator()
+//                );
+//            }
+//        }
+//        $this->validators = $validators;
+//
+//        return $this;
+//    }
 
-        return $this;
-    }
 
-    /**
-     * Check if the current Checkout matches this condition
-     *
-     * @return bool
-     */
-    public function isMatching()
-    {
-        $this->checkBackOfficeInput();
-        $this->checkCheckoutInput();
 
-        $isMatching = true;
-        /** @var $validator RuleValidator*/
-        foreach ($this->validators as $param => $validator) {
-            $a = $this->paramsToValidate[$param];
-            $operator = $validator->getOperator();
-            /** @var ComparableInterface, RuleParameterAbstract $b */
-            $b = $validator->getParam();
-
-            if (!Operators::isValid($a, $operator, $b)) {
-                $isMatching = false;
-            }
-        }
-
-        return $isMatching;
-
-    }
+//    /**
+//     * Check if the current Checkout matches this condition
+//     *
+//     * @return bool
+//     */
+//    public function isMatching()
+//    {
+//        $this->checkBackOfficeInput();
+//        $this->checkCheckoutInput();
+//
+//        $isMatching = true;
+//        /** @var $validator RuleValidator*/
+//        foreach ($this->validators as $param => $validator) {
+//            $a = $this->paramsToValidate[$param];
+//            $operator = $validator->getOperator();
+//            /** @var ComparableInterface, RuleParameterAbstract $b */
+//            $b = $validator->getParam();
+//
+//            if (!Operators::isValid($a, $operator, $b)) {
+//                $isMatching = false;
+//            }
+//        }
+//
+//        return $isMatching;
+//
+//    }
 
     /**
      * Return all available Operators for this Rule
@@ -162,16 +170,16 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
         return true;
     }
 
-    /**
-     * Generate current Rule param to be validated from adapter
-     *
-     * @throws \Thelia\Exception\NotImplementedException
-     * @return $this
-     */
-    protected function setParametersToValidate()
-    {
-        throw new \Thelia\Exception\NotImplementedException();
-    }
+//    /**
+//     * Generate current Rule param to be validated from adapter
+//     *
+//     * @throws \Thelia\Exception\NotImplementedException
+//     * @return $this
+//     */
+//    protected function setParametersToValidate()
+//    {
+//        throw new \Thelia\Exception\NotImplementedException();
+//    }
 
     /**
      * Return all validators
@@ -194,6 +202,17 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
         return $this->serviceId;
     }
 
-
+    /**
+     * Validate if Operator given is available for this Coupon
+     *
+     * @param string $operator           Operator to validate ex <
+     * @param array  $availableOperators Available operators
+     *
+     * @return bool
+     */
+    protected function isOperatorLegit($operator, array $availableOperators)
+    {
+         return in_array($operator, $availableOperators);
+    }
 
 }

@@ -24,17 +24,11 @@
 namespace Thelia\Constraint;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Thelia\Constraint\Rule\AvailableForXArticles;
-use Thelia\Constraint\Validator\PriceParam;
-use Thelia\Constraint\Validator\RuleValidator;
-use Thelia\Constraint\Rule\AvailableForTotalAmount;
+use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
+use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
 use Thelia\Coupon\CouponBaseAdapter;
-use Thelia\Coupon\CouponBaseAdapterTest;
 use Thelia\Coupon\CouponRuleCollection;
-use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Coupon\Type\RemoveXAmount;
-use Thelia\Tools\PhpUnitUtils;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -47,7 +41,7 @@ use Thelia\Tools\PhpUnitUtils;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
+class ConstraintFactoryTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -59,9 +53,9 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Check the if the Constraint Manager is able to check RuleValidators
+     * Check the Rules serialization module
      */
-    public function testIsMatching()
+    public function testBuild()
     {
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
@@ -75,42 +69,67 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getTranslator')
             ->will($this->returnValue($stubTranslator));
 
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(321.98));
-
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('USD'));
-
-        $rule1 = new AvailableForTotalAmount($stubAdapter);
-        $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::SUPERIOR);
-        $values = array(
-            AvailableForTotalAmount::PARAM1_PRICE => 40.00,
-            AvailableForTotalAmount::PARAM1_CURRENCY => 'USD'
+        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
+        $operators = array(
+            AvailableForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+            AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
         );
-        $rule1->populateFromForm($operators, $values);
-
-        $rule2 = new AvailableForTotalAmount($stubAdapter);
-        $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::INFERIOR);
         $values = array(
-            AvailableForTotalAmount::PARAM1_PRICE => 400.00,
-            AvailableForTotalAmount::PARAM1_CURRENCY => 'USD'
+            AvailableForTotalAmountManager::INPUT1 => 40.00,
+            AvailableForTotalAmountManager::INPUT2 => 'EUR'
         );
-        $rule2->populateFromForm($operators, $values);
-
-        $rules = new CouponRuleCollection();
-        $rules->add($rule1);
-        $rules->add($rule2);
+        $rule1->setValidatorsFromForm($operators, $values);
 
         /** @var ConstraintManager $constraintManager */
-        $constraintManager = new ConstraintManager($this->getContainer());
+        $constraintFactory = new ConstraintFactory($this->getContainer());
+        $ruleManager1 = $constraintFactory->build($rule1->getServiceId(), $operators, $values);
 
-        $expected = true;
-        $actual = $constraintManager->isMatching($rules);
+        $expected = $rule1;
+        $actual = $ruleManager1;
 
-        $this->assertEquals($expected, $actual, 'The ConstraintManager is no more able to check if a Rule is matching');
+        $this->assertEquals($expected, $actual);
+        $this->assertEquals($rule1->getServiceId(), $ruleManager1->getServiceId());
+        $this->assertEquals($rule1->getValidators(), $ruleManager1->getValidators());
     }
+
+    /**
+     * Check the Rules serialization module
+     */
+    public function testBuildFail()
+    {
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+
+        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
+        $operators = array(
+            AvailableForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+            AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            AvailableForTotalAmountManager::INPUT1 => 40.00,
+            AvailableForTotalAmountManager::INPUT2 => 'EUR'
+        );
+        $rule1->setValidatorsFromForm($operators, $values);
+
+        /** @var ConstraintManager $constraintManager */
+        $constraintFactory = new ConstraintFactory($this->getContainer());
+        $ruleManager1 = $constraintFactory->build('unset.service', $operators, $values);
+
+        $expected = false;
+        $actual = $ruleManager1;
+
+        $this->assertEquals($expected, $actual);
+    }
+
 
     /**
      * Check the Rules serialization module
@@ -129,31 +148,37 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getTranslator')
             ->will($this->returnValue($stubTranslator));
 
-        $rule1 = new AvailableForTotalAmount($stubAdapter);
-        $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::SUPERIOR);
-        $values = array(
-            AvailableForTotalAmount::PARAM1_PRICE => 40.00,
-            AvailableForTotalAmount::PARAM1_CURRENCY => 'EUR'
+        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
+        $operators = array(
+            AvailableForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+            AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
         );
-        $rule1->populateFromForm($operators, $values);
+        $values = array(
+            AvailableForTotalAmountManager::INPUT1 => 40.00,
+            AvailableForTotalAmountManager::INPUT2 => 'EUR'
+        );
+        $rule1->setValidatorsFromForm($operators, $values);
 
-        $rule2 = new AvailableForTotalAmount($stubAdapter);
-        $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::INFERIOR);
-        $values = array(
-            AvailableForTotalAmount::PARAM1_PRICE => 400.00,
-            AvailableForTotalAmount::PARAM1_CURRENCY => 'EUR'
+        $rule2 = new AvailableForTotalAmountManager($stubAdapter);
+        $operators = array(
+            AvailableForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+            AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
         );
-        $rule2->populateFromForm($operators, $values);
+        $values = array(
+            AvailableForTotalAmountManager::INPUT1 => 400.00,
+            AvailableForTotalAmountManager::INPUT2 => 'EUR'
+        );
+        $rule2->setValidatorsFromForm($operators, $values);
 
         $rules = new CouponRuleCollection();
         $rules->add($rule1);
         $rules->add($rule2);
 
         /** @var ConstraintManager $constraintManager */
-        $constraintManager = new ConstraintManager($this->getContainer());
+        $constraintFactory = new ConstraintFactory($this->getContainer());
 
-        $serializedRules = $constraintManager->serializeCouponRuleCollection($rules);
-        $unserializedRules = $constraintManager->unserializeCouponRuleCollection($serializedRules);
+        $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
+        $unserializedRules = $constraintFactory->unserializeCouponRuleCollection($serializedRules);
 
         $expected = (string)$rules;
         $actual = (string)$unserializedRules;
@@ -182,8 +207,8 @@ class ConstraintManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getTranslator')
             ->will($this->returnValue($stubTranslator));
 
-        $rule1 = new AvailableForTotalAmount($stubAdapter);
-        $rule2 = new AvailableForXArticles($stubAdapter);
+        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
+        $rule2 = new AvailableForXArticlesManager($stubAdapter);
 
         $adapter = new CouponBaseAdapter($container);
 

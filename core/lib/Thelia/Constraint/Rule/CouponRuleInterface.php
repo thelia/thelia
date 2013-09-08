@@ -47,21 +47,46 @@ interface CouponRuleInterface
     function __construct(CouponAdapterInterface $adapter);
 
     /**
+     * Get Rule Service id
+     *
+     * @return string
+     */
+    public function getServiceId();
+
+    /**
      * Check if backoffice inputs are relevant or not
      *
      * @return bool
      */
     public function checkBackOfficeInput();
 
-    /**
-     * Check if Checkout inputs are relevant or not
-     *
-     * @return bool
-     */
-    public function checkCheckoutInput();
+//    /**
+//     * Check if Checkout inputs are relevant or not
+//     *
+//     * @return bool
+//     */
+//    public function checkCheckoutInput();
 
     /**
-     * Check if the current Checkout matches this condition
+     * Check validators relevancy and store them
+     *
+     * @param array $operators Operators the Admin set in BackOffice
+     * @param array $values    Values the Admin set in BackOffice
+     *
+     * @throws \InvalidArgumentException
+     * @return $this
+     */
+    public function setValidatorsFromForm(array $operators, array $values);
+
+//    /**
+//     * Check if the current Checkout matches this condition
+//     *
+//     * @return bool
+//     */
+//    public function isMatching();
+
+    /**
+     * Test if Customer meets conditions
      *
      * @return bool
      */
@@ -96,15 +121,15 @@ interface CouponRuleInterface
      */
     public function getValidators();
 
-    /**
-     * Populate a Rule from a form admin
-     *
-     * @param array $operators Rule Operator set by the Admin
-     * @param array $values    Rule Values set by the Admin
-     *
-     * @return bool
-     */
-    public function populateFromForm(array$operators, array $values);
+//    /**
+//     * Populate a Rule from a form admin
+//     *
+//     * @param array $operators Rule Operator set by the Admin
+//     * @param array $values    Rule Values set by the Admin
+//     *
+//     * @return bool
+//     */
+//    public function populateFromForm(array$operators, array $values);
 
 
     /**

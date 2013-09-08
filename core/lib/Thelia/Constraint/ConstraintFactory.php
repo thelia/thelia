@@ -25,9 +25,7 @@ namespace Thelia\Constraint;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use Symfony\Component\Serializer\Serializer;
+use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Constraint\Rule\SerializableRule;
 use Thelia\Coupon\CouponAdapterInterface;
@@ -45,7 +43,7 @@ use Thelia\Coupon\CouponRuleCollection;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class ConstraintManager
+class ConstraintFactory
 {
     /** @var ContainerInterface Service Container */
     protected $container = null;
@@ -65,28 +63,6 @@ class ConstraintManager
     {
         $this->container = $container;
         $this->adapter = $container->get('thelia.adapter');
-    }
-
-    /**
-     * Check if the current Coupon is matching its conditions (Rules)
-     * Thelia variables are given by the CouponAdapterInterface
-     *
-     * @param CouponRuleCollection $collection A collection of rules
-     *
-     * @return bool
-     */
-    public function isMatching(CouponRuleCollection $collection)
-    {
-        $isMatching = true;
-
-        /** @var CouponRuleInterface $rule */
-        foreach ($collection->getRules() as $rule) {
-            if (!$rule->isMatching($this->adapter)) {
-                $isMatching = false;
-            }
-        }
-
-        return $isMatching;
     }
 
     /**
@@ -128,8 +104,8 @@ class ConstraintManager
             foreach ($unserializedRules as $rule) {
                 if ($this->container->has($rule->ruleServiceId)) {
                     /** @var CouponRuleInterface $couponRule */
-                    $couponRule = $this->container->get($rule->ruleServiceId);
-                    $couponRule->populateFromForm(
+                    $couponRule = $this->build(
+                        $rule->ruleServiceId,
                         (array) $rule->operators,
                         (array) $rule->values
                     );
@@ -139,5 +115,29 @@ class ConstraintManager
         }
 
         return $collection;
+    }
+
+
+    /**
+     * Build a Coupon Rule from form
+     *
+     * @param string $ruleServiceId Rule class name
+     * @param array  $operators     Rule Operator (<, >, = )
+     * @param array  $values        Values setting this Rule
+     *
+     * @throws \InvalidArgumentException
+     * @return CouponRuleInterface Ready to use Rule or false
+     */
+    public function build($ruleServiceId, array $operators, array $values)
+    {
+        if (!$this->container->has($ruleServiceId)) {
+            return false;
+        }
+
+        /** @var CouponRuleInterface $rule */
+        $rule = $this->container->get($ruleServiceId);
+        $rule->setValidatorsFromForm($operators, $values);
+
+        return $rule;
     }
 }

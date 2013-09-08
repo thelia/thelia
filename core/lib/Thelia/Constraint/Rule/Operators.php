@@ -51,62 +51,66 @@ abstract class Operators
     CONST SUPERIOR          =     '>';
     /** Param1 is different to Param2 */
     CONST DIFFERENT         =     '!=';
+    /** Param1 is in Param2 */
+    CONST IN         =     'in';
+    /** Param1 is not in Param2 */
+    CONST OUT         =     'out';
 
-    /**
-     * Check if a parameter is valid against a ComparableInterface from its operator
-     *
-     * @param mixed               $a        Parameter to validate
-     * @param string              $operator Operator to validate against
-     * @param ComparableInterface $b        Comparable  to validate against
-     *
-     * @return bool
-     */
-    public static function isValid($a, $operator, ComparableInterface $b)
-    {
-        $ret = false;
-
-        try {
-            $comparison = $b->compareTo($a);
-        } catch (\Exception $e) {
-            return false;
-        }
-
-        switch ($operator) {
-        case self::INFERIOR:
-            if ($comparison == 1) {
-                return true;
-            }
-            break;
-        case self::INFERIOR_OR_EQUAL:
-            if ($comparison == 1 || $comparison == 0) {
-                return true;
-            }
-            break;
-        case self::EQUAL:
-            if ($comparison == 0) {
-                return true;
-            }
-            break;
-        case self::SUPERIOR_OR_EQUAL:
-            if ($comparison == -1 || $comparison == 0) {
-                return true;
-            }
-            break;
-        case self::SUPERIOR:
-            if ($comparison == -1) {
-                return true;
-            }
-            break;
-        case self::DIFFERENT:
-            if ($comparison != 0) {
-                return true;
-            }
-            break;
-        default:
-        }
-
-        return $ret;
-    }
+//    /**
+//     * Check if a parameter is valid against a ComparableInterface from its operator
+//     *
+//     * @param mixed               $a        Parameter to validate
+//     * @param string              $operator Operator to validate against
+//     * @param ComparableInterface $b        Comparable  to validate against
+//     *
+//     * @return bool
+//     */
+//    public static function isValid($a, $operator, ComparableInterface $b)
+//    {
+//        $ret = false;
+//
+//        try {
+//            $comparison = $b->compareTo($a);
+//        } catch (\Exception $e) {
+//            return false;
+//        }
+//
+//        switch ($operator) {
+//        case self::INFERIOR:
+//            if ($comparison == 1) {
+//                return true;
+//            }
+//            break;
+//        case self::INFERIOR_OR_EQUAL:
+//            if ($comparison == 1 || $comparison == 0) {
+//                return true;
+//            }
+//            break;
+//        case self::EQUAL:
+//            if ($comparison == 0) {
+//                return true;
+//            }
+//            break;
+//        case self::SUPERIOR_OR_EQUAL:
+//            if ($comparison == -1 || $comparison == 0) {
+//                return true;
+//            }
+//            break;
+//        case self::SUPERIOR:
+//            if ($comparison == -1) {
+//                return true;
+//            }
+//            break;
+//        case self::DIFFERENT:
+//            if ($comparison != 0) {
+//                return true;
+//            }
+//            break;
+//        default:
+//        }
+//
+//        return $ret;
+//    }
 
     /**
      * Get operator translation
@@ -158,6 +162,20 @@ abstract class Operators
         case self::DIFFERENT:
             $ret = $translator->trans(
                 'different from',
+                array(),
+                'constraint'
+            );
+            break;
+        case self::IN:
+            $ret = $translator->trans(
+                'in',
+                array(),
+                'constraint'
+            );
+            break;
+        case self::OUT:
+            $ret = $translator->trans(
+                'not in',
                 array(),
                 'constraint'
             );

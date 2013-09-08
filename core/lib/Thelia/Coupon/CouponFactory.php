@@ -128,25 +128,5 @@ class CouponFactory
     }
 
 
-//    /**
-//     * Build a Coupon Rule from form
-//     *
-//     * @param string $type Rule class name
-//     * @param string $operator Rule Operator (<, >, = )
-//     * @param array $values Values setting this Rule
-//     *
-//     * @return CouponRuleInterface Ready to use Rule or false
-//     */
-//    public function buildCouponRuleFromForm($ruleServiceId, $operator, array $values)
-//    {
-//        /** @var CouponAdapterInterface $adapter */
-//        $adapter = $this->container->get('thelia.adapter');
-//        $validator = new PriceParam()
-//        try {
-//            $rule = new AvailableForTotalAmount($adapter, $validators);
-//            $rule = new $type($adapter, $validators);
-//        } catch (\Exception $e) {
-//            return false;
-//        }
-//    }
+
 }
