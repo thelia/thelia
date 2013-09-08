@@ -26,11 +26,15 @@ use Thelia\Model\Message;
 
 class MessageEvent extends ActionEvent
 {
-    protected $message;
+    protected $message = null;
 
     public function __construct(Message $message = null)
     {
         $this->message = $message;
+    }
+
+    public function hasMessage() {
+        return ! is_null($this->message);
     }
 
     public function getMessage()

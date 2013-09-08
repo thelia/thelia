@@ -164,10 +164,28 @@ class Session extends BaseSession
      * assign cart id in session
      *
      * @param $cart_id
+     * @return $this
      */
     public function setCart($cart_id)
     {
         $this->set("thelia.cart_id", $cart_id);
         return $this;
+    }
+
+    /**
+     * assign delivery id in session
+     *
+     * @param $delivery_id
+     * @return $this
+     */
+    public function setDelivery($delivery_id)
+    {
+        $this->set("thelia.delivery_id", $delivery_id);
+        return $this;
+    }
+
+    public function getDelivery()
+    {
+        return $this->get("thelia.delivery_id");
     }
 }

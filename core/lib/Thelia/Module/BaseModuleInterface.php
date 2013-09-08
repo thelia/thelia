@@ -21,8 +21,17 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Module;
 
-class CurrencyUpdatePositionEvent extends BaseUpdatePositionEvent
-{
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
+
+interface BaseModuleInterface {
+
+    public function setRequest(Request $request);
+    public function getRequest();
+
+    public function setDispatcher(EventDispatcherInterface $dispatcher);
+    public function getDispatcher();
 }

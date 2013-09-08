@@ -27,12 +27,12 @@ use Thelia\Model\LangQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 
-class ConfigModificationForm extends BaseDescForm
+class ConfigModificationForm extends BaseForm
 {
+    use StandardDescriptionFieldsTrait;
+
     protected function buildForm()
     {
-        parent::buildForm(true);
-
         $this->formBuilder
             ->add("id", "hidden", array(
                     "constraints" => array(
@@ -44,12 +44,26 @@ class ConfigModificationForm extends BaseDescForm
             ->add("name", "text", array(
                 "constraints" => array(
                     new NotBlank()
+                ),
+                "label" => "Name",
+                "label_attr" => array(
+                    "for" => "name"
                 )
             ))
-            ->add("value", "text", array())
+            ->add("value", "text", array(
+                "label" => "Value",
+                "label_attr" => array(
+                    "for" => "value"
+                )
+            ))
             ->add("hidden", "hidden", array())
-            ->add("secured", "hidden", array())
+            ->add("secured", "hidden", array(
+                "label" => "Prevent variable modification or deletion, except for super-admin"
+            ))
          ;
+
+        // Add standard description fields
+        $this->addStandardDescFields();
     }
 
     public function getName()

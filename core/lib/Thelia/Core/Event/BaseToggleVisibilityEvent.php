@@ -20,25 +20,29 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Thelia\Core\Event;
 
-class CategoryDeletionForm extends BaseForm
+
+class BaseToggleVisibilityEvent  extends ActionEvent
 {
-    protected function buildForm()
+    protected $object_id;
+
+    protected $object;
+
+    public function __construct($object_id)
     {
-        $this->formBuilder
-            ->add("category_id", "integer", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-        ;
+        $this->object_id = $object_id;
     }
 
-    public function getName()
+    public function getObjectId()
     {
-        return "thelia_category_deletion";
+        return $this->object_id;
+    }
+
+    public function setObjectId($object_id)
+    {
+        $this->object_id = $object_id;
+        return $this;
     }
 }

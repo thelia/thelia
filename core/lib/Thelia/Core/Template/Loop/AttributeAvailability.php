@@ -131,7 +131,8 @@ class AttributeAvailability extends BaseI18nLoop
                 ->set("TITLE",$attributeAv->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $attributeAv->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'));
+                ->set("POSTSCRIPTUM", $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("POSITION", $attributeAv->getPosition());
 
             $loopResult->addRow($loopResultRow);
         }

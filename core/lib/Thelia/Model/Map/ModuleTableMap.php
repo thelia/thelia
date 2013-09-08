@@ -57,7 +57,7 @@ class ModuleTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class ModuleTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the ID field
@@ -93,6 +93,11 @@ class ModuleTableMap extends TableMap
      * the column name for the POSITION field
      */
     const POSITION = 'module.POSITION';
+
+    /**
+     * the column name for the FULL_NAMESPACE field
+     */
+    const FULL_NAMESPACE = 'module.FULL_NAMESPACE';
 
     /**
      * the column name for the CREATED_AT field
@@ -125,12 +130,12 @@ class ModuleTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'Type', 'Activate', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'type', 'activate', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ModuleTableMap::ID, ModuleTableMap::CODE, ModuleTableMap::TYPE, ModuleTableMap::ACTIVATE, ModuleTableMap::POSITION, ModuleTableMap::CREATED_AT, ModuleTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'TYPE', 'ACTIVATE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'type', 'activate', 'position', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'Code', 'Type', 'Activate', 'Position', 'FullNamespace', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'type', 'activate', 'position', 'fullNamespace', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ModuleTableMap::ID, ModuleTableMap::CODE, ModuleTableMap::TYPE, ModuleTableMap::ACTIVATE, ModuleTableMap::POSITION, ModuleTableMap::FULL_NAMESPACE, ModuleTableMap::CREATED_AT, ModuleTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'TYPE', 'ACTIVATE', 'POSITION', 'FULL_NAMESPACE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'code', 'type', 'activate', 'position', 'full_namespace', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -140,12 +145,12 @@ class ModuleTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Type' => 2, 'Activate' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'type' => 2, 'activate' => 3, 'position' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(ModuleTableMap::ID => 0, ModuleTableMap::CODE => 1, ModuleTableMap::TYPE => 2, ModuleTableMap::ACTIVATE => 3, ModuleTableMap::POSITION => 4, ModuleTableMap::CREATED_AT => 5, ModuleTableMap::UPDATED_AT => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'TYPE' => 2, 'ACTIVATE' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'type' => 2, 'activate' => 3, 'position' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Type' => 2, 'Activate' => 3, 'Position' => 4, 'FullNamespace' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'type' => 2, 'activate' => 3, 'position' => 4, 'fullNamespace' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        self::TYPE_COLNAME       => array(ModuleTableMap::ID => 0, ModuleTableMap::CODE => 1, ModuleTableMap::TYPE => 2, ModuleTableMap::ACTIVATE => 3, ModuleTableMap::POSITION => 4, ModuleTableMap::FULL_NAMESPACE => 5, ModuleTableMap::CREATED_AT => 6, ModuleTableMap::UPDATED_AT => 7, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'TYPE' => 2, 'ACTIVATE' => 3, 'POSITION' => 4, 'FULL_NAMESPACE' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'type' => 2, 'activate' => 3, 'position' => 4, 'full_namespace' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -169,6 +174,7 @@ class ModuleTableMap extends TableMap
         $this->addColumn('TYPE', 'Type', 'TINYINT', true, null, null);
         $this->addColumn('ACTIVATE', 'Activate', 'TINYINT', false, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
+        $this->addColumn('FULL_NAMESPACE', 'FullNamespace', 'VARCHAR', false, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -349,6 +355,7 @@ class ModuleTableMap extends TableMap
             $criteria->addSelectColumn(ModuleTableMap::TYPE);
             $criteria->addSelectColumn(ModuleTableMap::ACTIVATE);
             $criteria->addSelectColumn(ModuleTableMap::POSITION);
+            $criteria->addSelectColumn(ModuleTableMap::FULL_NAMESPACE);
             $criteria->addSelectColumn(ModuleTableMap::CREATED_AT);
             $criteria->addSelectColumn(ModuleTableMap::UPDATED_AT);
         } else {
@@ -357,6 +364,7 @@ class ModuleTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.TYPE');
             $criteria->addSelectColumn($alias . '.ACTIVATE');
             $criteria->addSelectColumn($alias . '.POSITION');
+            $criteria->addSelectColumn($alias . '.FULL_NAMESPACE');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
