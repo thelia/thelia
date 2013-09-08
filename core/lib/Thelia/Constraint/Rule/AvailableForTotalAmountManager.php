@@ -74,36 +74,36 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
 //    /** @var RuleValidator Price Validator */
 //    protected $priceValidator = null;
 
-    /**
-     * Check if backoffice inputs are relevant or not
-     *
-     * @throws InvalidRuleOperatorException if Operator is not allowed
-     * @throws InvalidRuleValueException    if Value is not allowed
-     * @return bool
-     */
-    public function checkBackOfficeInput()
-    {
-        if (!isset($this->validators)
-            || empty($this->validators)
-            ||!isset($this->validators[self::PARAM1_PRICE])
-            ||!isset($this->validators[self::PARAM1_PRICE])
-        ) {
-            throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
-        }
-
-        /** @var RuleValidator $ruleValidator */
-        $ruleValidator = $this->validators[self::PARAM1_PRICE];
-        /** @var PriceParam $price */
-        $price = $ruleValidator->getParam();
-
-        if (!$price instanceof PriceParam) {
-            throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
-        }
-
-        $this->checkBackOfficeInputsOperators();
-
-        return $this->isPriceValid($price->getPrice(), $price->getCurrency());
-    }
+//    /**
+//     * Check if backoffice inputs are relevant or not
+//     *
+//     * @throws InvalidRuleOperatorException if Operator is not allowed
+//     * @throws InvalidRuleValueException    if Value is not allowed
+//     * @return bool
+//     */
+//    public function checkBackOfficeInput()
+//    {
+//        if (!isset($this->validators)
+//            || empty($this->validators)
+//            ||!isset($this->validators[self::PARAM1_PRICE])
+//            ||!isset($this->validators[self::PARAM1_PRICE])
+//        ) {
+//            throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
+//        }
+//
+//        /** @var RuleValidator $ruleValidator */
+//        $ruleValidator = $this->validators[self::PARAM1_PRICE];
+//        /** @var PriceParam $price */
+//        $price = $ruleValidator->getParam();
+//
+//        if (!$price instanceof PriceParam) {
+//            throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
+//        }
+//
+//        $this->checkBackOfficeInputsOperators();
+//
+//        return $this->isPriceValid($price->getPrice(), $price->getCurrency());
+//    }
 
 //    /**
 //     * Check if Checkout inputs are relevant or not
@@ -247,33 +247,33 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
         return false;
     }
 
-    /**
-     * Check if a price is valid
-     *
-     * @param float  $price    Price to check
-     * @param string $currency Price currency
-     *
-     * @throws InvalidRuleValueException if Value is not allowed
-     * @return bool
-     */
-    protected function isPriceValid($price, $currency)
-    {
-        $priceValidator = $this->priceValidator;
-
-        /** @var PriceParam $param */
-        $param = $priceValidator->getParam();
-        if ($currency == $param->getCurrency()) {
-            try {
-                $priceValidator->getParam()->compareTo($price);
-            } catch(\InvalidArgumentException $e) {
-                throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
-            }
-        } else {
-            throw new InvalidRuleValueException(get_class(), self::PARAM1_CURRENCY);
-        }
-
-        return true;
-    }
+//    /**
+//     * Check if a price is valid
+//     *
+//     * @param float  $price    Price to check
+//     * @param string $currency Price currency
+//     *
+//     * @throws InvalidRuleValueException if Value is not allowed
+//     * @return bool
+//     */
+//    protected function isPriceValid($price, $currency)
+//    {
+//        $priceValidator = $this->priceValidator;
+//
+//        /** @var PriceParam $param */
+//        $param = $priceValidator->getParam();
+//        if ($currency == $param->getCurrency()) {
+//            try {
+//                $priceValidator->getParam()->compareTo($price);
+//            } catch(\InvalidArgumentException $e) {
+//                throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
+//            }
+//        } else {
+//            throw new InvalidRuleValueException(get_class(), self::PARAM1_CURRENCY);
+//        }
+//
+//        return true;
+//    }
 
 //    /**
 //     * Generate current Rule param to be validated from adapter
@@ -312,15 +312,15 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
     public function getToolTip()
     {
         $i18nOperator = Operators::getI18n(
-            $this->translator, $this->priceValidator->getOperator()
+            $this->translator, $this->operators[self::INPUT1]
         );
 
         $toolTip = $this->translator->trans(
             'If cart total amount is <strong>%operator%</strong> %amount% %currency%',
             array(
                 '%operator%' => $i18nOperator,
-                '%amount%' => $this->priceValidator->getParam()->getPrice(),
-                '%currency%' => $this->priceValidator->getParam()->getCurrency()
+                '%amount%' => $this->values[self::INPUT1],
+                '%currency%' => $this->values[self::INPUT2]
             ),
             'constraint'
         );
@@ -361,21 +361,7 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
 //        return $this;
 //    }
 
-    /**
-     * Return a serializable Rule
-     *
-     * @return SerializableRule
-     */
-    public function getSerializableRule()
-    {
-        $serializableRule = new SerializableRule();
-        $serializableRule->ruleServiceId = $this->serviceId;
-        $serializableRule->operators = $this->operators;
 
-        $serializableRule->values = $this->values;
-
-        return $serializableRule;
-    }
 
 
 

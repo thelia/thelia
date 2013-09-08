@@ -25,6 +25,7 @@ namespace Thelia\Coupon;
 
 use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
+use Thelia\Constraint\Rule\SerializableRule;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -563,6 +564,101 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $expected = false;
         $actual =$isValid;
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testGetSerializableRule()
+    {
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getNbArticlesInCart')
+            ->will($this->returnValue(4));
+
+        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $operators = array(
+            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR
+        );
+        $values = array(
+            AvailableForXArticlesManager::INPUT1 => 4
+        );
+        $rule1->setValidatorsFromForm($operators, $values);
+
+        $serializableRule = $rule1->getSerializableRule();
+
+        $expected = new SerializableRule();
+        $expected->ruleServiceId = $rule1->getServiceId();
+        $expected->operators = $operators;
+        $expected->values = $values;
+
+        $actual = $serializableRule;
+
+        $this->assertEquals($expected, $actual);
+
+    }
+
+    public function testGetAvailableOperators()
+    {
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getNbArticlesInCart')
+            ->will($this->returnValue(4));
+
+        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $operators = array(
+            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR
+        );
+        $values = array(
+            AvailableForXArticlesManager::INPUT1 => 4
+        );
+        $rule1->setValidatorsFromForm($operators, $values);
+
+        $expected = array(
+            AvailableForXArticlesManager::INPUT1 => array(
+                Operators::INFERIOR,
+                Operators::INFERIOR_OR_EQUAL,
+                Operators::EQUAL,
+                Operators::SUPERIOR_OR_EQUAL,
+                Operators::SUPERIOR
+            )
+        );
+        $actual = $rule1->getAvailableOperators();
+
+        $this->assertEquals($expected, $actual);
+
+    }
+
+    public function testGetValidators()
+    {
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getNbArticlesInCart')
+            ->will($this->returnValue(4));
+
+        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $operators = array(
+            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR
+        );
+        $values = array(
+            AvailableForXArticlesManager::INPUT1 => 4
+        );
+        $rule1->setValidatorsFromForm($operators, $values);
+
+        $expected = array(
+            $operators,
+            $values
+        );
+        $actual = $rule1->getValidators();
+
+        $this->assertEquals($expected, $actual);
+
     }
 
 

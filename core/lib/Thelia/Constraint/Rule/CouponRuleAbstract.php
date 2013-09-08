@@ -44,10 +44,10 @@ use Thelia\Exception\InvalidRuleOperatorException;
  */
 abstract class CouponRuleAbstract implements CouponRuleInterface
 {
-    /** Operator key in $validators */
-    CONST OPERATOR = 'operator';
-    /** Value key in $validators */
-    CONST VALUE = 'value';
+//    /** Operator key in $validators */
+//    CONST OPERATOR = 'operator';
+//    /** Value key in $validators */
+//    CONST VALUE = 'value';
 
     /** @var string Service Id from Resources/config.xml  */
     protected $serviceId = null;
@@ -58,8 +58,8 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     /** @var array Parameters validating parameters against */
     protected $validators = array();
 
-    /** @var array Parameters to be validated */
-    protected $paramsToValidate = array();
+//    /** @var array Parameters to be validated */
+//    protected $paramsToValidate = array();
 
     /** @var  CouponAdapterInterface Provide necessary value from Thelia */
     protected $adapter = null;
@@ -150,25 +150,25 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
         return $this->availableOperators;
     }
 
-    /**
-     * Check if Operators set for this Rule in the BackOffice are legit
-     *
-     * @throws InvalidRuleOperatorException if Operator is not allowed
-     * @return bool
-     */
-    protected function checkBackOfficeInputsOperators()
-    {
-        /** @var RuleValidator $param */
-        foreach ($this->validators as $key => $param) {
-            $operator = $param->getOperator();
-            if (!isset($operator)
-                ||!in_array($operator, $this->availableOperators)
-            ) {
-                throw new InvalidRuleOperatorException(get_class(), $key);
-            }
-        }
-        return true;
-    }
+//    /**
+//     * Check if Operators set for this Rule in the BackOffice are legit
+//     *
+//     * @throws InvalidRuleOperatorException if Operator is not allowed
+//     * @return bool
+//     */
+//    protected function checkBackOfficeInputsOperators()
+//    {
+//        /** @var RuleValidator $param */
+//        foreach ($this->validators as $key => $param) {
+//            $operator = $param->getOperator();
+//            if (!isset($operator)
+//                ||!in_array($operator, $this->availableOperators)
+//            ) {
+//                throw new InvalidRuleOperatorException(get_class(), $key);
+//            }
+//        }
+//        return true;
+//    }
 
 //    /**
 //     * Generate current Rule param to be validated from adapter
@@ -183,13 +183,15 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
 
     /**
      * Return all validators
-     * Serialization purpose
      *
      * @return array
      */
     public function getValidators()
     {
-        return $this->validators;
+        return array(
+            $this->operators,
+            $this->values
+        );
     }
 
     /**
@@ -213,6 +215,22 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     protected function isOperatorLegit($operator, array $availableOperators)
     {
          return in_array($operator, $availableOperators);
+    }
+
+    /**
+     * Return a serializable Rule
+     *
+     * @return SerializableRule
+     */
+    public function getSerializableRule()
+    {
+        $serializableRule = new SerializableRule();
+        $serializableRule->ruleServiceId = $this->serviceId;
+        $serializableRule->operators = $this->operators;
+
+        $serializableRule->values = $this->values;
+
+        return $serializableRule;
     }
 
 }

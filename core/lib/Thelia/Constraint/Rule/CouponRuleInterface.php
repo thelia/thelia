@@ -53,12 +53,12 @@ interface CouponRuleInterface
      */
     public function getServiceId();
 
-    /**
-     * Check if backoffice inputs are relevant or not
-     *
-     * @return bool
-     */
-    public function checkBackOfficeInput();
+//    /**
+//     * Check if backoffice inputs are relevant or not
+//     *
+//     * @return bool
+//     */
+//    public function checkBackOfficeInput();
 
 //    /**
 //     * Check if Checkout inputs are relevant or not
@@ -115,7 +115,7 @@ interface CouponRuleInterface
     public function getToolTip();
 
     /**
-     * Get validators
+     * Return all validators
      *
      * @return array
      */

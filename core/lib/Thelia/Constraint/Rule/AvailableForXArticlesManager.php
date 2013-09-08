@@ -63,56 +63,56 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
         )
     );
 
-    /** @var QuantityParam Quantity Validator */
-    protected $quantityValidator = null;
+//    /** @var QuantityParam Quantity Validator */
+//    protected $quantityValidator = null;
 
-    /**
-     * Check if backoffice inputs are relevant or not
-     *
-     * @throws InvalidRuleOperatorException if Operator is not allowed
-     * @throws InvalidRuleValueException    if Value is not allowed
-     * @return bool
-     */
-    public function checkBackOfficeInput()
-    {
-        if (!isset($this->validators)
-            || empty($this->validators)
-            ||!isset($this->validators[self::PARAM1_QUANTITY])
-            ||!isset($this->validators[self::PARAM1_QUANTITY])
-        ) {
-            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
-        }
+//    /**
+//     * Check if backoffice inputs are relevant or not
+//     *
+//     * @throws InvalidRuleOperatorException if Operator is not allowed
+//     * @throws InvalidRuleValueException    if Value is not allowed
+//     * @return bool
+//     */
+//    public function checkBackOfficeInput()
+//    {
+//        if (!isset($this->validators)
+//            || empty($this->validators)
+//            ||!isset($this->validators[self::PARAM1_QUANTITY])
+//            ||!isset($this->validators[self::PARAM1_QUANTITY])
+//        ) {
+//            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
+//        }
+//
+//        /** @var RuleValidator $ruleValidator */
+//        $ruleValidator = $this->validators[self::PARAM1_QUANTITY];
+//        /** @var QuantityParam $quantity */
+//        $quantity = $ruleValidator->getParam();
+//
+//        if (!$quantity instanceof QuantityParam) {
+//            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
+//        }
+//
+//        $this->checkBackOfficeInputsOperators();
+//
+//        return $this->isQuantityValid($quantity->getInteger());
+//    }
 
-        /** @var RuleValidator $ruleValidator */
-        $ruleValidator = $this->validators[self::PARAM1_QUANTITY];
-        /** @var QuantityParam $quantity */
-        $quantity = $ruleValidator->getParam();
-
-        if (!$quantity instanceof QuantityParam) {
-            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
-        }
-
-        $this->checkBackOfficeInputsOperators();
-
-        return $this->isQuantityValid($quantity->getInteger());
-    }
-
-    /**
-     * Generate current Rule param to be validated from adapter
-     *
-     * @param CouponAdapterInterface $adapter allowing to gather
-     *                               all necessary Thelia variables
-     *
-     * @return $this
-     */
-    protected function setParametersToValidate()
-    {
-        $this->paramsToValidate = array(
-            self::PARAM1_QUANTITY => $this->adapter->getNbArticlesInCart()
-        );
-
-        return $this;
-    }
+//    /**
+//     * Generate current Rule param to be validated from adapter
+//     *
+//     * @param CouponAdapterInterface $adapter allowing to gather
+//     *                               all necessary Thelia variables
+//     *
+//     * @return $this
+//     */
+//    protected function setParametersToValidate()
+//    {
+//        $this->paramsToValidate = array(
+//            self::PARAM1_QUANTITY => $this->adapter->getNbArticlesInCart()
+//        );
+//
+//        return $this;
+//    }
 
 //    /**
 //     * Check if Checkout inputs are relevant or not
@@ -210,25 +210,25 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
         return false;
     }
 
-    /**
-     * Check if a quantity is valid
-     *
-     * @param int $quantity Quantity to check
-     *
-     * @throws InvalidRuleValueException if Value is not allowed
-     * @return bool
-     */
-    protected function isQuantityValid($quantity)
-    {
-        $quantityValidator = $this->quantityValidator;
-        try {
-            $quantityValidator->getParam()->compareTo($quantity);
-        } catch(InvalidArgumentException $e) {
-            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
-        }
-
-        return true;
-    }
+//    /**
+//     * Check if a quantity is valid
+//     *
+//     * @param int $quantity Quantity to check
+//     *
+//     * @throws InvalidRuleValueException if Value is not allowed
+//     * @return bool
+//     */
+//    protected function isQuantityValid($quantity)
+//    {
+//        $quantityValidator = $this->quantityValidator;
+//        try {
+//            $quantityValidator->getParam()->compareTo($quantity);
+//        } catch(InvalidArgumentException $e) {
+//            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
+//        }
+//
+//        return true;
+//    }
 
     /**
      * Get I18n name
@@ -252,14 +252,14 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
     public function getToolTip()
     {
         $i18nOperator = Operators::getI18n(
-            $this->translator, $this->priceValidator->getOperator()
+            $this->translator, $this->operators[self::INPUT1]
         );
 
         $toolTip = $this->translator->trans(
             'If cart products quantity is <strong>%operator%</strong> %quantity%',
             array(
                 '%operator%' => $i18nOperator,
-                '%quantity%' => $this->quantityValidator->getParam()->getInteger(),
+                '%quantity%' => $this->values[self::INPUT1]
             ),
             'constraint'
         );
@@ -296,25 +296,5 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
 //
 //        return $this;
 //    }
-
-    /**
-     * Return a serializable Rule
-     *
-     * @return SerializableRule
-     */
-    public function getSerializableRule()
-    {
-        $serializableRule = new SerializableRule();
-        $serializableRule->ruleServiceId = $this->serviceId;
-        $serializableRule->operators = array(
-            self::PARAM1_QUANTITY => $this->quantityValidator->getOperator()
-        );
-
-        $serializableRule->values = array(
-            self::PARAM1_QUANTITY => $this->quantityValidator->getInteger()
-        );
-
-        return $serializableRule;
-    }
 
 }
