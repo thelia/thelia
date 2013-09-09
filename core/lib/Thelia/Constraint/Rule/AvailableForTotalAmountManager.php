@@ -344,8 +344,20 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
             $cleanedCurrencies[$currency->getCode()] = $currency->getSymbol();
         }
 
+        $name1 = $this->translator->trans(
+            'Price',
+            array(),
+            'constraint'
+        );
+        $name2 = $this->translator->trans(
+            'Currency',
+            array(),
+            'constraint'
+        );
+
         return array(
             self::INPUT1 => array(
+                'title' => $name1,
                 'availableOperators' => $this->availableOperators[self::INPUT1],
                 'availableValues' => '',
                 'type' => 'text',
@@ -354,6 +366,7 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
                 'selectedOperator' => ''
             ),
             self::INPUT2 => array(
+                'title' => $name2,
                 'availableOperators' => $this->availableOperators[self::INPUT2],
                 'availableValues' => $cleanedCurrencies,
                 'type' => 'select',

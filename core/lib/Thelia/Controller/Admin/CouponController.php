@@ -330,7 +330,7 @@ class CouponController extends BaseAdminController
     /**
      * Manage Coupons read display
      *
-     * @param int $couponId Coupon Id
+     * @param string $ruleId Rule service id
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -338,16 +338,21 @@ class CouponController extends BaseAdminController
     {
         $this->checkAuth('ADMIN', 'admin.coupon.read');
 
-        // @todo uncomment
-//        if (!$this->getRequest()->isXmlHttpRequest()) {
-//            $this->redirect('index');
-//        }
+        if (!$this->getRequest()->isXmlHttpRequest()) {
+            $this->redirect(
+                $this->getRoute(
+                    'admin',
+                    array(),
+                    Router::ABSOLUTE_URL
+                )
+            );
+        }
 
         /** @var ConstraintFactory $constraintFactory */
         $constraintFactory = $this->container->get('thelia.constraint.factory');
         $inputs = $constraintFactory->getInputs($ruleId);
 
-        if (!$inputs) {
+        if ($inputs === null) {
             return $this->pageNotFound();
         }
 

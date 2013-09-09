@@ -194,8 +194,11 @@
 
     <section class="row">
         <div class="col-md-12 general-block-decorator clearfix">
+            <a title="{intl l='Save this rule'}" class="btn btn-default btn-primary pull-right">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+            </a>
 
-            <div class="form-group col-md-2">
+            <div id="rule-add-organizer" class="form-group col-md-2">
                 <label for="type">{intl l='Condition type :'}</label>
                 <label class="radio">
                     <input type="radio" name="type" id="type" value="1" checked> {intl l='And'}
@@ -205,7 +208,7 @@
                 </label>
             </div>
 
-            <div class="form-group col-md-4">
+            <div id="rule-add-type" class="form-group col-md-4">
                 <label for="categoryRule">{intl l='Rule\'s category :'}</label>
                 <select name="categoryRule" id="category-rule" class="form-control">
                     {foreach from=$availableRules item=availableRule}
@@ -214,7 +217,7 @@
                 </select>
             </div>
 
-            <div class="form-group col-md-6">
+            <div id="rule-add-operators-values" class="form-group col-md-6">
                 <label for="operator">{intl l='Operator :'}</label>
                 <div class="row">
                     <div class="col-lg-6">

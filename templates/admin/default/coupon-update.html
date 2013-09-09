@@ -43,6 +43,7 @@
             });
 
             $('#category-rule').on('change', function (e) {
+                $('#rule-add-operators-values').html('<div class="loading" ></div>');
                 var url = "{$urlAjaxGetRuleInput}";
                 url = url.replace('ruleId', $(this).val())
                 console.log(url);
@@ -50,13 +51,13 @@
                     url: url,
                     statusCode: {
                         404: function() {
-                            alert("page not found");
+                            $('#rule-add-operators-values').html(
+                                '{intl l='Please select another rule'}'
+                            );
                         }
-                    },
-                    context: document.body
+                    }
                 }).done(function(data) {
-                    console.log(data);
-                    $(this).addClass("done");
+                    $('#rule-add-operators-values').html(data);
                 });
             });
 

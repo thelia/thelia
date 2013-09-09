@@ -3,7 +3,7 @@
 {*{$inputs|var_dump}*}
 
 {foreach from=$inputs key=name item=input}
-    <label for="operator">Operator :</label>
+    <label for="operator">{$input.title}</label>
     <div class="row">
         <div class="col-lg-6">
             <select class="form-control" id="{$name}[operator]" name="{$name}[operator]">

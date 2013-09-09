@@ -304,8 +304,15 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
      */
     protected function generateInputs()
     {
+        $name1 = $this->translator->trans(
+            'Quantity',
+            array(),
+            'constraint'
+        );
+
         return array(
             self::INPUT1 => array(
+                'title' => $name1,
                 'availableOperators' => $this->availableOperators[self::INPUT1],
                 'type' => 'text',
                 'class' => 'form-control',
