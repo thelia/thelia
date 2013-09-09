@@ -61,12 +61,6 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the id field.
-     * @var        int
-     */
-    protected $id;
-
-    /**
      * The value for the tax_rule_id field.
      * @var        int
      */
@@ -85,10 +79,10 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     protected $tax_id;
 
     /**
-     * The value for the none field.
+     * The value for the position field.
      * @var        int
      */
-    protected $none;
+    protected $position;
 
     /**
      * The value for the created_at field.
@@ -380,17 +374,6 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     }
 
     /**
-     * Get the [id] column value.
-     *
-     * @return   int
-     */
-    public function getId()
-    {
-
-        return $this->id;
-    }
-
-    /**
      * Get the [tax_rule_id] column value.
      *
      * @return   int
@@ -424,14 +407,14 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     }
 
     /**
-     * Get the [none] column value.
+     * Get the [position] column value.
      *
      * @return   int
      */
-    public function getNone()
+    public function getPosition()
     {
 
-        return $this->none;
+        return $this->position;
     }
 
     /**
@@ -473,27 +456,6 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
             return $this->updated_at !== null ? $this->updated_at->format($format) : null;
         }
     }
-
-    /**
-     * Set the value of [id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
-     */
-    public function setId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[] = TaxRuleCountryTableMap::ID;
-        }
-
-
-        return $this;
-    } // setId()
 
     /**
      * Set the value of [tax_rule_id] column.
@@ -571,25 +533,25 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     } // setTaxId()
 
     /**
-     * Set the value of [none] column.
+     * Set the value of [position] column.
      *
      * @param      int $v new value
      * @return   \Thelia\Model\TaxRuleCountry The current object (for fluent API support)
      */
-    public function setNone($v)
+    public function setPosition($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->none !== $v) {
-            $this->none = $v;
-            $this->modifiedColumns[] = TaxRuleCountryTableMap::NONE;
+        if ($this->position !== $v) {
+            $this->position = $v;
+            $this->modifiedColumns[] = TaxRuleCountryTableMap::POSITION;
         }
 
 
         return $this;
-    } // setNone()
+    } // setPosition()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -670,28 +632,25 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TaxRuleCountryTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TaxRuleCountryTableMap::translateFieldName('TaxRuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TaxRuleCountryTableMap::translateFieldName('TaxRuleId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->tax_rule_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TaxRuleCountryTableMap::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TaxRuleCountryTableMap::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->country_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TaxRuleCountryTableMap::translateFieldName('TaxId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TaxRuleCountryTableMap::translateFieldName('TaxId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->tax_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TaxRuleCountryTableMap::translateFieldName('None', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->none = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TaxRuleCountryTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : TaxRuleCountryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TaxRuleCountryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : TaxRuleCountryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : TaxRuleCountryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -704,7 +663,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = TaxRuleCountryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = TaxRuleCountryTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\TaxRuleCountry object", 0, $e);
@@ -958,9 +917,6 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(TaxRuleCountryTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
-        }
         if ($this->isColumnModified(TaxRuleCountryTableMap::TAX_RULE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'TAX_RULE_ID';
         }
@@ -970,8 +926,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
         if ($this->isColumnModified(TaxRuleCountryTableMap::TAX_ID)) {
             $modifiedColumns[':p' . $index++]  = 'TAX_ID';
         }
-        if ($this->isColumnModified(TaxRuleCountryTableMap::NONE)) {
-            $modifiedColumns[':p' . $index++]  = 'NONE';
+        if ($this->isColumnModified(TaxRuleCountryTableMap::POSITION)) {
+            $modifiedColumns[':p' . $index++]  = 'POSITION';
         }
         if ($this->isColumnModified(TaxRuleCountryTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -990,9 +946,6 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case 'TAX_RULE_ID':
                         $stmt->bindValue($identifier, $this->tax_rule_id, PDO::PARAM_INT);
                         break;
@@ -1002,8 +955,8 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
                     case 'TAX_ID':
                         $stmt->bindValue($identifier, $this->tax_id, PDO::PARAM_INT);
                         break;
-                    case 'NONE':
-                        $stmt->bindValue($identifier, $this->none, PDO::PARAM_INT);
+                    case 'POSITION':
+                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1067,24 +1020,21 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getTaxRuleId();
                 break;
-            case 2:
+            case 1:
                 return $this->getCountryId();
                 break;
-            case 3:
+            case 2:
                 return $this->getTaxId();
                 break;
-            case 4:
-                return $this->getNone();
+            case 3:
+                return $this->getPosition();
                 break;
-            case 5:
+            case 4:
                 return $this->getCreatedAt();
                 break;
-            case 6:
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1110,19 +1060,18 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['TaxRuleCountry'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['TaxRuleCountry'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['TaxRuleCountry'][$this->getPrimaryKey()] = true;
+        $alreadyDumpedObjects['TaxRuleCountry'][serialize($this->getPrimaryKey())] = true;
         $keys = TaxRuleCountryTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getTaxRuleId(),
-            $keys[2] => $this->getCountryId(),
-            $keys[3] => $this->getTaxId(),
-            $keys[4] => $this->getNone(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[0] => $this->getTaxRuleId(),
+            $keys[1] => $this->getCountryId(),
+            $keys[2] => $this->getTaxId(),
+            $keys[3] => $this->getPosition(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1175,24 +1124,21 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setTaxRuleId($value);
                 break;
-            case 2:
+            case 1:
                 $this->setCountryId($value);
                 break;
-            case 3:
+            case 2:
                 $this->setTaxId($value);
                 break;
-            case 4:
-                $this->setNone($value);
+            case 3:
+                $this->setPosition($value);
                 break;
-            case 5:
+            case 4:
                 $this->setCreatedAt($value);
                 break;
-            case 6:
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1219,13 +1165,12 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     {
         $keys = TaxRuleCountryTableMap::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setTaxRuleId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCountryId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setTaxId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setNone($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[0], $arr)) $this->setTaxRuleId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setCountryId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setTaxId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPosition($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -1237,11 +1182,10 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     {
         $criteria = new Criteria(TaxRuleCountryTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(TaxRuleCountryTableMap::ID)) $criteria->add(TaxRuleCountryTableMap::ID, $this->id);
         if ($this->isColumnModified(TaxRuleCountryTableMap::TAX_RULE_ID)) $criteria->add(TaxRuleCountryTableMap::TAX_RULE_ID, $this->tax_rule_id);
         if ($this->isColumnModified(TaxRuleCountryTableMap::COUNTRY_ID)) $criteria->add(TaxRuleCountryTableMap::COUNTRY_ID, $this->country_id);
         if ($this->isColumnModified(TaxRuleCountryTableMap::TAX_ID)) $criteria->add(TaxRuleCountryTableMap::TAX_ID, $this->tax_id);
-        if ($this->isColumnModified(TaxRuleCountryTableMap::NONE)) $criteria->add(TaxRuleCountryTableMap::NONE, $this->none);
+        if ($this->isColumnModified(TaxRuleCountryTableMap::POSITION)) $criteria->add(TaxRuleCountryTableMap::POSITION, $this->position);
         if ($this->isColumnModified(TaxRuleCountryTableMap::CREATED_AT)) $criteria->add(TaxRuleCountryTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(TaxRuleCountryTableMap::UPDATED_AT)) $criteria->add(TaxRuleCountryTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1259,29 +1203,39 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(TaxRuleCountryTableMap::DATABASE_NAME);
-        $criteria->add(TaxRuleCountryTableMap::ID, $this->id);
+        $criteria->add(TaxRuleCountryTableMap::TAX_RULE_ID, $this->tax_rule_id);
+        $criteria->add(TaxRuleCountryTableMap::COUNTRY_ID, $this->country_id);
+        $criteria->add(TaxRuleCountryTableMap::TAX_ID, $this->tax_id);
 
         return $criteria;
     }
 
     /**
-     * Returns the primary key for this object (row).
-     * @return   int
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        $pks = array();
+        $pks[0] = $this->getTaxRuleId();
+        $pks[1] = $this->getCountryId();
+        $pks[2] = $this->getTaxId();
+
+        return $pks;
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Set the [composite] primary key.
      *
-     * @param       int $key Primary key.
+     * @param      array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey($keys)
     {
-        $this->setId($key);
+        $this->setTaxRuleId($keys[0]);
+        $this->setCountryId($keys[1]);
+        $this->setTaxId($keys[2]);
     }
 
     /**
@@ -1291,7 +1245,7 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return null === $this->getId();
+        return (null === $this->getTaxRuleId()) && (null === $this->getCountryId()) && (null === $this->getTaxId());
     }
 
     /**
@@ -1307,11 +1261,10 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setId($this->getId());
         $copyObj->setTaxRuleId($this->getTaxRuleId());
         $copyObj->setCountryId($this->getCountryId());
         $copyObj->setTaxId($this->getTaxId());
-        $copyObj->setNone($this->getNone());
+        $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1499,11 +1452,10 @@ abstract class TaxRuleCountry implements ActiveRecordInterface
      */
     public function clear()
     {
-        $this->id = null;
         $this->tax_rule_id = null;
         $this->country_id = null;
         $this->tax_id = null;
-        $this->none = null;
+        $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

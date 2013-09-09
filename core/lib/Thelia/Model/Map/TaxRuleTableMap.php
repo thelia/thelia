@@ -57,7 +57,7 @@ class TaxRuleTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 3;
 
     /**
      * The number of lazy-loaded columns
@@ -67,27 +67,12 @@ class TaxRuleTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /**
      * the column name for the ID field
      */
     const ID = 'tax_rule.ID';
-
-    /**
-     * the column name for the CODE field
-     */
-    const CODE = 'tax_rule.CODE';
-
-    /**
-     * the column name for the TITLE field
-     */
-    const TITLE = 'tax_rule.TITLE';
-
-    /**
-     * the column name for the DESCRIPTION field
-     */
-    const DESCRIPTION = 'tax_rule.DESCRIPTION';
 
     /**
      * the column name for the CREATED_AT field
@@ -120,12 +105,12 @@ class TaxRuleTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'Title', 'Description', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'title', 'description', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(TaxRuleTableMap::ID, TaxRuleTableMap::CODE, TaxRuleTableMap::TITLE, TaxRuleTableMap::DESCRIPTION, TaxRuleTableMap::CREATED_AT, TaxRuleTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'TITLE', 'DESCRIPTION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'title', 'description', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(TaxRuleTableMap::ID, TaxRuleTableMap::CREATED_AT, TaxRuleTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -135,12 +120,12 @@ class TaxRuleTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Title' => 2, 'Description' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'title' => 2, 'description' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(TaxRuleTableMap::ID => 0, TaxRuleTableMap::CODE => 1, TaxRuleTableMap::TITLE => 2, TaxRuleTableMap::DESCRIPTION => 3, TaxRuleTableMap::CREATED_AT => 4, TaxRuleTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'TITLE' => 2, 'DESCRIPTION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'title' => 2, 'description' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, ),
+        self::TYPE_COLNAME       => array(TaxRuleTableMap::ID => 0, TaxRuleTableMap::CREATED_AT => 1, TaxRuleTableMap::UPDATED_AT => 2, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CREATED_AT' => 1, 'UPDATED_AT' => 2, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'created_at' => 1, 'updated_at' => 2, ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -160,9 +145,6 @@ class TaxRuleTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('CODE', 'Code', 'VARCHAR', false, 45, null);
-        $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
-        $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -187,7 +169,7 @@ class TaxRuleTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => '', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
     /**
@@ -341,16 +323,10 @@ class TaxRuleTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(TaxRuleTableMap::ID);
-            $criteria->addSelectColumn(TaxRuleTableMap::CODE);
-            $criteria->addSelectColumn(TaxRuleTableMap::TITLE);
-            $criteria->addSelectColumn(TaxRuleTableMap::DESCRIPTION);
             $criteria->addSelectColumn(TaxRuleTableMap::CREATED_AT);
             $criteria->addSelectColumn(TaxRuleTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CODE');
-            $criteria->addSelectColumn($alias . '.TITLE');
-            $criteria->addSelectColumn($alias . '.DESCRIPTION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

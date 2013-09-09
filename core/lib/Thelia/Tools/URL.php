@@ -189,6 +189,14 @@ class URL
      {
          if(ConfigQuery::isRewritingEnable()) {
              $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
+         } else {
+             $allParametersWithoutView = array();
+             $allParametersWithoutView['locale'] = $viewLocale;
+             if(null !== $viewId) {
+                 $allParametersWithoutView[$view . '_id'] = $viewId;
+             }
+             $this->retriever->rewrittenUrl = null;
+             $this->retriever->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
          }
 
          return $this->retriever;
@@ -220,6 +228,14 @@ class URL
              }
 
              $this->retriever->loadSpecificUrl($view, $viewLocale, $viewId, $allOtherParameters);
+         } else {
+             $allParametersWithoutView = $viewOtherParameters;
+             $allParametersWithoutView['locale'] = $viewLocale;
+             if(null !== $viewId) {
+                 $allParametersWithoutView[$view . '_id'] = $viewId;
+             }
+             $this->retriever->rewrittenUrl = null;
+             $this->retriever->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
          }
 
          return $this->retriever;

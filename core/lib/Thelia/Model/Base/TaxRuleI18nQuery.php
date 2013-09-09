@@ -23,9 +23,13 @@ use Thelia\Model\Map\TaxRuleI18nTableMap;
  *
  * @method     ChildTaxRuleI18nQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildTaxRuleI18nQuery orderByLocale($order = Criteria::ASC) Order by the locale column
+ * @method     ChildTaxRuleI18nQuery orderByTitle($order = Criteria::ASC) Order by the title column
+ * @method     ChildTaxRuleI18nQuery orderByDescription($order = Criteria::ASC) Order by the description column
  *
  * @method     ChildTaxRuleI18nQuery groupById() Group by the id column
  * @method     ChildTaxRuleI18nQuery groupByLocale() Group by the locale column
+ * @method     ChildTaxRuleI18nQuery groupByTitle() Group by the title column
+ * @method     ChildTaxRuleI18nQuery groupByDescription() Group by the description column
  *
  * @method     ChildTaxRuleI18nQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildTaxRuleI18nQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -40,9 +44,13 @@ use Thelia\Model\Map\TaxRuleI18nTableMap;
  *
  * @method     ChildTaxRuleI18n findOneById(int $id) Return the first ChildTaxRuleI18n filtered by the id column
  * @method     ChildTaxRuleI18n findOneByLocale(string $locale) Return the first ChildTaxRuleI18n filtered by the locale column
+ * @method     ChildTaxRuleI18n findOneByTitle(string $title) Return the first ChildTaxRuleI18n filtered by the title column
+ * @method     ChildTaxRuleI18n findOneByDescription(string $description) Return the first ChildTaxRuleI18n filtered by the description column
  *
  * @method     array findById(int $id) Return ChildTaxRuleI18n objects filtered by the id column
  * @method     array findByLocale(string $locale) Return ChildTaxRuleI18n objects filtered by the locale column
+ * @method     array findByTitle(string $title) Return ChildTaxRuleI18n objects filtered by the title column
+ * @method     array findByDescription(string $description) Return ChildTaxRuleI18n objects filtered by the description column
  *
  */
 abstract class TaxRuleI18nQuery extends ModelCriteria
@@ -131,7 +139,7 @@ abstract class TaxRuleI18nQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, LOCALE FROM tax_rule_i18n WHERE ID = :p0 AND LOCALE = :p1';
+        $sql = 'SELECT ID, LOCALE, TITLE, DESCRIPTION FROM tax_rule_i18n WHERE ID = :p0 AND LOCALE = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -302,6 +310,64 @@ abstract class TaxRuleI18nQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TaxRuleI18nTableMap::LOCALE, $locale, $comparison);
+    }
+
+    /**
+     * Filter the query on the title column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByTitle('fooValue');   // WHERE title = 'fooValue'
+     * $query->filterByTitle('%fooValue%'); // WHERE title LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $title The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTaxRuleI18nQuery The current query, for fluid interface
+     */
+    public function filterByTitle($title = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($title)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $title)) {
+                $title = str_replace('*', '%', $title);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(TaxRuleI18nTableMap::TITLE, $title, $comparison);
+    }
+
+    /**
+     * Filter the query on the description column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDescription('fooValue');   // WHERE description = 'fooValue'
+     * $query->filterByDescription('%fooValue%'); // WHERE description LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $description The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTaxRuleI18nQuery The current query, for fluid interface
+     */
+    public function filterByDescription($description = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($description)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $description)) {
+                $description = str_replace('*', '%', $description);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(TaxRuleI18nTableMap::DESCRIPTION, $description, $comparison);
     }
 
     /**
