@@ -121,10 +121,11 @@ URL: http://www.thelia.net
 
                 <div class="language-switch" aria-labelledby="language-label">
                     <span id="language-label" class="dropdown-label">Language:</span>
-                    <a class="current dropdown-toggle" data-toggle="dropdown" href="language.html">English</a>
+                    <a class="current dropdown-toggle" data-toggle="dropdown" href="language.html">{lang attr="title"}</a>
                     <ul class="select dropdown-menu">
-                        <li><a href="?lang=fr">French</a></li>
-                        <li><a href="?lang=ge">German</a></li>
+                        {loop type="lang" name="lang_available" exclude="{lang attr="id"}"}
+                            <li><a href="?lang={#CODE}">{#TITLE}</a></li>
+                        {/loop}
                     </ul>
                 </div>
 
@@ -146,6 +147,7 @@ URL: http://www.thelia.net
 
 <main class="main-container" role="main">
     <div class="container">
+        {block name="breadcrumb"}{/block}
         {block name="main-content"}{/block}
     </div><!-- /.container -->
 </main><!-- /.main-container -->

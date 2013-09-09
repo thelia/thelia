@@ -152,6 +152,17 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
+     * Lang global data
+     *
+     * @param $params
+     * @param $smarty
+     */
+    public function langDataAccess($params, $smarty)
+    {
+        return $this->dataAccess("Lang", $params, $this->request->getSession()->getLang());
+    }
+
+    /**
      * @param               $objectLabel
      * @param               $params
      * @param ModelCriteria $search
@@ -251,6 +262,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'content', $this, 'contentDataAccess'),
             new SmartyPluginDescriptor('function', 'folder', $this, 'folderDataAccess'),
             new SmartyPluginDescriptor('function', 'currency', $this, 'currencyDataAccess'),
+            new SmartyPluginDescriptor('function', 'lang', $this, 'langDataAccess'),
         );
     }
 }

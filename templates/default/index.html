@@ -1,9 +1,5 @@
 {extends file="layout.tpl"}
 
-{block name="page-title" append}
-    homepage
-{/block}
-
 
 {block name="main-content"}
     <section class="carousel-container">
@@ -72,7 +68,7 @@
                                             preorder : http://schema.org/PreOrder
                                             online_only : http://schema.org/OnlineOnly
                                     -->
-                                    <span class="regular-price"><span itemprop="price" class="price">$ {format_number number="{#BEST_TAXED_PRICE}"}
+                                    <span class="regular-price"><span itemprop="price" class="price">{currency attr="symbol"} {format_number number="{#BEST_TAXED_PRICE}"}
 </span></span>
                                 </div>
                             </div>
@@ -131,8 +127,8 @@
                                     online_only : http://schema.org/OnlineOnly
                                 -->
                                 {loop name="productSaleElements_promo" type="product_sale_elements" product="{#ID}" limit="1"}
-                                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">$ {format_number number="{#TAXED_PROMO_PRICE}"}</span></span>
-                                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">$ {format_number number="{#TAXED_PRICE}"}</span></span>
+                                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{#TAXED_PROMO_PRICE}"} {currency attr="symbol"}</span></span>
+                                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{#TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                                 {/loop}
                             </div>
                         </div>
