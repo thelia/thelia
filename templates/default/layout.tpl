@@ -79,14 +79,13 @@ URL: http://www.thelia.net
                             <li><a href="address.html">New address</a></li>
                         </ul>
                     </li>
-                    <li><a href="#">Category 1</a></li>
-                    <li><a href="#">Category 2</a></li>
-                    <li><a href="#">Category 3</a></li>
-                    <li><a href="#">Category 4</a></li>
+                    {loop type="category" name="category.navigation" parent="0" limit="3"}
+                        <li><a href="{#URL}">{#TITLE}</a></li>
+                    {/loop}
                 </ul>
                 <ul class="nav navbar-nav navbar-cart navbar-right">
-                    <li><a href="register.html" class="register">Register!</a></li>
-                    <li><a href="login.html" class="login">Log In!</a></li>
+                    <li><a href="{url path="/register"}" class="register">{intl l="Register"}!</a></li>
+                    <li><a href="{url path="/login"}" class="login">{intl l="Log In!"}</a></li>
                     <li class="dropdown">
                         <a href="cart.html" class="dropdown-toggle cart" data-toggle="dropdown">
                             Cart <span class="badge">2</span>
@@ -130,11 +129,12 @@ URL: http://www.thelia.net
                 </div>
 
                 <div class="currency-switch" aria-labelledby="currency-label">
-                    <span id="currency-label" class="dropdown-label">Currency:</span>
+                    <span id="currency-label" class="dropdown-label">{intl l="Currency"}:</span>
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="currency.html">USD</a>
                     <ul class="select dropdown-menu">
-                        <li><a href="?cur=euro">€ - Euro</a></li>
-                        <li><a href="?cur=dollar">$ - Dollar</a></li>
+                        {loop type="currency" name="currency_available" }
+                            <li><a href="?cur=euro">{#SYMBOL} - {#NAME}</a></li>
+                        {/loop}
                     </ul>
                 </div>
             </div>

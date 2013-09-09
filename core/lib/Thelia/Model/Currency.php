@@ -13,6 +13,17 @@ class Currency extends BaseCurrency {
 
     use \Thelia\Model\Tools\PositionManagementTrait;
 
+    public static function getDefaultCurrency()
+    {
+        $currency = CurrencyQuery::create()->findOneByByDefault(1);
+
+        if (null === $currency) {
+            throw new \RuntimeException("No default currency is defined. Please define one.");
+        }
+
+        return $currency;
+    }
+
     /**
      * {@inheritDoc}
      */
