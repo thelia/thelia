@@ -25,6 +25,7 @@ namespace Thelia\TaxEngine;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Country;
 use Thelia\Model\Product;
+use Thelia\Model\TaxRuleQuery;
 
 /**
  * Class Calculator
@@ -33,6 +34,8 @@ use Thelia\Model\Product;
  */
 class Calculator
 {
+    protected $taxRuleQuery = null;
+
     protected $taxRulesCollection = null;
 
     protected $product = null;
@@ -40,6 +43,8 @@ class Calculator
 
     public function __construct()
     {
+        $this->taxRuleQuery = new TaxRuleQuery();
+
         return $this;
     }
 
@@ -55,11 +60,13 @@ class Calculator
         $this->product = $product;
         $this->country = $country;
 
+        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($product, $country);
+
         return $this;
     }
 
     public function getTaxAmount()
     {
-        
+
     }
 }

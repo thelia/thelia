@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Base\TaxRuleQuery as BaseTaxRuleQuery;
 
 
@@ -15,6 +16,16 @@ use Thelia\Model\Base\TaxRuleQuery as BaseTaxRuleQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class TaxRuleQuery extends BaseTaxRuleQuery {
+class TaxRuleQuery extends BaseTaxRuleQuery
+{
+    public function getTaxCalculatorCollection(Product $product, Country $country)
+    {
+        $search = TaxRuleCountryQuery::create()
+            ->filterByCountry($country, Criteria::EQUAL)
+            ->filterByTaxRuleId($product->getTaxRuleId())
+            ->orderByPosition()
+            ->find();
 
+        return $search;
+    }
 } // TaxRuleQuery
