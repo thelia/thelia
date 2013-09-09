@@ -52,9 +52,9 @@ abstract class Operators
     /** Param1 is different to Param2 */
     CONST DIFFERENT         =     '!=';
     /** Param1 is in Param2 */
-    CONST IN         =     'in';
+    CONST IN                =     'in';
     /** Param1 is not in Param2 */
-    CONST OUT         =     'out';
+    CONST OUT               =     'out';
 
 //    /**
 //     * Check if a parameter is valid against a ComparableInterface from its operator

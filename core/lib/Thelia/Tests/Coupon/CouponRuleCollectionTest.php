@@ -41,39 +41,46 @@ use Thelia\Constraint\Rule\Operators;
  */
 class CouponRuleCollectionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     *
-     */
-    public function testRuleSerialisation()
+    public function testSomething()
     {
-//        $rule1 = new AvailableForTotalAmount(
-//            , array(
-//                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
-//                    Operators::SUPERIOR,
-//                    new PriceParam(
-//                        , 40.00, 'EUR'
-//                    )
-//                )
-//            )
-//        );
-//        $rule2 = new AvailableForTotalAmount(
-//            , array(
-//                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
-//                    Operators::INFERIOR,
-//                    new PriceParam(
-//                        , 400.00, 'EUR'
-//                    )
-//                )
-//            )
-//        );
-//        $rules = new CouponRuleCollection(array($rule1, $rule2));
-//
-//        $serializedRules = base64_encode(serialize($rules));
-//        $unserializedRules = unserialize(base64_decode($serializedRules));
-//
-//        $expected = $rules;
-//        $actual = $unserializedRules;
-//
-//        $this->assertEquals($expected, $actual);
+        // Stop here and mark this test as incomplete.
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
     }
+//    /**
+//     *
+//     */
+//    public function testRuleSerialisation()
+//    {
+////        $rule1 = new AvailableForTotalAmount(
+////            , array(
+////                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
+////                    Operators::SUPERIOR,
+////                    new PriceParam(
+////                        , 40.00, 'EUR'
+////                    )
+////                )
+////            )
+////        );
+////        $rule2 = new AvailableForTotalAmount(
+////            , array(
+////                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
+////                    Operators::INFERIOR,
+////                    new PriceParam(
+////                        , 400.00, 'EUR'
+////                    )
+////                )
+////            )
+////        );
+////        $rules = new CouponRuleCollection(array($rule1, $rule2));
+////
+////        $serializedRules = base64_encode(serialize($rules));
+////        $unserializedRules = unserialize(base64_decode($serializedRules));
+////
+////        $expected = $rules;
+////        $actual = $unserializedRules;
+////
+////        $this->assertEquals($expected, $actual);
+//    }
 }
