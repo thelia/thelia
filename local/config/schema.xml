@@ -104,9 +104,9 @@
     </behavior>
   </table>
   <table name="tax_rule_country" namespace="Thelia\Model">
-    <column name="tax_rule_id" required="true" type="INTEGER" />
-    <column name="country_id" required="true" type="INTEGER" />
-    <column name="tax_id" type="INTEGER" />
+    <column name="tax_rule_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="country_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="tax_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="position" required="true" type="INTEGER" />
     <foreign-key foreignTable="tax" name="fk_tax_rule_country_tax_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_id" />
