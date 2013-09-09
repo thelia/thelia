@@ -1,151 +1,357 @@
-{include file="includes/header.html"}
-<div>
+{extends file="layout.tpl"}
 
-{loop type="auth" name="auth_test" context="front" roles="CUSTOMER"}
-
-<p>Customer is authentified :-)</p>
-{/loop}
-
-{elseloop rel="auth_test"}
-<p>Customer is not authentified :-(</p>
-{/elseloop}
-
-An image from asset directory :
-{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}
-</div>
-
-<div>
-{intl l='An internationalized string'}
-</div>
-
-
-<div>
-	jQuery data: <span id="jquery_block"></span>
-</div>
-
-<div>
-    <p>Category loop example</p>
-    <ul>
-        {loop type="category" name="catloop1"}
-            <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}, children: {$NB_CHILD}
-                {ifloop rel="inner1"}
-                    <ul>
-                        {loop type="category" name="inner1" parent="{$ID}"}
-                            <li>Sub cat {$ID} (parent is {$PARENT}): {$TITLE}</li>
-                        {/loop}
-                    </ul>
-                {/ifloop}
-            </li>
-        {/loop}
-    </ul>
-</div>
+{block name="main-content"}
+    <section class="carousel-container">
+        <div id="carousel" class="carousel slide">
+            <div class="carousel-wrapper">
+                <div class="carousel-inner">
+                    <figure class="item active">
+                        {images file='assets/img/carousel/1200x390.png'}<img src="{$asset_url}" alt="img1">{/images}
+                    </figure>
+                    <figure class="item">
+                        {images file='assets/img/carousel/1200x390.png'}<img src="{$asset_url}" alt="img2">{/images}
+                    </figure>
+                    <figure class="item">
+                        {images file='assets/img/carousel/1200x390.png'}<img src="{$asset_url}" alt="img3">{/images}
+                    </figure>
+                </div>
+            </div>
+            <a class="left carousel-control" href="#carousel" data-slide="prev"><i class="icon-prev"></i></a>
+            <a class="right carousel-control" href="#carousel" data-slide="next"><i class="icon-next"></i></a>
+        </div>
+    </section><!-- #carousel -->
 
 
+    <section id="products-new">
+        <div class="products-heading">
+            <h2>Latest <a href="category.html#latest" class="btn-all">+ View All</a></h2>
+        </div>
 
+        <div class="products-content">
+            <ul class="products-grid product-col-4">
 
-<div>
-	<p>Conditional example #1</p>
+                <li class="item">
+                    <article itemscope itemtype="http://schema.org/Product">
+                        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                        <meta itemprop="manufacturer" content="Diesel">
+                        <meta itemprop="category" content="Category1">
+                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
+                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
 
-  	{ifloop rel="catloop2"}
-  		Hey ! Loop catloop2 is not empty:
-  		<ul>
-   		{loop type="category" name="catloop2" parent="12"}
-       		<li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
-   		{/loop}
-   		</ul>
-  	{/ifloop}
+                        <a href="product-details.html" itemprop="url" tabindex="-1" class="product-image">
+                            {images file='assets/img/280x196.png'}<img itemprop="image" src="{$asset_url}" alt="Product #1">{/images}
+                            <span class="mask"></span>
+                        </a>
 
-  	{elseloop rel="catloop2"}
-  		<p>Loop catloop2 is empty</p>
-  	{/elseloop}
-</div>
+                        <a href="product-details.html" class="product-info">
+                            <h3 class="name"><span itemprop="name">Product #1</span></h3>
+                            <div class="short-description" itemprop="description">Cras justo odio, dapibus ac faquam.</div>
 
-<div>
-	<p>Conditional example #2</p>
+                            <div class="product-price">
+                                <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                    <meta itemprop="currency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                    <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                    <!-- List of availibility :
+                                            out_of_stock : http://schema.org/OutOfStock
+                                            in_stock : http://schema.org/InStock
+                                            instore_only : http://schema.org/InStoreOnly
+                                            preorder : http://schema.org/PreOrder
+                                            online_only : http://schema.org/OnlineOnly
+                                    -->
+                                    <span class="regular-price"><span itemprop="price" class="price">$40.00</span></span>
+                                </div>
+                            </div>
+                        </a>
+                    </article><!-- /product -->
+                </li>
+                <li class="item">
+                    <article itemscope itemtype="http://schema.org/Product">
+                        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                        <meta itemprop="manufacturer" content="Diesel">
+                        <meta itemprop="category" content="Category1">
+                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
+                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
 
-	{ifloop rel="catloop3"}
-		Loop catloop3 is not empty:
-		<ul>
-		{loop type="category" name="catloop3" parent="0"}
-	    	<li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
-	 	{/loop}
-	 	</ul>
-	{/ifloop}
+                        <a href="product-details.html" itemprop="url" tabindex="-1" class="product-image">
+                            {images file='assets/img/280x196.png'}<img itemprop="image" src="{$asset_url}" alt="Product #2">{/images}
+                            <span class="mask"></span>
+                        </a>
 
-	{elseloop rel="catloop3"}
-		<p>Loop catloop3 is empty</p>
-	{/elseloop}
+                        <a href="product-details.html" class="product-info">
+                            <h3 class="name"><span itemprop="name">Product #2</span></h3>
+                            <div class="short-description" itemprop="description">Cras justo odio, dapibus ac faquam.</div>
 
-	{elseloop rel="catloop2"}
-		<p>... but catloop2 is still empty :-)</p>
-	{/elseloop}
+                            <div class="product-price">
+                                <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                    <meta itemprop="currency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                    <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                    <!-- List of availibility :
+                                            out_of_stock : http://schema.org/OutOfStock
+                                            in_stock : http://schema.org/InStock
+                                            instore_only : http://schema.org/InStoreOnly
+                                            preorder : http://schema.org/PreOrder
+                                            online_only : http://schema.org/OnlineOnly
+                                    -->
+                                    <span class="regular-price"><span itemprop="price" class="price">$40.00</span></span>
+                                </div>
+                            </div>
+                        </a>
+                    </article><!-- /product -->
+                </li>
+                <li class="item">
+                    <article itemscope itemtype="http://schema.org/Product">
+                        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                        <meta itemprop="manufacturer" content="Diesel">
+                        <meta itemprop="category" content="Category1">
+                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
+                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
 
-</div>
+                        <a href="product-details.html" itemprop="url" tabindex="-1" class="product-image">
+                            {images file='assets/img/280x196.png'}<img itemprop="image" src="{$asset_url}" alt="Product #3">{/images}
+                            <span class="mask"></span>
+                        </a>
 
-<div>
-	<p>Traditional for loop</p>
-    {for $index=5 to 12 step 1}
-    	Compteur = {$index}<br />
-    {/for}
-</div>
+                        <a href="product-details.html" class="product-info">
+                            <h3 class="name"><span itemprop="name">Product #3</span></h3>
+                            <div class="short-description" itemprop="description">Cras justo odio, dapibus ac faquam.</div>
 
+                            <div class="product-price">
+                                <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                    <meta itemprop="currency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                    <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                    <!-- List of availibility :
+                                            out_of_stock : http://schema.org/OutOfStock
+                                            in_stock : http://schema.org/InStock
+                                            instore_only : http://schema.org/InStoreOnly
+                                            preorder : http://schema.org/PreOrder
+                                            online_only : http://schema.org/OnlineOnly
+                                    -->
+                                    <span class="regular-price"><span itemprop="price" class="price">$40.00</span></span>
+                                </div>
+                            </div>
+                        </a>
+                    </article><!-- /product -->
+                </li>
+                <li class="item">
+                    <article itemscope itemtype="http://schema.org/Product">
+                        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                        <meta itemprop="manufacturer" content="Diesel">
+                        <meta itemprop="category" content="Category1">
+                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
+                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
 
+                        <a href="product-details.html" itemprop="url" tabindex="-1" class="product-image">
+                            {images file='assets/img/280x196.png'}<img itemprop="image" src="{$asset_url}" alt="Product #4">{/images}
+                            <span class="mask"></span>
+                        </a>
 
-<div>
-    <p>Some pagination</p>
-    <p>PAGE 1</p>
-    <ul>
-        {loop type="category" name="catloopwithpagination1" limit="2" page="1"}
-        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
-        {/loop}
-    </ul>
-    <p>PAGE 2</p>
-    <ul>
-        {loop type="category" name="catloopwithpagination2" limit="2" page="2"}
-        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
-        {/loop}
-    </ul>
-    <p>PAGE 1000</p>
-    <ul>
+                        <a href="product-details.html" class="product-info">
+                            <h3 class="name"><span itemprop="name">Product #4</span></h3>
+                            <div class="short-description" itemprop="description">Cras justo odio, dapibus ac faquam.</div>
 
-        {loop type="category" name="catloopwithpagination1000" limit="2" page="1000"}
-            <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
-        {/loop}
+                            <div class="product-price">
+                                <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                    <meta itemprop="currency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                    <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                    <!-- List of availibility :
+                                            out_of_stock : http://schema.org/OutOfStock
+                                            in_stock : http://schema.org/InStock
+                                            instore_only : http://schema.org/InStoreOnly
+                                            preorder : http://schema.org/PreOrder
+                                            online_only : http://schema.org/OnlineOnly
+                                    -->
+                                    <span class="regular-price"><span itemprop="price" class="price">$40.00</span></span>
+                                </div>
+                            </div>
+                        </a>
+                    </article><!-- /product -->
+                </li>
 
-        {elseloop rel="catloopwithpagination1000"}
-            NO RESULTS
-        {/elseloop}
-    </ul>
-</div>
+            </ul>
+        </div>
+    </section><!-- #products-new -->
 
-<div>
-    <p>Some pagination with page choice</p>
-    {assign var=current_page value=2}
-    <p>PAGE {$current_page} :</p>
-    <ul>
-        {loop type="category" name="catloopwithpaginationchoice" limit="2" page="{$current_page}"}
-        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
-        {/loop}
-    </ul>
-    <p>page choice</p>
-    {pageloop rel="catloopwithpaginationchoice"}
-        {if ${PAGE} != {$current_page}}
-            {if {$PAGE} > {$current_page}-10 AND {$PAGE} < {$current_page}+10}
-                {$PAGE}
-            {/if}
-            {if {$PAGE} == {$current_page}-10 OR {$PAGE} == {$current_page}+10}
-                ...
-            {/if}
-            {if ({$PAGE} < {$current_page}-10 OR {$PAGE} > {$current_page}+10) AND ({$PAGE}%10 == 0 OR ${PAGE} == {$LAST} OR ${PAGE} == 1)}
-                {$PAGE}
-            {/if}
-        {else}
-            { {$PAGE} }
-        {/if}
-        {if {$PAGE} != {$LAST}}
-            -
-        {/if}
-    {/pageloop}
-</div>
+    <section id="products-offer">
+        <div class="products-heading">
+            <h2>Offers <a href="category.html#offer" class="btn-all">+ View All</a></h2>
+        </div>
 
-{include file="includes/footer.html"}
+        <div class="products-content">
+            <ul class="products-grid product-col-5 hover-effect">
+
+                <li class="item">
+                    <article itemscope itemtype="http://schema.org/Product">
+                        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                        <meta itemprop="manufacturer" content="Diesel">
+                        <meta itemprop="category" content="Category1">
+                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
+                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
+
+                        <a href="product-details.html" itemprop="url" tabindex="-1" class="product-image">
+
+                            {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="Promotion #1">{/images}
+                            <span class="mask"></span>
+                        </a>
+
+                        <div class="product-info">
+                            <h3 class="name"><a href="product-details.html"><span itemprop="name">Promotion #1</span></a></h3>
+                        </div>
+
+                        <div class="product-price">
+                            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                <meta itemprop="currency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                <!-- List of availibility :
+                                    out_of_stock : http://schema.org/OutOfStock
+                                    in_stock : http://schema.org/InStock
+                                    instore_only : http://schema.org/InStoreOnly
+                                    preorder : http://schema.org/PreOrder
+                                    online_only : http://schema.org/OnlineOnly
+                                -->
+                                <span class="special-price"><span itemprop="price" class="price-label">Special Price: </span><span class="price">$26.00</span></span>
+                                <span class="old-price"><span class="price-label">Regular Price: </span><span class="price">$36.00</span></span>
+                            </div>
+                        </div>
+                    </article><!-- /product -->
+                </li>
+                <li class="item">
+                    <article itemscope itemtype="http://schema.org/Product">
+                        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                        <meta itemprop="manufacturer" content="Diesel">
+                        <meta itemprop="category" content="Category1">
+                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
+                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
+
+                        <a href="product-details.html" itemprop="url" tabindex="-1" class="product-image">
+                            {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="Promotion #1">{/images}
+                            <span class="mask"></span>
+                        </a>
+
+                        <div class="product-info">
+                            <h3 class="name"><a href="product-details.html"><span itemprop="name">Promotion #1</span></a></h3>
+                        </div>
+
+                        <div class="product-price">
+                            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                <meta itemprop="currency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                <!-- List of availibility :
+                                    out_of_stock : http://schema.org/OutOfStock
+                                    in_stock : http://schema.org/InStock
+                                    instore_only : http://schema.org/InStoreOnly
+                                    preorder : http://schema.org/PreOrder
+                                    online_only : http://schema.org/OnlineOnly
+                                -->
+                                <span class="special-price"><span itemprop="price" class="price-label">Special Price: </span><span class="price">$26.00</span></span>
+                                <span class="old-price"><span class="price-label">Regular Price: </span><span class="price">$36.00</span></span>
+                            </div>
+                        </div>
+                    </article><!-- /product -->
+                </li>
+                <li class="item">
+                    <article itemscope itemtype="http://schema.org/Product">
+                        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                        <meta itemprop="manufacturer" content="Diesel">
+                        <meta itemprop="category" content="Category1">
+                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
+                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
+
+                        <a href="product-details.html" itemprop="url" tabindex="-1" class="product-image">
+                            {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="Promotion #1">{/images}
+                            <span class="mask"></span>
+                        </a>
+
+                        <div class="product-info">
+                            <h3 class="name"><a href="product-details.html"><span itemprop="name">Promotion #1</span></a></h3>
+                        </div>
+
+                        <div class="product-price">
+                            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                <meta itemprop="currency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                <!-- List of availibility :
+                                    out_of_stock : http://schema.org/OutOfStock
+                                    in_stock : http://schema.org/InStock
+                                    instore_only : http://schema.org/InStoreOnly
+                                    preorder : http://schema.org/PreOrder
+                                    online_only : http://schema.org/OnlineOnly
+                                -->
+                                <span class="special-price"><span itemprop="price" class="price-label">Special Price: </span><span class="price">$26.00</span></span>
+                                <span class="old-price"><span class="price-label">Regular Price: </span><span class="price">$36.00</span></span>
+                            </div>
+                        </div>
+                    </article><!-- /product -->
+                </li>
+                <li class="item">
+                    <article itemscope itemtype="http://schema.org/Product">
+                        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                        <meta itemprop="manufacturer" content="Diesel">
+                        <meta itemprop="category" content="Category1">
+                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
+                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
+
+                        <a href="product-details.html" itemprop="url" tabindex="-1" class="product-image">
+                            {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="Promotion #1">{/images}
+                            <span class="mask"></span>
+                        </a>
+
+                        <div class="product-info">
+                            <h3 class="name"><a href="product-details.html"><span itemprop="name">Promotion #1</span></a></h3>
+                        </div>
+
+                        <div class="product-price">
+                            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                <meta itemprop="currency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                <!-- List of availibility :
+                                    out_of_stock : http://schema.org/OutOfStock
+                                    in_stock : http://schema.org/InStock
+                                    instore_only : http://schema.org/InStoreOnly
+                                    preorder : http://schema.org/PreOrder
+                                    online_only : http://schema.org/OnlineOnly
+                                -->
+                                <span class="special-price"><span itemprop="price" class="price-label">Special Price: </span><span class="price">$26.00</span></span>
+                                <span class="old-price"><span class="price-label">Regular Price: </span><span class="price">$36.00</span></span>
+                            </div>
+                        </div>
+                    </article><!-- /product -->
+                </li>
+                <li class="item">
+                    <article itemscope itemtype="http://schema.org/Product">
+                        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                        <meta itemprop="manufacturer" content="Diesel">
+                        <meta itemprop="category" content="Category1">
+                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
+                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
+
+                        <a href="product-details.html" itemprop="url" tabindex="-1" class="product-image">
+                            {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="Promotion #1">{/images}
+                            <span class="mask"></span>
+                        </a>
+
+                        <div class="product-info">
+                            <h3 class="name"><a href="product-details.html"><span itemprop="name">Promotion #1</span></a></h3>
+                        </div>
+
+                        <div class="product-price">
+                            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                <meta itemprop="currency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                <!-- List of availibility :
+                                    out_of_stock : http://schema.org/OutOfStock
+                                    in_stock : http://schema.org/InStock
+                                    instore_only : http://schema.org/InStoreOnly
+                                    preorder : http://schema.org/PreOrder
+                                    online_only : http://schema.org/OnlineOnly
+                                -->
+                                <span class="special-price"><span itemprop="price" class="price-label">Special Price: </span><span class="price">$26.00</span></span>
+                                <span class="old-price"><span class="price-label">Regular Price: </span><span class="price">$36.00</span></span>
+                            </div>
+                        </div>
+                    </article><!-- /product -->
+                </li>
+
+            </ul>
+        </div>
+    </section><!-- #products-offer -->
+{/block}
