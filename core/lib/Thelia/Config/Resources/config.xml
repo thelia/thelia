@@ -7,25 +7,35 @@
     <loops>
         <loop class="Thelia\Core\Template\Loop\Accessory" name="accessory"/>
         <loop class="Thelia\Core\Template\Loop\Address" name="address"/>
+        <loop class="Thelia\Core\Template\Loop\AssociatedContent" name="associated_content"/>
+        <loop class="Thelia\Core\Template\Loop\Attribute" name="attribute"/>
+        <loop class="Thelia\Core\Template\Loop\AttributeAvailability" name="attribute_availability"/>
+        <loop class="Thelia\Core\Template\Loop\AttributeCombination" name="attribute_combination"/>
         <loop class="Thelia\Core\Template\Loop\Auth" name="auth"/>
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
         <loop class="Thelia\Core\Template\Loop\Content" name="content"/>
         <loop class="Thelia\Core\Template\Loop\Country" name="country"/>
+        <loop class="Thelia\Core\Template\Loop\Currency" name="currency"/>
         <loop class="Thelia\Core\Template\Loop\Customer" name="customer"/>
         <loop class="Thelia\Core\Template\Loop\Feature" name="feature"/>
-        <loop class="Thelia\Core\Template\Loop\FeatureAvailable" name="feature_available"/>
+        <loop class="Thelia\Core\Template\Loop\FeatureAvailability" name="feature_availability"/>
         <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature_value"/>
         <loop class="Thelia\Core\Template\Loop\Folder" name="folder"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
         <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
+        <loop class="Thelia\Core\Template\Loop\ProductSaleElements" name="product_sale_elements"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
         <loop class="Thelia\Core\Template\Loop\Title" name="title"/>
         <loop class="Thelia\Core\Template\Loop\Lang" name="lang"/>
         <loop class="Thelia\Core\Template\Loop\CategoryTree" name="category-tree"/>
         <loop class="Thelia\Core\Template\Loop\Cart" name="cart"/>
         <loop class="Thelia\Core\Template\Loop\Image" name="image"/>
+        <loop class="Thelia\Core\Template\Loop\Config" name="config"/>
+        <loop class="Thelia\Core\Template\Loop\Coupon" name="coupon"/>
+        <loop class="Thelia\Core\Template\Loop\Message" name="message"/>
+        <loop class="Thelia\Core\Template\Loop\Delivery" name="delivery"/>
     </loops>
 
     <forms>
@@ -35,10 +45,27 @@
         <form name="thelia.customer.login" class="Thelia\Form\CustomerLogin"/>
         <form name="thelia.admin.login" class="Thelia\Form\AdminLogin"/>
 
+        <form name="thelia.address.create" class="Thelia\Form\AddressCreateForm" />
+        <form name="thelia.address.update" class="Thelia\Form\AddressUpdateForm" />
+
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
-        <form name="thelia.admin.category.deletion" class="Thelia\Form\CategoryDeletionForm"/>
+        <form name="thelia.admin.category.deletion" class="Thelia\Form\CategoryModificationForm"/>
+
+        <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
+        <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
 
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
+
+        <form name="thelia.admin.config.creation" class="Thelia\Form\ConfigCreationForm"/>
+        <form name="thelia.admin.config.modification" class="Thelia\Form\ConfigModificationForm"/>
+
+        <form name="thelia.admin.message.creation" class="Thelia\Form\MessageCreationForm"/>
+        <form name="thelia.admin.message.modification" class="Thelia\Form\MessageModificationForm"/>
+
+        <form name="thelia.admin.currency.creation" class="Thelia\Form\CurrencyCreationForm"/>
+        <form name="thelia.admin.currency.modification" class="Thelia\Form\CurrencyModificationForm"/>
+
+        <form name="thelia.admin.coupon.creation" class="Thelia\Form\CouponCreationForm"/>
     </forms>
 
 
@@ -49,9 +76,17 @@
         <command class="Thelia\Command\ModuleGenerateCommand"/>
         <command class="Thelia\Command\ModuleGenerateModelCommand"/>
         <command class="Thelia\Command\ModuleGenerateSqlCommand"/>
+        <command class="Thelia\Command\CreateAdminUser"/>
+        <command class="Thelia\Command\ReloadDatabaseCommand"/>
     </commands>
 
     <services>
+
+        <!--  URL maganement -->
+
+        <service id="thelia.url.manager" class="Thelia\Tools\URL">
+            <argument type="service" id="service_container" />
+        </service>
 
         <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher">
             <argument type="service" id="service_container" />
@@ -69,7 +104,7 @@
 		<!--  Translation and internationalisation -->
 
 		<service id="thelia.translator" class="Thelia\Core\Translation\Translator">
-			<argument type="string" id="en_US"></argument>
+			<argument type="string" id="en_UK"></argument>
 		</service>
 
 		<!-- Security context for front and back office -->
@@ -77,8 +112,6 @@
 		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext" scope="request">
             <argument type="service" id="request" />
 		</service>
-
-        <service id="thelia.envContext" class="Thelia\Core\Context"/>
 
 		<!--  Parser context -->
 
@@ -102,9 +135,15 @@
 
         <service id="smarty.plugin.assetic" class="Thelia\Core\Template\Smarty\Plugins\Assetic" >
             <tag name="thelia.parser.register_plugin"/>
+            <argument>%kernel.environment%</argument>
         </service>
 
         <service id="smarty.plugin.theliasyntax" class="Thelia\Core\Template\Smarty\Plugins\TheliaSyntax" >
+            <tag name="thelia.parser.register_plugin"/>
+        </service>
+
+        <service id="smarty.plugin.format" class="Thelia\Core\Template\Smarty\Plugins\Format" scope="request">
+            <argument type="service" id="request"/>
             <tag name="thelia.parser.register_plugin"/>
         </service>
 
@@ -145,16 +184,23 @@
             <argument type="service" id="request"/>
         </service>
 
-        <service id="smarty.plugin.security" class="Thelia\Core\Template\Smarty\Plugins\Security"  scope="request">
+        <service id="smarty.plugin.security" class="Thelia\Core\Template\Smarty\Plugins\Security" scope="request">
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="thelia.securityContext" />
         </service>
 
-        <service id="smarty.plugin.dataAccess" class="Thelia\Core\Template\Smarty\Plugins\DataAccessFunctions"  scope="request">
+        <service id="smarty.plugin.dataAccess" class="Thelia\Core\Template\Smarty\Plugins\DataAccessFunctions" scope="request">
             <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="request" />
             <argument type="service" id="thelia.securityContext" />
             <argument type="service" id="thelia.parser.context"/>
         </service>
+
+        <service id="smarty.plugin.adminUtilities" class="Thelia\Core\Template\Smarty\Plugins\AdminUtilities" scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="thelia.securityContext" />
+        </service>
+
 
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">
             <argument type="service" id="event_dispatcher" />
@@ -167,6 +213,36 @@
         <service id="service_container" synthetic="true" />
 
         <service id="kernel" synthetic="true" />
+
+        <!-- Coupon module -->
+        <service id="thelia.adapter" class="Thelia\Coupon\CouponBaseAdapter">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="thelia.coupon.manager" class="Thelia\Coupon\CouponManager">
+            <argument type="service" id="thelia.adapter" />
+        </service>
+        <service id="thelia.constraint.factory" class="Thelia\Constraint\ConstraintFactory">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="thelia.constraint.rule.available_for_x_articles" class="Thelia\Constraint\Rule\AvailableForXArticlesManager">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.coupon.addRule"/>
+        </service>
+        <service id="thelia.constraint.rule.available_for_total_amount" class="Thelia\Constraint\Rule\AvailableForTotalAmountManager">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.coupon.addRule"/>
+        </service>
+
+        <service id="thelia.coupon.type.remove_x_amount" class="Thelia\Coupon\Type\RemoveXAmount">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.coupon.addCoupon"/>
+        </service>
+        <service id="thelia.coupon.type.remove_x_percent" class="Thelia\Coupon\Type\RemoveXPercent">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.coupon.addCoupon"/>
+        </service>
+
+
     </services>
 
 </config>

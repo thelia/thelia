@@ -68,24 +68,6 @@ abstract class TaxRule implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the code field.
-     * @var        string
-     */
-    protected $code;
-
-    /**
-     * The value for the title field.
-     * @var        string
-     */
-    protected $title;
-
-    /**
-     * The value for the description field.
-     * @var        string
-     */
-    protected $description;
-
-    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -311,7 +293,7 @@ abstract class TaxRule implements ActiveRecordInterface
      */
     public function hasVirtualColumn($name)
     {
-        return isset($this->virtualColumns[$name]);
+        return array_key_exists($name, $this->virtualColumns);
     }
 
     /**
@@ -421,39 +403,6 @@ abstract class TaxRule implements ActiveRecordInterface
     }
 
     /**
-     * Get the [code] column value.
-     *
-     * @return   string
-     */
-    public function getCode()
-    {
-
-        return $this->code;
-    }
-
-    /**
-     * Get the [title] column value.
-     *
-     * @return   string
-     */
-    public function getTitle()
-    {
-
-        return $this->title;
-    }
-
-    /**
-     * Get the [description] column value.
-     *
-     * @return   string
-     */
-    public function getDescription()
-    {
-
-        return $this->description;
-    }
-
-    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -513,69 +462,6 @@ abstract class TaxRule implements ActiveRecordInterface
 
         return $this;
     } // setId()
-
-    /**
-     * Set the value of [code] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\TaxRule The current object (for fluent API support)
-     */
-    public function setCode($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->code !== $v) {
-            $this->code = $v;
-            $this->modifiedColumns[] = TaxRuleTableMap::CODE;
-        }
-
-
-        return $this;
-    } // setCode()
-
-    /**
-     * Set the value of [title] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\TaxRule The current object (for fluent API support)
-     */
-    public function setTitle($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->title !== $v) {
-            $this->title = $v;
-            $this->modifiedColumns[] = TaxRuleTableMap::TITLE;
-        }
-
-
-        return $this;
-    } // setTitle()
-
-    /**
-     * Set the value of [description] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\TaxRule The current object (for fluent API support)
-     */
-    public function setDescription($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->description !== $v) {
-            $this->description = $v;
-            $this->modifiedColumns[] = TaxRuleTableMap::DESCRIPTION;
-        }
-
-
-        return $this;
-    } // setDescription()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -659,22 +545,13 @@ abstract class TaxRule implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TaxRuleTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TaxRuleTableMap::translateFieldName('Code', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->code = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TaxRuleTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->title = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TaxRuleTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->description = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TaxRuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TaxRuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : TaxRuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TaxRuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -687,7 +564,7 @@ abstract class TaxRule implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = TaxRuleTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = TaxRuleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\TaxRule object", 0, $e);
@@ -968,15 +845,6 @@ abstract class TaxRule implements ActiveRecordInterface
         if ($this->isColumnModified(TaxRuleTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(TaxRuleTableMap::CODE)) {
-            $modifiedColumns[':p' . $index++]  = 'CODE';
-        }
-        if ($this->isColumnModified(TaxRuleTableMap::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = 'TITLE';
-        }
-        if ($this->isColumnModified(TaxRuleTableMap::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
-        }
         if ($this->isColumnModified(TaxRuleTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -996,15 +864,6 @@ abstract class TaxRule implements ActiveRecordInterface
                 switch ($columnName) {
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
-                    case 'CODE':
-                        $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
-                        break;
-                    case 'TITLE':
-                        $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
-                        break;
-                    case 'DESCRIPTION':
-                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1078,18 +937,9 @@ abstract class TaxRule implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getCode();
-                break;
-            case 2:
-                return $this->getTitle();
-                break;
-            case 3:
-                return $this->getDescription();
-                break;
-            case 4:
                 return $this->getCreatedAt();
                 break;
-            case 5:
+            case 2:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1122,11 +972,8 @@ abstract class TaxRule implements ActiveRecordInterface
         $keys = TaxRuleTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getCode(),
-            $keys[2] => $this->getTitle(),
-            $keys[3] => $this->getDescription(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[1] => $this->getCreatedAt(),
+            $keys[2] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1182,18 +1029,9 @@ abstract class TaxRule implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setCode($value);
-                break;
-            case 2:
-                $this->setTitle($value);
-                break;
-            case 3:
-                $this->setDescription($value);
-                break;
-            case 4:
                 $this->setCreatedAt($value);
                 break;
-            case 5:
+            case 2:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1221,11 +1059,8 @@ abstract class TaxRule implements ActiveRecordInterface
         $keys = TaxRuleTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setTitle($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[1], $arr)) $this->setCreatedAt($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setUpdatedAt($arr[$keys[2]]);
     }
 
     /**
@@ -1238,9 +1073,6 @@ abstract class TaxRule implements ActiveRecordInterface
         $criteria = new Criteria(TaxRuleTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(TaxRuleTableMap::ID)) $criteria->add(TaxRuleTableMap::ID, $this->id);
-        if ($this->isColumnModified(TaxRuleTableMap::CODE)) $criteria->add(TaxRuleTableMap::CODE, $this->code);
-        if ($this->isColumnModified(TaxRuleTableMap::TITLE)) $criteria->add(TaxRuleTableMap::TITLE, $this->title);
-        if ($this->isColumnModified(TaxRuleTableMap::DESCRIPTION)) $criteria->add(TaxRuleTableMap::DESCRIPTION, $this->description);
         if ($this->isColumnModified(TaxRuleTableMap::CREATED_AT)) $criteria->add(TaxRuleTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(TaxRuleTableMap::UPDATED_AT)) $criteria->add(TaxRuleTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1306,9 +1138,6 @@ abstract class TaxRule implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setCode($this->getCode());
-        $copyObj->setTitle($this->getTitle());
-        $copyObj->setDescription($this->getDescription());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1723,7 +1552,10 @@ abstract class TaxRule implements ActiveRecordInterface
         $taxRuleCountriesToDelete = $this->getTaxRuleCountries(new Criteria(), $con)->diff($taxRuleCountries);
 
 
-        $this->taxRuleCountriesScheduledForDeletion = $taxRuleCountriesToDelete;
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->taxRuleCountriesScheduledForDeletion = clone $taxRuleCountriesToDelete;
 
         foreach ($taxRuleCountriesToDelete as $taxRuleCountryRemoved) {
             $taxRuleCountryRemoved->setTaxRule(null);
@@ -1816,7 +1648,7 @@ abstract class TaxRule implements ActiveRecordInterface
                 $this->taxRuleCountriesScheduledForDeletion = clone $this->collTaxRuleCountries;
                 $this->taxRuleCountriesScheduledForDeletion->clear();
             }
-            $this->taxRuleCountriesScheduledForDeletion[]= $taxRuleCountry;
+            $this->taxRuleCountriesScheduledForDeletion[]= clone $taxRuleCountry;
             $taxRuleCountry->setTaxRule(null);
         }
 
@@ -2104,9 +1936,6 @@ abstract class TaxRule implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->code = null;
-        $this->title = null;
-        $this->description = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -2284,6 +2113,54 @@ abstract class TaxRule implements ActiveRecordInterface
     public function getCurrentTranslation(ConnectionInterface $con = null)
     {
         return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return   string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param      string $v new value
+         * @return   \Thelia\Model\TaxRuleI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return   string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param      string $v new value
+         * @return   \Thelia\Model\TaxRuleI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
     }
 
     /**

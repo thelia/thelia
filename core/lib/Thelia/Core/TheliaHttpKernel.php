@@ -122,11 +122,21 @@ class TheliaHttpKernel extends HttpKernel
      */
     protected function initParam(Request $request)
     {
+        // Ensure an instaciation of URL service, which is accessed as a pseudo-singleton
+        // in the rest of the application.
+        // See Thelia\Tools\URL class.
+        $this->container->get('thelia.url.manager');
+
+        // Same thing for the Translator service.
+        $this->container->get('thelia.translator');
+
         $lang = $this->detectLang($request);
 
         if ($lang) {
-            $request->getSession()->set("lang", $lang->getCode());
-            $request->getSession()->set("locale", $lang->getLocale());
+            $request->getSession()
+                ->setLang($lang)
+                ->setLocale($lang->getLocale())
+            ;
         }
     }
 
@@ -137,6 +147,7 @@ class TheliaHttpKernel extends HttpKernel
     protected function detectLang(Request $request)
     {
         $lang = null;
+
         //first priority => lang parameter present in request (get or post)
         if ($request->query->has("lang")) {
             $lang = Model\LangQuery::create()->findOneByCode($request->query->get("lang"));
@@ -164,7 +175,7 @@ class TheliaHttpKernel extends HttpKernel
         }
 
         //check if lang is not defined. If not we have to search the good one.
-        if (null === $request->getSession()->get("lang")) {
+        if (null === $request->getSession()->getLang()) {
 
             if (Model\ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
                 //find lang with domain
@@ -173,9 +184,7 @@ class TheliaHttpKernel extends HttpKernel
 
             //find default lang
             return Model\LangQuery::create()->findOneByByDefault(1);
-
         }
-
     }
 
     protected function initSession(Request $request)

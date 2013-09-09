@@ -22,7 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\ImageEvent;
 use Thelia\Model\CategoryImageQuery;
@@ -43,12 +43,68 @@ use Thelia\Log\Tlog;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Image extends BaseLoop
+class Image extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @var array Possible image sources
      */
     protected $possible_sources = array('category', 'product', 'folder', 'content');
+
+    /**
+     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
+     */
+    protected function getArgDefinitions()
+    {
+        $collection = new ArgumentCollection(
+
+                Argument::createIntListTypeArgument('id'),
+                Argument::createIntListTypeArgument('exclude'),
+                new Argument(
+                        'order',
+                        new TypeCollection(
+                                new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
+                        ),
+                        'manual'
+                ),
+                Argument::createIntTypeArgument('lang'),
+
+                Argument::createIntTypeArgument('width'),
+                Argument::createIntTypeArgument('height'),
+                Argument::createIntTypeArgument('rotation', 0),
+                Argument::createAnyTypeArgument('background_color'),
+                Argument::createIntTypeArgument('quality'),
+                new Argument(
+                        'resize_mode',
+                        new TypeCollection(
+                                new EnumType(array('crop', 'borders', 'none'))
+                        ),
+                        'none'
+                ),
+                Argument::createAnyTypeArgument('effects'),
+
+                Argument::createIntTypeArgument('category'),
+                Argument::createIntTypeArgument('product'),
+                Argument::createIntTypeArgument('folder'),
+                Argument::createIntTypeArgument('content'),
+
+                new Argument(
+                        'source',
+                        new TypeCollection(
+                                new EnumType($this->possible_sources)
+                        )
+                ),
+                Argument::createIntTypeArgument('source_id')
+        );
+
+        // Add possible image sources
+        foreach($this->possible_sources as $source) {
+            $collection->addArgument(Argument::createIntTypeArgument($source));
+        }
+
+        return $collection;
+    }
 
     /**
      * Dynamically create the search query, and set the proper filter and order
@@ -63,7 +119,6 @@ class Image extends BaseLoop
 
         $queryClass   = sprintf("\Thelia\Model\%sImageQuery", $object);
         $filterMethod = sprintf("filterBy%sId", $object);
-        $mapClass     = sprintf("\Thelia\Model\Map\%sI18nTableMap", $object);
 
         // xxxImageQuery::create()
         $method = new \ReflectionMethod($queryClass, 'create');
@@ -73,19 +128,16 @@ class Image extends BaseLoop
         $method = new \ReflectionMethod($queryClass, $filterMethod);
         $method->invoke($search, $object_id);
 
-        $map = new \ReflectionClass($mapClass);
-        $title_map = $map->getConstant('TITLE');
-
         $orders  = $this->getOrder();
 
         // Results ordering
         foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn($title_map);
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
-                    $search->addDescendingOrderByColumn($title_map);
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual-reverse":
                     $search->orderByPosition(Criteria::DESC);
@@ -122,7 +174,7 @@ class Image extends BaseLoop
 
             $source_id = $this->getSourceId();
 
-            // echo "source = ".$this->getSource().", id=".$id."<br />";
+            // echo "source = ".$this->getSource().", id=".$source_id." - ".$this->getArg('source_id')->getValue()."<br />";
 
             if (is_null($source_id)) {
                 throw new \InvalidArgumentException("'source_id' argument cannot be null if 'source' argument is specified.");
@@ -167,6 +219,9 @@ class Image extends BaseLoop
 
         $search = $this->getSearchQuery($object_type, $object_id);
 
+        /* manage translations */
+        $locale = $this->configureI18nProcessing($search);
+
         $id = $this->getId();
 
         if (! is_null($id)) {
@@ -187,7 +242,7 @@ class Image extends BaseLoop
         $background_color = $this->getBackgroundColor();
         $quality = $this->getQuality();
         $effects = $this->getEffects();
-        $effects = $this->getEffects();
+
         if (! is_null($effects)) {
             $effects = explode(',', $effects);
         }
@@ -207,20 +262,11 @@ class Image extends BaseLoop
 
         }
 
-        /**
-         * \Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-                $this->request->getSession()->getLocale(),
-                (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
+        // echo "sql=".$search->toString();
 
         $results = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($results);
 
         foreach ($results as $result) {
 
@@ -251,21 +297,22 @@ class Image extends BaseLoop
                 // Dispatch image processing event
                 $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
 
-                $loopResultRow = new LoopResultRow();
+                $loopResultRow = new LoopResultRow($loopResult, $result, $this->versionable, $this->timestampable, $this->countable);
 
                 $loopResultRow
-                    ->set("ID", $result->getId())
-                    ->set("IMAGE_URL", $event->getFileUrl())
-                    ->set("ORIGINAL_IMAGE_URL", $event->getOriginalFileUrl())
-                    ->set("IMAGE_PATH", $event->getCacheFilepath())
-                    ->set("ORIGINAL_IMAGE_PATH", $source_filepath)
-                    ->set("TITLE", $result->getTitle())
-                    ->set("CHAPO", $result->getChapo())
-                    ->set("DESCRIPTION", $result->getDescription())
-                    ->set("POSTSCRIPTUM", $result->getPostscriptum())
-                    ->set("POSITION", $result->getPosition())
-                    ->set("OBJECT_TYPE", $object_type)
-                    ->set("OBJECT_ID", $object_id)
+                    ->set("ID"                  , $result->getId())
+                    ->set("LOCALE"              ,$locale)
+                    ->set("IMAGE_URL"           , $event->getFileUrl())
+                    ->set("ORIGINAL_IMAGE_URL"  , $event->getOriginalFileUrl())
+                    ->set("IMAGE_PATH"          , $event->getCacheFilepath())
+                    ->set("ORIGINAL_IMAGE_PATH" , $source_filepath)
+                    ->set("TITLE"               , $result->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO"               , $result->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION"         , $result->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM"        , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set("POSITION"            , $result->getPosition())
+                    ->set("OBJECT_TYPE"         , $object_type)
+                    ->set("OBJECT_ID"           , $object_id)
                 ;
 
                 $loopResult->addRow($loopResultRow);
@@ -277,60 +324,5 @@ class Image extends BaseLoop
         }
 
         return $loopResult;
-    }
-
-    /**
-     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
-     */
-    protected function getArgDefinitions()
-    {
-        $collection = new ArgumentCollection(
-
-            Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('exclude'),
-            new Argument(
-                    'order',
-                    new TypeCollection(
-                            new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
-                    ),
-                    'manual'
-            ),
-
-            Argument::createIntTypeArgument('width'),
-            Argument::createIntTypeArgument('height'),
-            Argument::createIntTypeArgument('rotation', 0),
-            Argument::createAnyTypeArgument('background_color'),
-            Argument::createIntTypeArgument('quality'),
-            new Argument(
-                'resize_mode',
-                new TypeCollection(
-                        new EnumType(array('crop', 'borders', 'none'))
-                ),
-                'none'
-            ),
-            Argument::createAnyTypeArgument('effects'),
-
-            Argument::createIntTypeArgument('category'),
-            Argument::createIntTypeArgument('product'),
-            Argument::createIntTypeArgument('folder'),
-            Argument::createIntTypeArgument('content'),
-
-            new Argument(
-                'source',
-                new TypeCollection(
-                        new EnumType($this->possible_sources)
-                )
-            ),
-            Argument::createIntTypeArgument('source_id'),
-
-            Argument::createIntListTypeArgument('lang')
-        );
-
-        // Add possible image sources
-        foreach($this->possible_sources as $source) {
-            $collection->addArgument(Argument::createIntTypeArgument($source));
-        }
-
-        return $collection;
     }
 }

@@ -30,6 +30,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * generate sql for a specific module
+ *
+ * Class ModuleGenerateSqlCommand
+ * @package Thelia\Command
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class ModuleGenerateSqlCommand extends BaseModuleGenerate
 {
     public function configure()

@@ -126,9 +126,6 @@ DROP TABLE IF EXISTS `tax_rule`;
 CREATE TABLE `tax_rule`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `code` VARCHAR(45),
-    `title` VARCHAR(255),
-    `description` TEXT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -142,14 +139,13 @@ DROP TABLE IF EXISTS `tax_rule_country`;
 
 CREATE TABLE `tax_rule_country`
 (
-    `id` INTEGER NOT NULL,
-    `tax_rule_id` INTEGER,
-    `country_id` INTEGER,
-    `tax_id` INTEGER,
-    `none` TINYINT,
+    `tax_rule_id` INTEGER NOT NULL,
+    `country_id` INTEGER NOT NULL,
+    `tax_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`tax_rule_id`,`country_id`,`tax_id`),
     INDEX `idx_tax_rule_country_tax_id` (`tax_id`),
     INDEX `idx_tax_rule_country_tax_rule_id` (`tax_rule_id`),
     INDEX `idx_tax_rule_country_country_id` (`country_id`),
@@ -157,7 +153,7 @@ CREATE TABLE `tax_rule_country`
         FOREIGN KEY (`tax_id`)
         REFERENCES `tax` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL,
+        ON DELETE CASCADE,
     CONSTRAINT `fk_tax_rule_country_tax_rule_id`
         FOREIGN KEY (`tax_rule_id`)
         REFERENCES `tax_rule` (`id`)
@@ -410,7 +406,8 @@ CREATE TABLE `config`
     `hidden` TINYINT DEFAULT 1 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `name_UNIQUE` (`name`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -454,7 +451,7 @@ DROP TABLE IF EXISTS `address`;
 CREATE TABLE `address`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255),
+    `label` VARCHAR(255),
     `customer_id` INTEGER NOT NULL,
     `title_id` INTEGER NOT NULL,
     `company` VARCHAR(255),
@@ -521,8 +518,14 @@ CREATE TABLE `lang`
     `code` VARCHAR(10),
     `locale` VARCHAR(45),
     `url` VARCHAR(255),
-    `position` INTEGER,
+    `date_format` VARCHAR(45),
+    `time_format` VARCHAR(45),
+    `datetime_format` VARCHAR(45),
+    `decimal_separator` VARCHAR(45),
+    `thousands_separator` VARCHAR(45),
+    `decimals` VARCHAR(45),
     `by_default` TINYINT,
+    `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -565,42 +568,6 @@ CREATE TABLE `content`
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- content_assoc
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `content_assoc`;
-
-CREATE TABLE `content_assoc`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `category_id` INTEGER,
-    `product_id` INTEGER,
-    `content_id` INTEGER,
-    `position` INTEGER,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
-    INDEX `idx_content_assoc_category_id` (`category_id`),
-    INDEX `idx_content_assoc_product_id` (`product_id`),
-    INDEX `idx_content_assoc_content_id` (`content_id`),
-    CONSTRAINT `fk_content_assoc_category_id`
-        FOREIGN KEY (`category_id`)
-        REFERENCES `category` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_content_assoc_product_id`
-        FOREIGN KEY (`product_id`)
-        REFERENCES `product` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_content_assoc_content_id`
-        FOREIGN KEY (`content_id`)
-        REFERENCES `content` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -832,6 +799,7 @@ CREATE TABLE `module`
     `type` TINYINT NOT NULL,
     `activate` TINYINT,
     `position` INTEGER,
+    `full_namespace` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -846,7 +814,7 @@ DROP TABLE IF EXISTS `accessory`;
 
 CREATE TABLE `accessory`
 (
-    `id` INTEGER NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
     `accessory` INTEGER NOT NULL,
     `position` INTEGER NOT NULL,
@@ -1053,58 +1021,15 @@ DROP TABLE IF EXISTS `message`;
 CREATE TABLE `message`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `code` VARCHAR(45) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
     `secured` TINYINT,
-    `ref` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
     `version_created_at` DATETIME,
     `version_created_by` VARCHAR(100),
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- rewriting
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `rewriting`;
-
-CREATE TABLE `rewriting`
-(
-    `id` INTEGER NOT NULL,
-    `url` VARCHAR(255) NOT NULL,
-    `product_id` INTEGER,
-    `category_id` INTEGER,
-    `folder_id` INTEGER,
-    `content_id` INTEGER,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_rewriting_product_id` (`product_id`),
-    INDEX `idx_rewriting_category_id` (`category_id`),
-    INDEX `idx_rewriting_folder_id` (`folder_id`),
-    INDEX `idx_rewriting_content_id` (`content_id`),
-    CONSTRAINT `fk_rewriting_product_id`
-        FOREIGN KEY (`product_id`)
-        REFERENCES `product` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_rewriting_category_id`
-        FOREIGN KEY (`category_id`)
-        REFERENCES `category` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_rewriting_folder_id`
-        FOREIGN KEY (`folder_id`)
-        REFERENCES `folder` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_rewriting_content_id`
-        FOREIGN KEY (`content_id`)
-        REFERENCES `content` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE
+    UNIQUE INDEX `name_UNIQUE` (`name`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1117,40 +1042,30 @@ CREATE TABLE `coupon`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45) NOT NULL,
-    `action` VARCHAR(255) NOT NULL,
-    `value` FLOAT NOT NULL,
-    `used` TINYINT,
-    `available_since` DATETIME,
-    `date_limit` DATETIME,
-    `activate` TINYINT,
+    `type` VARCHAR(255) NOT NULL,
+    `amount` FLOAT NOT NULL,
+    `is_used` TINYINT NOT NULL,
+    `is_enabled` TINYINT NOT NULL,
+    `expiration_date` DATETIME NOT NULL,
+    `serialized_rules` TEXT NOT NULL,
+    `is_cumulative` TINYINT NOT NULL,
+    `is_removing_postage` TINYINT NOT NULL,
+    `max_usage` INTEGER NOT NULL,
+    `is_available_on_special_offers` TINYINT(1) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
+    `version` INTEGER DEFAULT 0,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `code_UNIQUE` (`code`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- coupon_rule
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `coupon_rule`;
-
-CREATE TABLE `coupon_rule`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `coupon_id` INTEGER NOT NULL,
-    `controller` VARCHAR(255),
-    `operation` VARCHAR(255),
-    `value` FLOAT,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
-    INDEX `idx_coupon_rule_coupon_id` (`coupon_id`),
-    CONSTRAINT `fk_coupon_rule_coupon_id`
-        FOREIGN KEY (`coupon_id`)
-        REFERENCES `coupon` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE
+    UNIQUE INDEX `code_UNIQUE` (`code`),
+    INDEX `idx_is_enabled` (`is_enabled`),
+    INDEX `idx_is_used` (`is_used`),
+    INDEX `idx_type` (`type`),
+    INDEX `idx_amount` (`amount`),
+    INDEX `idx_expiration_date` (`expiration_date`),
+    INDEX `idx_is_cumulative` (`is_cumulative`),
+    INDEX `idx_is_removing_postage` (`is_removing_postage`),
+    INDEX `idx_max_usage` (`max_usage`),
+    INDEX `idx_is_available_on_special_offers` (`is_available_on_special_offers`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1163,7 +1078,6 @@ CREATE TABLE `coupon_order`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `order_id` INTEGER NOT NULL,
-    `code` VARCHAR(45) NOT NULL,
     `value` FLOAT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1458,6 +1372,113 @@ CREATE TABLE `folder_document`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- product_associated_content
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_associated_content`;
+
+CREATE TABLE `product_associated_content`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_id` INTEGER NOT NULL,
+    `content_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_product_associated_content_product_id` (`product_id`),
+    INDEX `idx_product_associated_content_content_id` (`content_id`),
+    CONSTRAINT `fk_product_associated_content_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_product_associated_content_content_id`
+        FOREIGN KEY (`content_id`)
+        REFERENCES `content` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- category_associated_content
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `category_associated_content`;
+
+CREATE TABLE `category_associated_content`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `category_id` INTEGER NOT NULL,
+    `content_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_category_associated_content_category_id` (`category_id`),
+    INDEX `idx_category_associated_content_content_id` (`content_id`),
+    CONSTRAINT `fk_category_associated_content_category_id`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `category` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_category_associated_content_content_id`
+        FOREIGN KEY (`content_id`)
+        REFERENCES `content` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- rewriting_url
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `rewriting_url`;
+
+CREATE TABLE `rewriting_url`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `url` VARCHAR(255) NOT NULL,
+    `view` VARCHAR(255),
+    `view_id` VARCHAR(255),
+    `view_locale` VARCHAR(255),
+    `redirected` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `url_UNIQUE` (`url`),
+    INDEX `idx_view_id` (`view_id`),
+    INDEX `idx_rewriting_url_redirected` (`redirected`),
+    CONSTRAINT `fk_rewriting_url_redirected`
+        FOREIGN KEY (`redirected`)
+        REFERENCES `rewriting_url` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- rewriting_argument
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `rewriting_argument`;
+
+CREATE TABLE `rewriting_argument`
+(
+    `rewriting_url_id` INTEGER NOT NULL,
+    `parameter` VARCHAR(255) NOT NULL,
+    `value` VARCHAR(255) NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`rewriting_url_id`,`parameter`,`value`),
+    INDEX `idx_rewriting_argument_rewirting_url_id` (`rewriting_url_id`),
+    CONSTRAINT `fk_rewriting_argument_rewirting_url_id`
+        FOREIGN KEY (`rewriting_url_id`)
+        REFERENCES `rewriting_url` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 
@@ -1549,6 +1570,8 @@ CREATE TABLE `tax_rule_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` TEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `tax_rule_i18n_FK_1`
         FOREIGN KEY (`id`)
@@ -1877,12 +1900,33 @@ CREATE TABLE `message_i18n`
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` TEXT,
-    `description` LONGTEXT,
-    `description_html` LONGTEXT,
+    `subject` TEXT,
+    `text_message` LONGTEXT,
+    `html_message` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `message_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `message` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- coupon_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `coupon_i18n`;
+
+CREATE TABLE `coupon_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `short_description` TEXT NOT NULL,
+    `description` LONGTEXT NOT NULL,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `coupon_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -2117,9 +2161,8 @@ DROP TABLE IF EXISTS `message_version`;
 CREATE TABLE `message_version`
 (
     `id` INTEGER NOT NULL,
-    `code` VARCHAR(45) NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
     `secured` TINYINT,
-    `ref` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
@@ -2129,6 +2172,36 @@ CREATE TABLE `message_version`
     CONSTRAINT `message_version_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `message` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- coupon_version
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `coupon_version`;
+
+CREATE TABLE `coupon_version`
+(
+    `id` INTEGER NOT NULL,
+    `code` VARCHAR(45) NOT NULL,
+    `type` VARCHAR(255) NOT NULL,
+    `amount` FLOAT NOT NULL,
+    `is_used` TINYINT NOT NULL,
+    `is_enabled` TINYINT NOT NULL,
+    `expiration_date` DATETIME NOT NULL,
+    `serialized_rules` TEXT NOT NULL,
+    `is_cumulative` TINYINT NOT NULL,
+    `is_removing_postage` TINYINT NOT NULL,
+    `max_usage` INTEGER NOT NULL,
+    `is_available_on_special_offers` TINYINT(1) NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    `version` INTEGER DEFAULT 0 NOT NULL,
+    PRIMARY KEY (`id`,`version`),
+    CONSTRAINT `coupon_version_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

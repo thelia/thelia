@@ -184,11 +184,11 @@ class ContentTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ContentAssoc', '\\Thelia\\Model\\ContentAssoc', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'ContentAssocs');
-        $this->addRelation('Rewriting', '\\Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
         $this->addRelation('ContentFolder', '\\Thelia\\Model\\ContentFolder', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'ContentFolders');
         $this->addRelation('ContentImage', '\\Thelia\\Model\\ContentImage', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'ContentImages');
         $this->addRelation('ContentDocument', '\\Thelia\\Model\\ContentDocument', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'ContentDocuments');
+        $this->addRelation('ProductAssociatedContent', '\\Thelia\\Model\\ProductAssociatedContent', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'ProductAssociatedContents');
+        $this->addRelation('CategoryAssociatedContent', '\\Thelia\\Model\\CategoryAssociatedContent', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'CategoryAssociatedContents');
         $this->addRelation('ContentI18n', '\\Thelia\\Model\\ContentI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ContentI18ns');
         $this->addRelation('ContentVersion', '\\Thelia\\Model\\ContentVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ContentVersions');
         $this->addRelation('Folder', '\\Thelia\\Model\\Folder', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Folders');
@@ -215,11 +215,11 @@ class ContentTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                ContentAssocTableMap::clearInstancePool();
-                RewritingTableMap::clearInstancePool();
                 ContentFolderTableMap::clearInstancePool();
                 ContentImageTableMap::clearInstancePool();
                 ContentDocumentTableMap::clearInstancePool();
+                ProductAssociatedContentTableMap::clearInstancePool();
+                CategoryAssociatedContentTableMap::clearInstancePool();
                 ContentI18nTableMap::clearInstancePool();
                 ContentVersionTableMap::clearInstancePool();
             }

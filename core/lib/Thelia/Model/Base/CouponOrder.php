@@ -69,12 +69,6 @@ abstract class CouponOrder implements ActiveRecordInterface
     protected $order_id;
 
     /**
-     * The value for the code field.
-     * @var        string
-     */
-    protected $code;
-
-    /**
      * The value for the value field.
      * @var        double
      */
@@ -261,7 +255,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      */
     public function hasVirtualColumn($name)
     {
-        return isset($this->virtualColumns[$name]);
+        return array_key_exists($name, $this->virtualColumns);
     }
 
     /**
@@ -382,17 +376,6 @@ abstract class CouponOrder implements ActiveRecordInterface
     }
 
     /**
-     * Get the [code] column value.
-     *
-     * @return   string
-     */
-    public function getCode()
-    {
-
-        return $this->code;
-    }
-
-    /**
      * Get the [value] column value.
      *
      * @return   double
@@ -488,27 +471,6 @@ abstract class CouponOrder implements ActiveRecordInterface
 
         return $this;
     } // setOrderId()
-
-    /**
-     * Set the value of [code] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\CouponOrder The current object (for fluent API support)
-     */
-    public function setCode($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->code !== $v) {
-            $this->code = $v;
-            $this->modifiedColumns[] = CouponOrderTableMap::CODE;
-        }
-
-
-        return $this;
-    } // setCode()
 
     /**
      * Set the value of [value] column.
@@ -616,19 +578,16 @@ abstract class CouponOrder implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CouponOrderTableMap::translateFieldName('OrderId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->order_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CouponOrderTableMap::translateFieldName('Code', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->code = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CouponOrderTableMap::translateFieldName('Value', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CouponOrderTableMap::translateFieldName('Value', TableMap::TYPE_PHPNAME, $indexType)];
             $this->value = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CouponOrderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CouponOrderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CouponOrderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CouponOrderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -641,7 +600,7 @@ abstract class CouponOrder implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = CouponOrderTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = CouponOrderTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\CouponOrder object", 0, $e);
@@ -883,9 +842,6 @@ abstract class CouponOrder implements ActiveRecordInterface
         if ($this->isColumnModified(CouponOrderTableMap::ORDER_ID)) {
             $modifiedColumns[':p' . $index++]  = 'ORDER_ID';
         }
-        if ($this->isColumnModified(CouponOrderTableMap::CODE)) {
-            $modifiedColumns[':p' . $index++]  = 'CODE';
-        }
         if ($this->isColumnModified(CouponOrderTableMap::VALUE)) {
             $modifiedColumns[':p' . $index++]  = 'VALUE';
         }
@@ -911,9 +867,6 @@ abstract class CouponOrder implements ActiveRecordInterface
                         break;
                     case 'ORDER_ID':
                         $stmt->bindValue($identifier, $this->order_id, PDO::PARAM_INT);
-                        break;
-                    case 'CODE':
-                        $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
                     case 'VALUE':
                         $stmt->bindValue($identifier, $this->value, PDO::PARAM_STR);
@@ -993,15 +946,12 @@ abstract class CouponOrder implements ActiveRecordInterface
                 return $this->getOrderId();
                 break;
             case 2:
-                return $this->getCode();
-                break;
-            case 3:
                 return $this->getValue();
                 break;
-            case 4:
+            case 3:
                 return $this->getCreatedAt();
                 break;
-            case 5:
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1035,10 +985,9 @@ abstract class CouponOrder implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getOrderId(),
-            $keys[2] => $this->getCode(),
-            $keys[3] => $this->getValue(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[2] => $this->getValue(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1091,15 +1040,12 @@ abstract class CouponOrder implements ActiveRecordInterface
                 $this->setOrderId($value);
                 break;
             case 2:
-                $this->setCode($value);
-                break;
-            case 3:
                 $this->setValue($value);
                 break;
-            case 4:
+            case 3:
                 $this->setCreatedAt($value);
                 break;
-            case 5:
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1128,10 +1074,9 @@ abstract class CouponOrder implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setOrderId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCode($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setValue($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[2], $arr)) $this->setValue($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1145,7 +1090,6 @@ abstract class CouponOrder implements ActiveRecordInterface
 
         if ($this->isColumnModified(CouponOrderTableMap::ID)) $criteria->add(CouponOrderTableMap::ID, $this->id);
         if ($this->isColumnModified(CouponOrderTableMap::ORDER_ID)) $criteria->add(CouponOrderTableMap::ORDER_ID, $this->order_id);
-        if ($this->isColumnModified(CouponOrderTableMap::CODE)) $criteria->add(CouponOrderTableMap::CODE, $this->code);
         if ($this->isColumnModified(CouponOrderTableMap::VALUE)) $criteria->add(CouponOrderTableMap::VALUE, $this->value);
         if ($this->isColumnModified(CouponOrderTableMap::CREATED_AT)) $criteria->add(CouponOrderTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CouponOrderTableMap::UPDATED_AT)) $criteria->add(CouponOrderTableMap::UPDATED_AT, $this->updated_at);
@@ -1213,7 +1157,6 @@ abstract class CouponOrder implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setOrderId($this->getOrderId());
-        $copyObj->setCode($this->getCode());
         $copyObj->setValue($this->getValue());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1303,7 +1246,6 @@ abstract class CouponOrder implements ActiveRecordInterface
     {
         $this->id = null;
         $this->order_id = null;
-        $this->code = null;
         $this->value = null;
         $this->created_at = null;
         $this->updated_at = null;

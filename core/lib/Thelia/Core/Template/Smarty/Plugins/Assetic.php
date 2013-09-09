@@ -32,13 +32,13 @@ class Assetic extends AbstractSmartyPlugin
 {
     public $assetManager;
 
-    public function __construct()
+    public function __construct($developmentMode)
     {
         $web_root  = THELIA_WEB_DIR;
 
         $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
 
-        $this->assetManager = new SmartyAssetsManager($web_root, $asset_dir_from_web_root);
+        $this->assetManager = new SmartyAssetsManager($web_root, $asset_dir_from_web_root, $developmentMode == 'dev');
     }
 
     public function blockJavascripts($params, $content, \Smarty_Internal_Template $template, &$repeat)

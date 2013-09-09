@@ -28,9 +28,16 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Event\Internal\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\CartEvent;
 
+/**
+ * managed cart
+ *
+ * Trait CartTrait
+ * @package Thelia\Cart
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 trait CartTrait
 {
     /**
@@ -42,8 +49,9 @@ trait CartTrait
      */
     public function getCart(Request $request)
     {
+        $session = $request->getSession();
 
-        if (null !== $cart = $request->getSession()->getCart()) {
+        if (null !== $cart = $session->getCart()) {
             return $cart;
         }
 
@@ -55,26 +63,26 @@ trait CartTrait
 
             if ($cart) {
                 //le panier existe en base
-                $customer = $request->getSession()->getCustomerUser();
+                $customer = $session->getCustomerUser();
 
                 if ($customer) {
                     if ($cart->getCustomerId() != $customer->getId()) {
                         //le customer du panier n'est pas le mm que celui connecté, il faut cloner le panier sans le customer_id
-                        $cart = $this->duplicateCart($cart, $request->getSession(), $customer);
+                        $cart = $this->duplicateCart($cart, $session, $customer);
                     }
                 } else {
                     if ($cart->getCustomerId() != null) {
                         //il faut dupliquer le panier sans le customer_id
-                        $cart = $this->duplicateCart($cart, $request->getSession());
+                        $cart = $this->duplicateCart($cart, $session);
                     }
                 }
 
             } else {
-                $cart = $this->createCart($request->getSession());
+                $cart = $this->createCart($session);
             }
         } else {
             //le cookie de panier n'existe pas, il va falloir le créer et faire un enregistrement en base.
-            $cart = $this->createCart($request->getSession());
+            $cart = $this->createCart($session);
         }
 
         return $cart;
@@ -116,7 +124,7 @@ trait CartTrait
         $cartEvent = new CartEvent($newCart);
         $this->getDispatcher()->dispatch(TheliaEvents::CART_DUPLICATE, $cartEvent);
 
-        return $cartEvent->cart;
+        return $cartEvent->getCart();
     }
 
     protected function generateCookie()

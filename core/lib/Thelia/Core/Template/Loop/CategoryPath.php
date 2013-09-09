@@ -23,7 +23,7 @@
 
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -54,7 +54,7 @@ use Thelia\Type\BooleanOrBothType;
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class CategoryPath extends BaseLoop
+class CategoryPath extends BaseI18nLoop
 {
     /**
      * @return ArgumentCollection
@@ -80,6 +80,9 @@ class CategoryPath extends BaseLoop
         $visible = $this->getVisible();
 
         $search = CategoryQuery::create();
+
+        $locale = $this->configureI18nProcessing($search, array('TITLE'));
+
         $search->filterById($id);
         if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
 
@@ -95,9 +98,10 @@ class CategoryPath extends BaseLoop
                 $loopResultRow = new LoopResultRow();
 
                 $loopResultRow
-                    ->set("TITLE",$category->getTitle())
-                    ->set("URL", $category->getUrl())
+                    ->set("TITLE",$category->getVirtualColumn('i18n_TITLE'))
+                    ->set("URL", $category->getUrl($locale))
                     ->set("ID", $category->getId())
+                    ->set("LOCALE",$locale)
                 ;
 
                 $results[] = $loopResultRow;
@@ -114,8 +118,11 @@ class CategoryPath extends BaseLoop
                     $ids[] = $parent;
 
                     $search = CategoryQuery::create();
+
+                    $this->configureI18nProcessing($search, array('TITLE'));
+
                     $search->filterById($parent);
-                    if ($visible == true) $search->filterByVisible($visible);
+                    if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
                 }
             }
         } while ($category != null && $parent > 0);

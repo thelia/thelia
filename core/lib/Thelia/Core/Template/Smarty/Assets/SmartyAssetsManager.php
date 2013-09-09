@@ -34,17 +34,21 @@ class SmartyAssetsManager
 
     private $web_root;
     private $path_relative_to_web_root;
+    private $developmentMode;
 
     /**
      * Creates a new SmartyAssetsManager instance
      *
-     * @param string $web_root                  the disk path to the web root
-     * @param string $path_relative_to_web_root the path (relative to web root) where the assets will be generated
+     * @param string    $web_root                    the disk path to the web root
+     * @param string    $path_relative_to_web_root   the path (relative to web root) where the assets will be generated
+     * @param  boolean  $developmentMode             true / false. If true, assets are not cached, and always generated.
      */
-    public function __construct($web_root, $path_relative_to_web_root)
+    public function __construct($web_root, $path_relative_to_web_root, $developmentMode)
     {
         $this->web_root = $web_root;
         $this->path_relative_to_web_root = $path_relative_to_web_root;
+
+        $this->developmentMode = $developmentMode;
 
         $this->assetic_manager = new AsseticHelper();
     }
@@ -70,10 +74,11 @@ class SmartyAssetsManager
             $url = $this->assetic_manager->asseticize(
                     $asset_dir.'/'.$asset_file,
                     $this->web_root."/".$this->path_relative_to_web_root,
-                    URL::absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE /* path only */),
+                    URL::getInstance()->absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE /* path only */),
                     $assetType,
                     $filters,
-                    $debug
+                    $debug,
+                    $this->developmentMode
              );
 
             return $url;

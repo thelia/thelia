@@ -27,6 +27,11 @@ use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 
+/**
+ * Class CustomerCreation
+ * @package Thelia\Form
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class CustomerCreation extends BaseForm
 {
 

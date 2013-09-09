@@ -285,7 +285,7 @@ abstract class Tax implements ActiveRecordInterface
      */
     public function hasVirtualColumn($name)
     {
-        return isset($this->virtualColumns[$name]);
+        return array_key_exists($name, $this->virtualColumns);
     }
 
     /**
@@ -791,10 +791,9 @@ abstract class Tax implements ActiveRecordInterface
 
             if ($this->taxRuleCountriesScheduledForDeletion !== null) {
                 if (!$this->taxRuleCountriesScheduledForDeletion->isEmpty()) {
-                    foreach ($this->taxRuleCountriesScheduledForDeletion as $taxRuleCountry) {
-                        // need to save related object because we set the relation to null
-                        $taxRuleCountry->save($con);
-                    }
+                    \Thelia\Model\TaxRuleCountryQuery::create()
+                        ->filterByPrimaryKeys($this->taxRuleCountriesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
                     $this->taxRuleCountriesScheduledForDeletion = null;
                 }
             }
@@ -1346,7 +1345,10 @@ abstract class Tax implements ActiveRecordInterface
         $taxRuleCountriesToDelete = $this->getTaxRuleCountries(new Criteria(), $con)->diff($taxRuleCountries);
 
 
-        $this->taxRuleCountriesScheduledForDeletion = $taxRuleCountriesToDelete;
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->taxRuleCountriesScheduledForDeletion = clone $taxRuleCountriesToDelete;
 
         foreach ($taxRuleCountriesToDelete as $taxRuleCountryRemoved) {
             $taxRuleCountryRemoved->setTax(null);
@@ -1439,7 +1441,7 @@ abstract class Tax implements ActiveRecordInterface
                 $this->taxRuleCountriesScheduledForDeletion = clone $this->collTaxRuleCountries;
                 $this->taxRuleCountriesScheduledForDeletion->clear();
             }
-            $this->taxRuleCountriesScheduledForDeletion[]= $taxRuleCountry;
+            $this->taxRuleCountriesScheduledForDeletion[]= clone $taxRuleCountry;
             $taxRuleCountry->setTax(null);
         }
 

@@ -64,10 +64,6 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProductQuery rightJoinProductSaleElements($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductSaleElements relation
  * @method     ChildProductQuery innerJoinProductSaleElements($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductSaleElements relation
  *
- * @method     ChildProductQuery leftJoinContentAssoc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentAssoc relation
- * @method     ChildProductQuery rightJoinContentAssoc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentAssoc relation
- * @method     ChildProductQuery innerJoinContentAssoc($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentAssoc relation
- *
  * @method     ChildProductQuery leftJoinProductImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductImage relation
  * @method     ChildProductQuery rightJoinProductImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductImage relation
  * @method     ChildProductQuery innerJoinProductImage($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductImage relation
@@ -84,13 +80,13 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProductQuery rightJoinAccessoryRelatedByAccessory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AccessoryRelatedByAccessory relation
  * @method     ChildProductQuery innerJoinAccessoryRelatedByAccessory($relationAlias = null) Adds a INNER JOIN clause to the query using the AccessoryRelatedByAccessory relation
  *
- * @method     ChildProductQuery leftJoinRewriting($relationAlias = null) Adds a LEFT JOIN clause to the query using the Rewriting relation
- * @method     ChildProductQuery rightJoinRewriting($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Rewriting relation
- * @method     ChildProductQuery innerJoinRewriting($relationAlias = null) Adds a INNER JOIN clause to the query using the Rewriting relation
- *
  * @method     ChildProductQuery leftJoinCartItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the CartItem relation
  * @method     ChildProductQuery rightJoinCartItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CartItem relation
  * @method     ChildProductQuery innerJoinCartItem($relationAlias = null) Adds a INNER JOIN clause to the query using the CartItem relation
+ *
+ * @method     ChildProductQuery leftJoinProductAssociatedContent($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductAssociatedContent relation
+ * @method     ChildProductQuery rightJoinProductAssociatedContent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductAssociatedContent relation
+ * @method     ChildProductQuery innerJoinProductAssociatedContent($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductAssociatedContent relation
  *
  * @method     ChildProductQuery leftJoinProductI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductI18n relation
  * @method     ChildProductQuery rightJoinProductI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductI18n relation
@@ -997,79 +993,6 @@ abstract class ProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\ContentAssoc object
-     *
-     * @param \Thelia\Model\ContentAssoc|ObjectCollection $contentAssoc  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductQuery The current query, for fluid interface
-     */
-    public function filterByContentAssoc($contentAssoc, $comparison = null)
-    {
-        if ($contentAssoc instanceof \Thelia\Model\ContentAssoc) {
-            return $this
-                ->addUsingAlias(ProductTableMap::ID, $contentAssoc->getProductId(), $comparison);
-        } elseif ($contentAssoc instanceof ObjectCollection) {
-            return $this
-                ->useContentAssocQuery()
-                ->filterByPrimaryKeys($contentAssoc->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByContentAssoc() only accepts arguments of type \Thelia\Model\ContentAssoc or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the ContentAssoc relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildProductQuery The current query, for fluid interface
-     */
-    public function joinContentAssoc($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ContentAssoc');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'ContentAssoc');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the ContentAssoc relation ContentAssoc object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\ContentAssocQuery A secondary query class using the current class as primary query
-     */
-    public function useContentAssocQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinContentAssoc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ContentAssoc', '\Thelia\Model\ContentAssocQuery');
-    }
-
-    /**
      * Filter the query by a related \Thelia\Model\ProductImage object
      *
      * @param \Thelia\Model\ProductImage|ObjectCollection $productImage  the related object to use as filter
@@ -1362,79 +1285,6 @@ abstract class ProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Rewriting object
-     *
-     * @param \Thelia\Model\Rewriting|ObjectCollection $rewriting  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductQuery The current query, for fluid interface
-     */
-    public function filterByRewriting($rewriting, $comparison = null)
-    {
-        if ($rewriting instanceof \Thelia\Model\Rewriting) {
-            return $this
-                ->addUsingAlias(ProductTableMap::ID, $rewriting->getProductId(), $comparison);
-        } elseif ($rewriting instanceof ObjectCollection) {
-            return $this
-                ->useRewritingQuery()
-                ->filterByPrimaryKeys($rewriting->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByRewriting() only accepts arguments of type \Thelia\Model\Rewriting or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Rewriting relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildProductQuery The current query, for fluid interface
-     */
-    public function joinRewriting($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Rewriting');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Rewriting');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Rewriting relation Rewriting object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\RewritingQuery A secondary query class using the current class as primary query
-     */
-    public function useRewritingQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinRewriting($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Rewriting', '\Thelia\Model\RewritingQuery');
-    }
-
-    /**
      * Filter the query by a related \Thelia\Model\CartItem object
      *
      * @param \Thelia\Model\CartItem|ObjectCollection $cartItem  the related object to use as filter
@@ -1505,6 +1355,79 @@ abstract class ProductQuery extends ModelCriteria
         return $this
             ->joinCartItem($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CartItem', '\Thelia\Model\CartItemQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\ProductAssociatedContent object
+     *
+     * @param \Thelia\Model\ProductAssociatedContent|ObjectCollection $productAssociatedContent  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductQuery The current query, for fluid interface
+     */
+    public function filterByProductAssociatedContent($productAssociatedContent, $comparison = null)
+    {
+        if ($productAssociatedContent instanceof \Thelia\Model\ProductAssociatedContent) {
+            return $this
+                ->addUsingAlias(ProductTableMap::ID, $productAssociatedContent->getProductId(), $comparison);
+        } elseif ($productAssociatedContent instanceof ObjectCollection) {
+            return $this
+                ->useProductAssociatedContentQuery()
+                ->filterByPrimaryKeys($productAssociatedContent->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByProductAssociatedContent() only accepts arguments of type \Thelia\Model\ProductAssociatedContent or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ProductAssociatedContent relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildProductQuery The current query, for fluid interface
+     */
+    public function joinProductAssociatedContent($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ProductAssociatedContent');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ProductAssociatedContent');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ProductAssociatedContent relation ProductAssociatedContent object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ProductAssociatedContentQuery A secondary query class using the current class as primary query
+     */
+    public function useProductAssociatedContentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinProductAssociatedContent($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductAssociatedContent', '\Thelia\Model\ProductAssociatedContentQuery');
     }
 
     /**

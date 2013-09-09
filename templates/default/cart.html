@@ -8,7 +8,7 @@
 </ul>
 
 {form name="thelia.cart.add" }
-{* We use $INDEX_PAGE as form action to avoid mixing post and get data *}
+{* We use {navigate to="index"} as form action to avoid mixing post and get data *}
     <form action="{url path="/cart/add" }" method="post" {form_enctype form=$form}>
 
         {*
@@ -24,7 +24,7 @@
         {form_error form=$form field="product"}
         {$message}
         {/form_error}
-            <label>{intl l="product"}: </label><input type="text" name="{$name}" value="{$value}" {$attr} ><br />
+            <label for="{$label_attr.for}">{intl l="{$label}"}: </label><input id="{$label_attr.for}" type="text" name="{$name}" value="{$value}" {$attr} ><br />
         {/form_field}
 
         {form_field form=$form field='product_sale_elements_id'}

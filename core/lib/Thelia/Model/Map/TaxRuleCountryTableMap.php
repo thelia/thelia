@@ -57,7 +57,7 @@ class TaxRuleCountryTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -67,12 +67,7 @@ class TaxRuleCountryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
-
-    /**
-     * the column name for the ID field
-     */
-    const ID = 'tax_rule_country.ID';
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the TAX_RULE_ID field
@@ -90,9 +85,9 @@ class TaxRuleCountryTableMap extends TableMap
     const TAX_ID = 'tax_rule_country.TAX_ID';
 
     /**
-     * the column name for the NONE field
+     * the column name for the POSITION field
      */
-    const NONE = 'tax_rule_country.NONE';
+    const POSITION = 'tax_rule_country.POSITION';
 
     /**
      * the column name for the CREATED_AT field
@@ -116,12 +111,12 @@ class TaxRuleCountryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'TaxRuleId', 'CountryId', 'TaxId', 'None', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'taxRuleId', 'countryId', 'taxId', 'none', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(TaxRuleCountryTableMap::ID, TaxRuleCountryTableMap::TAX_RULE_ID, TaxRuleCountryTableMap::COUNTRY_ID, TaxRuleCountryTableMap::TAX_ID, TaxRuleCountryTableMap::NONE, TaxRuleCountryTableMap::CREATED_AT, TaxRuleCountryTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'TAX_RULE_ID', 'COUNTRY_ID', 'TAX_ID', 'NONE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'tax_rule_id', 'country_id', 'tax_id', 'none', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('TaxRuleId', 'CountryId', 'TaxId', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('taxRuleId', 'countryId', 'taxId', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(TaxRuleCountryTableMap::TAX_RULE_ID, TaxRuleCountryTableMap::COUNTRY_ID, TaxRuleCountryTableMap::TAX_ID, TaxRuleCountryTableMap::POSITION, TaxRuleCountryTableMap::CREATED_AT, TaxRuleCountryTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('TAX_RULE_ID', 'COUNTRY_ID', 'TAX_ID', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('tax_rule_id', 'country_id', 'tax_id', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -131,12 +126,12 @@ class TaxRuleCountryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'TaxRuleId' => 1, 'CountryId' => 2, 'TaxId' => 3, 'None' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'taxRuleId' => 1, 'countryId' => 2, 'taxId' => 3, 'none' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(TaxRuleCountryTableMap::ID => 0, TaxRuleCountryTableMap::TAX_RULE_ID => 1, TaxRuleCountryTableMap::COUNTRY_ID => 2, TaxRuleCountryTableMap::TAX_ID => 3, TaxRuleCountryTableMap::NONE => 4, TaxRuleCountryTableMap::CREATED_AT => 5, TaxRuleCountryTableMap::UPDATED_AT => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TAX_RULE_ID' => 1, 'COUNTRY_ID' => 2, 'TAX_ID' => 3, 'NONE' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'tax_rule_id' => 1, 'country_id' => 2, 'tax_id' => 3, 'none' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('TaxRuleId' => 0, 'CountryId' => 1, 'TaxId' => 2, 'Position' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('taxRuleId' => 0, 'countryId' => 1, 'taxId' => 2, 'position' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(TaxRuleCountryTableMap::TAX_RULE_ID => 0, TaxRuleCountryTableMap::COUNTRY_ID => 1, TaxRuleCountryTableMap::TAX_ID => 2, TaxRuleCountryTableMap::POSITION => 3, TaxRuleCountryTableMap::CREATED_AT => 4, TaxRuleCountryTableMap::UPDATED_AT => 5, ),
+        self::TYPE_RAW_COLNAME   => array('TAX_RULE_ID' => 0, 'COUNTRY_ID' => 1, 'TAX_ID' => 2, 'POSITION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        self::TYPE_FIELDNAME     => array('tax_rule_id' => 0, 'country_id' => 1, 'tax_id' => 2, 'position' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -155,11 +150,10 @@ class TaxRuleCountryTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('TAX_RULE_ID', 'TaxRuleId', 'INTEGER', 'tax_rule', 'ID', false, null, null);
-        $this->addForeignKey('COUNTRY_ID', 'CountryId', 'INTEGER', 'country', 'ID', false, null, null);
-        $this->addForeignKey('TAX_ID', 'TaxId', 'INTEGER', 'tax', 'ID', false, null, null);
-        $this->addColumn('NONE', 'None', 'TINYINT', false, null, null);
+        $this->addForeignPrimaryKey('TAX_RULE_ID', 'TaxRuleId', 'INTEGER' , 'tax_rule', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('COUNTRY_ID', 'CountryId', 'INTEGER' , 'country', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('TAX_ID', 'TaxId', 'INTEGER' , 'tax', 'ID', true, null, null);
+        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -169,7 +163,7 @@ class TaxRuleCountryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Tax', '\\Thelia\\Model\\Tax', RelationMap::MANY_TO_ONE, array('tax_id' => 'id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('Tax', '\\Thelia\\Model\\Tax', RelationMap::MANY_TO_ONE, array('tax_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('TaxRule', '\\Thelia\\Model\\TaxRule', RelationMap::MANY_TO_ONE, array('tax_rule_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array('country_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
@@ -188,6 +182,59 @@ class TaxRuleCountryTableMap extends TableMap
     } // getBehaviors()
 
     /**
+     * Adds an object to the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
+     *
+     * @param \Thelia\Model\TaxRuleCountry $obj A \Thelia\Model\TaxRuleCountry object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
+     */
+    public static function addInstanceToPool($obj, $key = null)
+    {
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getTaxRuleId(), (string) $obj->getCountryId(), (string) $obj->getTaxId()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \Thelia\Model\TaxRuleCountry object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \Thelia\Model\TaxRuleCountry) {
+                $key = serialize(array((string) $value->getTaxRuleId(), (string) $value->getCountryId(), (string) $value->getTaxId()));
+
+            } elseif (is_array($value) && count($value) === 3) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\TaxRuleCountry object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
+    }
+
+    /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
      *
      * For tables with a single-column primary key, that simple pkey value will be returned.  For tables with
@@ -201,11 +248,11 @@ class TaxRuleCountryTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TaxRuleId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('TaxId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('TaxRuleId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('TaxId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -223,11 +270,7 @@ class TaxRuleCountryTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return (int) $row[
-                            $indexType == TableMap::TYPE_NUM
-                            ? 0 + $offset
-                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-                        ];
+            return $pks;
     }
 
     /**
@@ -325,19 +368,17 @@ class TaxRuleCountryTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(TaxRuleCountryTableMap::ID);
             $criteria->addSelectColumn(TaxRuleCountryTableMap::TAX_RULE_ID);
             $criteria->addSelectColumn(TaxRuleCountryTableMap::COUNTRY_ID);
             $criteria->addSelectColumn(TaxRuleCountryTableMap::TAX_ID);
-            $criteria->addSelectColumn(TaxRuleCountryTableMap::NONE);
+            $criteria->addSelectColumn(TaxRuleCountryTableMap::POSITION);
             $criteria->addSelectColumn(TaxRuleCountryTableMap::CREATED_AT);
             $criteria->addSelectColumn(TaxRuleCountryTableMap::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.TAX_RULE_ID');
             $criteria->addSelectColumn($alias . '.COUNTRY_ID');
             $criteria->addSelectColumn($alias . '.TAX_ID');
-            $criteria->addSelectColumn($alias . '.NONE');
+            $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -391,7 +432,18 @@ class TaxRuleCountryTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(TaxRuleCountryTableMap::DATABASE_NAME);
-            $criteria->add(TaxRuleCountryTableMap::ID, (array) $values, Criteria::IN);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(TaxRuleCountryTableMap::TAX_RULE_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(TaxRuleCountryTableMap::COUNTRY_ID, $value[1]));
+                $criterion->addAnd($criteria->getNewCriterion(TaxRuleCountryTableMap::TAX_ID, $value[2]));
+                $criteria->addOr($criterion);
+            }
         }
 
         $query = TaxRuleCountryQuery::create()->mergeWith($criteria);

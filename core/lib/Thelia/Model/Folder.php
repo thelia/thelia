@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\Folder as BaseFolder;
+use Thelia\Tools\URL;
 
 class Folder extends BaseFolder
 {
@@ -12,6 +13,11 @@ class Folder extends BaseFolder
     public function countChild()
     {
         return FolderQuery::countChild($this->getId());
+    }
+
+    public function getUrl($locale)
+    {
+        return URL::getInstance()->retrieve('folder', $this->getId(), $locale)->toString();
     }
 
     /**

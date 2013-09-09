@@ -1,69 +1,70 @@
-{$page_title={intl l='Welcome'}}
-{include file='includes/header.inc.html'}
+{extends file="admin-layout.tpl"}
 
-<div class="loginpage">
-   	<div class="brandbar container">
-       	<a class="brand" href="index.php">{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}</a>
-    </div>
+{* -- We do not check admin login on this page *}
+{block name="check-auth"}{/block}
 
-    <div id="wrapper" class="container">
+{block name="page-title"}{intl l='Welcome'}{/block}
 
-	    {module_include location='index_top'}
+{block name="main-content"}
+	<div class="loginpage">
 
-	   	<div class="hero-unit">
-	        <h1>{intl l='Thelia Back Office'}</h1>
+	    <div id="wrapper" class="container">
 
-			{form name="thelia.admin.login"}
-			<form action="{url path='/admin/checklogin'}" method="post" class="well form-inline" {form_enctype form=$form}>
+		    {module_include location='index_top'}
 
-				{if #form_error}<div class="alert alert-error">#form_error_message</div>{/if}
+		   	<div class="jumbotron">
+		        <h1>{intl l='Thelia Back Office'}</h1>
 
-                {form_hidden_fields form=$form}
+				{form name="thelia.admin.login"}
+				<form action="{url path='/admin/checklogin'}" method="post" class="well form-inline" {form_enctype form=$form}>
 
-				{form_field form=$form field='success_url'}
-				<input type="hidden" name="{$name}" value="{url path='/admin'}" /> {* on success, redirect to /admin *}
-				{/form_field}
+					{if #form_error}<div class="alert alert-error">#form_error_message</div>{/if}
 
-                {form_field form=$form field='username'}
-                <span {if $error}class="error"{/if}>
-				    <input type="text" class="input" placeholder="{intl l='User name'}" name="{$name}" value="{$value}" {$attr} />
-				</span>
-                {/form_field}
+	                {form_hidden_fields form=$form}
 
-                {form_field form=$form field='password'}
-                <span {if $error}class="error"{/if}>
-				    <input type="password" class="input" placeholder="{intl l='Password'}" name="{$name}" {$attr} />
-				</span>
-                {/form_field}
+					{form_field form=$form field='success_url'}
+					<input type="hidden" name="{$name}" value="{url path='/admin'}" /> {* on success, redirect to /admin *}
+					{/form_field}
 
-				{form_field form=$form field='remember_me'}
-				<label class="checkbox"> <input type="checkbox" name="{$name}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {intl l='Remember me'}</label>
-				{/form_field}
+	                {form_field form=$form field='username'}
+	                <span {if $error}class="error"{/if}>
+					    <input type="text" class="input" placeholder="{intl l='User name'}" name="{$name}" value="{$value}" {$attr} />
+					</span>
+	                {/form_field}
 
-				<span class="pull-right"><button type="submit" class="btn btn-primary">{intl l='Login'} <i class="icon-play icon-white"></i></button></span>
-			</form>
-			{/form}
-		</div>
+	                {form_field form=$form field='password'}
+	                <span {if $error}class="error"{/if}>
+					    <input type="password" class="input" placeholder="{intl l='Password'}" name="{$name}" {$attr} />
+					</span>
+	                {/form_field}
 
-		{module_include location='index_middle'}
+					{form_field form=$form field='remember_me'}
+					<label class="checkbox"> <input type="checkbox" name="{$name}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {intl l='Remember me'}</label>
+					{/form_field}
 
-		<div class="row-fluid feed-list">
-			<div class="span4 offset4">
-				<div class="well">{intl l="Loading Thelia lastest news..."}</div>
+					<span class="pull-right"><button type="submit" class="btn btn-default btn-primary">{intl l='Login'} <span class="glyphicon glyphicon-play"></span></button></span>
+				</form>
+				{/form}
+			</div>
+
+			{module_include location='index_middle'}
+
+			<div class="row feed-list">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="alert alert-info">{intl l="Loading Thelia lastest news..."}</div>
+				</div>
 			</div>
 		</div>
+
+		{module_include location='index_bottom'}
+
 	</div>
+{/block}
 
-	{module_include location='index_bottom'}
-
-</div>
-
-{include file='includes/js.inc.html'}
-
-<script>
-	$(function () {
-		$(".feed-list").load("{admin_viewurl view='includes/thelia_news_feed'}");
-	})
-</script>
-
-{include file='includes/footer.inc.html'}
+{block name="javascript-initialization"}
+	<script>
+		$(function () {
+			$(".feed-list").load("{admin_viewurl view='includes/thelia_news_feed'}");
+		})
+	</script>
+{/block}

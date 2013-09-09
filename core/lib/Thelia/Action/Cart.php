@@ -41,6 +41,7 @@ use Thelia\Model\ConfigQuery;
  *
  * Class Cart
  * @package Thelia\Action
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 class Cart extends BaseAction implements EventSubscriberInterface
 {
@@ -142,7 +143,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         return array(
             "action.addArticle" => array("addItem", 128),
             "action.deleteArticle" => array("deleteItem", 128),
-            "action.changeArticle" => array("changeItem", 128),
+            "action.updateArticle" => array("changeItem", 128),
         );
     }
 

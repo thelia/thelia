@@ -25,15 +25,179 @@
     </route>
 
 
-	<!-- Route to the catalog controller (process category browsing) -->
+	<!-- Route to the catalog controller -->
 
     <route id="admin.catalog" path="/admin/catalog">
-        <default key="_controller">Thelia\Controller\Admin\CategoryController::indexAction</default>
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::defaultAction</default>
     </route>
 
-    <route id="admin.category" path="/admin/catalog/category">
-        <default key="_controller">Thelia\Controller\Admin\CategoryController::processAction</default>
+    <!-- Customer rule management -->
+
+    <route id="admin.customers" path="/admin/customers">
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::indexAction</default>
     </route>
+
+    <!-- end Customer rule management -->
+
+    <!-- Categories management -->
+
+    <route id="admin.categories.default" path="/admin/categories">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::defaultAction</default>
+    </route>
+
+    <route id="admin.categories.create" path="/admin/categories/create">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::createAction</default>
+    </route>
+
+    <route id="admin.categories.update" path="/admin/categories/update">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::changeAction</default>
+    </route>
+
+    <route id="admin.categories.save" path="/admin/categories/save">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::saveChangeAction</default>
+    </route>
+
+    <route id="admin.categories.set-default" path="/admin/categories/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::toggleOnlineAction</default>
+    </route>
+
+    <route id="admin.categories.delete" path="/admin/categories/delete">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::deleteAction</default>
+    </route>
+
+    <route id="admin.categories.update-position" path="/admin/categories/update-position">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::updatePositionAction</default>
+    </route>
+    <route id="admin.category.ajax" path="/admin/catalog/category/parent/{parentId}.{_format}" methods="GET">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::getByParentIdAction</default>
+        <requirement key="_format">xml|json</requirement>
+    </route>
+
+
+
+
+
+
+
+    <!-- Route to the Coupon controller (process Coupon browsing) -->
+    <route id="admin.coupon.list" path="/admin/coupon">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::browseAction</default>
+    </route>
+    <route id="admin.coupon.create" path="/admin/coupon/create">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::createAction</default>
+    </route>
+    <route id="admin.coupon.update" path="/admin/coupon/update/{couponId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::updateAction</default>
+    </route>
+    <route id="admin.coupon.read" path="/admin/coupon/read/{couponId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
+    </route>
+    <route id="admin.coupon.rule.input" path="/admin/coupon/rule/{ruleId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::getRuleInputAction</default>
+    </route>
+
+
+
+
+
+
+    <!-- Routes to the Config (system variables) controller -->
+
+    <route id="admin.configuration.variables.default" path="/admin/configuration/variables">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.variables.update-values" path="/admin/configuration/variables/update-values">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::changeValuesAction</default>
+    </route>
+
+    <route id="admin.configuration.variables.create" path="/admin/configuration/variables/create">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.variables.update" path="/admin/configuration/variables/update">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::changeAction</default>
+    </route>
+
+    <route id="admin.configuration.variables.save" path="/admin/configuration/variables/save">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::saveChangeAction</default>
+    </route>
+
+    <route id="admin.configuration.variables.delete" path="/admin/configuration/variables/delete">
+        <default key="_controller">Thelia\Controller\Admin\ConfigController::deleteAction</default>
+    </route>
+
+    <!-- Routes to the Messages controller -->
+
+    <route id="admin.configuration.messages.default" path="/admin/configuration/messages">
+        <default key="_controller">Thelia\Controller\Admin\MessageController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.messages.create" path="/admin/configuration/messages/create">
+        <default key="_controller">Thelia\Controller\Admin\MessageController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.messages.update" path="/admin/configuration/messages/update">
+        <default key="_controller">Thelia\Controller\Admin\MessageController::changeAction</default>
+    </route>
+
+    <route id="admin.configuration.messages.save" path="/admin/configuration/messages/save">
+        <default key="_controller">Thelia\Controller\Admin\MessageController::saveChangeAction</default>
+    </route>
+
+    <route id="admin.configuration.messages.delete" path="/admin/configuration/messages/delete">
+        <default key="_controller">Thelia\Controller\Admin\MessageController::deleteAction</default>
+    </route>
+
+    <!-- Routes to the Currencies controller -->
+
+    <route id="admin.configuration.currencies.default" path="/admin/configuration/currencies">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.create" path="/admin/configuration/currencies/create">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.update" path="/admin/configuration/currencies/update">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::changeAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.save" path="/admin/configuration/currencies/save">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::saveChangeAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.set-default" path="/admin/configuration/currencies/set-default">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::setDefaultAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.update-rates" path="/admin/configuration/currencies/update-rates">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::updateRatesAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.delete" path="/admin/configuration/currencies/delete">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
+    </route>
+
+    <!-- attribute and feature routes  management -->
+
+    <route id="admin.configuration.attribute" path="/admin/configuration/product_attributes">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.attribute.edit" path="/admin/configuration/product_attributes/update">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::updateAction</default>
+    </route>
+
+    <!-- end attribute and feature routes  management -->
 
 	<!-- The default route, to display a template -->
 
@@ -41,4 +205,5 @@
         <default key="_controller">Thelia\Controller\Admin\AdminController::processTemplateAction</default>
         <requirement key="template">.*</requirement>
     </route>
+
 </routes>

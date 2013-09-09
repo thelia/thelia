@@ -36,6 +36,7 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * @param Request                  $request
      * @param EventDispatcherInterface $dispatcher
+     * @param ParserContext            $parserContext
      * @param bool                     $template
      * @param string                   $env
      * @param bool                     $debug
@@ -64,7 +65,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->setTemplate($template ?: ConfigQuery::read('active-template', 'default'));
 
         $this->debugging = $debug;
-
+        
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
@@ -83,12 +84,13 @@ class SmartyParser extends Smarty implements ParserInterface
 
         $this->registerFilter('pre', array($this, "preThelia"));
         $this->registerFilter('output', array($this, "removeBlankLines"));
+        $this->registerFilter('variable', array(__CLASS__, "theliaEscape"));
     }
 
     public function preThelia($tpl_source, \Smarty_Internal_Template $template)
     {
-        $new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9\-_]*)(.*)}`', '{\$$1$2}', $tpl_source);
-        $new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9\-_]*)`', '{\$$1|dieseCanceller:\'#$1\'}', $new_source);
+        $new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9_]*)(.*)}`', '{\$$1$2}', $tpl_source);
+        $new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9_]*)`', '{\$$1|dieseCanceller:\'#$1\'}', $new_source);
 
         return $new_source;
     }
@@ -96,6 +98,15 @@ class SmartyParser extends Smarty implements ParserInterface
     public function removeBlankLines($tpl_source, \Smarty_Internal_Template $template)
     {
         return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $tpl_source);
+    }
+
+    public static function theliaEscape($content, $smarty)
+    {
+        if(!is_object($content)) {
+            return htmlspecialchars($content ,ENT_QUOTES, Smarty::$_CHARSET);
+        } else {
+            return $content;
+        }
     }
 
     public function setTemplate($template_path_from_template_base)
@@ -212,14 +223,14 @@ class SmartyParser extends Smarty implements ParserInterface
         $templateDir = realpath(THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/");
 
         if (strpos($pathFileName, $templateDir) !== 0) {
-            throw new ResourceNotFoundException(sprintf("%s view does not exists", $file));
+            throw new ResourceNotFoundException(sprintf("'%s' view does not exists", $file));
         }
 
         if (!file_exists($fileName)) {
             $fileName .= ".html";
 
             if (!file_exists($fileName)) {
-                throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
+                throw new ResourceNotFoundException(sprintf("'%s' file not found in %s template", $file, $this->template));
             }
         }
 

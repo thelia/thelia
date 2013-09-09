@@ -23,9 +23,14 @@
 
 namespace Thelia\Tests\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Controller\Front\DefaultController;
 
+/**
+ * Class DefaultControllerTest
+ * @package Thelia\Tests\Controller
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class DefaultControllerTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -38,7 +43,7 @@ class DefaultControllerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($request->attributes->get('_view'), "index");
     }
 
-    public function testNoActionWithQuery()
+    public function testNoActionWithGetParam()
     {
         $defaultController = new DefaultController();
         $request = new Request(array(
@@ -50,15 +55,59 @@ class DefaultControllerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($request->attributes->get('_view'), 'foo');
     }
 
-    public function testNoActionWithRequest()
+    public function testNoActionWithPostParam()
     {
         $defaultController = new DefaultController();
-        $request = new Request(array(), array(
-            "view" => "foo"
-        ));
+        $request = new Request(
+            array(),
+            array("view" => "foo")
+        );
 
         $defaultController->noAction($request);
 
         $this->assertEquals($request->attributes->get('_view'), 'foo');
+    }
+
+
+    public function testNoActionWithAttribute()
+    {
+        $defaultController = new DefaultController();
+        $request = new Request(
+            array(),
+            array(),
+            array("_view" => "foo")
+        );
+
+        $defaultController->noAction($request);
+
+        $this->assertEquals($request->attributes->get('_view'), 'foo');
+    }
+
+    public function testNoActionWithAttributeAndQuery()
+    {
+        $defaultController = new DefaultController();
+        $request = new Request(
+            array("view" => "bar"),
+            array(),
+            array("_view" => "foo")
+        );
+
+        $defaultController->noAction($request);
+
+        $this->assertEquals($request->attributes->get('_view'), 'bar');
+    }
+
+    public function testNoActionWithAttributeAndRequest()
+    {
+        $defaultController = new DefaultController();
+        $request = new Request(
+            array(),
+            array("view" => "bar"),
+            array("_view" => "foo")
+        );
+
+        $defaultController->noAction($request);
+
+        $this->assertEquals($request->attributes->get('_view'), 'bar');
     }
 }

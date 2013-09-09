@@ -29,60 +29,87 @@ use Thelia\Exception\InvalidCartException;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Cart;
 use Thelia\Tools\URL;
+use Thelia\Model\Lang;
 
+/**
+ *
+ * extends mfony\Component\HttpFoundation\Session\Session for adding some helpers
+ *
+ * Class Session
+ * @package Thelia\Core\HttpFoundation\Session
+ * Symfony\Component\HttpFoundation\Request
+ */
 class Session extends BaseSession
 {
-    // -- Language ------------------------------------------------------------
-
-    public function getLocale()
-    {
-        return $this->get("locale", "en_US");
-    }
-
+    /**
+     * @return \Thelia\Model\Lang|null
+     */
     public function getLang()
     {
-        return substr($this->getLocale(), 0, 2);
+        return $this->get("thelia.current.lang", Lang::getDefaultLanguage());
+    }
+
+    public function setLang(Lang $lang)
+    {
+        $this->set("thelia.current.lang", $lang);
+
+        return $this;
+    }
+
+    public function getAdminEditionLang()
+    {
+        return $this->get('thelia.admin.edition.lang', Lang::getDefaultLanguage());
+    }
+
+    public function setAdminEditionLang($langId)
+    {
+        $this->set('thelia.admin.edition.lang', $langId);
+
+        return $this;
     }
 
     // -- Customer user --------------------------------------------------------
 
     public function setCustomerUser(UserInterface $user)
     {
-        $this->set('customer_user', $user);
+        $this->set('thelia.customer_user', $user);
+        return $this;
     }
 
     public function getCustomerUser()
     {
-        return $this->get('customer_user');
+        return $this->get('thelia.customer_user');
     }
 
     public function clearCustomerUser()
     {
-        return $this->remove('customer_user');
+        return $this->remove('thelia.customer_user');
     }
 
     // -- Admin user -----------------------------------------------------------
 
     public function setAdminUser(UserInterface $user)
     {
-        $this->set('admin_user', $user);
+        $this->set('thelia.admin_user', $user);
+        return $this;
     }
 
     public function getAdminUser()
     {
-        return $this->get('admin_user');
+        return $this->get('thelia.admin_user');
     }
 
     public function clearAdminUser()
     {
-        return $this->remove('admin_user');
+        return $this->remove('thelia.admin_user');
     }
 
     // -- Return page ----------------------------------------------------------
 
     public function setReturnToUrl($url)
     {
-        $this->set('return_to_url', $url);
+        $this->set('thelia.return_to_url', $url);
+        return $this;
     }
 
     /**
@@ -91,7 +118,7 @@ class Session extends BaseSession
      */
     public function getReturnToUrl()
     {
-        return $this->get('return_to_url', URL::getIndexPage());
+        return $this->get('thelia.return_to_url', URL::getInstance()->getIndexPage());
     }
 
     // -- Cart ------------------------------------------------------------------
@@ -103,7 +130,7 @@ class Session extends BaseSession
      */
     public function getCart()
     {
-        $cart_id =  $this->get("cart_id");
+        $cart_id =  $this->get("thelia.cart_id");
         $cart = null;
         if ($cart_id) {
             $cart = CartQuery::create()->findPk($cart_id);
@@ -137,10 +164,28 @@ class Session extends BaseSession
      * assign cart id in session
      *
      * @param $cart_id
+     * @return $this
      */
     public function setCart($cart_id)
     {
-        $this->set("cart_id", $cart_id);
+        $this->set("thelia.cart_id", $cart_id);
+        return $this;
     }
 
+    /**
+     * assign delivery id in session
+     *
+     * @param $delivery_id
+     * @return $this
+     */
+    public function setDelivery($delivery_id)
+    {
+        $this->set("thelia.delivery_id", $delivery_id);
+        return $this;
+    }
+
+    public function getDelivery()
+    {
+        return $this->get("thelia.delivery_id");
+    }
 }

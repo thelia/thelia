@@ -33,36 +33,11 @@ use Thelia\Core\HttpFoundation\Request;
  */
 class SecurityContext
 {
-    const CONTEXT_FRONT_OFFICE = 'front';
-    const CONTEXT_BACK_OFFICE  = 'admin';
-
     private $request;
-    private $context;
 
     public function __construct(Request $request)
     {
         $this->request = $request;
-
-        $this->context = null;
-    }
-
-    public function setContext($context)
-    {
-        if ($context !== self::CONTEXT_FRONT_OFFICE && $context !== self::CONTEXT_BACK_OFFICE) {
-            throw new \InvalidArgumentException(sprintf("Invalid or empty context identifier '%s'", $context));
-        }
-
-        $this->context = $context;
-
-        return $this;
-    }
-
-    public function getContext($exception_if_context_undefined = false)
-    {
-        if (null === $this->context && $exception_if_context_undefined === true)
-            throw new \LogicException("No context defined. Please use setContext() first.");
-
-        return $this->context;
     }
 
     private function getSession()
@@ -76,28 +51,67 @@ class SecurityContext
     }
 
     /**
-    * Gets the currently authenticated user in  the current context, or null if none is defined
+    * Gets the currently authenticated user in  the admin, or null if none is defined
     *
     * @return UserInterface|null A UserInterface instance or null if no user is available
     */
-    public function getUser()
+    public function getAdminUser()
     {
-        $context = $this->getContext(true);
-
-        if ($context === self::CONTEXT_FRONT_OFFICE)
-            $user = $this->getSession()->getCustomerUser();
-        else if ($context == self::CONTEXT_BACK_OFFICE)
-            $user = $this->getSession()->getAdminUser();
-        else
-            $user = null;
-
-        return $user;
+        return $this->getSession()->getAdminUser();
     }
 
-    final public function isAuthenticated()
+    /**
+     * Check if an admin user is logged in.
+     *
+     * @return true if an admin user is logged in, false otherwise.
+     */
+    public function hasAdminUser()
     {
-        if (null !== $this->getUser()) {
-            return true;
+        return $this->getSession()->getAdminUser() !== null;
+    }
+
+    /**
+     * Gets the currently authenticated customer, or null if none is defined
+     *
+     * @return UserInterface|null A UserInterface instance or null if no user is available
+     */
+    public function getCustomerUser()
+    {
+        return $this->getSession()->getCustomerUser();
+    }
+
+    /**
+     * Check if a customer user is logged in.
+     *
+     * @return true if a customer is logged in, false otherwise.
+     */
+    public function hasCustomerUser()
+    {
+        return $this->getSession()->getCustomerUser() !== null;
+    }
+
+    /**
+     * Check if a user has at least one of the required roles
+     *
+     * @param UserInterface $user the user
+     * @param array $roles the roles
+     * @return boolean true if the user has the required role, false otherwise
+     */
+    final public function hasRequiredRole($user, array $roles) {
+
+        if ($user != null) {
+            // Check if user's roles matches required roles
+            $userRoles = $user->getRoles();
+
+            $roleFound = false;
+
+            foreach ($userRoles as $role) {
+                if (in_array($role, $roles)) {
+                    $roleFound = true;
+
+                    return true;
+                }
+            }
         }
 
         return false;
@@ -110,85 +124,88 @@ class SecurityContext
     */
     final public function isGranted(array $roles, array $permissions)
     {
-        if ($this->isAuthenticated() === true) {
+        // Find a user which matches the required roles.
+        $user = $this->getCustomerUser();
 
-            $user = $this->getUser();
+        if (! $this->hasRequiredRole($user, $roles)) {
+            $user = $this->getAdminUser();
 
-            // Check if user's roles matches required roles
-            $userRoles = $user->getRoles();
+            if (! $this->hasRequiredRole($user, $roles)) {
+                $user = null;
+            }
+        }
 
-            $roleFound = false;
+        if ($user != null) {
 
-            foreach ($userRoles as $role) {
-                if (in_array($role, $roles)) {
-                    $roleFound = true;
-
-                    break;
-                }
+            if (empty($permissions)) {
+               return true;
             }
 
-            if ($roleFound) {
+            // Get permissions from profile
+            // $userPermissions = $user->getPermissions(); FIXME
 
-                   if (empty($permissions)) {
-                       return true;
-                   }
+            // TODO: Finalize permissions system !;
 
-                // Get permissions from profile
-                // $userPermissions = $user->getPermissions(); FIXME
+            $userPermissions = array('*'); // FIXME !
 
-                   // TODO: Finalize permissions system !;
+            $permissionsFound = true;
 
-                   $userPermissions = array('*'); // FIXME !
+            // User have all permissions ?
+            if (in_array('*', $userPermissions))
+               return true;
 
-                   $permissionsFound = true;
+            // Check that user's permissions matches required permissions
+            foreach ($permissions as $permission) {
+               if (! in_array($permission, $userPermissions)) {
+                   $permissionsFound = false;
 
-                   // User have all permissions ?
-                   if (in_array('*', $userPermissions))
-                       return true;
-
-                   // Check that user's permissions matches required permissions
-                   foreach ($permissions as $permission) {
-                       if (! in_array($permission, $userPermissions)) {
-                           $permissionsFound = false;
-
-                           break;
-                       }
-                   }
-
-                   return $permissionsFound;
+                   break;
+               }
             }
+
+            return $permissionsFound;
         }
 
         return false;
     }
 
     /**
-    * Sets the authenticated user.
+    * Sets the authenticated admin user.
     *
     * @param UserInterface $user A UserInterface, or null if no further user should be stored
     */
-    public function setUser(UserInterface $user)
+    public function setAdminUser(UserInterface $user)
     {
-        $context = $this->getContext(true);
-
         $user->eraseCredentials();
 
-        if ($context === self::CONTEXT_FRONT_OFFICE)
-            $this->getSession()->setCustomerUser($user);
-        else if ($context == self::CONTEXT_BACK_OFFICE)
-            $this->getSession()->setAdminUser($user);
+        $this->getSession()->setAdminUser($user);
     }
 
     /**
-     * Clear the user from the security context
+     * Sets the authenticated customer user.
+     *
+     * @param UserInterface $user A UserInterface, or null if no further user should be stored
      */
-    public function clear()
+    public function setCustomerUser(UserInterface $user)
     {
-        $context = $this->getContext(true);
+        $user->eraseCredentials();
 
-        if ($context === self::CONTEXT_FRONT_OFFICE)
-            $this->getSession()->clearCustomerUser();
-        else if ($context == self::CONTEXT_BACK_OFFICE)
-            $this->getSession()->clearAdminUser();
+        $this->getSession()->setCustomerUser($user);
+    }
+
+    /**
+     * Clear the customer from the security context
+     */
+    public function clearCustomerUser()
+    {
+        $this->getSession()->clearCustomerUser();
+    }
+
+    /**
+     * Clear the admin from the security context
+     */
+    public function clearAdminUser()
+    {
+       $this->getSession()->clearAdminUser();
     }
 }

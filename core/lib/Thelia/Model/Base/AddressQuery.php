@@ -22,7 +22,7 @@ use Thelia\Model\Map\AddressTableMap;
  *
  *
  * @method     ChildAddressQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildAddressQuery orderByName($order = Criteria::ASC) Order by the name column
+ * @method     ChildAddressQuery orderByLabel($order = Criteria::ASC) Order by the label column
  * @method     ChildAddressQuery orderByCustomerId($order = Criteria::ASC) Order by the customer_id column
  * @method     ChildAddressQuery orderByTitleId($order = Criteria::ASC) Order by the title_id column
  * @method     ChildAddressQuery orderByCompany($order = Criteria::ASC) Order by the company column
@@ -41,7 +41,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddressQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildAddressQuery groupById() Group by the id column
- * @method     ChildAddressQuery groupByName() Group by the name column
+ * @method     ChildAddressQuery groupByLabel() Group by the label column
  * @method     ChildAddressQuery groupByCustomerId() Group by the customer_id column
  * @method     ChildAddressQuery groupByTitleId() Group by the title_id column
  * @method     ChildAddressQuery groupByCompany() Group by the company column
@@ -87,7 +87,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddress findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAddress matching the query, or a new ChildAddress object populated from the query conditions when no match is found
  *
  * @method     ChildAddress findOneById(int $id) Return the first ChildAddress filtered by the id column
- * @method     ChildAddress findOneByName(string $name) Return the first ChildAddress filtered by the name column
+ * @method     ChildAddress findOneByLabel(string $label) Return the first ChildAddress filtered by the label column
  * @method     ChildAddress findOneByCustomerId(int $customer_id) Return the first ChildAddress filtered by the customer_id column
  * @method     ChildAddress findOneByTitleId(int $title_id) Return the first ChildAddress filtered by the title_id column
  * @method     ChildAddress findOneByCompany(string $company) Return the first ChildAddress filtered by the company column
@@ -106,7 +106,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddress findOneByUpdatedAt(string $updated_at) Return the first ChildAddress filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildAddress objects filtered by the id column
- * @method     array findByName(string $name) Return ChildAddress objects filtered by the name column
+ * @method     array findByLabel(string $label) Return ChildAddress objects filtered by the label column
  * @method     array findByCustomerId(int $customer_id) Return ChildAddress objects filtered by the customer_id column
  * @method     array findByTitleId(int $title_id) Return ChildAddress objects filtered by the title_id column
  * @method     array findByCompany(string $company) Return ChildAddress objects filtered by the company column
@@ -211,7 +211,7 @@ abstract class AddressQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, NAME, CUSTOMER_ID, TITLE_ID, COMPANY, FIRSTNAME, LASTNAME, ADDRESS1, ADDRESS2, ADDRESS3, ZIPCODE, CITY, COUNTRY_ID, PHONE, CELLPHONE, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM address WHERE ID = :p0';
+        $sql = 'SELECT ID, LABEL, CUSTOMER_ID, TITLE_ID, COMPANY, FIRSTNAME, LASTNAME, ADDRESS1, ADDRESS2, ADDRESS3, ZIPCODE, CITY, COUNTRY_ID, PHONE, CELLPHONE, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM address WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -342,32 +342,32 @@ abstract class AddressQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the name column
+     * Filter the query on the label column
      *
      * Example usage:
      * <code>
-     * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
-     * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
+     * $query->filterByLabel('fooValue');   // WHERE label = 'fooValue'
+     * $query->filterByLabel('%fooValue%'); // WHERE label LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $name The value to use as filter.
+     * @param     string $label The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
-    public function filterByName($name = null, $comparison = null)
+    public function filterByLabel($label = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($name)) {
+            if (is_array($label)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $name)) {
-                $name = str_replace('*', '%', $name);
+            } elseif (preg_match('/[\%\*]/', $label)) {
+                $label = str_replace('*', '%', $label);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(AddressTableMap::NAME, $name, $comparison);
+        return $this->addUsingAlias(AddressTableMap::LABEL, $label, $comparison);
     }
 
     /**

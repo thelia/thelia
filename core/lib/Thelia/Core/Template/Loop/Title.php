@@ -24,7 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -43,8 +43,10 @@ use Thelia\Model\ConfigQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Title extends BaseLoop
+class Title extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -64,35 +66,31 @@ class Title extends BaseLoop
     {
         $search = CustomerTitleQuery::create();
 
+        /* manage translations */
+        $locale = $this->configureI18nProcessing($search, array('SHORT', 'LONG'));
+
         $id = $this->getId();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
         $search->orderByPosition();
 
+        /* perform search */
         $titles = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($titles);
 
         foreach ($titles as $title) {
-            $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $title->getId());
-            $loopResultRow->set("DEFAULT", $title->getByDefault());
-            $loopResultRow->set("SHORT", $title->getShort());
-            $loopResultRow->set("LONG", $title->getLong());
+            $loopResultRow = new LoopResultRow($loopResult, $title, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow->set("ID", $title->getId())
+                ->set("IS_TRANSLATED",$title->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
+                ->set("DEFAULT", $title->getByDefault())
+                ->set("SHORT", $title->getVirtualColumn('i18n_SHORT'))
+                ->set("LONG", $title->getVirtualColumn('i18n_LONG'))
+                ->set("POSITION", $title->getPosition());
 
             $loopResult->addRow($loopResultRow);
         }

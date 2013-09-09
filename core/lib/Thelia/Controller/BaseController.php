@@ -25,15 +25,22 @@ namespace Thelia\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
+use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Router;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Event\ActionEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Thelia\Core\Factory\ActionEventFactory;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
+use Symfony\Component\EventDispatcher\Event;
+use Thelia\Core\Event\DefaultActionEvent;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  *
@@ -56,35 +63,15 @@ class BaseController extends ContainerAware
     }
 
     /**
-     * Create an action event
+     * Dispatch a Thelia event
      *
-     * @param  string          $action
-     * @return EventDispatcher
-     */
-    protected function dispatchEvent($action)
-    {
-        // Create the
-        $eventFactory = new ActionEventFactory($this->getRequest(), $action, $this->container->getParameter("thelia.actionEvent"));
-
-        $actionEvent = $eventFactory->createActionEvent();
-
-        $this->dispatch("action.$action", $actionEvent);
-
-        if ($actionEvent->hasErrorForm()) {
-            $this->getParserContext()->setErrorForm($actionEvent->getErrorForm());
-        }
-
-        return $actionEvent;
-    }
-
-    /**
-     * Dispatch a Thelia event to modules
-     *
-     * @param string      $eventName a TheliaEvent name, as defined in TheliaEvents class
-     * @param ActionEvent $event     the event
+     * @param string    $eventName a TheliaEvent name, as defined in TheliaEvents class
+     * @param Event     $event the action event, or null (a DefaultActionEvent will be dispatched)
      */
     protected function dispatch($eventName, ActionEvent $event = null)
     {
+        if ($event == null) $event = new DefaultActionEvent();
+
         $this->getDispatcher()->dispatch($eventName, $event);
     }
 
@@ -96,6 +83,17 @@ class BaseController extends ContainerAware
     public function getDispatcher()
     {
         return $this->container->get('event_dispatcher');
+    }
+
+    /**
+     *
+     * return the Translator
+     *
+     * @return mixed \Thelia\Core\Translation\Translator
+     */
+    public function getTranslator()
+    {
+        return $this->container->get('thelia.translator');
     }
 
     /**
@@ -113,13 +111,9 @@ class BaseController extends ContainerAware
      *
      * @return \Thelia\Core\Security\SecurityContext
      */
-    protected function getSecurityContext($context = false)
+    protected function getSecurityContext()
     {
-        $securityContext = $this->container->get('thelia.securityContext');
-
-        $securityContext->setContext($context === false ? SecurityContext::CONTEXT_BACK_OFFICE : $context);
-
-        return $securityContext;
+        return $this->container->get('thelia.securityContext');
     }
 
     /**
@@ -143,6 +137,29 @@ class BaseController extends ContainerAware
     }
 
     /**
+     * Get all errors that occured in a form
+     *
+     * @param \Symfony\Component\Form\Form $form
+     * @return string the error string
+     */
+    private function getErrorMessages(\Symfony\Component\Form\Form $form) {
+
+        $errors = '';
+
+        foreach ($form->getErrors() as $key => $error) {
+            $errors .= $error->getMessage() . ', ';
+        }
+
+        foreach ($form->all() as $child) {
+            if (!$child->isValid()) {
+                $errors .= $this->getErrorMessages($child) . ', ';
+            }
+        }
+
+        return rtrim($errors, ', ');
+    }
+
+    /**
      * Validate a BaseForm
      *
      * @param  BaseForm                     $aBaseForm      the form
@@ -160,31 +177,78 @@ class BaseController extends ContainerAware
 
             if ($form->isValid()) {
                 return $form;
-            } else {
-                throw new FormValidationException("Missing or invalid data");
             }
-        } else {
+            else {
+                throw new FormValidationException(sprintf("Missing or invalid data: %s", $this->getErrorMessages($form)));
+            }
+        }
+        else {
             throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
         }
     }
 
     /**
      *
-     * redirect request to specify url
+     * redirect request to the specified url
+     *
      * @param string $url
      */
-    public function redirect($url)
+    public function redirect($url, $status = 302)
     {
-        Redirect::exec($url);
+        Redirect::exec($url, $status);
     }
 
     /**
-     * If success_url param is present in request, follow this link.
+     * If success_url param is present in request or in the provided form, redirect to this URL.
+     *
+     * @param BaseForm $form a base form, which may contains the success URL
      */
-    protected function redirectSuccess()
+    protected function redirectSuccess(BaseForm $form = null)
     {
-        if (null !== $url = $this->getRequest()->get("success_url")) {
-            $this->redirect($url);
+        if ($form != null) {
+            $url = $form->getSuccessUrl();
         }
+        else {
+            $url = $this->getRequest()->get("success_url");
+        }
+
+        echo "url=$url";
+
+        if (null !== $url) $this->redirect($url);
+    }
+
+    /**
+     * Get a route path from the route id.
+     *
+     * @param string         $routerName    Router name
+     * @param string         $routeId       The name of the route
+     * @param mixed          $parameters    An array of parameters
+     * @param Boolean|string $referenceType The type of reference to be generated (one of the constants)
+     *
+     * @throws RouteNotFoundException              If the named route doesn't exist
+     * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
+     * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
+     *                                             it does not match the requirement
+     * @throws \InvalidArgumentException            When the router doesn't exist
+     * @return string The generated URL
+     */
+    protected function getRouteFromRouter($routerName, $routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH) {
+        /** @var Router $router */
+        $router =  $this->container->get($routerName);
+
+        if ($router == null) {
+            throw new \InvalidArgumentException(sprintf("Router '%s' does not exists.", $routerName));
+        }
+
+        return $router->generate($routeId, $parameters, $referenceType);
+    }
+
+    /**
+     * Return a 404 error
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    protected function pageNotFound()
+    {
+        throw new NotFoundHttpException();
     }
 }

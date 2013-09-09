@@ -61,7 +61,7 @@ class TheliaLoop extends AbstractSmartyPlugin
      */
     public static function getPagination($loopId)
     {
-        if (!empty(self::$pagination[$loopId])) {
+        if(!empty(self::$pagination[$loopId])) {
             return self::$pagination[$loopId];
         } else {
             return null;
@@ -75,8 +75,9 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
         $type = $this->getParam($params, 'type');
 
-        if (null == $type)
+    	if (null == $type) {
             throw new \InvalidArgumentException("Missing 'type' parameter in count arguments");
+        }
 
         $loop = $this->createLoopInstance($params);
 
@@ -101,13 +102,15 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
         $name = $this->getParam($params, 'name');
 
-        if (null == $name)
+        if (null == $name) {
             throw new \InvalidArgumentException("Missing 'name' parameter in loop arguments");
+        }
 
         $type = $this->getParam($params, 'type');
 
-        if (null == $type)
+        if (null == $type) {
             throw new \InvalidArgumentException("Missing 'type' parameter in loop arguments");
+        }
 
         if ($content === null) {
             // Check if a loop with the same name exists in the current scope, and abort if it's the case.
@@ -133,6 +136,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         }
 
         if ($loopResults->valid()) {
+
             $loopResultRow = $loopResults->current();
 
             // On first iteration, save variables that may be overwritten by this loop
@@ -141,8 +145,6 @@ class TheliaLoop extends AbstractSmartyPlugin
                 $saved_vars = array();
 
                 $varlist = $loopResultRow->getVars();
-                $varlist[] = 'LOOP_COUNT';
-                $varlist[] = 'LOOP_TOTAL';
 
                 foreach ($varlist as $var) {
                     $saved_vars[$var] = $template->getTemplateVars($var);
@@ -157,10 +159,6 @@ class TheliaLoop extends AbstractSmartyPlugin
 
             $repeat = true;
         }
-
-        // Assign meta information
-        $template->assign('LOOP_COUNT', 1 + $loopResults->key());
-        $template->assign('LOOP_TOTAL', $loopResults->getCount());
 
         // Loop is terminated. Cleanup.
         if (! $repeat) {
@@ -295,26 +293,24 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
+     * @param $smartyParams
      *
-     * find the loop class with his name and construct an instance of this class
-     *
-     * @param  string                                 $name
-     * @return \Thelia\Core\Template\Element\BaseLoop
-     * @throws InvalidElementException
-     * @throws ElementNotFoundException
+     * @return object
+     * @throws \Thelia\Core\Template\Element\Exception\InvalidElementException
+     * @throws \Thelia\Core\Template\Element\Exception\ElementNotFoundException
      */
     protected function createLoopInstance($smartyParams)
     {
         $type = strtolower($smartyParams['type']);
 
         if (! isset($this->loopDefinition[$type])) {
-            throw new ElementNotFoundException(sprintf("%s loop does not exists", $type));
+            throw new ElementNotFoundException(sprintf("'%s' loop type does not exists", $type));
         }
 
         $class = new \ReflectionClass($this->loopDefinition[$type]);
 
         if ($class->isSubclassOf("Thelia\Core\Template\Element\BaseLoop") === false) {
-            throw new InvalidElementException(sprintf("%s Loop class have to extends Thelia\Core\Template\Element\BaseLoop",
+            throw new InvalidElementException(sprintf("'%s' Loop class should extends Thelia\Core\Template\Element\BaseLoop",
                     $type));
         }
 

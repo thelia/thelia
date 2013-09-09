@@ -28,6 +28,13 @@ use Thelia\Command\CacheClear;
 
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * test the cache:clear command
+ *
+ * Class CacheClearTest
+ * @package Thelia\Tests\Command
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class CacheClearTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -40,6 +47,7 @@ class CacheClearTest extends \PHPUnit_Framework_TestCase
         $fs = new Filesystem();
 
         $fs->mkdir($this->cache_dir);
+        $fs->mkdir(THELIA_WEB_DIR . "/assets");
     }
 
     public function testCacheClear()

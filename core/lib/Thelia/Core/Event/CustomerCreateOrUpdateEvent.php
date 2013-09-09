@@ -13,7 +13,7 @@ namespace Thelia\Core\Event;
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Model\Customer;
 
-class CustomerCreateOrUpdateEvent extends Event {
+class CustomerCreateOrUpdateEvent extends ActionEvent {
 
     //base parameters for creating new customer
     protected $title;

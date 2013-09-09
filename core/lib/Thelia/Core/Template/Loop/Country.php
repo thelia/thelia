@@ -24,7 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -43,15 +43,16 @@ use Thelia\Model\ConfigQuery;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Country extends BaseLoop
+class Country extends BaseI18nLoop
 {
+    public $timestampable = true;
+
     /**
      * @return ArgumentCollection
      */
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('limit', 500), // overwrite orginal param to increase the limit
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('area'),
             Argument::createBooleanTypeArgument('with_area'),
@@ -67,6 +68,9 @@ class Country extends BaseLoop
     public function exec(&$pagination)
     {
         $search = CountryQuery::create();
+
+        /* manage translations */
+        $locale = $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -94,34 +98,25 @@ class Country extends BaseLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
+        $search->addAscendingOrderByColumn('i18n_TITLE');
 
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
-        $search->addAscendingOrderByColumn(\Thelia\Model\Map\CountryI18nTableMap::TITLE);
-
+        /* perform search */
         $countries = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($countries);
 
         foreach ($countries as $country) {
-            $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $country->getId());
-            $loopResultRow->set("AREA", $country->getAreaId());
-            $loopResultRow->set("TITLE", $country->getTitle());
-            $loopResultRow->set("CHAPO", $country->getChapo());
-            $loopResultRow->set("DESCRIPTION", $country->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $country->getPostscriptum());
-            $loopResultRow->set("ISOCODE", $country->getIsocode());
-            $loopResultRow->set("ISOALPHA2", $country->getIsoalpha2());
-            $loopResultRow->set("ISOALPHA3", $country->getIsoalpha3());
+            $loopResultRow = new LoopResultRow($loopResult, $country, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow->set("ID", $country->getId())
+                ->set("IS_TRANSLATED",$country->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
+                ->set("TITLE",$country->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $country->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $country->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $country->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("ISOCODE", $country->getIsocode())
+                ->set("ISOALPHA2", $country->getIsoalpha2())
+                ->set("ISOALPHA3", $country->getIsoalpha3());
 
             $loopResult->addRow($loopResultRow);
         }

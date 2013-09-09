@@ -25,7 +25,7 @@ namespace Thelia\Core\Event;
 
 use Thelia\Model\CartItem;
 
-class CartItemEvent extends InternalEvent
+class CartItemEvent extends ActionEvent
 {
     protected $cartItem;
 

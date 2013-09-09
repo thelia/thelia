@@ -148,7 +148,7 @@ class AccessoryTableMap extends TableMap
         $this->setPhpName('Accessory');
         $this->setClassName('\\Thelia\\Model\\Accessory');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
         $this->setIsCrossRef(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
@@ -427,6 +427,10 @@ class AccessoryTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from Accessory object
+        }
+
+        if ($criteria->containsKey(AccessoryTableMap::ID) && $criteria->keyContainsValue(AccessoryTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.AccessoryTableMap::ID.')');
         }
 
 

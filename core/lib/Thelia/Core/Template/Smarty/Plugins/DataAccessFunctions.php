@@ -23,10 +23,20 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+use Thelia\Model\CategoryQuery;
+use Thelia\Model\ContentQuery;
+use Thelia\Model\FolderQuery;
+use Thelia\Model\Product;
+use Thelia\Model\ProductQuery;
+use Thelia\Model\Tools\ModelCriteriaTools;
+use Thelia\Tools\DateTimeFormat;
+
 /**
  * Implementation of data access to main Thelia objects (users, cart, etc.)
  *
@@ -37,10 +47,13 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 {
     private $securityContext;
     protected $parserContext;
+    protected $request;
 
-    public function __construct(SecurityContext $securityContext, ParserContext $parserContext)
+    public function __construct(Request $request, SecurityContext $securityContext, ParserContext $parserContext)
     {
         $this->securityContext = $securityContext;
+        $this->parserContext = $parserContext;
+        $this->request = $request;
     }
 
     /**
@@ -52,7 +65,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      */
     public function adminDataAccess($params, &$smarty)
     {
-         return $this->userDataAccess("Admin User", SecurityContext::CONTEXT_BACK_OFFICE, $params);
+         return $this->dataAccess("Admin User", $params, $this->securityContext->getAdminUser());
     }
 
      /**
@@ -64,38 +77,146 @@ class DataAccessFunctions extends AbstractSmartyPlugin
       */
      public function customerDataAccess($params, &$smarty)
      {
-         return $this->userDataAccess("Customer User", SecurityContext::CONTEXT_FRONT_OFFICE, $params);
+         return $this->dataAccess("Customer User", $params, $this->securityContext->getCustomerUser());
      }
+
+    public function productDataAccess($params, &$smarty)
+    {
+        $productId = $this->request->get('product_id');
+
+        if($productId !== null) {
+
+            $search = ProductQuery::create()
+                ->filterById($productId);
+
+            return $this->dataAccessWithI18n("Product",  $params, $search);
+        }
+    }
+
+    public function categoryDataAccess($params, &$smarty)
+    {
+        $categoryId = $this->request->get('category_id');
+
+        if($categoryId !== null) {
+
+            $search = CategoryQuery::create()
+                ->filterById($categoryId);
+
+            return $this->dataAccessWithI18n("Category",  $params, $search);
+        }
+    }
+
+    public function contentDataAccess($params, &$smarty)
+    {
+        $contentId = $this->request->get('content_id');
+
+        if($contentId !== null) {
+
+            $search = ContentQuery::create()
+                ->filterById($contentId);
+
+            return $this->dataAccessWithI18n("Content",  $params, $search);
+        }
+    }
+
+    public function folderDataAccess($params, &$smarty)
+    {
+        $folderId = $this->request->get('folder_id');
+
+        if($folderId !== null) {
+
+            $search = FolderQuery::create()
+                ->filterById($folderId);
+
+            return $this->dataAccessWithI18n("Folder",  $params, $search);
+        }
+    }
 
     /**
-     * Provides access to user attributes using the accessors.
+     * @param               $objectLabel
+     * @param               $params
+     * @param ModelCriteria $search
+     * @param array         $columns
+     * @param null          $foreignTable
+     * @param string        $foreignKey
      *
-     * @param  array                    $params
-     * @param  unknown                  $smarty
-     * @return string                   the value of the requested attribute
-     * @throws InvalidArgumentException if the object does not have the requested attribute.
+     * @return string
      */
-     protected function userDataAccess($objectLabel, $context, $params)
-     {
-         $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
+    protected function dataAccessWithI18n($objectLabel, $params, ModelCriteria $search, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID')
+    {
+        $lang = $this->getNormalizedParam($params, array('lang'));
+        if($lang === null) {
+            $lang = $this->request->getSession()->getLang()->getId();
+        }
 
-         if (! empty($attribute)) {
-             $user = $this->securityContext->setContext($context)->getUser();
+        ModelCriteriaTools::getI18n(
+            false,
+            $lang,
+            $search,
+            $this->request->getSession()->getLang()->getLocale(),
+            $columns,
+            $foreignTable,
+            $foreignKey,
+            true
+        );
 
-             if (null != $user) {
-                 $getter = sprintf("get%s", ucfirst($attribute));
+        $data = $search->findOne();
 
-                 if (method_exists($user, $getter)) {
-                     return $user->$getter();
-                 }
+        $noGetterData = array();
+        foreach($columns as $column) {
+            $noGetterData[$column] = $data->getVirtualColumn('i18n_' . $column);
+        }
 
-                 throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", $objectLabel, $attribute));
+        return $this->dataAccess($objectLabel, $params, $data, $noGetterData);
+    }
 
-             }
-         }
+    /**
+     * @param       $objectLabel
+     * @param       $params
+     * @param       $data
+     * @param array $noGetterData
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    protected function dataAccess($objectLabel, $params, $data, $noGetterData = array())
+    {
+        $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
 
-         return '';
-     }
+        if (! empty($attribute)) {
+
+            if (null != $data) {
+
+                $keyAttribute = strtoupper($attribute);
+                if(array_key_exists($keyAttribute, $noGetterData)) {
+                    return $noGetterData[$keyAttribute];
+                }
+
+                $getter = sprintf("get%s", ucfirst($attribute));
+                if (method_exists($data, $getter)) {
+                    $return =  $data->$getter();
+
+                    if($return instanceof \DateTime) {
+                        if (array_key_exists("format", $params)) {
+                            $format = $params["format"];
+                        } else {
+                            $format = DateTimeFormat::getInstance($this->request)->getFormat(array_key_exists("output", $params) ? $params["output"] : null);
+                        }
+
+                        $return = $return->format($format);
+                    }
+
+                    return $return;
+                }
+
+                throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", $objectLabel, $attribute));
+
+            }
+        }
+
+        return '';
+    }
+
     /**
      * Define the various smarty plugins hendled by this class
      *
@@ -105,7 +226,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         return array(
             new SmartyPluginDescriptor('function', 'admin', $this, 'adminDataAccess'),
-            new SmartyPluginDescriptor('function', 'customer', $this, 'customerDataAccess')
+            new SmartyPluginDescriptor('function', 'customer', $this, 'customerDataAccess'),
+            new SmartyPluginDescriptor('function', 'product', $this, 'productDataAccess'),
+            new SmartyPluginDescriptor('function', 'category', $this, 'categoryDataAccess'),
+            new SmartyPluginDescriptor('function', 'content', $this, 'contentDataAccess'),
+            new SmartyPluginDescriptor('function', 'folder', $this, 'folderDataAccess'),
         );
     }
 }

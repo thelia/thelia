@@ -1,0 +1,250 @@
+@import "variables.less";
+@import "navbar.less";
+@import "scaffolding.less";
+@import "type.less";
+@import "breadcrumbs.less";
+@import "forms.less";
+@import "datepicker.less";
+@import "modals.less";
+@import "tables.less";
+@import "tablesorter.less";
+@import "bootstrap-editable.less";
+@import "bootstrap-switch.less";
+
+// -- Base styling ------------------------------------------------------------
+
+#wrapper {
+	padding-top: 20px;
+}
+
+// Bootstrap Adjustements ------------------------------------------------------
+
+.footer {
+  background: none repeat scroll 0 0 transparent;
+  border: medium none;
+  box-shadow: none;
+  color: #7D756A;
+  margin-bottom: 0;
+  padding: 35px 15px 15px;
+  text-align: left;
+}
+
+// -- Top bar -----------------------------------------------------------------
+
+.topbar {
+
+	background: url("@{imgDir}/top.jpg") repeat-x;	
+	font-weight: bold;
+
+	.version-info {
+        line-height: @topBarHeight;
+        height: @topBarHeight;
+		background: url("@{imgDir}/top-bar-logo.png") left -3px no-repeat;
+		padding-left: 100px;
+        text-shadow: 0px 1px 1px black;
+        color: #6d737b;
+	}
+
+    .form-search, .btn-group{
+        margin-top: 10px;
+    }
+}
+
+// -- Brandbar ----------------------------------------------------------------
+
+.loginpage {
+
+	.hero-unit {
+    	background-color: transparent;
+
+    	h1 {
+    		margin-bottom: 25px;
+    	}
+	}
+
+	.well {
+  		background-color: #E4E3DE;
+  		border: 1px solid rgba(0, 0, 0, 0.2);
+  		box-shadow: 0 -4px 0 rgba(0, 0, 0, 0.05) inset;
+	}
+}
+
+
+// -- Feed list on home page --------------------------------------------------
+
+.feed-list {
+	h2 {
+		font-size: 24px;
+		line-height: 120%;
+		color: #E9730F;
+
+		a {
+			&:hover {
+				color: inherit;
+				text-decoration: none;
+			}
+		}
+	}
+
+	h3 {
+		margin-bottom: 0;
+		padding-bottom: 0;
+		font-size: 90%;
+		line-height: 100%;
+	}
+
+	.feed-list-item{
+		padding: 10px 20px;
+	}
+}
+
+.brandbar {
+
+    background: url("@{imgDir}/header.jpg") repeat-x;
+    height: 90px;
+
+    a.brand {
+        text-indent: -133337px;
+        display: block;
+        float: left;
+        margin-right: 20px;
+        background: url("@{imgDir}/logo.png") 0px 12px no-repeat;
+        width: 124px;
+        height: 63px;
+    }
+
+    .breadcrumb {
+        .rounded(0px);
+        padding: 25px 0px 25px 30px;
+        background: url("@{imgDir}/logo-light.png") left center no-repeat;
+        float: left;
+        margin: 12px 0px 0px 0px;
+
+        a {
+            color: #949aa1;
+            text-shadow: 0px 1px 0px rgba(0,0,0,0.8);
+        }
+
+        .active {
+            color: #FFF;
+            text-shadow: 0px 1px 0px rgba(0,0,0,0.8);
+            border-bottom: 1px dotted white;
+        }
+    }
+
+    .Blocmoncompte {
+        float: right;
+        margin: 0px;
+        padding: 0px;
+        margin-top: 35px;
+
+        color: white;
+        font-size: 13px;
+        text-shadow: 0px 1px 0px rgba(0,0,0,0.8);
+    }
+
+    dt {
+        float: left;
+        margin-right: 15px;
+    }
+
+    .deconnexion {
+        float: right;
+        margin: 0px;
+
+        a {
+            text-indent: -13337px;
+            display: block;
+            background: url("@{imgDir}/deconnexion.png") no-repeat;
+            width: 23px;
+            height: 24px;
+        }
+    }
+}
+
+.brandbar-wide {
+        width: 100%;
+}
+
+// -- Login form --------------------------------------------------------------
+
+.form-signin {
+	max-width: 400px;
+	padding: 19px 29px 29px;
+	margin: 0 auto 20px;
+	background-color: #fff;
+	border: 1px solid #e5e5e5;
+	.rounded(5px);
+	.box-shadow;
+}
+
+// -- General decoration of back-office boxes ---------------------------------
+
+.general-block-decorator {
+    background: none repeat scroll 0 0 white;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 -4px 0 rgba(0, 0, 0, 0.05) inset, 0 2px 3px rgba(0, 0, 0, 0.1);
+    padding: 1em;
+    margin-bottom: 20px;
+
+    // The block title
+    .title {
+        color: #5A6876;
+        text-transform: uppercase;
+        font-weight: bold;
+        padding-bottom: 0.5em;
+        line-height: 30px;
+    }
+
+    .title-without-tabs {
+        border-bottom: 2px solid #A5CED8;
+        margin-bottom: 0.5em;
+    }
+
+    // The action bar on the right
+    .actions {
+        text-align: right;
+    }
+}
+
+// The overall form container
+.form-container {
+
+    // The inner toolbar (flags & save buttons)
+    .inner-toolbar {
+
+        line-height: 30px;
+        margin-bottom: 1em;
+        border-bottom: 1px dotted #A5CED8;
+        padding-bottom: 0.5em;
+
+        .inner-actions {
+            text-align: right;
+        }
+
+        .nav-pills {
+            margin-bottom: 0;
+
+            li a {
+                padding: 4px;
+                opacity: 0.3;
+            }
+
+            li.active a {
+                opacity: 1;
+                background-color: #E7E7E7;
+            }
+        }
+    }
+}
+
+// -- Editable tweaks ---------------------------------------------------------
+
+.editable-click, a.editable-click, a.editable-click:hover {
+  border-bottom: 1px dotted #0088CC;
+}
+
+.ui-slider{
+	margin-top: 23px;
+}

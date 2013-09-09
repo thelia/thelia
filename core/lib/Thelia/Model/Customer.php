@@ -2,8 +2,8 @@
 
 namespace Thelia\Model;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
-use Thelia\Core\Event\Internal\CustomerEvent;
+use Propel\Runtime\Exception\PropelException;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\Customer as BaseCustomer;
 
 use Thelia\Model\Exception\InvalidArgumentException;
@@ -17,6 +17,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Core\Security\Role\Role;
+use Thelia\Core\Event\CustomerEvent;
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
@@ -31,10 +32,7 @@ use Thelia\Core\Security\Role\Role;
  */
 class Customer extends BaseCustomer implements UserInterface
 {
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    protected $dispatcher;
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**
      * @param int $titleId customer title id (from customer_title table)
@@ -77,70 +75,49 @@ class Customer extends BaseCustomer implements UserInterface
         $con = Propel::getWriteConnection(CustomerTableMap::DATABASE_NAME);
         $con->beginTransaction();
         try {
+            if ($this->isNew()) {
+                $address = new Address();
+
+                $address
+                    ->setTitleId($titleId)
+                    ->setFirstname($firstname)
+                    ->setLastname($lastname)
+                    ->setAddress1($address1)
+                    ->setAddress2($address2)
+                    ->setAddress3($address3)
+                    ->setPhone($phone)
+                    ->setCellphone($cellphone)
+                    ->setZipcode($zipcode)
+                    ->setCountryId($countryId)
+                    ->setIsDefault(1)
+                    ;
+
+                $this->addAddress($address);
+
+            } else {
+                $address = $this->getDefaultAddress();
+
+                $address
+                    ->setTitleId($titleId)
+                    ->setFirstname($firstname)
+                    ->setLastname($lastname)
+                    ->setAddress1($address1)
+                    ->setAddress2($address2)
+                    ->setAddress3($address3)
+                    ->setPhone($phone)
+                    ->setCellphone($cellphone)
+                    ->setZipcode($zipcode)
+                    ->setCountryId($countryId)
+                    ->save($con)
+                ;
+            }
             $this->save($con);
-
-            $address = new Address();
-
-            $address
-                ->setTitleId($titleId)
-                ->setFirstname($firstname)
-                ->setLastname($lastname)
-                ->setAddress1($address1)
-                ->setAddress2($address2)
-                ->setAddress3($address3)
-                ->setPhone($phone)
-                ->setCellphone($cellphone)
-                ->setZipcode($zipcode)
-                ->setCountryId($countryId)
-                ->setIsDefault(1)
-                ->setCustomer($this)
-                ->save($con);
 
             $con->commit();
 
-
-        } catch(Exception $e) {
+        } catch(PropelException $e) {
             $con->rollback();
             throw $e;
-        }
-    }
-
-    public function preInsert(ConnectionInterface $con = null)
-    {
-        $this->setRef($this->generateRef());
-        $customerEvent = new CustomerEvent($this);
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, $customerEvent);
-
-        return true;
-    }
-
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        $customerEvent = new CustomerEvent($this);
-
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATECUSTOMER, $customerEvent);
-
-    }
-
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        $customerEvent = new CustomerEvent($this);
-        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECUSTOMER, $customerEvent);
-
-        return true;
-    }
-
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        $customerEvent = new CustomerEvent($this);
-        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECUSTOMER, $customerEvent);
-    }
-
-    protected function dispatchEvent($eventName, CustomerEvent $customerEvent)
-    {
-        if (!is_null($this->dispatcher)) {
-            $this->dispatcher->dispatch($eventName, $customerEvent);
         }
     }
 
@@ -150,11 +127,22 @@ class Customer extends BaseCustomer implements UserInterface
     }
 
     /**
+     * @return Address
+     */
+    public function getDefaultAddress()
+    {
+        return AddressQuery::create()
+            ->filterByCustomer($this)
+            ->filterByIsDefault(1)
+            ->findOne();
+    }
+
+    /**
      * create hash for plain password and set it in Customer object
      *
      * @param string $password plain password before hashing
+     * @throws Exception\InvalidArgumentException
      * @return $this|Customer
-     * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
      */
     public function setPassword($password)
     {
@@ -184,11 +172,6 @@ class Customer extends BaseCustomer implements UserInterface
         return parent::setEmail($email);
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
    /**
      * {@inheritDoc}
      */
@@ -216,5 +199,58 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function getRoles() {
     	return array(new Role('CUSTOMER'));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preInsert(ConnectionInterface $con = null)
+    {
+        $this->setRef($this->generateRef());
+
+        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, new CustomerEvent($this));
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function postInsert(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_CREATECUSTOMER, new CustomerEvent($this));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preUpdate(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECUSTOMER, new CustomerEvent($this));
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function postUpdate(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_UPDATECUSTOMER, new CustomerEvent($this));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONFIG, new CustomerEvent($this));
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function postDelete(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_DELETECONFIG, new CustomerEvent($this));
     }
 }

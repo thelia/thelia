@@ -24,12 +24,13 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Log\Tlog;
 
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
@@ -46,7 +47,7 @@ use Thelia\Type\BooleanOrBothType;
  * - current : current id is used if you are on a category page
  * - not_empty : if value is 1, category and subcategories must have at least 1 product
  * - visible : default 1, if you want category not visible put 0
- * - order : all value available :  'alpha', 'alpha-reverse', 'manual' (default), 'manual-reverse', 'random'
+ * - order : all value available :  'alpha', 'alpha_reverse', 'manual' (default), 'manual_reverse', 'random'
  * - exclude : all category id you want to exclude (as for id, an integer or a "string list" can be used)
  *
  * example :
@@ -61,8 +62,11 @@ use Thelia\Type\BooleanOrBothType;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Category extends BaseLoop
+class Category extends BaseI18nLoop
 {
+    public $timestampable = true;
+    public $versionable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -77,7 +81,7 @@ class Category extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'visible', 'visible_reverse', 'random'))
                 ),
                 'manual'
             ),
@@ -94,7 +98,10 @@ class Category extends BaseLoop
     {
         $search = CategoryQuery::create();
 
-        $id = $this->getId();
+        /* manage translations */
+        $locale = $this->configureI18nProcessing($search);
+
+		$id = $this->getId();
 
         if (!is_null($id)) {
             $search->filterById($id, Criteria::IN);
@@ -106,13 +113,15 @@ class Category extends BaseLoop
             $search->filterByParent($parent);
         }
 
-        $current = $this->getCurrent();
+
+		$current = $this->getCurrent();
 
         if ($current === true) {
             $search->filterById($this->request->get("category_id"));
         } elseif ($current === false) {
             $search->filterById($this->request->get("category_id"), Criteria::NOT_IN);
         }
+
 
          $exclude = $this->getExclude();
 
@@ -121,23 +130,29 @@ class Category extends BaseLoop
         }
 
         if ($this->getVisible() != BooleanOrBothType::ANY)
-            $search->filterByVisible($this->getVisible() ? 1 : 0);
+        	$search->filterByVisible($this->getVisible() ? 1 : 0);
 
         $orders  = $this->getOrder();
 
-        foreach ($orders as $order) {
+        foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha-reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "manual-reverse":
+                case "manual_reverse":
                     $search->orderByPosition(Criteria::DESC);
                     break;
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "visible":
+                    $search->orderByVisible(Criteria::ASC);
+                    break;
+                case "visible_reverse":
+                    $search->orderByVisible(Criteria::DESC);
                     break;
                 case "random":
                     $search->clearOrderByColumns();
@@ -147,47 +162,36 @@ class Category extends BaseLoop
             }
         }
 
-        /**
-         * \Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
+        /* perform search */
         $categories = $this->search($search, $pagination);
 
+        /* @todo */
         $notEmpty  = $this->getNot_empty();
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($categories);
 
         foreach ($categories as $category) {
+            /*
+             * no cause pagination lost :
+             * if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
+             */
 
-            if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
-
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $category, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow
-                ->set("ID", $category->getId())
-                ->set("TITLE",$category->getTitle())
-                ->set("CHAPO", $category->getChapo())
-                ->set("DESCRIPTION", $category->getDescription())
-                ->set("POSTSCRIPTUM", $category->getPostscriptum())
-                ->set("PARENT", $category->getParent())
-                ->set("URL", $category->getUrl())
-                ->set("PRODUCT_COUNT", $category->countChild())
-                ->set("VISIBLE", $category->getVisible() ? "1" : "0")
-                ->set("POSITION", $category->getPosition())
-
-                ->set("CREATE_DATE", $category->getCreatedAt())
-                ->set("UPDATE_DATE", $category->getUpdatedAt())
-                ->set("VERSION", $category->getVersion())
-                ->set("VERSION_DATE", $category->getVersionCreatedAt())
-                ->set("VERSION_AUTHOR", $category->getVersionCreatedBy())
-            ;
+            	->set("ID", $category->getId())
+                ->set("IS_TRANSLATED",$category->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
+            	->set("TITLE", $category->getVirtualColumn('i18n_TITLE'))
+	            ->set("CHAPO", $category->getVirtualColumn('i18n_CHAPO'))
+	            ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
+	            ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
+	            ->set("PARENT", $category->getParent())
+	            ->set("URL", $category->getUrl($locale))
+	            ->set("PRODUCT_COUNT", $category->countChild())
+	            ->set("VISIBLE", $category->getVisible() ? "1" : "0")
+	            ->set("POSITION", $category->getPosition())
+			;
 
             $loopResult->addRow($loopResultRow);
         }

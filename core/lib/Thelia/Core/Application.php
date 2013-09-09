@@ -29,6 +29,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * cli application for Thelia
+ * Class Application
+ * @package Thelia\Core
+ * mfony\Component\HttpFoundation\Session\Session
+ */
 class Application extends BaseApplication
 {
 

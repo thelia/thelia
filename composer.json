@@ -9,9 +9,8 @@
     },
     "require":{
         "php": ">=5.4",
-        "ezyang/htmlpurifier": "dev-master",
         "ircmaxell/password-compat": "dev-master",
-        "propel/propel": "2.0.0-alpha1",
+        "propel/propel": "dev-master",
         "psr/log" : "1.0",
         "symfony/class-loader": "2.2.*",
         "symfony/config" : "2.2.*",
@@ -27,7 +26,7 @@
         "symfony-cmf/routing": "1.0.0",
 
         "symfony/form": "2.2.*",
-        "symfony/validator": "2.3.*@dev",
+        "symfony/validator": "2.3.*",
 
         "smarty/smarty": "v3.1.14",
         "kriswallsmith/assetic": "1.2.*@dev",
@@ -36,11 +35,14 @@
 
         "simplepie/simplepie": "dev-master",
 
-        "imagine/imagine": "dev-master"
+        "imagine/imagine": "dev-master",
+        "symfony/serializer": "dev-master",
+        "symfony/icu": "1.0"
     },
     "require-dev" : {
         "phpunit/phpunit": "3.7.*",
-        "fzaninotto/faker": "dev-master"
+        "fzaninotto/faker": "dev-master",
+        "maximebf/debugbar": "1.*"
     },
     "minimum-stability": "stable",
     "config" : {

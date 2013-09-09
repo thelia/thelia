@@ -24,134 +24,39 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Category as CategoryModel;
-use Thelia\Form\CategoryCreationForm;
-use Thelia\Core\Event\CategoryEvent;
-use Thelia\Tools\Redirect;
 use Thelia\Model\CategoryQuery;
-use Thelia\Model\AdminLog;
-use Thelia\Form\CategoryDeletionForm;
-use Thelia\Action\Exception\FormValidationException;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\CategoryTableMap;
 use Propel\Runtime\Exception\PropelException;
 
+use Thelia\Core\Event\CategoryCreateEvent;
+use Thelia\Core\Event\CategoryDeleteEvent;
+use Thelia\Core\Event\CategoryToggleVisibilityEvent;
+use Thelia\Core\Event\CategoryChangePositionEvent;
+
 class Category extends BaseAction implements EventSubscriberInterface
 {
-    public function create(ActionEvent $event)
+    public function create(CategoryCreateEvent $event)
     {
+        $category = new CategoryModel();
 
-        $this->checkAuth("ADMIN", "admin.category.create");
+        $category
+            ->setDispatcher($this->getDispatcher())
+            ->create(
+               $event->getTitle(),
+               $event->getParent(),
+               $event->getLocale()
+         );
 
-        $request = $event->getRequest();
-
-        try {
-            $categoryCreationForm = new CategoryCreationForm($request);
-
-            $form = $this->validateForm($categoryCreationForm, "POST");
-
-            $data = $form->getData();
-
-            $category = new CategoryModel();
-
-               $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CREATECATEGORY, $event);
-
-               $category->create(
-                $data["title"],
-                $data["parent"],
-                $data["locale"]
-            );
-
-               AdminLog::append(sprintf("Category %s (ID %s) created", $category->getTitle(), $category->getId()), $request, $request->getSession()->getAdminUser());
-
-            $categoryEvent = new CategoryEvent($category);
-
-            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECATEGORY, $categoryEvent);
-
-            // Substitute _ID_ in the URL with the ID of the created category
-            $successUrl = str_replace('_ID_', $category->getId(), $categoryCreationForm->getSuccessUrl());
-
-            // Redirect to the success URL
-            $this->redirect($successUrl);
-
-        } catch (PropelException $e) {
-            Tlog::getInstance()->error(sprintf('error during creating category with message "%s"', $e->getMessage()));
-
-            $message = "Failed to create this category, please try again.";
-        }
-
-        // The form has errors, propagate it.
-        $this->propagateFormError($categoryCreationForm, $message, $event);
+        $event->setCategory($category);
     }
 
-    public function modify(ActionEvent $event)
+    public function update(CategoryChangeEvent $event)
     {
-
-        $this->checkAuth("ADMIN", "admin.category.delete");
-
-        $request = $event->getRequest();
-
-        $customerModification = new CustomerModification($request);
-
-        $form = $customerModification->getForm();
-
-        if ($request->isMethod("post")) {
-
-            $form->bind($request);
-
-            if ($form->isValid()) {
-                $data = $form->getData();
-
-                $customer = CustomerQuery::create()->findPk(1);
-                try {
-                    $customerEvent = new CustomerEvent($customer);
-                    $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECUSTOMER, $customerEvent);
-
-                    $data = $form->getData();
-
-                    $customer->createOrUpdate(
-                        $data["title"],
-                        $data["firstname"],
-                        $data["lastname"],
-                        $data["address1"],
-                        $data["address2"],
-                        $data["address3"],
-                        $data["phone"],
-                        $data["cellphone"],
-                        $data["zipcode"],
-                        $data["country"]
-                    );
-
-                    $customerEvent->customer = $customer;
-                    $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECUSTOMER, $customerEvent);
-
-                    // Update the logged-in user, and redirect to the success URL (exits)
-                    // We don-t send the login event, as the customer si already logged.
-                    $this->processSuccessfullLogin($event, $customer, $customerModification);
-                 } catch (PropelException $e) {
-
-                    Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
-
-                    $message = "Failed to change your account, please try again.";
-                }
-            } else {
-                $message = "Missing or invalid data";
-            }
-        } else {
-            $message = "Wrong form method !";
-        }
-
-        // The form has an error
-        $customerModification->setError(true);
-        $customerModification->setErrorMessage($message);
-
-        // Dispatch the errored form
-        $event->setErrorForm($customerModification);
-
     }
 
     /**
@@ -159,50 +64,14 @@ class Category extends BaseAction implements EventSubscriberInterface
      *
      * @param ActionEvent $event
      */
-    public function delete(ActionEvent $event)
+    public function delete(CategoryDeleteEvent $event)
     {
+        $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
-        $this->checkAuth("ADMIN", "admin.category.delete");
+        if ($category !== null) {
 
-        $request = $event->getRequest();
-
-        try {
-            $categoryDeletionForm = new CategoryDeletionForm($request);
-
-            $form = $this->validateForm($categoryDeletionForm, "POST");
-
-            $data = $form->getData();
-
-            $category = CategoryQuery::create()->findPk($data['id']);
-
-            $categoryEvent = new CategoryEvent($category);
-
-            $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_DELETECATEGORY, $categoryEvent);
-
-            $category->delete();
-
-            AdminLog::append(sprintf("Category %s (ID %s) deleted", $category->getTitle(), $category->getId()), $request, $request->getSession()->getAdminUser());
-
-            $categoryEvent->category = $category;
-
-            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_DELETECATEGORY, $categoryEvent);
-
-            // Substitute _ID_ in the URL with the ID of the created category
-            $successUrl = str_replace('_ID_', $category->getParent(), $categoryDeletionForm->getSuccessUrl());
-
-            // Redirect to the success URL
-            Redirect::exec($successUrl);
-        } catch (PropelException $e) {
-
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during deleting category ID=%s on action/modifyCustomer with message "%s"', $data['id'], $e->getMessage()));
-
-            $message = "Failed to change your account, please try again.";
-        } catch (FormValidationException $e) {
-
-             $message = $e->getMessage();
+            $category->setDispatcher($this->getDispatcher())->delete();
         }
-
-        $this->propagateFormError($categoryDeletionForm, $message, $event);
     }
 
     /**
@@ -210,60 +79,41 @@ class Category extends BaseAction implements EventSubscriberInterface
      *
      * @param ActionEvent $event
      */
-    public function toggleVisibility(ActionEvent $event)
+    public function toggleVisibility(CategoryToggleVisibilityEvent $event)
     {
-
-        $this->checkAuth("ADMIN", "admin.category.edit");
-
-        $request = $event->getRequest();
-
-        $category = CategoryQuery::create()->findPk($request->get('category_id', 0));
+        $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
 
-            $category->setVisible($category->getVisible() ? false : true);
-
-            $category->save();
-
-            $categoryEvent = new CategoryEvent($category);
-
-            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECATEGORY, $categoryEvent);
+            $category
+                ->setDispatcher($this->getDispatcher())
+                ->setVisible($category->getVisible() ? false : true)
+                ->save()
+            ;
         }
     }
 
     /**
-     * Move category up
+     * Changes category position, selecting absolute ou relative change.
      *
-     * @param ActionEvent $event
+     * @param CategoryChangePositionEvent $event
      */
-    public function changePositionUp(ActionEvent $event)
+    public function changePosition(CategoryChangePositionEvent $event)
     {
-        return $this->exchangePosition($event, 'up');
-    }
-
-    /**
-     * Move category down
-     *
-     * @param ActionEvent $event
-     */
-    public function changePositionDown(ActionEvent $event)
-    {
-        return $this->exchangePosition($event, 'down');
+        if ($event->getMode() == CategoryChangePositionEvent::POSITION_ABSOLUTE)
+            return $this->changeAbsolutePosition($event);
+        else
+            return $this->exchangePosition($event);
     }
 
     /**
      * Move up or down a category
      *
-     * @param ActionEvent $event
-     * @param string      $direction up to move up, down to move down
+     * @param CategoryChangePositionEvent $event
      */
-    protected function exchangePosition(ActionEvent $event, $direction)
+    protected function exchangePosition(CategoryChangePositionEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.edit");
-
-        $request = $event->getRequest();
-
-        $category = CategoryQuery::create()->findPk($request->get('category_id', 0));
+       $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
 
@@ -275,10 +125,10 @@ class Category extends BaseAction implements EventSubscriberInterface
                 ->filterByParent($category->getParent());
 
             // Up or down ?
-            if ($direction == 'up') {
+            if ($event->getMode() == CategoryChangePositionEvent::POSITION_UP) {
                 // Find the category immediately before me
                 $search->filterByPosition(array('max' => $my_position-1))->orderByPosition(Criteria::DESC);
-            } elseif ($direction == 'down') {
+            } elseif ($event->getMode() == CategoryChangePositionEvent::POSITION_DOWN) {
                 // Find the category immediately after me
                 $search->filterByPosition(array('min' => $my_position+1))->orderByPosition(Criteria::ASC);
             } else
@@ -295,7 +145,11 @@ class Category extends BaseAction implements EventSubscriberInterface
                 $cnx->beginTransaction();
 
                 try {
-                    $category->setPosition($result->getPosition())->save();
+                    $category
+                        ->setDispatcher($this->getDispatcher())
+                        ->setPosition($result->getPosition())
+                        ->save()
+                    ;
 
                     $result->setPosition($my_position)->save();
 
@@ -310,20 +164,16 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Changes category position
      *
-     * @param ActionEvent $event
+     * @param CategoryChangePositionEvent $event
      */
-    public function changePosition(ActionEvent $event)
+    protected function changeAbsolutePosition(CategoryChangePositionEvent $event)
     {
-        $this->checkAuth("ADMIN", "admin.category.edit");
-
-        $request = $event->getRequest();
-
-        $category = CategoryQuery::create()->findPk($request->get('category_id', 0));
+        $category = CategoryQuery::create()->findPk($event->getCategoryId());
 
         if ($category !== null) {
 
             // The required position
-            $new_position = $request->get('position', null);
+            $new_position = $event->getPosition();
 
             // The current position
             $current_position = $category->getPosition();
@@ -356,7 +206,11 @@ class Category extends BaseAction implements EventSubscriberInterface
                         $result->setPosition($result->getPosition() + $delta)->save($cnx);
                     }
 
-                    $category->setPosition($new_position)->save($cnx);
+                    $category
+                        ->setDispatcher($this->getDispatcher())
+                        ->setPosition($new_position)
+                        ->save($cnx)
+                    ;
 
                     $cnx->commit();
                 } catch (Exception $e) {
@@ -389,14 +243,16 @@ class Category extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            "action.createCategory" => array("create", 128),
-            "action.modifyCategory" => array("modify", 128),
-            "action.deleteCategory" => array("delete", 128),
+            TheliaEvents::CATEGORY_CREATE => array("create", 128),
+            TheliaEvents::CATEGORY_UPDATE => array("update", 128),
+            TheliaEvents::CATEGORY_DELETE => array("delete", 128),
 
-            "action.toggleCategoryVisibility" 	=> array("toggleVisibility", 128),
-            "action.changeCategoryPositionUp" 	=> array("changePositionUp", 128),
-            "action.changeCategoryPositionDown" => array("changePositionDown", 128),
-            "action.changeCategoryPosition" 	=> array("changePosition", 128),
+            TheliaEvents::CATEGORY_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
+            TheliaEvents::CATEGORY_CHANGE_POSITION   => array("changePosition", 128),
+
+            "action.updateCategoryPositionU" 	=> array("changePositionUp", 128),
+            "action.updateCategoryPositionDown" => array("changePositionDown", 128),
+            "action.updateCategoryPosition" 	=> array("changePosition", 128),
         );
     }
 }

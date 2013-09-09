@@ -41,52 +41,6 @@ class BaseAction
     }
 
     /**
-     * Validate a BaseForm
-     *
-     * @param  BaseForm                     $aBaseForm      the form
-     * @param  string                       $expectedMethod the expected method, POST or GET, or null for any of them
-     * @throws FormValidationException      is the form contains error, or the method is not the right one
-     * @return \Symfony\Component\Form\Form Form the symfony form object
-     */
-    protected function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
-    {
-        $form = $aBaseForm->getForm();
-
-        if ($expectedMethod == null || $aBaseForm->getRequest()->isMethod($expectedMethod)) {
-
-            $form->bind($aBaseForm->getRequest());
-
-            if ($form->isValid()) {
-                return $form;
-            } else {
-                throw new FormValidationException("Missing or invalid data");
-            }
-        } else {
-            throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
-        }
-    }
-
-    /**
-     * Propagate a form error in the action event
-     *
-     * @param BaseForm    $aBaseForm     the form
-     * @param string      $error_message an error message that may be displayed to the customer
-     * @param ActionEvent $event         the action event
-     */
-    protected function propagateFormError(BaseForm $aBaseForm, $error_message, ActionEvent $event)
-    {
-        // The form has an error
-        $aBaseForm->setError(true);
-        $aBaseForm->setErrorMessage($error_message);
-
-        // Store the form in the parser context
-        $event->setErrorForm($aBaseForm);
-
-        // Stop event propagation
-        $event->stopPropagation();
-    }
-
-    /**
      * Return the event dispatcher,
      *
      * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
@@ -95,5 +49,4 @@ class BaseAction
     {
         return $this->container->get('event_dispatcher');
     }
-
 }

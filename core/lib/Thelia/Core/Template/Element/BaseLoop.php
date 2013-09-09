@@ -28,6 +28,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Model\Tools\ModelCriteriaTools;
 
 /**
  *
@@ -52,6 +53,10 @@ abstract class BaseLoop
     protected $securityContext;
 
     protected $args;
+
+    public $countable = true;
+    public $timestampable = false;
+    public $versionable = false;
 
     /**
      * Create a new Loop
@@ -80,6 +85,7 @@ abstract class BaseLoop
             Argument::createIntTypeArgument('offset', 0),
             Argument::createIntTypeArgument('page'),
             Argument::createIntTypeArgument('limit', PHP_INT_MAX),
+            Argument::createBooleanTypeArgument('backend_context', false),
         );
     }
 
@@ -136,7 +142,7 @@ abstract class BaseLoop
             } elseif ($value !== null && !$argument->type->isValid($value)) {
                 /* check type */
                 $faultActor[] = $argument->name;
-                $faultDetails[] = sprintf('Invalid value for "%s" argument in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
+                $faultDetails[] = sprintf('Invalid value "%s" for "%s" argument in loop type: %s, name: %s', $value, $argument->name, $loopType, $loopName);
             } else {
                 /* set default */
                 /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
@@ -187,8 +193,8 @@ abstract class BaseLoop
     }
 
     /**
-     * @param \ModelCriteria $search
-     * @param null           $pagination
+     * @param ModelCriteria $search
+     * @param null          $pagination
      *
      * @return array|mixed|\PropelModelPager|\PropelObjectCollection
      */
@@ -202,7 +208,7 @@ abstract class BaseLoop
     }
 
     /**
-     * @param \ModelCriteria $search
+     * @param ModelCriteria $search
      *
      * @return array|mixed|\PropelObjectCollection
      */
@@ -217,10 +223,10 @@ abstract class BaseLoop
     }
 
     /**
-     * @param \ModelCriteria $search
-     * @param                $pagination
+     * @param ModelCriteria $search
+     * @param               $pagination
      *
-     * @return array|\PropelModelPager
+     * @return array|\Propel\Runtime\Util\PropelModelPager
      */
     protected function searchWithPagination(ModelCriteria $search, &$pagination)
     {
@@ -237,23 +243,9 @@ abstract class BaseLoop
      *
      * this function have to be implement in your own loop class.
      *
-     * All your parameters are defined in defineArgs() and can be accessible like a class property.
+     * All loops parameters can be accessible via getter.
      *
-     * example :
-     *
-     * public function defineArgs()
-     * {
-     *  return array (
-     *      "ref",
-     *      "id" => "optional",
-     *      "stock" => array(
-     *          "optional",
-     *          "default" => 10
-     *          )
-     *  );
-     * }
-     *
-     * you can retrieve ref value using $this->ref
+     * for example, ref parameter is accessible through getRef method
      *
      * @param $pagination
      *
@@ -265,18 +257,31 @@ abstract class BaseLoop
      *
      * define all args used in your loop
      *
-     * array key is your arg name.
      *
      * example :
      *
-     * return array (
-     *  "ref",
-     *  "id" => "optional",
-     *  "stock" => array(
-     *          "optional",
-     *          "default" => 10
-     *          )
-     * );
+     * public function getArgDefinitions()
+     * {
+     *  return new ArgumentCollection(
+     *       Argument::createIntListTypeArgument('id'),
+     *           new Argument(
+     *           'ref',
+     *           new TypeCollection(
+     *               new Type\AlphaNumStringListType()
+     *           )
+     *       ),
+     *       Argument::createIntListTypeArgument('category'),
+     *       Argument::createBooleanTypeArgument('new'),
+     *       Argument::createBooleanTypeArgument('promo'),
+     *       Argument::createFloatTypeArgument('min_price'),
+     *       Argument::createFloatTypeArgument('max_price'),
+     *       Argument::createIntTypeArgument('min_stock'),
+     *       Argument::createFloatTypeArgument('min_weight'),
+     *       Argument::createFloatTypeArgument('max_weight'),
+     *       Argument::createBooleanTypeArgument('current'),
+     *
+     *   );
+     * }
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */

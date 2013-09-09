@@ -55,8 +55,6 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
         );
 
         $this->options = array_merge($defaults, $options);
-
-        $this->loginForm->bind($this->request);
     }
 
     /**

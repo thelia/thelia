@@ -23,7 +23,28 @@
 namespace Thelia\Controller\Front;
 
 use Thelia\Controller\BaseController;
+use Thelia\Tools\URL;
 
 class BaseFrontController extends BaseController
 {
+    /**
+     * Return the route path defined for the givent route ID
+     *
+     * @param string $routeId a route ID, as defines in Config/Resources/routing/front.xml
+     *
+     * @see \Thelia\Controller\BaseController::getRouteFromRouter()
+     */
+    protected function getRoute($routeId) {
+        return $this->getRouteFromRouter('router.front', $routeId);
+    }
+
+    /**
+     * Redirect to à route ID related URL
+     *
+     * @param unknown $routeId the route ID, as found in Config/Resources/routing/admin.xml
+     * @param unknown $urlParameters the URL parametrs, as a var/value pair array
+     */
+    public function redirectToRoute($routeId, $urlParameters = array()) {
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId), $urlParameters));
+    }
 }

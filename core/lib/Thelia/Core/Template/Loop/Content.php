@@ -24,7 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -49,8 +49,11 @@ use Thelia\Type\BooleanOrBothType;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Content extends BaseLoop
+class Content extends BaseI18nLoop
 {
+    public $timestampable = true;
+    public $versionable = true;
+
     /**
      * @return ArgumentCollection
      */
@@ -84,6 +87,9 @@ class Content extends BaseLoop
     public function exec(&$pagination)
     {
         $search = ContentQuery::create();
+
+        /* manage translations */
+        $locale = $this->configureI18nProcessing($search);
 
         $id = $this->getId();
 
@@ -153,10 +159,10 @@ class Content extends BaseLoop
         foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\ContentI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\ContentI18nTableMap::TITLE);
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
                     if(null === $folder || count($folder) != 1)
@@ -199,32 +205,25 @@ class Content extends BaseLoop
             );
         }
 
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
+        /* perform search */
         $search->groupBy(ContentTableMap::ID);
 
         $contents = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($contents);
 
         foreach ($contents as $content) {
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $content, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow->set("ID", $content->getId())
-                ->set("TITLE",$content->getTitle())
-                ->set("CHAPO", $content->getChapo())
-                ->set("DESCRIPTION", $content->getDescription())
-                ->set("POSTSCRIPTUM", $content->getPostscriptum())
+                ->set("IS_TRANSLATED",$content->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
+                ->set("TITLE",$content->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $content->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $content->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $content->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $content->getPosition())
+                ->set("URL", $content->getUrl($locale))
             ;
 
             $loopResult->addRow($loopResultRow);

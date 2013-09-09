@@ -22,8 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Front;
 
-use Propel\Runtime\Exception\PropelException;
-use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\CustomerLoginEvent;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
@@ -36,65 +34,107 @@ use Thelia\Form\CustomerModification;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\CustomerEvent;
+use Thelia\Core\Factory\ActionEventFactory;
+use Thelia\Tools\URL;
+use Thelia\Log\Tlog;
+use Thelia\Core\Security\Exception\WrongPasswordException;
 
+/**
+ * Class CustomerController
+ * @package Thelia\Controller\Front
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class CustomerController extends BaseFrontController
 {
     /**
-     * create a new Customer. Retrieve data in form and dispatch a action.createCustomer event
-     *
-     * if error occurs, message is set in the parserContext
+     * Create a new customer.
+     * On success, redirect to success_url if exists, otherwise, display the same view again.
      */
     public function createAction()
     {
-        $request = $this->getRequest();
-        $customerCreation = new CustomerCreation($request);
-        try {
-            $form = $this->validateForm($customerCreation, "post");
+        if (! $this->getSecurityContext()->hasCustomerUser()) {
 
-            $customerCreateEvent = $this->createEventInstance($form->getData());
+            $message = false;
 
-            $this->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $customerCreateEvent);
+            $customerCreation = new CustomerCreation($this->getRequest());
 
-            $this->processLogin($customerCreateEvent->getCustomer());
+            try {
+                $form = $this->validateForm($customerCreation, "post");
 
-            $this->redirectSuccess();
+                $customerCreateEvent = $this->createEventInstance($form->getData());
 
-        } catch (FormValidationException $e) {
-            $customerCreation->setErrorMessage($e->getMessage());
-            $this->getParserContext()->setErrorForm($customerCreation);
-        } catch (PropelException $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("error during customer creation process in front context with message : %s", $e->getMessage()));
-            $this->getParserContext()->setGeneralError($e->getMessage());
+                $this->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $customerCreateEvent);
+
+                $this->processLogin($customerCreateEvent->getCustomer());
+
+                $this->redirectSuccess($customerCreation);
+            }
+            catch (FormValidationException $e) {
+                $message = sprintf("Please check your input: %s", $e->getMessage());
+            }
+            catch (\Exception $e) {
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+            }
+
+            if ($message !== false) {
+                Tlog::getInstance()->error(sprintf("Error during customer creation process : %s. Exception was %s", $message, $e->getMessage()));
+
+                $customerCreation->setErrorMessage($message);
+
+                $this->getParserContext()
+                    ->addForm($customerCreation)
+                    ->setGeneralError($message)
+                ;
+            }
         }
-
     }
 
+    /**
+     * Update customer data. On success, redirect to success_url if exists.
+     * Otherwise, display the same view again.
+     */
     public function updateAction()
     {
-        $request = $this->getRequest();
-        $customerModification = new CustomerModification($request);
+        if ($this->getSecurityContext()->hasCustomerUser()) {
 
-        try {
+            $message = false;
 
-            $customer = $this->getSecurityContext(SecurityContext::CONTEXT_FRONT_OFFICE)->getUser();
+            $customerModification = new CustomerModification($this->getRequest());
 
-            $form = $this->validateForm($customerModification, "post");
+            try {
 
-            $customerChangeEvent = $this->createEventInstance($form->getData());
-            $customerChangeEvent->setCustomer($customer);
+                $customer = $this->getSecurityContext()->getCustomerUser();
 
-            $this->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_UPDATEACCOUNT, $customerChangeEvent);
+                $form = $this->validateForm($customerModification, "post");
 
-            $this->processLogin($customerChangeEvent->getCustomer());
+                $customerChangeEvent = $this->createEventInstance($form->getData());
+                $customerChangeEvent->setCustomer($customer);
 
-            $this->redirectSuccess();
+                $this->dispatch(TheliaEvents::CUSTOMER_UPDATEACCOUNT, $customerChangeEvent);
 
-        } catch (FormValidationException $e) {
-            $customerModification->setErrorMessage($e->getMessage());
-            $this->getParserContext()->setErrorForm($customerModification);
-        } catch (PropelException $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("error during updating customer in front context with message : %s", $e->getMessage()));
-            $this->getParserContext()->setGeneralError($e->getMessage());
+                $this->processLogin($customerChangeEvent->getCustomer());
+
+                $this->redirectSuccess($customerModification);
+
+            }
+            catch (FormValidationException $e) {
+                $message = sprintf("Please check your input: %s", $e->getMessage());
+            }
+            catch (\Exception $e) {
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+            }
+
+            if ($message !== false) {
+                Tlog::getInstance()->error(sprintf("Error during customer modification process : %s.", $message));
+
+                $customerModification->setErrorMessage($message);
+
+                $this->getParserContext()
+                    ->addForm($customerModification)
+                    ->setGeneralError($message)
+                ;
+            }
         }
     }
 
@@ -102,41 +142,77 @@ class CustomerController extends BaseFrontController
      * Perform user login. On a successful login, the user is redirected to the URL
      * found in the success_url form parameter, or / if none was found.
      *
-     * If login is not successfull, the same view is dispolyed again.
+     * If login is not successfull, the same view is displayed again.
      *
      */
     public function loginAction()
     {
-        $request = $this->getRequest();
+        if (! $this->getSecurityContext()->hasCustomerUser()) {
+            $message = false;
 
-        $customerLoginForm = new CustomerLogin($request);
+            $request = $this->getRequest();
+            $customerLoginForm = new CustomerLogin($request);
 
-        $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
+            try {
 
-        try {
-            $customer = $authenticator->getAuthentifiedUser();
+                $form = $this->validateForm($customerLoginForm, "post");
 
-            $customerLoginEvent = new CustomerLoginEvent($customer);
+                $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
 
-            $this->processLogin($customer, $customerLoginEvent);
+                $customer = $authenticator->getAuthentifiedUser();
 
-            $this->redirectSuccess();
-        } catch (ValidatorException $e) {
+                $this->processLogin($customer);
 
-        } catch(UsernameNotFoundException $e) {
+                $this->redirectSuccess($customerLoginForm);
 
-        } catch(AuthenticationException $e) {
+            }
+            catch (FormValidationException $e) {
+                $message = sprintf("Please check your input: %s", $e->getMessage());
+            }
+            catch(UsernameNotFoundException $e) {
+                $message = "This customer email was not found.";
+            }
+            catch (WrongPasswordException $e) {
+                $message = "Wrong password. Please try again.";
+            }
+            catch(AuthenticationException $e) {
+                $message = "Sorry, we failed to authentify you. Please try again.";
+            }
+            catch (\Exception $e) {
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+            }
 
-        } catch (\Exception $e) {
+            if ($message !== false) {
+                Tlog::getInstance()->error(sprintf("Error during customer login process : %s. Exception was %s", $message, $e->getMessage()));
 
+                $customerLoginForm->setErrorMessage($message);
+
+                $this->getParserContext()->addForm($customerLoginForm);
+            }
         }
     }
 
-    public function processLogin(Customer $customer,$event = null)
+    /**
+     * Perform customer logout.
+     */
+    public function logoutAction()
     {
-        $this->getSecurityContext(SecurityContext::CONTEXT_FRONT_OFFICE)->setUser($customer);
+        if ($this->getSecurityContext()->hasCustomerUser()) {
+            $this->dispatch(TheliaEvents::CUSTOMER_LOGOUT);
+        }
 
-        if($event) $this->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
+        // Redirect to home page
+        $this->redirect(URL::getInstance()->getIndexPage());
+    }
+
+    /**
+     * Dispatch event for customer login action
+     *
+     * @param Customer $customer
+     */
+    protected function processLogin(Customer $customer)
+    {
+        $this->dispatch(TheliaEvents::CUSTOMER_LOGIN, new CustomerLoginEvent($customer));
     }
 
     /**
@@ -162,10 +238,9 @@ class CustomerController extends BaseFrontController
             $this->getRequest()->getSession()->getLang(),
             isset($data["reseller"])?$data["reseller"]:null,
             isset($data["sponsor"])?$data["sponsor"]:null,
-            isset($data["discount"])?$data["discount"]:nullsch
+            isset($data["discount"])?$data["discount"]:null
         );
 
         return $customerCreateEvent;
     }
-
 }

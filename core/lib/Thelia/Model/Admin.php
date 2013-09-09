@@ -26,7 +26,7 @@ class Admin extends BaseAdmin implements UserInterface
         \Thelia\Log\Tlog::getInstance()->debug($password);
 
         if ($this->isNew() && ($password === null || trim($password) == "")) {
-            throw new InvalidArgumentException("customer password is mandatory on creation");
+            throw new \InvalidArgumentException("customer password is mandatory on creation");
         }
 
         if($password !== null && trim($password) != "") {

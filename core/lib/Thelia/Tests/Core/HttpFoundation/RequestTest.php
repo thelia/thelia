@@ -4,6 +4,13 @@ namespace Thelia\Tests\Core\HttpFoundation;
 
 use Thelia\Core\HttpFoundation\Request;
 
+/**
+ * the the helpers addinf in Request class
+ *
+ * Class RequestTest
+ * @package Thelia\Tests\Core\HttpFoundation
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
 

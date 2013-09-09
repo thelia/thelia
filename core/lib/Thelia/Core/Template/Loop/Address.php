@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -46,6 +47,8 @@ use Thelia\Type;
  */
 class Address extends BaseLoop
 {
+    public $timestampable = true;
+    
     /**
      * @return ArgumentCollection
      */
@@ -61,7 +64,7 @@ class Address extends BaseLoop
                 ),
                 'current'
             ),
-            Argument::createBooleanTypeArgument('default'),
+            Argument::createBooleanTypeArgument('default', false),
             Argument::createIntListTypeArgument('exclude')
         );
     }
@@ -84,7 +87,7 @@ class Address extends BaseLoop
         $customer = $this->getCustomer();
 
         if ($customer === 'current') {
-            $currentCustomer = $this->request->getSession()->getCustomerUser();
+            $currentCustomer = $this->securityContext->getCustomerUser();
             if ($currentCustomer === null) {
                 return new LoopResult();
             } else {
@@ -96,10 +99,9 @@ class Address extends BaseLoop
 
         $default = $this->getDefault();
 
+
         if ($default === true) {
             $search->filterByIsDefault(1, Criteria::EQUAL);
-        } elseif ($default === false) {
-            $search->filterByIsDefault(1, Criteria::NOT_EQUAL);
         }
 
         $exclude = $this->getExclude();
@@ -110,26 +112,28 @@ class Address extends BaseLoop
 
         $addresses = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($addresses);
 
         foreach ($addresses as $address) {
-            $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $address->getId());
-            $loopResultRow->set("NAME", $address->getName());
-            $loopResultRow->set("CUSTOMER", $address->getCustomerId());
-            $loopResultRow->set("TITLE", $address->getTitleId());
-            $loopResultRow->set("COMPANY", $address->getCompany());
-            $loopResultRow->set("FIRSTNAME", $address->getFirstname());
-            $loopResultRow->set("LASTNAME", $address->getLastname());
-            $loopResultRow->set("ADDRESS1", $address->getAddress1());
-            $loopResultRow->set("ADDRESS2", $address->getAddress2());
-            $loopResultRow->set("ADDRESS3", $address->getAddress3());
-            $loopResultRow->set("ZIPCODE", $address->getZipcode());
-            $loopResultRow->set("CITY", $address->getCity());
-            $loopResultRow->set("COUNTRY", $address->getCountryId());
-            $loopResultRow->set("PHONE", $address->getPhone());
-            $loopResultRow->set("CELLPHONE", $address->getCellphone());
-            $loopResultRow->set("DEFAULT", $address->getIsDefault());
+            $loopResultRow = new LoopResultRow($loopResult, $address, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow
+                ->set("ID", $address->getId())
+                ->set("LABEL", $address->getLabel())
+                ->set("CUSTOMER", $address->getCustomerId())
+                ->set("TITLE", $address->getTitleId())
+                ->set("COMPANY", $address->getCompany())
+                ->set("FIRSTNAME", $address->getFirstname())
+                ->set("LASTNAME", $address->getLastname())
+                ->set("ADDRESS1", $address->getAddress1())
+                ->set("ADDRESS2", $address->getAddress2())
+                ->set("ADDRESS3", $address->getAddress3())
+                ->set("ZIPCODE", $address->getZipcode())
+                ->set("CITY", $address->getCity())
+                ->set("COUNTRY", $address->getCountryId())
+                ->set("PHONE", $address->getPhone())
+                ->set("CELLPHONE", $address->getCellphone())
+                ->set("DEFAULT", $address->getIsDefault())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

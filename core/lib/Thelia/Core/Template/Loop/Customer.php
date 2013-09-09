@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -46,6 +47,8 @@ use Thelia\Type;
  */
 class Customer extends BaseLoop
 {
+    public $timestampable = true;
+    
     /**
      * @return ArgumentCollection
      */
@@ -61,6 +64,7 @@ class Customer extends BaseLoop
                 )
             ),
             Argument::createBooleanTypeArgument('reseller'),
+            Argument::createBooleanTypeArgument('last_order'),
             Argument::createIntTypeArgument('sponsor')
         );
     }
@@ -77,7 +81,7 @@ class Customer extends BaseLoop
         $current = $this->getCurrent();
 
         if ($current === true) {
-            $currentCustomer = $this->request->getSession()->getCustomerUser();
+            $currentCustomer = $this->securityContext->getCustomerUser();
             if ($currentCustomer === null) {
                 return new LoopResult();
             } else {
@@ -113,10 +117,10 @@ class Customer extends BaseLoop
 
         $customers = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult();
+        $loopResult = new LoopResult($customers);
 
         foreach ($customers as $customer) {
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $customer, $this->versionable, $this->timestampable, $this->countable);
             $loopResultRow->set("ID", $customer->getId());
             $loopResultRow->set("REF", $customer->getRef());
             $loopResultRow->set("TITLE", $customer->getTitleId());
@@ -126,6 +130,20 @@ class Customer extends BaseLoop
             $loopResultRow->set("RESELLER", $customer->getReseller());
             $loopResultRow->set("SPONSOR", $customer->getSponsor());
             $loopResultRow->set("DISCOUNT", $customer->getDiscount());
+
+            $lastOrderDate = "";
+            $lastOrderAmount = "";
+
+            if ($this->getLastOrder()) {
+                $order = $customer->getOrders()->getFirst();
+                if ($order) {
+                    $lastOrderDate = $order->getCreatedAt();
+                    $lastOrderAmount = $order->getTotalAmount();
+                }
+            }
+
+            $loopResultRow->set("LASTORDER_DATE", $lastOrderDate);
+            $loopResultRow->set("LASTORDER_AMOUNT", $lastOrderAmount);
 
             $loopResult->addRow($loopResultRow);
         }

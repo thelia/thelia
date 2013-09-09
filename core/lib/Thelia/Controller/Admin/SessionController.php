@@ -43,25 +43,28 @@ class SessionController extends BaseAdminController
     {
         $this->dispatch(TheliaEvents::ADMIN_LOGOUT);
 
-        $this->getSecurityContext()->clear();
+        $this->getSecurityContext()->clearAdminUser();
 
         // Go back to login page.
-        return Redirect::exec(URL::absoluteUrl('/admin/login')); // FIXME - should be a parameter
+        $this->redirectToRoute('admin.login');
     }
 
     public function checkLoginAction()
     {
-        $adminLoginForm = new AdminLogin($this->getRequest());
-
         $request = $this->getRequest();
 
-        $authenticator = new AdminUsernamePasswordFormAuthenticator($request, $adminLoginForm);
+        $adminLoginForm = new AdminLogin($request);
 
         try {
+
+            $form = $this->validateForm($adminLoginForm, "post");
+
+            $authenticator = new AdminUsernamePasswordFormAuthenticator($request, $adminLoginForm);
+
             $user = $authenticator->getAuthentifiedUser();
 
             // Success -> store user in security context
-            $this->getSecurityContext()->setUser($user);
+            $this->getSecurityContext()->setAdminUser($user);
 
             // Log authentication success
             AdminLog::append("Authentication successful", $request, $user);
@@ -70,30 +73,32 @@ class SessionController extends BaseAdminController
 
             // Redirect to the success URL
             return Redirect::exec($adminLoginForm->getSuccessUrl());
-         } catch (ValidatorException $ex) {
+
+         }
+         catch (FormValidationException $ex) {
 
              // Validation problem
-             $message = "Missing or invalid information. Please check your input.";
-         } catch (AuthenticationException $ex) {
+             $message = $this->createStandardFormValidationErrorMessage($ex);
+         }
+         catch (AuthenticationException $ex) {
 
              // Log authentication failure
              AdminLog::append(sprintf("Authentication failure for username '%s'", $authenticator->getUsername()), $request);
 
-             $message = "Login failed. Please check your username and password.";
-         } catch (\Exception $ex) {
+             $message =  $this->getTranslator()->trans("Login failed. Please check your username and password.");
+         }
+         catch (\Exception $ex) {
 
              // Log authentication failure
              AdminLog::append(sprintf("Undefined error: %s", $ex->getMessage()), $request);
 
-             $message = "Unable to process your request. Please try again.";
+             $message = $this->getTranslator()->trans(
+                     "Unable to process your request. Please try again (%err).",
+                     array("%err" => $ex->getMessage())
+             );
          }
 
-         // Store error information in the form
-         $adminLoginForm->setError(true);
-         $adminLoginForm->setErrorMessage($message);
-
-         // Store the form name in session (see Form Smarty plugin to find usage of this parameter)
-         $this->getParserContext()->setErrorForm($adminLoginForm);
+         $this->setupFormErrorContext("Login process", $message, $adminLoginForm, $ex);
 
           // Display the login form again
         return $this->render("login");

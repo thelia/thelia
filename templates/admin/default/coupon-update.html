@@ -1,0 +1,41 @@
+{extends file="admin-layout.tpl"}
+{block name="check-permissions"}admin.coupon.update{/block}
+{block name="page-title"}{intl l='Update coupon'}{/block}
+
+{block name="main-content"}
+<section id="wrapper" class="container">
+
+    <nav>
+        <ul class="breadcrumb">
+            {include file="includes/coupon_breadcrumb.html"}
+        </ul>
+    </nav>
+
+    <div class="page-header">
+        <h1>Coupons : <small>Update a coupon</small></h1>
+    </div>
+
+    {form name="thelia.admin.coupon.creation"}
+        {include file='coupon/form.html' formAction={url path={$formAction}} form=$form}
+    {/form}
+
+</section> <!-- #wrapper -->
+{/block}
+
+{include file='includes/confirmation-modal.html'}
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/bootstrap-datepicker/js/bootstrap-datepicker.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/main.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    <script>
+        $(function($){
+            miniBrowser(0, '/test_to_remove/datas_coupon_edit.json');
+        });
+    </script>
+{/block}

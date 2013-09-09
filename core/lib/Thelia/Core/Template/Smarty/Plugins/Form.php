@@ -82,6 +82,7 @@ class Form extends AbstractSmartyPlugin
 
     public function generateForm($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
+
         if ($repeat) {
 
             $name = $this->getParam($params, 'name');
@@ -93,15 +94,11 @@ class Form extends AbstractSmartyPlugin
             $instance = $this->createInstance($name);
 
             // Check if parser context contains our form
-            $errorForm = $this->parserContext->getErrorForm();
+            $form = $this->parserContext->getForm($instance->getName());
 
-            if (null != $errorForm && $errorForm->getName() == $instance->getName()) {
-
-                // Re-use the errored form
-                $instance = $errorForm;
-
-                // Don't do that, as we may want to use this form firther in the template code
-                //$this->parserContext->clearErrorForm();
+            if (null != $form) {
+                // Re-use the form
+                $instance = $form;
             }
 
             $instance->createView();
@@ -110,7 +107,8 @@ class Form extends AbstractSmartyPlugin
 
             $template->assign("form_error", $instance->hasError() ? true : false);
             $template->assign("form_error_message", $instance->getErrorMessage());
-        } else {
+        }
+        else {
             return $content;
         }
     }
@@ -122,9 +120,17 @@ class Form extends AbstractSmartyPlugin
             $formFieldView = $this->getFormFieldView($params);
 
             $template->assign("options", $formFieldView->vars);
+
             $template->assign("name", $formFieldView->vars["full_name"]);
             $template->assign("value", $formFieldView->vars["value"]);
+
+            // If Checkbox input type
+            if ($formFieldView->vars['checked'] !== null) {
+                $this->renderFormFieldCheckBox($template, $formFieldView);
+            }
+
             $template->assign("label", $formFieldView->vars["label"]);
+            $template->assign("label_attr", $formFieldView->vars["label_attr"]);
 
             $errors = $formFieldView->vars["errors"];
 
@@ -266,5 +272,18 @@ class Form extends AbstractSmartyPlugin
             new SmartyPluginDescriptor("function", "form_enctype", $this, "formEnctype"),
             new SmartyPluginDescriptor("block", "form_error", $this, "formError")
         );
+    }
+
+    /**
+     * @param \Smarty_Internal_Template $template
+     * @param $formFieldView
+     */
+    public function renderFormFieldCheckBox(\Smarty_Internal_Template $template, $formFieldView)
+    {
+        $template->assign("value", 0);
+        if ($formFieldView->vars['checked']) {
+            $template->assign("value", 1);
+        }
+        $template->assign("value", $formFieldView->vars['checked']);
     }
 }

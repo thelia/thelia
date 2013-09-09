@@ -32,6 +32,13 @@ use Symfony\Component\Validator\Validation;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
+/**
+ * Base form class for creating form objects
+ *
+ * Class BaseForm
+ * @package Thelia\Form
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 abstract class BaseForm
 {
     /**
@@ -128,12 +135,14 @@ abstract class BaseForm
             $successUrl = $default;
         }
 
-        return URL::absoluteUrl($successUrl);
+        return URL::getInstance()->absoluteUrl($successUrl);
     }
 
     public function createView()
     {
         $this->view = $this->form->createView();
+
+        return $this;
     }
 
     public function getView()
@@ -152,6 +161,8 @@ abstract class BaseForm
     public function setError($has_error = true)
     {
         $this->has_error = $has_error;
+
+        return $this;
     }
 
     /**
@@ -173,6 +184,8 @@ abstract class BaseForm
     {
         $this->setError(true);
         $this->error_message = $message;
+
+        return $this;
     }
 
     /**

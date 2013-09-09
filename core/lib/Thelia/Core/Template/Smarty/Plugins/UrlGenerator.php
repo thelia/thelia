@@ -47,14 +47,15 @@ class UrlGenerator extends AbstractSmartyPlugin
     public function generateUrlFunction($params, &$smarty)
     {
         // the path to process
-           $path = $this->getParam($params, 'path');
+        $path = $this->getParam($params, 'path');
 
-           $target = $this->getParam($params, 'target', null);
+        $target = $this->getParam($params, 'target', null);
 
-           $url = URL::absoluteUrl($path, $this->getArgsFromParam($params, array('path', 'target')));
+        $url = URL::getInstance()->absoluteUrl($path, $this->getArgsFromParam($params, array('path', 'target')));
 
-           if ($target != null) $url .= '#'.$target;
-           return $url;
+        if ($target != null) $url .= '#'.$target;
+
+        return $url;
      }
 
      /**
@@ -81,6 +82,15 @@ class UrlGenerator extends AbstractSmartyPlugin
          return $this->generateViewUrlFunction($params, true);
      }
 
+    public function navigateToUrlFunction($params, &$smarty)
+     {
+         $to = $this->getParam($params, 'to', null);
+
+         $toMethod = $this->getNavigateToMethod($to);
+
+         return $this->$toMethod();
+     }
+
      protected function generateViewUrlFunction($params, $forAdmin)
      {
          // the view name (without .html)
@@ -92,7 +102,7 @@ class UrlGenerator extends AbstractSmartyPlugin
          $args = $this->getArgsFromParam($params, array('view', 'action', 'target'));
 
          if (! empty($action)) $args['action'] = $action;
-         return $forAdmin ? URL::adminViewUrl($view, $args) : URL::viewUrl($view, $args);
+         return $forAdmin ? URL::getInstance()->adminViewUrl($view, $args) : URL::getInstance()->viewUrl($view, $args);
      }
 
      /**
@@ -125,7 +135,50 @@ class UrlGenerator extends AbstractSmartyPlugin
         return array(
             new SmartyPluginDescriptor('function', 'url', $this, 'generateUrlFunction'),
             new SmartyPluginDescriptor('function', 'viewurl', $this, 'generateFrontViewUrlFunction'),
-            new SmartyPluginDescriptor('function', 'admin_viewurl', $this, 'generateAdminViewUrlFunction')
+            new SmartyPluginDescriptor('function', 'admin_viewurl', $this, 'generateAdminViewUrlFunction'),
+            new SmartyPluginDescriptor('function', 'navigate', $this, 'navigateToUrlFunction'),
         );
+    }
+
+    /**
+     * @return array sur le format "to_value" => "method_name"
+     */
+    protected function getNavigateToValues()
+    {
+        return array(
+            "current"   => "getCurrentUrl",
+            "return_to" => "getReturnToUrl",
+            "index"     => "getIndexUrl",
+        );
+    }
+
+    protected function getNavigateToMethod($to)
+    {
+        if($to === null) {
+            throw new \InvalidArgumentException("Missing 'to' parameter in `navigate` substitution.");
+        }
+
+        $navigateToValues = $this->getNavigateToValues();
+
+        if(!array_key_exists($to, $navigateToValues)) {
+            throw new \InvalidArgumentException("Incorrect value for parameter `to` in `navigate` substitution.");
+        }
+
+        return $navigateToValues[$to];
+    }
+
+    protected function getCurrentUrl()
+    {
+        return URL::getInstance()->retrieveCurrent($this->request)->toString();
+    }
+
+    protected function getReturnToUrl()
+    {
+        return URL::getInstance()->absoluteUrl($this->request->getSession()->getReturnToUrl());
+    }
+
+    protected function getIndexUrl()
+    {
+        return URL::getInstance()->getIndexPage();
     }
 }

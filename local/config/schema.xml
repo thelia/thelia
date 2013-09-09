@@ -96,19 +96,19 @@
   </table>
   <table name="tax_rule" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="code" size="45" type="VARCHAR" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="LONGVARCHAR" />
     <behavior name="timestampable" />
-    <behavior name="i18n" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
   </table>
   <table name="tax_rule_country" namespace="Thelia\Model">
-    <column name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="tax_rule_id" type="INTEGER" />
-    <column name="country_id" type="INTEGER" />
-    <column name="tax_id" type="INTEGER" />
-    <column name="none" type="TINYINT" />
-    <foreign-key foreignTable="tax" name="fk_tax_rule_country_tax_id" onDelete="SET NULL" onUpdate="RESTRICT">
+    <column name="tax_rule_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="country_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="tax_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="position" required="true" type="INTEGER" />
+    <foreign-key foreignTable="tax" name="fk_tax_rule_country_tax_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_id" />
     </foreign-key>
     <foreign-key foreignTable="tax_rule" name="fk_tax_rule_country_tax_rule_id" onDelete="CASCADE" onUpdate="RESTRICT">
@@ -303,6 +303,9 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <unique name="name_UNIQUE">
+      <unique-column name="name" />
+    </unique>
     <behavior name="timestampable" />
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
@@ -334,7 +337,7 @@
   </table>
   <table name="address" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="name" size="255" type="VARCHAR" />
+    <column name="label" size="255" type="VARCHAR" />
     <column name="customer_id" required="true" type="INTEGER" />
     <column name="title_id" required="true" type="INTEGER" />
     <column name="company" size="255" type="VARCHAR" />
@@ -386,8 +389,14 @@
     <column name="code" size="10" type="VARCHAR" />
     <column name="locale" size="45" type="VARCHAR" />
     <column name="url" size="255" type="VARCHAR" />
-    <column name="position" type="INTEGER" />
+    <column name="date_format" size="45" type="VARCHAR" />
+    <column name="time_format" size="45" type="VARCHAR" />
+    <column name="datetime_format" size="45" type="VARCHAR" />
+    <column name="decimal_separator" size="45" type="VARCHAR" />
+    <column name="thousands_separator" size="45" type="VARCHAR" />
+    <column name="decimals" size="45" type="VARCHAR" />
     <column name="by_default" type="TINYINT" />
+    <column name="position" type="INTEGER" />
     <behavior name="timestampable" />
   </table>
   <table name="folder" namespace="Thelia\Model">
@@ -424,32 +433,6 @@
       <parameter name="log_created_at" value="true" />
       <parameter name="log_created_by" value="true" />
     </behavior>
-  </table>
-  <table name="content_assoc" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="category_id" type="INTEGER" />
-    <column name="product_id" type="INTEGER" />
-    <column name="content_id" type="INTEGER" />
-    <column name="position" type="INTEGER" />
-    <foreign-key foreignTable="category" name="fk_content_assoc_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="category_id" />
-    </foreign-key>
-    <foreign-key foreignTable="product" name="fk_content_assoc_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="product_id" />
-    </foreign-key>
-    <foreign-key foreignTable="content" name="fk_content_assoc_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="content_id" />
-    </foreign-key>
-    <index name="idx_content_assoc_category_id">
-      <index-column name="category_id" />
-    </index>
-    <index name="idx_content_assoc_product_id">
-      <index-column name="product_id" />
-    </index>
-    <index name="idx_content_assoc_content_id">
-      <index-column name="content_id" />
-    </index>
-    <behavior name="timestampable" />
   </table>
   <table name="product_image" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -622,6 +605,7 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <column name="full_namespace" size="255" type="VARCHAR" />
     <unique name="code_UNIQUE">
       <unique-column name="code" />
     </unique>
@@ -631,7 +615,7 @@
     </behavior>
   </table>
   <table isCrossRef="true" name="accessory" namespace="Thelia\Model">
-    <column name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column name="accessory" required="true" type="INTEGER" />
     <column name="position" required="true" type="INTEGER" />
@@ -766,86 +750,79 @@
   </table>
   <table name="message" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="code" required="true" size="45" type="VARCHAR" />
+    <column name="name" required="true" size="255" type="VARCHAR" />
     <column name="secured" type="TINYINT" />
-    <column name="ref" size="255" type="VARCHAR" />
     <column name="title" type="LONGVARCHAR" />
-    <column name="description" type="CLOB" />
-    <column name="description_html" type="CLOB" />
+    <column name="subject" type="LONGVARCHAR" />
+    <column name="text_message" type="CLOB" />
+    <column name="html_message" type="CLOB" />
+    <unique name="name_UNIQUE">
+      <unique-column name="name" />
+    </unique>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, description_html" />
+      <parameter name="i18n_columns" value="title, subject, text_message, html_message" />
     </behavior>
     <behavior name="versionable">
       <parameter name="log_created_at" value="true" />
       <parameter name="log_created_by" value="true" />
     </behavior>
   </table>
-  <table name="rewriting" namespace="Thelia\Model">
-    <column name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="url" required="true" size="255" type="VARCHAR" />
-    <column name="product_id" type="INTEGER" />
-    <column name="category_id" type="INTEGER" />
-    <column name="folder_id" type="INTEGER" />
-    <column name="content_id" type="INTEGER" />
-    <foreign-key foreignTable="product" name="fk_rewriting_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="product_id" />
-    </foreign-key>
-    <foreign-key foreignTable="category" name="fk_rewriting_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="category_id" />
-    </foreign-key>
-    <foreign-key foreignTable="folder" name="fk_rewriting_folder_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="folder_id" />
-    </foreign-key>
-    <foreign-key foreignTable="content" name="fk_rewriting_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="content_id" />
-    </foreign-key>
-    <index name="idx_rewriting_product_id">
-      <index-column name="product_id" />
-    </index>
-    <index name="idx_rewriting_category_id">
-      <index-column name="category_id" />
-    </index>
-    <index name="idx_rewriting_folder_id">
-      <index-column name="folder_id" />
-    </index>
-    <index name="idx_rewriting_content_id">
-      <index-column name="content_id" />
-    </index>
-    <behavior name="timestampable" />
-  </table>
   <table name="coupon" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="45" type="VARCHAR" />
-    <column name="action" required="true" size="255" type="VARCHAR" />
-    <column name="value" required="true" type="FLOAT" />
-    <column name="used" type="TINYINT" />
-    <column name="available_since" type="TIMESTAMP" />
-    <column name="date_limit" type="TIMESTAMP" />
-    <column name="activate" type="TINYINT" />
+    <column name="type" required="true" size="255" type="VARCHAR" />
+    <column name="title" required="true" size="255" type="VARCHAR" />
+    <column name="short_description" required="true" type="LONGVARCHAR" />
+    <column name="description" required="true" type="CLOB" />
+    <column name="amount" required="true" type="FLOAT" />
+    <column name="is_used" required="true" type="TINYINT" />
+    <column name="is_enabled" required="true" type="TINYINT" />
+    <column name="expiration_date" required="true" type="TIMESTAMP" />
+    <column name="serialized_rules" required="true" type="LONGVARCHAR" />
+    <column name="is_cumulative" required="true" type="TINYINT" />
+    <column name="is_removing_postage" required="true" type="TINYINT" />
+    <column name="max_usage" required="true" type="INTEGER" />
+    <column name="is_available_on_special_offers" required="true" type="BOOLEAN" />
     <unique name="code_UNIQUE">
       <unique-column name="code" />
     </unique>
-    <behavior name="timestampable" />
-  </table>
-  <table name="coupon_rule" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="coupon_id" required="true" type="INTEGER" />
-    <column name="controller" size="255" type="VARCHAR" />
-    <column name="operation" size="255" type="VARCHAR" />
-    <column name="value" type="FLOAT" />
-    <foreign-key foreignTable="coupon" name="fk_coupon_rule_coupon_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="coupon_id" />
-    </foreign-key>
-    <index name="idx_coupon_rule_coupon_id">
-      <index-column name="coupon_id" />
+    <index name="idx_is_enabled">
+      <index-column name="is_enabled" />
+    </index>
+    <index name="idx_is_used">
+      <index-column name="is_used" />
+    </index>
+    <index name="idx_type">
+      <index-column name="type" />
+    </index>
+    <index name="idx_amount">
+      <index-column name="amount" />
+    </index>
+    <index name="idx_expiration_date">
+      <index-column name="expiration_date" />
+    </index>
+    <index name="idx_is_cumulative">
+      <index-column name="is_cumulative" />
+    </index>
+    <index name="idx_is_removing_postage">
+      <index-column name="is_removing_postage" />
+    </index>
+    <index name="idx_max_usage">
+      <index-column name="max_usage" />
+    </index>
+    <index name="idx_is_available_on_special_offers">
+      <index-column name="is_available_on_special_offers" />
     </index>
     <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, short_description, description" />
+    </behavior>
+    <behavior name="versionable" />
   </table>
   <table name="coupon_order" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="order_id" required="true" type="INTEGER" />
-    <column name="code" required="true" size="45" type="VARCHAR" />
     <column name="value" required="true" type="FLOAT" />
     <foreign-key foreignTable="order" name="fk_coupon_order_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_id" />
@@ -1085,5 +1062,76 @@
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
+  </table>
+  <table name="product_associated_content" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="product_id" required="true" type="INTEGER" />
+    <column name="content_id" required="true" type="INTEGER" />
+    <column name="position" required="true" type="INTEGER" />
+    <foreign-key foreignTable="product" name="fk_product_associated_content_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_id" />
+    </foreign-key>
+    <foreign-key foreignTable="content" name="fk_product_associated_content_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="content_id" />
+    </foreign-key>
+    <index name="idx_product_associated_content_product_id">
+      <index-column name="product_id" />
+    </index>
+    <index name="idx_product_associated_content_content_id">
+      <index-column name="content_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="category_associated_content" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="category_id" required="true" type="INTEGER" />
+    <column name="content_id" required="true" type="INTEGER" />
+    <column name="position" required="true" type="INTEGER" />
+    <foreign-key foreignTable="category" name="fk_category_associated_content_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="category_id" />
+    </foreign-key>
+    <foreign-key foreignTable="content" name="fk_category_associated_content_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="content_id" />
+    </foreign-key>
+    <index name="idx_category_associated_content_category_id">
+      <index-column name="category_id" />
+    </index>
+    <index name="idx_category_associated_content_content_id">
+      <index-column name="content_id" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="rewriting_url" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="url" required="true" size="255" type="VARCHAR" />
+    <column name="view" size="255" type="VARCHAR" />
+    <column name="view_id" size="255" type="VARCHAR" />
+    <column name="view_locale" size="255" type="VARCHAR" />
+    <column name="redirected" type="INTEGER" />
+    <foreign-key foreignTable="rewriting_url" name="fk_rewriting_url_redirected" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="redirected" />
+    </foreign-key>
+    <unique name="url_UNIQUE">
+      <unique-column name="url" />
+    </unique>
+    <index name="idx_view_id">
+      <index-column name="view_id" />
+    </index>
+    <index name="idx_rewriting_url_redirected">
+      <index-column name="redirected" />
+    </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="rewriting_argument" namespace="Thelia\Model">
+    <column name="rewriting_url_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="parameter" primaryKey="true" required="true" size="255" type="VARCHAR" />
+    <column name="value" primaryKey="true" required="true" size="255" type="VARCHAR" />
+    <foreign-key foreignTable="rewriting_url" name="fk_rewriting_argument_rewirting_url_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="rewriting_url_id" />
+    </foreign-key>
+    <index name="idx_rewriting_argument_rewirting_url_id">
+      <index-column name="rewriting_url_id" />
+    </index>
+    <behavior name="timestampable" />
   </table>
 </database>

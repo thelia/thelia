@@ -36,6 +36,7 @@ use Thelia\Core\Template\ParserContext;
  *
  * Class ControllerListener
  * @package Thelia\Core\EventListener
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 class ControllerListener implements EventSubscriberInterface
 {
@@ -59,12 +60,7 @@ class ControllerListener implements EventSubscriberInterface
             $event = new ActionEventFactory($request, $action, $event->getKernel()->getContainer()->getParameter("thelia.actionEvent"));
             $actionEvent = $event->createActionEvent();
             $dispatcher->dispatch("action.".$action, $actionEvent);
-
-            // Process form errors
-            if ($actionEvent->hasErrorForm()) {
-                $this->parserContext->setErrorForm($actionEvent->getErrorForm());
-            }
-        }
+         }
     }
 
    public static function getSubscribedEvents()

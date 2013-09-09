@@ -86,7 +86,7 @@ class ViewListener implements EventSubscriberInterface
         } catch (AuthenticationException $ex) {
 
             // Redirect to the login template
-            $event->setResponse(Redirect::exec(URL::viewUrl($ex->getLoginTemplate())));
+            Redirect::exec($this->container->get('thelia.url.manager')->viewUrl($ex->getLoginTemplate()));
         }
     }
 

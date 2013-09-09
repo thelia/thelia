@@ -1,10 +1,22 @@
-{$page_title={intl l='AN error occured'}}
+{extends file="admin-layout.tpl"}
 
-{include file='includes/header.inc.html'}
+{* -- We do not check admin login on this page *}
+{block name="check-auth"}{/block}
 
+{block name="page-title"}{intl l='An error occured'}{/block}
+
+{block name="main-content"}
     <div id="wrapper" class="container">
-        <h1>{intl l="Oops! An Error Occurred"}</h1>
-        <p>{$error_message}</p>
-    </div>
 
-{include file='includes/footer.inc.html'}
+        <div class="row">
+            <div class="col-md-12">
+                <h1>{intl l="Oops! An Error Occurred"}</h1>
+
+                {block name="error-message"}<div class="alert alert-error">{$error_message}</div>{/block}
+
+                <p><i class="glyphicon glyphicon-backward"></i> <a href="{url path='/admin/home'}">{intl l="Go to administration home"}</a></p>
+            </div>
+        </div>
+
+    </div>
+{/block}
