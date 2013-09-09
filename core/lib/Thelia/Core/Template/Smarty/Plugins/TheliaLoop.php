@@ -293,13 +293,11 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
+     * @param $smartyParams
      *
-     * find the loop class with his name and construct an instance of this class
-     *
-     * @param  string                                 $name
-     * @return \Thelia\Core\Template\Element\BaseLoop
-     * @throws InvalidElementException
-     * @throws ElementNotFoundException
+     * @return object
+     * @throws \Thelia\Core\Template\Element\Exception\InvalidElementException
+     * @throws \Thelia\Core\Template\Element\Exception\ElementNotFoundException
      */
     protected function createLoopInstance($smartyParams)
     {
