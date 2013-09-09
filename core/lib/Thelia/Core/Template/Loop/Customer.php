@@ -64,6 +64,7 @@ class Customer extends BaseLoop
                 )
             ),
             Argument::createBooleanTypeArgument('reseller'),
+            Argument::createBooleanTypeArgument('last_order'),
             Argument::createIntTypeArgument('sponsor')
         );
     }
@@ -129,6 +130,20 @@ class Customer extends BaseLoop
             $loopResultRow->set("RESELLER", $customer->getReseller());
             $loopResultRow->set("SPONSOR", $customer->getSponsor());
             $loopResultRow->set("DISCOUNT", $customer->getDiscount());
+
+            $lastOrderDate = "";
+            $lastOrderAmount = "";
+
+            if ($this->getLastOrder()) {
+                $order = $customer->getOrders()->getFirst();
+                if ($order) {
+                    $lastOrderDate = $order->getCreatedAt();
+                    $lastOrderAmount = $order->getTotalAmount();
+                }
+            }
+
+            $loopResultRow->set("LASTORDER_DATE", $lastOrderDate);
+            $loopResultRow->set("LASTORDER_AMOUNT", $lastOrderAmount);
 
             $loopResult->addRow($loopResultRow);
         }
