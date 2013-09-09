@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
@@ -44,14 +45,22 @@ class TheliaLoop extends AbstractSmartyPlugin
     protected $dispatcher;
     protected $securityContext;
 
+    /** @var ContainerInterface Service Container */
+    protected $container = null;
+
     protected $loopstack = array();
     protected $varstack = array();
 
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher, SecurityContext $securityContext)
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
     {
-        $this->request = $request;
-        $this->dispatcher = $dispatcher;
-        $this->securityContext = $securityContext;
+        $this->container = $container;
+
+        $this->request = $container->get('request');
+        $this->dispatcher = $container->get('event_dispatcher');
+        $this->securityContext = $container->get('thelia.securityContext');
     }
 
     /**
@@ -315,9 +324,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         }
 
         $loop = $class->newInstance(
-                $this->request,
-                $this->dispatcher,
-                $this->securityContext
+            $this->container
         );
 
         $loop->initializeArgs($smartyParams);
