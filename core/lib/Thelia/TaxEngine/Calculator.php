@@ -67,13 +67,15 @@ class Calculator
         return $this;
     }
 
-    public function getTaxAmount()
+    public function getTaxAmount($amount)
     {
+        if(false === filter_var($amount, FILTER_VALIDATE_FLOAT)) {
+            throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
+        }
+
         if(null === $this->taxRulesGroupedCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxAmount', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
         }
-
-        $amount = $this->product->getRealLowestPrice();
 
         $taxRateAmount = 0;
         foreach($this->taxRulesGroupedCollection as $taxRule) {
@@ -83,8 +85,12 @@ class Calculator
         return $amount * $taxRateAmount * 0.01;
     }
 
-    public function getTaxedPrice()
+    public function getTaxedPrice($amount)
     {
-        return $this->product->getRealLowestPrice() + $this->getTaxAmount();
+        if(false === filter_var($amount, FILTER_VALIDATE_FLOAT)) {
+            throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
+        }
+
+        return $amount + $this->getTaxAmount($amount);
     }
 }

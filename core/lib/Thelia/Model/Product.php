@@ -28,6 +28,6 @@ class Product extends BaseProduct
     public function getTaxedPrice(Country $country)
     {
         $taxCalculator = new Calculator();
-        return $taxCalculator->load($this, $country)->getTaxedPrice();
+        return $taxCalculator->load($this, $country)->getTaxedPrice($this->getRealLowestPrice());
     }
 }

@@ -510,6 +510,12 @@ class Product extends BaseI18nLoop
         foreach ($products as $product) {
             $loopResultRow = new LoopResultRow($loopResult, $product, $this->versionable, $this->timestampable, $this->countable);
 
+            $price = $product->getRealLowestPrice();
+            $taxedPrice = $product->getTaxedPrice(
+                CountryQuery::create()->findOneById(64) // @TODO : make it magic
+            );
+
+
             $loopResultRow->set("ID", $product->getId())
                 ->set("REF",$product->getRef())
                 ->set("IS_TRANSLATED",$product->getVirtualColumn('IS_TRANSLATED'))
@@ -519,10 +525,9 @@ class Product extends BaseI18nLoop
                 ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("URL", $product->getUrl($locale))
-                ->set("BEST_PRICE", $product->getRealLowestPrice())
-                ->set("BEST_TAXED_PRICE", $product->getTaxedPrice(
-                    CountryQuery::create()->findOneById(64) // @TODO : make it magic
-                ))
+                ->set("BEST_PRICE", $price)
+                ->set("BEST_PRICE_TAX", $taxedPrice - $price)
+                ->set("BEST_TAXED_PRICE", $taxedPrice)
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))
                 ->set("POSITION", $product->getPosition())

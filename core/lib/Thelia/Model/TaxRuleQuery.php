@@ -37,8 +37,6 @@ class TaxRuleQuery extends BaseTaxRuleQuery
             ->withColumn('ROUND(SUM(' . TaxTableMap::RATE . '), 2)', self::ALIAS_FOR_TAX_RATE_SUM)
         ;
 
-        //var_dump($search->toString());
-
         return $search->find();
     }
 } // TaxRuleQuery

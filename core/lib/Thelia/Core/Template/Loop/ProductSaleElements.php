@@ -35,6 +35,7 @@ use Thelia\Log\Tlog;
 
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\CountryQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -124,6 +125,15 @@ class ProductSaleElements extends BaseLoop
         foreach ($PSEValues as $PSEValue) {
             $loopResultRow = new LoopResultRow($loopResult, $PSEValue, $this->versionable, $this->timestampable, $this->countable);
 
+            $price = $PSEValue->getPrice();
+            $taxedPrice = $PSEValue->getTaxedPrice(
+                CountryQuery::create()->findOneById(64) // @TODO : make it magic
+            );
+            $promoPrice = $PSEValue->getPromoPrice();
+            $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
+                CountryQuery::create()->findOneById(64) // @TODO : make it magic
+            );
+
             $loopResultRow->set("ID", $PSEValue->getId())
                 ->set("QUANTITY", $PSEValue->getQuantity())
                 ->set("IS_PROMO", $PSEValue->getPromo() === 1 ? 1 : 0)
@@ -131,8 +141,12 @@ class ProductSaleElements extends BaseLoop
                 ->set("WEIGHT", $PSEValue->getWeight())
 
                 ->set("CURRENCY", $PSEValue->getVirtualColumn('price_CURRENCY_ID'))
-                ->set("PRICE", $PSEValue->getVirtualColumn('price_PRICE'))
-                ->set("PROMO_PRICE", $PSEValue->getVirtualColumn('price_PROMO_PRICE'));
+                ->set("PRICE", $price)
+                ->set("PRICE_TAX", $taxedPrice - $price)
+                ->set("TAXED_PRICE", $taxedPrice)
+                ->set("PROMO_PRICE", $promoPrice)
+                ->set("PROMO_PRICE_TAX", $taxedPromoPrice - $promoPrice)
+                ->set("TAXED_PROMO_PRICE", $taxedPromoPrice);
 
             $loopResult->addRow($loopResultRow);
         }
