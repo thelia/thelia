@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Element;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -52,6 +53,9 @@ abstract class BaseLoop
      */
     protected $securityContext;
 
+    /** @var ContainerInterface Service Container */
+    protected $container = null;
+
     protected $args;
 
     public $countable = true;
@@ -61,15 +65,15 @@ abstract class BaseLoop
     /**
      * Create a new Loop
      *
-     * @param Request                  $request
-     * @param EventDispatcherInterface $dispatcher
-     * @param SecurityContext          $securityContext
+     * @param ContainerInterface $container
      */
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher, SecurityContext $securityContext)
+    public function __construct(ContainerInterface $container)
     {
-        $this->request = $request;
-        $this->dispatcher = $dispatcher;
-        $this->securityContext = $securityContext;
+        $this->container = $container;
+
+        $this->request = $container->get('request');
+        $this->dispatcher = $container->get('event_dispatcher');
+        $this->securityContext = $container->get('thelia.securityContext');
 
         $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
     }
