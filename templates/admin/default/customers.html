@@ -1,3 +1,4 @@
+
 {extends file="admin-layout.tpl"}
 
 {block name="page-title"}{intl l='Customer'}{/block}
@@ -5,6 +6,9 @@
 {block name="check-permissions"}admin.customer.view{/block}
 
 {block name="main-content"}
+    {assign var=customer_page value={$smarty.get.page|default:1}}
+
+
     <div class="catalog">
     <div id="wrapper" class="container">
 
@@ -21,7 +25,7 @@
                         {module_include location='customer_list_caption'}
 
                         {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.customers.create"}
-                            <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new category'}" href="#add_category_dialog" data-toggle="modal">
+                            <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new Customer'}" href="#add_customer_dialog" data-toggle="modal">
                                 <span class="glyphicon glyphicon-plus-sign"></span>
                             </a>
                         {/loop}
@@ -31,7 +35,7 @@
                         <thead>
                         <tr>
                             <th class="object-title">
-                                {intl l="customer ref"}
+                                {intl l="customer ref"}  {$customer_current_page} toto
                             </th>
 
                             <th class="object-title">
@@ -55,7 +59,7 @@
                         </thead>
 
                         <tbody>
-                        {loop name="customer_list" type="customer" visible="*" last_order="1" backend_context="1"}
+                        {loop name="customer_list" type="customer" visible="*" last_order="1" backend_context="1" page={$customer_page} limit={$display_customer}}
                             <tr>
                                 <td>{#REF}</td>
 
@@ -102,6 +106,33 @@
 
 
     {module_include location='customer_bottom'}
+    <div class="row">
+        <div class="col-md-12 text-center">
+
+            <ul class="pagination pagination-centered">
+                {if #customer_page != 1}
+                    <li><a href="{url path="/admin/customers" page="1"}">&laquo;</a></li>
+                {else}
+                    <li class="disabled"><a href="#">&laquo;</a></li>
+                {/if}
+
+            {pageloop rel="customer_list"}
+                {if #PAGE != #CURRENT}
+                    <li><a href="{url path="/admin/customers" page="#PAGE"}">#PAGE</a></li>
+                {else}
+                    <li class="active"><a href="#">#PAGE</a></li>
+                {/if}
+
+                {if #PAGE == #LAST && #LAST != #CURRENT}
+                    <li><a href="{url path="/admin/customers" page="#PAGE"}">&raquo;</a></li>
+                {else}
+                    <li class="disabled"><a href="#">&raquo;</a></li>
+                {/if}
+            {/pageloop}
+            </ul>
+        </div>
+    </div>
+
     </div>
     </div>
 
