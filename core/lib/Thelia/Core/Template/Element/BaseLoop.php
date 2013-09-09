@@ -243,23 +243,9 @@ abstract class BaseLoop
      *
      * this function have to be implement in your own loop class.
      *
-     * All your parameters are defined in defineArgs() and can be accessible like a class property.
+     * All loops parameters can be accessible via getter.
      *
-     * example :
-     *
-     * public function defineArgs()
-     * {
-     *  return array (
-     *      "ref",
-     *      "id" => "optional",
-     *      "stock" => array(
-     *          "optional",
-     *          "default" => 10
-     *          )
-     *  );
-     * }
-     *
-     * you can retrieve ref value using $this->ref
+     * for example, ref parameter is accessible through getRef method
      *
      * @param $pagination
      *
@@ -271,18 +257,31 @@ abstract class BaseLoop
      *
      * define all args used in your loop
      *
-     * array key is your arg name.
      *
      * example :
      *
-     * return array (
-     *  "ref",
-     *  "id" => "optional",
-     *  "stock" => array(
-     *          "optional",
-     *          "default" => 10
-     *          )
-     * );
+     * public function getArgDefinitions()
+     * {
+     *  return new ArgumentCollection(
+     *       Argument::createIntListTypeArgument('id'),
+     *           new Argument(
+     *           'ref',
+     *           new TypeCollection(
+     *               new Type\AlphaNumStringListType()
+     *           )
+     *       ),
+     *       Argument::createIntListTypeArgument('category'),
+     *       Argument::createBooleanTypeArgument('new'),
+     *       Argument::createBooleanTypeArgument('promo'),
+     *       Argument::createFloatTypeArgument('min_price'),
+     *       Argument::createFloatTypeArgument('max_price'),
+     *       Argument::createIntTypeArgument('min_stock'),
+     *       Argument::createFloatTypeArgument('min_weight'),
+     *       Argument::createFloatTypeArgument('max_weight'),
+     *       Argument::createBooleanTypeArgument('current'),
+     *
+     *   );
+     * }
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */

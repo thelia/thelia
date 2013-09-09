@@ -34,6 +34,7 @@
         <loop class="Thelia\Core\Template\Loop\Image" name="image"/>
         <loop class="Thelia\Core\Template\Loop\Config" name="config"/>
         <loop class="Thelia\Core\Template\Loop\Message" name="message"/>
+        <loop class="Thelia\Core\Template\Loop\Delivery" name="delivery"/>
     </loops>
 
     <forms>
@@ -47,7 +48,10 @@
         <form name="thelia.address.update" class="Thelia\Form\AddressUpdateForm" />
 
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
-        <form name="thelia.admin.category.deletion" class="Thelia\Form\CategoryDeletionForm"/>
+        <form name="thelia.admin.category.deletion" class="Thelia\Form\CategoryModificationForm"/>
+
+        <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
+        <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
 
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
 
@@ -79,7 +83,6 @@
 
         <service id="thelia.url.manager" class="Thelia\Tools\URL">
             <argument type="service" id="service_container" />
-            <argument >%kernel.environment%</argument>
         </service>
 
         <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher">
@@ -98,7 +101,7 @@
 		<!--  Translation and internationalisation -->
 
 		<service id="thelia.translator" class="Thelia\Core\Translation\Translator">
-			<argument type="string" id="en_US"></argument>
+			<argument type="string" id="en_UK"></argument>
 		</service>
 
 		<!-- Security context for front and back office -->

@@ -9,7 +9,6 @@
     },
     "require":{
         "php": ">=5.4",
-        "ezyang/htmlpurifier": "dev-master",
         "ircmaxell/password-compat": "dev-master",
         "propel/propel": "dev-master",
         "psr/log" : "1.0",
@@ -41,7 +40,8 @@
     },
     "require-dev" : {
         "phpunit/phpunit": "3.7.*",
-        "fzaninotto/faker": "dev-master"
+        "fzaninotto/faker": "dev-master",
+        "maximebf/debugbar": "1.*"
     },
     "minimum-stability": "stable",
     "config" : {

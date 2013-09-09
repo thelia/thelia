@@ -24,7 +24,9 @@
 
 namespace Thelia\Module;
 
-abstract class BaseModule
+use Symfony\Component\DependencyInjection\ContainerAware;
+
+abstract class BaseModule extends ContainerAware
 {
 
     public function __construct()
@@ -35,6 +37,19 @@ abstract class BaseModule
     protected function activate()
     {
 
+    }
+
+    public function hasContainer()
+    {
+        return null === $this->container;
+    }
+
+    public function getContainer()
+    {
+        if($this->hasContainer() === false) {
+            throw new \RuntimeException("Sorry, container his not available in this context");
+        }
+        return $this->container;
     }
 
     abstract public function install();

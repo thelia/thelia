@@ -27,6 +27,7 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery orderByType($order = Criteria::ASC) Order by the type column
  * @method     ChildModuleQuery orderByActivate($order = Criteria::ASC) Order by the activate column
  * @method     ChildModuleQuery orderByPosition($order = Criteria::ASC) Order by the position column
+ * @method     ChildModuleQuery orderByFullNamespace($order = Criteria::ASC) Order by the full_namespace column
  * @method     ChildModuleQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildModuleQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -35,6 +36,7 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery groupByType() Group by the type column
  * @method     ChildModuleQuery groupByActivate() Group by the activate column
  * @method     ChildModuleQuery groupByPosition() Group by the position column
+ * @method     ChildModuleQuery groupByFullNamespace() Group by the full_namespace column
  * @method     ChildModuleQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildModuleQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -58,6 +60,7 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModule findOneByType(int $type) Return the first ChildModule filtered by the type column
  * @method     ChildModule findOneByActivate(int $activate) Return the first ChildModule filtered by the activate column
  * @method     ChildModule findOneByPosition(int $position) Return the first ChildModule filtered by the position column
+ * @method     ChildModule findOneByFullNamespace(string $full_namespace) Return the first ChildModule filtered by the full_namespace column
  * @method     ChildModule findOneByCreatedAt(string $created_at) Return the first ChildModule filtered by the created_at column
  * @method     ChildModule findOneByUpdatedAt(string $updated_at) Return the first ChildModule filtered by the updated_at column
  *
@@ -66,6 +69,7 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     array findByType(int $type) Return ChildModule objects filtered by the type column
  * @method     array findByActivate(int $activate) Return ChildModule objects filtered by the activate column
  * @method     array findByPosition(int $position) Return ChildModule objects filtered by the position column
+ * @method     array findByFullNamespace(string $full_namespace) Return ChildModule objects filtered by the full_namespace column
  * @method     array findByCreatedAt(string $created_at) Return ChildModule objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildModule objects filtered by the updated_at column
  *
@@ -156,7 +160,7 @@ abstract class ModuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, TYPE, ACTIVATE, POSITION, CREATED_AT, UPDATED_AT FROM module WHERE ID = :p0';
+        $sql = 'SELECT ID, CODE, TYPE, ACTIVATE, POSITION, FULL_NAMESPACE, CREATED_AT, UPDATED_AT FROM module WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -436,6 +440,35 @@ abstract class ModuleQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ModuleTableMap::POSITION, $position, $comparison);
+    }
+
+    /**
+     * Filter the query on the full_namespace column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByFullNamespace('fooValue');   // WHERE full_namespace = 'fooValue'
+     * $query->filterByFullNamespace('%fooValue%'); // WHERE full_namespace LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $fullNamespace The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildModuleQuery The current query, for fluid interface
+     */
+    public function filterByFullNamespace($fullNamespace = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($fullNamespace)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $fullNamespace)) {
+                $fullNamespace = str_replace('*', '%', $fullNamespace);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ModuleTableMap::FULL_NAMESPACE, $fullNamespace, $comparison);
     }
 
     /**

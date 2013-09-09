@@ -803,6 +803,7 @@ CREATE TABLE `module`
     `type` TINYINT NOT NULL,
     `activate` TINYINT,
     `position` INTEGER,
+    `full_namespace` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),

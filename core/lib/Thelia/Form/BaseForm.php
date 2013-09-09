@@ -141,6 +141,8 @@ abstract class BaseForm
     public function createView()
     {
         $this->view = $this->form->createView();
+
+        return $this;
     }
 
     public function getView()
@@ -159,6 +161,8 @@ abstract class BaseForm
     public function setError($has_error = true)
     {
         $this->has_error = $has_error;
+
+        return $this;
     }
 
     /**
@@ -180,6 +184,8 @@ abstract class BaseForm
     {
         $this->setError(true);
         $this->error_message = $message;
+
+        return $this;
     }
 
     /**

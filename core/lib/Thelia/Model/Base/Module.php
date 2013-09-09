@@ -90,6 +90,12 @@ abstract class Module implements ActiveRecordInterface
     protected $position;
 
     /**
+     * The value for the full_namespace field.
+     * @var        string
+     */
+    protected $full_namespace;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -457,6 +463,17 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
+     * Get the [full_namespace] column value.
+     *
+     * @return   string
+     */
+    public function getFullNamespace()
+    {
+
+        return $this->full_namespace;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -602,6 +619,27 @@ abstract class Module implements ActiveRecordInterface
     } // setPosition()
 
     /**
+     * Set the value of [full_namespace] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function setFullNamespace($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->full_namespace !== $v) {
+            $this->full_namespace = $v;
+            $this->modifiedColumns[] = ModuleTableMap::FULL_NAMESPACE;
+        }
+
+
+        return $this;
+    } // setFullNamespace()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -695,13 +733,16 @@ abstract class Module implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ModuleTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ModuleTableMap::translateFieldName('FullNamespace', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->full_namespace = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -714,7 +755,7 @@ abstract class Module implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = ModuleTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = ModuleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Module object", 0, $e);
@@ -987,6 +1028,9 @@ abstract class Module implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleTableMap::POSITION)) {
             $modifiedColumns[':p' . $index++]  = 'POSITION';
         }
+        if ($this->isColumnModified(ModuleTableMap::FULL_NAMESPACE)) {
+            $modifiedColumns[':p' . $index++]  = 'FULL_NAMESPACE';
+        }
         if ($this->isColumnModified(ModuleTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -1018,6 +1062,9 @@ abstract class Module implements ActiveRecordInterface
                         break;
                     case 'POSITION':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
+                        break;
+                    case 'FULL_NAMESPACE':
+                        $stmt->bindValue($identifier, $this->full_namespace, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1103,9 +1150,12 @@ abstract class Module implements ActiveRecordInterface
                 return $this->getPosition();
                 break;
             case 5:
-                return $this->getCreatedAt();
+                return $this->getFullNamespace();
                 break;
             case 6:
+                return $this->getCreatedAt();
+                break;
+            case 7:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1142,8 +1192,9 @@ abstract class Module implements ActiveRecordInterface
             $keys[2] => $this->getType(),
             $keys[3] => $this->getActivate(),
             $keys[4] => $this->getPosition(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[5] => $this->getFullNamespace(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1208,9 +1259,12 @@ abstract class Module implements ActiveRecordInterface
                 $this->setPosition($value);
                 break;
             case 5:
-                $this->setCreatedAt($value);
+                $this->setFullNamespace($value);
                 break;
             case 6:
+                $this->setCreatedAt($value);
+                break;
+            case 7:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1242,8 +1296,9 @@ abstract class Module implements ActiveRecordInterface
         if (array_key_exists($keys[2], $arr)) $this->setType($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setActivate($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[5], $arr)) $this->setFullNamespace($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
     }
 
     /**
@@ -1260,6 +1315,7 @@ abstract class Module implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleTableMap::TYPE)) $criteria->add(ModuleTableMap::TYPE, $this->type);
         if ($this->isColumnModified(ModuleTableMap::ACTIVATE)) $criteria->add(ModuleTableMap::ACTIVATE, $this->activate);
         if ($this->isColumnModified(ModuleTableMap::POSITION)) $criteria->add(ModuleTableMap::POSITION, $this->position);
+        if ($this->isColumnModified(ModuleTableMap::FULL_NAMESPACE)) $criteria->add(ModuleTableMap::FULL_NAMESPACE, $this->full_namespace);
         if ($this->isColumnModified(ModuleTableMap::CREATED_AT)) $criteria->add(ModuleTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ModuleTableMap::UPDATED_AT)) $criteria->add(ModuleTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1329,6 +1385,7 @@ abstract class Module implements ActiveRecordInterface
         $copyObj->setType($this->getType());
         $copyObj->setActivate($this->getActivate());
         $copyObj->setPosition($this->getPosition());
+        $copyObj->setFullNamespace($this->getFullNamespace());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1876,6 +1933,7 @@ abstract class Module implements ActiveRecordInterface
         $this->type = null;
         $this->activate = null;
         $this->position = null;
+        $this->full_namespace = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

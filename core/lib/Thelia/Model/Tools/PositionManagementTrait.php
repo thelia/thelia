@@ -55,7 +55,7 @@ trait PositionManagementTrait {
             ->orderByPosition(Criteria::DESC)
             ->limit(1);
 
-            if ($parent !== null) $last->filterByParent($parent);
+            if ($parent !== null) $query->filterByParent($parent);
 
             $last = $query->findOne()
         ;

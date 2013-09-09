@@ -60,4 +60,11 @@
         <default key="_view">cart</default>
     </route>
 
+    <!-- order management process -->
+    <route id="order.delivery.add" path="/delivery/choose/{delivery_id}">
+        <default key="_controller">Thelia\Controller\Front\DeliveryController::select</default>
+        <requirement key="delivery_id">\d+</requirement>
+    </route>
+    <!-- end order management process -->
+
 </routes>

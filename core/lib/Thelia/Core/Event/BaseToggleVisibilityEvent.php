@@ -23,6 +23,26 @@
 
 namespace Thelia\Core\Event;
 
-class CurrencyUpdatePositionEvent extends BaseUpdatePositionEvent
+
+class BaseToggleVisibilityEvent  extends ActionEvent
 {
+    protected $object_id;
+
+    protected $object;
+
+    public function __construct($object_id)
+    {
+        $this->object_id = $object_id;
+    }
+
+    public function getObjectId()
+    {
+        return $this->object_id;
+    }
+
+    public function setObjectId($object_id)
+    {
+        $this->object_id = $object_id;
+        return $this;
+    }
 }

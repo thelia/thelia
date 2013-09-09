@@ -43,7 +43,7 @@ use Thelia\Form\MessageCreationForm;
 class AttributeController extends BaseAdminController
 {
     /**
-     * The default action is displaying the messages list.
+     * The default action is displaying the attributes list.
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
@@ -51,7 +51,13 @@ class AttributeController extends BaseAdminController
 
         if (null !== $response = $this->checkAuth("admin.configuration.attributes.view")) return $response;
 
-        return $this->render('product_attributes');
+        return $this->render('product-attributes');
     }
 
+    public function updateAction() {
+
+        if (null !== $response = $this->checkAuth("admin.configuration.attributes.update")) return $response;
+
+        return $this->render('product-attributes-edit');
+    }
 }
