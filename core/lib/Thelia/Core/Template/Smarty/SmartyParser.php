@@ -90,8 +90,8 @@ class SmartyParser extends Smarty implements ParserInterface
 
     public function preThelia($tpl_source, \Smarty_Internal_Template $template)
     {
-        $new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9\-_]*)(.*)}`', '{\$$1$2}', $tpl_source);
-        $new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9\-_]*)`', '{\$$1|dieseCanceller:\'#$1\'}', $new_source);
+        $new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9_]*)(.*)}`', '{\$$1$2}', $tpl_source);
+        $new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9_]*)`', '{\$$1|dieseCanceller:\'#$1\'}', $new_source);
 
         return $new_source;
     }
