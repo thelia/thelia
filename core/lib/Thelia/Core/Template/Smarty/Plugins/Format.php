@@ -113,9 +113,15 @@ class Format extends AbstractSmartyPlugin
             throw new SmartyPluginException("number is a mandatory parameter in format_number function");
         }
 
+        $number = $params["number"];
+
+        if(empty($number)) {
+            return "";
+        }
+
         $lang = $this->request->getSession()->getLang();
 
-        $number = $params["number"];
+
         $decimals = array_key_exists("decimals", $params) ? $params["decimals"] : $lang->getDecimals();
         $decPoint = array_key_exists("dec_point", $params) ? $params["dec_point"] : $lang->getDecimalSeparator();
         $thousandsSep = array_key_exists("thousands_sep", $params) ? $params["thousands_sep"] : $lang->getThousandsSeparator();

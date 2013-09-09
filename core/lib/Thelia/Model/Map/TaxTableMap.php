@@ -160,7 +160,7 @@ class TaxTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('TaxRuleCountry', '\\Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'tax_id', ), 'SET NULL', 'RESTRICT', 'TaxRuleCountries');
+        $this->addRelation('TaxRuleCountry', '\\Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'tax_id', ), 'CASCADE', 'RESTRICT', 'TaxRuleCountries');
         $this->addRelation('TaxI18n', '\\Thelia\\Model\\TaxI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'TaxI18ns');
     } // buildRelations()
 

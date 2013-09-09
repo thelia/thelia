@@ -1631,7 +1631,10 @@ abstract class Country implements ActiveRecordInterface
         $taxRuleCountriesToDelete = $this->getTaxRuleCountries(new Criteria(), $con)->diff($taxRuleCountries);
 
 
-        $this->taxRuleCountriesScheduledForDeletion = $taxRuleCountriesToDelete;
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->taxRuleCountriesScheduledForDeletion = clone $taxRuleCountriesToDelete;
 
         foreach ($taxRuleCountriesToDelete as $taxRuleCountryRemoved) {
             $taxRuleCountryRemoved->setCountry(null);
@@ -1724,7 +1727,7 @@ abstract class Country implements ActiveRecordInterface
                 $this->taxRuleCountriesScheduledForDeletion = clone $this->collTaxRuleCountries;
                 $this->taxRuleCountriesScheduledForDeletion->clear();
             }
-            $this->taxRuleCountriesScheduledForDeletion[]= $taxRuleCountry;
+            $this->taxRuleCountriesScheduledForDeletion[]= clone $taxRuleCountry;
             $taxRuleCountry->setCountry(null);
         }
 

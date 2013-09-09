@@ -383,6 +383,7 @@ function createProduct($faker, $category, $position, &$productIdList)
     $product->addCategory($category);
     $product->setVisible(rand(1, 10)>7 ? 0 : 1);
     $product->setPosition($position);
+    $product->setTaxRuleId(1);
     setI18n($faker, $product);
 
     $product->save();

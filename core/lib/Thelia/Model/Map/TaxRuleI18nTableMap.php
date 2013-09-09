@@ -57,7 +57,7 @@ class TaxRuleI18nTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class TaxRuleI18nTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
      * the column name for the ID field
@@ -78,6 +78,16 @@ class TaxRuleI18nTableMap extends TableMap
      * the column name for the LOCALE field
      */
     const LOCALE = 'tax_rule_i18n.LOCALE';
+
+    /**
+     * the column name for the TITLE field
+     */
+    const TITLE = 'tax_rule_i18n.TITLE';
+
+    /**
+     * the column name for the DESCRIPTION field
+     */
+    const DESCRIPTION = 'tax_rule_i18n.DESCRIPTION';
 
     /**
      * The default string format for model objects of the related table
@@ -91,12 +101,12 @@ class TaxRuleI18nTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Locale', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'locale', ),
-        self::TYPE_COLNAME       => array(TaxRuleI18nTableMap::ID, TaxRuleI18nTableMap::LOCALE, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', ),
-        self::TYPE_FIELDNAME     => array('id', 'locale', ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id', 'Locale', 'Title', 'Description', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'locale', 'title', 'description', ),
+        self::TYPE_COLNAME       => array(TaxRuleI18nTableMap::ID, TaxRuleI18nTableMap::LOCALE, TaxRuleI18nTableMap::TITLE, TaxRuleI18nTableMap::DESCRIPTION, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', 'TITLE', 'DESCRIPTION', ),
+        self::TYPE_FIELDNAME     => array('id', 'locale', 'title', 'description', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -106,12 +116,12 @@ class TaxRuleI18nTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, ),
-        self::TYPE_COLNAME       => array(TaxRuleI18nTableMap::ID => 0, TaxRuleI18nTableMap::LOCALE => 1, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, ),
-        self::TYPE_NUM           => array(0, 1, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, 'Title' => 2, 'Description' => 3, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, ),
+        self::TYPE_COLNAME       => array(TaxRuleI18nTableMap::ID => 0, TaxRuleI18nTableMap::LOCALE => 1, TaxRuleI18nTableMap::TITLE => 2, TaxRuleI18nTableMap::DESCRIPTION => 3, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, 'TITLE' => 2, 'DESCRIPTION' => 3, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -132,6 +142,8 @@ class TaxRuleI18nTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'tax_rule', 'ID', true, null, null);
         $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_US');
+        $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
+        $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
     } // initialize()
 
     /**
@@ -331,9 +343,13 @@ class TaxRuleI18nTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(TaxRuleI18nTableMap::ID);
             $criteria->addSelectColumn(TaxRuleI18nTableMap::LOCALE);
+            $criteria->addSelectColumn(TaxRuleI18nTableMap::TITLE);
+            $criteria->addSelectColumn(TaxRuleI18nTableMap::DESCRIPTION);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.LOCALE');
+            $criteria->addSelectColumn($alias . '.TITLE');
+            $criteria->addSelectColumn($alias . '.DESCRIPTION');
         }
     }
 

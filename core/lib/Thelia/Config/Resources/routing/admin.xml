@@ -31,6 +31,14 @@
         <default key="_controller">Thelia\Controller\Admin\CategoryController::defaultAction</default>
     </route>
 
+    <!-- Customer rule management -->
+
+    <route id="admin.customers" path="/admin/customers">
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::indexAction</default>
+    </route>
+
+    <!-- end Customer rule management -->
+
     <!-- Categories management -->
 
     <route id="admin.categories.default" path="/admin/categories">
