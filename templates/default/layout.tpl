@@ -30,6 +30,8 @@ URL: http://www.thelia.net
     {stylesheets file='assets/less/styles.less' filters='less,cssembed'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
+
+    {block name="stylesheet"}{/block}
 </head>
 
 <body class="page-home" itemscope itemtype="http://schema.org/WebPage">
@@ -143,9 +145,9 @@ URL: http://www.thelia.net
 </div><!-- /.header-container -->
 
 <main class="main-container" role="main">
-<div class="container">
-    {block name="main-content"}{/block}
-</div><!-- /.container -->
+    <div class="container">
+        {block name="main-content"}{/block}
+    </div><!-- /.container -->
 </main><!-- /.main-container -->
 
 <section class="footer-container" itemscope itemtype="http://schema.org/WPFooter">
