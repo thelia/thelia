@@ -65,9 +65,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->setTemplate($template ?: ConfigQuery::read('active-template', 'default'));
 
         $this->debugging = $debug;
-
-        $this->escape_html = true;
-
+        
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
@@ -86,6 +84,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
         $this->registerFilter('pre', array($this, "preThelia"));
         $this->registerFilter('output', array($this, "removeBlankLines"));
+        $this->registerFilter('variable', array(__CLASS__, "theliaEscape"));
     }
 
     public function preThelia($tpl_source, \Smarty_Internal_Template $template)
@@ -99,6 +98,15 @@ class SmartyParser extends Smarty implements ParserInterface
     public function removeBlankLines($tpl_source, \Smarty_Internal_Template $template)
     {
         return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $tpl_source);
+    }
+
+    public static function theliaEscape($content, $smarty)
+    {
+        if(!is_object($content)) {
+            return htmlspecialchars($content ,ENT_QUOTES, Smarty::$_CHARSET);
+        } else {
+            return $content;
+        }
     }
 
     public function setTemplate($template_path_from_template_base)
