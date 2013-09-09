@@ -29,7 +29,7 @@ use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\Operators;
 use Thelia\Coupon\Type\RemoveXAmountManager;
 
-require_once '../CouponManagerTest.php';
+//require_once '../CouponManagerTest.php';
 
 /**
  * Created by JetBrains PhpStorm.

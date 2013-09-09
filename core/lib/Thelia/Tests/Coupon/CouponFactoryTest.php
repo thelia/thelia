@@ -203,29 +203,29 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function generateValidRules()
     {
-        $rule1 = new AvailableForTotalAmount(
-            , array(
-                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
-                    Operators::SUPERIOR,
-                    new PriceParam(
-                        , 40.00, 'EUR'
-                    )
-                )
-            )
-        );
-        $rule2 = new AvailableForTotalAmount(
-            , array(
-                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
-                    Operators::INFERIOR,
-                    new PriceParam(
-                        , 400.00, 'EUR'
-                    )
-                )
-            )
-        );
-        $rules = new CouponRuleCollection(array($rule1, $rule2));
-
-        return $rules;
+//        $rule1 = new AvailableForTotalAmount(
+//            , array(
+//                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
+//                    Operators::SUPERIOR,
+//                    new PriceParam(
+//                        , 40.00, 'EUR'
+//                    )
+//                )
+//            )
+//        );
+//        $rule2 = new AvailableForTotalAmount(
+//            , array(
+//                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
+//                    Operators::INFERIOR,
+//                    new PriceParam(
+//                        , 400.00, 'EUR'
+//                    )
+//                )
+//            )
+//        );
+//        $rules = new CouponRuleCollection(array($rule1, $rule2));
+//
+//        return $rules;
     }
 
     /**

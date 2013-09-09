@@ -24,14 +24,14 @@
 namespace Thelia\Coupon;
 
 use PHPUnit_Framework_TestCase;
-use Thelia\Constraint\Rule\AvailableForTotalAmount;
+use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\Operators;
 use Thelia\Constraint\Validator\PriceParam;
 use Thelia\Constraint\Validator\RuleValidator;
 use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Coupon\Type\RemoveXPercent;
+use Thelia\Coupon\Type\RemoveXPercentManager;
 
-require_once '../CouponManagerTest.php';
+//require_once '../CouponManagerTest.php';
 
 /**
  * Created by JetBrains PhpStorm.
