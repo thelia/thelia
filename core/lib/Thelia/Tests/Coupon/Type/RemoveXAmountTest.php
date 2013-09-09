@@ -25,9 +25,9 @@ namespace Thelia\Coupon;
 
 use Thelia\Constraint\Validator\PriceParam;
 use Thelia\Constraint\Validator\RuleValidator;
-use Thelia\Constraint\Rule\AvailableForTotalAmount;
+use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\Operators;
-use Thelia\Coupon\Type\RemoveXAmount;
+use Thelia\Coupon\Type\RemoveXAmountManager;
 
 require_once '../CouponManagerTest.php';
 
@@ -56,10 +56,10 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Test if a Coupon is well displayed
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getCode
-     * @covers Thelia\Coupon\type\RemoveXAmount::getTitle
-     * @covers Thelia\Coupon\type\RemoveXAmount::getShortDescription
-     * @covers Thelia\Coupon\type\RemoveXAmount::getDescription
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::getCode
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::getTitle
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::getShortDescription
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::getDescription
      *
      */
     public function testDisplay()
@@ -86,7 +86,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Test if a Coupon can be Cumulative
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::isCumulative
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::isCumulative
      *
      */
     public function testIsCumulative()
@@ -100,7 +100,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test if a Coupon can be non cumulative
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::isCumulative
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::isCumulative
      *
      */
     public function testIsNotCumulative()
@@ -115,7 +115,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test if a Coupon can remove postage
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::isRemovingPostage
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::isRemovingPostage
      *
      */
     public function testIsRemovingPostage()
@@ -129,7 +129,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Test if a Coupon won't remove postage if not set to
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::isRemovingPostage
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::isRemovingPostage
      */
     public function testIsNotRemovingPostage()
     {
@@ -143,7 +143,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Test if a Coupon has the effect expected (discount 10euros)
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::getEffect
      */
     public function testGetEffect()
     {
@@ -158,8 +158,8 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon rule setter
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::setRules
-     * @covers Thelia\Coupon\type\RemoveXAmount::getRules
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::setRules
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::getRules
      */
     public function testSetRulesValid()
     {
@@ -190,7 +190,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon rule setter
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::setRules
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::setRules
      * @expectedException \Thelia\Exception\InvalidRuleException
      *
      */
@@ -216,7 +216,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon effect for rule Total Amount < 400
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::getEffect
      *
      */
     public function testGetEffectIfTotalAmountInferiorTo400Valid()
@@ -241,7 +241,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon effect for rule Total Amount <= 400
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::getEffect
      *
      */
     public function testGetEffectIfTotalAmountInferiorOrEqualTo400Valid()
@@ -266,7 +266,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon effect for rule Total Amount == 400
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::getEffect
      *
      */
     public function testGetEffectIfTotalAmountEqualTo400Valid()
@@ -291,7 +291,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon effect for rule Total Amount >= 400
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::getEffect
      *
      */
     public function testGetEffectIfTotalAmountSuperiorOrEqualTo400Valid()
@@ -316,7 +316,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon effect for rule Total Amount > 400
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     * @covers Thelia\Coupon\type\RemoveXAmountManager::getEffect
      *
      */
     public function testGetEffectIfTotalAmountSuperiorTo400Valid()

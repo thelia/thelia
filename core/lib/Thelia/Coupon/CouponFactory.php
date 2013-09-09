@@ -23,7 +23,9 @@
 
 namespace Thelia\Coupon;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
+use Thelia\Constraint\ConstraintFactory;
 use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\CouponExpiredException;
@@ -44,17 +46,21 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
  */
 class CouponFactory
 {
+    /** @var ContainerInterface Service Container */
+    protected $container = null;
+
     /** @var  CouponAdapterInterface Provide necessary value from Thelia*/
     protected $adapter;
 
     /**
      * Constructor
      *
-     * @param CouponAdapterInterface $adapter Provide necessary value from Thelia
+     * @param ContainerInterface $container Service container
      */
-    function __construct(CouponAdapterInterface $adapter)
+    function __construct(ContainerInterface $container)
     {
-        $this->adapter = $adapter;
+        $this->container = $container;
+        $this->adapter = $container->get('thelia.adapter');
     }
 
     /**
@@ -102,10 +108,15 @@ class CouponFactory
     {
         $isCumulative = ($model->getIsCumulative() == 1 ? true : false);
         $isRemovingPostage = ($model->getIsRemovingPostage() == 1 ? true : false);
-        $couponClass = $model->getType();
 
-        /** @var CouponInterface $coupon*/
-        $coupon = new $couponClass(
+        if (!$this->container->has($model->getType())) {
+            return false;
+        }
+
+        /** @var CouponInterface $couponManager*/
+        $couponManager = $this->container->get($model->getType());
+        $couponManager->set(
+            $this->adapter,
             $model->getCode(),
             $model->getTitle(),
             $model->getShortDescription(),
@@ -119,12 +130,15 @@ class CouponFactory
             $model->getExpirationDate()
         );
 
-        /** @var CouponRuleCollection $rules */
-        $rules = unserialize(base64_decode($model->getSerializedRules()));
+        /** @var ConstraintFactory $constraintFactory */
+        $constraintFactory = $this->container->get('thelia.constraint.factory');
+        $rules = $constraintFactory->unserializeCouponRuleCollection(
+            $model->getSerializedRules()
+        );
 
-        $coupon->setRules($rules);
+        $couponManager->setRules($rules);
 
-        return $coupon;
+        return $couponManager;
     }
 
 

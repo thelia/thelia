@@ -297,4 +297,22 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
 //        return $this;
 //    }
 
+    /**
+     * Generate inputs ready to be drawn
+     *
+     * @return array
+     */
+    protected function generateInputs()
+    {
+        return array(
+            self::INPUT1 => array(
+                'availableOperators' => $this->availableOperators[self::INPUT1],
+                'type' => 'text',
+                'class' => 'form-control',
+                'value' => '',
+                'selectedOperator' => ''
+            )
+        );
+    }
+
 }

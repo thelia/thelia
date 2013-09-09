@@ -24,6 +24,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Router;
 use Thelia\Constraint\ConstraintFactory;
 use Thelia\Constraint\ConstraintFactoryTest;
 use Thelia\Constraint\Rule\AvailableForTotalAmount;
@@ -38,7 +39,9 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
+use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\CouponRuleCollection;
+use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Form\CouponCreationForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -142,7 +145,7 @@ class CouponController extends BaseAdminController
 
         $i18n = new I18n();
         /** @var Lang $lang */
-        $lang = $this->getSession()->get('lang');
+        $lang = $this->getSession()->getLang();
         $eventToDispatch = TheliaEvents::COUPON_UPDATE;
 
         if ($this->getRequest()->isMethod('POST')) {
@@ -172,14 +175,16 @@ class CouponController extends BaseAdminController
                 'locale' => $coupon->getLocale(),
             );
 
-            /** @var CouponAdapterInterface $adapter */
-            $adapter = $this->container->get('thelia.adapter');
-            /** @var Translator $translator */
-            $translator = $this->container->get('thelia.translator');
-
             $args['rulesObject'] = array();
+
+            /** @var ConstraintFactory $constraintFactory */
+            $constraintFactory = $this->container->get('thelia.constraint.factory');
+            $rules = $constraintFactory->unserializeCouponRuleCollection(
+                $coupon->getSerializedRules()
+            );
+
             /** @var CouponRuleInterface $rule */
-            foreach ($coupon->getRules()->getRules() as $rule) {
+            foreach ($rules as $rule) {
                 $args['rulesObject'][] = array(
                     'name' => $rule->getName(),
                     'tooltip' => $rule->getToolTip(),
@@ -193,6 +198,15 @@ class CouponController extends BaseAdminController
             // Pass it to the parser
             $this->getParserContext()->addForm($changeForm);
         }
+
+        $args['availableCoupons'] = $this->getAvailableCoupons();
+        $args['availableRules'] = $this->getAvailableRules();
+        $args['urlAjaxGetRuleInput'] = $this->getRouteFromRouter(
+            'router.admin',
+            'admin.coupon.rule.input',
+            array('ruleId' => 'ruleId'),
+            Router::ABSOLUTE_URL
+        );
 
         $args['formAction'] = 'admin/coupon/update/' . $couponId;
 
@@ -489,6 +503,52 @@ class CouponController extends BaseAdminController
         return $this;
     }
 
+    /**
+     * Get all available rules
+     *
+     * @return array
+     */
+    protected function getAvailableRules()
+    {
+        /** @var CouponManager $couponManager */
+        $couponManager = $this->container->get('thelia.coupon.manager');
+        $availableRules = $couponManager->getAvailableRules();
+        $cleanedRules = array();
+        /** @var CouponRuleInterface $availableRule */
+        foreach ($availableRules as $availableRule) {
+            $rule = array();
+            $rule['serviceId'] = $availableRule->getServiceId();
+            $rule['name'] = $availableRule->getName();
+            $rule['toolTip'] = $availableRule->getToolTip();
+            $cleanedRules[] = $rule;
+        }
+
+        return $cleanedRules;
+    }
+
+    /**
+     * Get all available coupons
+     *
+     * @return array
+     */
+    protected function getAvailableCoupons()
+    {
+        /** @var CouponManager $couponManager */
+        $couponManager = $this->container->get('thelia.coupon.manager');
+        $availableCoupons = $couponManager->getAvailableCoupons();
+        $cleanedRules = array();
+        /** @var CouponInterface $availableCoupon */
+        foreach ($availableCoupons as $availableCoupon) {
+            $rule = array();
+            $rule['serviceId'] = $availableCoupon->getServiceId();
+            $rule['name'] = $availableCoupon->getName();
+            $rule['toolTip'] = $availableCoupon->getToolTip();
+            $cleanedRules[] = $rule;
+        }
+
+        return $cleanedRules;
+    }
+
 //    /**
 //     * Validation Rule creation
 //     *
@@ -510,5 +570,7 @@ class CouponController extends BaseAdminController
 //            return false;
 //        }
 //    }
+
+
 
 }

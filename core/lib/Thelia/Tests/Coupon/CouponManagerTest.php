@@ -25,10 +25,10 @@ namespace Thelia\Coupon;
 
 use Thelia\Constraint\Validator\PriceParam;
 use Thelia\Constraint\Validator\RuleValidator;
-use Thelia\Constraint\Rule\AvailableForTotalAmount;
+use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\Operators;
 use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Coupon\Type\RemoveXAmount;
+use Thelia\Coupon\Type\RemoveXAmountManager;
 use Thelia\Tools\PhpUnitUtils;
 
 /**

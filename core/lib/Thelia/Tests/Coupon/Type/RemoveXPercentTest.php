@@ -58,7 +58,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     /**
      * Test if a Coupon can be Cumulative
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::isCumulative
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::isCumulative
      *
      */
     public function testIsCumulative()
@@ -72,7 +72,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test if a Coupon can be non cumulative
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::isCumulative
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::isCumulative
      *
      */
     public function testIsNotCumulative()
@@ -87,7 +87,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test if a Coupon can remove postage
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::isRemovingPostage
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::isRemovingPostage
      *
      */
     public function testIsRemovingPostage()
@@ -101,7 +101,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     /**
      * Test if a Coupon won't remove postage if not set to
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::isRemovingPostage
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::isRemovingPostage
      */
     public function testIsNotRemovingPostage()
     {
@@ -115,7 +115,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     /**
      * Test if a Coupon has the effect expected (discount 10euros)
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::getEffect
      */
     public function testGetEffect()
     {
@@ -130,8 +130,8 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon rule setter
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::setRules
-     * @covers Thelia\Coupon\type\RemoveXAmount::getRules
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::setRules
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::getRules
      */
     public function testSetRulesValid()
     {
@@ -162,7 +162,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon rule setter
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::setRules
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::setRules
      * @expectedException \Thelia\Exception\InvalidRuleException
      *
      */
@@ -188,7 +188,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon effect for rule Total Amount < 400
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::getEffect
      *
      */
     public function testGetEffectIfTotalAmountInferiorTo400Valid()
@@ -212,7 +212,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon effect for rule Total Amount <= 400
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::getEffect
      *
      */
     public function testGetEffectIfTotalAmountInferiorOrEqualTo400Valid()
@@ -236,7 +236,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon effect for rule Total Amount == 400
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::getEffect
      *
      */
     public function testGetEffectIfTotalAmountEqualTo400Valid()
@@ -260,7 +260,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon effect for rule Total Amount >= 400
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::getEffect
      *
      */
     public function testGetEffectIfTotalAmountSuperiorOrEqualTo400Valid()
@@ -284,7 +284,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     /**
      * Test Coupon effect for rule Total Amount > 400
      *
-     * @covers Thelia\Coupon\type\RemoveXAmount::getEffect
+     * @covers Thelia\Coupon\type\RemoveXPercentManager::getEffect
      *
      */
     public function testGetEffectIfTotalAmountSuperiorTo400Valid()

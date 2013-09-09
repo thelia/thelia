@@ -32,6 +32,8 @@ use Thelia\Constraint\Validator\RuleValidator;
 use Thelia\Exception\InvalidRuleException;
 use Thelia\Exception\InvalidRuleOperatorException;
 use Thelia\Exception\InvalidRuleValueException;
+use Thelia\Model\Currency;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Type\FloatType;
 
 /**
@@ -297,7 +299,7 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
      */
     public function getName()
     {
-        return $this->adapter->get('thelia.translator')->trans(
+        return $this->translator->trans(
             'Cart total amount',
             array(),
             'constraint'
@@ -326,6 +328,40 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
         );
 
         return $toolTip;
+    }
+
+    /**
+     * Generate inputs ready to be drawn
+     *
+     * @return array
+     */
+    protected function generateInputs()
+    {
+        $currencies = CurrencyQuery::create()->find();
+        $cleanedCurrencies = array();
+        /** @var Currency $currency */
+        foreach ($currencies as $currency) {
+            $cleanedCurrencies[$currency->getCode()] = $currency->getSymbol();
+        }
+
+        return array(
+            self::INPUT1 => array(
+                'availableOperators' => $this->availableOperators[self::INPUT1],
+                'availableValues' => '',
+                'type' => 'text',
+                'class' => 'form-control',
+                'value' => '',
+                'selectedOperator' => ''
+            ),
+            self::INPUT2 => array(
+                'availableOperators' => $this->availableOperators[self::INPUT2],
+                'availableValues' => $cleanedCurrencies,
+                'type' => 'select',
+                'class' => 'form-control',
+                'value' => '',
+                'selectedOperator' => Operators::EQUAL
+            )
+        );
     }
 
 //    /**

@@ -104,13 +104,13 @@
                             <label for="effect">{intl l='Effect :'}</label>
                             {form_field form=$form field='effect'}
                                 <select name="{$name}" value="{$value}" id="effect" class="col-md-12 form-control">
-                                    <option value="1" data-description="More description n°1 about item">Remove x percents for category Y</option>
-                                    <option value="2" data-description="More description n°2 about item">Remove x percents</option>
-                                    <option value="3" data-description="More description n°3 about item">Remove x amount</option>
+                                    {foreach from=$availableCoupons item=availableCoupon}
+                                        <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}">{$availableCoupon.name}</option>
+                                    {/foreach}
                                 </select>
                                 {if $error}{$message}{/if}
                             {/form_field}
-                            <span class="help-block">More description n°1 about item</span>
+                            <span id="effectToolTip" class="help-block">{$availableCoupons.0.toolTip}</span>
                         </div>
                     </div>
 
@@ -206,25 +206,11 @@
             </div>
 
             <div class="form-group col-md-4">
-                <label for="category-rule">{intl l='Rule\'s category :'}</label>
+                <label for="categoryRule">{intl l='Rule\'s category :'}</label>
                 <select name="categoryRule" id="category-rule" class="form-control">
-                    <option value="1" selected>Total amount</option>
-                    <option value="2">Date</option>
-                    <option value="3">NbArtFromCategory</option>
-                </select>
-
-                <label for="category-rule">Rule's category :</label>
-                <select name="categoryRule" id="category-rule" class="form-control">
-                    <option value="1">Total amount</option>
-                    <option value="2" selected>Date</option>
-                    <option value="3">NbArtFromCategory</option>
-                </select>
-
-                <label for="category-rule">Rule's category :</label>
-                <select name="categoryRule" id="category-rule" class="form-control">
-                    <option value="1">Total amount</option>
-                    <option value="2">Date</option>
-                    <option value="3" selected>NbArtFromCategory</option>
+                    {foreach from=$availableRules item=availableRule}
+                        <option value="{$availableRule.serviceId}" data-description="{$availableRule.toolTip}">{$availableRule.name}</option>
+                    {/foreach}
                 </select>
             </div>
 

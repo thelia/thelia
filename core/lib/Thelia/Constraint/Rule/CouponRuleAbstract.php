@@ -188,9 +188,35 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
      */
     public function getValidators()
     {
-        return array(
-            $this->operators,
-            $this->values
+        $this->validators = $this->generateInputs();
+
+        $translatedInputs = array();
+        foreach ($this->validators as $key => $validator) {
+            $translatedOperators = array();
+            foreach ($validator['availableOperators'] as $availableOperators) {
+                $translatedOperators[$availableOperators] = Operators::getI18n(
+                    $this->translator,
+                    $availableOperators
+                );
+            }
+
+            $validator['availableOperators'] = $translatedOperators;
+            $translatedInputs[$key] = $validator;
+        }
+
+        return $translatedInputs;
+    }
+
+    /**
+     * Generate inputs ready to be drawn
+     *
+     * @throws \Thelia\Exception\NotImplementedException
+     * @return array
+     */
+    protected function generateInputs()
+    {
+        throw new \Thelia\Exception\NotImplementedException(
+            'The generateInputs method must be implemented in ' . get_class()
         );
     }
 

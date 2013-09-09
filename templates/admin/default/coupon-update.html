@@ -36,6 +36,34 @@
     <script>
         $(function($){
             miniBrowser(0, '/test_to_remove/datas_coupon_edit.json');
+
+            $('#effect').on('change', function (e) {
+                var optionSelected = $("option:selected", this);
+                $('#effectToolTip').html(optionSelected.attr("data-description"));
+            });
+
+            $('#category-rule').on('change', function (e) {
+                var url = "{$urlAjaxGetRuleInput}";
+                url = url.replace('ruleId', $(this).val())
+                console.log(url);
+                $.ajax({
+                    url: url,
+                    statusCode: {
+                        404: function() {
+                            alert("page not found");
+                        }
+                    },
+                    context: document.body
+                }).done(function(data) {
+                    console.log(data);
+                    $(this).addClass("done");
+                });
+            });
+
+
         });
+
+
+
     </script>
 {/block}
