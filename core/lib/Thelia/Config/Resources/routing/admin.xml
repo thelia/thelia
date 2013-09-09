@@ -84,6 +84,9 @@
     <route id="admin.coupon.read" path="/admin/coupon/read/{couponId}">
         <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
     </route>
+    <route id="admin.coupon.rule.input" path="/admin/coupon/rule/{ruleId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::getRuleInputAction</default>
+    </route>
 
 
 

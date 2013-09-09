@@ -24,6 +24,8 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Constraint\ConstraintFactory;
+use Thelia\Constraint\ConstraintFactoryTest;
 use Thelia\Constraint\Rule\AvailableForTotalAmount;
 use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Constraint\Validator\PriceParam;
@@ -309,6 +311,39 @@ class CouponController extends BaseAdminController
         }
 
         return $this->render('coupon-read', array('couponId' => $couponId));
+    }
+
+    /**
+     * Manage Coupons read display
+     *
+     * @param int $couponId Coupon Id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getRuleInputAction($ruleId)
+    {
+        $this->checkAuth('ADMIN', 'admin.coupon.read');
+
+        // @todo uncomment
+//        if (!$this->getRequest()->isXmlHttpRequest()) {
+//            $this->redirect('index');
+//        }
+
+        /** @var ConstraintFactory $constraintFactory */
+        $constraintFactory = $this->container->get('thelia.constraint.factory');
+        $inputs = $constraintFactory->getInputs($ruleId);
+
+        if (!$inputs) {
+            return $this->pageNotFound();
+        }
+
+        return $this->render(
+            'coupon/rule-input-ajax',
+            array(
+                'ruleId' => $ruleId,
+                'inputs' => $inputs
+            )
+        );
     }
 
     /**

@@ -140,4 +140,23 @@ class ConstraintFactory
 
         return $rule;
     }
+
+    /**
+     * Get Coupon Rule inputs from serviceId
+     *
+     * @param string $ruleServiceId Rule class name
+     *
+     * @return array Ready to be drawn rule inputs
+     */
+    public function getInputs($ruleServiceId)
+    {
+        if (!$this->container->has($ruleServiceId)) {
+            return false;
+        }
+
+        /** @var CouponRuleInterface $rule */
+        $rule = $this->container->get($ruleServiceId);
+
+        return $rule->getValidators();
+    }
 }
