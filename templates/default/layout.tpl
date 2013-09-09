@@ -130,10 +130,10 @@ URL: http://www.thelia.net
 
                 <div class="currency-switch" aria-labelledby="currency-label">
                     <span id="currency-label" class="dropdown-label">{intl l="Currency"}:</span>
-                    <a class="current dropdown-toggle" data-toggle="dropdown" href="currency.html">USD</a>
+                    <a class="current dropdown-toggle" data-toggle="dropdown" href="currency.html">{currency attr="code"}</a>
                     <ul class="select dropdown-menu">
-                        {loop type="currency" name="currency_available" }
-                            <li><a href="?cur=euro">{#SYMBOL} - {#NAME}</a></li>
+                        {loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
+                            <li><a href="?currency={#ISOCODE}">{#SYMBOL} - {#NAME}</a></li>
                         {/loop}
                     </ul>
                 </div>
