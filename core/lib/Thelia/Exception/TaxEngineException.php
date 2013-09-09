@@ -31,6 +31,9 @@ class TaxEngineException extends \RuntimeException
 
     const UNDEFINED_PRODUCT = 501;
     const UNDEFINED_COUNTRY = 502;
+    const UNDEFINED_TAX_RULES_COLLECTION = 503;
+
+    const BAD_AMOUNT_FORMAT = 601;
 
     public function __construct($message, $code = null, $previous = null) {
         if($code === null) {

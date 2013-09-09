@@ -36,7 +36,7 @@ class Calculator
 {
     protected $taxRuleQuery = null;
 
-    protected $taxRulesCollection = null;
+    protected $taxRulesGroupedCollection = null;
 
     protected $product = null;
     protected $country = null;
@@ -44,12 +44,14 @@ class Calculator
     public function __construct()
     {
         $this->taxRuleQuery = new TaxRuleQuery();
-
-        return $this;
     }
 
     public function load(Product $product, Country $country)
     {
+        $this->product = null;
+        $this->country = null;
+        $this->taxRulesGroupedCollection = null;
+
         if($product->getId() === null) {
             throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
         }
@@ -60,13 +62,29 @@ class Calculator
         $this->product = $product;
         $this->country = $country;
 
-        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($product, $country);
+        $this->taxRulesGroupedCollection = $this->taxRuleQuery->getTaxCalculatorGroupedCollection($product, $country);
 
         return $this;
     }
 
     public function getTaxAmount()
     {
+        if(null === $this->taxRulesGroupedCollection) {
+            throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxAmount', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
+        }
 
+        $amount = $this->product->getRealLowestPrice();
+
+        $taxRateAmount = 0;
+        foreach($this->taxRulesGroupedCollection as $taxRule) {
+            $taxRateAmount += $taxRule->getTaxRuleRateSum();
+        }
+
+        return $amount * $taxRateAmount * 0.01;
+    }
+
+    public function getTaxedPrice()
+    {
+        return $this->product->getRealLowestPrice() + $this->getTaxAmount();
     }
 }

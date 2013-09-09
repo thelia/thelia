@@ -34,6 +34,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
@@ -333,10 +334,10 @@ class Product extends BaseI18nLoop
         foreach($isProductPriceLeftJoinList as $pSE => $isProductPriceLeftJoin) {
             $booleanMatchedPriceList[] = 'CASE WHEN `' . $pSE . '`.PROMO=1 THEN `' . $isProductPriceLeftJoin . '`.PROMO_PRICE ELSE `' . $isProductPriceLeftJoin . '`.PRICE END';
         }
-        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchedPromoList) . ')', 'main_product_is_promo');
-        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchedNewnessList) . ')', 'main_product_is_new');
-        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchedPriceList) . ')', 'real_highest_price');
-        $search->withColumn('MIN(' . implode(' OR ', $booleanMatchedPriceList) . ')', 'real_lowest_price');
+        $search->withColumn('ROUND(MAX(' . implode(' OR ', $booleanMatchedPromoList) . '), 2)', 'main_product_is_promo');
+        $search->withColumn('ROUND(MAX(' . implode(' OR ', $booleanMatchedNewnessList) . '), 2)', 'main_product_is_new');
+        $search->withColumn('ROUND(MAX(' . implode(' OR ', $booleanMatchedPriceList) . '), 2)', 'real_highest_price');
+        $search->withColumn('ROUND(MIN(' . implode(' OR ', $booleanMatchedPriceList) . '), 2)', 'real_lowest_price');
 
 
         $current = $this->getCurrent();
@@ -518,7 +519,10 @@ class Product extends BaseI18nLoop
                 ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("URL", $product->getUrl($locale))
-                ->set("BEST_PRICE", $product->getVirtualColumn('real_lowest_price'))
+                ->set("BEST_PRICE", $product->getRealLowestPrice())
+                ->set("BEST_TAXED_PRICE", $product->getTaxedPrice(
+                    CountryQuery::create()->findOneById(64) // @TODO : make it magic
+                ))
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))
                 ->set("POSITION", $product->getPosition())

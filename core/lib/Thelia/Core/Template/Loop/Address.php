@@ -87,7 +87,7 @@ class Address extends BaseLoop
         $customer = $this->getCustomer();
 
         if ($customer === 'current') {
-            $currentCustomer = $this->request->getSession()->getCustomerUser();
+            $currentCustomer = $this->securityContext->getCustomerUser();
             if ($currentCustomer === null) {
                 return new LoopResult();
             } else {

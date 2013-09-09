@@ -80,7 +80,7 @@ class Customer extends BaseLoop
         $current = $this->getCurrent();
 
         if ($current === true) {
-            $currentCustomer = $this->request->getSession()->getCustomerUser();
+            $currentCustomer = $this->securityContext->getCustomerUser();
             if ($currentCustomer === null) {
                 return new LoopResult();
             } else {
