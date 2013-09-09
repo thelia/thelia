@@ -40,6 +40,37 @@ use Thelia\Coupon\CouponRuleCollection;
 interface CouponInterface
 {
     /**
+     * Set Coupon
+     *
+     * @param CouponInterface $adapter                    Provides necessary value from Thelia
+     * @param string          $code                       Coupon code (ex: XMAS)
+     * @param string          $title                      Coupon title (ex: Coupon for XMAS)
+     * @param string          $shortDescription           Coupon short description
+     * @param string          $description                Coupon description
+     * @param float           $effect                     Coupon amount/percentage to deduce
+     * @param bool            $isCumulative               If Coupon is cumulative
+     * @param bool            $isRemovingPostage          If Coupon is removing postage
+     * @param bool            $isAvailableOnSpecialOffers If available on Product already
+     *                                                    on special offer price
+     * @param bool            $isEnabled                  False if Coupon is disabled by admin
+     * @param int             $maxUsage                   How many usage left
+     * @param \Datetime       $expirationDate             When the Code is expiring
+     */
+    public function set(
+        $adapter,
+        $code,
+        $title,
+        $shortDescription,
+        $description,
+        $effect,
+        $isCumulative,
+        $isRemovingPostage,
+        $isAvailableOnSpecialOffers,
+        $isEnabled,
+        $maxUsage,
+        \DateTime $expirationDate);
+
+    /**
      * Return Coupon code (ex: XMAS)
      *
      * @return string
@@ -107,12 +138,9 @@ interface CouponInterface
      * Check if the current Coupon is matching its conditions (Rules)
      * Thelia variables are given by the CouponAdapterInterface
      *
-     * @param CouponAdapterInterface $adapter allowing to gather
-     *                               all necessary Thelia variables
-     *
      * @return bool
      */
-    public function isMatching(CouponAdapterInterface $adapter);
+    public function isMatching();
 
     /**
      * Replace the existing Rules by those given in parameter
@@ -176,5 +204,12 @@ interface CouponInterface
      * @return string
      */
     public function getToolTip();
+
+    /**
+     * Get Coupon Manager service Id
+     *
+     * @return string
+     */
+    public function getServiceId();
 
 }

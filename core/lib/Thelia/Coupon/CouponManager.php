@@ -49,6 +49,12 @@ class CouponManager
     /** @var array CouponInterface to process*/
     protected $coupons = array();
 
+    /** @var array Available Coupons (Services) */
+    protected $availableCoupons = array();
+
+    /** @var array Available Rules (Services) */
+    protected $availableRules = array();
+
     /**
      * Constructor
      *
@@ -207,5 +213,45 @@ class CouponManager
         }
 
         return $rule;
+    }
+
+    /**
+     * Add an available CouponManager (Services)
+     *
+     * @param CouponInterface $coupon CouponManager
+     */
+    public function addAvailableCoupon(CouponInterface $coupon)
+    {
+        $this->availableCoupons[] = $coupon;
+    }
+
+    /**
+     * Get all available CouponManagers (Services)
+     *
+     * @return array
+     */
+    public function getAvailableCoupons()
+    {
+        return $this->availableCoupons;
+    }
+
+    /**
+     * Add an available ConstraintManager (Services)
+     *
+     * @param CouponRuleInterface $rule CouponRuleInterface
+     */
+    public function addAvailableRule(CouponRuleInterface $rule)
+    {
+        $this->availableRules[] = $rule;
+    }
+
+    /**
+     * Get all available ConstraintManagers (Services)
+     *
+     * @return array
+     */
+    public function getAvailableRules()
+    {
+        return $this->availableRules;
     }
 }

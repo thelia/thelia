@@ -147,7 +147,7 @@ class CouponBaseAdapter implements CouponAdapterInterface
      */
     public function getCurrentCoupons()
     {
-        $couponFactory = new CouponFactory($this);
+        $couponFactory = $this->container->get('thelia.coupon.factory');
 
         // @todo Get from Session
         $couponCodes = array('XMAS', 'SPRINGBREAK');

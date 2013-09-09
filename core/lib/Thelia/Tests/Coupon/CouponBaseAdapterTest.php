@@ -36,61 +36,68 @@ namespace Thelia\Coupon;
  */
 class CouponBaseAdapterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var CouponBaseAdapter
-     */
-    protected $object;
-
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp()
+    public function testSomething()
     {
-        $this->object = new CouponBaseAdapter;
-    }
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
-    }
-
-    /**
-     * @covers Thelia\Coupon\CouponBaseAdapter::getCart
-     * @todo   Implement testGetCart().
-     */
-    public function testGetCart()
-    {
-        // Remove the following lines when you implement this test.
+        // Stop here and mark this test as incomplete.
         $this->markTestIncomplete(
-          'This test has not been implemented yet.'
+            'This test has not been implemented yet.'
         );
     }
-
-    /**
-     * @covers Thelia\Coupon\CouponBaseAdapter::getDeliveryAddress
-     * @todo   Implement testGetDeliveryAddress().
-     */
-    public function testGetDeliveryAddress()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers Thelia\Coupon\CouponBaseAdapter::getCustomer
-     * @todo   Implement testGetCustomer().
-     */
-    public function testGetCustomer()
-    {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-          'This test has not been implemented yet.'
-        );
-    }
+//    /**
+//     * @var CouponBaseAdapter
+//     */
+//    protected $object;
+//
+//    /**
+//     * Sets up the fixture, for example, opens a network connection.
+//     * This method is called before a test is executed.
+//     */
+//    protected function setUp()
+//    {
+//        $this->object = new CouponBaseAdapter;
+//    }
+//
+//    /**
+//     * Tears down the fixture, for example, closes a network connection.
+//     * This method is called after a test is executed.
+//     */
+//    protected function tearDown()
+//    {
+//    }
+//
+//    /**
+//     * @covers Thelia\Coupon\CouponBaseAdapter::getCart
+//     * @todo   Implement testGetCart().
+//     */
+//    public function testGetCart()
+//    {
+//        // Remove the following lines when you implement this test.
+//        $this->markTestIncomplete(
+//          'This test has not been implemented yet.'
+//        );
+//    }
+//
+//    /**
+//     * @covers Thelia\Coupon\CouponBaseAdapter::getDeliveryAddress
+//     * @todo   Implement testGetDeliveryAddress().
+//     */
+//    public function testGetDeliveryAddress()
+//    {
+//        // Remove the following lines when you implement this test.
+//        $this->markTestIncomplete(
+//          'This test has not been implemented yet.'
+//        );
+//    }
+//
+//    /**
+//     * @covers Thelia\Coupon\CouponBaseAdapter::getCustomer
+//     * @todo   Implement testGetCustomer().
+//     */
+//    public function testGetCustomer()
+//    {
+//        // Remove the following lines when you implement this test.
+//        $this->markTestIncomplete(
+//          'This test has not been implemented yet.'
+//        );
+//    }
 }

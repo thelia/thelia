@@ -55,11 +55,11 @@ class RegisterRulePass implements CompilerPassInterface
         }
 
         $couponManager = $container->getDefinition('thelia.coupon.manager');
-        $services = $container->findTaggedServiceIds("thelia.coupon.addCoupon");
+        $services = $container->findTaggedServiceIds("thelia.coupon.addRule");
 
         foreach ($services as $id => $rule) {
             $couponManager->addMethodCall(
-                'addAvailableCoupon',
+                'addAvailableRule',
                 array(
                     new Reference($id)
                 )
