@@ -184,8 +184,9 @@ class CouponController extends BaseAdminController
             );
 
             /** @var CouponRuleInterface $rule */
-            foreach ($rules as $rule) {
+            foreach ($rules->getRules() as $rule) {
                 $args['rulesObject'][] = array(
+                    'serviceId' => $rule->getServiceId(),
                     'name' => $rule->getName(),
                     'tooltip' => $rule->getToolTip(),
                     'validators' => $rule->getValidators()
@@ -338,15 +339,15 @@ class CouponController extends BaseAdminController
     {
         $this->checkAuth('ADMIN', 'admin.coupon.read');
 
-        if (!$this->getRequest()->isXmlHttpRequest()) {
-            $this->redirect(
-                $this->getRoute(
-                    'admin',
-                    array(),
-                    Router::ABSOLUTE_URL
-                )
-            );
-        }
+//        if (!$this->getRequest()->isXmlHttpRequest()) {
+//            $this->redirect(
+//                $this->getRoute(
+//                    'admin',
+//                    array(),
+//                    Router::ABSOLUTE_URL
+//                )
+//            );
+//        }
 
         /** @var ConstraintFactory $constraintFactory */
         $constraintFactory = $this->container->get('thelia.constraint.factory');

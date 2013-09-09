@@ -167,9 +167,6 @@
             <table class="table table-striped">
                 <caption class="clearfix">
                     {intl l='Rules'}
-                    <a class="btn btn-default btn-primary pull-right" title="{intl l='Add a new rule'}">
-                        <span class="glyphicon glyphicon-plus-sign"></span>
-                    </a>
                 </caption>
                 <thead>
                 <tr>
@@ -178,9 +175,15 @@
                 </tr>
                 </thead>
                 <tbody>
-                    {foreach from=$rulesObject item=rule}
+                    {foreach from=$rulesObject item=rule name=rulesForeach}
                         <tr>
-                            <td>{$rule.tooltip}</td>
+                            <td>
+                                {if !$smarty.foreach.rulesForeach.first}
+                                    <span class="label label-info">{intl l='And'}</span>
+                                {/if}
+                                {$rule.tooltip nofilter}
+                            </td>
+
                             <td>
                                 <a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}</a>
                                 <a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="glyphicon glyphicon-remove"></span> {intl l='Delete'}</a>
@@ -194,9 +197,32 @@
 
     <section class="row">
         <div class="col-md-12 general-block-decorator clearfix">
-            <a title="{intl l='Save this rule'}" class="btn btn-default btn-primary pull-right">
-                <span class="glyphicon glyphicon-plus-sign"></span>
-            </a>
+            <table class="table table-striped">
+                <caption class="clearfix">
+                    {intl l='Add a Rule'}
+                    <a title="{intl l='Save this rule'}" class="btn btn-default btn-primary pull-right">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                    </a>
+                </caption>
+                <thead>
+                <tr>
+                    <th>{intl l='Conditions link'}</th>
+                    <th>{intl l='Rule Type'}</th>
+                    <th>{intl l='Operator'}</th>
+                    <th>{intl l='Value'}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td></tr>
+                    <td></tr>
+                    <td></tr>
+                    <td></tr>
+                </td>
+                </tbody>
+            </table>
+
+
 
             <div id="rule-add-organizer" class="form-group col-md-2">
                 <label for="type">{intl l='Condition type :'}</label>

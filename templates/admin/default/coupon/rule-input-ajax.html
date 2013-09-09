@@ -1,8 +1,4 @@
-{*test*}
-{*{$ruleId}*}
-{*{$inputs|var_dump}*}
-
-{foreach from=$inputs key=name item=input}
+{foreach from=$inputs.inputs key=name item=input}
     <label for="operator">{$input.title}</label>
     <div class="row">
         <div class="col-lg-6">
@@ -72,3 +68,14 @@
                 {*</tbody></table>*}
         {*</div>*}
     {*</div>*}
+
+<script>
+    var ruleToSave = [];
+    ruleToSave['serviceId'] = '{$ruleId}';
+    ruleToSave['operators'] = [];
+    ruleToSave['values'] = [];
+    {foreach from=$inputs.inputs key=name item=input}
+        ruleToSave['operators']['{$name nofilter}'] = 'to set';
+        ruleToSave['values']['{$name nofilter}'] = 'to set';
+    {/foreach}
+</script>
