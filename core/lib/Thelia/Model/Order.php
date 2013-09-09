@@ -15,6 +15,6 @@ class Order extends BaseOrder {
      */
     public function getTotalAmount()
     {
-        return 0;
+        return 2;
     }
 }
