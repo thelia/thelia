@@ -76,7 +76,6 @@ class Thelia extends Kernel
 
         $definePropel = new DefinePropel(new DatabaseConfiguration(),
             Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
-        $propelConfig = $definePropel->getConfig();
         $serviceContainer = Propel::getServiceContainer();
         $serviceContainer->setAdapterClass('thelia', 'mysql');
         $manager = new ConnectionManagerSingle();
@@ -84,7 +83,6 @@ class Thelia extends Kernel
         $serviceContainer->setConnectionManager('thelia', $manager);
 
         if ($this->isDebug()) {
-            //$serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
             $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
             $con->useDebug(true);
         }
