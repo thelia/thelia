@@ -22,6 +22,9 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Thelia\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthorizationException;
@@ -211,12 +214,26 @@ class BaseAdminController extends BaseController
     /**
      * Return the route path defined for the givent route ID
      *
-     * @param string $routeId a route ID, as defines in Config/Resources/routing/admin.xml
+     * @param string         $routeId a route ID, as defines in Config/Resources/routing/admin.xml
+     * @param mixed          $parameters    An array of parameters
+     * @param Boolean|string $referenceType The type of reference to be generated (one of the constants)
+     *
+     * @throws RouteNotFoundException              If the named route doesn't exist
+     * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
+     * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
+     *                                             it does not match the requirement
+     * @throws \InvalidArgumentException            When the router doesn't exist
+     * @return string The generated URL
      *
      * @see \Thelia\Controller\BaseController::getRouteFromRouter()
      */
-    protected function getRoute($routeId) {
-        return $this->getRouteFromRouter('router.admin', $routeId);
+    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH) {
+        return $this->getRouteFromRouter(
+            'router.admin',
+            $routeId,
+            $parameters,
+            $referenceType
+        );
     }
 
     /**

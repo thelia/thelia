@@ -25,6 +25,10 @@ namespace Thelia\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
+use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Router;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
@@ -216,20 +220,27 @@ class BaseController extends ContainerAware
     /**
      * Get a route path from the route id.
      *
-     * @param $routerName
-     * @param $routeId
+     * @param string         $routerName    Router name
+     * @param string         $routeId       The name of the route
+     * @param mixed          $parameters    An array of parameters
+     * @param Boolean|string $referenceType The type of reference to be generated (one of the constants)
      *
-     * @return mixed
-     * @throws InvalidArgumentException
+     * @throws RouteNotFoundException              If the named route doesn't exist
+     * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
+     * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
+     *                                             it does not match the requirement
+     * @throws \InvalidArgumentException            When the router doesn't exist
+     * @return string The generated URL
      */
-    protected function getRouteFromRouter($routerName, $routeId) {
-        $route = $this->container->get($routerName)->getRouteCollection()->get($routeId);
+    protected function getRouteFromRouter($routerName, $routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH) {
+        /** @var Router $router */
+        $router =  $this->container->get($routerName);
 
-        if ($route == null) {
-            throw new \InvalidArgumentException(sprintf("Route ID '%s' does not exists.", $routeId));
+        if ($router == null) {
+            throw new \InvalidArgumentException(sprintf("Router '%s' does not exists.", $routerName));
         }
 
-        return $route->getPath();
+        return $router->generate($routeId, $parameters, $referenceType);
     }
 
     /**
