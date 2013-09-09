@@ -13,6 +13,8 @@ Index : {navigate to="index"}<br />
     <h3>#TITLE</h3>
     <p>#DESCRIPTION</p>
 
+    <p>Starting by #BEST_PRICE € HT (TAX : #BEST_PRICE_TAX ; #BEST_TAXED_PRICE € TTC)</p>
+
     {ifloop rel="acc"}
     <h4>Accessories</h4>
     <ul>
@@ -64,7 +66,7 @@ Index : {navigate to="index"}<br />
         #ATTRIBUTE_TITLE = #ATTRIBUTE_AVAILABILITY_TITLE<br />
         {/loop}
         <br />#WEIGHT g
-        <br /><strong>{if #IS_PROMO == 1} #PROMO_PRICE € (instead of #PRICE) {else} #PRICE € {/if}</strong>
+        <br /><strong>{if #IS_PROMO == 1} #PROMO_PRICE € HT // TAX : #PROMO_PRICE_TAX ; #TAXED_PROMO_PRICE € TTC (instead of #PRICE HT // TAX : #PRICE_TAX ; #TAXED_PRICE € TTC){else} #PRICE € HT // TAX : #PRICE_TAX ; #TAXED_PRICE € TTC{/if}</strong>
         <br /><br />
         Add
         <select>

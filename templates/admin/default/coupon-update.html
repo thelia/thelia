@@ -36,6 +36,35 @@
     <script>
         $(function($){
             miniBrowser(0, '/test_to_remove/datas_coupon_edit.json');
+
+            $('#effect').on('change', function (e) {
+                var optionSelected = $("option:selected", this);
+                $('#effectToolTip').html(optionSelected.attr("data-description"));
+            });
+
+            $('#category-rule').on('change', function (e) {
+                $('#rule-add-operators-values').html('<div class="loading" ></div>');
+                var url = "{$urlAjaxGetRuleInput}";
+                url = url.replace('ruleId', $(this).val())
+                console.log(url);
+                $.ajax({
+                    url: url,
+                    statusCode: {
+                        404: function() {
+                            $('#rule-add-operators-values').html(
+                                '{intl l='Please select another rule'}'
+                            );
+                        }
+                    }
+                }).done(function(data) {
+                    $('#rule-add-operators-values').html(data);
+                });
+            });
+
+
         });
+
+
+
     </script>
 {/block}

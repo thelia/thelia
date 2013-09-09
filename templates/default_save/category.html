@@ -1,3 +1,9 @@
+<html>
+<head>
+    {debugbar_renderHead}
+</head>
+<body>
+
 <h1>Category page</h1>
 
 <div style="border: solid 8px; margin: 0px; padding: 0px; width: 45%; float: left">
@@ -25,6 +31,8 @@
         <h3><a href="#URL">PRODUCT #ID : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
         <h4>#TITLE</h4>
         <p>#DESCRIPTION</p>
+
+        <p>Starting by #BEST_PRICE € HT (TAX : #BEST_PRICE_TAX ; #BEST_TAXED_PRICE € TTC)</p>
 
         {ifloop rel="ft"}
             <h5>Features</h5>
@@ -141,3 +149,7 @@
 </ul>
 
 </div>
+
+    {debugbar_render}
+</body>
+</html>

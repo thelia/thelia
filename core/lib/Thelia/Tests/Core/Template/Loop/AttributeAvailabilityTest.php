@@ -41,7 +41,7 @@ class AttributeAvailabilityTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new AttributeAvailability($this->request, $this->dispatcher, $this->securityContext);
+        return new AttributeAvailability($this->container);
     }
 
     public function getMandatoryArguments()

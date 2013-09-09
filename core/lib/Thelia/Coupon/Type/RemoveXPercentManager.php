@@ -36,12 +36,15 @@ use Thelia\Exception\MissingAdapterException;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveXPercent extends CouponAbstract
+class RemoveXPercentManager extends CouponAbstract
 {
+    /** @var string Service Id  */
+    protected $serviceId = 'thelia.coupon.type.remove_x_percent';
+
     protected $percent = 0;
 
     /**
-     * Constructor
+     * Set Coupon
      *
      * @param CouponInterface $adapter                    Provides necessary value from Thelia
      * @param string          $code                       Coupon code (ex: XMAS)
@@ -57,7 +60,7 @@ class RemoveXPercent extends CouponAbstract
      * @param int             $maxUsage                   How many usage left
      * @param \Datetime       $expirationDate             When the Code is expiring
      */
-    function __construct(
+    public function set(
         $adapter,
         $code,
         $title,
@@ -119,7 +122,7 @@ class RemoveXPercent extends CouponAbstract
     {
         return $this->adapter
             ->getTranslator()
-            ->trans('Remove X percent to total cart', null, 'constraint');
+            ->trans('Remove X percent to total cart', array(), 'constraint');
     }
 
     /**
@@ -133,7 +136,7 @@ class RemoveXPercent extends CouponAbstract
             ->getTranslator()
             ->trans(
                 'This coupon will remove the entered percentage to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.',
-                null,
+                array(),
                 'constraint'
             );
 

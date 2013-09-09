@@ -21,31 +21,24 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Tests\Core\Template\Loop;
+namespace Thelia\Exception;
 
-use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
+use Thelia\Log\Tlog;
 
-use Thelia\Core\Template\Loop\Country;
-
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
-class CountryTest extends BaseLoopTestor
+class TaxEngineException extends \RuntimeException
 {
-    public function getTestedClassName()
-    {
-        return 'Thelia\Core\Template\Loop\Country';
-    }
+    const UNKNOWN_EXCEPTION = 0;
 
-    public function getTestedInstance()
-    {
-        return new Country($this->container);
-    }
+    const UNDEFINED_PRODUCT = 501;
+    const UNDEFINED_COUNTRY = 502;
+    const UNDEFINED_TAX_RULES_COLLECTION = 503;
 
-    public function getMandatoryArguments()
-    {
-        return array();
+    const BAD_AMOUNT_FORMAT = 601;
+
+    public function __construct($message, $code = null, $previous = null) {
+        if($code === null) {
+            $code = self::UNKNOWN_EXCEPTION;
+        }
+        parent::__construct($message, $code, $previous);
     }
 }

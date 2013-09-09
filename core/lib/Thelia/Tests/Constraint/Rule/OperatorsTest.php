@@ -48,6 +48,14 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
     {
     }
 
+    public function testSomething()
+    {
+        // Stop here and mark this test as incomplete.
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+    }
+
 //    /**
 //     *
 //     * @covers Thelia\Coupon\Rule\Operator::isValidAccordingToOperator

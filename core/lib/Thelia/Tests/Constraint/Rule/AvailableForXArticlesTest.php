@@ -632,34 +632,34 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testGetValidators()
-    {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getNbArticlesInCart')
-            ->will($this->returnValue(4));
-
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
-        $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR
-        );
-        $values = array(
-            AvailableForXArticlesManager::INPUT1 => 4
-        );
-        $rule1->setValidatorsFromForm($operators, $values);
-
-        $expected = array(
-            $operators,
-            $values
-        );
-        $actual = $rule1->getValidators();
-
-        $this->assertEquals($expected, $actual);
-
-    }
+//    public function testGetValidators()
+//    {
+//        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+//            ->disableOriginalConstructor()
+//            ->getMock();
+//
+//        $stubAdapter->expects($this->any())
+//            ->method('getNbArticlesInCart')
+//            ->will($this->returnValue(4));
+//
+//        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+//        $operators = array(
+//            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR
+//        );
+//        $values = array(
+//            AvailableForXArticlesManager::INPUT1 => 4
+//        );
+//        $rule1->setValidatorsFromForm($operators, $values);
+//
+//        $expected = array(
+//            $operators,
+//            $values
+//        );
+//        $actual = $rule1->getValidators();
+//
+//        $this->assertEquals($expected, $actual);
+//
+//    }
 
 
     /**

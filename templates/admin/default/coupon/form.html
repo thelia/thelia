@@ -104,13 +104,13 @@
                             <label for="effect">{intl l='Effect :'}</label>
                             {form_field form=$form field='effect'}
                                 <select name="{$name}" value="{$value}" id="effect" class="col-md-12 form-control">
-                                    <option value="1" data-description="More description n°1 about item">Remove x percents for category Y</option>
-                                    <option value="2" data-description="More description n°2 about item">Remove x percents</option>
-                                    <option value="3" data-description="More description n°3 about item">Remove x amount</option>
+                                    {foreach from=$availableCoupons item=availableCoupon}
+                                        <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}">{$availableCoupon.name}</option>
+                                    {/foreach}
                                 </select>
                                 {if $error}{$message}{/if}
                             {/form_field}
-                            <span class="help-block">More description n°1 about item</span>
+                            <span id="effectToolTip" class="help-block">{$availableCoupons.0.toolTip}</span>
                         </div>
                     </div>
 
@@ -194,8 +194,11 @@
 
     <section class="row">
         <div class="col-md-12 general-block-decorator clearfix">
+            <a title="{intl l='Save this rule'}" class="btn btn-default btn-primary pull-right">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+            </a>
 
-            <div class="form-group col-md-2">
+            <div id="rule-add-organizer" class="form-group col-md-2">
                 <label for="type">{intl l='Condition type :'}</label>
                 <label class="radio">
                     <input type="radio" name="type" id="type" value="1" checked> {intl l='And'}
@@ -205,30 +208,16 @@
                 </label>
             </div>
 
-            <div class="form-group col-md-4">
-                <label for="category-rule">{intl l='Rule\'s category :'}</label>
+            <div id="rule-add-type" class="form-group col-md-4">
+                <label for="categoryRule">{intl l='Rule\'s category :'}</label>
                 <select name="categoryRule" id="category-rule" class="form-control">
-                    <option value="1" selected>Total amount</option>
-                    <option value="2">Date</option>
-                    <option value="3">NbArtFromCategory</option>
-                </select>
-
-                <label for="category-rule">Rule's category :</label>
-                <select name="categoryRule" id="category-rule" class="form-control">
-                    <option value="1">Total amount</option>
-                    <option value="2" selected>Date</option>
-                    <option value="3">NbArtFromCategory</option>
-                </select>
-
-                <label for="category-rule">Rule's category :</label>
-                <select name="categoryRule" id="category-rule" class="form-control">
-                    <option value="1">Total amount</option>
-                    <option value="2">Date</option>
-                    <option value="3" selected>NbArtFromCategory</option>
+                    {foreach from=$availableRules item=availableRule}
+                        <option value="{$availableRule.serviceId}" data-description="{$availableRule.toolTip}">{$availableRule.name}</option>
+                    {/foreach}
                 </select>
             </div>
 
-            <div class="form-group col-md-6">
+            <div id="rule-add-operators-values" class="form-group col-md-6">
                 <label for="operator">{intl l='Operator :'}</label>
                 <div class="row">
                     <div class="col-lg-6">

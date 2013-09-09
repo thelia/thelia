@@ -149,11 +149,7 @@
 
         <service id="smarty.plugin.thelialoop" class="Thelia\Core\Template\Smarty\Plugins\TheliaLoop" scope="request">
             <tag name="thelia.parser.register_plugin"/>
-
-            <argument type="service" id="request" />
-            <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="thelia.securityContext"/>
-
+            <argument type="service" id="service_container" />
             <call method="setLoopList">
                 <argument>%thelia.parser.loops%</argument>
             </call>
@@ -219,26 +215,34 @@
             <argument type="service" id="service_container" />
         </service>
         <service id="thelia.coupon.manager" class="Thelia\Coupon\CouponManager">
-            <argument type="service" id="thelia.adapter" />
+            <argument type="service" id="service_container" />
         </service>
+        <service id="thelia.coupon.factory" class="Thelia\Coupon\CouponFactory">
+            <argument type="service" id="service_container" />
+        </service>
+
         <service id="thelia.constraint.factory" class="Thelia\Constraint\ConstraintFactory">
             <argument type="service" id="service_container" />
         </service>
+        <service id="thelia.constraint.rule.available_for_everyone" class="Thelia\Constraint\Rule\AvailableForEveryoneManager">
+            <argument type="service" id="thelia.adapter" />
+            <tag name="thelia.coupon.addRule"/>
+        </service>
         <service id="thelia.constraint.rule.available_for_x_articles" class="Thelia\Constraint\Rule\AvailableForXArticlesManager">
-            <argument type="service" id="thelia.translator" />
+            <argument type="service" id="thelia.adapter" />
             <tag name="thelia.coupon.addRule"/>
         </service>
         <service id="thelia.constraint.rule.available_for_total_amount" class="Thelia\Constraint\Rule\AvailableForTotalAmountManager">
-            <argument type="service" id="thelia.translator" />
+            <argument type="service" id="thelia.adapter" />
             <tag name="thelia.coupon.addRule"/>
         </service>
 
-        <service id="thelia.coupon.type.remove_x_amount" class="Thelia\Coupon\Type\RemoveXAmount">
-            <argument type="service" id="thelia.translator" />
+        <service id="thelia.coupon.type.remove_x_amount" class="Thelia\Coupon\Type\RemoveXAmountManager">
+            <argument type="service" id="thelia.adapter" />
             <tag name="thelia.coupon.addCoupon"/>
         </service>
-        <service id="thelia.coupon.type.remove_x_percent" class="Thelia\Coupon\Type\RemoveXPercent">
-            <argument type="service" id="thelia.translator" />
+        <service id="thelia.coupon.type.remove_x_percent" class="Thelia\Coupon\Type\RemoveXPercentManager">
+            <argument type="service" id="thelia.adapter" />
             <tag name="thelia.coupon.addCoupon"/>
         </service>
 

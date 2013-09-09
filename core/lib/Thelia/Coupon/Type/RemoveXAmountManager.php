@@ -37,10 +37,13 @@ use Thelia\Coupon\Type\CouponAbstract;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveXAmount extends CouponAbstract
+class RemoveXAmountManager extends CouponAbstract
 {
+    /** @var string Service Id  */
+    protected $serviceId = 'thelia.coupon.type.remove_x_amount';
+
     /**
-     * Constructor
+     * Set Coupon
      *
      * @param CouponInterface $adapter                    Provides necessary value from Thelia
      * @param string          $code                       Coupon code (ex: XMAS)
@@ -56,7 +59,7 @@ class RemoveXAmount extends CouponAbstract
      * @param int             $maxUsage                   How many usage left
      * @param \Datetime       $expirationDate             When the Code is expiring
      */
-    function __construct(
+    public function set(
         $adapter,
         $code,
         $title,
@@ -97,7 +100,7 @@ class RemoveXAmount extends CouponAbstract
     {
         return $this->adapter
             ->getTranslator()
-            ->trans('Remove X amount to total cart', null, 'constraint');
+            ->trans('Remove X amount to total cart', array(), 'constraint');
     }
 
     /**
@@ -111,7 +114,7 @@ class RemoveXAmount extends CouponAbstract
             ->getTranslator()
             ->trans(
                 'This coupon will remove the entered amount to the customer total checkout. If the discount is superior to the total checkout price the customer will only pay the postage. Unless if the coupon is set to remove postage too.',
-                null,
+                array(),
                 'constraint'
             );
 

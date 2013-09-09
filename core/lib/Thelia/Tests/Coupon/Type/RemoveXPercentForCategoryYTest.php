@@ -36,28 +36,35 @@ namespace Thelia\Coupon;
  */
 class RemoveXPercentForCategoryYTest extends \PHPUnit_Framework_TestCase
 {
-
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp()
+    public function testSomething()
     {
-    }
-
-    public function incompleteTest()
-    {
+        // Stop here and mark this test as incomplete.
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
     }
 
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
-    }
+//    /**
+//     * Sets up the fixture, for example, opens a network connection.
+//     * This method is called before a test is executed.
+//     */
+//    protected function setUp()
+//    {
+//    }
+//
+//    public function incompleteTest()
+//    {
+//        $this->markTestIncomplete(
+//            'This test has not been implemented yet.'
+//        );
+//    }
+//
+//    /**
+//     * Tears down the fixture, for example, closes a network connection.
+//     * This method is called after a test is executed.
+//     */
+//    protected function tearDown()
+//    {
+//    }
 
 }
