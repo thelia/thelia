@@ -41,7 +41,7 @@ class CountryTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new Country($this->request, $this->dispatcher, $this->securityContext);
+        return new Country($this->container);
     }
 
     public function getMandatoryArguments()

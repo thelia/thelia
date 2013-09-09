@@ -59,11 +59,12 @@ abstract class BaseI18nLoop extends BaseLoop
      * @param array $columns the i18n columns
      * @param string $foreignTable the specified table (default  to criteria table)
      * @param string $foreignKey the foreign key in this table (default to criteria table)
+     * @param bool          $forceReturn
      *
      * @return mixed the locale
      */
-    protected function configureI18nProcessing(ModelCriteria $search, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID', $forceReturn = false) {
-
+    protected function configureI18nProcessing(ModelCriteria $search, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID', $forceReturn = false)
+    {
         /* manage translations */
         return ModelCriteriaTools::getI18n(
             $this->getBackend_context(),
