@@ -17,7 +17,9 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', 0, 0, NOW(), NOW()),
 ('page_not_found_view', '404.html', 0, 0, NOW(), NOW());
 
-INSERT INTO `module` (`code`, `type`, `activate`, `position`, `created_at`, `updated_at`) VALUES ('test', '1', '1', '1', NOW(), NOW());
+
+INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
+(1, 'DebugBar', 1, 1, 1, 'DebugBar\\DebugBar', NOW(), NOW());
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
 (1, 1, 1, NOW(), NOW()),
@@ -1107,3 +1109,25 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (268, 'en_UK', 'USA - Alabama', '', '', ''),
 (268, 'es_ES', 'USA - Alabama', '', '', ''),
 (268, 'fr_FR', 'USA - Alabama', '', '', '');
+
+INSERT INTO  `tax` (`id`, `rate`, `created_at`, `updated_at`)
+  VALUES
+  (1, '19.6', NOW(), NOW());
+
+INSERT INTO `tax_i18n` (`id`, `locale`, `title`)
+  VALUES
+  (1, 'fr_FR', 'TVA française à 19.6%'),
+  (1, 'en_UK', 'french 19.6% tax');
+
+INSERT INTO  `tax_rule` (`id`, `created_at`, `updated_at`)
+  VALUES
+  (1, NOW(), NOW());
+
+INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`)
+  VALUES
+  (1, 'fr_FR', 'TVA française à 19.6%'),
+  (1, 'en_UK', 'french 19.6% tax');
+
+INSERT INTO  `tax_rule_country` (`tax_rule_id`, `country_id`, `tax_id`, `position`, `created_at`, `updated_at`)
+  VALUES
+  (1, 64, 1, 1, NOW(), NOW());

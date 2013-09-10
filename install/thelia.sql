@@ -126,9 +126,6 @@ DROP TABLE IF EXISTS `tax_rule`;
 CREATE TABLE `tax_rule`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `code` VARCHAR(45),
-    `title` VARCHAR(255),
-    `description` TEXT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -142,14 +139,13 @@ DROP TABLE IF EXISTS `tax_rule_country`;
 
 CREATE TABLE `tax_rule_country`
 (
-    `id` INTEGER NOT NULL,
-    `tax_rule_id` INTEGER,
-    `country_id` INTEGER,
-    `tax_id` INTEGER,
-    `none` TINYINT,
+    `tax_rule_id` INTEGER NOT NULL,
+    `country_id` INTEGER NOT NULL,
+    `tax_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`tax_rule_id`,`country_id`,`tax_id`),
     INDEX `idx_tax_rule_country_tax_id` (`tax_id`),
     INDEX `idx_tax_rule_country_tax_rule_id` (`tax_rule_id`),
     INDEX `idx_tax_rule_country_country_id` (`country_id`),
@@ -157,7 +153,7 @@ CREATE TABLE `tax_rule_country`
         FOREIGN KEY (`tax_id`)
         REFERENCES `tax` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL,
+        ON DELETE CASCADE,
     CONSTRAINT `fk_tax_rule_country_tax_rule_id`
         FOREIGN KEY (`tax_rule_id`)
         REFERENCES `tax_rule` (`id`)
@@ -803,6 +799,7 @@ CREATE TABLE `module`
     `type` TINYINT NOT NULL,
     `activate` TINYINT,
     `position` INTEGER,
+    `full_namespace` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1573,6 +1570,8 @@ CREATE TABLE `tax_rule_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` TEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `tax_rule_i18n_FK_1`
         FOREIGN KEY (`id`)

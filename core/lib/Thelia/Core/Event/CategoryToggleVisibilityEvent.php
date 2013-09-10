@@ -22,35 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
-use Thelia\Model\Category;
 
-class CategoryToggleVisibilityEvent extends ActionEvent
+class CategoryToggleVisibilityEvent extends BaseToggleVisibilityEvent
 {
-    protected $category_id;
-    protected $category;
-
-    public function __construct($category_id)
-    {
-        $this->category_id = $category_id;
-    }
-
-    public function getCategoryId()
-    {
-        return $this->category_id;
-    }
-
-    public function setCategoryId($category_id)
-    {
-        $this->category_id = $category_id;
-    }
-
-    public function getCategory()
-    {
-        return $this->category;
-    }
-
-    public function setCategory(Category $category)
-    {
-        $this->category = $category;
-    }
 }

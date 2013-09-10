@@ -1,0 +1,127 @@
+{extends file="admin-layout.tpl"}
+{block name="check-permissions"}admin.coupon.view{/block}
+{block name="page-title"}{intl l='Coupon'}{/block}
+
+{block name="main-content"}
+<section id="wrapper" class="container">
+
+    <nav>
+        <ul class="breadcrumb">
+            {include file="includes/coupon_breadcrumb.html"}
+        </ul>
+    </nav>
+    
+    <div class="page-header">
+        <h1>Coupons : <small>Read coupon n°1</small></h1>
+    </div>
+
+
+    <section class="row">
+		<div class="col-md-12 general-block-decorator">
+            {loop type="coupon" name="read_coupon" id=1 backend_context="true"}
+			<div class="alert alert-info">				
+				<span class="glyphicon glyphicon-question-sign"></span>
+                {if #IS_ENABLED}{else}This coupon is disabled, you can enable to the bottom of this form.{/if}
+			</div>
+
+            <table class="table table-striped">
+				<tbody>
+					<tr>
+						<td>Code</td>
+						<td>#CODE</td>
+					</tr>
+					<tr>
+						<td>Title</td>
+						<td>#TITLE</td>
+					</tr>
+					<tr>
+						<td>Expiration date</td>
+						<td>EXPIRATION_DATE</td>
+					</tr>
+	    			<tr>
+	    				<td>Usage left</td>
+	    				<td>
+                            {if #USAGE_LEFT}
+                            <span class="label label-success">
+                                #USAGE_LEFT
+                            </span>
+                            {else}
+                            <span class="label label-important">
+                                0
+                            </span>
+                            {/if}
+                        </td>
+	    			</tr>
+                    <tr>
+                        <td colspan="2">#SHORT_DESCRIPTION</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">#DESCRIPTION</td>
+                    </tr>
+	    			<tr>
+                        <td colspan="2">
+                        {if #IS_CUMULATIVE}
+                            <span class="label label-success">
+                                {intl l="May be cumulative"}
+                            </span>
+                        {else}
+                            <span class="label label-important">
+                                {intl l="Can't be cumulative"}
+                            </span>
+                        {/if}
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td colspan="2">
+                            {if #IS_REMOVING_POSTAGE}
+                                <span class="label label-important">
+                                    {intl l="Will remove postage"}
+                                </span>
+                            {else}
+                                <span class="label label-success">
+                                    {intl l="Won't remove postage"}
+                                </span>
+                            {/if}
+                        </td>
+	    			</tr>
+	    			<tr>
+	    				<td>Amount</td>
+	    				<td>#AMOUNT</td>
+	    			</tr>
+	    			<tr>
+	    				<td>Conditions of application</td>
+	    				<td>
+	    					<ul class="list-unstyled">
+	    						<li>Total cart supperior to 400 &euro;</li>
+	    						<li><span class="label label-info">OR</span></li>
+	    						<li>At least 4 products</li>
+	    					</ul>
+	    				</td>
+	    			</tr>	
+	    			<tr>
+	    				<td>Actions</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="icon-edit icon-white"></span> Edit</a>
+	    					<a href="#url" class="btn btn-default btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="glyphicon glyphicon-ok"></span> Enabled</a>
+	    				</td>
+	    			</tr>    		
+				</tbody>
+			</table>
+            {/loop}
+		</div>
+	</section>
+</section> <!-- #wrapper -->
+
+{include file='includes/confirmation-modal.html' id="enable" message="{intl l='Do you really want to enable this element ?'}"}
+
+{/block}
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/js/main.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/bootstrap-editable/js/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+{/block}

@@ -43,6 +43,15 @@ use Thelia\Form\MessageCreationForm;
 class MessageController extends BaseAdminController
 {
     /**
+     * Render the messages list
+     *
+     * @return Symfony\Component\HttpFoundation\Response the response
+     */
+    protected function renderList() {
+        return $this->render('messages');
+    }
+
+    /**
      * The default action is displaying the messages list.
      *
      * @return Symfony\Component\HttpFoundation\Response the response
@@ -51,7 +60,7 @@ class MessageController extends BaseAdminController
 
         if (null !== $response = $this->checkAuth("admin.configuration.messages.view")) return $response;
 
-        return $this->render('messages');
+        return $this->renderList();
     }
 
     /**
@@ -66,7 +75,7 @@ class MessageController extends BaseAdminController
 
         $message = false;
 
-        // Create the Creation Form
+        // Create the creation Form
         $creationForm = new MessageCreationForm($this->getRequest());
 
         try {
@@ -87,10 +96,11 @@ class MessageController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::MESSAGE_CREATE, $createEvent);
 
+            if (! $createEvent->hasMessage()) throw new \LogicException($this->getTranslator()->trans("No message was created."));
+
             $createdObject = $createEvent->getMessage();
 
-            // Log message creation
-            $this->adminLogAppend(sprintf("Variable %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
+            $this->adminLogAppend(sprintf("Message %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
 
             // Substitute _ID_ in the URL with the ID of the created object
             $successUrl = str_replace('_ID_', $createdObject->getId(), $creationForm->getSuccessUrl());
@@ -100,26 +110,14 @@ class MessageController extends BaseAdminController
         }
         catch (FormValidationException $ex) {
             // Form cannot be validated
-            $message = sprintf("Please check your input: %s", $ex->getMessage());
+            $message = $this->createStandardFormValidationErrorMessage($ex);
         }
         catch (\Exception $ex) {
             // Any other error
-            $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+            $message = $ex->getMessage();
         }
 
-        if ($message !== false) {
-            // An error has been detected: log it
-            Tlog::getInstance()->error(sprintf("Error during message creation process : %s. Exception was %s", $message, $ex->getMessage()));
-
-            // Mark the form as errored
-            $creationForm->setErrorMessage($message);
-
-            // Pass it to the parser, along with the error message
-            $this->getParserContext()
-                ->addForm($creationForm)
-                ->setGeneralError($message)
-            ;
-        }
+        $this->setupFormErrorContext("message modification", $message, $creationForm, $ex);
 
         // At this point, the form has error, and should be redisplayed.
         return $this->render('messages');
@@ -206,7 +204,8 @@ class MessageController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::MESSAGE_UPDATE, $changeEvent);
 
-            // Log message modification
+            if (! $changeEvent->hasMessage()) throw new \LogicException($this->getTranslator()->trans("No message was updated."));
+
             $changedObject = $changeEvent->getMessage();
 
             $this->adminLogAppend(sprintf("Variable %s (ID %s) modified", $changedObject->getName(), $changedObject->getId()));
@@ -224,27 +223,15 @@ class MessageController extends BaseAdminController
             $this->redirect($changeForm->getSuccessUrl());
         }
         catch (FormValidationException $ex) {
-            // Invalid data entered
-            $message = sprintf("Please check your input: %s", $ex->getMessage());
+            // Form cannot be validated
+            $message = $this->createStandardFormValidationErrorMessage($ex);
         }
         catch (\Exception $ex) {
             // Any other error
-            $message = sprintf("Sorry, an error occured: %s", $ex->getMessage());
+            $message = $ex->getMessage();
         }
 
-        if ($message !== false) {
-            // Log error message
-            Tlog::getInstance()->error(sprintf("Error during message modification process : %s. Exception was %s", $message, $ex->getMessage()));
-
-            // Mark the form as errored
-            $changeForm->setErrorMessage($message);
-
-            // Pas the form and the error to the parser
-            $this->getParserContext()
-                ->addForm($changeForm)
-                ->setGeneralError($message)
-            ;
-        }
+        $this->setupFormErrorContext("message modification", $message, $changeForm, $ex);
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->render('message-edit', array('message_id' => $message_id));
@@ -265,6 +252,9 @@ class MessageController extends BaseAdminController
 
         $this->dispatch(TheliaEvents::MESSAGE_DELETE, $event);
 
-        $this->redirect(URL::getInstance()->adminViewUrl('messages'));
+        if ($event->hasMessage())
+            $this->adminLogAppend(sprintf("Message %s (ID %s) modified", $event->getMessage()->getName(), $event->getMessage()->getId()));
+
+        $this->redirectToRoute('admin.configuration.messages.default');
     }
 }

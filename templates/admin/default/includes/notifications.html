@@ -1,0 +1,11 @@
+{*
+    Params
+    - type : notification type (default alert)
+    - message : modal message
+*}
+{if $message}
+<div class="{if $type}$type{else}alert alert-info{/if}">
+    <span class="icon-question-sign"></span>
+    {$message}
+</div>
+{/if}

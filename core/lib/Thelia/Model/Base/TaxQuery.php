@@ -432,7 +432,7 @@ abstract class TaxQuery extends ModelCriteria
      *
      * @return ChildTaxQuery The current query, for fluid interface
      */
-    public function joinTaxRuleCountry($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinTaxRuleCountry($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('TaxRuleCountry');
@@ -467,7 +467,7 @@ abstract class TaxQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\TaxRuleCountryQuery A secondary query class using the current class as primary query
      */
-    public function useTaxRuleCountryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useTaxRuleCountryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinTaxRuleCountry($relationAlias, $joinType)

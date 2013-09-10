@@ -1,0 +1,74 @@
+{*test*}
+{*{$ruleId}*}
+{*{$inputs|var_dump}*}
+
+{foreach from=$inputs key=name item=input}
+    <label for="operator">{$input.title}</label>
+    <div class="row">
+        <div class="col-lg-6">
+            <select class="form-control" id="{$name}[operator]" name="{$name}[operator]">
+                {foreach from=$input.availableOperators key=k item=availableOperator}
+                    <option value="{$availableOperator}">{$availableOperator}</option>
+                {/foreach}
+            </select>
+        </div>
+        <div class="input-group col-lg-6">
+            {if $input.type == 'select'}
+                <select class="{$input.class}" id="{$name}[value]" name="{$name}[value]">
+                    {foreach from=$input.availableValues key=code item=availableValue}
+                        <option value="{$code}">{$availableValue}</option>
+                    {/foreach}
+                </select>
+            {else}
+                <input type="{$input.type}" class="{$input.class}" id="{$name}[value]" name="{$name}[value]">
+                {*<span class="input-group-addon">€</span>*}
+            {/if}
+        </div>
+    </div>
+{/foreach}
+    {*<label for="operator">Operator :</label>*}
+    {*<div class="row">*}
+        {*<div class="col-lg-6">*}
+            {*<select class="form-control" id="operator" name="operator">*}
+                {*<option value="1">is superior to</option>*}
+                {*<option value="2">equals to</option>*}
+                {*<option value="3">is inferior to</option>*}
+                {*<option value="4">is inferior or equals to</option>*}
+                {*<option value="5">is superior or equals to</option>*}
+            {*</select>*}
+        {*</div>*}
+        {*<div data-date-format="dd/mm/yyyy" data-date="12/02/2012" class="input-group col-lg-6 date">*}
+            {*<input type="text" class="form-control" name="value">*}
+            {*<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>*}
+        {*</div>*}
+    {*</div>*}
+    {*<label for="operator">Operator :</label>*}
+    {*<div class="row">*}
+        {*<div class="col-lg-6">*}
+            {*<select class="form-control" id="operator" name="operator">*}
+                {*<option value="1">is superior to</option>*}
+                {*<option value="2">equals to</option>*}
+                {*<option value="3">is inferior to</option>*}
+                {*<option value="4">is inferior or equals to</option>*}
+                {*<option value="5">is superior or equals to</option>*}
+            {*</select>*}
+        {*</div>*}
+        {*<div class="col-lg-6">*}
+            {*<input type="text" class="form-control" name="value">*}
+        {*</div>*}
+    {*</div>*}
+    {*<div class="row">*}
+        {*<div class="col-lg-12">*}
+            {*<table class="table table-bordered">*}
+                {*<tbody><tr>*}
+                    {*<td id="minibrowser-breadcrumb"><div><span> &gt; </span><a href="#">Racine</a></div></td>*}
+                {*</tr>*}
+                {*<tr>*}
+                    {*<th><span class="icon-th-list"></span> Categories list</th>*}
+                {*</tr>*}
+                {*<tr>*}
+                    {*<td id="minibrowser-categories"><div><p><a href="#">Boyaux</a></p><p><a href="#">Epices / condiments</a></p><p><a href="#">Emballage</a></p><p><a href="#">Petits matériels</a></p><p><a href="#">Materiel de cuisine</a></p><p><a href="#">Bacs</a></p><p><a href="#">Hygiène &amp; entretien</a></p><p><a href="#">Art de la table</a></p><p><a href="#">Matériels</a></p></div></td>*}
+                {*</tr>*}
+                {*</tbody></table>*}
+        {*</div>*}
+    {*</div>*}

@@ -33,12 +33,15 @@ namespace Thelia\Core;
  */
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Validator\Tests\Fixtures\Reference;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 use Thelia\Core\Bundle;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Log\Tlog;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
@@ -73,7 +76,6 @@ class Thelia extends Kernel
 
         $definePropel = new DefinePropel(new DatabaseConfiguration(),
             Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
-        $propelConfig = $definePropel->getConfig();
         $serviceContainer = Propel::getServiceContainer();
         $serviceContainer->setAdapterClass('thelia', 'mysql');
         $manager = new ConnectionManagerSingle();
@@ -81,11 +83,19 @@ class Thelia extends Kernel
         $serviceContainer->setConnectionManager('thelia', $manager);
 
         if ($this->isDebug()) {
-            $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
-
             $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
             $con->useDebug(true);
         }
+    }
+
+    /**
+     * dispatch an event when application is boot
+     */
+    public function boot()
+    {
+        parent::boot();
+
+        $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
     }
 
     /**
@@ -107,6 +117,16 @@ class Thelia extends Kernel
             foreach ($modules as $module) {
 
                 try {
+
+                    $defintion = new Definition();
+                    $defintion->setClass($module->getFullNamespace());
+                    $defintion->addMethodCall("setContainer", array('service_container'));
+
+                    $container->setDefinition(
+                        "module.".$module->getCode(),
+                        $defintion
+                    );
+
                     $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/Config"));
                     $loader->load("config.xml");
                 } catch (\InvalidArgumentException $e) {

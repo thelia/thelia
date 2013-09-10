@@ -41,6 +41,34 @@ class CreateAdminUser extends ContainerAwareCommand
             ->setName("thelia:create-admin")
             ->setDescription("Create a new adminsitration user")
             ->setHelp("The <info>thelia:create-admin</info> command create a new administration user.")
+            ->addOption(
+                'login_name',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Admin login name',
+                null
+            )
+            ->addOption(
+                'first_name',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'User first name',
+                null
+            )
+            ->addOption(
+                "last_name",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'User last name',
+                null
+            )
+            ->addOption(
+                'password',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Password',
+                null
+            )
         ;
 
     }
@@ -54,25 +82,25 @@ class CreateAdminUser extends ContainerAwareCommand
         $admin->save();
 
         $output->writeln(array(
-            "",
-            "<info>User ".$admin->getLogin()." successfully created.</info>",
-            ""
-        ));
+                "",
+                "<info>User ".$admin->getLogin()." successfully created.</info>",
+                ""
+            ));
     }
 
     protected function enterData($dialog, $output, $label, $error_message)
     {
         return $dialog->askAndValidate(
-                $output,
-                $this->decorateInfo($label),
-                function ($answer) {
-                    $answer = trim($answer);
-                    if (empty($answer)) {
-                        throw new \RuntimeException("This information is mandatory.");
-                    }
-
-                    return $answer;
+            $output,
+            $this->decorateInfo($label),
+            function ($answer) {
+                $answer = trim($answer);
+                if (empty($answer)) {
+                    throw new \RuntimeException("This information is mandatory.");
                 }
+
+                return $answer;
+            }
         );
     }
 
@@ -89,13 +117,13 @@ class CreateAdminUser extends ContainerAwareCommand
 
         $admin = new Admin();
 
-        $admin->setLogin($this->enterData($dialog, $output, "Admin login name : ", "Please enter a login name."));
-        $admin->setFirstname($this->enterData($dialog, $output, "User first name : ", "Please enter user first name."));
-        $admin->setLastname($this->enterData($dialog, $output, "User last name : ", "Please enter user last name."));
+        $admin->setLogin($input->getOption("login_name") ?: $this->enterData($dialog, $output, "Admin login name : ", "Please enter a login name."));
+        $admin->setFirstname($input->getOption("first_name") ?: $this->enterData($dialog, $output, "User first name : ", "Please enter user first name."));
+        $admin->setLastname($input->getOption("last_name") ?: $this->enterData($dialog, $output, "User last name : ", "Please enter user last name."));
 
         do {
-            $password = $this->enterData($dialog, $output, "Password : ", "Please enter a password.");
-            $password_again = $this->enterData($dialog, $output, "Password (again): ", "Please enter the password again.");
+            $password = $input->getOption("password") ?: $this->enterData($dialog, $output, "Password : ", "Please enter a password.");
+            $password_again = $input->getOption("password") ?: $this->enterData($dialog, $output, "Password (again): ", "Please enter the password again.");
 
             if (! empty($password) && $password == $password_again) {
 
@@ -109,7 +137,7 @@ class CreateAdminUser extends ContainerAwareCommand
         while (true);
 
         return $admin;
-     }
+    }
 
     protected function decorateInfo($text)
     {

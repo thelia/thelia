@@ -41,7 +41,7 @@ class AssociatedContentTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new AssociatedContent($this->request, $this->dispatcher, $this->securityContext);
+        return new AssociatedContent($this->container);
     }
 
     public function getMandatoryArguments()

@@ -96,19 +96,19 @@
   </table>
   <table name="tax_rule" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="code" size="45" type="VARCHAR" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="LONGVARCHAR" />
     <behavior name="timestampable" />
-    <behavior name="i18n" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
   </table>
   <table name="tax_rule_country" namespace="Thelia\Model">
-    <column name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="tax_rule_id" type="INTEGER" />
-    <column name="country_id" type="INTEGER" />
-    <column name="tax_id" type="INTEGER" />
-    <column name="none" type="TINYINT" />
-    <foreign-key foreignTable="tax" name="fk_tax_rule_country_tax_id" onDelete="SET NULL" onUpdate="RESTRICT">
+    <column name="tax_rule_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="country_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="tax_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="position" required="true" type="INTEGER" />
+    <foreign-key foreignTable="tax" name="fk_tax_rule_country_tax_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_id" />
     </foreign-key>
     <foreign-key foreignTable="tax_rule" name="fk_tax_rule_country_tax_rule_id" onDelete="CASCADE" onUpdate="RESTRICT">
@@ -605,6 +605,7 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <column name="full_namespace" size="255" type="VARCHAR" />
     <unique name="code_UNIQUE">
       <unique-column name="code" />
     </unique>

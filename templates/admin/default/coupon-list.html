@@ -1,0 +1,173 @@
+{extends file="admin-layout.tpl"}
+{block name="check-permissions"}admin.coupon.view{/block}
+{block name="page-title"}{intl l='Coupons'}{/block}
+
+{block name="main-content"}
+<section id="wrapper" class="container">
+
+    <nav>
+        <ul class="breadcrumb">
+            {include file="includes/coupon_breadcrumb.html"}
+        </ul>
+    </nav>
+    
+    <div class="page-header">
+        <h1>Coupons : <small>List of coupons</small></h1>
+    </div>
+
+    <section class="row">
+		<div class="col-md-12 general-block-decorator">
+	    	<table class="table table-striped tablesorter">
+	    		<caption>
+	    			List of enabled coupons
+	    		</caption>
+	    		<thead>
+	    			<tr>
+	    				<th>Code</th>
+	    				<th>Title</th>
+	    				<th>Expiration date</th>
+	    				<th>Usage left</th>
+	    				<th class="sorter-false filter-false">Actions</th>
+	    			</tr>	    			
+	    		</thead>
+	    		<tbody>
+	    			<tr>
+	    				<td><a href="#">XMAS13</a></td>
+	    				<td>Coupon for XMAS -30 &euro;</td>
+	    				<td>18/10/2013</td>
+	    				<td>49</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+	    					<a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#disable"><span class="glyphicon glyphicon-off"></span> Disable</a>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td><a href="#">XMAS13</a></td>
+	    				<td>Coupon for XMAS -30 &euro;</td>
+	    				<td>05/09/2013</td>
+	    				<td>20</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+	    					<a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#disable"><span class="glyphicon glyphicon-off"></span> Disable</a>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td><a href="#">XMAS13</a></td>
+	    				<td>Coupon for XMAS -30 &euro;</td>
+	    				<td>03/12/2013</td>
+	    				<td>9</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+	    					<a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#disable"><span class="glyphicon glyphicon-off"></span> Disable</a>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td><a href="#">XMAS13</a></td>
+	    				<td>Coupon for XMAS -30 &euro;</td>
+	    				<td>25/01/2013</td>
+	    				<td>4</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+	    					<a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#disable"><span class="glyphicon glyphicon-off"></span> Disable</a>
+	    				</td>
+	    			</tr>
+	    		</tbody>
+	    	</table>
+		</div>
+    </section>
+
+    <section class="row">
+		<div class="col-md-12 general-block-decorator">
+	    	<table class="table table-striped tablesorter">
+	    		<caption>
+	    			List of disabled coupons
+	    		</caption>
+	    		<thead>
+	    			<tr>
+	    				<th>Code</th>
+	    				<th>Title</th>
+	    				<th>Expiration date</th>
+	    				<th>Usage left</th>
+	    				<th class="sorter-false filter-false">Actions</th>
+	    			</tr>
+	    		</thead>
+	    		<tbody>
+	    			<tr>
+	    				<td>XMAS13</td>
+	    				<td>Coupon for XMAS -30 &euro;</td>
+	    				<td>18/10/2013</td>
+	    				<td>49</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+	    					<a href="#url" class="btn btn-default btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="glyphicon glyphicon-ok"></span> Enabled</a>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>XMAS13</td>
+	    				<td>Coupon for XMAS -20 &euro;</td>
+	    				<td>05/09/2013</td>
+	    				<td>49</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+	    					<a href="#url" class="btn btn-default btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="glyphicon glyphicon-ok"></span> Enabled</a>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>XMAS13</td>
+	    				<td>Coupon for XMAS -50 &euro;</td>
+	    				<td>03/12/2013</td>
+	    				<td>49</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+	    					<a href="#url" class="btn btn-default btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="glyphicon glyphicon-ok"></span> Enabled</a>
+	    				</td>
+	    			</tr>
+	    			<tr>
+	    				<td>XMAS13</td>
+	    				<td>Coupon for XMAS -5 &euro;</td>
+	    				<td>25/01/2013</td>
+	    				<td>49</td>
+	    				<td>
+	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+	    					<a href="#url" class="btn btn-default btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="glyphicon glyphicon-ok"></span> Enabled</a>
+	    				</td>
+	    			</tr>
+	    		</tbody>
+	    	</table>
+		</div>
+    </section>
+
+</section> <!-- #wrapper -->
+
+{include file='includes/confirmation-modal.html' id="disable" message="{intl l='Do you really want to disable this element ?'}"}
+{include file='includes/confirmation-modal.html' id="enable" message="{intl l='Do you really want to enable this element ?'}"}
+
+{/block}
+
+
+{block name="javascript-initialization"}
+	
+    {javascripts file='assets/bootstrap-editable/js/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/tablesorter/jquery.tablesorter.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/tablesorter/jquery.metadata.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/tablesorter/jquery.tablesorter.widgets.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/tablesorter/jquery.tablesorter.widgets-filter-formatter.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/main.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+{/block}

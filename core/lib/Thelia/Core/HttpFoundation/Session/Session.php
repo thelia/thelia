@@ -28,6 +28,7 @@ use Thelia\Core\Security\User\UserInterface;
 use Thelia\Exception\InvalidCartException;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Cart;
+use Thelia\Model\Currency;
 use Thelia\Tools\URL;
 use Thelia\Model\Lang;
 
@@ -44,9 +45,9 @@ class Session extends BaseSession
     /**
      * @return \Thelia\Model\Lang|null
      */
-    public function getLang()
+    public function getLang($forceDefault = true)
     {
-        return $this->get("thelia.current.lang", Lang::getDefaultLanguage());
+        return $this->get("thelia.current.lang", $forceDefault ? Lang::getDefaultLanguage():null);
     }
 
     public function setLang(Lang $lang)
@@ -66,6 +67,16 @@ class Session extends BaseSession
         $this->set('thelia.admin.edition.lang', $langId);
 
         return $this;
+    }
+
+    public function setCurrency(Currency $currency)
+    {
+        $this->set("thelia.current.currency", $currency);
+    }
+
+    public function getCurrency($forceDefault = true)
+    {
+        return $this->get("thelia.current.currency", $forceDefault ? Currency::getDefaultCurrency():null);
     }
 
     // -- Customer user --------------------------------------------------------
@@ -164,10 +175,28 @@ class Session extends BaseSession
      * assign cart id in session
      *
      * @param $cart_id
+     * @return $this
      */
     public function setCart($cart_id)
     {
         $this->set("thelia.cart_id", $cart_id);
         return $this;
+    }
+
+    /**
+     * assign delivery id in session
+     *
+     * @param $delivery_id
+     * @return $this
+     */
+    public function setDelivery($delivery_id)
+    {
+        $this->set("thelia.delivery_id", $delivery_id);
+        return $this;
+    }
+
+    public function getDelivery()
+    {
+        return $this->get("thelia.delivery_id");
     }
 }

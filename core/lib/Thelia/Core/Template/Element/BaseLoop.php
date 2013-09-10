@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Element;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -52,6 +53,9 @@ abstract class BaseLoop
      */
     protected $securityContext;
 
+    /** @var ContainerInterface Service Container */
+    protected $container = null;
+
     protected $args;
 
     public $countable = true;
@@ -61,15 +65,15 @@ abstract class BaseLoop
     /**
      * Create a new Loop
      *
-     * @param Request                  $request
-     * @param EventDispatcherInterface $dispatcher
-     * @param SecurityContext          $securityContext
+     * @param ContainerInterface $container
      */
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher, SecurityContext $securityContext)
+    public function __construct(ContainerInterface $container)
     {
-        $this->request = $request;
-        $this->dispatcher = $dispatcher;
-        $this->securityContext = $securityContext;
+        $this->container = $container;
+
+        $this->request = $container->get('request');
+        $this->dispatcher = $container->get('event_dispatcher');
+        $this->securityContext = $container->get('thelia.securityContext');
 
         $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
     }
@@ -243,23 +247,9 @@ abstract class BaseLoop
      *
      * this function have to be implement in your own loop class.
      *
-     * All your parameters are defined in defineArgs() and can be accessible like a class property.
+     * All loops parameters can be accessible via getter.
      *
-     * example :
-     *
-     * public function defineArgs()
-     * {
-     *  return array (
-     *      "ref",
-     *      "id" => "optional",
-     *      "stock" => array(
-     *          "optional",
-     *          "default" => 10
-     *          )
-     *  );
-     * }
-     *
-     * you can retrieve ref value using $this->ref
+     * for example, ref parameter is accessible through getRef method
      *
      * @param $pagination
      *
@@ -271,18 +261,31 @@ abstract class BaseLoop
      *
      * define all args used in your loop
      *
-     * array key is your arg name.
      *
      * example :
      *
-     * return array (
-     *  "ref",
-     *  "id" => "optional",
-     *  "stock" => array(
-     *          "optional",
-     *          "default" => 10
-     *          )
-     * );
+     * public function getArgDefinitions()
+     * {
+     *  return new ArgumentCollection(
+     *       Argument::createIntListTypeArgument('id'),
+     *           new Argument(
+     *           'ref',
+     *           new TypeCollection(
+     *               new Type\AlphaNumStringListType()
+     *           )
+     *       ),
+     *       Argument::createIntListTypeArgument('category'),
+     *       Argument::createBooleanTypeArgument('new'),
+     *       Argument::createBooleanTypeArgument('promo'),
+     *       Argument::createFloatTypeArgument('min_price'),
+     *       Argument::createFloatTypeArgument('max_price'),
+     *       Argument::createIntTypeArgument('min_stock'),
+     *       Argument::createFloatTypeArgument('min_weight'),
+     *       Argument::createFloatTypeArgument('max_weight'),
+     *       Argument::createBooleanTypeArgument('current'),
+     *
+     *   );
+     * }
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */

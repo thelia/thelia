@@ -1,0 +1,36 @@
+// header
+header {
+    .header {
+        .make-row();
+        margin-bottom: @line-height-computed;
+
+        .logo {
+            .make-md-column(4);
+            .hidden-xs;
+            margin-top: 0;
+            a {
+                text-decoration: none;
+            }
+        }
+
+        .language-container {
+            .make-md-column(4);
+            .make-md-column-offset(4);
+            text-align: right;
+
+            .search-container {
+                margin-bottom: @line-height-computed/2;
+            }
+
+            .language-switch,
+            .currency-switch {
+                display: inline-block;
+                position: relative;
+                vertical-align: middle;
+                .dropdown-label { display: inline-block; float: left; font-size: 1em; font-weight: 300; margin-left: 1em; margin-right: .4em; }
+                .current { display: inline-block; float: left; position: relative; }
+                .select { left:auto; right: 0; min-width: 80px; }
+            }
+        }
+    }
+}

@@ -22,6 +22,7 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Front;
 
+use Symfony\Component\Routing\Router;
 use Thelia\Controller\BaseController;
 use Thelia\Tools\URL;
 
@@ -34,8 +35,8 @@ class BaseFrontController extends BaseController
      *
      * @see \Thelia\Controller\BaseController::getRouteFromRouter()
      */
-    protected function getRoute($routeId) {
-        return $this->getRouteFromRouter('router.front', $routeId);
+    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH) {
+        return $this->getRouteFromRouter('router.front', $routeId, $parameters, $referenceType);
     }
 
     /**
@@ -44,7 +45,7 @@ class BaseFrontController extends BaseController
      * @param unknown $routeId the route ID, as found in Config/Resources/routing/admin.xml
      * @param unknown $urlParameters the URL parametrs, as a var/value pair array
      */
-    public function redirectToRoute($routeId, $urlParameters = array()) {
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId), $urlParameters));
+    public function redirectToRoute($routeId, $urlParameters = array(), $referenceType = Router::ABSOLUTE_PATH) {
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, array(), $referenceType), $urlParameters));
     }
 }

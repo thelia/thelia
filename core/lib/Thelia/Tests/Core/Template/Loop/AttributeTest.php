@@ -41,7 +41,7 @@ class AttributeTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new Attribute($this->request, $this->dispatcher, $this->securityContext);
+        return new Attribute($this->container);
     }
 
     public function getMandatoryArguments()

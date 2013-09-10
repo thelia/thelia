@@ -102,6 +102,10 @@ abstract class BaseForm
             $this->formBuilder->add("success_url", "text");
         }
 
+        if (! $this->formBuilder->has('error_message')) {
+            $this->formBuilder->add("error_message", "text");
+        }
+
         $this->form = $this->formBuilder->getForm();
     }
 
@@ -141,6 +145,8 @@ abstract class BaseForm
     public function createView()
     {
         $this->view = $this->form->createView();
+
+        return $this;
     }
 
     public function getView()
@@ -159,6 +165,8 @@ abstract class BaseForm
     public function setError($has_error = true)
     {
         $this->has_error = $has_error;
+
+        return $this;
     }
 
     /**
@@ -180,6 +188,8 @@ abstract class BaseForm
     {
         $this->setError(true);
         $this->error_message = $message;
+
+        return $this;
     }
 
     /**
