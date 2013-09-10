@@ -15,7 +15,7 @@ Parameters:
 {* re-display the form creation dialog if it contains errors *}
 
 {form name="{$form_name}"}
-    {if #form_error}
+    {if $form_error}
         $('#{$dialog_id}').modal();
     {/if}
 {/form}
