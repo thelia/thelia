@@ -80,4 +80,18 @@ class Currency extends BaseCurrency {
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECURRENCY, new CurrencyEvent($this));
     }
+
+    /**
+     * Get the [rate] column value.
+     *
+     * @return   double
+     */
+    public function getRate()
+    {
+        if(false === filter_var($this->rate, FILTER_VALIDATE_FLOAT)) {
+            throw new PropelException('Currency::rate is not float value');
+        }
+
+        return $this->rate;
+    }
 }
