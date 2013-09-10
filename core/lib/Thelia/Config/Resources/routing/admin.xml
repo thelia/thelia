@@ -149,11 +149,11 @@
 
     <!-- attribute and feature routes  management -->
 
-    <route id="admin.configuration.attribute" path="/admin/configuration/product_attributes">
+    <route id="admin.configuration.product-attribute.default" path="/admin/configuration/product-attributes">
         <default key="_controller">Thelia\Controller\Admin\AttributeController::defaultAction</default>
     </route>
 
-    <route id="admin.configuration.attribute.edit" path="/admin/configuration/product_attributes/update">
+    <route id="admin.configuration.product-attribute.edit" path="/admin/configuration/product-attributes/update">
         <default key="_controller">Thelia\Controller\Admin\AttributeController::updateAction</default>
     </route>
 

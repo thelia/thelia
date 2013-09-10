@@ -36,6 +36,8 @@
     {* Modules css are included here *}
 
     {module_include location='head_css'}
+
+    {debugbar_renderHead}
 </head>
 
 <body>
@@ -233,5 +235,7 @@
     {debugbar_render}
 	{* Modules scripts are included now *}
 	{module_include location='footer_js'}
+
+	{debugbar_render}
 </body>
 </html>
