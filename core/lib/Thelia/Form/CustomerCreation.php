@@ -43,19 +43,28 @@ class CustomerCreation extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "firstname"
+                "label" => "Firstname",
+                "label_attr" => array(
+                    "for" => "firstname"
+                )
             ))
             ->add("lastname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "lastname"
+                "label" => "Lastname",
+                "label_attr" => array(
+                    "for" => "lastname"
+                )
             ))
             ->add("address1", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "address"
+                "label" => "Address",
+                "label_attr" => array(
+                    "for" => "address"
+                )
             ))
             ->add("address2", "text", array(
                 "label" => "Address Line 2"
@@ -64,28 +73,43 @@ class CustomerCreation extends BaseForm
                 "label" => "Address Line 3"
             ))
             ->add("phone", "text", array(
-                "label" => "phone"
+                "label" => "Phone",
+                "label_attr" => array(
+                    "for" => "phone"
+                )
             ))
             ->add("cellphone", "text", array(
-                "label" => "cellphone"
+                "label" => "Cellphone",
+                "label_attr" => array(
+                    "for" => "cellphone"
+                )
             ))
             ->add("zipcode", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "zipcode"
+                "label" => "Zip code",
+                "label_attr" => array(
+                    "for" => "zipcode"
+                )
             ))
             ->add("city", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "city"
+                "label" => "City",
+                "label_attr" => array(
+                    "for" => "city"
+                )
             ))
             ->add("country", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "country"
+                "label" => "Country",
+                "label_attr" => array(
+                    "for" => "country"
+                )
             ))
             ->add("title", "text", array(
                 "constraints" => array(
@@ -104,7 +128,10 @@ class CustomerCreation extends BaseForm
                         )
                     ))
                 ),
-                "label" => "email"
+                "label" => "Email",
+                "label_attr" => array(
+                    "for" => "email"
+                )
             ))
             ->add("email_confirm", "email", array(
                 "constraints" => array(
@@ -115,14 +142,20 @@ class CustomerCreation extends BaseForm
                         )
                     ))
                 ),
-                "label" => "email confirmation"
+                "label" => "Email confirmation",
+                "label_attr" => array(
+                    "for" => "email-confirmation"
+                )
             ))
             ->add("password", "password", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4)))
                 ),
-                "label" => "password"
+                "label" => "Password",
+                "label_attr" => array(
+                    "for" => "password"
+                )
             ))
             ->add("password_confirm", "password", array(
                 "constraints" => array(
@@ -132,7 +165,10 @@ class CustomerCreation extends BaseForm
                         array($this, "verifyPasswordField")
                     )))
                 ),
-                "label" => "password confirmation"
+                "label" => "Password confirmation",
+                "label_attr" => array(
+                    "for" => "password-confirmation"
+                )
             ))
 
         ;

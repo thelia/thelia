@@ -37,6 +37,11 @@
         <default key="_controller">Thelia\Controller\Admin\CustomerController::indexAction</default>
     </route>
 
+    <route id="admin.customer.update.view" path="/admin/customer/update/{customer_id}">
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::viewAction</default>
+        <requirement key="customer_id">\d+</requirement>
+    </route>
+
     <!-- end Customer rule management -->
 
     <!-- Categories management -->
