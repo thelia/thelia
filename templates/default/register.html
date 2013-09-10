@@ -16,13 +16,13 @@
 
         <article class="col-main" role="main" aria-labelledby="main-label">
 
-            <h1 id="main-label" class="page-header">Create New Account</h1>
-
+            <h1 id="main-label" class="page-header">{intl l="Create New Account"}</h1>
+            {form name=""}
             <form id="form-register" class="form-horizontal" action="" method="post" role="form">
 
                 <fieldset id="register-info" class="panel panel">
                     <div class="panel-heading">
-                        1. Personal Informations
+                        1. {intl l="Personal Informations"}
                     </div>
 
                     <div class="panel-body">
@@ -158,6 +158,7 @@
                     </div>
                 </div><!--/.form-group-->
             </form>
+            {/form}
         </article>
 
     </div><!-- /.layout -->
