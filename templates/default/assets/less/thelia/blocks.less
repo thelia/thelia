@@ -1,0 +1,253 @@
+// Thelia : Block (Nav, Links, Poll, )
+
+.block {
+    background: @block-bg;
+    border: 1px solid @block-border;
+    .border-radius(@block-border-radius);
+    .box-shadow(@block-shadow);
+
+    // Heading
+    .block-heading {
+        background: @block-heading-bg;
+        border-bottom: 1px solid @block-heading-border;
+        color: @block-heading-color;
+        margin:0 0 @padding-base-vertical 0; padding-bottom: @padding-base-vertical;
+    }
+
+    // Within heading, strip any `h*` tag of it's default margins for spacing.
+    .block-title {
+        font-size: @block-heading-font-size;
+        margin-top: 0; margin-bottom: 0;
+        > a {
+            color: inherit;
+        }
+    }
+
+    .block-content {
+        font-size: @font-size-small;
+        margin-bottom: @line-height-computed;
+
+        .block-subtitle {
+            border-bottom: 1px solid @block-subheading-border;
+            color: @block-subheading-color;
+            font-size: @block-subheading-font-size;
+            font-weight: 300;
+            margin:0 0 @padding-base-vertical 0;
+        }
+    }
+}
+
+
+// Block - Default
+.block-default {
+    .block-content {
+        ul {
+            .list-unstyled();
+            > li {
+                margin-left: 15px; padding-top: @padding-base-vertical;
+                a {
+                    color: @block-links-color;
+                    // Hover state
+                    &:hover,
+                    &:focus {
+                        color: @link-hover-color;
+                    }
+                }
+                &:before {
+                    .icon(@chevron-right);
+                    color: @link-color;
+                    margin-left: -15px; margin-right: 5px;
+                }
+            }
+        }
+    }
+}
+
+
+/* Block - Links */
+.block-links {
+    .block-content {
+        ul {
+            .list-unstyled();
+            > li + li a { border-top: 1px solid @block-links-border; }
+            > li a {
+                background-color: @block-links-bg;
+                color: @block-links-color;
+                display: block;
+                font-size: @font-size-small;
+                font-weight: normal;
+                padding: 10px 3px;
+                position: relative;
+
+                // Hover state
+                &:hover,
+                &:focus {
+                    text-decoration: none;
+                    background-color: @block-links-hover-bg;
+                }
+
+                > p { margin-bottom: 0; }
+            }
+        }
+    }
+}
+
+
+/* Block - Nav */
+.block-nav {
+    .block-heading { margin-bottom: 0;}
+    .block-content {
+        ul {
+            .list-unstyled();
+            //> li + li a { border-top: 1px solid @block-nav-border; }
+            > li a {
+                background-color: @block-nav-bg;
+                border-top: 1px solid @block-nav-border;
+                color: @block-nav-color;
+                display: block;
+                font-size: @font-size-small;
+                font-weight: normal;
+                padding: 10px 3px;
+                position: relative;
+
+                // Hover state
+                &:hover,
+                &:focus {
+                    text-decoration: none;
+                    background-color: @block-nav-hover-bg;
+                }
+                &.accordion-toggle {
+                    &:after {
+                        color: @brand-primary;
+                        float: right;
+                        .icon(@minus);
+                    }
+                    &.collapsed:after { content: @plus; }
+                }
+            }
+            ul a { padding-left: 15px; }
+            ul ul a { padding-left: 30px; }
+            ul ul ul a { padding-left: 45px; }
+        }
+    }
+}
+
+
+/* Block - Thumbnails */
+.block-thumbnail {
+    .make-row();
+    &.block-thumbnail-2 li { max-width: percentage((6 / @grid-columns)); }
+    &.block-thumbnail-3 li { max-width: percentage((4 / @grid-columns)); }
+    &.block-thumbnail-4 li { max-width: percentage((3 / @grid-columns)); }
+    .block-content {
+        ul {
+            .list-unstyled();
+            > li {
+                float: left;
+                padding-right: (@grid-gutter-width / 4);
+                padding-bottom: (@grid-gutter-width / 4);
+                position: relative;
+                max-width: percentage((4 / @grid-columns)); // Default is 3 thumbnails
+            }
+        }
+    }
+}
+
+/* Block - Social */
+.block-social {
+    .block-content {
+        ul {
+            .list-unstyled();
+            > li {
+                display: inline-block;
+                font-size: @font-size-large;
+                > a {
+                    color: @block-social-links-color;
+                    &:hover,
+                    &:focus {
+                        color: @block-social-links-hover-color;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+/* Block - Newsletter */
+&.block-newsletter {
+    .block-content {
+        form {
+            .btn-subscribe { padding: 6px 6px; }
+        }
+    }
+}
+
+
+/* Block - Contact Info */
+.block-contact {
+    .block-content {
+        ul {
+            .list-unstyled();
+            > li {
+                clear: both;
+                margin-bottom: 5px;
+           }
+        }
+    }
+}
+
+
+// Block - Carousel
+.block-carousel {
+    margin-bottom: 30px;
+    .carousel-indicators {
+        bottom: auto;
+    }
+    .block-carousel-control {
+        .pull-right;
+        .carousel-control {
+            background: #efefef;
+            color: #000;
+            display: block;
+            float: left;
+            font-size: 24px;
+            margin-left: 3px;
+            position: relative;
+            top: 1px; left: auto; bottom: auto;
+            width: 28px; height: 28px;
+            .transition(background-color 300ms ease-in-out);
+
+            &:hover,&:focus {
+                background-color: #000;
+                color: #fff;
+            }
+         }
+    }
+}
+
+
+/* Block - Poll */
+.block-poll {}
+
+
+/* Block - Compare */
+.block-compare {}
+
+
+/* Block - Wishlist */
+.block-wishlist {}
+
+
+/* Block - Cart */
+.block-cart {
+    .block-title {}
+    .block-content {}
+}
+
+
+/* Block - Related */
+.block-cart {
+    .block-title {}
+    .block-content {}
+}

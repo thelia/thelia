@@ -1,0 +1,20 @@
+//
+// Magnifier
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Parent container
+.magnify {
+    position: relative;
+    cursor:none;
+}
+
+// Magnifying glass
+.magnify-large {
+    position: absolute;
+    display: none;
+    width: 175px; height: 175px;
+    @shadow: 0 0 0 7px rgba(255, 255, 255, 0.85), 0 0 7px 7px rgba(0, 0, 0, 0.25), inset 0 0 40px 2px rgba(0, 0, 0, 0.25);
+    .box-shadow(@shadow);
+    .border-radius(100%);
+    z-index:10;
+}
