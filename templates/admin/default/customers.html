@@ -59,7 +59,7 @@
                         </thead>
 
                         <tbody>
-                        {loop name="customer_list" type="customer" visible="*" last_order="1" backend_context="1" page={$customer_page} limit={$display_customer}}
+                        {loop name="customer_list" type="customer" current="false" visible="*" last_order="1" backend_context="1" page={$customer_page} limit={$display_customer}}
                             <tr>
                                 <td>{#REF}</td>
 

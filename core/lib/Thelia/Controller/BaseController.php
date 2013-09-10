@@ -179,7 +179,14 @@ class BaseController extends ContainerAware
                 return $form;
             }
             else {
-                throw new FormValidationException(sprintf("Missing or invalid data: %s", $this->getErrorMessages($form)));
+                $errorMessage = null;
+                if ($form->get("error_message")->getData() != null) {
+                    $errorMessage = $form->get("error_message")->getData();
+                } else {
+                    $errorMessage = sprintf("Missing or invalid data: %s", $this->getErrorMessages($form));
+                }
+
+                throw new FormValidationException($errorMessage);
             }
         }
         else {

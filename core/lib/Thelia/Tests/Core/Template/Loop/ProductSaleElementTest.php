@@ -41,7 +41,7 @@ class ProductSaleElementsTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new ProductSaleElements($this->request, $this->dispatcher, $this->securityContext);
+        return new ProductSaleElements($this->container);
     }
 
     public function getMandatoryArguments()

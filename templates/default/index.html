@@ -1,151 +1,142 @@
-{include file="includes/header.html"}
-<div>
-
-{loop type="auth" name="auth_test" context="front" roles="CUSTOMER"}
-
-<p>Customer is authentified :-)</p>
-{/loop}
-
-{elseloop rel="auth_test"}
-<p>Customer is not authentified :-(</p>
-{/elseloop}
-
-An image from asset directory :
-{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}
-</div>
-
-<div>
-{intl l='An internationalized string'}
-</div>
+{extends file="layout.tpl"}
 
 
-<div>
-	jQuery data: <span id="jquery_block"></span>
-</div>
-
-<div>
-    <p>Category loop example</p>
-    <ul>
-        {loop type="category" name="catloop1"}
-            <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}, children: {$NB_CHILD}
-                {ifloop rel="inner1"}
-                    <ul>
-                        {loop type="category" name="inner1" parent="{$ID}"}
-                            <li>Sub cat {$ID} (parent is {$PARENT}): {$TITLE}</li>
-                        {/loop}
-                    </ul>
-                {/ifloop}
-            </li>
-        {/loop}
-    </ul>
-</div>
-
-
+{block name="main-content"}
+    <section class="carousel-container">
+        <div id="carousel" class="carousel slide">
+            <div class="carousel-wrapper">
+                <div class="carousel-inner">
+                    <figure class="item active">
+                        {images file='assets/img/carousel/slider1.png'}<img src="{$asset_url}" alt="img1">{/images}
+                    </figure>
+                    <figure class="item">
+                        {images file='assets/img/carousel/slider2.png'}<img src="{$asset_url}" alt="img2">{/images}
+                    </figure>
+                    <figure class="item">
+                        {images file='assets/img/carousel/slider3.png'}<img src="{$asset_url}" alt="img3">{/images}
+                    </figure>
+                </div>
+            </div>
+            <a class="left carousel-control" href="#carousel" data-slide="prev"><i class="icon-prev"></i></a>
+            <a class="right carousel-control" href="#carousel" data-slide="next"><i class="icon-next"></i></a>
+        </div>
+    </section><!-- #carousel -->
 
 
-<div>
-	<p>Conditional example #1</p>
+    <section id="products-new">
+        <div class="products-heading">
+            <h2>Latest <a href="#latest" class="btn-all">+ View All</a></h2>
+        </div>
 
-  	{ifloop rel="catloop2"}
-  		Hey ! Loop catloop2 is not empty:
-  		<ul>
-   		{loop type="category" name="catloop2" parent="12"}
-       		<li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
-   		{/loop}
-   		</ul>
-  	{/ifloop}
+        <div class="products-content">
+            <ul class="products-grid product-col-4">
+                {loop name="product_new" type="product" limit="4" new="yes"}
+                <li class="item">
+                    <article itemscope itemtype="http://schema.org/Product">
+                        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                        <meta itemprop="manufacturer" content="Diesel">
+                        <meta itemprop="category" content="Category1">
+                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
+                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
 
-  	{elseloop rel="catloop2"}
-  		<p>Loop catloop2 is empty</p>
-  	{/elseloop}
-</div>
+                        <a href="#URL" itemprop="url" tabindex="-1" class="product-image">
+                            {ifloop rel="image_product_new" }
+                                <img itemprop="image"
+                            {loop name="image_product_new" type="image" limit="1" product="{#ID}"}
+                                src="{#IMAGE_URL}"
+                            {/loop}
+                                alt="Product #{#LOOP_COUNT}" >
+                            {/ifloop}
+                            {elseloop rel="image_product_new"}
+                                {images file='assets/img/280x196.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{#LOOP_COUNT}">{/images}
+                            {/elseloop}
+                            <span class="mask"></span>
+                        </a>
 
-<div>
-	<p>Conditional example #2</p>
+                        <a href="{#URL}" class="product-info">
+                            <h3 class="name"><span itemprop="name">{#TITLE}</span></h3>
+                            <div class="short-description" itemprop="description">{#CHAPO}</div>
 
-	{ifloop rel="catloop3"}
-		Loop catloop3 is not empty:
-		<ul>
-		{loop type="category" name="catloop3" parent="0"}
-	    	<li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
-	 	{/loop}
-	 	</ul>
-	{/ifloop}
+                            <div class="product-price">
+                                <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                    <meta itemprop="currency" content="{currency attr="code"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                    <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                    <!-- List of availibility :
+                                            out_of_stock : http://schema.org/OutOfStock
+                                            in_stock : http://schema.org/InStock
+                                            instore_only : http://schema.org/InStoreOnly
+                                            preorder : http://schema.org/PreOrder
+                                            online_only : http://schema.org/OnlineOnly
+                                    -->
+                                    <span class="regular-price"><span itemprop="price" class="price">{currency attr="symbol"} {format_number number="{#BEST_TAXED_PRICE}"}
+</span></span>
+                                </div>
+                            </div>
+                        </a>
+                    </article><!-- /product -->
+                </li>
+                {/loop}
 
-	{elseloop rel="catloop3"}
-		<p>Loop catloop3 is empty</p>
-	{/elseloop}
+            </ul>
+        </div>
+    </section><!-- #products-new -->
 
-	{elseloop rel="catloop2"}
-		<p>... but catloop2 is still empty :-)</p>
-	{/elseloop}
+    <section id="products-offer">
+        <div class="products-heading">
+            <h2>Offers <a href="#offer" class="btn-all">+ View All</a></h2>
+        </div>
 
-</div>
+        <div class="products-content">
+            <ul class="products-grid product-col-5 hover-effect">
+                {loop name="product_promo" type="product" limit="5" promo="yes"}
+                <li class="item">
+                    <article itemscope itemtype="http://schema.org/Product">
+                        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                        <meta itemprop="manufacturer" content="Diesel">
+                        <meta itemprop="category" content="Category1">
+                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
+                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
 
-<div>
-	<p>Traditional for loop</p>
-    {for $index=5 to 12 step 1}
-    	Compteur = {$index}<br />
-    {/for}
-</div>
+                        <a href="{#URL}" itemprop="url" tabindex="-1" class="product-image">
+                            {ifloop rel="image_product_promo" }
+                            <img itemprop="image"
+                                    {loop name="image_product_promo" type="image" limit="1" product="{#ID}"}
+                                        src="{#IMAGE_URL}"
+                                    {/loop}
+                                 alt="Product #{#LOOP_COUNT}" >
+                            {/ifloop}
+                            {elseloop rel="image_product_promo"}
+                                {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="Promotion #{#LOOP_COUNT}">{/images}
+                            {/elseloop}
+                            <span class="mask"></span>
+                        </a>
 
+                        <div class="product-info">
+                            <h3 class="name"><a href="{#URL}"><span itemprop="name">{#CHAPO}</span></a></h3>
+                        </div>
 
+                        <div class="product-price">
+                            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                <meta itemprop="currency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                <!-- List of availibility :
+                                    out_of_stock : http://schema.org/OutOfStock
+                                    in_stock : http://schema.org/InStock
+                                    instore_only : http://schema.org/InStoreOnly
+                                    preorder : http://schema.org/PreOrder
+                                    online_only : http://schema.org/OnlineOnly
+                                -->
+                                {loop name="productSaleElements_promo" type="product_sale_elements" product="{#ID}" limit="1"}
+                                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{#TAXED_PROMO_PRICE}"} {currency attr="symbol"}</span></span>
+                                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{#TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                                {/loop}
+                            </div>
+                        </div>
+                    </article><!-- /product -->
+                </li>
+                {/loop}
 
-<div>
-    <p>Some pagination</p>
-    <p>PAGE 1</p>
-    <ul>
-        {loop type="category" name="catloopwithpagination1" limit="2" page="1"}
-        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
-        {/loop}
-    </ul>
-    <p>PAGE 2</p>
-    <ul>
-        {loop type="category" name="catloopwithpagination2" limit="2" page="2"}
-        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
-        {/loop}
-    </ul>
-    <p>PAGE 1000</p>
-    <ul>
-
-        {loop type="category" name="catloopwithpagination1000" limit="2" page="1000"}
-            <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
-        {/loop}
-
-        {elseloop rel="catloopwithpagination1000"}
-            NO RESULTS
-        {/elseloop}
-    </ul>
-</div>
-
-<div>
-    <p>Some pagination with page choice</p>
-    {assign var=current_page value=2}
-    <p>PAGE {$current_page} :</p>
-    <ul>
-        {loop type="category" name="catloopwithpaginationchoice" limit="2" page="{$current_page}"}
-        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
-        {/loop}
-    </ul>
-    <p>page choice</p>
-    {pageloop rel="catloopwithpaginationchoice"}
-        {if ${PAGE} != {$current_page}}
-            {if {$PAGE} > {$current_page}-10 AND {$PAGE} < {$current_page}+10}
-                {$PAGE}
-            {/if}
-            {if {$PAGE} == {$current_page}-10 OR {$PAGE} == {$current_page}+10}
-                ...
-            {/if}
-            {if ({$PAGE} < {$current_page}-10 OR {$PAGE} > {$current_page}+10) AND ({$PAGE}%10 == 0 OR ${PAGE} == {$LAST} OR ${PAGE} == 1)}
-                {$PAGE}
-            {/if}
-        {else}
-            { {$PAGE} }
-        {/if}
-        {if {$PAGE} != {$LAST}}
-            -
-        {/if}
-    {/pageloop}
-</div>
-
-{include file="includes/footer.html"}
+            </ul>
+        </div>
+    </section><!-- #products-offer -->
+{/block}

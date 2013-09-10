@@ -41,7 +41,7 @@ class FolderTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new Folder($this->request, $this->dispatcher, $this->securityContext);
+        return new Folder($this->container);
     }
 
     public function getMandatoryArguments()

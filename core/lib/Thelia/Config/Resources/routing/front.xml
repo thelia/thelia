@@ -15,17 +15,29 @@
         <default key="_view">connexion</default>
     </route>
 
+    <route id="customer.create.view" path="/register">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">register</default>
+    </route>
+
     <route id="customer.update.process" path="/customer/update" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::updateAction</default>
     </route>
 
     <route id="customer.login.process" path="/customer/login" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::loginAction</default>
+        <default key="_view">login</default>
+    </route>
+
+    <route id="customer.login.view" path="/login">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">login</default>
     </route>
 
     <route id="customer.logout.process" path="/customer/logout">
         <default key="_controller">Thelia\Controller\Front\CustomerController::logoutAction</default>
     </route>
+
     <!-- end customer routes -->
 
     <!-- customer address routes -->

@@ -41,7 +41,7 @@ class AddressTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new Address($this->request, $this->dispatcher, $this->securityContext);
+        return new Address($this->container);
     }
 
     public function getMandatoryArguments()
