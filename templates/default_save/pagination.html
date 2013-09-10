@@ -7,7 +7,7 @@
 <div style="border: solid 1px; padding: 20px;">
 
 {loop name="cat" type="category" page="{$category_current_page}" limit="2"}
-    <h2>#LOOP_COUNT - #TITLE</h2>
+    <h2>{$LOOP_COUNT} - {$TITLE}</h2>
         <h3>Products :</h3>
 
         <div style="border: solid 1px; padding: 20px;">
@@ -17,23 +17,23 @@
         {assign var=product_current_page value={$smarty.get.$this_product_getter|default:1}}
 
         <ul>
-        {loop name="prod" type="product" category="#ID" page="{$product_current_page}" limit="2"}
+        {loop name="prod" type="product" category="$ID" page="{$product_current_page}" limit="2"}
             <li>
-                #ID:#REF
+                {$ID}:{$REF}
             </li>
         {/loop}
         </ul>
 
         </div>
 
-        <p>#TITLE page choice</p>
+        <p>{$TITLE} page choice</p>
         {pageloop rel="prod"}
-            {if ${PAGE} != {$product_current_page}}
-                <a href="index_dev.php?view=pagination&category_page={$category_current_page}&{$this_product_getter}=#PAGE">#PAGE</a>
+            {if $PAGE != $product_current_page}
+                <a href="index_dev.php?view=pagination&category_page={$category_current_page}&{$this_product_getter}={$PAGE}">{$PAGE}</a>
             {else}
-                { #PAGE }
+                {$PAGE}
             {/if}
-            {if {$PAGE} != {$LAST}}
+            {if $PAGE != $LAST}
                 -
             {/if}
         {/pageloop}
@@ -44,12 +44,12 @@
 
 <p>categories page choice</p>
 {pageloop rel="cat"}
-{if ${PAGE} != {$category_current_page}}
-    <a href="index_dev.php?view=pagination&category_page=#PAGE">#PAGE</a>
+{if $PAGE != $category_current_page}
+    <a href="index_dev.php?view=pagination&category_page={$PAGE}">{$PAGE}</a>
 {else}
-    { #PAGE }
+    {$PAGE}
 {/if}
-{if {$PAGE} != {$LAST}}
+{if $PAGE != $LAST}
     -
 {/if}
 {/pageloop}
@@ -62,18 +62,18 @@ Pagination before loop
 {capture name="prod2"}
        {loop name="prod2" type="product" page="{$product_current_page}" limit="2"}
             <li>
-                #ID:#REF
+                {$ID}:{$REF}
             </li>
         {/loop}
 {/capture}
 
 {pageloop rel="prod2"}
     {if ${PAGE} != {$product_current_page}}
-        <a href="index_dev.php?view=pagination&category_page={$category_current_page}&{$this_product_getter}=#PAGE">#PAGE</a>
+        <a href="index_dev.php?view=pagination&category_page={$category_current_page}&{$this_product_getter}={$PAGE}">{$PAGE}</a>
     {else}
-        { #PAGE }
+        {$PAGE}
     {/if}
-    {if {$PAGE} != {$LAST}}
+    {if $PAGE != $LAST}
         -
     {/if}
 {/pageloop}
@@ -82,11 +82,11 @@ Pagination before loop
 
 {pageloop rel="prod2"}
     {if ${PAGE} != {$product_current_page}}
-        <a href="index_dev.php?view=pagination&category_page={$category_current_page}&{$this_product_getter}=#PAGE">#PAGE</a>
+        <a href="index_dev.php?view=pagination&category_page={$category_current_page}&{$this_product_getter}={$PAGE}">{$PAGE}</a>
     {else}
-        { #PAGE }
+        {$PAGE}
     {/if}
-    {if {$PAGE} != {$LAST}}
+    {if $PAGE != $LAST}
         -
     {/if}
 {/pageloop}

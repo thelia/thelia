@@ -5,22 +5,22 @@
     <h2>Category Images</h2>
     <ul>
     {loop type="category" name="jsvdfk"}
-        <li><p>Category id #ID: #TITLE</p>
+        <li><p>Category id {$ID}: {$TITLE}</p>
         <ul>
             <li>
-            {loop type="image" name="image_test" category="#ID" width="200" height="100" resize_mode="borders"}
-                  <p>Processed file URL: #IMAGE_URL</p>
-                  <p>Original file URL: #ORIGINAL_IMAGE_URL</p>
-                  <img src="#IMAGE_URL" />
+            {loop type="image" name="image_test" category="$ID" width="200" height="100" resize_mode="borders"}
+                  <p>Processed file URL: {$IMAGE_URL}</p>
+                  <p>Original file URL: {$ORIGINAL_IMAGE_URL}</p>
+                  <img src="{$IMAGE_URL}" />
             {/loop}
 
-            {loop type="image" name="image_test" category="#ID"}
-                  <p>Full size file URL: #IMAGE_URL</p>
-                  <img src="#IMAGE_URL" />
+            {loop type="image" name="image_test" category="$ID"}
+                  <p>Full size file URL: {$IMAGE_URL}</p>
+                  <img src="{$IMAGE_URL}" />
             {/loop}
 
-            {loop type="image" name="image_test" source="category" source_id="#ID"}
-                  <p>source="category" source_id="x" argument style: Processed file URL: #IMAGE_URL</p>
+            {loop type="image" name="image_test" source="category" source_id="$ID"}
+                  <p>source="category" source_id="x" argument style: Processed file URL: {$IMAGE_URL}</p>
             {/loop}
             </li>
          </ul>
@@ -34,27 +34,27 @@
     <h2>Product Images</h2>
 	<ul>
 	{loop type="product" name="jsvdfk"}
-        <li><p>Product id #ID: #TITLE</p>
+        <li><p>Product id {$ID}: {$TITLE}</p>
         <ul>
             <li>
-            {loop type="image" name="image_test" product="#ID" width="200" height="100" resize_mode="borders" effects="gamma:0.7" background_color="#cc8000"}
-		          <p>Processed file URL: #IMAGE_URL</p>
-		          <p>Original file URL: #ORIGINAL_IMAGE_URL</p>
+            {loop type="image" name="image_test" product="$ID" width="200" height="100" resize_mode="borders" effects="gamma:0.7" background_color="#cc8000"}
+		          <p>Processed file URL: {$IMAGE_URL}</p>
+		          <p>Original file URL: {$ORIGINAL_IMAGE_URL}</p>
 		          <p>Images:</p>
 
-		          <img src="#IMAGE_URL" />
+		          <img src="{$IMAGE_URL}" />
 		    {/loop}
-		    {loop type="image" name="image_test" product="#ID" width="200" height="100" resize_mode="crop"}
-		    <img src="#IMAGE_URL" />
+		    {loop type="image" name="image_test" product="$ID" width="200" height="100" resize_mode="crop"}
+		    <img src="{$IMAGE_URL}" />
 		    {/loop}
-            {loop type="image" name="image_test" product="#ID" width="100" height="200" resize_mode="borders" background_color="#cc8000"}
-            <img src="#IMAGE_URL" />
+            {loop type="image" name="image_test" product="$ID" width="100" height="200" resize_mode="borders" background_color="#cc8000"}
+            <img src="{$IMAGE_URL}" />
             {/loop}
-            {loop type="image" name="image_test" product="#ID" width="100" rotation="-20" background_color="#facabe"}
-            <img src="#IMAGE_URL" />
+            {loop type="image" name="image_test" product="$ID" width="100" rotation="-20" background_color="#facabe"}
+            <img src="{$IMAGE_URL}" />
             {/loop}
-            {loop type="image" name="image_test" product="#ID" width="200" height="100" resize_mode="borders" background_color="#facabe" effects="negative"}
-            <img src="#IMAGE_URL" />
+            {loop type="image" name="image_test" product="$ID" width="200" height="100" resize_mode="borders" background_color="#facabe" effects="negative"}
+            <img src="{$IMAGE_URL}" />
             {/loop}
 		    </p>
             </li>
@@ -67,13 +67,13 @@
     <h2>Folder Images</h2>
     <ul>
     {loop type="folder" name="jsvdfk"}
-        <li><p>Folder id #ID: #TITLE</p>
+        <li><p>Folder id {$ID}: {$TITLE}</p>
         <ul>
             <li>
-            {loop type="image" name="image_test" folder="#ID" width="200" height="100" resize_mode="borders"}
-                  <p>Processed file URL: #IMAGE_URL</p>
-                  <p>Original file URL: #ORIGINAL_IMAGE_URL</p>
-                  <img src="#IMAGE_URL" />
+            {loop type="image" name="image_test" folder="$ID" width="200" height="100" resize_mode="borders"}
+                  <p>Processed file URL: {$IMAGE_URL}</p>
+                  <p>Original file URL: {$ORIGINAL_IMAGE_URL}</p>
+                  <img src="{$IMAGE_URL}" />
             {/loop}
             </li>
          </ul>
@@ -86,13 +86,13 @@
     <h2>Content Images</h2>
     <ul>
     {loop type="content" name="jsvdfk"}
-        <li><p>Content id #ID: #TITLE</p>
+        <li><p>Content id {$ID}: {$TITLE}</p>
         <ul>
             <li>
-            {loop type="image" name="image_test" content="#ID" width="200" height="100" resize_mode="borders"}
-                  <p>Processed file URL: #IMAGE_URL</p>
-                  <p>Original file URL: #ORIGINAL_IMAGE_URL</p>
-                  <img src="#IMAGE_URL" />
+            {loop type="image" name="image_test" content="$ID" width="200" height="100" resize_mode="borders"}
+                  <p>Processed file URL: {$IMAGE_URL}</p>
+                  <p>Original file URL: {$ORIGINAL_IMAGE_URL}</p>
+                  <img src="{$IMAGE_URL}" />
             {/loop}
             </li>
          </ul>
