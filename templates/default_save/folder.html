@@ -1,13 +1,13 @@
 {loop name="folder0" type="folder" parent="0" order="alpha_reverse"}
     <div style="border: solid 4px blue; padding: 20px; margin: 10px;">
-    <h2>FOLDER : #TITLE</h2>
-    {loop name="folder1" type="folder" parent="#ID"}
+    <h2>FOLDER : {$TITLE}</h2>
+    {loop name="folder1" type="folder" parent="$ID"}
         <div style="border: double 4px lightseagreen; padding: 20px; margin: 10px;">
-        <h3>SUBFOLDER : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
-        {loop name="content" type="content" folder="#ID"}
+        <h3>SUBFOLDER : {$TITLE}  ({$LOOP_COUNT} / {$LOOP_TOTAL})</h3>
+        {loop name="content" type="content" folder="$ID"}
             <div style="border: solid 1px green; padding: 20px; margin: 10px;">
-                <h3>CONTENT : #TITLE</h3>
-                <p>#DESCRIPTION</p>
+                <h3>CONTENT : {$TITLE}</h3>
+                <p>{$DESCRIPTION}</p>
             </div>
         {/loop}
         </div>

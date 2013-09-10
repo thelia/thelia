@@ -2,8 +2,8 @@
 {loop name="car" type="category"}
     <li>
         <ul>
-    {loop name="product" type="product" category="#ID"}
-        <li>#REF</li>
+    {loop name="product" type="product" category="$ID"}
+        <li>{$REF}</li>
     {/loop}
         </ul>
     </li>

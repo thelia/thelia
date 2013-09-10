@@ -119,12 +119,13 @@
             {pageloop rel="customer_list"}
                 {if $PAGE != $CURRENT}
                     <li><a href="{url path="/admin/customers" page="{$PAGE}"}">{$PAGE}</a></li>
+
                 {else}
                     <li class="active"><a href="#">{$PAGE}</a></li>
                 {/if}
 
                 {if $PAGE == $LAST && $LAST != $CURRENT}
-                    <li><a href="{url path="/admin/customers" page="{$PAGE}"}">&raquo;</a></li>
+                    <li><a href="{url path="/admin/customers" page="$PAGE"}">&raquo;</a></li>
                 {else}
                     <li class="disabled"><a href="#">&raquo;</a></li>
                 {/if}

@@ -82,17 +82,8 @@ class SmartyParser extends Smarty implements ParserInterface
         // The default HTTP status
         $this->status = 200;
 
-        $this->registerFilter('pre', array($this, "preThelia"));
         $this->registerFilter('output', array($this, "removeBlankLines"));
         $this->registerFilter('variable', array(__CLASS__, "theliaEscape"));
-    }
-
-    public function preThelia($tpl_source, \Smarty_Internal_Template $template)
-    {
-        $new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9_]*)(.*)}`', '{\$$1$2}', $tpl_source);
-        $new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9_]*)`', '{\$$1|dieseCanceller:\'#$1\'}', $new_source);
-
-        return $new_source;
     }
 
     public function removeBlankLines($tpl_source, \Smarty_Internal_Template $template)
@@ -102,7 +93,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
     public static function theliaEscape($content, $smarty)
     {
-        if(!is_object($content)) {
+        if(is_scalar($content)) {
             return htmlspecialchars($content ,ENT_QUOTES, Smarty::$_CHARSET);
         } else {
             return $content;
