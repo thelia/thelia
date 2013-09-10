@@ -174,22 +174,23 @@
                     <th>{intl l='Actions'}</th>
                 </tr>
                 </thead>
-                <tbody>
-                    {foreach from=$rulesObject item=rule name=rulesForeach}
-                        <tr>
-                            <td>
-                                {if !$smarty.foreach.rulesForeach.first}
-                                    <span class="label label-info">{intl l='And'}</span>
-                                {/if}
-                                {$rule.tooltip nofilter}
-                            </td>
+                <tbody id="constraint-list">
+                    {include file='coupon/rules.html' rules=$rulesObject}
+                    {*{foreach from=$rulesObject item=rule name=rulesForeach}*}
+                        {*<tr>*}
+                            {*<td>*}
+                                {*{if !$smarty.foreach.rulesForeach.first}*}
+                                    {*<span class="label label-info">{intl l='And'}</span>*}
+                                {*{/if}*}
+                                {*{$rule.tooltip nofilter}*}
+                            {*</td>*}
 
-                            <td>
-                                <a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}</a>
-                                <a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="glyphicon glyphicon-remove"></span> {intl l='Delete'}</a>
-                            </td>
-                        </tr>
-                    {/foreach}
+                            {*<td>*}
+                                {*<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}</a>*}
+                                {*<a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="glyphicon glyphicon-remove"></span> {intl l='Delete'}</a>*}
+                            {*</td>*}
+                        {*</tr>*}
+                    {*{/foreach}*}
                 </tbody>
             </table>
         </div>
@@ -197,32 +198,9 @@
 
     <section class="row">
         <div class="col-md-12 general-block-decorator clearfix">
-            <table class="table table-striped">
-                <caption class="clearfix">
-                    {intl l='Add a Rule'}
-                    <a title="{intl l='Save this rule'}" class="btn btn-default btn-primary pull-right">
-                        <span class="glyphicon glyphicon-plus-sign"></span>
-                    </a>
-                </caption>
-                <thead>
-                <tr>
-                    <th>{intl l='Conditions link'}</th>
-                    <th>{intl l='Rule Type'}</th>
-                    <th>{intl l='Operator'}</th>
-                    <th>{intl l='Value'}</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td></tr>
-                    <td></tr>
-                    <td></tr>
-                    <td></tr>
-                </td>
-                </tbody>
-            </table>
-
-
+            <a id="constraint-save-btn" title="{intl l='Save this rule'}" class="btn btn-default btn-primary pull-right">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+            </a>
 
             <div id="rule-add-organizer" class="form-group col-md-2">
                 <label for="type">{intl l='Condition type :'}</label>
@@ -243,72 +221,72 @@
                 </select>
             </div>
 
-            <div id="rule-add-operators-values" class="form-group col-md-6">
-                <label for="operator">{intl l='Operator :'}</label>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <select name="operator" id="operator" class="form-control">
-                            <option value="1">is superior to</option>
-                            <option value="2">equals to</option>
-                            <option value="3">is inferior to</option>
-                            <option value="4">is inferior or equals to</option>
-                            <option value="5">is superior or equals to</option>
-                        </select>
-                    </div>
-                    <div class="input-group col-lg-6">
-                        <input type="text" name="value" class="form-control">
-                        <span class="input-group-addon">&euro;</span>
-                    </div>
-                </div>
-                
+            <div id="constraint-add-operators-values" class="form-group col-md-6">
+                {*<label for="operator">{intl l='Operator :'}</label>*}
+                {*<div class="row">*}
+                    {*<div class="col-lg-6">*}
+                        {*<select name="operator" id="operator" class="form-control">*}
+                            {*<option value="1">is superior to</option>*}
+                            {*<option value="2">equals to</option>*}
+                            {*<option value="3">is inferior to</option>*}
+                            {*<option value="4">is inferior or equals to</option>*}
+                            {*<option value="5">is superior or equals to</option>*}
+                        {*</select>*}
+                    {*</div>*}
+                    {*<div class="input-group col-lg-6">*}
+                        {*<input type="text" name="value" class="form-control">*}
+                        {*<span class="input-group-addon">&euro;</span>*}
+                    {*</div>*}
+                {*</div>*}
+                {**}
 
-                <label for="operator">Operator :</label>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <select name="operator" id="operator" class="form-control">
-                            <option value="1">is superior to</option>
-                            <option value="2">equals to</option>
-                            <option value="3">is inferior to</option>
-                            <option value="4">is inferior or equals to</option>
-                            <option value="5">is superior or equals to</option>
-                        </select>
-                    </div>
-                    <div class="input-group col-lg-6 date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
-                        <input type="text" name="value" class="form-control">
-                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                    </div>
-                </div>
+                {*<label for="operator">Operator :</label>*}
+                {*<div class="row">*}
+                    {*<div class="col-lg-6">*}
+                        {*<select name="operator" id="operator" class="form-control">*}
+                            {*<option value="1">is superior to</option>*}
+                            {*<option value="2">equals to</option>*}
+                            {*<option value="3">is inferior to</option>*}
+                            {*<option value="4">is inferior or equals to</option>*}
+                            {*<option value="5">is superior or equals to</option>*}
+                        {*</select>*}
+                    {*</div>*}
+                    {*<div class="input-group col-lg-6 date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">*}
+                        {*<input type="text" name="value" class="form-control">*}
+                        {*<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>*}
+                    {*</div>*}
+                {*</div>*}
 
-                <label for="operator">Operator :</label>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <select name="operator" id="operator" class="form-control">
-                            <option value="1">is superior to</option>
-                            <option value="2">equals to</option>
-                            <option value="3">is inferior to</option>
-                            <option value="4">is inferior or equals to</option>
-                            <option value="5">is superior or equals to</option>
-                        </select>
-                    </div>
-                    <div class="col-lg-6">
-                        <input type="text" name="value" class="form-control">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <table class="table table-bordered">
-                            <tr>
-                                <td id="minibrowser-breadcrumb"></td>
-                            </tr>
-                            <tr>
-                                <th><span class="icon-th-list"></span> Categories list</th>
-                            </tr>
-                            <tr>
-                                <td id="minibrowser-categories"></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
+                {*<label for="operator">Operator :</label>*}
+                {*<div class="row">*}
+                    {*<div class="col-lg-6">*}
+                        {*<select name="operator" id="operator" class="form-control">*}
+                            {*<option value="1">is superior to</option>*}
+                            {*<option value="2">equals to</option>*}
+                            {*<option value="3">is inferior to</option>*}
+                            {*<option value="4">is inferior or equals to</option>*}
+                            {*<option value="5">is superior or equals to</option>*}
+                        {*</select>*}
+                    {*</div>*}
+                    {*<div class="col-lg-6">*}
+                        {*<input type="text" name="value" class="form-control">*}
+                    {*</div>*}
+                {*</div>*}
+                {*<div class="row">*}
+                    {*<div class="col-lg-12">*}
+                        {*<table class="table table-bordered">*}
+                            {*<tr>*}
+                                {*<td id="minibrowser-breadcrumb"></td>*}
+                            {*</tr>*}
+                            {*<tr>*}
+                                {*<th><span class="icon-th-list"></span> Categories list</th>*}
+                            {*</tr>*}
+                            {*<tr>*}
+                                {*<td id="minibrowser-categories"></td>*}
+                            {*</tr>*}
+                        {*</table>*}
+                    {*</div>*}
+                {*</div>*}
             </div>
         </div>
     </section>

@@ -33,6 +33,10 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
 
+    {javascripts file='assets/js/json2.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
     <script>
         $(function($){
             miniBrowser(0, '/test_to_remove/datas_coupon_edit.json');
@@ -46,10 +50,10 @@
             var initRule = function() {
                 var rules = [];
                 {foreach from=$rulesObject key=k item=rule}
-                    var rule = [];
+                    var rule = {};
                     rule['serviceId'] = '{$rule.serviceId nofilter}';
-                    rule['operators'] = [];
-                    rule['values'] = [];
+                    rule['operators'] = {};
+                    rule['values'] = {};
 
                     {foreach from=$rule.validators.setOperators key=input item=operator}
                         rule['operators']['{$input nofilter}'] = '{$operator nofilter}';
@@ -63,8 +67,27 @@
 
             // Save Rules AJAX
             var saveRuleAjax = function() {
-                console.log(rules);
+                var $url = '{$urlAjaxUpdateRules}';
                 console.log('save');
+                console.log('{$urlAjaxUpdateRules}');
+                console.log(rules);
+                console.log(JSON.stringify(rules));
+                $.ajax({
+                    type: "POST",
+                    url: $url,
+                    {*data: {literal}{{/literal}rules:rules{literal}}{/literal},*}
+                    data: {literal}{{/literal}rules:JSON.stringify(rules){literal}}{/literal},
+                    statusCode: {
+                        404: function() {
+                            $('#constraint-add-operators-values').html(
+                                '{intl l='Please retry'}'
+                            );
+                        }
+                    }
+                }).done(function(data) {
+                    $('#constraint-list').html(data);
+                    $('#constraint-add-operators-values').html('');
+                });
             }
 
             // Remove 1 Rule then Save Rules AJAX
@@ -75,7 +98,7 @@
 
             // Add 1 Rule then Save Rules AJAX
             var addRuleAjax = function() {
-                rules.pop(ruleToSave);
+                rules.push(ruleToSave);
                 saveRuleAjax();
             }
 
@@ -83,6 +106,22 @@
             var rules = initRule();
             console.log(rules);
 
+
+            // Save rules on click
+            var onClickSaveRule = function() {
+                $('#constraint-save-btn').on('click', function (e) {
+                    addRuleAjax();
+                });
+            }
+            onClickSaveRule();
+
+            // Remove rule on click
+            var onClickDeleteRule = function() {
+                $('#constraint-delete-btn').on('click', function (e) {
+//                    removeRuleAjax();
+                });
+            }
+            onClickDeleteRule();
 
             // Reload effect inputs when changing effect
             var onEffectChange = function() {
@@ -96,29 +135,24 @@
             // Reload rule inputs when changing effect
             var onRuleChange = function() {
                 $('#category-rule').on('change', function (e) {
-                    $('#rule-add-operators-values').html('<div class="loading" ></div>');
+                    $('#constraint-add-operators-values').html('<div class="loading" ></div>');
                     var url = "{$urlAjaxGetRuleInput}";
                     url = url.replace('ruleId', $(this).val())
-                    console.log(url);
                     $.ajax({
                         url: url,
                         statusCode: {
                             404: function() {
-                                $('#rule-add-operators-values').html(
-                                        '{intl l='Please select another rule'}'
+                                $('#constraint-add-operators-values').html(
+                                    '{intl l='Please select another rule'}'
                                 );
                             }
                         }
                     }).done(function(data) {
-                        $('#rule-add-operators-values').html(data);
+                        $('#constraint-add-operators-values').html(data);
                     });
                 });
             }
             onRuleChange();
-
-
-
-
         });
 
 

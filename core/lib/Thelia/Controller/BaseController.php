@@ -251,4 +251,14 @@ class BaseController extends ContainerAware
     {
         throw new NotFoundHttpException();
     }
+
+    /**
+     * Check if environment is in debug mode
+     *
+     * @return bool
+     */
+    protected function isDebug()
+    {
+        return $this->container->getParameter('kernel.debug');
+    }
 }

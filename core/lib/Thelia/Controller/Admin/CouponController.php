@@ -202,10 +202,15 @@ class CouponController extends BaseAdminController
 
         $args['availableCoupons'] = $this->getAvailableCoupons();
         $args['availableRules'] = $this->getAvailableRules();
-        $args['urlAjaxGetRuleInput'] = $this->getRouteFromRouter(
-            'router.admin',
+        $args['urlAjaxGetRuleInput'] = $this->getRoute(
             'admin.coupon.rule.input',
             array('ruleId' => 'ruleId'),
+            Router::ABSOLUTE_URL
+        );
+
+        $args['urlAjaxUpdateRules'] = $this->getRoute(
+            'admin.coupon.rule.update',
+            array('couponId' => $couponId),
             Router::ABSOLUTE_URL
         );
 
@@ -289,6 +294,8 @@ class CouponController extends BaseAdminController
                 );
             }
 
+//            $args['rules'] = $this->cleanRuleForTemplate($coupon->getRules()->getRules());
+
             // Setup the object form
             $changeForm = new CouponCreationForm($this->getRequest(), 'form', $data);
 
@@ -339,15 +346,17 @@ class CouponController extends BaseAdminController
     {
         $this->checkAuth('ADMIN', 'admin.coupon.read');
 
-//        if (!$this->getRequest()->isXmlHttpRequest()) {
-//            $this->redirect(
-//                $this->getRoute(
-//                    'admin',
-//                    array(),
-//                    Router::ABSOLUTE_URL
-//                )
-//            );
-//        }
+        if ($this->isDebug()) {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                $this->redirect(
+                    $this->getRoute(
+                        'admin',
+                        array(),
+                        Router::ABSOLUTE_URL
+                    )
+                );
+            }
+        }
 
         /** @var ConstraintFactory $constraintFactory */
         $constraintFactory = $this->container->get('thelia.constraint.factory');
@@ -362,6 +371,102 @@ class CouponController extends BaseAdminController
             array(
                 'ruleId' => $ruleId,
                 'inputs' => $inputs
+            )
+        );
+    }
+
+
+    /**
+     * Manage Coupons read display
+     *
+     * @param int $couponId Coupon id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function updateRulesAction($couponId)
+    {
+        $this->checkAuth('ADMIN', 'admin.coupon.read');
+
+        if ($this->isDebug()) {
+            if (!$this->getRequest()->isXmlHttpRequest()) {
+                $this->redirect(
+                    $this->getRoute(
+                        'admin',
+                        array(),
+                        Router::ABSOLUTE_URL
+                    )
+                );
+            }
+        }
+
+        $search = CouponQuery::create();
+        /** @var Coupon $coupon */
+        $coupon = $search->findOneById($couponId);
+
+        if (!$coupon) {
+            return $this->pageNotFound();
+        }
+
+        $rules = new CouponRuleCollection();
+
+        /** @var ConstraintFactory $constraintFactory */
+        $constraintFactory = $this->container->get('thelia.constraint.factory');
+        $rulesReceived = json_decode($this->getRequest()->get('rules'));
+        foreach ($rulesReceived as $ruleReceived) {
+            var_dump('building ', $ruleReceived->values);
+            $rule = $constraintFactory->build(
+                $ruleReceived->serviceId,
+                (array) $ruleReceived->operators,
+                (array) $ruleReceived->values
+            );
+            $rules->add(clone $rule);
+        }
+
+        $coupon->setSerializedRules(
+            $constraintFactory->serializeCouponRuleCollection($rules)
+        );
+
+        $couponEvent = new CouponCreateOrUpdateEvent(
+            $coupon->getCode(),
+            $coupon->getTitle(),
+            $coupon->getAmount(),
+            $coupon->getType(),
+            $coupon->getShortDescription(),
+            $coupon->getDescription(),
+            $coupon->getIsEnabled(),
+            $coupon->getExpirationDate(),
+            $coupon->getIsAvailableOnSpecialOffers(),
+            $coupon->getIsCumulative(),
+            $coupon->getIsRemovingPostage(),
+            $coupon->getMaxUsage(),
+            $rules,
+            $coupon->getLocale()
+        );
+
+        $eventToDispatch = TheliaEvents::COUPON_RULE_UPDATE;
+        // Dispatch Event to the Action
+        $this->dispatch(
+            $eventToDispatch,
+            $couponEvent
+        );
+
+        $this->adminLogAppend(
+            sprintf(
+                'Coupon %s (ID %s) rules updated',
+                $couponEvent->getTitle(),
+                $couponEvent->getCoupon()->getId()
+            )
+        );
+
+        $cleanedRules = $this->cleanRuleForTemplate($rules);
+
+        return $this->render(
+            'coupon/rules',
+            array(
+                'couponId' => $couponId,
+                'rules' => $cleanedRules,
+                'urlEdit' => $couponId,
+                'urlDelete' => $couponId
             )
         );
     }
@@ -550,6 +655,21 @@ class CouponController extends BaseAdminController
             $rule['name'] = $availableCoupon->getName();
             $rule['toolTip'] = $availableCoupon->getToolTip();
             $cleanedRules[] = $rule;
+        }
+
+        return $cleanedRules;
+    }
+
+    /**
+     * @param $rules
+     * @return array
+     */
+    protected function cleanRuleForTemplate($rules)
+    {
+        $cleanedRules = array();
+        /** @var $rule CouponRuleInterface */
+        foreach ($rules->getRules() as $rule) {
+            $cleanedRules[] = $rule->getToolTip();
         }
 
         return $cleanedRules;

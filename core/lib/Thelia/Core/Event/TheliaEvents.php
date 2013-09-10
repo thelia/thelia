@@ -281,22 +281,6 @@ final class TheliaEvents
      */
     const AFTER_CONSUME_COUPON 	= "action.after_consume_coupon";
 
-
-    /**
-     * Sent when attempting to create Coupon Rule
-     */
-    const COUPON_RULE_CREATE 	= "action.create_coupon_rule";
-
-    /**
-     * Sent just before an attempt to create a Coupon Rule
-     */
-    const BEFORE_COUPON_RULE_CREATE 	= "action.before_create_coupon_rule";
-
-    /**
-     * Sent just after an attempt to create a Coupon Rule
-     */
-    const AFTER_COUPON_RULE_CREATE 	= "action.after_create_coupon_rule";
-
     /**
      * Sent when attempting to update Coupon Rule
      */

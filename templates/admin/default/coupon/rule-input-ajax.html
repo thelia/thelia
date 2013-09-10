@@ -1,22 +1,23 @@
+{*{$inputs.inputs|var_dump}*}
 {foreach from=$inputs.inputs key=name item=input}
     <label for="operator">{$input.title}</label>
     <div class="row">
         <div class="col-lg-6">
-            <select class="form-control" id="{$name}[operator]" name="{$name}[operator]">
+            <select class="form-control" id="{$name}-operator" name="{$name}[operator]">
                 {foreach from=$input.availableOperators key=k item=availableOperator}
-                    <option value="{$availableOperator}">{$availableOperator}</option>
+                    <option value="{$k}">{$availableOperator}</option>
                 {/foreach}
             </select>
         </div>
         <div class="input-group col-lg-6">
             {if $input.type == 'select'}
-                <select class="{$input.class}" id="{$name}[value]" name="{$name}[value]">
+                <select class="{$input.class}" id="{$name}-value" name="{$name}[value]">
                     {foreach from=$input.availableValues key=code item=availableValue}
                         <option value="{$code}">{$availableValue}</option>
                     {/foreach}
                 </select>
             {else}
-                <input type="{$input.type}" class="{$input.class}" id="{$name}[value]" name="{$name}[value]">
+                <input type="{$input.type}" class="{$input.class}" id="{$name}-value" name="{$name}[value]">
                 {*<span class="input-group-addon">€</span>*}
             {/if}
         </div>
@@ -70,12 +71,32 @@
     {*</div>*}
 
 <script>
-    var ruleToSave = [];
+    var ruleToSave = {};
     ruleToSave['serviceId'] = '{$ruleId}';
-    ruleToSave['operators'] = [];
-    ruleToSave['values'] = [];
+    ruleToSave['operators'] = {};
+    ruleToSave['values'] = {};
     {foreach from=$inputs.inputs key=name item=input}
-        ruleToSave['operators']['{$name nofilter}'] = 'to set';
-        ruleToSave['values']['{$name nofilter}'] = 'to set';
+        ruleToSave['operators']['{$name nofilter}'] = '{foreach from=$inputs.inputs[$name].availableOperators key=keyOperator item=valueOperator name=operators}{if $smarty.foreach.operators.first}{$keyOperator nofilter}{/if}{/foreach}';
+        ruleToSave['values']['{$name nofilter}'] = '{if count($inputs.inputs[$name].availableValues) != 0}{foreach from=$inputs.inputs[$name].availableValues key=keyValue item=valueValue name=values}{if $smarty.foreach.values.first}{$keyValue nofilter}{/if}{/foreach}{else}to set{/if}';
     {/foreach}
+
+
+    // Update ruleToSave Array ready to be saved
+    var onInputsChange = function() {literal}{{/literal}
+        {foreach from=$inputs.inputs key=name item=input}
+            $('#{$name}-operator').change(function (e) {
+                var $this = $(this);
+                ruleToSave['operators']['{$name nofilter}'] = $this.val();
+                console.log('#{$name}-operator changed ' + $this.val());
+                console.log(ruleToSave);
+            });
+            $('#{$name}-value').change(function (e) {
+                var $this = $(this);
+                ruleToSave['values']['{$name nofilter}'] = $this.val();
+                console.log('#{$name}-value changed ' + $this.val());
+                console.log(ruleToSave);
+            });
+        {/foreach}
+    {literal}}{/literal}
+    onInputsChange();
 </script>

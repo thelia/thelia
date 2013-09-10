@@ -95,6 +95,9 @@
     <route id="admin.coupon.rule.input" path="/admin/coupon/rule/{ruleId}">
         <default key="_controller">Thelia\Controller\Admin\CouponController::getRuleInputAction</default>
     </route>
+    <route id="admin.coupon.rule.update" path="/admin/coupon/{couponId}/rule/update/">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::updateRulesAction</default>
+    </route>
 
 
 
