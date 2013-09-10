@@ -24,6 +24,9 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Constraint\ConstraintFactory;
+use Thelia\Constraint\Rule\CouponRuleInterface;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -84,10 +87,27 @@ class Coupon extends BaseI18nLoop
         $coupons = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
+        /** @var ConstraintFactory $constraintFactory */
+        $constraintFactory = $this->container->get('thelia.constraint.factory');
+
+        /** @var Request $request */
+        $request = $this->container->get('request');
+        /** @var Lang $lang */
+        $lang = $request->getSession()->getLang();
+
 
         /** @var MCoupon $coupon */
         foreach ($coupons as $coupon) {
             $loopResultRow = new LoopResultRow();
+            $rules = $constraintFactory->unserializeCouponRuleCollection(
+                $coupon->getSerializedRules()
+            );
+
+            $cleanedRules = array();
+            /** @var CouponRuleInterface $rule */
+            foreach ($rules->getRules() as $key => $rule) {
+                $cleanedRules[] = $rule->getToolTip();
+            }
             $loopResultRow->set("ID", $coupon->getId())
                 ->set("IS_TRANSLATED", $coupon->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE", $locale)
@@ -95,13 +115,13 @@ class Coupon extends BaseI18nLoop
                 ->set("TITLE", $coupon->getVirtualColumn('i18n_TITLE'))
                 ->set("SHORT_DESCRIPTION", $coupon->getVirtualColumn('i18n_SHORT_DESCRIPTION'))
                 ->set("DESCRIPTION", $coupon->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("EXPIRATION_DATE", $coupon->getExpirationDate())
+                ->set("EXPIRATION_DATE", $coupon->getExpirationDate($lang->getDateFormat()))
                 ->set("USAGE_LEFT", $coupon->getMaxUsage())
                 ->set("IS_CUMULATIVE", $coupon->getIsCumulative())
                 ->set("IS_REMOVING_POSTAGE", $coupon->getIsRemovingPostage())
                 ->set("IS_ENABLED", $coupon->getIsEnabled())
                 ->set("AMOUNT", $coupon->getAmount())
-                ->set("APPLICATION_CONDITIONS", $coupon->getRules());
+                ->set("APPLICATION_CONDITIONS", $cleanedRules);
             $loopResult->addRow($loopResultRow);
         }
 

@@ -14,10 +14,10 @@ if exist local\config\database.yml (
     ..\..\bin\propel build -v --output-dir=../../core/lib/
 
     echo [INFO] Building SQL CREATE file
-    ..\..\bin\propel sql:build -v --output-dir=../../install/
+    ..\..\bin\propel sql:build -v --output-dir=..\..\install
 
 
-    echo [INFO] Reloaded Thelia2 database
+    echo [INFO] Reloading Thelia2 database
     cd ..\..
     del install\sqldb.map
     php Thelia thelia:dev:reloadDB

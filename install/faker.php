@@ -556,6 +556,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
     $coupon1->setSerializedRules($serializedRules);
 
+    $coupon1->setMaxUsage(40);
     $coupon1->setIsCumulative(1);
     $coupon1->setIsRemovingPostage(0);
     $coupon1->save();
@@ -606,6 +607,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
     $coupon2->setSerializedRules($serializedRules);
 
+    $coupon1->setMaxUsage(-1);
     $coupon2->setIsCumulative(0);
     $coupon2->setIsRemovingPostage(1);
     $coupon2->save();

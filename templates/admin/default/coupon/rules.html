@@ -1,0 +1,18 @@
+{foreach from=$rules item=rule name=rulesForeach}
+    <tr>
+        <td>
+            {if !$smarty.foreach.rulesForeach.first}
+                <span class="label label-info">{intl l='And'}</span>
+            {/if}
+            {$rule nofilter}
+        </td>
+        <td>
+            <a class="btn btn-default btn-primary btn-medium" href="{$urlEdit}">
+                <span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}
+            </a>
+            <a data-target="#delete" data-toggle="confirm" class="btn btn-default btn-danger btn-medium" href="{$urlDelete}">
+                <span class="glyphicon glyphicon-remove"></span> {intl l='Delete'}
+            </a>
+        </td>
+    </tr>
+{/foreach}
