@@ -60,7 +60,7 @@ URL: http://www.thelia.net
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="Main Navigation">
                 <ul class="nav navbar-nav navbar-categories">
-                    <li class="active"><a href="index.html" class="home" tabindex="-1">Home</a></li>
+                    <li class="active"><a href="{url path="/"}" class="home" tabindex="-1">Home</a></li>
                     <li class="dropdown">
                         <a href="" data-toggle="dropdown" class="dropdown-toggle">Pages</a>
                         <ul class="dropdown-menu list-subnav" role="menu">
@@ -100,7 +100,7 @@ URL: http://www.thelia.net
     <header class="container" role="banner">
         <div class="header">
             <h1 class="logo">
-                <a href="index.html" class="Thelia * Since 2006 *">
+                <a href="{url path="/"}" class="Thelia * Since 2006 *">
                     {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="Thelia">{/images}
                 </a>
             </h1>
@@ -212,8 +212,8 @@ URL: http://www.thelia.net
                                 <li><a href="#">Delivery & Returns</a></li>
                                 <li><a href="#">Terms & Conditions </a></li>
                                 <li><a href="contact.html">Contact Us</a></li>
-                                <li><a href="login.html">Login</a></li>
-                                <li><a href="register.html">Register</a></li>
+                                <li><a href="{url path="/login"}">Login</a></li>
+                                <li><a href="{url path="/register"}">Register</a></li>
                                 <li><a href="checkout.html">Checkout</a></li>
                             </ul>
                         </div>
