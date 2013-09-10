@@ -62,7 +62,7 @@ class CustomerCreation extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label_for" => array(
+                "label_attr" => array(
                     "for" => "address"
                 ),
                 "label" => Translator::getInstance()->trans("Street Address")
@@ -77,6 +77,12 @@ class CustomerCreation extends BaseForm
                 "label" => Translator::getInstance()->trans("Address Line 3"),
                 "label_attr" => array(
                     "for" => "address3"
+                )
+            ))
+            ->add("company", "text", array(
+                "label" => Translator::getInstance()->trans("Company name"),
+                "label_attr" => array(
+                    "for" => "company"
                 )
             ))
             ->add("phone", "text", array(
@@ -172,7 +178,10 @@ class CustomerCreation extends BaseForm
                         array($this, "verifyPasswordField")
                     )))
                 ),
-                "label" => "password confirmation"
+                "label" => "Password confirmation",
+                "label_attr" => array(
+                    "for" => "password_confirmation"
+                )
             ))
 
         ;
