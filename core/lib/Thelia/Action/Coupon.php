@@ -172,7 +172,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::COUPON_DISABLE => array("disable", 128),
             TheliaEvents::COUPON_ENABLE => array("enable", 128),
             TheliaEvents::COUPON_CONSUME => array("consume", 128),
-            TheliaEvents::COUPON_RULE_CREATE => array("createRule", 128),
             TheliaEvents::COUPON_RULE_UPDATE => array("updateRule", 128),
             TheliaEvents::COUPON_RULE_DELETE => array("deleteRule", 128)
         );
