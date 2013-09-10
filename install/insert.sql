@@ -7,6 +7,7 @@ INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`date_format`,`time_format
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 ('session_config.default', '1', 1, 1, NOW(), NOW()),
 ('verifyStock', '1', 0, 0, NOW(), NOW()),
+('active-template', 'default', 0, 0, NOW(), NOW()),
 ('default_lang_without_translation', '1', 0, 0, NOW(), NOW()),
 ('rewriting_enable', '0', 0, 0, NOW(), NOW()),
 ('imagine_graphic_driver', 'gd', 0, 0, NOW(), NOW()),
@@ -15,7 +16,8 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('images_library_path', 'local/media/images', 0, 0, NOW(), NOW()),
 ('image_cache_dir_from_web_root', 'cache/images', 0, 0, NOW(), NOW()),
 ('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', 0, 0, NOW(), NOW()),
-('page_not_found_view', '404.html', 0, 0, NOW(), NOW());
+('page_not_found_view', '404.html', 0, 0, NOW(), NOW()),
+('use_tax_free_amounts', 1, 1, 0, NOW(), NOW());
 
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
