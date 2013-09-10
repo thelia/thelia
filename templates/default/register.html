@@ -17,7 +17,7 @@
         <article class="col-main" role="main" aria-labelledby="main-label">
 
             <h1 id="main-label" class="page-header">{intl l="Create New Account"}</h1>
-            {form name=""}
+            {form name="thelia.customer.creation"}
             <form id="form-register" class="form-horizontal" action="" method="post" role="form">
 
                 <fieldset id="register-info" class="panel panel">
@@ -41,13 +41,14 @@
                                 <span class="help-block"><i class="icon-remove"></i> Invalid input!</span>
                             </div>
                         </div><!--/.form-group-->
-
+                        {form_field form=$form field="email"}
                         <div class="form-group group-email">
-                            <label class="control-label" for="email">Email Address: <span class="required">*</span></label>
+                            <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
                             <div class="control-input">
-                                <input type="email" name="email" id="email" class="form-control" placeholder="johndoe@domain.com" required>
+                                <input type="email" name="{$name}" id="{$label_attr.for}" class="form-control" placeholder="johndoe@domain.com" required value="">
                             </div>
                         </div><!--/.form-group-->
+                        {/form_field}
 
                         <div class="form-group group-phone">
                             <label class="control-label" for="phone">Telephone: <span class="required">*</span></label>
