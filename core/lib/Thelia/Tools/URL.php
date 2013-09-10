@@ -121,6 +121,11 @@ class URL
 
             $base_url = $this->getBaseUrl();
 
+            // TODO fix this ugly patch
+            if(strpos($path, "index_dev.php")) {
+                $path = str_replace('index_dev.php', '', $path);
+            }
+
             // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
             if ($path_only == self::PATH_TO_FILE) {
                 // As the base_url always ends with '/', if we don't find / at the end, we have a script.

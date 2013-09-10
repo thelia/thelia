@@ -71,4 +71,9 @@ class Cart extends BaseCart
             ->findOne()
         ;
     }
+
+    public function getTaxedAmount()
+    {
+
+    }
 }

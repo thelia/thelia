@@ -41,7 +41,7 @@ class FeatureAvailabilityTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new FeatureAvailability($this->request, $this->dispatcher, $this->securityContext);
+        return new FeatureAvailability($this->container);
     }
 
     public function getMandatoryArguments()

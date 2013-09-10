@@ -41,7 +41,7 @@ class FeatureTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new Feature($this->request, $this->dispatcher, $this->securityContext);
+        return new Feature($this->container);
     }
 
     public function getMandatoryArguments()

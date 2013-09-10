@@ -20,7 +20,7 @@ class Translator extends BaseTranslator
      * Return this class instance, only once instanciated.
      *
      * @throws \RuntimeException if the class has not been instanciated.
-     * @return Thelia\Core\Translation\Translator the instance.
+     * @return \Thelia\Core\Translation\Translator the instance.
      */
     public static function getInstance() {
         if (self::$instance == null) throw new \RuntimeException("Translator instance is not initialized.");

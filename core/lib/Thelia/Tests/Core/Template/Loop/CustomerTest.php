@@ -41,7 +41,7 @@ class CustomerTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new Customer($this->request, $this->dispatcher, $this->securityContext);
+        return new Customer($this->container);
     }
 
     public function getMandatoryArguments()

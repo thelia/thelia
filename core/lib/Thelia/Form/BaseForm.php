@@ -102,6 +102,10 @@ abstract class BaseForm
             $this->formBuilder->add("success_url", "text");
         }
 
+        if (! $this->formBuilder->has('error_message')) {
+            $this->formBuilder->add("error_message", "text");
+        }
+
         $this->form = $this->formBuilder->getForm();
     }
 

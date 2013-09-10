@@ -1,0 +1,10 @@
+
+// Thelia: Breadcrumb
+.breadcrumb {
+    padding: @breadcrumb-padding;
+    > li {
+       &+li:before {
+           .icon(@angle-right); // Unicode space added since inline-block means non-collapsing white-space
+       }
+   }
+}

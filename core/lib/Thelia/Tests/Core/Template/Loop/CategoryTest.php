@@ -41,7 +41,7 @@ class CategoryTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new Category($this->request, $this->dispatcher, $this->securityContext);
+        return new Category($this->container);
     }
 
     public function getMandatoryArguments()

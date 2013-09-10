@@ -41,7 +41,7 @@ class ContentTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new Content($this->request, $this->dispatcher, $this->securityContext);
+        return new Content($this->container);
     }
 
     public function getMandatoryArguments()

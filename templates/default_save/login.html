@@ -1,0 +1,49 @@
+{include file="includes/header.html"}
+
+<h1>{intl l='Please login'}</h1>
+
+{form name="thelia.customer.login" }
+
+<form action="{url path='/customer/login'}" method="post" {form_enctype form=$form}>
+	{*
+	The field below are not par of the Login form, it defines view to render if the form cannot be validated
+	*}
+	<input type="hidden" name="view" value="login" /> 	{* the view to return to if the form cannot be validated *}
+
+	{*
+	This field is common to all BaseForm instances (thus, this one), and defines
+	the URL the customer is redirected to once the form has been successfully
+	processed
+	*}
+
+	{form_field form=$form field='success_url'}
+	<input type="hidden" name="{$name}" value="{navigate to="return_to"}" /> {* the url the user is redirected to on login success *}
+	{/form_field}
+
+	{*
+	The form error status and the form error messages are defined in Customer action,
+	and passed back to the form plugin through the ParserContext.
+	*}
+
+	{if #form_error}<div class="alert alert-error">#form_error_message</div>{/if}
+
+    {form_hidden_fields form=$form}
+
+    {form_field form=$form field="email"}
+        {if #error}{#message}{/if}
+        <label>{intl l="Your e-mail address"}: </label><input type="email" name="{$name}" {$attr} value="{$value}"><br />
+    {/form_field}
+
+    {form_field form=$form field='password'}
+    <label>{intl l="Your password"}: </label><input type="password" name="{$name}" {$attr} value="{$value}"> <br />
+    {/form_field}
+
+	{form_field form=$form field='remember_me'}
+	<label class="checkbox"> <input type="checkbox" name="{$name}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {intl l='Remember me'}</label>
+	{/form_field}
+
+	<button type="submit">{intl l='Login'}</button>
+</form>
+{/form}
+
+{include file='includes/footer.html'}

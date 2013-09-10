@@ -23,6 +23,7 @@
 
 namespace Thelia\Tests\Core\Template\Element;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
@@ -34,11 +35,9 @@ use Thelia\Core\HttpFoundation\Session\Session;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-abstract class BaseLoopTestor extends \Thelia\Tests\TestCaseWithURLToolSetup
+abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
 {
-    protected $request;
-    protected $dispatcher;
-    protected $securityContext;
+    protected $container;
 
     protected $instance;
 
@@ -57,12 +56,35 @@ abstract class BaseLoopTestor extends \Thelia\Tests\TestCaseWithURLToolSetup
 
     public function setUp()
     {
-        $this->request = new Request();
+        $this->container = new ContainerBuilder();
+
+        $session = new Session(new MockArraySessionStorage());
+        $request = new Request();
+
+        $request->setSession($session);
+
+        /*$stubEventdispatcher = $this->getMockBuilder('\Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubSecurityContext = $this->getMockBuilder('\Thelia\Core\Security\SecurityContext')
+            ->disableOriginalConstructor()
+            ->getMock();*/
+
+        /*$stubAdapter->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));*/
+
+        /*$this->request = new Request();
         $this->request->setSession(new Session(new MockArraySessionStorage()));
 
         $this->dispatcher = new EventDispatcher();
 
-        $this->securityContext = new SecurityContext($this->request);
+        $this->securityContext = new SecurityContext($this->request);*/
+
+        $this->container->set('request', $request);
+        $this->container->set('event_dispatcher', new EventDispatcher());
+        $this->container->set('thelia.securityContext', new SecurityContext($request));
 
         $this->instance = $this->getTestedInstance();
         $this->instance->initializeArgs($this->getMandatoryArguments());
