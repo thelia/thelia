@@ -35,6 +35,7 @@ use Thelia\Log\Tlog;
 
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
@@ -54,8 +55,6 @@ use Thelia\Type\BooleanOrBothType;
  * Class Product
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- * @todo : manage currency in price filter
  */
 class Product extends BaseI18nLoop
 {
@@ -137,6 +136,10 @@ class Product extends BaseI18nLoop
      */
     public function exec(&$pagination)
     {
+        $currency = $this->request->getSession()->getCurrency();
+        $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
+        $defaultCurrencySuffix = '_default_currency';
+
         $search = ProductQuery::create();
 
         /* manage translations */
@@ -144,7 +147,7 @@ class Product extends BaseI18nLoop
 
         $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
         $isPSELeftJoinList = array();
-        $isProductPriceLeftJoinList = array();
+        $isProductPriceFirstLeftJoin = array();
 
         $id = $this->getId();
 
@@ -232,46 +235,6 @@ class Product extends BaseI18nLoop
                 ->where('NOT ISNULL(`is_max_weight`.ID)');
         }
 
-        $min_price = $this->getMin_price();
-
-        if(null !== $min_price) {
-            $isPSELeftJoinList[] = 'is_min_price';
-            $isProductPriceLeftJoinList['is_min_price'] = 'min_price_data';
-            $minPriceJoin = new Join();
-            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_min_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'min_price_data');
-            $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
-
-            $search->joinProductSaleElements('is_min_price', Criteria::LEFT_JOIN)
-                ->addJoinObject($minPriceJoin)
-                ->condition('in_promo', '`is_min_price`.promo'. Criteria::EQUAL .'1')
-                ->condition('not_in_promo', '`is_min_price`.promo'. Criteria::NOT_EQUAL .'1')
-                ->condition('min_promo_price', '`min_price_data`.promo_price' . Criteria::GREATER_EQUAL . '?', $min_price, \PDO::PARAM_STR)
-                ->condition('min_price', '`min_price_data`.price' . Criteria::GREATER_EQUAL . '?', $min_price, \PDO::PARAM_STR)
-                ->combine(array('in_promo', 'min_promo_price'), Criteria::LOGICAL_AND, 'in_promo_min_price')
-                ->combine(array('not_in_promo', 'min_price'), Criteria::LOGICAL_AND, 'not_in_promo_min_price')
-                ->where(array('not_in_promo_min_price', 'in_promo_min_price'), Criteria::LOGICAL_OR);
-        }
-
-        $max_price = $this->getMax_price();
-
-        if(null !== $max_price) {
-            $isPSELeftJoinList[] = 'is_max_price';
-            $isProductPriceLeftJoinList['is_max_price'] = 'max_price_data';
-            $minPriceJoin = new Join();
-            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_max_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'max_price_data');
-            $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
-
-            $search->joinProductSaleElements('is_max_price', Criteria::LEFT_JOIN)
-                ->addJoinObject($minPriceJoin)
-                ->condition('in_promo', '`is_max_price`.promo'. Criteria::EQUAL .'1')
-                ->condition('not_in_promo', '`is_max_price`.promo'. Criteria::NOT_EQUAL .'1')
-                ->condition('min_promo_price', '`max_price_data`.promo_price' . Criteria::LESS_EQUAL . '?', $max_price, \PDO::PARAM_STR)
-                ->condition('max_price', '`max_price_data`.price' . Criteria::LESS_EQUAL . '?', $max_price, \PDO::PARAM_STR)
-                ->combine(array('in_promo', 'min_promo_price'), Criteria::LOGICAL_AND, 'in_promo_max_price')
-                ->combine(array('not_in_promo', 'max_price'), Criteria::LOGICAL_AND, 'not_in_promo_max_price')
-                ->where(array('not_in_promo_max_price', 'in_promo_max_price'), Criteria::LOGICAL_OR);
-        }
-
         if( $attributeNonStrictMatch != '*' ) {
             if($attributeNonStrictMatch == 'none') {
                 $actuallyUsedAttributeNonStrictMatchList = $isPSELeftJoinList;
@@ -286,13 +249,96 @@ class Product extends BaseI18nLoop
             }
         }
 
+        $min_price = $this->getMin_price();
+
+        if(null !== $min_price) {
+
+            if(false === ConfigQuery::useTaxFreeAmounts()) {
+                // @todo
+            }
+
+            $isPSELeftJoinList[] = 'is_min_price';
+            $isProductPriceFirstLeftJoin = array('is_min_price', 'min_price_data');
+
+            $minPriceJoin = new Join();
+            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_min_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'min_price_data');
+            $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
+
+            $search->joinProductSaleElements('is_min_price', Criteria::LEFT_JOIN)
+                ->addJoinObject($minPriceJoin, 'is_min_price_join')
+                ->addJoinCondition('is_min_price_join', '`min_price_data`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
+
+            if($defaultCurrency->getId() != $currency->getId()) {
+                $minPriceJoinDefaultCurrency = new Join();
+                $minPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_min_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'min_price_data' . $defaultCurrencySuffix);
+                $minPriceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
+
+                $search->addJoinObject($minPriceJoinDefaultCurrency, 'is_min_price_join' . $defaultCurrencySuffix)
+                    ->addJoinCondition('is_min_price_join' . $defaultCurrencySuffix, '`min_price_data' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+
+                /**
+                 * In propel we trust : $currency->getRate() always returns a float.
+                 * Or maybe not : rate value is checked as a float in overloaded getRate method.
+                 */
+                $MinPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END) THEN
+                    CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data' . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `min_price_data' . $defaultCurrencySuffix . '`.PRICE END * ' . $currency->getRate() . '
+                ELSE
+                    CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END
+                END';
+            } else {
+                $MinPriceToCompareAsSQL = 'CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data`.PROMO_PRICE ELSE `min_price_data`.PRICE END';
+            }
+
+            $search->where('ROUND(' . $MinPriceToCompareAsSQL . ', 2)>=?', $min_price, \PDO::PARAM_STR);
+        }
+
+        $max_price = $this->getMax_price();
+
+        if(null !== $max_price) {
+            $isPSELeftJoinList[] = 'is_max_price';
+            $isProductPriceFirstLeftJoin = array('is_max_price', 'max_price_data');
+
+            $maxPriceJoin = new Join();
+            $maxPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_max_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'max_price_data');
+            $maxPriceJoin->setJoinType(Criteria::LEFT_JOIN);
+
+            $search->joinProductSaleElements('is_max_price', Criteria::LEFT_JOIN)
+                ->addJoinObject($maxPriceJoin, 'is_max_price_join')
+                ->addJoinCondition('is_max_price_join', '`max_price_data`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
+
+            if($defaultCurrency->getId() != $currency->getId()) {
+                $maxPriceJoinDefaultCurrency = new Join();
+                $maxPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_max_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'max_price_data' . $defaultCurrencySuffix);
+                $maxPriceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
+
+                $search->addJoinObject($maxPriceJoinDefaultCurrency, 'is_max_price_join' . $defaultCurrencySuffix)
+                    ->addJoinCondition('is_max_price_join' . $defaultCurrencySuffix, '`max_price_data' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+
+                /**
+                 * In propel we trust : $currency->getRate() always returns a float.
+                 * Or maybe not : rate value is checked as a float in overloaded getRate method.
+                 */
+                $MaxPriceToCompareAsSQL = 'CASE WHEN ISNULL(CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END) THEN
+                    CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data' . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `max_price_data' . $defaultCurrencySuffix . '`.PRICE END * ' . $currency->getRate() . '
+                ELSE
+                    CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END
+                END';
+
+            } else {
+                $MaxPriceToCompareAsSQL = 'CASE WHEN `is_max_price`.PROMO=1 THEN `max_price_data`.PROMO_PRICE ELSE `max_price_data`.PRICE END';
+            }
+
+            $search->where('ROUND(' . $MaxPriceToCompareAsSQL . ', 2)<=?', $max_price, \PDO::PARAM_STR);
+        }
+
         /*
          * for ordering and outputs, the product will be :
          * - new if at least one the criteria matching PSE is new
          * - in promo if at least one the criteria matching PSE is in promo
          */
 
-        if(count($isProductPriceLeftJoinList) == 0) {
+        /* if we don't have any join yet, let's make a global one */
+        if(empty($isProductPriceFirstLeftJoin)) {
             if(count($isPSELeftJoinList) == 0) {
                 $joiningTable = "global";
                 $isPSELeftJoinList[] = $joiningTable;
@@ -301,13 +347,22 @@ class Product extends BaseI18nLoop
                 $joiningTable = $isPSELeftJoinList[0];
             }
 
-            $isProductPriceLeftJoinList[$joiningTable] = 'global_price_data';
+            $isProductPriceFirstLeftJoin = array($joiningTable, 'global_price_data');
 
-            $minPriceJoin = new Join();
-            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', $joiningTable, ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data');
-            $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
+            $globalPriceJoin = new Join();
+            $globalPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', $joiningTable, ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data');
+            $globalPriceJoin->setJoinType(Criteria::LEFT_JOIN);
 
-            $search->addJoinObject($minPriceJoin);
+            $search->addJoinObject($globalPriceJoin, 'global_price_join')
+                ->addJoinCondition('global_price_join', '`global_price_data`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
+
+            if($defaultCurrency->getId() != $currency->getId()) {
+                $globalPriceJoinDefaultCurrency = new Join();
+                $globalPriceJoinDefaultCurrency->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', $joiningTable, ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data' . $defaultCurrencySuffix);
+                $globalPriceJoinDefaultCurrency->setJoinType(Criteria::LEFT_JOIN);
+                $search->addJoinObject($globalPriceJoinDefaultCurrency, 'global_price_join' . $defaultCurrencySuffix)
+                    ->addJoinCondition('global_price_join' . $defaultCurrencySuffix, '`global_price_data' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+            }
         }
 
         /*
@@ -330,15 +385,24 @@ class Product extends BaseI18nLoop
             $booleanMatchedPromoList[] = '`' . $isPSELeftJoin . '`.PROMO';
             $booleanMatchedNewnessList[] = '`' . $isPSELeftJoin . '`.NEWNESS';
         }
-        $booleanMatchedPriceList = array();
-        foreach($isProductPriceLeftJoinList as $pSE => $isProductPriceLeftJoin) {
-            $booleanMatchedPriceList[] = 'CASE WHEN `' . $pSE . '`.PROMO=1 THEN `' . $isProductPriceLeftJoin . '`.PROMO_PRICE ELSE `' . $isProductPriceLeftJoin . '`.PRICE END';
-        }
         $search->withColumn('ROUND(MAX(' . implode(' OR ', $booleanMatchedPromoList) . '), 2)', 'main_product_is_promo');
         $search->withColumn('ROUND(MAX(' . implode(' OR ', $booleanMatchedNewnessList) . '), 2)', 'main_product_is_new');
-        $search->withColumn('ROUND(MAX(' . implode(' OR ', $booleanMatchedPriceList) . '), 2)', 'real_highest_price');
-        $search->withColumn('ROUND(MIN(' . implode(' OR ', $booleanMatchedPriceList) . '), 2)', 'real_lowest_price');
 
+        $booleanMatchedPrice = 'CASE WHEN `' . $isProductPriceFirstLeftJoin[0] . '`.PROMO=1 THEN `' . $isProductPriceFirstLeftJoin[1] . '`.PROMO_PRICE ELSE `' . $isProductPriceFirstLeftJoin[1] . '`.PRICE END';
+        $booleanMatchedPriceDefaultCurrency = 'CASE WHEN `' . $isProductPriceFirstLeftJoin[0] . '`.PROMO=1 THEN `' . $isProductPriceFirstLeftJoin[1] . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `' . $isProductPriceFirstLeftJoin[1] . $defaultCurrencySuffix . '`.PRICE END';
+
+        if($defaultCurrency->getId() != $currency->getId()) {
+            /**
+             * In propel we trust : $currency->getRate() always returns a float.
+             * Or maybe not : rate value is checked as a float in overloaded getRate method.
+             */
+            $priceToCompareAsSQL = 'CASE WHEN ISNULL(' . $booleanMatchedPrice .') THEN ' . $booleanMatchedPriceDefaultCurrency . ' * ' . $currency->getRate() . ' ELSE ' . $booleanMatchedPrice . ' END';
+        } else {
+            $priceToCompareAsSQL = $booleanMatchedPrice;
+        }
+
+        $search->withColumn('ROUND(MAX(' . $priceToCompareAsSQL . '), 2)', 'real_highest_price');
+        $search->withColumn('ROUND(MIN(' . $priceToCompareAsSQL . '), 2)', 'real_lowest_price');
 
         $current = $this->getCurrent();
 
