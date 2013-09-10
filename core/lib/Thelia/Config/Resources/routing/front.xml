@@ -26,6 +26,7 @@
 
     <route id="customer.login.process" path="/customer/login" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::loginAction</default>
+        <default key="_view">login</default>
     </route>
 
     <route id="customer.login.view" path="/login">

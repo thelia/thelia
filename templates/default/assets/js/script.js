@@ -47,7 +47,7 @@
 		}
 
 		// Login
-		var $form_login = $('#form-login');
+/*		var $form_login = $('#form-login');
 		if($form_login.size() > 0) {
 			$form_login.on('change.account', ':radio', function(){
 				if($(this).val() === '0')
@@ -55,7 +55,7 @@
 				else
 					$('#password', $form_login).prop('disabled', false); // Enabled
 			}).find(':radio:checked').trigger('change.account');
-		}
+		}*/
 
 		// Forgot Password
 /*
