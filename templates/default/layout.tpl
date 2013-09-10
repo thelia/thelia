@@ -80,7 +80,7 @@ URL: http://www.thelia.net
                         </ul>
                     </li>
                     {loop type="category" name="category.navigation" parent="0" limit="3"}
-                        <li><a href="{#URL}">{#TITLE}</a></li>
+                        <li><a href="{$URL}">{$TITLE}</a></li>
                     {/loop}
                 </ul>
                 <ul class="nav navbar-nav navbar-cart navbar-right">
@@ -124,7 +124,7 @@ URL: http://www.thelia.net
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="language.html">{lang attr="title"}</a>
                     <ul class="select dropdown-menu">
                         {loop type="lang" name="lang_available" exclude="{lang attr="id"}"}
-                            <li><a href="?lang={#CODE}">{#TITLE}</a></li>
+                            <li><a href="?lang={$CODE}">{$TITLE}</a></li>
                         {/loop}
                     </ul>
                 </div>
@@ -134,7 +134,7 @@ URL: http://www.thelia.net
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="currency.html">{currency attr="code"}</a>
                     <ul class="select dropdown-menu">
                         {loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
-                            <li><a href="?currency={#ISOCODE}">{#SYMBOL} - {#NAME}</a></li>
+                            <li><a href="?currency={$ISOCODE}">{$SYMBOL} - {$NAME}</a></li>
                         {/loop}
                     </ul>
                 </div>

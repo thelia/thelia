@@ -18,7 +18,7 @@
             <h1 id="main-label" class="page-header">{intl l="Login"}</h1>
             {form name="thelia.customer.login"}
             <form id="form-login" action="{url path="/customer/login"}" method="post" role="form" {form_enctype form=$form}>
-                {if #form_error}<div class="alert alert-danger">#form_error_message</div>{/if}
+                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
                 {form_field form=$form field='success_url'}
                     <input type="hidden" name="{$name}" value="{navigate to="return_to"}" /> {* the url the user is redirected to on login success *}
                 {/form_field}
