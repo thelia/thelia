@@ -50,7 +50,7 @@
 		                        <input type="hidden" name="{$name}" value="{{$edit_language_locale}}" />
 		                        {/form_field}
 
-					            {if #form_error}<div class="alert alert-danger">#form_error_message</div>{/if}
+					            {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 								
 								{form_field form=$form field='name'}
 								<div class="form-group {if $error}has-error{/if}">

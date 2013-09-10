@@ -21,18 +21,18 @@
             {loop type="coupon" name="read_coupon" id=1 backend_context="true"}
 			<div class="alert alert-info">				
 				<span class="glyphicon glyphicon-question-sign"></span>
-                {if #IS_ENABLED}{else}This coupon is disabled, you can enable to the bottom of this form.{/if}
+                {if !$IS_ENABLED}This coupon is disabled, you can enable to the bottom of this form.{/if}
 			</div>
 
             <table class="table table-striped">
 				<tbody>
 					<tr>
 						<td>Code</td>
-						<td>#CODE</td>
+						<td>{$CODE}</td>
 					</tr>
 					<tr>
 						<td>Title</td>
-						<td>#TITLE</td>
+						<td>{$TITLE}</td>
 					</tr>
 					<tr>
 						<td>Expiration date</td>
@@ -41,9 +41,9 @@
 	    			<tr>
 	    				<td>Usage left</td>
 	    				<td>
-                            {if #USAGE_LEFT}
+                            {if $USAGE_LEFT}
                             <span class="label label-success">
-                                #USAGE_LEFT
+                                {$USAGE_LEFT}
                             </span>
                             {else}
                             <span class="label label-important">
@@ -53,14 +53,14 @@
                         </td>
 	    			</tr>
                     <tr>
-                        <td colspan="2">#SHORT_DESCRIPTION</td>
+                        <td colspan="2">{$SHORT_DESCRIPTION}</td>
                     </tr>
                     <tr>
-                        <td colspan="2">#DESCRIPTION</td>
+                        <td colspan="2">{$DESCRIPTION}</td>
                     </tr>
 	    			<tr>
                         <td colspan="2">
-                        {if #IS_CUMULATIVE}
+                        {if $IS_CUMULATIVE}
                             <span class="label label-success">
                                 {intl l="May be cumulative"}
                             </span>
@@ -73,7 +73,7 @@
 	    			</tr>
 	    			<tr>
 	    				<td colspan="2">
-                            {if #IS_REMOVING_POSTAGE}
+                            {if $IS_REMOVING_POSTAGE}
                                 <span class="label label-important">
                                     {intl l="Will remove postage"}
                                 </span>
@@ -86,7 +86,7 @@
 	    			</tr>
 	    			<tr>
 	    				<td>Amount</td>
-	    				<td>#AMOUNT</td>
+	    				<td>{$AMOUNT}</td>
 	    			</tr>
 	    			<tr>
 	    				<td>Conditions of application</td>
