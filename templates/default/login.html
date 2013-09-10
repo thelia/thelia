@@ -34,7 +34,7 @@
                             <div class="control-input">
                             <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" {$attr}  aria-required="true" autofocus required>
                             {if $error}
-                                <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                <span class="help-block"><span class="icon-remove"></span> {$message}</span>
                             {/if}
                             </div>
                         </div>
@@ -58,7 +58,7 @@
                             <div class="control-input">
                             <input type="password" name="{$name}" id="{$label_attr.for}" class="form-control" autocomplete="off">
                             {if $error}
-                                <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                <span class="help-block"><span class="icon-remove"></span> {$message}</span>
                             {/if}
                             </div>
                         </div>
