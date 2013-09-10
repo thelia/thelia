@@ -32,7 +32,7 @@ use Thelia\Core\Template\Loop\Product;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-/*class ProductTest extends BaseLoopTestor
+class ProductTest extends BaseLoopTestor
 {
     public function getTestedClassName()
     {
@@ -41,11 +41,11 @@ use Thelia\Core\Template\Loop\Product;
 
     public function getTestedInstance()
     {
-        return new Product($this->request, $this->dispatcher, $this->securityContext);
+        return new Product($this->container);
     }
 
     public function getMandatoryArguments()
     {
         return array();
     }
-}*/
+}

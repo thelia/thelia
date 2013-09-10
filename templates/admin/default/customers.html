@@ -1,0 +1,139 @@
+
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Customer'}{/block}
+
+{block name="check-permissions"}admin.customer.view{/block}
+
+{block name="main-content"}
+    {assign var=customer_page value={$smarty.get.page|default:1}}
+
+
+    <div class="catalog">
+    <div id="wrapper" class="container">
+
+
+    {module_include location='customer_top'}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="general-block-decorator">
+                <table class="table table-striped table-condensed" id="customer_list">
+                    <caption>
+                        {intl l="Customers list"}
+
+                        {module_include location='customer_list_caption'}
+
+                        {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.customers.create"}
+                            <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new Customer'}" href="#add_customer_dialog" data-toggle="modal">
+                                <span class="glyphicon glyphicon-plus-sign"></span>
+                            </a>
+                        {/loop}
+                    </caption>
+
+                    {ifloop rel="customer_list"}
+                        <thead>
+                        <tr>
+                            <th class="object-title">
+                                {intl l="customer ref"}
+                            </th>
+
+                            <th class="object-title">
+                                {intl l="company"}
+                            </th>
+
+                            {module_include location='category_list_header'}
+
+                            <th>
+                                {intl l="firstname & lastname"}
+                            </th>
+
+                            <th>
+                                {intl l="last order"}
+                            </th>
+
+                            <th>{intl l='order amount'}</th>
+
+                            <th>{intl l='Actions'}</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {loop name="customer_list" type="customer" current="false" visible="*" last_order="1" backend_context="1" page={$customer_page} limit={$display_customer}}
+                            <tr>
+                                <td>{#REF}</td>
+
+                                <td>
+                                    {#COMPANY}
+                                </td>
+
+                                <td class="object-title">
+                                    {#FIRSTNAME} {#LASTNAME}
+                                </td>
+
+                                {module_include location='customer_list_row'}
+
+                                <td>
+                                    {format_date date=$LASTORDER_DATE}
+                                </td>
+
+                                <td>
+                                    {format_number number=$LASTORDER_AMOUNT}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+
+                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.customer.edit"}
+                                            <a class="btn btn-default btn-xs" title="{intl l='Edit this customer'}" href="{url path="/admin/customer/update/{$ID}" }"><i class="glyphicon glyphicon-edit"></i></a>
+                                        {/loop}
+                                        {loop type="auth" name="can_send_mail" roles="ADMIN" permissions="admin.customer.sendMail"}
+                                            <a class="btn btn-default btn-xs" title="{intl l="Send a mail to this customer"}" href="mailto:{#EMAIL}"><span class="glyphicon glyphicon-envelope"></span></a>
+                                        {/loop}
+                                        {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.customer.delete"}
+                                            <a class="btn btn-default btn-xs customer-delete" title="{intl l='Delete this customer and all his orders'}"  href="#delete_customer_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                        {/loop}
+                                    </div>
+                                </td>
+
+                            </tr>
+                        {/loop}
+                        </tbody>
+                    {/ifloop}
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    {module_include location='customer_bottom'}
+    <div class="row">
+        <div class="col-md-12 text-center">
+
+            <ul class="pagination pagination-centered">
+                {if #customer_page != 1}
+                    <li><a href="{url path="/admin/customers" page="1"}">&laquo;</a></li>
+                {else}
+                    <li class="disabled"><a href="#">&laquo;</a></li>
+                {/if}
+
+            {pageloop rel="customer_list"}
+                {if #PAGE != #CURRENT}
+                    <li><a href="{url path="/admin/customers" page="#PAGE"}">#PAGE</a></li>
+                {else}
+                    <li class="active"><a href="#">#PAGE</a></li>
+                {/if}
+
+                {if #PAGE == #LAST && #LAST != #CURRENT}
+                    <li><a href="{url path="/admin/customers" page="#PAGE"}">&raquo;</a></li>
+                {else}
+                    <li class="disabled"><a href="#">&raquo;</a></li>
+                {/if}
+            {/pageloop}
+            </ul>
+        </div>
+    </div>
+
+    </div>
+    </div>
+
+{/block}

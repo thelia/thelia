@@ -26,9 +26,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Scope;
 
+use Thelia\Core\DependencyInjection\Compiler\RegisterCouponPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterListenersPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterParserPluginPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterRulePass;
 
 /**
  * First Bundle use in Thelia
@@ -60,6 +62,8 @@ class TheliaBundle extends Bundle
             ->addCompilerPass(new RegisterListenersPass())
             ->addCompilerPass(new RegisterParserPluginPass())
             ->addCompilerPass(new RegisterRouterPass())
+            ->addCompilerPass(new RegisterCouponPass())
+            ->addCompilerPass(new RegisterRulePass())
         ;
 
     }

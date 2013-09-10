@@ -1109,3 +1109,25 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (268, 'en_US', 'USA - Alabama', '', '', ''),
 (268, 'es_ES', 'USA - Alabama', '', '', ''),
 (268, 'fr_FR', 'USA - Alabama', '', '', '');
+
+INSERT INTO  `tax` (`id`, `rate`, `created_at`, `updated_at`)
+  VALUES
+  (1, '19.6', NOW(), NOW());
+
+INSERT INTO `tax_i18n` (`id`, `locale`, `title`)
+  VALUES
+  (1, 'fr_FR', 'TVA française à 19.6%'),
+  (1, 'en_UK', 'french 19.6% tax');
+
+INSERT INTO  `tax_rule` (`id`, `created_at`, `updated_at`)
+  VALUES
+  (1, NOW(), NOW());
+
+INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`)
+  VALUES
+  (1, 'fr_FR', 'TVA française à 19.6%'),
+  (1, 'en_UK', 'french 19.6% tax');
+
+INSERT INTO  `tax_rule_country` (`tax_rule_id`, `country_id`, `tax_id`, `position`, `created_at`, `updated_at`)
+  VALUES
+  (1, 64, 1, 1, NOW(), NOW());

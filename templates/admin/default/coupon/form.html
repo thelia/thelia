@@ -1,0 +1,294 @@
+{$thelia_page_css_file = "assets/bootstrap-editable/css/bootstrap-editable.css"}
+{include file='includes/notifications.html' message=$general_error}
+<form action="{$formAction}" {form_enctype form=$form} method="POST" >
+    <section class="row">
+        <div class="col-md-12 general-block-decorator">
+
+            {form_hidden_fields form=$form}
+
+            {form_field form=$form field='locale'}
+                <input type="hidden" name="{$name}" value="{if $value}{$value}{else}{$edit_language_locale}{/if}" />
+            {/form_field}
+
+            {form_field form=$form field='success_url'}
+                <input type="hidden" name="{$name}" value="{url path='/admin/coupon/read/{id}'}" />
+            {/form_field}
+
+            <div class="span4">
+                <div class="control-group">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="code">{intl l='Code :'}</label>
+                    {form_field form=$form field='code'}
+                        <input id="code" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='code'}">
+                        {if $error}{$message}{/if}
+                    {/form_field}
+                </div>
+
+                <div class="form-group">
+                    <label for="title">{intl l='Title :'}</label>
+                    {form_field form=$form field='title'}
+                        <input id="title" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='title'}">
+                        {if $error}{$message}{/if}
+                    {/form_field}
+                </div>
+
+                <div class="form-group">
+                    <label for="enabled" class="checkbox">
+                        {form_field form=$form field='isEnabled'}
+                            <input id="enabled" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                            {if $error}{$message}{/if}
+                        {/form_field}
+                        {intl l='Is enabled ?'}
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="available-on-special-offers" class="checkbox">
+                        {form_field form=$form field='isAvailableOnSpecialOffers'}
+                            <input id="available-on-special-offers" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                            {if $error}{$message}{/if}
+                        {/form_field}
+                        {intl l='Is available on special offers ?'}
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="cumulative" class="checkbox">
+                        {form_field form=$form field='isCumulative'}
+                            <input id="cumulative" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                            {if $error}{$message}{/if}
+                        {/form_field}
+                        {intl l='Is cumulative ?'}
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="renoving-postage" class="checkbox">
+                        {form_field form=$form field='isRemovingPostage'}
+                            <input id="renoving-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                            {if $error}{$message}{/if}
+                        {/form_field}
+                        {intl l='Is removing postage ?'}
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="expiration-date">{intl l='Expiration date :'}</label>
+                    <div class="input-append date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
+                        {form_field form=$form field='expirationDate'}
+                            <input type="text" id="expiration-date" name="{$name}" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}">
+                            {if $error}{$message}{/if}
+                        {/form_field}
+                        <span class="add-on"><span class="icon-th"></span></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="max-usage">{intl l='Max usage :'}</label>
+                    <label for="is-unlimited" class="checkbox">
+                        <input id="is-unlimited" type="checkbox" name="is-unlimited" checked >
+                        {intl l='Is unlimited ?'}
+                    </label>
+                    {form_field form=$form field='maxUsage'}
+                        <input id="max-usage" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="{intl l='max usage'}">
+                        {if $error}{$message}{/if}
+                    {/form_field}
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="well clearfix">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="effect">{intl l='Effect :'}</label>
+                            {form_field form=$form field='effect'}
+                                <select name="{$name}" value="{$value}" id="effect" class="col-md-12 form-control">
+                                    {foreach from=$availableCoupons item=availableCoupon}
+                                        <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}">{$availableCoupon.name}</option>
+                                    {/foreach}
+                                </select>
+                                {if $error}{$message}{/if}
+                            {/form_field}
+                            <span id="effectToolTip" class="help-block">{$availableCoupons.0.toolTip}</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="amount">{intl l='Amount :'}</label>
+                            {form_field form=$form field='amount'}
+                                <input id="amount" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="{intl l='14.50'}">
+                                {if $error}{$message}{/if}
+                            {/form_field}
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category :</label>
+                            {*form_field form=$form field='category'*}
+                                <select name="{$name}" value="{$value}" id="category" class="form-control">
+                                    <option value="1">Category 1</option>
+                                    <option value="1">Category 2</option>
+                                    <option value="1">Category 3</option>
+                                </select>
+                                {*if $error}{$message}{/if}*}
+                            {*/form_field*}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="short-description">{intl l='Short description :'}</label>
+                    {form_field form=$form field='shortDescription'}
+                        <textarea id="short-description" name="{$name}" placeholder="{intl l='short description'}" class="span12" rows="5">{$value nofilter}</textarea>
+                        {if $error}{$message}{/if}
+                    {/form_field}
+                </div>
+            </div>
+            
+            <div class="clearfix"></div>
+            <div class="col-md-12">
+
+                <div class="form-group">
+                    <label for="description">{intl l='Long description :'}</label>
+                    {form_field form=$form field='description'}
+                        <textarea id="description" name="{$name}" placeholder="{intl l='long description'}" class="form-control wysiwyg" rows="10">{$value nofilter}</textarea>
+                        {if $error}{$message}{/if}
+                    {/form_field}
+                </div>
+
+                <button type="submit" class="btn btn-default btn-primary">{intl l='Save'}</button>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="row">
+        <div class="col-md-12 general-block-decorator">
+            <table class="table table-striped">
+                <caption class="clearfix">
+                    {intl l='Rules'}
+                </caption>
+                <thead>
+                <tr>
+                    <th>{intl l='Conditions'}</th>
+                    <th>{intl l='Actions'}</th>
+                </tr>
+                </thead>
+                <tbody id="constraint-list">
+                    {include file='coupon/rules.html' rules=$rulesObject}
+                    {*{foreach from=$rulesObject item=rule name=rulesForeach}*}
+                        {*<tr>*}
+                            {*<td>*}
+                                {*{if !$smarty.foreach.rulesForeach.first}*}
+                                    {*<span class="label label-info">{intl l='And'}</span>*}
+                                {*{/if}*}
+                                {*{$rule.tooltip nofilter}*}
+                            {*</td>*}
+
+                            {*<td>*}
+                                {*<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}</a>*}
+                                {*<a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#delete"><span class="glyphicon glyphicon-remove"></span> {intl l='Delete'}</a>*}
+                            {*</td>*}
+                        {*</tr>*}
+                    {*{/foreach}*}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="row">
+        <div class="col-md-12 general-block-decorator clearfix">
+            <a id="constraint-save-btn" title="{intl l='Save this rule'}" class="btn btn-default btn-primary pull-right">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+            </a>
+
+            <div id="rule-add-organizer" class="form-group col-md-2">
+                <label for="type">{intl l='Condition type :'}</label>
+                <label class="radio">
+                    <input type="radio" name="type" id="type" value="1" checked> {intl l='And'}
+                </label>
+                <label class="radio">
+                    <input type="radio" name="type" value="2"> {intl l='Or'}
+                </label>
+            </div>
+
+            <div id="rule-add-type" class="form-group col-md-4">
+                <label for="categoryRule">{intl l='Rule\'s category :'}</label>
+                <select name="categoryRule" id="category-rule" class="form-control">
+                    {foreach from=$availableRules item=availableRule}
+                        <option value="{$availableRule.serviceId}" data-description="{$availableRule.toolTip}">{$availableRule.name}</option>
+                    {/foreach}
+                </select>
+            </div>
+
+            <div id="constraint-add-operators-values" class="form-group col-md-6">
+                {*<label for="operator">{intl l='Operator :'}</label>*}
+                {*<div class="row">*}
+                    {*<div class="col-lg-6">*}
+                        {*<select name="operator" id="operator" class="form-control">*}
+                            {*<option value="1">is superior to</option>*}
+                            {*<option value="2">equals to</option>*}
+                            {*<option value="3">is inferior to</option>*}
+                            {*<option value="4">is inferior or equals to</option>*}
+                            {*<option value="5">is superior or equals to</option>*}
+                        {*</select>*}
+                    {*</div>*}
+                    {*<div class="input-group col-lg-6">*}
+                        {*<input type="text" name="value" class="form-control">*}
+                        {*<span class="input-group-addon">&euro;</span>*}
+                    {*</div>*}
+                {*</div>*}
+                {**}
+
+                {*<label for="operator">Operator :</label>*}
+                {*<div class="row">*}
+                    {*<div class="col-lg-6">*}
+                        {*<select name="operator" id="operator" class="form-control">*}
+                            {*<option value="1">is superior to</option>*}
+                            {*<option value="2">equals to</option>*}
+                            {*<option value="3">is inferior to</option>*}
+                            {*<option value="4">is inferior or equals to</option>*}
+                            {*<option value="5">is superior or equals to</option>*}
+                        {*</select>*}
+                    {*</div>*}
+                    {*<div class="input-group col-lg-6 date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">*}
+                        {*<input type="text" name="value" class="form-control">*}
+                        {*<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>*}
+                    {*</div>*}
+                {*</div>*}
+
+                {*<label for="operator">Operator :</label>*}
+                {*<div class="row">*}
+                    {*<div class="col-lg-6">*}
+                        {*<select name="operator" id="operator" class="form-control">*}
+                            {*<option value="1">is superior to</option>*}
+                            {*<option value="2">equals to</option>*}
+                            {*<option value="3">is inferior to</option>*}
+                            {*<option value="4">is inferior or equals to</option>*}
+                            {*<option value="5">is superior or equals to</option>*}
+                        {*</select>*}
+                    {*</div>*}
+                    {*<div class="col-lg-6">*}
+                        {*<input type="text" name="value" class="form-control">*}
+                    {*</div>*}
+                {*</div>*}
+                {*<div class="row">*}
+                    {*<div class="col-lg-12">*}
+                        {*<table class="table table-bordered">*}
+                            {*<tr>*}
+                                {*<td id="minibrowser-breadcrumb"></td>*}
+                            {*</tr>*}
+                            {*<tr>*}
+                                {*<th><span class="icon-th-list"></span> Categories list</th>*}
+                            {*</tr>*}
+                            {*<tr>*}
+                                {*<td id="minibrowser-categories"></td>*}
+                            {*</tr>*}
+                        {*</table>*}
+                    {*</div>*}
+                {*</div>*}
+            </div>
+        </div>
+    </section>
+</form>
+

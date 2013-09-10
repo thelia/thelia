@@ -39,6 +39,7 @@ use Thelia\Core\Factory\ActionEventFactory;
 use Thelia\Tools\URL;
 use Thelia\Log\Tlog;
 use Thelia\Core\Security\Exception\WrongPasswordException;
+use Symfony\Component\Routing\Router;
 
 /**
  * Class CustomerController
@@ -167,16 +168,25 @@ class CustomerController extends BaseFrontController
 
             }
             catch (FormValidationException $e) {
+
+                if ($request->request->has("account")) {
+                    $account = $request->request->get("account");
+                    $form = $customerLoginForm->getForm();
+                    if($account == 0 && $form->get("email")->getData() !== null) {
+                        $this->redirectToRoute("customer.create.view", array("email" => $form->get("email")->getData()));
+                    }
+                }
+
                 $message = sprintf("Please check your input: %s", $e->getMessage());
             }
             catch(UsernameNotFoundException $e) {
-                $message = "This customer email was not found.";
+                $message = "Wrong email or password. Please try again";
             }
             catch (WrongPasswordException $e) {
-                $message = "Wrong password. Please try again.";
+                $message = "Wrong email or password. Please try again";
             }
             catch(AuthenticationException $e) {
-                $message = "Sorry, we failed to authentify you. Please try again.";
+                $message = "Wrong email or password. Please try again";
             }
             catch (\Exception $e) {
                 $message = sprintf("Sorry, an error occured: %s", $e->getMessage());

@@ -1,0 +1,36 @@
+{*
+    Params
+    - id : aside element id (default delete)
+    - title : modal title (default Confirmation)
+    - message : modal message (default Do you really want to delete this element ?)
+*}
+{block name="confirmation-modal"}
+<aside id="{if $id}{$id}{else}delete{/if}" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    {if $title}
+                        {$title}
+                    {else}
+                        {intl l='Confirmation'}
+                    {/if}
+                </h3>
+            </div>
+            <div class="modal-body">
+                <p>
+                {if $message}
+                    {$message}
+                {else}
+                    {intl l='Do you really want to delete this element ?'}
+                {/if}
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal">{intl l='Cancel'}</button>
+                <a href="#" class="btn btn-default btn-success" data-confirm="confirm">{intl l='Confirm'}</a>
+            </div>
+        </div>
+    </div>
+</aside> <!-- #delete / Delete confirmation -->
+{/block}

@@ -1,0 +1,13 @@
+
+// Pagination
+.pagination {
+    .icon-next:before { content: @chevron-right; }
+    .icon-prev:before { content: @chevron-left; }
+
+    > li {
+        > a,
+        > span {
+            &:focus { z-index: 3; }
+        }
+    }
+}

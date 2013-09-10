@@ -41,7 +41,7 @@ class TitleTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new Title($this->request, $this->dispatcher, $this->securityContext);
+        return new Title($this->container);
     }
 
     public function getMandatoryArguments()

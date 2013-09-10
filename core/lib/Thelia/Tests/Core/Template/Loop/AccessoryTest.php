@@ -41,7 +41,7 @@ class AccessoryTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new Accessory($this->request, $this->dispatcher, $this->securityContext);
+        return new Accessory($this->container);
     }
 
     public function getMandatoryArguments()

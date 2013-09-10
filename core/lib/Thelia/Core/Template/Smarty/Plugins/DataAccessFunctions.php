@@ -31,6 +31,7 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
@@ -133,6 +134,35 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
+     * currency global data
+     *
+     * @param $params
+     * @param $smarty
+     */
+    public function currencyDataAccess($params, $smarty)
+    {
+        $currency = $this->request->getSession()->getCurrency();
+
+        if ($currency) {
+            $currencyQuery = CurrencyQuery::create()
+                ->filterById($currency->getId());
+
+            return $this->dataAccessWithI18n("Currency", $params, $currencyQuery, array("NAME"));
+        }
+    }
+
+    /**
+     * Lang global data
+     *
+     * @param $params
+     * @param $smarty
+     */
+    public function langDataAccess($params, $smarty)
+    {
+        return $this->dataAccess("Lang", $params, $this->request->getSession()->getLang());
+    }
+
+    /**
      * @param               $objectLabel
      * @param               $params
      * @param ModelCriteria $search
@@ -231,6 +261,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'category', $this, 'categoryDataAccess'),
             new SmartyPluginDescriptor('function', 'content', $this, 'contentDataAccess'),
             new SmartyPluginDescriptor('function', 'folder', $this, 'folderDataAccess'),
+            new SmartyPluginDescriptor('function', 'currency', $this, 'currencyDataAccess'),
+            new SmartyPluginDescriptor('function', 'lang', $this, 'langDataAccess'),
         );
     }
 }

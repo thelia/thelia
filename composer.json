@@ -36,6 +36,7 @@
         "simplepie/simplepie": "dev-master",
 
         "imagine/imagine": "dev-master",
+        "symfony/serializer": "dev-master",
         "symfony/icu": "1.0"
     },
     "require-dev" : {

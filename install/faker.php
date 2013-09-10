@@ -1,4 +1,11 @@
 <?php
+use Thelia\Constraint\ConstraintFactory;
+use Thelia\Constraint\ConstraintManager;
+use Thelia\Constraint\Rule\AvailableForTotalAmount;
+use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
+use Thelia\Constraint\Rule\AvailableForXArticlesManager;
+use Thelia\Constraint\Rule\Operators;
+use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Model\ProductImage;
 use Thelia\Model\CategoryImage;
 use Thelia\Model\FolderImage;
@@ -9,10 +16,13 @@ use Imagine\Image\Point;
 require __DIR__ . '/../core/bootstrap.php';
 
 $thelia = new Thelia\Core\Thelia("dev", true);
+$thelia->boot();
 
 $faker = Faker\Factory::create();
 
-$con = \Propel\Runtime\Propel::getConnection(Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
+$con = \Propel\Runtime\Propel::getConnection(
+    Thelia\Model\Map\ProductTableMap::DATABASE_NAME
+);
 $con->beginTransaction();
 
 $currency = \Thelia\Model\CurrencyQuery::create()->filterByCode('EUR')->findOne();
@@ -358,6 +368,8 @@ try {
         }
     }
 
+    generateCouponFixtures($thelia);
+
     $con->commit();
 } catch (Exception $e) {
     echo "error : ".$e->getMessage()."\n";
@@ -371,6 +383,7 @@ function createProduct($faker, $category, $position, &$productIdList)
     $product->addCategory($category);
     $product->setVisible(rand(1, 10)>7 ? 0 : 1);
     $product->setPosition($position);
+    $product->setTaxRuleId(1);
     setI18n($faker, $product);
 
     $product->save();
@@ -398,7 +411,7 @@ function createCategory($faker, $parent, $position, &$categoryIdList, $contentId
 
     //add random associated content
     $alreadyPicked = array();
-    for($i=1; $i<rand(0, 3); $i++) {
+    for ($i=1; $i<rand(0, 3); $i++) {
         $categoryAssociatedContent = new Thelia\Model\CategoryAssociatedContent();
         do {
             $pick = array_rand($contentIdList, 1);
@@ -482,4 +495,120 @@ function setI18n($faker, &$object)
         $object->setDescription($locale . ' : ' . $description);
     }
 }
+/**
+ * Generate Coupon fixtures
+ */
+function generateCouponFixtures($thelia)
+{
+    $container = $thelia->getContainer();
+    $adapter = $container->get('thelia.adapter');
 
+    // Coupons
+    $coupon1 = new Thelia\Model\Coupon();
+    $coupon1->setCode('XMAS');
+    $coupon1->setType('thelia.coupon.type.remove_x_amount');
+    $coupon1->setTitle('Christmas coupon');
+    $coupon1->setShortDescription('Coupon for Christmas removing 10€ if your total checkout is more than 40€');
+    $coupon1->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras at luctus tellus. Integer turpis mauris, aliquet vitae risus tristique, pellentesque vestibulum urna. Vestibulum sodales laoreet lectus dictum suscipit. Praesent vulputate, sem id varius condimentum, quam magna tempor elit, quis venenatis ligula nulla eget libero. Cras egestas euismod tellus, id pharetra leo suscipit quis. Donec lacinia ac lacus et ultricies. Nunc in porttitor neque. Proin at quam congue, consectetur orci sed, congue nulla. Nulla eleifend nunc ligula, nec pharetra elit tempus quis. Vivamus vel mauris sed est dictum blandit. Maecenas blandit dapibus velit ut sollicitudin. In in euismod mauris, consequat viverra magna. Cras velit velit, sollicitudin commodo tortor gravida, tempus varius nulla.
+
+Donec rhoncus leo mauris, id porttitor ante luctus tempus. Curabitur quis augue feugiat, ullamcorper mauris ac, interdum mi. Quisque aliquam lorem vitae felis lobortis, id interdum turpis mattis. Vestibulum diam massa, ornare congue blandit quis, facilisis at nisl. In tortor metus, venenatis non arcu nec, sollicitudin ornare nisl. Nunc erat risus, varius nec urna at, iaculis lacinia elit. Aenean ut felis tempus, tincidunt odio non, sagittis nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec vitae hendrerit elit. Nunc sit amet gravida risus, euismod lobortis massa. Nam a erat mauris. Nam a malesuada lorem. Nulla id accumsan dolor, sed rhoncus tellus. Quisque dictum felis sed leo auctor, at volutpat lectus viverra. Morbi rutrum, est ac aliquam imperdiet, nibh sem sagittis justo, ac mattis magna lacus eu nulla.
+
+Duis interdum lectus nulla, nec pellentesque sapien condimentum at. Suspendisse potenti. Sed eu purus tellus. Nunc quis rhoncus metus. Fusce vitae tellus enim. Interdum et malesuada fames ac ante ipsum primis in faucibus. Etiam tempor porttitor erat vitae iaculis. Sed est elit, consequat non ornare vitae, vehicula eget lectus. Etiam consequat sapien mauris, eget consectetur magna imperdiet eget. Nunc sollicitudin luctus velit, in commodo nulla adipiscing fermentum. Fusce nisi sapien, posuere vitae metus sit amet, facilisis sollicitudin dui. Fusce ultricies auctor enim sit amet iaculis. Morbi at vestibulum enim, eget adipiscing eros.
+
+Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentesque elit erat, lacinia sed semper ac, sagittis vel elit. Nam eu convallis est. Curabitur rhoncus odio vitae consectetur pellentesque. Nam vitae arcu nec ante scelerisque dignissim vel nec neque. Suspendisse augue nulla, mollis eget dui et, tempor facilisis erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ac diam ipsum. Donec convallis dui ultricies velit auctor, non lobortis nulla ultrices. Morbi vitae dignissim ante, sit amet lobortis tortor. Nunc dapibus condimentum augue, in molestie neque congue non.
+
+Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
+    $coupon1->setAmount(10.00);
+    $coupon1->setIsUsed(1);
+    $coupon1->setIsEnabled(1);
+    $date = new \DateTime();
+    $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
+
+    $rule1 = new AvailableForTotalAmountManager($adapter);
+    $operators = array(
+        AvailableForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+        AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
+    );
+    $values = array(
+        AvailableForTotalAmountManager::INPUT1 => 40.00,
+        AvailableForTotalAmountManager::INPUT2 => 'EUR'
+    );
+    $rule1->setValidatorsFromForm($operators, $values);
+
+    $rule2 = new AvailableForTotalAmountManager($adapter);
+    $operators = array(
+        AvailableForTotalAmountManager::INPUT1 => Operators::INFERIOR,
+        AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
+    );
+    $values = array(
+        AvailableForTotalAmountManager::INPUT1 => 400.00,
+        AvailableForTotalAmountManager::INPUT2 => 'EUR'
+    );
+    $rule2->setValidatorsFromForm($operators, $values);
+
+    $rules = new CouponRuleCollection();
+    $rules->add($rule1);
+    $rules->add($rule2);
+
+    /** @var ConstraintFactory $constraintFactory */
+    $constraintFactory = $container->get('thelia.constraint.factory');
+
+    $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
+    $coupon1->setSerializedRules($serializedRules);
+
+    $coupon1->setMaxUsage(40);
+    $coupon1->setIsCumulative(1);
+    $coupon1->setIsRemovingPostage(0);
+    $coupon1->save();
+
+
+
+
+
+
+
+
+    // Coupons
+    $coupon2 = new Thelia\Model\Coupon();
+    $coupon2->setCode('SPRINGBREAK');
+    $coupon2->setType('thelia.coupon.type.remove_x_percent');
+    $coupon2->setTitle('Springbreak coupon');
+    $coupon2->setShortDescription('Coupon for Springbreak removing 10% if you have more than 4 articles in your cart');
+    $coupon2->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras at luctus tellus. Integer turpis mauris, aliquet vitae risus tristique, pellentesque vestibulum urna. Vestibulum sodales laoreet lectus dictum suscipit. Praesent vulputate, sem id varius condimentum, quam magna tempor elit, quis venenatis ligula nulla eget libero. Cras egestas euismod tellus, id pharetra leo suscipit quis. Donec lacinia ac lacus et ultricies. Nunc in porttitor neque. Proin at quam congue, consectetur orci sed, congue nulla. Nulla eleifend nunc ligula, nec pharetra elit tempus quis. Vivamus vel mauris sed est dictum blandit. Maecenas blandit dapibus velit ut sollicitudin. In in euismod mauris, consequat viverra magna. Cras velit velit, sollicitudin commodo tortor gravida, tempus varius nulla.
+
+Donec rhoncus leo mauris, id porttitor ante luctus tempus. Curabitur quis augue feugiat, ullamcorper mauris ac, interdum mi. Quisque aliquam lorem vitae felis lobortis, id interdum turpis mattis. Vestibulum diam massa, ornare congue blandit quis, facilisis at nisl. In tortor metus, venenatis non arcu nec, sollicitudin ornare nisl. Nunc erat risus, varius nec urna at, iaculis lacinia elit. Aenean ut felis tempus, tincidunt odio non, sagittis nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec vitae hendrerit elit. Nunc sit amet gravida risus, euismod lobortis massa. Nam a erat mauris. Nam a malesuada lorem. Nulla id accumsan dolor, sed rhoncus tellus. Quisque dictum felis sed leo auctor, at volutpat lectus viverra. Morbi rutrum, est ac aliquam imperdiet, nibh sem sagittis justo, ac mattis magna lacus eu nulla.
+
+Duis interdum lectus nulla, nec pellentesque sapien condimentum at. Suspendisse potenti. Sed eu purus tellus. Nunc quis rhoncus metus. Fusce vitae tellus enim. Interdum et malesuada fames ac ante ipsum primis in faucibus. Etiam tempor porttitor erat vitae iaculis. Sed est elit, consequat non ornare vitae, vehicula eget lectus. Etiam consequat sapien mauris, eget consectetur magna imperdiet eget. Nunc sollicitudin luctus velit, in commodo nulla adipiscing fermentum. Fusce nisi sapien, posuere vitae metus sit amet, facilisis sollicitudin dui. Fusce ultricies auctor enim sit amet iaculis. Morbi at vestibulum enim, eget adipiscing eros.
+
+Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentesque elit erat, lacinia sed semper ac, sagittis vel elit. Nam eu convallis est. Curabitur rhoncus odio vitae consectetur pellentesque. Nam vitae arcu nec ante scelerisque dignissim vel nec neque. Suspendisse augue nulla, mollis eget dui et, tempor facilisis erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ac diam ipsum. Donec convallis dui ultricies velit auctor, non lobortis nulla ultrices. Morbi vitae dignissim ante, sit amet lobortis tortor. Nunc dapibus condimentum augue, in molestie neque congue non.
+
+Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
+    $coupon2->setAmount(10.00);
+    $coupon2->setIsUsed(1);
+    $coupon2->setIsEnabled(1);
+    $date = new \DateTime();
+    $coupon2->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
+
+    $rule1 = new AvailableForXArticlesManager($adapter);
+    $operators = array(
+        AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR,
+    );
+    $values = array(
+        AvailableForXArticlesManager::INPUT1 => 4,
+    );
+    $rule1->setValidatorsFromForm($operators, $values);
+
+    $rules = new CouponRuleCollection();
+    $rules->add($rule1);
+
+    /** @var ConstraintFactory $constraintFactory */
+    $constraintFactory = $container->get('thelia.constraint.factory');
+
+    $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
+    $coupon2->setSerializedRules($serializedRules);
+
+    $coupon1->setMaxUsage(-1);
+    $coupon2->setIsCumulative(0);
+    $coupon2->setIsRemovingPostage(1);
+    $coupon2->save();
+}

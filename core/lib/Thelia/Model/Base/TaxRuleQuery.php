@@ -23,16 +23,10 @@ use Thelia\Model\Map\TaxRuleTableMap;
  *
  *
  * @method     ChildTaxRuleQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildTaxRuleQuery orderByCode($order = Criteria::ASC) Order by the code column
- * @method     ChildTaxRuleQuery orderByTitle($order = Criteria::ASC) Order by the title column
- * @method     ChildTaxRuleQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method     ChildTaxRuleQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildTaxRuleQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildTaxRuleQuery groupById() Group by the id column
- * @method     ChildTaxRuleQuery groupByCode() Group by the code column
- * @method     ChildTaxRuleQuery groupByTitle() Group by the title column
- * @method     ChildTaxRuleQuery groupByDescription() Group by the description column
  * @method     ChildTaxRuleQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildTaxRuleQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -56,16 +50,10 @@ use Thelia\Model\Map\TaxRuleTableMap;
  * @method     ChildTaxRule findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTaxRule matching the query, or a new ChildTaxRule object populated from the query conditions when no match is found
  *
  * @method     ChildTaxRule findOneById(int $id) Return the first ChildTaxRule filtered by the id column
- * @method     ChildTaxRule findOneByCode(string $code) Return the first ChildTaxRule filtered by the code column
- * @method     ChildTaxRule findOneByTitle(string $title) Return the first ChildTaxRule filtered by the title column
- * @method     ChildTaxRule findOneByDescription(string $description) Return the first ChildTaxRule filtered by the description column
  * @method     ChildTaxRule findOneByCreatedAt(string $created_at) Return the first ChildTaxRule filtered by the created_at column
  * @method     ChildTaxRule findOneByUpdatedAt(string $updated_at) Return the first ChildTaxRule filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildTaxRule objects filtered by the id column
- * @method     array findByCode(string $code) Return ChildTaxRule objects filtered by the code column
- * @method     array findByTitle(string $title) Return ChildTaxRule objects filtered by the title column
- * @method     array findByDescription(string $description) Return ChildTaxRule objects filtered by the description column
  * @method     array findByCreatedAt(string $created_at) Return ChildTaxRule objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildTaxRule objects filtered by the updated_at column
  *
@@ -156,7 +144,7 @@ abstract class TaxRuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, TITLE, DESCRIPTION, CREATED_AT, UPDATED_AT FROM tax_rule WHERE ID = :p0';
+        $sql = 'SELECT ID, CREATED_AT, UPDATED_AT FROM tax_rule WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -284,93 +272,6 @@ abstract class TaxRuleQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TaxRuleTableMap::ID, $id, $comparison);
-    }
-
-    /**
-     * Filter the query on the code column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCode('fooValue');   // WHERE code = 'fooValue'
-     * $query->filterByCode('%fooValue%'); // WHERE code LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $code The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildTaxRuleQuery The current query, for fluid interface
-     */
-    public function filterByCode($code = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($code)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $code)) {
-                $code = str_replace('*', '%', $code);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(TaxRuleTableMap::CODE, $code, $comparison);
-    }
-
-    /**
-     * Filter the query on the title column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByTitle('fooValue');   // WHERE title = 'fooValue'
-     * $query->filterByTitle('%fooValue%'); // WHERE title LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $title The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildTaxRuleQuery The current query, for fluid interface
-     */
-    public function filterByTitle($title = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($title)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $title)) {
-                $title = str_replace('*', '%', $title);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(TaxRuleTableMap::TITLE, $title, $comparison);
-    }
-
-    /**
-     * Filter the query on the description column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByDescription('fooValue');   // WHERE description = 'fooValue'
-     * $query->filterByDescription('%fooValue%'); // WHERE description LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $description The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildTaxRuleQuery The current query, for fluid interface
-     */
-    public function filterByDescription($description = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($description)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $description)) {
-                $description = str_replace('*', '%', $description);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(TaxRuleTableMap::DESCRIPTION, $description, $comparison);
     }
 
     /**
@@ -563,7 +464,7 @@ abstract class TaxRuleQuery extends ModelCriteria
      *
      * @return ChildTaxRuleQuery The current query, for fluid interface
      */
-    public function joinTaxRuleCountry($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinTaxRuleCountry($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('TaxRuleCountry');
@@ -598,7 +499,7 @@ abstract class TaxRuleQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\TaxRuleCountryQuery A secondary query class using the current class as primary query
      */
-    public function useTaxRuleCountryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useTaxRuleCountryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinTaxRuleCountry($relationAlias, $joinType)

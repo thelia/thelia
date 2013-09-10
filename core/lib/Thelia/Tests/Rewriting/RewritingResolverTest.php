@@ -61,7 +61,7 @@ class RewritingResolverTest extends \PHPUnit_Framework_TestCase
         $resolver = new RewritingResolver();
 
         $method = $this->getMethod('getOtherParameters');
-        $actual = $method->invoke($resolver);
+        $method->invoke($resolver);
     }
 
     public function testGetOtherParameters()

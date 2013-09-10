@@ -67,6 +67,18 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
     protected $locale;
 
     /**
+     * The value for the title field.
+     * @var        string
+     */
+    protected $title;
+
+    /**
+     * The value for the description field.
+     * @var        string
+     */
+    protected $description;
+
+    /**
      * @var        TaxRule
      */
     protected $aTaxRule;
@@ -369,6 +381,28 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
     }
 
     /**
+     * Get the [title] column value.
+     *
+     * @return   string
+     */
+    public function getTitle()
+    {
+
+        return $this->title;
+    }
+
+    /**
+     * Get the [description] column value.
+     *
+     * @return   string
+     */
+    public function getDescription()
+    {
+
+        return $this->description;
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
@@ -413,6 +447,48 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
 
         return $this;
     } // setLocale()
+
+    /**
+     * Set the value of [title] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\TaxRuleI18n The current object (for fluent API support)
+     */
+    public function setTitle($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->title !== $v) {
+            $this->title = $v;
+            $this->modifiedColumns[] = TaxRuleI18nTableMap::TITLE;
+        }
+
+
+        return $this;
+    } // setTitle()
+
+    /**
+     * Set the value of [description] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\TaxRuleI18n The current object (for fluent API support)
+     */
+    public function setDescription($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->description !== $v) {
+            $this->description = $v;
+            $this->modifiedColumns[] = TaxRuleI18nTableMap::DESCRIPTION;
+        }
+
+
+        return $this;
+    } // setDescription()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -460,6 +536,12 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TaxRuleI18nTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
             $this->locale = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TaxRuleI18nTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->title = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TaxRuleI18nTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->description = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -468,7 +550,7 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 2; // 2 = TaxRuleI18nTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = TaxRuleI18nTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\TaxRuleI18n object", 0, $e);
@@ -695,6 +777,12 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
         if ($this->isColumnModified(TaxRuleI18nTableMap::LOCALE)) {
             $modifiedColumns[':p' . $index++]  = 'LOCALE';
         }
+        if ($this->isColumnModified(TaxRuleI18nTableMap::TITLE)) {
+            $modifiedColumns[':p' . $index++]  = 'TITLE';
+        }
+        if ($this->isColumnModified(TaxRuleI18nTableMap::DESCRIPTION)) {
+            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
+        }
 
         $sql = sprintf(
             'INSERT INTO tax_rule_i18n (%s) VALUES (%s)',
@@ -711,6 +799,12 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
                         break;
                     case 'LOCALE':
                         $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
+                        break;
+                    case 'TITLE':
+                        $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
+                        break;
+                    case 'DESCRIPTION':
+                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -773,6 +867,12 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
             case 1:
                 return $this->getLocale();
                 break;
+            case 2:
+                return $this->getTitle();
+                break;
+            case 3:
+                return $this->getDescription();
+                break;
             default:
                 return null;
                 break;
@@ -804,6 +904,8 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getLocale(),
+            $keys[2] => $this->getTitle(),
+            $keys[3] => $this->getDescription(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -855,6 +957,12 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
             case 1:
                 $this->setLocale($value);
                 break;
+            case 2:
+                $this->setTitle($value);
+                break;
+            case 3:
+                $this->setDescription($value);
+                break;
         } // switch()
     }
 
@@ -881,6 +989,8 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setLocale($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setTitle($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
     }
 
     /**
@@ -894,6 +1004,8 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
 
         if ($this->isColumnModified(TaxRuleI18nTableMap::ID)) $criteria->add(TaxRuleI18nTableMap::ID, $this->id);
         if ($this->isColumnModified(TaxRuleI18nTableMap::LOCALE)) $criteria->add(TaxRuleI18nTableMap::LOCALE, $this->locale);
+        if ($this->isColumnModified(TaxRuleI18nTableMap::TITLE)) $criteria->add(TaxRuleI18nTableMap::TITLE, $this->title);
+        if ($this->isColumnModified(TaxRuleI18nTableMap::DESCRIPTION)) $criteria->add(TaxRuleI18nTableMap::DESCRIPTION, $this->description);
 
         return $criteria;
     }
@@ -966,6 +1078,8 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
     {
         $copyObj->setId($this->getId());
         $copyObj->setLocale($this->getLocale());
+        $copyObj->setTitle($this->getTitle());
+        $copyObj->setDescription($this->getDescription());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -1051,6 +1165,8 @@ abstract class TaxRuleI18n implements ActiveRecordInterface
     {
         $this->id = null;
         $this->locale = null;
+        $this->title = null;
+        $this->description = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();

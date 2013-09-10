@@ -204,6 +204,114 @@ final class TheliaEvents
      */
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
 
+
+
+    /**
+     * Sent when creating a Coupon
+     */
+    const COUPON_CREATE = "action.create_coupon";
+
+    /**
+     * Sent just before a successful insert of a new Coupon in the database.
+     */
+    const BEFORE_CREATE_COUPON 	= "action.before_create_coupon";
+
+    /**
+     * Sent just after a successful insert of a new Coupon in the database.
+     */
+    const AFTER_CREATE_COUPON 	= "action.after_create_coupon";
+
+    /**
+     * Sent when editing a Coupon
+     */
+    const COUPON_UPDATE = "action.update_coupon";
+
+    /**
+     * Sent just before a successful update of a new Coupon in the database.
+     */
+    const BEFORE_UPDATE_COUPON 	= "action.before_update_coupon";
+
+    /**
+     * Sent just after a successful update of a new Coupon in the database.
+     */
+    const AFTER_UPDATE_COUPON 	= "action.after_update_coupon";
+
+    /**
+     * Sent when disabling a Coupon
+     */
+    const COUPON_DISABLE = "action.disable_coupon";
+
+    /**
+     * Sent just before a successful disable of a new Coupon in the database.
+     */
+    const BEFORE_DISABLE_COUPON 	= "action.before_disable_coupon";
+
+    /**
+     * Sent just after a successful disable of a new Coupon in the database.
+     */
+    const AFTER_DISABLE_COUPON 	= "action.after_disable_coupon";
+
+    /**
+     * Sent when enabling a Coupon
+     */
+    const COUPON_ENABLE = "action.enable_coupon";
+
+    /**
+     * Sent just before a successful enable of a new Coupon in the database.
+     */
+    const BEFORE_ENABLE_COUPON 	= "action.before_enable_coupon";
+
+    /**
+     * Sent just after a successful enable of a new Coupon in the database.
+     */
+    const AFTER_ENABLE_COUPON 	= "action.after_enable_coupon";
+
+    /**
+     * Sent when attempting to use a Coupon
+     */
+    const COUPON_CONSUME 	= "action.consume_coupon";
+
+    /**
+     * Sent just before an attempt to use a Coupon
+     */
+    const BEFORE_CONSUME_COUPON 	= "action.before_consume_coupon";
+
+    /**
+     * Sent just after an attempt to use a Coupon
+     */
+    const AFTER_CONSUME_COUPON 	= "action.after_consume_coupon";
+
+    /**
+     * Sent when attempting to update Coupon Rule
+     */
+    const COUPON_RULE_UPDATE 	= "action.update_coupon_rule";
+
+    /**
+     * Sent just before an attempt to update a Coupon Rule
+     */
+    const BEFORE_COUPON_RULE_UPDATE 	= "action.before_update_coupon_rule";
+
+    /**
+     * Sent just after an attempt to update a Coupon Rule
+     */
+    const AFTER_COUPON_RULE_UPDATE 	= "action.after_update_coupon_rule";
+
+    /**
+     * Sent when attempting to delete Coupon Rule
+     */
+    const COUPON_RULE_DELETE 	= "action.delete_coupon_rule";
+
+    /**
+     * Sent just before an attempt to delete a Coupon Rule
+     */
+    const BEFORE_COUPON_RULE_DELETE 	= "action.before_delete_coupon_rule";
+
+    /**
+     * Sent just after an attempt to delete a Coupon Rule
+     */
+    const AFTER_COUPON_RULE_DELETE 	= "action.after_delete_coupon_rule";
+
+
     // -- Configuration management ---------------------------------------------
 
     const CONFIG_CREATE   = "action.createConfig";

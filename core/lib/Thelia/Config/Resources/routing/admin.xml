@@ -31,6 +31,14 @@
         <default key="_controller">Thelia\Controller\Admin\CategoryController::defaultAction</default>
     </route>
 
+    <!-- Customer rule management -->
+
+    <route id="admin.customers" path="/admin/customers">
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::indexAction</default>
+    </route>
+
+    <!-- end Customer rule management -->
+
     <!-- Categories management -->
 
     <route id="admin.categories.default" path="/admin/categories">
@@ -60,6 +68,41 @@
     <route id="admin.categories.update-position" path="/admin/categories/update-position">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::updatePositionAction</default>
     </route>
+    <route id="admin.category.ajax" path="/admin/catalog/category/parent/{parentId}.{_format}" methods="GET">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::getByParentIdAction</default>
+        <requirement key="_format">xml|json</requirement>
+    </route>
+
+
+
+
+
+
+
+    <!-- Route to the Coupon controller (process Coupon browsing) -->
+    <route id="admin.coupon.list" path="/admin/coupon">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::browseAction</default>
+    </route>
+    <route id="admin.coupon.create" path="/admin/coupon/create">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::createAction</default>
+    </route>
+    <route id="admin.coupon.update" path="/admin/coupon/update/{couponId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::updateAction</default>
+    </route>
+    <route id="admin.coupon.read" path="/admin/coupon/read/{couponId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
+    </route>
+    <route id="admin.coupon.rule.input" path="/admin/coupon/rule/{ruleId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::getRuleInputAction</default>
+    </route>
+    <route id="admin.coupon.rule.update" path="/admin/coupon/{couponId}/rule/update/">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::updateRulesAction</default>
+    </route>
+
+
+
+
+
 
     <!-- Routes to the Config (system variables) controller -->
 
