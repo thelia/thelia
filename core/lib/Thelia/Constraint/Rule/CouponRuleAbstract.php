@@ -203,8 +203,12 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
             $validator['availableOperators'] = $translatedOperators;
             $translatedInputs[$key] = $validator;
         }
+        $validators = array();
+        $validators['inputs'] = $translatedInputs;
+        $validators['setOperators'] = $this->operators;
+        $validators['setValues'] = $this->values;
 
-        return $translatedInputs;
+        return $validators;
     }
 
     /**

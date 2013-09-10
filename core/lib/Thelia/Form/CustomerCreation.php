@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,7 +17,7 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 namespace Thelia\Form;
@@ -26,6 +26,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Class CustomerCreation
@@ -43,7 +44,7 @@ class CustomerCreation extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "Firstname",
+                "label" => Translator::getInstance()->trans("First Name"),
                 "label_attr" => array(
                     "for" => "firstname"
                 )
@@ -52,7 +53,7 @@ class CustomerCreation extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "Lastname",
+                "label" => Translator::getInstance()->trans("Last Name"),
                 "label_attr" => array(
                     "for" => "lastname"
                 )
@@ -61,25 +62,37 @@ class CustomerCreation extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "Address",
                 "label_attr" => array(
                     "for" => "address"
-                )
+                ),
+                "label" => Translator::getInstance()->trans("Street Address")
             ))
             ->add("address2", "text", array(
-                "label" => "Address Line 2"
+                "label" => Translator::getInstance()->trans("Address Line 2"),
+                "label_attr" => array(
+                    "for" => "address2"
+                )
             ))
             ->add("address3", "text", array(
-                "label" => "Address Line 3"
+                "label" => Translator::getInstance()->trans("Address Line 3"),
+                "label_attr" => array(
+                    "for" => "address3"
+                )
+            ))
+            ->add("company", "text", array(
+                "label" => Translator::getInstance()->trans("Company name"),
+                "label_attr" => array(
+                    "for" => "company"
+                )
             ))
             ->add("phone", "text", array(
-                "label" => "Phone",
+                "label" => Translator::getInstance()->trans("Phone"),
                 "label_attr" => array(
                     "for" => "phone"
                 )
             ))
             ->add("cellphone", "text", array(
-                "label" => "Cellphone",
+                "label" => Translator::getInstance()->trans("Cellphone"),
                 "label_attr" => array(
                     "for" => "cellphone"
                 )
@@ -88,7 +101,7 @@ class CustomerCreation extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "Zip code",
+                "label" => Translator::getInstance()->trans("Zip code"),
                 "label_attr" => array(
                     "for" => "zipcode"
                 )
@@ -97,7 +110,7 @@ class CustomerCreation extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "City",
+                "label" => Translator::getInstance()->trans("City"),
                 "label_attr" => array(
                     "for" => "city"
                 )
@@ -106,7 +119,7 @@ class CustomerCreation extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "Country",
+                "label" => Translator::getInstance()->trans("Country"),
                 "label_attr" => array(
                     "for" => "country"
                 )
@@ -115,7 +128,10 @@ class CustomerCreation extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => "title"
+                "label" => Translator::getInstance()->trans("Title"),
+                "label_attr" => array(
+                    "for" => "title"
+                )
             ))
             ->add("email", "email", array(
                 "constraints" => array(
@@ -128,12 +144,12 @@ class CustomerCreation extends BaseForm
                         )
                     ))
                 ),
-                "label" => "Email",
+                "label" => Translator::getInstance()->trans("Email Address"),
                 "label_attr" => array(
                     "for" => "email"
                 )
             ))
-            ->add("email_confirm", "email", array(
+/*            ->add("email_confirm", "email", array(
                 "constraints" => array(
                     new Constraints\Callback(array(
                         "methods" => array(
@@ -142,17 +158,14 @@ class CustomerCreation extends BaseForm
                         )
                     ))
                 ),
-                "label" => "Email confirmation",
-                "label_attr" => array(
-                    "for" => "email-confirmation"
-                )
-            ))
+                "label" => "email confirmation"
+            ))*/
             ->add("password", "password", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4)))
                 ),
-                "label" => "Password",
+                "label" => Translator::getInstance()->trans("Password"),
                 "label_attr" => array(
                     "for" => "password"
                 )
@@ -167,7 +180,7 @@ class CustomerCreation extends BaseForm
                 ),
                 "label" => "Password confirmation",
                 "label_attr" => array(
-                    "for" => "password-confirmation"
+                    "for" => "password_confirmation"
                 )
             ))
 
