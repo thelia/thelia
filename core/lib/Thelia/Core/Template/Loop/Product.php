@@ -307,7 +307,9 @@ class Product extends BaseI18nLoop
             $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', $joiningTable, ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data');
             $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
 
-            $search->addJoinObject($minPriceJoin);
+            $currency = $this->request->getSession()->getCurrency();
+            $search->addJoinObject($minPriceJoin, 'min_price_join')
+                ->addJoinCondition('min_price_join', '`global_price_data`.`currency_id` = ?', $currency, null, \PDO::PARAM_INT);
         }
 
         /*
@@ -338,6 +340,9 @@ class Product extends BaseI18nLoop
         $search->withColumn('ROUND(MAX(' . implode(' OR ', $booleanMatchedNewnessList) . '), 2)', 'main_product_is_new');
         $search->withColumn('ROUND(MAX(' . implode(' OR ', $booleanMatchedPriceList) . '), 2)', 'real_highest_price');
         $search->withColumn('ROUND(MIN(' . implode(' OR ', $booleanMatchedPriceList) . '), 2)', 'real_lowest_price');
+
+        $search->withColumn('ROUND(MAX(' . implode(' OR ', $booleanMatchedPriceList) . '), 2)', 'real_highest_price_default_currency');
+        $search->withColumn('ROUND(MIN(' . implode(' OR ', $booleanMatchedPriceList) . '), 2)', 'real_lowest_price_default_currency');
 
 
         $current = $this->getCurrent();
@@ -501,6 +506,8 @@ class Product extends BaseI18nLoop
                     break(2);
             }
         }
+
+        var_dump($search->toString());
 
         /* perform search */
         $products = $this->search($search, $pagination);
