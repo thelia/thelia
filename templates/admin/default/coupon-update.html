@@ -16,7 +16,7 @@
     </div>
 
     {form name="thelia.admin.coupon.creation"}
-        {include file='coupon/form.html' formAction={url path={$formAction}} form=$form}
+        {include file='coupon/form.html' formAction={url path={$formAction}} form=$form noRules=false}
     {/form}
 
 </section> <!-- #wrapper -->
@@ -43,11 +43,19 @@
 
 
 
-
+            Array.prototype.clean = function(deleteValue) {
+                for (var i = 0; i < this.length; i++) {
+                    if (this[i] == deleteValue) {
+                        this.splice(i, 1);
+                        i--;
+                    }
+                }
+                return this;
+            };
 
 
             // Init Rules
-            var initRule = function() {
+            var initRules = function() {
                 var rules = [];
                 {foreach from=$rulesObject key=k item=rule}
                     var rule = {};
@@ -67,16 +75,13 @@
 
             // Save Rules AJAX
             var saveRuleAjax = function() {
+                console.log('rulesToSave');
+                console.log(rulesToSave);
                 var $url = '{$urlAjaxUpdateRules}';
-                console.log('save');
-                console.log('{$urlAjaxUpdateRules}');
-                console.log(rules);
-                console.log(JSON.stringify(rules));
                 $.ajax({
                     type: "POST",
                     url: $url,
-                    {*data: {literal}{{/literal}rules:rules{literal}}{/literal},*}
-                    data: {literal}{{/literal}rules:JSON.stringify(rules){literal}}{/literal},
+                    data: {literal}{{/literal}rules:JSON.stringify(rulesToSave){literal}}{/literal},
                     statusCode: {
                         404: function() {
                             $('#constraint-add-operators-values').html(
@@ -91,20 +96,83 @@
             }
 
             // Remove 1 Rule then Save Rules AJAX
-            var removeRuleAjax = function($id) {
-                rules.slice($id, 1);
+            var removeRuleAjax = function(id) {
+                // Delete rule in temporary array
+                delete rulesToSave[id];
+                rulesToSave.clean(undefined);
+
+                // Save
                 saveRuleAjax();
             }
 
-            // Add 1 Rule then Save Rules AJAX
-            var addRuleAjax = function() {
-                rules.push(ruleToSave);
+            // Add 1 Rule / or update the temporary Rules array then Save Rules via AJAX
+            var addRuleAjax = function(id) {
+                if(typeof id === 'number' && id % 1 == 0) {
+                    rulesToSave[id] = ruleToSave;
+                } else {
+                    rulesToSave.push(ruleToSave);
+                }
+
                 saveRuleAjax();
             }
 
+            // Set rule inputs to allow editing
+            var updateRuleAjax = function(id) {
+                ruleToSave = rulesToSave[id];
+                var ruleToUpdate = ruleToSave;
 
-            var rules = initRule();
-            console.log(rules);
+                // Deleting this rule, we will reset it
+                delete rulesToSave[id];
+
+                // Set the rule seletor
+                $("#category-rule option").filter(function() {
+                    return $(this).val() == ruleToSave.serviceId;
+                }).prop('selected', true);
+
+                // Force rule input refresh
+                loadRuleInputs(ruleToSave.serviceId, ruleToUpdate, function(ruleToUpdate) {
+                    fillInRuleInputs(ruleToUpdate);
+                });
+            }
+
+            // Fill in rule inputs
+            var fillInRuleInputs = function(ruleToUpdate) {
+                var valueId = null;
+                var operatorId = null;
+
+                for (idName in ruleToUpdate.operators) {
+                    // Setting idName operator input
+                    operatorId = idName + '-operator';
+                    $('#' + operatorId).val(ruleToUpdate.operators[idName]);
+                    // Setting idName value input
+                    valueId = idName + '-value';
+                    $('#' + valueId).val(ruleToUpdate.values[idName]);
+                }
+            }
+
+
+
+
+
+            // Reload rule inputs
+            var loadRuleInputs = function(ruleId, ruleToSave, callBack) {
+                $('#constraint-add-operators-values').html('<div class="loading" ></div>');
+                var url = "{$urlAjaxGetRuleInput}";
+                url = url.replace('ruleId', ruleId)
+                $.ajax({
+                    url: url,
+                    statusCode: {
+                        404: function() {
+                            $('#constraint-add-operators-values').html(
+                                '{intl l='Please select another rule'}'
+                            );
+                        }
+                    }
+                }).done(function(data) {
+                    $('#constraint-add-operators-values').html(data);
+                    return callBack(ruleToSave);
+                });
+            }
 
 
             // Save rules on click
@@ -117,11 +185,23 @@
 
             // Remove rule on click
             var onClickDeleteRule = function() {
-                $('#constraint-delete-btn').on('click', function (e) {
-//                    removeRuleAjax();
+                $('.constraint-delete-btn').on('click', function (e) {
+                    e.preventDefault();
+                    var $this = $(this);
+                    removeRuleAjax($this.attr('data-int'));
                 });
             }
             onClickDeleteRule();
+
+            // Remove rule on click
+            var onClickUpdateRule = function() {
+                $('.constraint-update-btn').on('click', function (e) {
+                    e.preventDefault();
+                    var $this = $(this);
+                    updateRuleAjax($this.attr('data-int'));
+                });
+            }
+            onClickUpdateRule();
 
             // Reload effect inputs when changing effect
             var onEffectChange = function() {
@@ -135,24 +215,18 @@
             // Reload rule inputs when changing effect
             var onRuleChange = function() {
                 $('#category-rule').on('change', function (e) {
-                    $('#constraint-add-operators-values').html('<div class="loading" ></div>');
-                    var url = "{$urlAjaxGetRuleInput}";
-                    url = url.replace('ruleId', $(this).val())
-                    $.ajax({
-                        url: url,
-                        statusCode: {
-                            404: function() {
-                                $('#constraint-add-operators-values').html(
-                                    '{intl l='Please select another rule'}'
-                                );
-                            }
-                        }
-                    }).done(function(data) {
-                        $('#constraint-add-operators-values').html(data);
-                    });
+                    loadRuleInputs($(this).val(), null, function(ruleToSave) {});
                 });
             }
             onRuleChange();
+
+
+
+
+            // Rule to save
+            var ruleToSave = {literal}{}{/literal};
+            // Rules which will be saved
+            var rulesToSave = initRules();
         });
 
 
