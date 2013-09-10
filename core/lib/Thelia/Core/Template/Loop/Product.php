@@ -25,7 +25,6 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -253,6 +252,11 @@ class Product extends BaseI18nLoop
         $min_price = $this->getMin_price();
 
         if(null !== $min_price) {
+
+            if(false === ConfigQuery::useTaxFreeAmounts()) {
+                // @todo
+            }
+
             $isPSELeftJoinList[] = 'is_min_price';
             $isProductPriceFirstLeftJoin = array('is_min_price', 'min_price_data');
 
@@ -272,7 +276,6 @@ class Product extends BaseI18nLoop
                 $search->addJoinObject($minPriceJoinDefaultCurrency, 'is_min_price_join' . $defaultCurrencySuffix)
                     ->addJoinCondition('is_min_price_join' . $defaultCurrencySuffix, '`min_price_data' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
-                $MinPriceToCompareAsSQL = 'CASE WHEN `is_min_price`.PROMO=1 THEN `min_price_data' . $defaultCurrencySuffix . '`.PROMO_PRICE ELSE `min_price_data' . $defaultCurrencySuffix . '`.PRICE END';
                 /**
                  * In propel we trust : $currency->getRate() always returns a float.
                  * Or maybe not : rate value is checked as a float in overloaded getRate method.
