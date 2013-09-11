@@ -36,13 +36,12 @@
         "simplepie/simplepie": "dev-master",
 
         "imagine/imagine": "dev-master",
-        "symfony/serializer": "dev-master",
         "symfony/icu": "1.0"
     },
     "require-dev" : {
         "phpunit/phpunit": "3.7.*",
         "fzaninotto/faker": "dev-master",
-        "maximebf/debugbar": "1.*"
+        "maximebf/debugbar": "dev-master"
     },
     "minimum-stability": "stable",
     "config" : {
