@@ -22,10 +22,17 @@ casper.start(thelia2_login_coupon_update_url, function() {
         $('#category-rule').val('thelia.constraint.rule.available_for_x_articles').change();
         return true;
     });
-    this.capture('screenshot-category-rule.png');
+    this.capture('tests/functionnal/casperjs/pictures/screenshot-category-rule.png');
 //    this.click('constraint-list > tr:last-child > td > a.constraint-update-btn');
 });
 
+casper.wait(1000, function() {
+    this.echo("\nWaiting....");
+});
+
+casper.then(function(){
+
+});
 
 ////EDIT CHECK
 // @todo implement
