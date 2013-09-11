@@ -177,10 +177,6 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
 //        $this->assertEquals($expected, $actual);
 //    }
 
-
-
-
-
     /**
      * Check if test inferior operator is working
      *
@@ -501,7 +497,6 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
-
     /**
      * Check if test superior operator is working
      *
@@ -660,7 +655,6 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
 //        $this->assertEquals($expected, $actual);
 //
 //    }
-
 
     /**
      * Tears down the fixture, for example, closes a network connection.

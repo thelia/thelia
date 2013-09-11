@@ -50,6 +50,7 @@ class BaseUpdatePositionEvent extends ActionEvent
     public function setMode($mode)
     {
         $this->mode = $mode;
+
         return $this;
     }
 
@@ -61,6 +62,7 @@ class BaseUpdatePositionEvent extends ActionEvent
     public function setPosition($position)
     {
         $this->position = $position;
+
         return $this;
     }
 
@@ -72,6 +74,7 @@ class BaseUpdatePositionEvent extends ActionEvent
     public function setObjectId($object_id)
     {
         $this->object_id = $object_id;
+
         return $this;
     }
 }

@@ -65,7 +65,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->setTemplate($template ?: ConfigQuery::read('active-template', 'default'));
 
         $this->debugging = $debug;
-        
+
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
@@ -93,7 +93,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
     public static function theliaEscape($content, $smarty)
     {
-        if(is_scalar($content)) {
+        if (is_scalar($content)) {
             return htmlspecialchars($content ,ENT_QUOTES, Smarty::$_CHARSET);
         } else {
             return $content;

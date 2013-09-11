@@ -23,12 +23,9 @@
 
 namespace Thelia\Action;
 
-use Propel\Runtime\Exception\PropelException;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\CartEvent;
-use Thelia\Form\CartAdd;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\CartItem;

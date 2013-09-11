@@ -85,7 +85,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         $productId = $this->request->get('product_id');
 
-        if($productId !== null) {
+        if ($productId !== null) {
 
             $search = ProductQuery::create()
                 ->filterById($productId);
@@ -98,7 +98,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         $categoryId = $this->request->get('category_id');
 
-        if($categoryId !== null) {
+        if ($categoryId !== null) {
 
             $search = CategoryQuery::create()
                 ->filterById($categoryId);
@@ -111,7 +111,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         $contentId = $this->request->get('content_id');
 
-        if($contentId !== null) {
+        if ($contentId !== null) {
 
             $search = ContentQuery::create()
                 ->filterById($contentId);
@@ -124,7 +124,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         $folderId = $this->request->get('folder_id');
 
-        if($folderId !== null) {
+        if ($folderId !== null) {
 
             $search = FolderQuery::create()
                 ->filterById($folderId);
@@ -175,7 +175,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     protected function dataAccessWithI18n($objectLabel, $params, ModelCriteria $search, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID')
     {
         $lang = $this->getNormalizedParam($params, array('lang'));
-        if($lang === null) {
+        if ($lang === null) {
             $lang = $this->request->getSession()->getLang()->getId();
         }
 
@@ -193,7 +193,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $data = $search->findOne();
 
         $noGetterData = array();
-        foreach($columns as $column) {
+        foreach ($columns as $column) {
             $noGetterData[$column] = $data->getVirtualColumn('i18n_' . $column);
         }
 
@@ -218,7 +218,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             if (null != $data) {
 
                 $keyAttribute = strtoupper($attribute);
-                if(array_key_exists($keyAttribute, $noGetterData)) {
+                if (array_key_exists($keyAttribute, $noGetterData)) {
                     return $noGetterData[$keyAttribute];
                 }
 
@@ -226,7 +226,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 if (method_exists($data, $getter)) {
                     $return =  $data->$getter();
 
-                    if($return instanceof \DateTime) {
+                    if ($return instanceof \DateTime) {
                         if (array_key_exists("format", $params)) {
                             $format = $params["format"];
                         } else {

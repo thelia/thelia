@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
-use Thelia\Model\Currency;
 
 class CurrencyCreateEvent extends CurrencyEvent
 {

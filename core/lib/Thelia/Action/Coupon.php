@@ -27,9 +27,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Coupon as CouponModel;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Propel;
-use Thelia\Model\Map\CategoryTableMap;
 
 /**
  * Created by JetBrains PhpStorm.

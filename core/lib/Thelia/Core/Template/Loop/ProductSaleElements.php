@@ -24,18 +24,16 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\Base\ProductSaleElementsQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -52,7 +50,7 @@ use Thelia\Type;
 class ProductSaleElements extends BaseLoop
 {
     public $timestampable = true;
-    
+
     /**
      * @return ArgumentCollection
      */
@@ -81,6 +79,7 @@ class ProductSaleElements extends BaseLoop
      * @param $pagination
      *
      * @return \Thelia\Core\Template\Element\LoopResult
+     * @throws \InvalidArgumentException
      */
     public function exec(&$pagination)
     {
@@ -92,24 +91,39 @@ class ProductSaleElements extends BaseLoop
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
-                case "alpha":
-                    //$search->addAscendingOrderByColumn(\Thelia\Model\Map\AttributeI18nTableMap::TITLE);
+                case "min_price":
+                    $search->addAscendingOrderByColumn('real_lowest_price', Criteria::ASC);
                     break;
-                case "alpha_reverse":
-                    //$search->addDescendingOrderByColumn(\Thelia\Model\Map\AttributeI18nTableMap::TITLE);
+                case "max_price":
+                    $search->addDescendingOrderByColumn('real_lowest_price');
                     break;
-                case "attribute":
-                    //$search->orderByPosition(Criteria::ASC);
+                case "promo":
+                    $search->addDescendingOrderByColumn('main_product_is_promo');
                     break;
-                case "attribute_reverse":
-                    //$search->orderByPosition(Criteria::DESC);
+                case "new":
+                    $search->addDescendingOrderByColumn('main_product_is_new');
                     break;
+                case "random":
+                    $search->clearOrderByColumns();
+                    $search->addAscendingOrderByColumn('RAND()');
+                    break(2);
             }
         }
 
-        $currency = $this->getCurrency();
+        $currencyId = $this->getCurrency();
+        if (null !== $currencyId) {
+            $currency = CurrencyQuery::create()->findOneById($currencyId);
+            if (null === $currency) {
+                throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
+            }
+        } else {
+            $currency = $this->request->getSession()->getCurrency();
+        }
+
+        $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
+        $defaultCurrencySuffix = '_default_currency';
 
         $search->joinProductPrice('price', Criteria::INNER_JOIN);
             //->addJoinCondition('price', '');

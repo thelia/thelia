@@ -24,7 +24,6 @@
 namespace Thelia\Coupon;
 
 use InvalidArgumentException;
-use Thelia\Constraint\Validator\PriceParam;
 use Thelia\Constraint\Validator\QuantityParam;
 
 /**

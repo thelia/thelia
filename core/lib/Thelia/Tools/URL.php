@@ -62,9 +62,9 @@ class URL
      * @throws \RuntimeException if the class has not been instanciated.
      * @return \Thelia\Tools\URL the instance.
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (self::$instance == null) throw new \RuntimeException("URL instance is not initialized.");
-
         return self::$instance;
     }
 
@@ -122,7 +122,7 @@ class URL
             $base_url = $this->getBaseUrl();
 
             // TODO fix this ugly patch
-            if(strpos($path, "index_dev.php")) {
+            if (strpos($path, "index_dev.php")) {
                 $path = str_replace('index_dev.php', '', $path);
             }
 
@@ -148,7 +148,6 @@ class URL
         $sepChar = strstr($base, '?') === false ? '?' : '&';
 
         if ('' !== $queryString = rtrim($queryString, "&")) $queryString = $sepChar . $queryString;
-
         return $base . $queryString;
     }
 
@@ -192,12 +191,12 @@ class URL
       */
      public function retrieve($view, $viewId, $viewLocale)
      {
-         if(ConfigQuery::isRewritingEnable()) {
+         if (ConfigQuery::isRewritingEnable()) {
              $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
          } else {
              $allParametersWithoutView = array();
              $allParametersWithoutView['locale'] = $viewLocale;
-             if(null !== $viewId) {
+             if (null !== $viewId) {
                  $allParametersWithoutView[$view . '_id'] = $viewId;
              }
              $this->retriever->rewrittenUrl = null;
@@ -216,19 +215,19 @@ class URL
       */
      public function retrieveCurrent(Request $request)
      {
-         if(ConfigQuery::isRewritingEnable()) {
+         if (ConfigQuery::isRewritingEnable()) {
              $view = $request->attributes->get('_view', null);
              $viewLocale = $request->query->get('locale', null);
              $viewId = $view === null ? null : $request->query->get($view . '_id', null);
 
              $allOtherParameters = $request->query->all();
-             if($view !== null) {
+             if ($view !== null) {
                  unset($allOtherParameters['view']);
-                 if($viewId !== null) {
+                 if ($viewId !== null) {
                      unset($allOtherParameters[$view . '_id']);
                  }
              }
-             if($viewLocale !== null) {
+             if ($viewLocale !== null) {
                  unset($allOtherParameters['locale']);
              }
 
@@ -236,7 +235,7 @@ class URL
          } else {
              $allParametersWithoutView = $viewOtherParameters;
              $allParametersWithoutView['locale'] = $viewLocale;
-             if(null !== $viewId) {
+             if (null !== $viewId) {
                  $allParametersWithoutView[$view . '_id'] = $viewId;
              }
              $this->retriever->rewrittenUrl = null;
@@ -256,6 +255,7 @@ class URL
      public function resolve($url)
      {
          $this->resolver->load($url);
+
          return $this->resolver;
      }
 }

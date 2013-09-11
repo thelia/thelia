@@ -107,8 +107,7 @@ class Form extends AbstractSmartyPlugin
 
             $template->assign("form_error", $instance->hasError() ? true : false);
             $template->assign("form_error_message", $instance->getErrorMessage());
-        }
-        else {
+        } else {
             return $content;
         }
     }
@@ -201,7 +200,6 @@ class Form extends AbstractSmartyPlugin
         }
     }
 
-
     protected function assignFieldErrorVars(\Smarty_Internal_Template $template, array $errors)
     {
         $template->assign("message", $errors[0]->getMessage());
@@ -222,7 +220,6 @@ class Form extends AbstractSmartyPlugin
 
         if (null == $fieldName)
             throw new \InvalidArgumentException("'field' parameter is missing");
-
 
         if (empty($instance->getView()[$fieldName]))
             throw new \InvalidArgumentException(sprintf("Field name '%s' not found in form %s", $fieldName, $instance->getName()));

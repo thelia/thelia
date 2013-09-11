@@ -28,9 +28,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Tools\URL;
 use Thelia\Core\Event\ConfigUpdateEvent;
 use Thelia\Core\Event\ConfigCreateEvent;
-use Thelia\Log\Tlog;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Form\ConfigModificationForm;
 use Thelia\Form\ConfigCreationForm;
@@ -47,8 +45,8 @@ class ConfigController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    protected function renderList() {
-
+    protected function renderList()
+    {
         // Find the current order
         $order = $this->getRequest()->get(
                 'order',
@@ -66,10 +64,9 @@ class ConfigController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function defaultAction() {
-
+    public function defaultAction()
+    {
         if (null !== $response = $this->checkAuth("admin.configuration.variables.view")) return $response;
-
         return $this->renderList();
     }
 
@@ -78,8 +75,8 @@ class ConfigController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function createAction() {
-
+    public function createAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.variables.create")) return $response;
 
@@ -120,12 +117,10 @@ class ConfigController extends BaseAdminController
 
             // Redirect to the success URL
             $this->redirect($successUrl);
-        }
-        catch (FormValidationException $ex) {
+        } catch (FormValidationException $ex) {
             // Form cannot be validated
             $message = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $message = $ex->getMessage();
         }
@@ -141,8 +136,8 @@ class ConfigController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function changeAction() {
-
+    public function changeAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.variables.update")) return $response;
 
@@ -183,8 +178,8 @@ class ConfigController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function saveChangeAction() {
-
+    public function saveChangeAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.variables.update")) return $response;
 
@@ -240,12 +235,10 @@ class ConfigController extends BaseAdminController
 
             // Redirect to the success URL
             $this->redirect($changeForm->getSuccessUrl());
-        }
-        catch (FormValidationException $ex) {
+        } catch (FormValidationException $ex) {
             // Form cannot be validated
             $message = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $message = $ex->getMessage();
         }
@@ -261,15 +254,15 @@ class ConfigController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function changeValuesAction() {
-
+    public function changeValuesAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.variables.update")) return $response;
 
         $variables = $this->getRequest()->get('variable', array());
 
         // Process all changed variables
-        foreach($variables as $id => $value) {
+        foreach ($variables as $id => $value) {
             $event = new ConfigUpdateEvent($id);
             $event->setValue($value);
 
@@ -284,8 +277,8 @@ class ConfigController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function deleteAction() {
-
+    public function deleteAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.variables.delete")) return $response;
 

@@ -84,6 +84,7 @@ class Session extends BaseSession
     public function setCustomerUser(UserInterface $user)
     {
         $this->set('thelia.customer_user', $user);
+
         return $this;
     }
 
@@ -102,6 +103,7 @@ class Session extends BaseSession
     public function setAdminUser(UserInterface $user)
     {
         $this->set('thelia.admin_user', $user);
+
         return $this;
     }
 
@@ -120,6 +122,7 @@ class Session extends BaseSession
     public function setReturnToUrl($url)
     {
         $this->set('thelia.return_to_url', $url);
+
         return $this;
     }
 
@@ -180,6 +183,7 @@ class Session extends BaseSession
     public function setCart($cart_id)
     {
         $this->set("thelia.cart_id", $cart_id);
+
         return $this;
     }
 
@@ -192,6 +196,7 @@ class Session extends BaseSession
     public function setDelivery($delivery_id)
     {
         $this->set("thelia.delivery_id", $delivery_id);
+
         return $this;
     }
 

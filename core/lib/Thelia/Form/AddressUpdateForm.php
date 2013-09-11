@@ -24,14 +24,13 @@
 namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-
 /**
  * Class AddressUpdateForm
  * @package Thelia\Form
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class AddressUpdateForm extends AddressCreateForm {
-
+class AddressUpdateForm extends AddressCreateForm
+{
     /**
      *
      * in this function you add all the fields you need for your Form.
@@ -55,7 +54,6 @@ class AddressUpdateForm extends AddressCreateForm {
     protected function buildForm()
     {
         parent::buildForm();
-
 
     }
 

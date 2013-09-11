@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
-use Thelia\Model\Category;
 
 class CategoryUpdateEvent extends CategoryCreateEvent
 {
@@ -49,6 +48,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     public function setCategoryId($category_id)
     {
         $this->category_id = $category_id;
+
         return $this;
     }
 
@@ -60,6 +60,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     public function setChapo($chapo)
     {
         $this->chapo = $chapo;
+
         return $this;
     }
 
@@ -71,6 +72,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     public function setDescription($description)
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -82,6 +84,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     public function setPostscriptum($postscriptum)
     {
         $this->postscriptum = $postscriptum;
+
         return $this;
     }
 
@@ -93,6 +96,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     public function setUrl($url)
     {
         $this->url = $url;
+
         return $this;
     }
 
@@ -104,6 +108,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     public function setVisibility($visibility)
     {
         $this->visibility = $visibility;
+
         return $this;
     }
 
@@ -115,6 +120,7 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     public function setParent($parent)
     {
         $this->parent = $parent;
+
         return $this;
     }
 }

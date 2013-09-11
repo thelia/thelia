@@ -42,4 +42,9 @@ class ConfigQuery extends BaseConfigQuery {
     {
         return self::read('active-template', 'default');
     }
+
+    public static function useTaxFreeAmounts()
+    {
+        return self::read('use_tax_free_amounts', 'default') == 1;
+    }
 } // ConfigQuery

@@ -32,7 +32,6 @@ use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\Console\Input\InputArgument;
 use Thelia\Core\Event\TheliaEvents;
 
-
 class ClearImageCache extends ContainerAwareCommand
 {
     protected function configure()
@@ -60,8 +59,7 @@ class ClearImageCache extends ContainerAwareCommand
             $dispatcher->dispatch(TheliaEvents::IMAGE_CLEAR_CACHE, $event);
 
             $output->writeln(sprintf('%s image cache successfully cleared.', is_null($subdir) ? 'Entire' : ucfirst($subdir)));
-        }
-        catch(\Exception $ex) {
+        } catch (\Exception $ex) {
              $output->writeln(sprintf("Failed to clear image cache: %s", $ex->getMessage()));
         }
     }

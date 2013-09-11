@@ -24,19 +24,15 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\Base\FeatureProductQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\FeatureAvTableMap;
-use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -107,18 +103,18 @@ class FeatureValue extends BaseI18nLoop
         }
 
         $excludeFeatureAvailability = $this->getExclude_feature_availability();
-        if($excludeFeatureAvailability == true) {
+        if ($excludeFeatureAvailability == true) {
             $search->filterByFeatureAvId(null, Criteria::NULL);
         }
 
         $excludeDefaultValues = $this->getExclude_personal_values();
-        if($excludeDefaultValues == true) {
+        if ($excludeDefaultValues == true) {
             $search->filterByByDefault(null, Criteria::NULL);
         }
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
                     $search->addAscendingOrderByColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE');

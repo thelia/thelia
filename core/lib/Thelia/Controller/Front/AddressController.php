@@ -31,7 +31,6 @@ use Thelia\Model\Base\AddressQuery;
 use Thelia\Model\Customer;
 use Thelia\Tools\URL;
 
-
 /**
  * Class AddressController
  * @package Thelia\Controller\Front
@@ -64,10 +63,9 @@ class AddressController extends BaseFrontController
             $this->dispatch(TheliaEvents::ADDRESS_CREATE, $event);
             $this->redirectSuccess($addressCreate);
 
-        }catch (FormValidationException $e) {
+        } catch (FormValidationException $e) {
             $message = sprintf("Please check your input: %s", $e->getMessage());
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
         }
 
@@ -91,7 +89,7 @@ class AddressController extends BaseFrontController
             $this->redirectToRoute("home");
         }
 
-        if(null === $address_id =  $request->get("address_id")) {
+        if (null === $address_id =  $request->get("address_id")) {
             $this->redirectToRoute("home");
         }
 
@@ -108,7 +106,7 @@ class AddressController extends BaseFrontController
                 $this->redirectToRoute("home");
             }
 
-            if($address->getCustomer()->getId() != $customer->getId()) {
+            if ($address->getCustomer()->getId() != $customer->getId()) {
                 $this->redirectToRoute("home");
             }
 
@@ -118,10 +116,9 @@ class AddressController extends BaseFrontController
             $this->dispatch(TheliaEvents::ADDRESS_UPDATE, $event);
 
             $this->redirectSuccess($addressUpdate);
-        }catch (FormValidationException $e) {
+        } catch (FormValidationException $e) {
             $message = sprintf("Please check your input: %s", $e->getMessage());
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
         }
 

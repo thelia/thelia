@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Install;
-use Thelia\Install\BaseInstall;
 use Thelia\Install\CheckPermission;
 
 /**
@@ -30,8 +29,8 @@ use Thelia\Install\CheckPermission;
  * @package Thelia\Controller\Install
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class InstallController extends BaseInstallController {
-
+class InstallController extends BaseInstallController
+{
     public function index()
     {
         $this->verifyStep(1);
@@ -58,7 +57,7 @@ class InstallController extends BaseInstallController {
            return true;
         }
 
-        switch($step) {
+        switch ($step) {
             case "1" :
                 if ($sessionStep > 1) {
                     $this->redirect("/install/step/2");

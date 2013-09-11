@@ -25,7 +25,6 @@ namespace Thelia\Core\Event;
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Model\Address;
 
-
 /**
  * Class AddressEvent
  * @package Thelia\Core\Event
@@ -38,11 +37,10 @@ class AddressEvent extends ActionEvent
      */
     protected $address;
 
-    function __construct(Address $address)
+    public function __construct(Address $address)
     {
         $this->address = $address;
     }
-
 
     /**
      * @return \Thelia\Model\Address

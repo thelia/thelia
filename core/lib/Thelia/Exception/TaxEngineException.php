@@ -23,8 +23,6 @@
 
 namespace Thelia\Exception;
 
-use Thelia\Log\Tlog;
-
 class TaxEngineException extends \RuntimeException
 {
     const UNKNOWN_EXCEPTION = 0;
@@ -35,8 +33,9 @@ class TaxEngineException extends \RuntimeException
 
     const BAD_AMOUNT_FORMAT = 601;
 
-    public function __construct($message, $code = null, $previous = null) {
-        if($code === null) {
+    public function __construct($message, $code = null, $previous = null)
+    {
+        if ($code === null) {
             $code = self::UNKNOWN_EXCEPTION;
         }
         parent::__construct($message, $code, $previous);

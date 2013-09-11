@@ -30,7 +30,6 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Action\Image;
 use Thelia\Core\Event\ImageEvent;
 use Thelia\Model\ConfigQuery;
-use Thelia\Tools\URL;
 
 /**
  * Class ImageTest
@@ -78,7 +77,8 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         }
     }
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         $dir = THELIA_WEB_DIR."/cache/tests";
         if ($dh = @opendir($dir)) {
             while ($file = readdir($dh)) {
@@ -91,7 +91,8 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         }
     }
 
-    public function tearDown() {
+    public function tearDown()
+    {
         // restore cache configuration.
         $config = ConfigQuery::create()->filterByName('image_cache_dir_from_web_root')->findOne();
 
@@ -249,7 +250,6 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
          $image->processImage($event);
      }
 
-
      /**
       * Apply all transformations
       */
@@ -343,7 +343,8 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
          $image->processImage($event);
      }
 
-     public function testClearTestsCache() {
+     public function testClearTestsCache()
+     {
          $event = new ImageEvent($this->request);
 
          $event->setCacheSubdirectory('tests');
@@ -353,7 +354,8 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
          $image->clearCache($event);
      }
 
-     public function testClearWholeCache() {
+     public function testClearWholeCache()
+     {
          $event = new ImageEvent($this->request);
 
          $image = new Image($this->getContainer());
@@ -366,7 +368,8 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
       *
       * @expectedException \InvalidArgumentException
       */
-     public function testClearUnallowedPathCache() {
+     public function testClearUnallowedPathCache()
+     {
          $event = new ImageEvent($this->request);
 
          $event->setCacheSubdirectory('../../../..');
