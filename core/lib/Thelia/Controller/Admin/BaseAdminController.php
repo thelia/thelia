@@ -25,6 +25,7 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Router;
 use Thelia\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthorizationException;
@@ -227,7 +228,7 @@ class BaseAdminController extends BaseController
      *
      * @see \Thelia\Controller\BaseController::getRouteFromRouter()
      */
-    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH)
+    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::RELATIVE_PATH)
     {
         return $this->getRouteFromRouter(
             'router.admin',
