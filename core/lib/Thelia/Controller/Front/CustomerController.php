@@ -44,6 +44,7 @@ use Thelia\Core\Security\Exception\WrongPasswordException;
  */
 class CustomerController extends BaseFrontController
 {
+    use \Thelia\Cart\CartTrait;
     /**
      * Create a new customer.
      * On success, redirect to success_url if exists, otherwise, display the same view again.
@@ -65,7 +66,12 @@ class CustomerController extends BaseFrontController
 
                 $this->processLogin($customerCreateEvent->getCustomer());
 
-                $this->redirectSuccess($customerCreation);
+                $cart = $this->getCart($this->getRequest());
+                if($cart->getCartItems()->count() > 0) {
+                    $this->redirectToRoute("cart.view");
+                } else {
+                    $this->redirectSuccess($customerCreation);
+                }
             } catch (FormValidationException $e) {
                 $message = sprintf("Please check your input: %s", $e->getMessage());
             } catch (\Exception $e) {
@@ -232,7 +238,7 @@ class CustomerController extends BaseFrontController
             $data["country"],
             isset($data["email"])?$data["email"]:null,
             isset($data["password"]) ? $data["password"]:null,
-            $this->getRequest()->getSession()->getLang(),
+            $this->getRequest()->getSession()->getLang()->getId(),
             isset($data["reseller"])?$data["reseller"]:null,
             isset($data["sponsor"])?$data["sponsor"]:null,
             isset($data["discount"])?$data["discount"]:null
