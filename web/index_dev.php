@@ -34,7 +34,8 @@ require __DIR__ . '/../core/bootstrap.php';
 // List of allowed IP
 $trustedIp = array(
   '::1',
-  '127.0.0.1'
+  '127.0.0.1',
+  '192.168.56.1'
 );
 
 $request = Request::createFromGlobals();
