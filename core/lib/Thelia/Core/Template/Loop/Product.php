@@ -84,6 +84,7 @@ class Product extends BaseI18nLoop
             Argument::createBooleanTypeArgument('current_category'),
             Argument::createIntTypeArgument('depth', 1),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
+            Argument::createIntTypeArgument('currency'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -134,7 +135,16 @@ class Product extends BaseI18nLoop
      */
     public function exec(&$pagination)
     {
-        $currency = $this->request->getSession()->getCurrency();
+        $currencyId = $this->getCurrency();
+        if(null !== $currencyId) {
+            $currency = CurrencyQuery::create()->findOneById($currencyId);
+            if(null === $currency) {
+                throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
+            }
+        } else {
+            $currency = $this->request->getSession()->getCurrency();
+        }
+
         $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
         $defaultCurrencySuffix = '_default_currency';
 
