@@ -23,6 +23,7 @@
 
 namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Class AddressCreateForm
@@ -59,65 +60,104 @@ class AddressCreateForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "address name",
+                "label" => Translator::getInstance()->trans("Address label *"),
+                "label_attr" => array(
+                    "for" => "label_create"
+                ),
                 "required" => true
             ))
             ->add("title", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "title"
+                "label" => Translator::getInstance()->trans("Title"),
+                "label_attr" => array(
+                    "for" => "title_create"
+                )
             ))
             ->add("firstname", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "first name"
+                "label" => Translator::getInstance()->trans("Firstname"),
+                "label_attr" => array(
+                    "for" => "firstname_create"
+                )
             ))
             ->add("lastname", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "last name"
+                "label" => Translator::getInstance()->trans("Lastname"),
+                "label_attr" => array(
+                    "for" => "lastname_create"
+                )
             ))
             ->add("address1", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "address"
+                "label" => Translator::getInstance()->trans("Street Address"),
+                "label_attr" => array(
+                    "for" => "address1_create"
+                )
             ))
-            ->add("address2", "text", array(
-                "label" => "address (line 2)"
+            ->add("address2", "text", array(                
+                "label" => Translator::getInstance()->trans("Additional address"),
+                "label_attr" => array(
+                    "for" => "address2_create"
+                )
             ))
             ->add("address3", "text", array(
-                "label" => "address (line 3)"
+                "label" => Translator::getInstance()->trans("Additional address"),
+                "label_attr" => array(
+                    "for" => "address3_create"
+                )
             ))
             ->add("zipcode", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "zipcode"
+                "label" => Translator::getInstance()->trans("Zip code"),
+                "label_attr" => array(
+                    "for" => "zipcode_create"
+                )
             ))
             ->add("city", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "city"
+                "label" => Translator::getInstance()->trans("City"),
+                "label_attr" => array(
+                    "for" => "city_create"
+                )
             ))
             ->add("country", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => "country"
+                "label" => Translator::getInstance()->trans("Country"),
+                "label_attr" => array(
+                    "for" => "country_create"
+                )
             ))
             ->add("phone", "text", array(
-                "label" => "phone"
+                "label" => Translator::getInstance()->trans("Phone"),
+                "label_attr" => array(
+                    "for" => "phone_create"
+                )
             ))
             ->add("cellphone", "text", array(
-                "label" => "cellphone"
+                "label" => Translator::getInstance()->trans("Cellphone"),
+                "label_attr" => array(
+                    "for" => "cellphone_create"
+                )
             ))
             ->add("company", "text", array(
-                "label" => "company"
+                "label" => Translator::getInstance()->trans("Compagny"),
+                "label_attr" => array(
+                    "for" => "company_create"
+                )
             ))
             ;
     }
