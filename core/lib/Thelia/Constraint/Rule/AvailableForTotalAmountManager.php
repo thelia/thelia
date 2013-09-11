@@ -73,70 +73,6 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
        )
     );
 
-//    /** @var RuleValidator Price Validator */
-//    protected $priceValidator = null;
-
-//    /**
-//     * Check if backoffice inputs are relevant or not
-//     *
-//     * @throws InvalidRuleOperatorException if Operator is not allowed
-//     * @throws InvalidRuleValueException    if Value is not allowed
-//     * @return bool
-//     */
-//    public function checkBackOfficeInput()
-//    {
-//        if (!isset($this->validators)
-//            || empty($this->validators)
-//            ||!isset($this->validators[self::PARAM1_PRICE])
-//            ||!isset($this->validators[self::PARAM1_PRICE])
-//        ) {
-//            throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
-//        }
-//
-//        /** @var RuleValidator $ruleValidator */
-//        $ruleValidator = $this->validators[self::PARAM1_PRICE];
-//        /** @var PriceParam $price */
-//        $price = $ruleValidator->getParam();
-//
-//        if (!$price instanceof PriceParam) {
-//            throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
-//        }
-//
-//        $this->checkBackOfficeInputsOperators();
-//
-//        return $this->isPriceValid($price->getPrice(), $price->getCurrency());
-//    }
-
-//    /**
-//     * Check if Checkout inputs are relevant or not
-//     *
-//     * @throws InvalidRuleValueException if Value is not allowed
-//     * @return bool
-//     */
-//    public function checkCheckoutInput()
-//    {
-//        $currency = $this->adapter->getCheckoutCurrency();
-//        if (empty($currency)) {
-//            throw new InvalidRuleValueException(
-//                get_class(), self::PARAM1_CURRENCY
-//            );
-//        }
-//
-//        $price = $this->adapter->getCartTotalPrice();
-//        if (empty($price)) {
-//            throw new InvalidRuleValueException(
-//                get_class(), self::PARAM1_PRICE
-//            );
-//        }
-//
-//        $this->paramsToValidate = array(
-//            self::PARAM1_PRICE => $this->adapter->getCartTotalPrice(),
-//            self::PARAM1_CURRENCY => $this->adapter->getCheckoutCurrency()
-//        );
-//
-//        return $this->isPriceValid($price, $currency);
-//    }
-
     /**
      * Check validators relevancy and store them
      *
@@ -249,49 +185,6 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
         return false;
     }
 
-//    /**
-//     * Check if a price is valid
-//     *
-//     * @param float  $price    Price to check
-//     * @param string $currency Price currency
-//     *
-//     * @throws InvalidRuleValueException if Value is not allowed
-//     * @return bool
-//     */
-//    protected function isPriceValid($price, $currency)
-//    {
-//        $priceValidator = $this->priceValidator;
-//
-//        /** @var PriceParam $param */
-//        $param = $priceValidator->getParam();
-//        if ($currency == $param->getCurrency()) {
-//            try {
-//                $priceValidator->getParam()->compareTo($price);
-//            } catch(\InvalidArgumentException $e) {
-//                throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
-//            }
-//        } else {
-//            throw new InvalidRuleValueException(get_class(), self::PARAM1_CURRENCY);
-//        }
-//
-//        return true;
-//    }
-
-//    /**
-//     * Generate current Rule param to be validated from adapter
-//     *
-//     * @return $this
-//     */
-//    protected function setParametersToValidate()
-//    {
-//        $this->paramsToValidate = array(
-//            self::PARAM1_PRICE => $this->adapter->getCartTotalPrice(),
-//            self::PARAM1_CURRENCY => $this->adapter->getCheckoutCurrency()
-//        );
-//
-//        return $this;
-//    }
-
     /**
      * Get I18n name
      *
@@ -376,42 +269,5 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
             )
         );
     }
-
-//    /**
-//     * Populate a Rule from a form admin
-//     *
-//     * @param array $operators Rule Operator set by the Admin
-//     * @param array $values    Rule Values set by the Admin
-//     *
-//     * @throws \InvalidArgumentException
-//     * @return $this
-//     */
-//    public function populateFromForm(array $operators, array $values)
-//    {
-//        if ($values[self::PARAM1_PRICE] === null
-//            || $values[self::PARAM1_CURRENCY] === null
-//        ) {
-//            throw new \InvalidArgumentException(
-//                'The Rule ' . get_class() . 'needs at least a quantity set (' . self::PARAM1_PRICE . ', ' . self::PARAM1_CURRENCY . ')'
-//            );
-//        }
-//
-//        $this->priceValidator = new RuleValidator(
-//            $operators[self::PARAM1_PRICE],
-//            new PriceParam(
-//                $this->translator,
-//                $values[self::PARAM1_PRICE],
-//                $values[self::PARAM1_CURRENCY]
-//            )
-//        );
-//
-//        $this->validators = array(self::PARAM1_PRICE => $this->priceValidator);
-//
-//        return $this;
-//    }
-
-
-
-
 
 }

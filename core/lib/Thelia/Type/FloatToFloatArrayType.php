@@ -20,33 +20,37 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Type;
 
-namespace Thelia\Exception;
+/**
+ *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ */
 
-class TaxEngineException extends \RuntimeException
+class FloatToFloatArrayType implements TypeInterface
 {
-    const UNKNOWN_EXCEPTION = 0;
-
-    const BAD_RECORDED_TYPE = 101;
-    const BAD_RECORDED_REQUIREMENTS = 102;
-
-    const TAX_TYPE_BAD_ABSTRACT_METHOD = 201;
-    const TAX_TYPE_REQUIREMENT_NOT_FOUND = 202;
-    const TAX_TYPE_BAD_REQUIREMENT_VALUE = 203;
-
-    const UNDEFINED_PRODUCT = 501;
-    const UNDEFINED_COUNTRY = 502;
-    const UNDEFINED_TAX_RULES_COLLECTION = 503;
-    const UNDEFINED_REQUIREMENTS = 504;
-    const UNDEFINED_REQUIREMENT_VALUE = 505;
-
-    const BAD_AMOUNT_FORMAT = 601;
-
-    public function __construct($message, $code = null, $previous = null)
+    public function getType()
     {
-        if ($code === null) {
-            $code = self::UNKNOWN_EXCEPTION;
+        return 'Float key to float value array type';
+    }
+
+    public function isValid($value)
+    {
+        if(!is_array($value))
+            return false;
+
+        foreach($value as $key => $value) {
+            if( filter_var($key, FILTER_VALIDATE_FLOAT) === false || filter_var($value, FILTER_VALIDATE_FLOAT) === false ) {
+                return false;
+            }
         }
-        parent::__construct($message, $code, $previous);
+
+        return true;
+    }
+
+    public function getFormattedValue($value)
+    {
+        return $this->isValid($value) ? $value : null;
     }
 }

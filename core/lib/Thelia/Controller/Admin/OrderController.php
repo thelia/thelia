@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,36 +17,23 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Exception;
+namespace Thelia\Controller\Admin;
 
-class TaxEngineException extends \RuntimeException
+/**
+ * Class OrderController
+ * @package Thelia\Controller\Admin
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+class OrderController extends BaseAdminController
 {
-    const UNKNOWN_EXCEPTION = 0;
-
-    const BAD_RECORDED_TYPE = 101;
-    const BAD_RECORDED_REQUIREMENTS = 102;
-
-    const TAX_TYPE_BAD_ABSTRACT_METHOD = 201;
-    const TAX_TYPE_REQUIREMENT_NOT_FOUND = 202;
-    const TAX_TYPE_BAD_REQUIREMENT_VALUE = 203;
-
-    const UNDEFINED_PRODUCT = 501;
-    const UNDEFINED_COUNTRY = 502;
-    const UNDEFINED_TAX_RULES_COLLECTION = 503;
-    const UNDEFINED_REQUIREMENTS = 504;
-    const UNDEFINED_REQUIREMENT_VALUE = 505;
-
-    const BAD_AMOUNT_FORMAT = 601;
-
-    public function __construct($message, $code = null, $previous = null)
+    public function indexAction()
     {
-        if ($code === null) {
-            $code = self::UNKNOWN_EXCEPTION;
-        }
-        parent::__construct($message, $code, $previous);
+        if (null !== $response = $this->checkAuth("admin.orders.view")) return $response;
+        return $this->render("orders", array("display_order" => 20));
     }
+
 }

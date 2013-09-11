@@ -20,33 +20,28 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\TaxEngine\TaxType;
 
-namespace Thelia\Exception;
+use Thelia\Type\FloatToFloatArrayType;
+use Thelia\Type\ModelType;
 
-class TaxEngineException extends \RuntimeException
+/**
+ *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ */
+class featureSlicePercentTaxType extends  BaseTaxType
 {
-    const UNKNOWN_EXCEPTION = 0;
-
-    const BAD_RECORDED_TYPE = 101;
-    const BAD_RECORDED_REQUIREMENTS = 102;
-
-    const TAX_TYPE_BAD_ABSTRACT_METHOD = 201;
-    const TAX_TYPE_REQUIREMENT_NOT_FOUND = 202;
-    const TAX_TYPE_BAD_REQUIREMENT_VALUE = 203;
-
-    const UNDEFINED_PRODUCT = 501;
-    const UNDEFINED_COUNTRY = 502;
-    const UNDEFINED_TAX_RULES_COLLECTION = 503;
-    const UNDEFINED_REQUIREMENTS = 504;
-    const UNDEFINED_REQUIREMENT_VALUE = 505;
-
-    const BAD_AMOUNT_FORMAT = 601;
-
-    public function __construct($message, $code = null, $previous = null)
+    public function calculate($untaxedPrice)
     {
-        if ($code === null) {
-            $code = self::UNKNOWN_EXCEPTION;
-        }
-        parent::__construct($message, $code, $previous);
+
+    }
+
+    public function getRequirementsList()
+    {
+        return array(
+            'featureId' => new ModelType('Currency'),
+            'slices' => new FloatToFloatArrayType(),
+        );
     }
 }

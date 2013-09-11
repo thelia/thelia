@@ -1,4 +1,3 @@
-{*{$inputs.inputs|var_dump}*}
 {foreach from=$inputs.inputs key=name item=input}
     <label for="operator">{$input.title}</label>
     <div class="row">
@@ -71,32 +70,33 @@
     {*</div>*}
 
 <script>
-    var ruleToSave = {};
-    ruleToSave['serviceId'] = '{$ruleId}';
-    ruleToSave['operators'] = {};
-    ruleToSave['values'] = {};
-    {foreach from=$inputs.inputs key=name item=input}
-        ruleToSave['operators']['{$name nofilter}'] = '{foreach from=$inputs.inputs[$name].availableOperators key=keyOperator item=valueOperator name=operators}{if $smarty.foreach.operators.first}{$keyOperator nofilter}{/if}{/foreach}';
-        ruleToSave['values']['{$name nofilter}'] = '{if count($inputs.inputs[$name].availableValues) != 0}{foreach from=$inputs.inputs[$name].availableValues key=keyValue item=valueValue name=values}{if $smarty.foreach.values.first}{$keyValue nofilter}{/if}{/foreach}{else}to set{/if}';
-    {/foreach}
+
+    // Init Rules to set
+    couponManager.ruleToSave['serviceId'] = '{$ruleId}';
+    couponManager.ruleToSave['operators'] = {literal}{}{/literal};
+    couponManager.ruleToSave['values'] = {literal}{}{/literal};
+{foreach from=$inputs.inputs key=name item=input}
+    couponManager.ruleToSave['operators']['{$name nofilter}'] = '{foreach from=$inputs.inputs[$name].availableOperators key=keyOperator item=valueOperator name=operators}{if $smarty.foreach.operators.first}{$keyOperator nofilter}{/if}{/foreach}';
+    couponManager.ruleToSave['values']['{$name nofilter}'] = '{if count($inputs.inputs[$name].availableValues) != 0}{foreach from=$inputs.inputs[$name].availableValues key=keyValue item=valueValue name=values}{if $smarty.foreach.values.first}{$keyValue nofilter}{/if}{/foreach}{else}to set{/if}';
+{/foreach}
 
 
-    // Update ruleToSave Array ready to be saved
-    var onInputsChange = function() {literal}{{/literal}
-        {foreach from=$inputs.inputs key=name item=input}
-            $('#{$name}-operator').change(function (e) {
-                var $this = $(this);
-                ruleToSave['operators']['{$name nofilter}'] = $this.val();
-                console.log('#{$name}-operator changed ' + $this.val());
-                console.log(ruleToSave);
-            });
-            $('#{$name}-value').change(function (e) {
-                var $this = $(this);
-                ruleToSave['values']['{$name nofilter}'] = $this.val();
-                console.log('#{$name}-value changed ' + $this.val());
-                console.log(ruleToSave);
-            });
-        {/foreach}
+    // Fill in ready to be saved rule array
+    couponManager.onInputsChange = function() {literal}{{/literal}
+{foreach from=$inputs.inputs key=name item=input}
+        // Operator selector
+        $('#{$name}-operator').change(function (e) {
+            console.log('changin operator');
+            var $this = $(this);
+            couponManager.ruleToSave['operators']['{$name nofilter}'] = $this.val();
+        });
+        // Value input
+        $('#{$name}-value').change(function (e) {
+            console.log('changin value');
+            var $this = $(this);
+            couponManager.ruleToSave['values']['{$name nofilter}'] = $this.val();
+        });
+{/foreach}
     {literal}}{/literal}
-    onInputsChange();
+    couponManager.onInputsChange();
 </script>

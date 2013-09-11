@@ -4,6 +4,7 @@ namespace Thelia\Model;
 
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Base\Tax as BaseTax;
+use Thelia\TaxEngine\TaxType\BaseTaxType;
 
 class Tax extends BaseTax
 {
@@ -33,14 +34,37 @@ class Tax extends BaseTax
         return $taxRuleCountryPosition;
     }
 
-    public function getTaxRuleRateSum()
+    public function getTypeInstance()
     {
-        try {
-            $taxRuleRateSum = $this->getVirtualColumn(TaxRuleQuery::ALIAS_FOR_TAX_RATE_SUM);
-        } catch(PropelException $e) {
-            throw new PropelException("Virtual column `" . TaxRuleQuery::ALIAS_FOR_TAX_RATE_SUM . "` does not exist in Tax::getTaxRuleRateSum");
+        $class = '\\Thelia\\TaxEngine\\TaxType\\' . $this->getType();
+
+        /* test type */
+        if(!class_exists($class)) {
+            throw new TaxEngineException('Recorded type does not exists', TaxEngineException::BAD_RECORDED_TYPE);
         }
 
-        return $taxRuleRateSum;
+        $instance = new $class;
+
+        if(!$instance instanceof BaseTaxType) {
+            throw new TaxEngineException('Recorded type does not extends BaseTaxType', TaxEngineException::BAD_RECORDED_TYPE);
+        }
+
+        return $instance;
+    }
+
+    public function setRequirements($requirements)
+    {
+        parent::setSerializedRequirements(base64_encode(json_encode($requirements)));
+    }
+
+    public function getRequirements()
+    {
+        $requirements = json_decode(base64_decode(parent::getSerializedRequirements()), true);
+
+        if(json_last_error() != JSON_ERROR_NONE || !is_array($requirements)) {
+            throw new TaxEngineException('BAD RECORDED REQUIREMENTS', TaxEngineException::BAD_RECORDED_REQUIREMENTS);
+        }
+
+        return $requirements;
     }
 }
