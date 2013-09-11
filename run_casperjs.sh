@@ -22,5 +22,4 @@ php install/faker.php
 echo -e "\n\e[01;34m[INFO] Adding admin\e[00m\n"
 php Thelia thelia:create-admin --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2
 
-# casperjs test ./exe --pre=./conf/local.js --direct
-
+casperjs test ./tests/functionnal/casperjs/exe --pre=./tests/functionnal/casperjs/conf/local.js --direct
