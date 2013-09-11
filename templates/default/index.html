@@ -34,10 +34,8 @@
                 <li class="item">
                     <article itemscope itemtype="http://schema.org/Product">
                         <!-- Use the meta tag to specify content that is not visible on the page in any way -->
-                        <meta itemprop="manufacturer" content="Diesel">
-                        <meta itemprop="category" content="Category1">
-                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
-                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
+                        <meta itemprop="brand" content="Diesel">
+                        <meta itemprop="productID" content="isbn:925872">
 
                         <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
                             {ifloop rel="image_product_new" }
@@ -59,8 +57,11 @@
 
                             <div class="product-price">
                                 <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                                    <meta itemprop="currency" content="{currency attr="code"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
-                                    <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                    <meta itemprop="category" content="Category1">
+                                    <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
+                                    <meta itemprop="priceCurrency" content="{currency attr="code"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                    <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
+
                                     <!-- List of availibility :
                                             out_of_stock : http://schema.org/OutOfStock
                                             in_stock : http://schema.org/InStock
@@ -92,10 +93,8 @@
                 <li class="item">
                     <article itemscope itemtype="http://schema.org/Product">
                         <!-- Use the meta tag to specify content that is not visible on the page in any way -->
-                        <meta itemprop="manufacturer" content="Diesel">
-                        <meta itemprop="category" content="Category1">
-                        <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
-                        <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
+                        <meta itemprop="brand" content="Diesel">
+                        <meta itemprop="productID" content="isbn:925872">
 
                         <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
                             {ifloop rel="image_product_promo" }
@@ -117,8 +116,10 @@
 
                         <div class="product-price">
                             <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                                <meta itemprop="currency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
-                                <link itemprop="availability" href="http://schema.org/InStock" content="In Stock" />
+                                <meta itemprop="category" content="Category1">
+                                <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
+                                <meta itemprop="priceCurrency" content="{currency attr="code"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
                                 <!-- List of availibility :
                                     out_of_stock : http://schema.org/OutOfStock
                                     in_stock : http://schema.org/InStock
