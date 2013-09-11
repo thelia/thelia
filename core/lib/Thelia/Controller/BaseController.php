@@ -215,8 +215,6 @@ class BaseController extends ContainerAware
             $url = $this->getRequest()->get("success_url");
         }
 
-        echo "url=$url";
-
         if (null !== $url) $this->redirect($url);
     }
 
