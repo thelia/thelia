@@ -9,7 +9,7 @@ casper.test.comment('Testing coupons');
 
 //UPDATE COUPON RULE
 casper.start(thelia2_login_coupon_update_url, function() {
-    console.log('Now on : ' + this.getCurrentUrl());
+    this.capture('tests/functionnal/casperjs/screenshot/coupons/init.png');
     this.echo('\nCOUPON RULE - EDIT');
     this.test.assertTitle('Update coupon - Thelia Back Office', 'Web page title OK');
 //    this.test.assertSelectorHasText('#content-header > h1', 'Liste des pays', 'Web page main content OK');
@@ -18,12 +18,10 @@ casper.start(thelia2_login_coupon_update_url, function() {
 
     // Create rule
     this.evaluate(function() {
-//        document.querySelector('select#category-rule').selectedItem = 'thelia.constraint.rule.available_for_x_articles';
         $('#category-rule').val('thelia.constraint.rule.available_for_x_articles').change();
         return true;
     });
-    this.capture('tests/functionnal/casperjs/pictures/screenshot-category-rule.png');
-//    this.click('constraint-list > tr:last-child > td > a.constraint-update-btn');
+    this.capture('tests/functionnal/casperjs/screenshot/coupons/rule-selected.png');
 });
 
 casper.wait(1000, function() {
@@ -31,7 +29,21 @@ casper.wait(1000, function() {
 });
 
 casper.then(function(){
+    this.evaluate(function() {
+        $('#quantity-operator').val('>=').change();
+        return true;
+    });
+    this.sendKeys('input#quantity-value', '4');
+    this.click('#constraint-save-btn');
+});
 
+casper.wait(1000, function() {
+    this.echo("\nWaiting....");
+});
+
+casper.then(function(){
+    this.capture('tests/functionnal/casperjs/screenshot/coupons/rule-added.png');
+    this.test.assertSelectorHasText('tbody#constraint-list tr:nth-child(3)', ' If cart products quantity is superior or equals to 4','3rd rule found');
 });
 
 ////EDIT CHECK
