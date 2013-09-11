@@ -224,7 +224,7 @@
 	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 
     {debugbar_renderjs}
-    {debugbar_renderresult}
+
 
 	{block name="after-javascript-include"}{/block}
 

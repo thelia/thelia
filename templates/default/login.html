@@ -4,7 +4,7 @@
     <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
         <strong id="breadcrumb-label">{intl l="You are here"}: </strong>
         <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="index.php" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
             <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{intl l="Login"}</span></li>
         </ul>
     </nav><!-- /.nav-breadcrumb -->
@@ -67,7 +67,7 @@
                 </fieldset>
 
                 <div class="group-btn">
-                    <a href="{url path="/customer/password"}" class="forgot-password">{intl l="Forgot your Password ?"}</a>
+                    <a href="{url path="/password"}" class="forgot-password">{intl l="Forgot your Password ?"}</a>
                     <button type="submit" class="btn btn-login">{intl l="Next"}</button>
                 </div>
             </form>

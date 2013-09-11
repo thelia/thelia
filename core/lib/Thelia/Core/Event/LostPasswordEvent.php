@@ -21,62 +21,31 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace DebugBar\Listeners;
-use DebugBar\DataCollector\MemoryCollector;
-use DebugBar\DataCollector\MessagesCollector;
-use DebugBar\DataCollector\PhpInfoCollector;
-use DebugBar\DataCollector\PropelCollector;
-use DebugBar\DataCollector\TimeDataCollector;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Thelia\Action\BaseAction;
-use Thelia\Core\Event\TheliaEvents;
+namespace Thelia\Core\Event;
 
 
 /**
- * Class DebugBarListeners
- * @package DebugBar\Listeners
+ * Class LostPasswordEvent
+ * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class DebugBarListeners extends BaseAction implements EventSubscriberInterface {
+class LostPasswordEvent extends ActionEvent {
 
-    public function initDebugBar()
+    protected $email;
+
+    public function __construct($email)
     {
-        $debugBar = $this->container->get("debugBar");
-
-
-        $debugBar->addCollector(new PhpInfoCollector());
-        //$debugBar->addCollector(new MessagesCollector());
-        //$debugBar->addCollector(new RequestDataCollector());
-        $debugBar->addCollector(new TimeDataCollector());
-        $debugBar->addCollector(new MemoryCollector());
-        $debugBar->addCollector(new PropelCollector());
+        $this->email = $email;
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * @return mixed
      */
-    public static function getSubscribedEvents()
+    public function getEmail()
     {
-        return array(
-            TheliaEvents::BOOT => array("initDebugBar", 128)
-        );
+        return $this->email;
     }
+
+
+
 }
