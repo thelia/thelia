@@ -42,7 +42,7 @@ use Thelia\Type;
  *
  * Product Sale Elements loop
  *
- * @todo : manage attribute_availability
+ * @todo : manage attribute_availability ?
  *
  * Class ProductSaleElements
  * @package Thelia\Core\Template\Loop
