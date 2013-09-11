@@ -30,10 +30,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\FolderQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
@@ -83,7 +81,7 @@ class Folder extends BaseI18nLoop
         /* manage translations */
         $locale = $this->configureI18nProcessing($search);
 
-		$id = $this->getId();
+        $id = $this->getId();
 
         if (!is_null($id)) {
             $search->filterById($id, Criteria::IN);
@@ -95,15 +93,13 @@ class Folder extends BaseI18nLoop
             $search->filterByParent($parent);
         }
 
-
-		$current = $this->getCurrent();
+        $current = $this->getCurrent();
 
         if ($current === true) {
             $search->filterById($this->request->get("folder_id"));
         } elseif ($current === false) {
             $search->filterById($this->request->get("folder_id"), Criteria::NOT_IN);
         }
-
 
          $exclude = $this->getExclude();
 
@@ -117,7 +113,7 @@ class Folder extends BaseI18nLoop
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
@@ -157,19 +153,19 @@ class Folder extends BaseI18nLoop
             $loopResultRow = new LoopResultRow($loopResult, $folder, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow
-            	->set("ID", $folder->getId())
+                ->set("ID", $folder->getId())
                 ->set("IS_TRANSLATED",$folder->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE",$locale)
                 ->set("TITLE",$folder->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $folder->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
-	            ->set("PARENT", $folder->getParent())
+                ->set("PARENT", $folder->getParent())
                 ->set("URL", $folder->getUrl($locale))
-	            ->set("CONTENT_COUNT", $folder->countChild())
-	            ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
-	            ->set("POSITION", $folder->getPosition())
-			;
+                ->set("CONTENT_COUNT", $folder->countChild())
+                ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
+                ->set("POSITION", $folder->getPosition())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

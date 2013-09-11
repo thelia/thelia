@@ -24,7 +24,6 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -48,7 +47,7 @@ use Thelia\Type;
 class Address extends BaseLoop
 {
     public $timestampable = true;
-    
+
     /**
      * @return ArgumentCollection
      */
@@ -98,7 +97,6 @@ class Address extends BaseLoop
         }
 
         $default = $this->getDefault();
-
 
         if ($default === true) {
             $search->filterByIsDefault(1, Criteria::EQUAL);

@@ -24,7 +24,6 @@
 namespace Thelia\Coupon;
 
 use InvalidArgumentException;
-use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Constraint\Validator\RepeatedDateParam;
 
 /**

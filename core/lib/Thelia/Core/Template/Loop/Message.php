@@ -30,7 +30,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\LangQuery;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\MessageQuery;
 use Thelia\Type\BooleanOrBothType;

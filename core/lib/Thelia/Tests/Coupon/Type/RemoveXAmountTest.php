@@ -25,7 +25,6 @@ namespace Thelia\Coupon;
 
 use Thelia\Constraint\Validator\PriceParam;
 use Thelia\Constraint\Validator\RuleValidator;
-use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\Operators;
 use Thelia\Coupon\Type\RemoveXAmountManager;
 

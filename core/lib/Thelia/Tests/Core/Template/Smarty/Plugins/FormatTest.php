@@ -168,7 +168,6 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dateTime->format("Y-m-d H:i:s"), $render);
     }
 
-
     /**
      * test formatNumber without mandatory parameters
      *
@@ -268,7 +267,5 @@ class FormatTest extends \PHPUnit_Framework_TestCase
 
         return $mock;
     }
-
-
 
 }

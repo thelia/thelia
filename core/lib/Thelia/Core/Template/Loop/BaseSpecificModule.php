@@ -28,13 +28,13 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ModuleQuery;
 
-
 /**
  * Class Delivery
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class BaseSpecificModule extends BaseI18nLoop {
+class BaseSpecificModule extends BaseI18nLoop
+{
     public $timestampable = true;
 
     /**
@@ -93,11 +93,9 @@ class BaseSpecificModule extends BaseI18nLoop {
     {
         $search = ModuleQuery::create();
 
-        if(null !== $id = $this->getId())
-        {
+        if (null !== $id = $this->getId()) {
             $search->filterById($id);
         }
-
 
         if (null !== $exclude = $this->getExclude()) {
             $search->filterById($exclude, Criteria::NOT_IN);

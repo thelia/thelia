@@ -204,8 +204,6 @@ final class TheliaEvents
      */
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
 
-
-
     /**
      * Sent when creating a Coupon
      */
@@ -311,7 +309,6 @@ final class TheliaEvents
      */
     const AFTER_COUPON_RULE_DELETE 	= "action.after_delete_coupon_rule";
 
-
     // -- Configuration management ---------------------------------------------
 
     const CONFIG_CREATE   = "action.createConfig";
@@ -360,6 +357,5 @@ final class TheliaEvents
 
     const BEFORE_DELETECURRENCY = "action.before_deleteCurrency";
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
-
 
 }

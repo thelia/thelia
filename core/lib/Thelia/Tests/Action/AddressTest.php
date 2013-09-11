@@ -26,7 +26,6 @@ use Thelia\Action\Address;
 use Thelia\Core\Event\AddressCreateOrUpdateEvent;
 use Thelia\Model\Base\CustomerQuery;
 
-
 /**
  *
  * test address eventListener
@@ -119,7 +118,6 @@ class AddressTest extends \PHPUnit_Framework_TestCase
 
         $actionAddress = new Address($this->getContainer());
         $actionAddress->update($addressEvent);
-
 
         $updatedAddress = $addressEvent->getAddress();
         $this->assertInstanceOf("Thelia\Model\Address", $updatedAddress);

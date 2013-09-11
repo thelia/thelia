@@ -28,7 +28,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Install\Database;
 
-
 /**
  * Class ReloadDatabasesCommand
  * @package Thelia\Command

@@ -25,7 +25,6 @@ namespace Thelia\Controller\Front;
 use Thelia\Model\ModuleQuery;
 use Thelia\Tools\URL;
 
-
 /**
  * Class DeliveryController
  * @package Thelia\Controller\Front

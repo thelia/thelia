@@ -37,13 +37,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Validator\Tests\Fixtures\Reference;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 use Thelia\Core\Bundle;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Log\Tlog;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
 use Thelia\Core\TheliaContainerBuilder;

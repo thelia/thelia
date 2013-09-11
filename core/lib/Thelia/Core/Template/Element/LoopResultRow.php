@@ -38,14 +38,14 @@ class LoopResultRow
 
     public function __construct($loopResult = null, $model = null, $versionable = false, $timestampable = false, $countable = true)
     {
-        if($model instanceof ActiveRecordInterface) {
+        if ($model instanceof ActiveRecordInterface) {
             $this->model = $model;
 
             $this->versionable = $versionable;
             $this->timestampable = $timestampable;
         }
 
-        if($loopResult instanceof LoopResult) {
+        if ($loopResult instanceof LoopResult) {
             $this->loopResult = $loopResult;
 
             $this->countable = $countable;
@@ -95,17 +95,17 @@ class LoopResultRow
 
     protected function assignDefaultOutputs()
     {
-        if(true === $this->versionable) {
-            foreach($this->getVersionOutputs() as $output) {
+        if (true === $this->versionable) {
+            foreach ($this->getVersionOutputs() as $output) {
                 $this->set($output[0], $this->model->$output[1]());
             }
         }
-        if(true === $this->timestampable) {
-            foreach($this->getTimestampOutputs() as $output) {
+        if (true === $this->timestampable) {
+            foreach ($this->getTimestampOutputs() as $output) {
                 $this->set($output[0], $this->model->$output[1]());
             }
         }
-        if(true === $this->countable) {
+        if (true === $this->countable) {
             $this->set('LOOP_COUNT', 1 + $this->loopResult->getCount());
             $this->set('LOOP_TOTAL', $this->loopResult->modelCollection->count());
         }

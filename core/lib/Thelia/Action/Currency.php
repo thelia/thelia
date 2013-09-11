@@ -23,7 +23,6 @@
 
 namespace Thelia\Action;
 
-
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Thelia\Model\CurrencyQuery;
@@ -59,7 +58,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
             ->save()
         ;
-
 
         $event->setCurrency($currency);
     }
@@ -136,16 +134,15 @@ class Currency extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateRates() {
-
+    public function updateRates()
+    {
         $rates_url = ConfigQuery::read('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml');
 
         $rate_data = @file_get_contents($rates_url);
 
         if ($rate_data && $sxe = new \SimpleXMLElement($rate_data)) {
 
-            foreach ($sxe->Cube[0]->Cube[0]->Cube as $last)
-            {
+            foreach ($sxe->Cube[0]->Cube[0]->Cube as $last) {
                 $code = strtoupper($last["currency"]);
                 $rate = floatval($last['rate']);
 
@@ -157,8 +154,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                     ;
                 }
             }
-        }
-        else {
+        } else {
             throw new \RuntimeException(sprintf("Failed to get currency rates data from URL %s", $rates_url));
         }
     }

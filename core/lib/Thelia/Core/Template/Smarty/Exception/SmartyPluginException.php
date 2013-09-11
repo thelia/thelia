@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Template\Smarty\Exception;
 
-
 /**
  * Class SmartyPluginException
  * @package Thelia\Core\Template\Smarty\Exception

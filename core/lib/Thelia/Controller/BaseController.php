@@ -39,7 +39,6 @@ use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Event\DefaultActionEvent;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -65,8 +64,8 @@ class BaseController extends ContainerAware
     /**
      * Dispatch a Thelia event
      *
-     * @param string    $eventName a TheliaEvent name, as defined in TheliaEvents class
-     * @param Event     $event the action event, or null (a DefaultActionEvent will be dispatched)
+     * @param string $eventName a TheliaEvent name, as defined in TheliaEvents class
+     * @param Event  $event     the action event, or null (a DefaultActionEvent will be dispatched)
      */
     protected function dispatch($eventName, ActionEvent $event = null)
     {
@@ -139,11 +138,11 @@ class BaseController extends ContainerAware
     /**
      * Get all errors that occured in a form
      *
-     * @param \Symfony\Component\Form\Form $form
-     * @return string the error string
+     * @param  \Symfony\Component\Form\Form $form
+     * @return string                       the error string
      */
-    private function getErrorMessages(\Symfony\Component\Form\Form $form) {
-
+    private function getErrorMessages(\Symfony\Component\Form\Form $form)
+    {
         $errors = '';
 
         foreach ($form->getErrors() as $key => $error) {
@@ -177,8 +176,7 @@ class BaseController extends ContainerAware
 
             if ($form->isValid()) {
                 return $form;
-            }
-            else {
+            } else {
                 $errorMessage = null;
                 if ($form->get("error_message")->getData() != null) {
                     $errorMessage = $form->get("error_message")->getData();
@@ -188,8 +186,7 @@ class BaseController extends ContainerAware
 
                 throw new FormValidationException($errorMessage);
             }
-        }
-        else {
+        } else {
             throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
         }
     }
@@ -214,8 +211,7 @@ class BaseController extends ContainerAware
     {
         if ($form != null) {
             $url = $form->getSuccessUrl();
-        }
-        else {
+        } else {
             $url = $this->getRequest()->get("success_url");
         }
 
@@ -236,10 +232,11 @@ class BaseController extends ContainerAware
      * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
-     * @throws \InvalidArgumentException            When the router doesn't exist
-     * @return string The generated URL
+     * @throws \InvalidArgumentException When the router doesn't exist
+     * @return string                    The generated URL
      */
-    protected function getRouteFromRouter($routerName, $routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH) {
+    protected function getRouteFromRouter($routerName, $routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH)
+    {
         /** @var Router $router */
         $router =  $this->container->get($routerName);
 

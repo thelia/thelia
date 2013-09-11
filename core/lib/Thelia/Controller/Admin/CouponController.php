@@ -26,17 +26,12 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 use Thelia\Constraint\ConstraintFactory;
-use Thelia\Constraint\ConstraintFactoryTest;
 use Thelia\Constraint\Rule\AvailableForTotalAmount;
 use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Constraint\Validator\PriceParam;
-use Thelia\Core\Event\Coupon\CouponCreateEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Security\Exception\AuthenticationException;
-use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Coupon\CouponManager;
@@ -222,7 +217,6 @@ class CouponController extends BaseAdminController
         );
     }
 
-
     /**
      * Manage Coupons Rule creation display
      *
@@ -311,8 +305,6 @@ class CouponController extends BaseAdminController
         );
     }
 
-
-
     /**
      * Manage Coupons read display
      *
@@ -374,7 +366,6 @@ class CouponController extends BaseAdminController
             )
         );
     }
-
 
     /**
      * Manage Coupons read display
@@ -696,7 +687,5 @@ class CouponController extends BaseAdminController
 //            return false;
 //        }
 //    }
-
-
 
 }

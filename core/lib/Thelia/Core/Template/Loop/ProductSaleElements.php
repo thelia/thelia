@@ -24,17 +24,14 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\Base\ProductSaleElementsQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Type\TypeCollection;
@@ -53,7 +50,7 @@ use Thelia\Type;
 class ProductSaleElements extends BaseLoop
 {
     public $timestampable = true;
-    
+
     /**
      * @return ArgumentCollection
      */
@@ -93,7 +90,7 @@ class ProductSaleElements extends BaseLoop
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
                 case "min_price":
                     $search->addAscendingOrderByColumn('real_lowest_price', Criteria::ASC);
@@ -115,9 +112,9 @@ class ProductSaleElements extends BaseLoop
         }
 
         $currencyId = $this->getCurrency();
-        if(null !== $currency) {
+        if (null !== $currency) {
             $currency = CurrencyQuery::create()->findOneById($currencyId);
-            if(null === $currency) {
+            if (null === $currency) {
                 throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
             }
         } else {
