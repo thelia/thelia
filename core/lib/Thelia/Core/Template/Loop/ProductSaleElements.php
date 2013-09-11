@@ -68,9 +68,9 @@ class ProductSaleElements extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'attribute', 'attribute_reverse'))
+                    new Type\EnumListType(array('min_price', 'max_price', 'promo', 'new', 'random'))
                 ),
-                'attribute'
+                'random'
             )
         );
     }
@@ -125,8 +125,11 @@ class ProductSaleElements extends BaseLoop
         $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
         $defaultCurrencySuffix = '_default_currency';
 
-        $search->joinProductPrice('price', Criteria::INNER_JOIN);
-            //->addJoinCondition('price', '');
+        $search->joinProductPrice('price', Criteria::INNER_JOIN)
+            ->addJoinCondition('price', '`price`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
+
+        $search->joinProductPrice('price' . $defaultCurrencySuffix, Criteria::INNER_JOIN)
+            ->addJoinCondition('price_default_currency', '`price' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
         $search->withColumn('`price`.CURRENCY_ID', 'price_CURRENCY_ID')
             ->withColumn('`price`.PRICE', 'price_PRICE')
