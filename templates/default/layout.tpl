@@ -120,7 +120,7 @@ URL: http://www.thelia.net
                         <div class="input-group">
                             <input type="search" name="q" id="q" placeholder="Search..." class="form-control" aria-required="true" required pattern=". { 2,}" title="Minmimum 2 characters.">
                             <div class="input-group-btn">
-                                <button type="submit" class="btn btn-search"><span class="icon-search"></span> <span>Search</span></button>
+                                <button type="submit" class="btn btn-search"><i class="icon-search"></i> <span>Search</span></button>
                             </div>
                         </div>
                     </form>
