@@ -67,29 +67,29 @@ class Calculator
         return $this;
     }
 
-    public function getTaxAmount($amount)
+    public function getTaxAmount($untaxedPrice)
     {
         if(null === $this->taxRulesGroupedCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxAmount', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
         }
 
-        if(false === filter_var($amount, FILTER_VALIDATE_FLOAT)) {
+        if(false === filter_var($untaxedPrice, FILTER_VALIDATE_FLOAT)) {
             throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
         }
 
         $totalTaxAmount = 0;
         foreach($this->taxRulesGroupedCollection as $taxRule) {
             $rateSum = $taxRule->getTaxRuleRateSum();
-            $taxAmount = $amount * $rateSum * 0.01;
+            $taxAmount = $untaxedPrice * $rateSum * 0.01;
             $totalTaxAmount += $taxAmount;
-            $amount += $taxAmount;
+            $untaxedPrice += $taxAmount;
         }
 
         return $totalTaxAmount;
     }
 
-    public function getTaxedPrice($amount)
+    public function getTaxedPrice($untaxedPrice)
     {
-        return $amount + $this->getTaxAmount($amount);
+        return $untaxedPrice + $this->getTaxAmount($untaxedPrice);
     }
 }
