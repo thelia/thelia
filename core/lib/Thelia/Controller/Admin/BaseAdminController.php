@@ -25,7 +25,6 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\Routing\Router;
 use Thelia\Controller\BaseController;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthorizationException;
