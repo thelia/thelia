@@ -156,6 +156,25 @@ try {
         "azerty"
     );
 
+    for($i = 0; $i < 50; $i++) {
+        $customer = new Thelia\Model\Customer();
+        $customer->createOrUpdate(
+            1,
+            "thelia".$i,
+            "thelia".$i,
+            "5 rue rochon",
+            "",
+            "",
+            "0102030405",
+            "0601020304",
+            "63000",
+            "clermont-ferrand",
+            64,
+            sprintf("test%d@thelia.net", $i),
+            "azerty".$i
+        );
+    }
+
     //features and features_av
     $featureList = array();
     for($i=0; $i<4; $i++) {

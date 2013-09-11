@@ -128,12 +128,13 @@
                     <li class="active"><a href="#">{$PAGE}</a></li>
                 {/if}
 
+
+            {/pageloop}
                 {if $PAGE == $LAST && $LAST != $CURRENT}
                     <li><a href="{url path="/admin/customers" page="$PAGE"}">&raquo;</a></li>
                 {else}
                     <li class="disabled"><a href="#">&raquo;</a></li>
                 {/if}
-            {/pageloop}
             </ul>
 
         </div>
