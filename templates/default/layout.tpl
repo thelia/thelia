@@ -30,7 +30,7 @@ URL: http://www.thelia.net
     {stylesheets file='assets/less/styles.less' filters='less,cssembed'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
-
+    {debugbar_rendercss}
     {block name="stylesheet"}{/block}
 </head>
 
@@ -396,6 +396,9 @@ URL: http://www.thelia.net
 {javascripts file='assets/js/script.js'}
     <script src="{$asset_url}"></script>
 {/javascripts}
+
+{debugbar_renderjs}
+{debugbar_renderresult}
 
 <!--[if lt IE 9]>
 <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>

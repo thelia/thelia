@@ -32,6 +32,7 @@ namespace Thelia\Core;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Kernel;
@@ -81,9 +82,10 @@ class Thelia extends Kernel
         $manager = new ConnectionManagerSingle();
         $manager->setConfiguration($definePropel->getConfig());
         $serviceContainer->setConnectionManager('thelia', $manager);
-
+        $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
+        $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
         if ($this->isDebug()) {
-            $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
+
             $con->useDebug(true);
         }
     }

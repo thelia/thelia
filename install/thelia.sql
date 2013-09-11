@@ -1213,14 +1213,13 @@ DROP TABLE IF EXISTS `product_price`;
 
 CREATE TABLE `product_price`
 (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_sale_elements_id` INTEGER NOT NULL,
     `currency_id` INTEGER NOT NULL,
     `price` FLOAT NOT NULL,
     `promo_price` FLOAT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`product_sale_elements_id`,`currency_id`),
     INDEX `idx_product_price_product_sale_elements_id` (`product_sale_elements_id`),
     INDEX `idx_product_price_currency_id` (`currency_id`),
     CONSTRAINT `fk_product_price_product_sale_elements_id`
