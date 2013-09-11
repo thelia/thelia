@@ -79,6 +79,7 @@ class ProductSaleElements extends BaseLoop
      * @param $pagination
      *
      * @return \Thelia\Core\Template\Element\LoopResult
+     * @throws \InvalidArgumentException
      */
     public function exec(&$pagination)
     {
@@ -112,7 +113,7 @@ class ProductSaleElements extends BaseLoop
         }
 
         $currencyId = $this->getCurrency();
-        if (null !== $currency) {
+        if (null !== $currencyId) {
             $currency = CurrencyQuery::create()->findOneById($currencyId);
             if (null === $currency) {
                 throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
