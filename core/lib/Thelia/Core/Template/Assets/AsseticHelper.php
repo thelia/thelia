@@ -29,6 +29,7 @@ use Assetic\Filter;
 use Assetic\Factory\AssetFactory;
 use Assetic\Factory\Worker\CacheBustingWorker;
 use Assetic\AssetWriter;
+use Thelia\Model\ConfigQuery;
 
 /**
  * This class is a simple helper for generating assets using Assetic.
@@ -126,25 +127,28 @@ class AsseticHelper
         //
         if ($dev_mode == true || ! file_exists($target_file)) {
 
-            // Delete previous version of the file
-            list($commonPart, $dummy) = explode('-', $asset_target_path);
+            if (ConfigQuery::read('process_assets', true)) {
 
-            foreach (glob("$output_path/$commonPart-*") as $filename) {
-                @unlink($filename);
-            }
+                // Delete previous version of the file
+                list($commonPart, $dummy) = explode('-', $asset_target_path);
 
-            // Apply filters now
-            foreach ($filter_list as $filter) {
-                if ('?' != $filter[0]) {
-                    $asset->ensureFilter($fm->get($filter));
-                } elseif (!$debug) {
-                    $asset->ensureFilter($fm->get(substr($filter, 1)));
+                foreach (glob("$output_path/$commonPart-*") as $filename) {
+                    @unlink($filename);
                 }
+
+                // Apply filters now
+                foreach ($filter_list as $filter) {
+                    if ('?' != $filter[0]) {
+                        $asset->ensureFilter($fm->get($filter));
+                    } elseif (!$debug) {
+                        $asset->ensureFilter($fm->get(substr($filter, 1)));
+                    }
+                }
+
+                $writer = new AssetWriter($output_path);
+
+                $writer->writeAsset($asset);
             }
-
-            $writer = new AssetWriter($output_path);
-
-            $writer->writeAsset($asset);
         }
 
         return rtrim($output_url, '/').'/'.$asset_target_path;
