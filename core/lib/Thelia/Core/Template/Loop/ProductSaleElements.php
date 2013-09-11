@@ -34,6 +34,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -41,7 +42,7 @@ use Thelia\Type;
  *
  * Product Sale Elements loop
  *
- * @todo : manage currency and attribute_availability
+ * @todo : manage attribute_availability
  *
  * Class ProductSaleElements
  * @package Thelia\Core\Template\Loop
@@ -94,16 +95,16 @@ class ProductSaleElements extends BaseLoop
         foreach ($orders as $order) {
             switch ($order) {
                 case "min_price":
-                    $search->addAscendingOrderByColumn('real_lowest_price', Criteria::ASC);
+                    $search->addAscendingOrderByColumn('price_FINAL_PRICE', Criteria::ASC);
                     break;
                 case "max_price":
-                    $search->addDescendingOrderByColumn('real_lowest_price');
+                    $search->addDescendingOrderByColumn('price_FINAL_PRICE');
                     break;
                 case "promo":
-                    $search->addDescendingOrderByColumn('main_product_is_promo');
+                    $search->orderByPromo(Criteria::DESC);
                     break;
                 case "new":
-                    $search->addDescendingOrderByColumn('main_product_is_new');
+                    $search->orderByNewness(Criteria::DESC);
                     break;
                 case "random":
                     $search->clearOrderByColumns();
@@ -125,15 +126,22 @@ class ProductSaleElements extends BaseLoop
         $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
         $defaultCurrencySuffix = '_default_currency';
 
-        $search->joinProductPrice('price', Criteria::INNER_JOIN)
+        $search->joinProductPrice('price', Criteria::LEFT_JOIN)
             ->addJoinCondition('price', '`price`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
 
-        $search->joinProductPrice('price' . $defaultCurrencySuffix, Criteria::INNER_JOIN)
+        $search->joinProductPrice('price' . $defaultCurrencySuffix, Criteria::LEFT_JOIN)
             ->addJoinCondition('price_default_currency', '`price' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
 
-        $search->withColumn('`price`.CURRENCY_ID', 'price_CURRENCY_ID')
-            ->withColumn('`price`.PRICE', 'price_PRICE')
-            ->withColumn('`price`.PROMO_PRICE', 'price_PROMO_PRICE');
+        /**
+         * rate value is checked as a float in overloaded getRate method.
+         */
+        $priceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END, 2)';
+        $promoPriceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END, 2)';
+        $search->withColumn($priceSelectorAsSQL, 'price_PRICE')
+            ->withColumn($promoPriceSelectorAsSQL, 'price_PROMO_PRICE')
+            ->withColumn('CASE WHEN ' . ProductSaleElementsTableMap::PROMO . ' = 1 THEN ' . $promoPriceSelectorAsSQL . ' ELSE ' . $priceSelectorAsSQL . ' END', 'price_FINAL_PRICE');
+
+        $search->groupById();
 
         $PSEValues = $this->search($search, $pagination);
 
@@ -156,8 +164,6 @@ class ProductSaleElements extends BaseLoop
                 ->set("IS_PROMO", $PSEValue->getPromo() === 1 ? 1 : 0)
                 ->set("IS_NEW", $PSEValue->getNewness() === 1 ? 1 : 0)
                 ->set("WEIGHT", $PSEValue->getWeight())
-
-                ->set("CURRENCY", $PSEValue->getVirtualColumn('price_CURRENCY_ID'))
                 ->set("PRICE", $price)
                 ->set("PRICE_TAX", $taxedPrice - $price)
                 ->set("TAXED_PRICE", $taxedPrice)

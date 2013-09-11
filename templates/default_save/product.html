@@ -1,4 +1,4 @@
-{include file="includes/header.html"}
+{*include file="includes/header.html"*}
 
 Here you are : {navigate to="current"}<br />
 From : {navigate to="return_to"}<br />
@@ -62,7 +62,7 @@ Index : {navigate to="index"}<br />
     <h4>Product sale elements</h4>
 
     {assign var=current_product value=$ID}
-    {loop name="pse" type="product_sale_elements" product="$ID"}
+    {loop name="pse" type="product_sale_elements" product="$ID" order="promo,min_price"}
     <div style="border: solid 2px darkorange; padding: 5px; margin: 5px;">
         {loop name="combi" type="attribute_combination" product_sale_elements="$ID"}
         {$ATTRIBUTE_TITLE} = {$ATTRIBUTE_AVAILABILITY_TITLE}<br />
@@ -91,4 +91,4 @@ Index : {navigate to="index"}<br />
     <h2>Produit introuvable !</h2>
 {/elseloop}
 
-{include file="includes/footer.html"}
+{*include file="includes/footer.html"*}
