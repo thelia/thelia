@@ -101,74 +101,129 @@
                     </div>
 
                     <div class="panel-body">
-                        <div class="form-group group-company">
-                            <label class="control-label" for="company">Company Name: <span class="required">*</span></label>
-                            <div class="control-input">
-                                <input type="text" name="company" id="company" class="form-control" placeholder="Thelia" required>
-                            </div>
-                        </div><!--/.form-group-->
+                        {form_field form=$form field="company"}
+                            <div class="form-group group-company {if $error}has-error{elseif $value != "" && !$error}has_success{/if}">
+                                <label class="control-label" for="{$label_attr.for}">{$label}</label>
+                                <div class="control-input">
+                                    <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" placeholder="Thelia" value="{$value}" autofocus>
+                                    {if $error }
+                                        <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                    {elseif $value != "" && !$error}
+                                        <span class="help-block"><i class="icon-ok"></i></span>
+                                    {/if}
+                                </div>
+                            </div><!--/.form-group-->
+                        {/form_field}
 
-                        <div class="form-group group-address">
-                            <label class="control-label" for="address">Street Address: <span class="required">*</span></label>
-                            <div class="control-input">
-                                <input type="text" name="asresss" id="address" class="form-control" placeholder="Street address" required>
-                            </div>
-                        </div><!--/.form-group-->
+                        {form_field form=$form field="address1"}
+                            <div class="form-group group-address1 {if $error}has-error{elseif $value != "" && !$error}has_success{/if}">
+                                <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
+                                <div class="control-input">
+                                    <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" placeholder="{$label}" value="{$value}" autofocus required>
+                                    {if $error }
+                                        <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                    {elseif $value != "" && !$error}
+                                        <span class="help-block"><i class="icon-ok"></i></span>
+                                    {/if}
+                                </div>
+                            </div><!--/.form-group-->
+                        {/form_field}
 
-                        <div class="form-group group-address_2">
-                            <label class="control-label" for="address_2">Address 2:</label>
-                            <div class="control-input">
-                                <input type="text" name="address_2" id="address_2" class="form-control" placeholder="">
-                            </div>
-                        </div><!--/.form-group-->
+                        {form_field form=$form field="address2"}
+                            <div class="form-group group-address2 {if $error}has-error{elseif $value != "" && !$error}has_success{/if}">
+                                <label class="control-label" for="{$label_attr.for}">{$label}</label>
+                                <div class="control-input">
+                                    <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" placeholder="" value="{$value}" autofocus>
+                                    {if $error }
+                                        <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                    {elseif $value != "" && !$error}
+                                        <span class="help-block"><i class="icon-ok"></i></span>
+                                    {/if}
+                                </div>
+                            </div><!--/.form-group-->
+                        {/form_field}
 
-                        <div class="form-group group-city">
-                            <label class="control-label" for="city">City: <span class="required">*</span></label>
-                            <div class="control-input">
-                                <input type="text" name="city" id="city" class="form-control" placeholder="New york" required>
-                            </div>
-                        </div><!--/.form-group-->
+                        {form_field form=$form field="city"}
+                            <div class="form-group group-city {if $error}has-error{elseif $value != "" && !$error}has_success{/if}">
+                                <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
+                                <div class="control-input">
+                                    <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" placeholder="New York" value="{$value}" autofocus required>
+                                    {if $error }
+                                        <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                    {elseif $value != "" && !$error}
+                                        <span class="help-block"><i class="icon-ok"></i></span>
+                                    {/if}
+                                </div>
+                            </div><!--/.form-group-->
+                        {/form_field}
 
-                        <div class="form-group group-zip">
-                            <label class="control-label" for="zip">Postal Code: <span class="required">*</span></label>
-                            <div class="control-input">
-                                <input type="text" name="zip" id="zip" class="form-control" placeholder="H2T 2V6" required>
-                            </div>
-                        </div><!--/.form-group-->
+                        {form_field form=$form field="zipcode"}
+                            <div class="form-group group-zip {if $error}has-error{elseif $value != "" && !$error}has_success{/if}">
+                                <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
+                                <div class="control-input">
+                                    <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" placeholder="H2T 2V6" value="{$value}" autofocus required>
+                                    {if $error }
+                                        <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                    {elseif $value != "" && !$error}
+                                        <span class="help-block"><i class="icon-ok"></i></span>
+                                    {/if}
+                                </div>
+                            </div><!--/.form-group-->
+                        {/form_field}
 
-                        <div class="form-group group-country">
-                            <label class="control-label" for="country">Country: <span class="required">*</span></label>
-                            <div class="control-input">
-                                <select name"country" id="country" class="form-control" required>
-                                <option value="">-- Select Country --</option>
-                                <option value="1">Country1</option>
-                                <option value="2">Country2</option>
-                                <option value="3">Country3</option>
-                                <option value="4">Country4</option>
-                                </select>
-                            </div>
-                        </div><!--/.form-group-->
+                        {form_field form=$form field="country"}
+                            <div class="form-group group-country {if $error}has-error{elseif $value != "" && !$error}has_success{/if}">
+                                <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
+                                <div class="control-input">
+                                    <select name"{$name}" id="{$label_attr.for}" class="form-control" required>
+                                        <option value="">-- Select Country --</option>
+                                        {loop type="country" name="country.list"}
+                                            <option value="{$ID}">{$TITLE}</option>
+                                        {/loop}
+                                    </select>
+                                    {if $error }
+                                        <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                    {elseif $value != "" && !$error}
+                                        <span class="help-block"><i class="icon-ok"></i></span>
+                                    {/if}
+                                </div>
+                            </div><!--/.form-group-->
+                        {/form_field}
                     </div>
                 </fieldset>
                 <fieldset id="register-login" class="panel">
                     <div class="panel-heading">
-                        3. Login Information
+                        3. {intl l="Login Information"}
                     </div>
 
                     <div class="panel-body">
-                        <div class="form-group group-password">
-                            <label class="control-label" for="password">Password: <span class="required">*</span></label>
-                            <div class="control-input">
-                                <input type="password" name="password" id="password" class="form-control" required autocomplete="off">
-                            </div>
-                        </div><!--/.form-group-->
+                        {form_field form=$form field="password"}
+                            <div class="form-group group-password {if $error}has-error{elseif $value != "" && !$error}has_success{/if}">
+                                <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
+                                <div class="control-input">
+                                    <input type="password" name="{$name}" id="{$label_attr.for}" class="form-control" required autocomplete="off">
+                                    {if $error }
+                                        <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                    {elseif $value != "" && !$error}
+                                        <span class="help-block"><i class="icon-ok"></i></span>
+                                    {/if}
+                                </div>
+                            </div><!--/.form-group-->
+                        {/form_field}
 
-                        <div class="form-group group-confirm_password">
-                            <label class="control-label" for="confirm_password">Confirm Password: <span class="required">*</span></label>
-                            <div class="control-input">
-                                <input type="password" name="confirm_password" id="confirm_password" class="form-control" required autocomplete="off">
-                            </div>
-                        </div><!--/.form-group-->
+                        {form_field form=$form field="password_confirm"}
+                            <div class="form-group group-password_confirm {if $error}has-error{elseif $value != "" && !$error}has_success{/if}">
+                                <label class="control-label" for="{$label_attr.for}">{$label} <span class="required">*</span></label>
+                                <div class="control-input">
+                                    <input type="password" name="{$name}" id="{$label_attr.for}" class="form-control" required autocomplete="off">
+                                    {if $error }
+                                        <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                    {elseif $value != "" && !$error}
+                                        <span class="help-block"><i class="icon-ok"></i></span>
+                                    {/if}
+                                </div>
+                            </div><!--/.form-group-->
+                        {/form_field}
                     </div>
                 </fieldset>
 
