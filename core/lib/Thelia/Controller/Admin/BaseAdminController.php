@@ -228,7 +228,7 @@ class BaseAdminController extends BaseController
      *
      * @see \Thelia\Controller\BaseController::getRouteFromRouter()
      */
-    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::RELATIVE_PATH)
+    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_URL)
     {
         return $this->getRouteFromRouter(
             'router.admin',
