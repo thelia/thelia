@@ -26,7 +26,6 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Tools\URL;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 
 /**
@@ -43,7 +42,8 @@ class AdminUtilities extends AbstractSmartyPlugin
         $this->securityContext = $securityContext;
     }
 
-    public function generatePositionChangeBlock($params, &$smarty) {
+    public function generatePositionChangeBlock($params, &$smarty)
+    {
         // The required permissions
         $permission = $this->getParam($params, 'permission');
 
@@ -77,12 +77,10 @@ class AdminUtilities extends AbstractSmartyPlugin
                 $position,
                 URL::getInstance()->absoluteUrl($path, array('mode' => 'down', $url_parameter => $id))
             );
-        }
-        else {
+        } else {
             return $position;
         }
     }
-
 
     /**
      * Generates the link of a sortable column header
@@ -111,12 +109,10 @@ class AdminUtilities extends AbstractSmartyPlugin
         if ($current_order == $order) {
             $icon = 'up';
             $order_change = $reverse_order;
-        }
-        else if ($current_order == $reverse_order) {
+        } elseif ($current_order == $reverse_order) {
             $icon = 'down';
             $order_change = $order;
-        }
-        else {
+        } else {
             $order_change = $order;
         }
 
@@ -127,7 +123,6 @@ class AdminUtilities extends AbstractSmartyPlugin
 
         return sprintf('%s<a href="%s">%s</a>', $output, URL::getInstance()->absoluteUrl($path, array('order' => $order_change)), $label);
     }
-
 
     /**
      * Define the various smarty plugins handled by this class

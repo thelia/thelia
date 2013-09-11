@@ -24,12 +24,10 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Constraint\ConstraintFactory;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Coupon as CouponModel;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Propel;
-use Thelia\Model\Map\CategoryTableMap;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -69,18 +67,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Occurring when a Coupon rule is about to be created
-     *
-     * @param CouponCreateOrUpdateEvent $event Event creation or update Event
-     */
-    public function createRule(CouponCreateOrUpdateEvent $event)
-    {
-        $coupon = $event->getCoupon();
-
-        $this->createOrUpdate($coupon, $event);
-    }
-
-    /**
      * Occurring when a Coupon rule is about to be updated
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Event
@@ -89,19 +75,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     {
         $coupon = $event->getCoupon();
 
-        $this->createOrUpdate($coupon, $event);
-    }
-
-    /**
-     * Occurring when a Coupon rule is about to be deleted
-     *
-     * @param CouponCreateOrUpdateEvent $event Event creation or update Event
-     */
-    public function deleteRule(CouponCreateOrUpdateEvent $event)
-    {
-        $coupon = $event->getCoupon();
-
-        $this->createOrUpdate($coupon, $event);
+        $this->createOrUpdateRule($coupon, $event);
     }
 
     /**
@@ -130,6 +104,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getTitle(),
             $event->getAmount(),
             $event->getEffect(),
+            $event->isRemovingPostage(),
             $event->getShortDescription(),
             $event->getDescription(),
             $event->isEnabled(),
@@ -137,7 +112,28 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->isAvailableOnSpecialOffers(),
             $event->isCumulative(),
             $event->getMaxUsage(),
-            $event->getRules(),
+            $event->getLocale()
+        );
+
+        $event->setCoupon($coupon);
+    }
+
+    /**
+     * Call the Model and delegate the create or delete action
+     * Feed the Event with the updated model
+     *
+     * @param CouponModel               $coupon Model to save
+     * @param CouponCreateOrUpdateEvent $event  Event containing data
+     */
+    protected function createOrUpdateRule(CouponModel $coupon, CouponCreateOrUpdateEvent $event)
+    {
+        $coupon->setDispatcher($this->getDispatcher());
+
+        /** @var ConstraintFactory $constraintFactory */
+        $constraintFactory = $this->container->get('thelia.constraint.factory');
+
+        $coupon->createOrUpdateRules(
+            $constraintFactory->serializeCouponRuleCollection($event->getRules()),
             $event->getLocale()
         );
 
@@ -172,8 +168,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::COUPON_DISABLE => array("disable", 128),
             TheliaEvents::COUPON_ENABLE => array("enable", 128),
             TheliaEvents::COUPON_CONSUME => array("consume", 128),
-            TheliaEvents::COUPON_RULE_UPDATE => array("updateRule", 128),
-            TheliaEvents::COUPON_RULE_DELETE => array("deleteRule", 128)
+            TheliaEvents::COUPON_RULE_UPDATE => array("updateRule", 128)
         );
     }
 }

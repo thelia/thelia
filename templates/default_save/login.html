@@ -25,12 +25,12 @@
 	and passed back to the form plugin through the ParserContext.
 	*}
 
-	{if #form_error}<div class="alert alert-error">#form_error_message</div>{/if}
+	{if $0form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
 
     {form_hidden_fields form=$form}
 
     {form_field form=$form field="email"}
-        {if #error}{#message}{/if}
+        {if $error}{$message}{/if}
         <label>{intl l="Your e-mail address"}: </label><input type="email" name="{$name}" {$attr} value="{$value}"><br />
     {/form_field}
 

@@ -145,5 +145,4 @@ class CartEvent extends ActionEvent
         return $this->cart;
     }
 
-
 }

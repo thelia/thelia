@@ -3,7 +3,7 @@
 <h1>{intl l='cart'}</h1>
 <ul>
 {loop name="cart" type="cart"}
-    <li>Item {$LOOP_COUNT}/{$LOOP_TOTAL} : #ITEM_ID #TITLE - quantity : #QUANTITY</li>
+    <li>Item {$LOOP_COUNT}/{$LOOP_TOTAL} : {$ITEM_ID} {$TITLE} - quantity : {$QUANTITY}</li>
 {/loop}
 </ul>
 
@@ -16,7 +16,7 @@
         and passed back to the form plugin through the ParserContext.
         *}
 
-        {if #form_error}<div class="alert alert-error">#form_error_message</div>{/if}
+        {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
 
         {form_hidden_fields form=$form}
 

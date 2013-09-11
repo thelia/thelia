@@ -23,9 +23,8 @@
 
 namespace Thelia\Module;
 
-
-interface DeliveryModuleInterface extends BaseModuleInterface {
-
+interface DeliveryModuleInterface extends BaseModuleInterface
+{
     /**
      *
      * calculate and return delivery price

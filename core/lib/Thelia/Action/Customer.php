@@ -27,17 +27,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Form\CustomerCreation;
-use Thelia\Form\CustomerModification;
 use Thelia\Model\Customer as CustomerModel;
-use Thelia\Log\Tlog;
-use Thelia\Model\CustomerQuery;
-use Thelia\Form\CustomerLogin;
-use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
-use Symfony\Component\Validator\Exception\ValidatorException;
-use Thelia\Core\Security\Exception\AuthenticationException;
-use Thelia\Core\Security\Exception\UsernameNotFoundException;
-use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\CustomerLoginEvent;
 
 /**
@@ -95,7 +85,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $event->setCustomer($customer);
     }
-
 
     public function login(CustomerLoginEvent $event)
     {

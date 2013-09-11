@@ -18,7 +18,7 @@
 				{form name="thelia.admin.login"}
 				<form action="{url path='/admin/checklogin'}" method="post" class="well form-inline" {form_enctype form=$form}>
 
-					{if #form_error}<div class="alert alert-error">#form_error_message</div>{/if}
+					{if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
 
 	                {form_hidden_fields form=$form}
 
@@ -28,13 +28,13 @@
 
 	                {form_field form=$form field='username'}
 	                <span {if $error}class="error"{/if}>
-					    <input type="text" class="input" placeholder="{intl l='User name'}" name="{$name}" value="{$value}" {$attr} />
+					    <input type="text" id="username" class="input" placeholder="{intl l='User name'}" name="{$name}" value="{$value}" {$attr} />
 					</span>
 	                {/form_field}
 
 	                {form_field form=$form field='password'}
 	                <span {if $error}class="error"{/if}>
-					    <input type="password" class="input" placeholder="{intl l='Password'}" name="{$name}" {$attr} />
+					    <input type="password" id="password" class="input" placeholder="{intl l='Password'}" name="{$name}" {$attr} />
 					</span>
 	                {/form_field}
 

@@ -24,18 +24,17 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\Base\ProductSaleElementsQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -43,7 +42,7 @@ use Thelia\Type;
  *
  * Product Sale Elements loop
  *
- * @todo : manage currency and attribute_availability
+ * @todo : manage attribute_availability ?
  *
  * Class ProductSaleElements
  * @package Thelia\Core\Template\Loop
@@ -52,7 +51,7 @@ use Thelia\Type;
 class ProductSaleElements extends BaseLoop
 {
     public $timestampable = true;
-    
+
     /**
      * @return ArgumentCollection
      */
@@ -70,9 +69,9 @@ class ProductSaleElements extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'attribute', 'attribute_reverse'))
+                    new Type\EnumListType(array('min_price', 'max_price', 'promo', 'new', 'random'))
                 ),
-                'attribute'
+                'random'
             )
         );
     }
@@ -81,6 +80,7 @@ class ProductSaleElements extends BaseLoop
      * @param $pagination
      *
      * @return \Thelia\Core\Template\Element\LoopResult
+     * @throws \InvalidArgumentException
      */
     public function exec(&$pagination)
     {
@@ -92,31 +92,56 @@ class ProductSaleElements extends BaseLoop
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
-                case "alpha":
-                    //$search->addAscendingOrderByColumn(\Thelia\Model\Map\AttributeI18nTableMap::TITLE);
+                case "min_price":
+                    $search->addAscendingOrderByColumn('price_FINAL_PRICE', Criteria::ASC);
                     break;
-                case "alpha_reverse":
-                    //$search->addDescendingOrderByColumn(\Thelia\Model\Map\AttributeI18nTableMap::TITLE);
+                case "max_price":
+                    $search->addDescendingOrderByColumn('price_FINAL_PRICE');
                     break;
-                case "attribute":
-                    //$search->orderByPosition(Criteria::ASC);
+                case "promo":
+                    $search->orderByPromo(Criteria::DESC);
                     break;
-                case "attribute_reverse":
-                    //$search->orderByPosition(Criteria::DESC);
+                case "new":
+                    $search->orderByNewness(Criteria::DESC);
                     break;
+                case "random":
+                    $search->clearOrderByColumns();
+                    $search->addAscendingOrderByColumn('RAND()');
+                    break(2);
             }
         }
 
-        $currency = $this->getCurrency();
+        $currencyId = $this->getCurrency();
+        if (null !== $currencyId) {
+            $currency = CurrencyQuery::create()->findOneById($currencyId);
+            if (null === $currency) {
+                throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
+            }
+        } else {
+            $currency = $this->request->getSession()->getCurrency();
+        }
 
-        $search->joinProductPrice('price', Criteria::INNER_JOIN);
-            //->addJoinCondition('price', '');
+        $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
+        $defaultCurrencySuffix = '_default_currency';
 
-        $search->withColumn('`price`.CURRENCY_ID', 'price_CURRENCY_ID')
-            ->withColumn('`price`.PRICE', 'price_PRICE')
-            ->withColumn('`price`.PROMO_PRICE', 'price_PROMO_PRICE');
+        $search->joinProductPrice('price', Criteria::LEFT_JOIN)
+            ->addJoinCondition('price', '`price`.`currency_id` = ?', $currency->getId(), null, \PDO::PARAM_INT);
+
+        $search->joinProductPrice('price' . $defaultCurrencySuffix, Criteria::LEFT_JOIN)
+            ->addJoinCondition('price_default_currency', '`price' . $defaultCurrencySuffix . '`.`currency_id` = ?', $defaultCurrency->getId(), null, \PDO::PARAM_INT);
+
+        /**
+         * rate value is checked as a float in overloaded getRate method.
+         */
+        $priceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END, 2)';
+        $promoPriceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END, 2)';
+        $search->withColumn($priceSelectorAsSQL, 'price_PRICE')
+            ->withColumn($promoPriceSelectorAsSQL, 'price_PROMO_PRICE')
+            ->withColumn('CASE WHEN ' . ProductSaleElementsTableMap::PROMO . ' = 1 THEN ' . $promoPriceSelectorAsSQL . ' ELSE ' . $priceSelectorAsSQL . ' END', 'price_FINAL_PRICE');
+
+        $search->groupById();
 
         $PSEValues = $this->search($search, $pagination);
 
@@ -139,8 +164,6 @@ class ProductSaleElements extends BaseLoop
                 ->set("IS_PROMO", $PSEValue->getPromo() === 1 ? 1 : 0)
                 ->set("IS_NEW", $PSEValue->getNewness() === 1 ? 1 : 0)
                 ->set("WEIGHT", $PSEValue->getWeight())
-
-                ->set("CURRENCY", $PSEValue->getVirtualColumn('price_CURRENCY_ID'))
                 ->set("PRICE", $price)
                 ->set("PRICE_TAX", $taxedPrice - $price)
                 ->set("TAXED_PRICE", $taxedPrice)

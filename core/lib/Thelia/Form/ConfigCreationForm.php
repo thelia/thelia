@@ -60,7 +60,7 @@ class ConfigCreationForm extends BaseForm
                     new Constraints\NotBlank()
                 )
             ))
-            ->add("value", "text", array(                
+            ->add("value", "text", array(
                 "label" => "Value *",
                 "label_attr" => array(
                     "for" => "value"

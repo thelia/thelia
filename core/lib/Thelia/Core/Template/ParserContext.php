@@ -25,7 +25,6 @@ namespace Thelia\Core\Template;
 
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Tools\URL;
 use Thelia\Form\BaseForm;
 /**
  * The parser context is an application-wide context, which stores var-value pairs.

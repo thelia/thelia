@@ -17,8 +17,8 @@
                     </figure>
                 </div>
             </div>
-            <a class="left carousel-control" href="#carousel" data-slide="prev"><i class="icon-prev"></i></a>
-            <a class="right carousel-control" href="#carousel" data-slide="next"><i class="icon-next"></i></a>
+            <a class="left carousel-control" href="#carousel" data-slide="prev"><span class="icon-prev"></span></a>
+            <a class="right carousel-control" href="#carousel" data-slide="next"><span class="icon-next"></span></a>
         </div>
     </section><!-- #carousel -->
 
@@ -39,23 +39,23 @@
                         <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
                         <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
 
-                        <a href="#URL" itemprop="url" tabindex="-1" class="product-image">
+                        <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
                             {ifloop rel="image_product_new" }
                                 <img itemprop="image"
-                            {loop name="image_product_new" type="image" limit="1" product="{#ID}"}
-                                src="{#IMAGE_URL}"
+                            {loop name="image_product_new" type="image" limit="1" product="{$ID}"}
+                                src="{$IMAGE_URL}"
                             {/loop}
-                                alt="Product #{#LOOP_COUNT}" >
+                                alt="Product #{$LOOP_COUNT}" >
                             {/ifloop}
                             {elseloop rel="image_product_new"}
-                                {images file='assets/img/280x196.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{#LOOP_COUNT}">{/images}
+                                {images file='assets/img/280x196.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{$LOOP_COUNT}">{/images}
                             {/elseloop}
                             <span class="mask"></span>
                         </a>
 
-                        <a href="{#URL}" class="product-info">
-                            <h3 class="name"><span itemprop="name">{#TITLE}</span></h3>
-                            <div class="short-description" itemprop="description">{#CHAPO}</div>
+                        <a href="{$URL}" class="product-info">
+                            <h3 class="name"><span itemprop="name">{$TITLE}</span></h3>
+                            <div class="short-description" itemprop="description">{$CHAPO}</div>
 
                             <div class="product-price">
                                 <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
@@ -68,7 +68,7 @@
                                             preorder : http://schema.org/PreOrder
                                             online_only : http://schema.org/OnlineOnly
                                     -->
-                                    <span class="regular-price"><span itemprop="price" class="price">{currency attr="symbol"} {format_number number="{#BEST_TAXED_PRICE}"}
+                                    <span class="regular-price"><span itemprop="price" class="price">{currency attr="symbol"} {format_number number="{$BEST_TAXED_PRICE}"}
 </span></span>
                                 </div>
                             </div>
@@ -97,22 +97,22 @@
                         <meta itemprop="condition" content="new"> <!-- List of condition : new, used, refurbished -->
                         <meta itemprop="identifier" content="mpn:925872"> <!-- List of identifier : asin, isbn, mpn, upc, sku -->
 
-                        <a href="{#URL}" itemprop="url" tabindex="-1" class="product-image">
+                        <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
                             {ifloop rel="image_product_promo" }
                             <img itemprop="image"
-                                    {loop name="image_product_promo" type="image" limit="1" product="{#ID}"}
-                                        src="{#IMAGE_URL}"
+                                    {loop name="image_product_promo" type="image" limit="1" product="{$ID}"}
+                                        src="{$IMAGE_URL}"
                                     {/loop}
-                                 alt="Product #{#LOOP_COUNT}" >
+                                 alt="Product #{$LOOP_COUNT}" >
                             {/ifloop}
                             {elseloop rel="image_product_promo"}
-                                {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="Promotion #{#LOOP_COUNT}">{/images}
+                                {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="Promotion #{$LOOP_COUNT}">{/images}
                             {/elseloop}
                             <span class="mask"></span>
                         </a>
 
                         <div class="product-info">
-                            <h3 class="name"><a href="{#URL}"><span itemprop="name">{#CHAPO}</span></a></h3>
+                            <h3 class="name"><a href="{$URL}"><span itemprop="name">{$CHAPO}</span></a></h3>
                         </div>
 
                         <div class="product-price">
@@ -126,9 +126,9 @@
                                     preorder : http://schema.org/PreOrder
                                     online_only : http://schema.org/OnlineOnly
                                 -->
-                                {loop name="productSaleElements_promo" type="product_sale_elements" product="{#ID}" limit="1"}
-                                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{#TAXED_PROMO_PRICE}"} {currency attr="symbol"}</span></span>
-                                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{#TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                                {loop name="productSaleElements_promo" type="product_sale_elements" product="{$ID}" limit="1"}
+                                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$TAXED_PROMO_PRICE}"} {currency attr="symbol"}</span></span>
+                                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                                 {/loop}
                             </div>
                         </div>

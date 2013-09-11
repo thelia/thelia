@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event;
 
-
 class BaseToggleVisibilityEvent  extends ActionEvent
 {
     protected $object_id;
@@ -43,6 +42,7 @@ class BaseToggleVisibilityEvent  extends ActionEvent
     public function setObjectId($object_id)
     {
         $this->object_id = $object_id;
+
         return $this;
     }
 }

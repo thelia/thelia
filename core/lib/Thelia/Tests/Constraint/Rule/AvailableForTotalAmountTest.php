@@ -151,7 +151,6 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
 //        $this->assertEquals($expected, $actual);
 //    }
 
-
     /**
      * Check if test inferior operator is working
      *
@@ -512,7 +511,6 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
-
     /**
      * Check if test superior operator is working
      *
@@ -585,7 +583,6 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
-
     /**
      * Check currency is checked
      *
@@ -657,7 +654,6 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $actual =$isValid;
         $this->assertEquals($expected, $actual);
     }
-
 
     /**
      * Tears down the fixture, for example, closes a network connection.

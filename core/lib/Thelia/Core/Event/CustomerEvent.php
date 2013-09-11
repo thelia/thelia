@@ -43,5 +43,4 @@ class CustomerEvent extends ActionEvent
         return $this->customer;
     }
 
-
 }

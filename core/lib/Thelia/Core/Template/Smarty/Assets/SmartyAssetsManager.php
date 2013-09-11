@@ -39,9 +39,9 @@ class SmartyAssetsManager
     /**
      * Creates a new SmartyAssetsManager instance
      *
-     * @param string    $web_root                    the disk path to the web root
-     * @param string    $path_relative_to_web_root   the path (relative to web root) where the assets will be generated
-     * @param  boolean  $developmentMode             true / false. If true, assets are not cached, and always generated.
+     * @param string  $web_root                  the disk path to the web root
+     * @param string  $path_relative_to_web_root the path (relative to web root) where the assets will be generated
+     * @param boolean $developmentMode           true / false. If true, assets are not cached, and always generated.
      */
     public function __construct($web_root, $path_relative_to_web_root, $developmentMode)
     {

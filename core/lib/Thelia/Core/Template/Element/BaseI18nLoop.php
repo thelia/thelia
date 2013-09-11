@@ -24,10 +24,8 @@
 namespace Thelia\Core\Template\Element;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\Tools\ModelCriteriaTools;
 
 /**
@@ -55,10 +53,10 @@ abstract class BaseI18nLoop extends BaseLoop
     /**
      * Setup ModelCriteria for proper i18n processing
      *
-     * @param ModelCriteria $search the Propel Criteria to configure
-     * @param array $columns the i18n columns
-     * @param string $foreignTable the specified table (default  to criteria table)
-     * @param string $foreignKey the foreign key in this table (default to criteria table)
+     * @param ModelCriteria $search       the Propel Criteria to configure
+     * @param array         $columns      the i18n columns
+     * @param string        $foreignTable the specified table (default  to criteria table)
+     * @param string        $foreignKey   the foreign key in this table (default to criteria table)
      * @param bool          $forceReturn
      *
      * @return mixed the locale
@@ -66,6 +64,7 @@ abstract class BaseI18nLoop extends BaseLoop
     protected function configureI18nProcessing(ModelCriteria $search, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID', $forceReturn = false)
     {
         /* manage translations */
+
         return ModelCriteriaTools::getI18n(
             $this->getBackend_context(),
             $this->getLang(),

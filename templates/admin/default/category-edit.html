@@ -146,7 +146,7 @@
                                                     </label>
 
                                                     <div class="controls">
-                                                        <input type="text" name="id" disabled="disabled" value="#ID" />
+                                                        <input type="text" name="id" disabled="disabled" value="{$ID}" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -162,7 +162,7 @@
                                                             <option value="0">{intl l="Top level"}</option>
 
                                                             {loop name="cat-parent" type="category-tree" visible="*" category="0" exclude="{$current_category_id}"}
-                                                                 <option value="#ID" style="padding-left: {3 + $LEVEL * 20}px" {if $parent_category_id == $ID}selected="selected"{/if}>{$TITLE}</option>
+                                                                 <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $parent_category_id == $ID}selected="selected"{/if}>{$TITLE}</option>
                                                             {/loop}
 
                                                         </select>

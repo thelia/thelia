@@ -22,9 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Model\LangQuery;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 
 class CurrencyModificationForm extends CurrencyCreationForm
