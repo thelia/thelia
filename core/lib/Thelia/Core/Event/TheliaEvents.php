@@ -72,6 +72,10 @@ final class TheliaEvents
     const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
 
     /**
+     * sent when a customer need a new password
+     */
+    const LOST_PASSWORD = "action.lostPassword";
+    /**
      * Sent before the logout of the administrator.
      */
     const ADMIN_LOGOUT = "action.admin_logout";

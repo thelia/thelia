@@ -38,8 +38,13 @@
         <default key="_controller">Thelia\Controller\Front\CustomerController::logoutAction</default>
     </route>
 
-    <route id="customer.password.retrieve.view" path="/password">
+    <route id="customer.password.retrieve.view" path="/password" methods="get">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">password</default>
+    </route>
+
+    <route id="customer.password.retrieve.process" path="/password" methods="post">
+        <default key="_controller">Thelia\Controller\Front\CustomerController::newPasswordAction</default>
         <default key="_view">password</default>
     </route>
 
