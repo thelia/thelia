@@ -69,6 +69,11 @@
             
         }
 
+        // -- Bootstrap tooltip --
+        if($('[rel="tooltip"]').length){            
+            $('[rel="tooltip"]').tooltip();
+        }
+
         // -- Confirm Box --
         if($('[data-toggle="confirm"]').length){
             $('[data-toggle="confirm"]').click(function(e){		
