@@ -235,7 +235,7 @@ class BaseController extends ContainerAware
      * @throws \InvalidArgumentException When the router doesn't exist
      * @return string                    The generated URL
      */
-    protected function getRouteFromRouter($routerName, $routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH)
+    protected function getRouteFromRouter($routerName, $routeId, $parameters = array(), $referenceType = Router::RELATIVE_PATH)
     {
         /** @var Router $router */
         $router =  $this->container->get($routerName);

@@ -35,4 +35,12 @@ class CustomerController extends BaseAdminController
         if (null !== $response = $this->checkAuth("admin.customers.view")) return $response;
         return $this->render("customers", array("display_customer" => 20));
     }
+
+    public function viewAction($customer_id)
+    {
+
+    	return $this->render("customer-edit", array(
+    		"customer_id" => $customer_id
+    	));
+    }
 }
