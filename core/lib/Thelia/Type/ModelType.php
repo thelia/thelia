@@ -20,27 +20,47 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Type;
 
-namespace Thelia\Exception;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
+use Thelia\Exception\TypeException;
 
-class TaxEngineException extends \RuntimeException
+/**
+ *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ */
+class ModelType implements TypeInterface
 {
-    const UNKNOWN_EXCEPTION = 0;
+    protected $expectedModelActiveRecord = null;
 
-    const BAD_RECORDED_TYPE = 101;
-    const BAD_RECORDED_REQUIREMENTS = 102;
-
-    const UNDEFINED_PRODUCT = 501;
-    const UNDEFINED_COUNTRY = 502;
-    const UNDEFINED_TAX_RULES_COLLECTION = 503;
-
-    const BAD_AMOUNT_FORMAT = 601;
-
-    public function __construct($message, $code = null, $previous = null)
+    /**
+     * @param $expectedModelActiveRecord
+     * @throws TypeException
+     */
+    public function __construct($expectedModelActiveRecord)
     {
-        if ($code === null) {
-            $code = self::UNKNOWN_EXCEPTION;
+        $class = '\\Thelia\\Model\\' . $expectedModelActiveRecord;
+
+        if(!(class_exists($class) && new $class instanceof ActiveRecordInterface)) {
+            throw new TypeException('MODEL NOT FOUND', TypeException::MODEL_NOT_FOUND);
         }
-        parent::__construct($message, $code, $previous);
+
+        $this->expectedModelActiveRecord = $class;
+    }
+
+    public function getType()
+    {
+        return 'Model type';
+    }
+
+    public function isValid($value)
+    {
+        return $value instanceof $this->expectedModelActiveRecord;
+    }
+
+    public function getFormattedValue($value)
+    {
+        return $this->isValid($value) ? $value : null;
     }
 }

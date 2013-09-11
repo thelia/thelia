@@ -20,27 +20,26 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\TaxEngine\TaxType;
 
-namespace Thelia\Exception;
+use Thelia\Type\FloatType;
 
-class TaxEngineException extends \RuntimeException
+/**
+ *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ */
+class PricePercentTaxType extends BaseTaxType
 {
-    const UNKNOWN_EXCEPTION = 0;
-
-    const BAD_RECORDED_TYPE = 101;
-    const BAD_RECORDED_REQUIREMENTS = 102;
-
-    const UNDEFINED_PRODUCT = 501;
-    const UNDEFINED_COUNTRY = 502;
-    const UNDEFINED_TAX_RULES_COLLECTION = 503;
-
-    const BAD_AMOUNT_FORMAT = 601;
-
-    public function __construct($message, $code = null, $previous = null)
+    public function calculate($untaxedPrice)
     {
-        if ($code === null) {
-            $code = self::UNKNOWN_EXCEPTION;
-        }
-        parent::__construct($message, $code, $previous);
+        return $untaxedPrice * $this->getRequirement("percent") * 0.01;
+    }
+
+    public function getRequirementsList()
+    {
+        return array(
+            'percent' => new FloatType(),
+        );
     }
 }

@@ -20,7 +20,6 @@ use Thelia\Model\Map\TaxTableMap;
 class TaxRuleQuery extends BaseTaxRuleQuery
 {
     const ALIAS_FOR_TAX_RULE_COUNTRY_POSITION = 'taxRuleCountryPosition';
-    const ALIAS_FOR_TAX_RATE_SUM = 'taxRateSum';
 
     public function getTaxCalculatorGroupedCollection(Product $product, Country $country)
     {
@@ -29,12 +28,10 @@ class TaxRuleQuery extends BaseTaxRuleQuery
                 TaxRuleCountryQuery::create()
                     ->filterByCountry($country, Criteria::EQUAL)
                     ->filterByTaxRuleId($product->getTaxRuleId())
-                    ->groupByPosition()
                     ->orderByPosition()
                     ->find()
             )
             ->withColumn(TaxRuleCountryTableMap::POSITION, self::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION)
-            ->withColumn('ROUND(SUM(' . TaxTableMap::RATE . '), 2)', self::ALIAS_FOR_TAX_RATE_SUM)
         ;
 
         return $search->find();

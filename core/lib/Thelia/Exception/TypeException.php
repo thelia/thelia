@@ -23,18 +23,11 @@
 
 namespace Thelia\Exception;
 
-class TaxEngineException extends \RuntimeException
+class TypeException extends \RuntimeException
 {
     const UNKNOWN_EXCEPTION = 0;
 
-    const BAD_RECORDED_TYPE = 101;
-    const BAD_RECORDED_REQUIREMENTS = 102;
-
-    const UNDEFINED_PRODUCT = 501;
-    const UNDEFINED_COUNTRY = 502;
-    const UNDEFINED_TAX_RULES_COLLECTION = 503;
-
-    const BAD_AMOUNT_FORMAT = 601;
+    const MODEL_NOT_FOUND = 404;
 
     public function __construct($message, $code = null, $previous = null)
     {

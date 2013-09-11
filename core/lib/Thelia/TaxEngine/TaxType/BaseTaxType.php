@@ -20,27 +20,64 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\TaxEngine\TaxType;
 
-namespace Thelia\Exception;
+use Thelia\Type\TypeInterface;
 
-class TaxEngineException extends \RuntimeException
+/**
+ *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ */
+abstract class BaseTaxType
 {
-    const UNKNOWN_EXCEPTION = 0;
+    protected $requirements = null;
 
-    const BAD_RECORDED_TYPE = 101;
-    const BAD_RECORDED_REQUIREMENTS = 102;
+    public abstract function calculate($untaxedPrice);
 
-    const UNDEFINED_PRODUCT = 501;
-    const UNDEFINED_COUNTRY = 502;
-    const UNDEFINED_TAX_RULES_COLLECTION = 503;
+    public abstract function getRequirementsList();
 
-    const BAD_AMOUNT_FORMAT = 601;
-
-    public function __construct($message, $code = null, $previous = null)
+    public function loadRequirements($requirementsValues)
     {
-        if ($code === null) {
-            $code = self::UNKNOWN_EXCEPTION;
+        $this->requirements = $this->getRequirementsList();
+
+        if(!is_array($this->requirements)) {
+            //@todo throw sg
+            exit('err_1');
         }
-        parent::__construct($message, $code, $previous);
+
+        foreach($this->requirements as $requirement => $requirementType) {
+            if(!$requirementType instanceof TypeInterface) {
+                //@todo throw sg
+                exit('err_2');
+            }
+
+            if(!array_key_exists($requirement, $requirementsValues)) {
+                //@todo throw sg
+                exit('err_3');
+            }
+
+            if(!$requirementType->isValid($requirementsValues[$requirement])) {
+                //@todo throw sg
+                exit('err_4');
+            }
+
+            $this->requirements[$requirement] = $requirementsValues[$requirement];
+        }
+    }
+
+    public function getRequirement($key)
+    {
+        if($this->requirements === null) {
+            //@todo throw sg
+            exit('err_5');
+        }
+
+        if(!array_key_exists($key, $this->requirements)) {
+            //@todo throw sg
+            exit('err_6');
+        }
+
+        return $this->requirements[$key];
     }
 }

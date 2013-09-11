@@ -111,7 +111,8 @@ DROP TABLE IF EXISTS `tax`;
 CREATE TABLE `tax`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `rate` FLOAT NOT NULL,
+    `type` VARCHAR(255) NOT NULL,
+    `serialized_requirements` TEXT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)

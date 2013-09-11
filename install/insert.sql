@@ -17,7 +17,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('image_cache_dir_from_web_root', 'cache/images', 0, 0, NOW(), NOW()),
 ('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', 0, 0, NOW(), NOW()),
 ('page_not_found_view', '404.html', 0, 0, NOW(), NOW()),
-('use_tax_free_amounts', 1, 1, 0, NOW(), NOW());
+('use_tax_free_amounts', 0, 1, 0, NOW(), NOW());
 
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
@@ -1112,9 +1112,9 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (268, 'es_ES', 'USA - Alabama', '', '', ''),
 (268, 'fr_FR', 'USA - Alabama', '', '', '');
 
-INSERT INTO  `tax` (`id`, `rate`, `created_at`, `updated_at`)
+INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `updated_at`)
   VALUES
-  (1, '19.6', NOW(), NOW());
+  (1, 'PricePercentTaxType', 'eyJwZXJjZW50IjoxOS42fQ==', NOW(), NOW());
 
 INSERT INTO `tax_i18n` (`id`, `locale`, `title`)
   VALUES
