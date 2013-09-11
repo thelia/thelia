@@ -37,24 +37,19 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
 
+    {javascripts file='assets/js/coupon.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
     <script>
         $(function($){
             miniBrowser(0, '/test_to_remove/datas_coupon_edit.json');
 
-            Array.prototype.clean = function(deleteValue) {
-                for (var i = 0; i < this.length; i++) {
-                    if (this[i] == deleteValue) {
-                        this.splice(i, 1);
-                        i--;
-                    }
-                }
-                return this;
-            };
-
             // Init Rules
-            var initRules = function() {
+            couponManager.initRules = function() {
                 var rules = [];
                 {foreach from=$rulesObject key=k item=rule}
+                    // Init rule
                     var rule = {};
                     rule['serviceId'] = '{$rule.serviceId nofilter}';
                     rule['operators'] = {};
@@ -64,19 +59,24 @@
                         rule['operators']['{$input nofilter}'] = '{$operator nofilter}';
                         rule['values']['{$input nofilter}'] = '{$rule.validators.setValues[$input] nofilter}';
                     {/foreach}
+
+                    // Add rule
                     rules.push(rule);
                 {/foreach}
 
                 return rules;
-            }
+            };
 
             // Save Rules AJAX
-            var saveRuleAjax = function() {
+            couponManager.saveRuleAjax = function() {
+                $('#constraint-add-operators-values').html('<div class="loading" ></div>');
+                console.log('about to save');
+                console.log(couponManager.rulesToSave);
                 var $url = '{$urlAjaxUpdateRules}';
                 $.ajax({
                     type: "POST",
                     url: $url,
-                    data: {literal}{{/literal}rules:JSON.stringify(rulesToSave){literal}}{/literal},
+                    data: {literal}{{/literal}rules:JSON.stringify(couponManager.rulesToSave){literal}}{/literal},
                     statusCode: {
                         404: function() {
                             $('#constraint-add-operators-values').html(
@@ -87,72 +87,13 @@
                 }).done(function(data) {
                     $('#constraint-list').html(data);
                     $('#constraint-add-operators-values').html('');
+                    couponManager.onClickUpdateRule();
+                    couponManager.onClickDeleteRule();
                 });
-            }
-
-            // Remove 1 Rule then Save Rules AJAX
-            var removeRuleAjax = function(id) {
-                // Delete rule in temporary array
-                delete rulesToSave[id];
-                rulesToSave.clean(undefined);
-
-                // Save
-                saveRuleAjax();
-            }
-
-            // Add 1 Rule / or update the temporary Rules array then Save Rules via AJAX
-            var addRuleAjax = function(id) {
-                // If update
-                if(typeof id === 'number' && id % 1 == 0) {
-                    rulesToSave[id] = ruleToSave;
-                } else { // If create
-                    rulesToSave.push(ruleToSave);
-                }
-
-                // Save
-                saveRuleAjax();
-            }
-
-            // Set rule inputs to allow editing
-            var updateRuleAjax = function(id) {
-                ruleToSave = rulesToSave[id];
-                var ruleToUpdate = ruleToSave;
-
-                // Deleting this rule, we will reset it
-                delete rulesToSave[id];
-
-                // Set the rule seletor
-                $("#category-rule option").filter(function() {
-                    return $(this).val() == ruleToSave.serviceId;
-                }).prop('selected', true);
-
-                // Force rule input refresh
-                loadRuleInputs(ruleToSave.serviceId, ruleToUpdate, function(ruleToUpdate) {
-                    fillInRuleInputs(ruleToUpdate);
-                });
-            }
-
-            // Fill in rule inputs
-            var fillInRuleInputs = function(ruleToUpdate) {
-                var valueId = null;
-                var operatorId = null;
-
-                for (idName in ruleToUpdate.operators) {
-                    // Setting idName operator input
-                    operatorId = idName + '-operator';
-                    $('#' + operatorId).val(ruleToUpdate.operators[idName]);
-                    // Setting idName value input
-                    valueId = idName + '-value';
-                    $('#' + valueId).val(ruleToUpdate.values[idName]);
-                }
-            }
-
-
-
-
+            };
 
             // Reload rule inputs
-            var loadRuleInputs = function(ruleId, ruleToSave, callBack) {
+            couponManager.loadRuleInputs = function(ruleId, callBack) {
                 $('#constraint-add-operators-values').html('<div class="loading" ></div>');
                 var url = "{$urlAjaxGetRuleInput}";
                 url = url.replace('ruleId', ruleId)
@@ -167,71 +108,13 @@
                     }
                 }).done(function(data) {
                     $('#constraint-add-operators-values').html(data);
-                    return callBack(ruleToSave);
+
+                    return callBack();
                 });
-            }
-
-
-            // Save rules on click
-            var onClickSaveRule = function() {
-                $('#constraint-save-btn').on('click', function (e) {
-                    addRuleAjax();
-                });
-            }
-            onClickSaveRule();
-
-            // Remove rule on click
-            var onClickDeleteRule = function() {
-                $('.constraint-delete-btn').on('click', function (e) {
-                    e.preventDefault();
-                    var $this = $(this);
-                    removeRuleAjax($this.attr('data-int'));
-                });
-            }
-            onClickDeleteRule();
-
-            // Update rule on click
-            var onClickUpdateRule = function() {
-                $('.constraint-update-btn').on('click', function (e) {
-                    e.preventDefault();
-                    var $this = $(this);
-                    updateRuleAjax($this.attr('data-int'));
-
-                    // Hide row being updated
-                    $this.parent().parent().remove();
-                });
-            }
-            onClickUpdateRule();
-
-            // Reload effect inputs when changing effect
-            var onEffectChange = function() {
-                $('#effect').on('change', function (e) {
-                    var optionSelected = $("option:selected", this);
-                    $('#effectToolTip').html(optionSelected.attr("data-description"));
-                });
-            }
-            onEffectChange();
-
-            // Reload rule inputs when changing effect
-            var onRuleChange = function() {
-                $('#category-rule').on('change', function (e) {
-                    loadRuleInputs($(this).val(), null, function(ruleToSave) {literal}{}{/literal});
-                });
-            }
-            onRuleChange();
-
-            // Fill in ready to be saved rule array
-            // var onInputsChange = function()
-            // In AJAX response
-
-
+            };
 
             // Rules which will be saved
-            var rulesToSave = initRules();
+            couponManager.rulesToSave = couponManager.initRules();
         });
-
-        // Rule to save
-        var ruleToSave = {literal}{}{/literal};
-
     </script>
 {/block}
