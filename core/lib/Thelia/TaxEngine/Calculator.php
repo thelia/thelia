@@ -75,6 +75,11 @@ class Calculator
 
     public function getTaxAmount($untaxedPrice)
     {
+        return $this->getTaxedPrice($untaxedPrice) - $untaxedPrice;
+    }
+
+    public function getTaxedPrice($untaxedPrice)
+    {
         if(null === $this->taxRulesCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxAmount', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
         }
@@ -105,10 +110,5 @@ class Calculator
         $taxedPrice += $currentTax;
 
         return $taxedPrice;
-    }
-
-    public function getTaxedPrice($untaxedPrice)
-    {
-        return $untaxedPrice + $this->getTaxAmount($untaxedPrice);
     }
 }
