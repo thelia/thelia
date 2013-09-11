@@ -24,11 +24,13 @@ namespace Thelia\Controller\Front;
 
 use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\CustomerLoginEvent;
+use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Thelia\Form\CustomerCreation;
 use Thelia\Form\CustomerLogin;
+use Thelia\Form\CustomerLostPasswordForm;
 use Thelia\Form\CustomerModification;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
@@ -44,6 +46,42 @@ use Thelia\Core\Security\Exception\WrongPasswordException;
  */
 class CustomerController extends BaseFrontController
 {
+    use \Thelia\Cart\CartTrait;
+
+    public function newPasswordAction()
+    {
+        if (! $this->getSecurityContext()->hasCustomerUser()) {
+            $message = false;
+
+            $passwordLost = new CustomerLostPasswordForm($this->getRequest());
+
+            try {
+
+                $form = $this->validateForm($passwordLost);
+
+                $event = new LostPasswordEvent($form->get("email")->getData());
+
+                $this->dispatch(TheliaEvents::LOST_PASSWORD, $event);
+
+            } catch (FormValidationException $e) {
+                $message = sprintf("Please check your input: %s", $e->getMessage());
+            } catch (\Exception $e) {
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+            }
+
+            if ($message !== false) {
+                Tlog::getInstance()->error(sprintf("Error during customer creation process : %s. Exception was %s", $message, $e->getMessage()));
+
+                $passwordLost->setErrorMessage($message);
+
+                $this->getParserContext()
+                    ->addForm($passwordLost)
+                    ->setGeneralError($message)
+                ;
+            }
+        }
+    }
+
     /**
      * Create a new customer.
      * On success, redirect to success_url if exists, otherwise, display the same view again.
@@ -65,7 +103,12 @@ class CustomerController extends BaseFrontController
 
                 $this->processLogin($customerCreateEvent->getCustomer());
 
-                $this->redirectSuccess($customerCreation);
+                $cart = $this->getCart($this->getRequest());
+                if($cart->getCartItems()->count() > 0) {
+                    $this->redirectToRoute("cart.view");
+                } else {
+                    $this->redirectSuccess($customerCreation);
+                }
             } catch (FormValidationException $e) {
                 $message = sprintf("Please check your input: %s", $e->getMessage());
             } catch (\Exception $e) {
@@ -232,7 +275,7 @@ class CustomerController extends BaseFrontController
             $data["country"],
             isset($data["email"])?$data["email"]:null,
             isset($data["password"]) ? $data["password"]:null,
-            $this->getRequest()->getSession()->getLang(),
+            $this->getRequest()->getSession()->getLang()->getId(),
             isset($data["reseller"])?$data["reseller"]:null,
             isset($data["sponsor"])?$data["sponsor"]:null,
             isset($data["discount"])?$data["discount"]:null
