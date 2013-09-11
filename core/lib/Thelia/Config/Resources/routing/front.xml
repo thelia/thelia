@@ -34,7 +34,7 @@
         <default key="_view">login</default>
     </route>
 
-    <route id="customer.logout.process" path="/customer/logout">
+    <route id="customer.logout.process" path="/logout">
         <default key="_controller">Thelia\Controller\Front\CustomerController::logoutAction</default>
     </route>
 

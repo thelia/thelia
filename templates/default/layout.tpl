@@ -84,8 +84,15 @@ URL: http://www.thelia.net
                     {/loop}
                 </ul>
                 <ul class="nav navbar-nav navbar-cart navbar-right">
+                    {loop type="auth" name="customer_info_block" roles="CUSTOMER" context="front"}
+                        <li><a href="{url path="/logout"}" class="register">{intl l="Log out!"}</a></li>
+                        <li><a href="{url path="/customer/account"}" class="login">{intl l="My Account"}</a></li>
+                    {/loop}
+
+                    {elseloop rel="customer_info_block" rel="customer_info_block"}
                     <li><a href="{url path="/register"}" class="register">{intl l="Register"}!</a></li>
                     <li><a href="{url path="/login"}" class="login">{intl l="Log In!"}</a></li>
+                    {/elseloop}
                     <li class="dropdown">
                         <a href="cart.html" class="dropdown-toggle cart" data-toggle="dropdown">
                             Cart <span class="badge">2</span>
