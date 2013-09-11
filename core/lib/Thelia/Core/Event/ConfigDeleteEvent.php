@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event;
 
-use Thelia\Model\Config;
-
 class ConfigDeleteEvent extends ConfigEvent
 {
     protected $config_id;

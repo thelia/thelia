@@ -47,7 +47,12 @@ class Session extends BaseSession
      */
     public function getLang($forceDefault = true)
     {
-        return $this->get("thelia.current.lang", $forceDefault ? Lang::getDefaultLanguage():null);
+        $lang = $this->get("thelia.current.lang");
+        if(null === $lang && $forceDefault)
+        {
+            $lang = Lang::getDefaultLanguage();
+        }
+        return $lang;
     }
 
     public function setLang(Lang $lang)
@@ -59,7 +64,12 @@ class Session extends BaseSession
 
     public function getAdminEditionLang()
     {
-        return $this->get('thelia.admin.edition.lang', Lang::getDefaultLanguage());
+        $lang = $this->get('thelia.admin.edition.lang');
+
+        if (null === $lang) {
+            $lang =  Lang::getDefaultLanguage();
+        }
+        return $lang;
     }
 
     public function setAdminEditionLang($langId)
@@ -76,7 +86,13 @@ class Session extends BaseSession
 
     public function getCurrency($forceDefault = true)
     {
-        return $this->get("thelia.current.currency", $forceDefault ? Currency::getDefaultCurrency():null);
+        $currency = $this->get("thelia.current.currency");
+
+        if(null === $currency && $forceDefault)
+        {
+            $currency = Currency::getDefaultCurrency();
+        }
+        return $currency;
     }
 
     // -- Customer user --------------------------------------------------------
@@ -84,6 +100,7 @@ class Session extends BaseSession
     public function setCustomerUser(UserInterface $user)
     {
         $this->set('thelia.customer_user', $user);
+
         return $this;
     }
 
@@ -102,6 +119,7 @@ class Session extends BaseSession
     public function setAdminUser(UserInterface $user)
     {
         $this->set('thelia.admin_user', $user);
+
         return $this;
     }
 
@@ -120,6 +138,7 @@ class Session extends BaseSession
     public function setReturnToUrl($url)
     {
         $this->set('thelia.return_to_url', $url);
+
         return $this;
     }
 
@@ -180,6 +199,7 @@ class Session extends BaseSession
     public function setCart($cart_id)
     {
         $this->set("thelia.cart_id", $cart_id);
+
         return $this;
     }
 
@@ -192,6 +212,7 @@ class Session extends BaseSession
     public function setDelivery($delivery_id)
     {
         $this->set("thelia.delivery_id", $delivery_id);
+
         return $this;
     }
 

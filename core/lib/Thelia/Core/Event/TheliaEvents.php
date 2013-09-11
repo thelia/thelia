@@ -204,8 +204,6 @@ final class TheliaEvents
      */
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
 
-
-
     /**
      * Sent when creating a Coupon
      */

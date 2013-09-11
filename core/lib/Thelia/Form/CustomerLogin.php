@@ -22,12 +22,9 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
-use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\CustomerQuery;
 
 class CustomerLogin extends BaseForm
 {

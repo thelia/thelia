@@ -29,7 +29,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Model\Tools\ModelCriteriaTools;
 
 /**
  *

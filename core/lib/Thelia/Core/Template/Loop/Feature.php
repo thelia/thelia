@@ -34,7 +34,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\Base\CategoryQuery;
 use Thelia\Model\Base\ProductCategoryQuery;
 use Thelia\Model\Base\FeatureQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductCategoryTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;

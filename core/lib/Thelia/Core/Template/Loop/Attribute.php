@@ -24,21 +24,16 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
-
-use Thelia\Model\Base\LangQuery;
 
 use Thelia\Model\Base\CategoryQuery;
 use Thelia\Model\Base\ProductCategoryQuery;
 use Thelia\Model\Base\AttributeQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductCategoryTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -113,17 +108,17 @@ class Attribute extends BaseI18nLoop
         $product = $this->getProduct();
         $category = $this->getCategory();
 
-        if(null !== $product) {
+        if (null !== $product) {
             $productCategories = ProductCategoryQuery::create()->select(array(ProductCategoryTableMap::CATEGORY_ID))->filterByProductId($product, Criteria::IN)->find()->getData();
 
-            if(null === $category) {
+            if (null === $category) {
                 $category = $productCategories;
             } else {
                 $category = array_merge($category, $productCategories);
             }
         }
 
-        if(null !== $category) {
+        if (null !== $category) {
             $search->filterByCategory(
                 CategoryQuery::create()->filterById($category)->find(),
                 Criteria::IN
@@ -132,7 +127,7 @@ class Attribute extends BaseI18nLoop
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');

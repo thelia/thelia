@@ -130,7 +130,6 @@ class ConstraintFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
-
     /**
      * Check the Rules serialization module
      */
@@ -180,8 +179,8 @@ class ConstraintFactoryTest extends \PHPUnit_Framework_TestCase
         $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
         $unserializedRules = $constraintFactory->unserializeCouponRuleCollection($serializedRules);
 
-        $expected = (string)$rules;
-        $actual = (string)$unserializedRules;
+        $expected = (string) $rules;
+        $actual = (string) $unserializedRules;
 
         $this->assertEquals($expected, $actual);
     }

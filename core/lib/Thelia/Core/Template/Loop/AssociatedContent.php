@@ -77,15 +77,15 @@ class AssociatedContent extends Content
         $product = $this->getProduct();
         $category = $this->getCategory();
 
-        if($product === null && $category === null) {
+        if ($product === null && $category === null) {
             throw new \InvalidArgumentException('You have to provide either `product` or `category` argument in associated_content loop');
         }
 
-        if($product !== null) {
+        if ($product !== null) {
             $search = ProductAssociatedContentQuery::create();
 
             $search->filterByProductId($product, Criteria::EQUAL);
-        } elseif($category !== null) {
+        } elseif ($category !== null) {
             $search = CategoryAssociatedContentQuery::create();
 
             $search->filterByCategoryId($category, Criteria::EQUAL);

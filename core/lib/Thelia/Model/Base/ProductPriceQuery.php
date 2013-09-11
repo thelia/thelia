@@ -21,7 +21,6 @@ use Thelia\Model\Map\ProductPriceTableMap;
  *
  *
  *
- * @method     ChildProductPriceQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildProductPriceQuery orderByProductSaleElementsId($order = Criteria::ASC) Order by the product_sale_elements_id column
  * @method     ChildProductPriceQuery orderByCurrencyId($order = Criteria::ASC) Order by the currency_id column
  * @method     ChildProductPriceQuery orderByPrice($order = Criteria::ASC) Order by the price column
@@ -29,7 +28,6 @@ use Thelia\Model\Map\ProductPriceTableMap;
  * @method     ChildProductPriceQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProductPriceQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildProductPriceQuery groupById() Group by the id column
  * @method     ChildProductPriceQuery groupByProductSaleElementsId() Group by the product_sale_elements_id column
  * @method     ChildProductPriceQuery groupByCurrencyId() Group by the currency_id column
  * @method     ChildProductPriceQuery groupByPrice() Group by the price column
@@ -52,7 +50,6 @@ use Thelia\Model\Map\ProductPriceTableMap;
  * @method     ChildProductPrice findOne(ConnectionInterface $con = null) Return the first ChildProductPrice matching the query
  * @method     ChildProductPrice findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProductPrice matching the query, or a new ChildProductPrice object populated from the query conditions when no match is found
  *
- * @method     ChildProductPrice findOneById(int $id) Return the first ChildProductPrice filtered by the id column
  * @method     ChildProductPrice findOneByProductSaleElementsId(int $product_sale_elements_id) Return the first ChildProductPrice filtered by the product_sale_elements_id column
  * @method     ChildProductPrice findOneByCurrencyId(int $currency_id) Return the first ChildProductPrice filtered by the currency_id column
  * @method     ChildProductPrice findOneByPrice(double $price) Return the first ChildProductPrice filtered by the price column
@@ -60,7 +57,6 @@ use Thelia\Model\Map\ProductPriceTableMap;
  * @method     ChildProductPrice findOneByCreatedAt(string $created_at) Return the first ChildProductPrice filtered by the created_at column
  * @method     ChildProductPrice findOneByUpdatedAt(string $updated_at) Return the first ChildProductPrice filtered by the updated_at column
  *
- * @method     array findById(int $id) Return ChildProductPrice objects filtered by the id column
  * @method     array findByProductSaleElementsId(int $product_sale_elements_id) Return ChildProductPrice objects filtered by the product_sale_elements_id column
  * @method     array findByCurrencyId(int $currency_id) Return ChildProductPrice objects filtered by the currency_id column
  * @method     array findByPrice(double $price) Return ChildProductPrice objects filtered by the price column
@@ -114,10 +110,10 @@ abstract class ProductPriceQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj  = $c->findPk(12, $con);
+     * $obj = $c->findPk(array(12, 34), $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param array[$product_sale_elements_id, $currency_id] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildProductPrice|array|mixed the result, formatted by the current formatter
@@ -127,7 +123,7 @@ abstract class ProductPriceQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = ProductPriceTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = ProductPriceTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
@@ -155,10 +151,11 @@ abstract class ProductPriceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PRODUCT_SALE_ELEMENTS_ID, CURRENCY_ID, PRICE, PROMO_PRICE, CREATED_AT, UPDATED_AT FROM product_price WHERE ID = :p0';
+        $sql = 'SELECT PRODUCT_SALE_ELEMENTS_ID, CURRENCY_ID, PRICE, PROMO_PRICE, CREATED_AT, UPDATED_AT FROM product_price WHERE PRODUCT_SALE_ELEMENTS_ID = :p0 AND CURRENCY_ID = :p1';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
+            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -168,7 +165,7 @@ abstract class ProductPriceQuery extends ModelCriteria
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
             $obj = new ChildProductPrice();
             $obj->hydrate($row);
-            ProductPriceTableMap::addInstanceToPool($obj, (string) $key);
+            ProductPriceTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
         }
         $stmt->closeCursor();
 
@@ -197,7 +194,7 @@ abstract class ProductPriceQuery extends ModelCriteria
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(12, 56, 832), $con);
+     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     ConnectionInterface $con an optional connection object
@@ -227,8 +224,10 @@ abstract class ProductPriceQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
+        $this->addUsingAlias(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(ProductPriceTableMap::CURRENCY_ID, $key[1], Criteria::EQUAL);
 
-        return $this->addUsingAlias(ProductPriceTableMap::ID, $key, Criteria::EQUAL);
+        return $this;
     }
 
     /**
@@ -240,49 +239,17 @@ abstract class ProductPriceQuery extends ModelCriteria
      */
     public function filterByPrimaryKeys($keys)
     {
-
-        return $this->addUsingAlias(ProductPriceTableMap::ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductPriceQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(ProductPriceTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(ProductPriceTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
+        if (empty($keys)) {
+            return $this->add(null, '1<>1', Criteria::CUSTOM);
+        }
+        foreach ($keys as $key) {
+            $cton0 = $this->getNewCriterion(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(ProductPriceTableMap::CURRENCY_ID, $key[1], Criteria::EQUAL);
+            $cton0->addAnd($cton1);
+            $this->addOr($cton0);
         }
 
-        return $this->addUsingAlias(ProductPriceTableMap::ID, $id, $comparison);
+        return $this;
     }
 
     /**
@@ -699,7 +666,9 @@ abstract class ProductPriceQuery extends ModelCriteria
     public function prune($productPrice = null)
     {
         if ($productPrice) {
-            $this->addUsingAlias(ProductPriceTableMap::ID, $productPrice->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond0', $this->getAliasedColName(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID), $productPrice->getProductSaleElementsId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(ProductPriceTableMap::CURRENCY_ID), $productPrice->getCurrencyId(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 
         return $this;

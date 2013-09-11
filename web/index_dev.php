@@ -32,19 +32,20 @@ $env = 'dev';
 require __DIR__ . '/../core/bootstrap.php';
 
 // List of allowed IP
-//$trustedIp = array(
-//  '::1',
-//  '127.0.0.1'
-//);
+$trustedIp = array(
+  '::1',
+  '127.0.0.1',
+  '192.168.56.1'
+);
 
 $request = Request::createFromGlobals();
 $thelia = new Thelia("dev", true);
 
-//if ( false === in_array($request->getClientIp(), $trustedIp)) {
-//    // Redirect 401 Unauthorized
-//    $response = new Response('Unauthorized', 401);
-//    $thelia->terminate($request, $response);
-//}
+if ( false === in_array($request->getClientIp(), $trustedIp)) {
+    // Redirect 401 Unauthorized
+    $response = new Response('Unauthorized', 401);
+    $thelia->terminate($request, $response);
+}
 
 $response = $thelia->handle($request)->prepare($request)->send();
 

@@ -1,9 +1,3 @@
-<html>
-<head>
-    {debugbar_renderHead}
-</head>
-<body>
-
 <h1>Category page</h1>
 
 <div style="border: solid 8px; margin: 0px; padding: 0px; width: 45%; float: left">
@@ -12,13 +6,13 @@
 
 {loop name="category0" type="category" parent="0" order="manual"}
 <div style="border: solid 4px blue; padding: 20px; margin: 10px;">
-    <h2>CATEGORY : #TITLE (#LOOP_COUNT / #LOOP_TOTAL)</h2>
+    <h2>CATEGORY : {$TITLE} ({$LOOP_COUNT} / {$LOOP_TOTAL})</h2>
 
     {ifloop rel="prod_ass_cont"}
         <h5>Associated Content</h5>
         <ul>
-            {loop name="prod_ass_cont" type="associated_content" category="#ID" order="associated_content"}
-            <li>#TITLE</li>
+            {loop name="prod_ass_cont" type="associated_content" category="$ID" order="associated_content"}
+            <li>{$TITLE}</li>
             {/loop}
         </ul>
     {/ifloop}
@@ -26,23 +20,23 @@
         <h5>No associated content</h5>
     {/elseloop}
 
-    {loop name="product" type="product" category="#ID"}
+    {loop name="product" type="product" category="$ID"}
     <div style="border: dashed 2px red; padding: 20px; margin: 10px;">
-        <h3><a href="#URL">PRODUCT #ID : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
-        <h4>#TITLE</h4>
-        <p>#DESCRIPTION</p>
+        <h3><a href="{$URL}">PRODUCT {$ID} : {$REF} ({$LOOP_COUNT} / {$LOOP_TOTA}L)</a></h3>
+        <h4>{$TITLE}</h4>
+        <p>{$DESCRIPTION}</p>
 
-        <p>Starting by #BEST_PRICE € HT (TAX : #BEST_PRICE_TAX ; #BEST_TAXED_PRICE € TTC)</p>
+        <p>Starting by {$BEST_PRICE} € HT (TAX : {$BEST_PRICE_TAX} ; {$BEST_TAXED_PRICE} € TTC)</p>
 
         {ifloop rel="ft"}
             <h5>Features</h5>
             <ul>
-                {assign var=current_product value=#ID}
-                {loop name="ft" type="feature" order="manual" product="#ID"}
+                {assign var=current_product value=$ID}
+                {loop name="ft" type="feature" order="manual" product="$ID"}
                 <li>
-                    <strong>#TITLE</strong> :
-                    {loop name="ft_v" type="feature_value" product="{$current_product}" feature="#ID"}
-                        #TITLE / #PERSONAL_VALUE
+                    <strong>{$TITLE}</strong> :
+                    {loop name="ft_v" type="feature_value" product="{$current_product}" feature="{$ID}"}
+                        {$TITLE} / {$PERSONAL_VALUE}
                     {/loop}
                 </li>
                 {/loop}
@@ -53,15 +47,15 @@
         {/elseloop}
     </div>
     {/loop}
-    {loop name="catgory1" type="category" parent="#ID"}
+    {loop name="catgory1" type="category" parent="$ID"}
     <div style="border: double 4px lightseagreen; padding: 20px; margin: 10px;">
-        <h3>SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
+        <h3>SUBCATEGORY : {$TITLE}  ({$LOOP_COUNT} / {$LOOP_TOTAL})</h3>
 
         {ifloop rel="prod_ass_cont"}
             <h5>Associated Content</h5>
             <ul>
-                {loop name="prod_ass_cont" type="associated_content" category="#ID" order="associated_content"}
-                <li>#TITLE</li>
+                {loop name="prod_ass_cont" type="associated_content" category="$ID" order="associated_content"}
+                <li>{$TITLE}</li>
                 {/loop}
             </ul>
         {/ifloop}
@@ -69,22 +63,22 @@
             <h5>No associated content</h5>
         {/elseloop}
 
-        {loop name="product" type="product" category="#ID"}
+        {loop name="product" type="product" category="$ID"}
 
             <div style="border: solid 1px green; padding: 20px; margin: 10px;">
-                <h3><a href="#URL">PRODUCT #ID : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
-                <h4>#TITLE</h4>
-                <p>#DESCRIPTION</p>
+                <h3><a href="{$URL}">PRODUCT {$ID} : {$REF} ({$LOOP_COUNT} / {$LOOP_TOTAL})</a></h3>
+                <h4>{$TITLE}</h4>
+                <p>{$DESCRIPTION}</p>
 
                 {ifloop rel="ft"}
                 <h5>Features</h5>
                 <ul>
-                    {assign var=current_product value=#ID}
-                    {loop name="ft" type="feature" order="manual" product="#ID"}
+                    {assign var=current_product value=$ID}
+                    {loop name="ft" type="feature" order="manual" product="$ID"}
                     <li>
-                        <strong>#TITLE</strong> :
-                        {loop name="ft_v" type="feature_value" product="{$current_product}" feature="#ID"}
-                        #TITLE / #PERSONAL_VALUE
+                        <strong>{$TITLE}</strong> :
+                        {loop name="ft_v" type="feature_value" product="{$current_product}" feature="$ID"}
+                        {$TITLE} / {$PERSONAL_VALUE}
                         {/loop}
                     </li>
                     {/loop}
@@ -109,10 +103,10 @@
 <ul>
     {loop name="ft" type="feature" order="manual"}
     <li>
-        #TITLE
+        {$TITLE}
         <ul>
-            {loop name="ftav" type="feature_availability" order="manual" feature="#ID"}
-                <li>#TITLE</li>
+            {loop name="ftav" type="feature_availability" order="manual" feature="$ID"}
+                <li>{$TITLE}</li>
             {/loop}
         </ul>
     </li>
@@ -126,10 +120,10 @@
 <ul>
     {loop name="attr" type="attribute" order="manual"}
     <li>
-        #TITLE
+        {$TITLE}
         <ul>
-            {loop name="attrav" type="attribute_availability" order="manual" attribute="#ID"}
-            <li>#TITLE</li>
+            {loop name="attrav" type="attribute_availability" order="manual" attribute="$ID"}
+            <li>{$TITLE}</li>
             {/loop}
         </ul>
     </li>
@@ -143,13 +137,9 @@
 <ul>
     {loop name="cur" type="currency"}
     <li>
-        #NAME (#SYMBOL)
+        {$NAME} ({$SYMBOL})
     </li>
     {/loop}
 </ul>
 
 </div>
-
-    {debugbar_render}
-</body>
-</html>

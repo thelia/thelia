@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
-use Thelia\Model\Config;
 
 class ConfigCreateEvent extends ConfigEvent
 {

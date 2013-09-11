@@ -32,7 +32,6 @@ use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\Element\Exception\InvalidElementException;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Security\SecurityContext;
 
 class TheliaLoop extends AbstractSmartyPlugin
@@ -70,7 +69,7 @@ class TheliaLoop extends AbstractSmartyPlugin
      */
     public static function getPagination($loopId)
     {
-        if(!empty(self::$pagination[$loopId])) {
+        if (!empty(self::$pagination[$loopId])) {
             return self::$pagination[$loopId];
         } else {
             return null;
@@ -84,7 +83,7 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
         $type = $this->getParam($params, 'type');
 
-    	if (null == $type) {
+        if (null == $type) {
             throw new \InvalidArgumentException("Missing 'type' parameter in count arguments");
         }
 

@@ -23,7 +23,7 @@
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
-    {debugbar_renderHead}
+    {debugbar_rendercss}
 
     {block name="after-bootstrap-css"}{/block}
 
@@ -223,10 +223,13 @@
 
 	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 
-	{block name="after-javascript-include"}{/block}	
+    {debugbar_renderjs}
+    {debugbar_renderresult}
+
+	{block name="after-javascript-include"}{/block}
 
     {block name="javascript-initialization"}{/block}
-    {debugbar_render}
+
 	{* Modules scripts are included now *}
 	{module_include location='footer_js'}
 

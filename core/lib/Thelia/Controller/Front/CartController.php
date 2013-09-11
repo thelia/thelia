@@ -77,7 +77,7 @@ class CartController extends BaseFrontController
             $this->getDispatcher()->dispatch(TheliaEvents::CART_UPDATEITEM, $cartEvent);
 
             $this->redirectSuccess();
-        } catch(PropelException $e) {
+        } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
@@ -96,7 +96,6 @@ class CartController extends BaseFrontController
             \Thelia\Log\Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
-
 
     }
 

@@ -25,7 +25,6 @@ namespace Thelia\Controller\Install;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Controller\BaseController;
 
-
 /**
  * Class BaseInstallController
  * @package Thelia\Controller\Install

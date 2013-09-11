@@ -25,8 +25,8 @@ namespace Thelia\Action;
 
 use Thelia\Core\Event\BaseChangePositionEvent;
 
-trait PositionManagementTrait {
-
+trait PositionManagementTrait
+{
     const POSITION_UP
     /**
      * Changes object position, selecting absolute ou relative change.

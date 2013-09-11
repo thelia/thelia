@@ -150,7 +150,7 @@ class TheliaHttpKernel extends HttpKernel
             $currency = $request->getSession()->getCurrency(false);
         }
 
-        if(null === $currency) {
+        if (null === $currency) {
             $currency = Model\Currency::getDefaultCurrency();
         }
 

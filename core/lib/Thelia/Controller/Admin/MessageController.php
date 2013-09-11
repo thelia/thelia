@@ -28,9 +28,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Tools\URL;
 use Thelia\Core\Event\MessageUpdateEvent;
 use Thelia\Core\Event\MessageCreateEvent;
-use Thelia\Log\Tlog;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Model\MessageQuery;
 use Thelia\Form\MessageModificationForm;
 use Thelia\Form\MessageCreationForm;
@@ -47,7 +45,8 @@ class MessageController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    protected function renderList() {
+    protected function renderList()
+    {
         return $this->render('messages');
     }
 
@@ -56,10 +55,9 @@ class MessageController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function defaultAction() {
-
+    public function defaultAction()
+    {
         if (null !== $response = $this->checkAuth("admin.configuration.messages.view")) return $response;
-
         return $this->renderList();
     }
 
@@ -68,8 +66,8 @@ class MessageController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function createAction() {
-
+    public function createAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.messages.create")) return $response;
 
@@ -107,12 +105,10 @@ class MessageController extends BaseAdminController
 
             // Redirect to the success URL
             $this->redirect($successUrl);
-        }
-        catch (FormValidationException $ex) {
+        } catch (FormValidationException $ex) {
             // Form cannot be validated
             $message = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $message = $ex->getMessage();
         }
@@ -128,8 +124,8 @@ class MessageController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function changeAction() {
-
+    public function changeAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.messages.update")) return $response;
 
@@ -168,8 +164,8 @@ class MessageController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function saveChangeAction() {
-
+    public function saveChangeAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.messages.update")) return $response;
 
@@ -221,12 +217,10 @@ class MessageController extends BaseAdminController
 
             // Redirect to the success URL
             $this->redirect($changeForm->getSuccessUrl());
-        }
-        catch (FormValidationException $ex) {
+        } catch (FormValidationException $ex) {
             // Form cannot be validated
             $message = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $message = $ex->getMessage();
         }
@@ -242,8 +236,8 @@ class MessageController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function deleteAction() {
-
+    public function deleteAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.messages.delete")) return $response;
 

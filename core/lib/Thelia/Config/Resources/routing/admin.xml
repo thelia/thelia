@@ -37,6 +37,19 @@
         <default key="_controller">Thelia\Controller\Admin\CustomerController::indexAction</default>
     </route>
 
+    <route id="admin.customer.update.view" path="/admin/customer/update/{customer_id}">
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::viewAction</default>
+        <requirement key="customer_id">\d+</requirement>
+    </route>
+
+    <!-- end Customer rule management -->
+
+    <!-- Order rule management -->
+
+    <route id="admin.order" path="/admin/order">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::indexAction</default>
+    </route>    
+
     <!-- end Customer rule management -->
 
     <!-- Categories management -->
@@ -192,11 +205,11 @@
 
     <!-- attribute and feature routes  management -->
 
-    <route id="admin.configuration.attribute" path="/admin/configuration/product_attributes">
+    <route id="admin.configuration.product-attribute.default" path="/admin/configuration/product-attributes">
         <default key="_controller">Thelia\Controller\Admin\AttributeController::defaultAction</default>
     </route>
 
-    <route id="admin.configuration.attribute.edit" path="/admin/configuration/product_attributes/update">
+    <route id="admin.configuration.product-attribute.edit" path="/admin/configuration/product-attributes/update">
         <default key="_controller">Thelia\Controller\Admin\AttributeController::updateAction</default>
     </route>
 

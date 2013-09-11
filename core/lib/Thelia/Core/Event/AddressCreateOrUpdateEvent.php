@@ -26,7 +26,6 @@ use Symfony\Component\EventDispatcher\Event;
 use Thelia\Model\Address;
 use Thelia\Model\Customer;
 
-
 /**
  * Class AddressCreateOrUpdateEvent
  * @package Thelia\Core\Event
@@ -109,7 +108,7 @@ class AddressCreateOrUpdateEvent extends ActionEvent
      */
     protected $address;
 
-    function __construct($label, $title, $firstname, $lastname, $address1, $address2, $address3, $zipcode, $city, $country, $cellphone, $phone, $company)
+    public function __construct($label, $title, $firstname, $lastname, $address1, $address2, $address3, $zipcode, $city, $country, $cellphone, $phone, $company)
     {
         $this->address1 = $address1;
         $this->address2 = $address2;
@@ -262,6 +261,5 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     {
         return $this->address;
     }
-
 
 }

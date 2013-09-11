@@ -4,7 +4,7 @@
 
 <ul>
 {loop type="address" name="customer_list" customer="current"}
-    <li>{#LABEL} - {#FIRSTNAME} {#LASTNAME} - <a href="{url path="/address/edit/{#ID}"}">edit</a></li>
+    <li>{$LABEL} - {$FIRSTNAME} {$LASTNAME} - <a href="{url path="/address/edit/{$ID}"}">edit</a></li>
 {/loop}
 </ul>
 

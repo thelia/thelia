@@ -27,19 +27,15 @@ use Thelia\Core\Event\CustomerLoginEvent;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
-use Thelia\Core\Security\SecurityContext;
 use Thelia\Form\CustomerCreation;
 use Thelia\Form\CustomerLogin;
 use Thelia\Form\CustomerModification;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\CustomerEvent;
-use Thelia\Core\Factory\ActionEventFactory;
 use Thelia\Tools\URL;
 use Thelia\Log\Tlog;
 use Thelia\Core\Security\Exception\WrongPasswordException;
-use Symfony\Component\Routing\Router;
 
 /**
  * Class CustomerController
@@ -70,11 +66,9 @@ class CustomerController extends BaseFrontController
                 $this->processLogin($customerCreateEvent->getCustomer());
 
                 $this->redirectSuccess($customerCreation);
-            }
-            catch (FormValidationException $e) {
+            } catch (FormValidationException $e) {
                 $message = sprintf("Please check your input: %s", $e->getMessage());
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
 
@@ -118,11 +112,9 @@ class CustomerController extends BaseFrontController
 
                 $this->redirectSuccess($customerModification);
 
-            }
-            catch (FormValidationException $e) {
+            } catch (FormValidationException $e) {
                 $message = sprintf("Please check your input: %s", $e->getMessage());
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
 
@@ -166,29 +158,24 @@ class CustomerController extends BaseFrontController
 
                 $this->redirectSuccess($customerLoginForm);
 
-            }
-            catch (FormValidationException $e) {
+            } catch (FormValidationException $e) {
 
                 if ($request->request->has("account")) {
                     $account = $request->request->get("account");
                     $form = $customerLoginForm->getForm();
-                    if($account == 0 && $form->get("email")->getData() !== null) {
+                    if ($account == 0 && $form->get("email")->getData() !== null) {
                         $this->redirectToRoute("customer.create.view", array("email" => $form->get("email")->getData()));
                     }
                 }
 
                 $message = sprintf("Please check your input: %s", $e->getMessage());
-            }
-            catch(UsernameNotFoundException $e) {
+            } catch (UsernameNotFoundException $e) {
                 $message = "Wrong email or password. Please try again";
-            }
-            catch (WrongPasswordException $e) {
+            } catch (WrongPasswordException $e) {
                 $message = "Wrong email or password. Please try again";
-            }
-            catch(AuthenticationException $e) {
+            } catch (AuthenticationException $e) {
                 $message = "Wrong email or password. Please try again";
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
 

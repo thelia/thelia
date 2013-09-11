@@ -23,12 +23,14 @@ use Thelia\Model\Map\TaxTableMap;
  *
  *
  * @method     ChildTaxQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildTaxQuery orderByRate($order = Criteria::ASC) Order by the rate column
+ * @method     ChildTaxQuery orderByType($order = Criteria::ASC) Order by the type column
+ * @method     ChildTaxQuery orderBySerializedRequirements($order = Criteria::ASC) Order by the serialized_requirements column
  * @method     ChildTaxQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildTaxQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildTaxQuery groupById() Group by the id column
- * @method     ChildTaxQuery groupByRate() Group by the rate column
+ * @method     ChildTaxQuery groupByType() Group by the type column
+ * @method     ChildTaxQuery groupBySerializedRequirements() Group by the serialized_requirements column
  * @method     ChildTaxQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildTaxQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -48,12 +50,14 @@ use Thelia\Model\Map\TaxTableMap;
  * @method     ChildTax findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTax matching the query, or a new ChildTax object populated from the query conditions when no match is found
  *
  * @method     ChildTax findOneById(int $id) Return the first ChildTax filtered by the id column
- * @method     ChildTax findOneByRate(double $rate) Return the first ChildTax filtered by the rate column
+ * @method     ChildTax findOneByType(string $type) Return the first ChildTax filtered by the type column
+ * @method     ChildTax findOneBySerializedRequirements(string $serialized_requirements) Return the first ChildTax filtered by the serialized_requirements column
  * @method     ChildTax findOneByCreatedAt(string $created_at) Return the first ChildTax filtered by the created_at column
  * @method     ChildTax findOneByUpdatedAt(string $updated_at) Return the first ChildTax filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildTax objects filtered by the id column
- * @method     array findByRate(double $rate) Return ChildTax objects filtered by the rate column
+ * @method     array findByType(string $type) Return ChildTax objects filtered by the type column
+ * @method     array findBySerializedRequirements(string $serialized_requirements) Return ChildTax objects filtered by the serialized_requirements column
  * @method     array findByCreatedAt(string $created_at) Return ChildTax objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildTax objects filtered by the updated_at column
  *
@@ -144,7 +148,7 @@ abstract class TaxQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, RATE, CREATED_AT, UPDATED_AT FROM tax WHERE ID = :p0';
+        $sql = 'SELECT ID, TYPE, SERIALIZED_REQUIREMENTS, CREATED_AT, UPDATED_AT FROM tax WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -275,44 +279,61 @@ abstract class TaxQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the rate column
+     * Filter the query on the type column
      *
      * Example usage:
      * <code>
-     * $query->filterByRate(1234); // WHERE rate = 1234
-     * $query->filterByRate(array(12, 34)); // WHERE rate IN (12, 34)
-     * $query->filterByRate(array('min' => 12)); // WHERE rate > 12
+     * $query->filterByType('fooValue');   // WHERE type = 'fooValue'
+     * $query->filterByType('%fooValue%'); // WHERE type LIKE '%fooValue%'
      * </code>
      *
-     * @param     mixed $rate The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $type The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildTaxQuery The current query, for fluid interface
      */
-    public function filterByRate($rate = null, $comparison = null)
+    public function filterByType($type = null, $comparison = null)
     {
-        if (is_array($rate)) {
-            $useMinMax = false;
-            if (isset($rate['min'])) {
-                $this->addUsingAlias(TaxTableMap::RATE, $rate['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($rate['max'])) {
-                $this->addUsingAlias(TaxTableMap::RATE, $rate['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
+        if (null === $comparison) {
+            if (is_array($type)) {
                 $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $type)) {
+                $type = str_replace('*', '%', $type);
+                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(TaxTableMap::RATE, $rate, $comparison);
+        return $this->addUsingAlias(TaxTableMap::TYPE, $type, $comparison);
+    }
+
+    /**
+     * Filter the query on the serialized_requirements column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySerializedRequirements('fooValue');   // WHERE serialized_requirements = 'fooValue'
+     * $query->filterBySerializedRequirements('%fooValue%'); // WHERE serialized_requirements LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $serializedRequirements The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTaxQuery The current query, for fluid interface
+     */
+    public function filterBySerializedRequirements($serializedRequirements = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($serializedRequirements)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $serializedRequirements)) {
+                $serializedRequirements = str_replace('*', '%', $serializedRequirements);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(TaxTableMap::SERIALIZED_REQUIREMENTS, $serializedRequirements, $comparison);
     }
 
     /**

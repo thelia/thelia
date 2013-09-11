@@ -24,7 +24,6 @@
 namespace Thelia\Tools;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DateTimeFormat
 {
@@ -46,7 +45,7 @@ class DateTimeFormat
 
         $format = null;
 
-        if($lang) {
+        if ($lang) {
             switch ($output) {
                 case "date" :
                     $format = $lang->getDateFormat();
