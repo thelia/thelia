@@ -90,7 +90,6 @@ class URL
 
             $schemeAuthority = "$scheme://$host"."$port";
         }
-
         return $schemeAuthority.$this->requestContext->getBaseUrl();
     }
 
