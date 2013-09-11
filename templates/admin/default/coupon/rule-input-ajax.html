@@ -72,33 +72,29 @@
 <script>
 
     // Init Rules to set
-    var ruleToSave = {};
     ruleToSave['serviceId'] = '{$ruleId}';
-    ruleToSave['operators'] = {};
-    ruleToSave['values'] = {};
-    {foreach from=$inputs.inputs key=name item=input}
-        ruleToSave['operators']['{$name nofilter}'] = '{foreach from=$inputs.inputs[$name].availableOperators key=keyOperator item=valueOperator name=operators}{if $smarty.foreach.operators.first}{$keyOperator nofilter}{/if}{/foreach}';
-        ruleToSave['values']['{$name nofilter}'] = '{if count($inputs.inputs[$name].availableValues) != 0}{foreach from=$inputs.inputs[$name].availableValues key=keyValue item=valueValue name=values}{if $smarty.foreach.values.first}{$keyValue nofilter}{/if}{/foreach}{else}to set{/if}';
-    {/foreach}
+    ruleToSave['operators'] = {literal}{}{/literal};
+    ruleToSave['values'] = {literal}{}{/literal};
+{foreach from=$inputs.inputs key=name item=input}
+    ruleToSave['operators']['{$name nofilter}'] = '{foreach from=$inputs.inputs[$name].availableOperators key=keyOperator item=valueOperator name=operators}{if $smarty.foreach.operators.first}{$keyOperator nofilter}{/if}{/foreach}';
+    ruleToSave['values']['{$name nofilter}'] = '{if count($inputs.inputs[$name].availableValues) != 0}{foreach from=$inputs.inputs[$name].availableValues key=keyValue item=valueValue name=values}{if $smarty.foreach.values.first}{$keyValue nofilter}{/if}{/foreach}{else}to set{/if}';
+{/foreach}
 
 
     // Fill in ready to be saved rule array
     var onInputsChange = function() {literal}{{/literal}
-        {foreach from=$inputs.inputs key=name item=input}
-            $('#{$name}-operator').change(function (e) {
-
-                var $this = $(this);
-                console.log('{$name}-operator changed by ' + $this.val());
-                ruleToSave['operators']['{$name nofilter}'] = $this.val();
-            });
-            $('#{$name}-value').change(function (e) {
-                var $this = $(this);
-                console.log('{$name}-value changed by ' + $this);
-                ruleToSave['values']['{$name nofilter}'] = $this.val();
-            });
-        {/foreach}
-        console.log('will save ');
-        console.log(ruleToSave);
+{foreach from=$inputs.inputs key=name item=input}
+        // Operator selector
+        $('#{$name}-operator').change(function (e) {
+            var $this = $(this);
+            ruleToSave['operators']['{$name nofilter}'] = $this.val();
+        });
+        // Value input
+        $('#{$name}-value').change(function (e) {
+            var $this = $(this);
+            ruleToSave['values']['{$name nofilter}'] = $this.val();
+        });
+{/foreach}
     {literal}}{/literal}
     onInputsChange();
 </script>

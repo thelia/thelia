@@ -41,8 +41,6 @@
         $(function($){
             miniBrowser(0, '/test_to_remove/datas_coupon_edit.json');
 
-
-
             Array.prototype.clean = function(deleteValue) {
                 for (var i = 0; i < this.length; i++) {
                     if (this[i] == deleteValue) {
@@ -52,7 +50,6 @@
                 }
                 return this;
             };
-
 
             // Init Rules
             var initRules = function() {
@@ -75,8 +72,6 @@
 
             // Save Rules AJAX
             var saveRuleAjax = function() {
-                console.log('rulesToSave');
-                console.log(rulesToSave);
                 var $url = '{$urlAjaxUpdateRules}';
                 $.ajax({
                     type: "POST",
@@ -107,12 +102,14 @@
 
             // Add 1 Rule / or update the temporary Rules array then Save Rules via AJAX
             var addRuleAjax = function(id) {
+                // If update
                 if(typeof id === 'number' && id % 1 == 0) {
                     rulesToSave[id] = ruleToSave;
-                } else {
+                } else { // If create
                     rulesToSave.push(ruleToSave);
                 }
 
+                // Save
                 saveRuleAjax();
             }
 
@@ -193,12 +190,15 @@
             }
             onClickDeleteRule();
 
-            // Remove rule on click
+            // Update rule on click
             var onClickUpdateRule = function() {
                 $('.constraint-update-btn').on('click', function (e) {
                     e.preventDefault();
                     var $this = $(this);
                     updateRuleAjax($this.attr('data-int'));
+
+                    // Hide row being updated
+                    $this.parent().parent().remove();
                 });
             }
             onClickUpdateRule();
@@ -215,21 +215,23 @@
             // Reload rule inputs when changing effect
             var onRuleChange = function() {
                 $('#category-rule').on('change', function (e) {
-                    loadRuleInputs($(this).val(), null, function(ruleToSave) {});
+                    loadRuleInputs($(this).val(), null, function(ruleToSave) {literal}{}{/literal});
                 });
             }
             onRuleChange();
 
+            // Fill in ready to be saved rule array
+            // var onInputsChange = function()
+            // In AJAX response
 
 
 
-            // Rule to save
-            var ruleToSave = {literal}{}{/literal};
             // Rules which will be saved
             var rulesToSave = initRules();
         });
 
-
+        // Rule to save
+        var ruleToSave = {literal}{}{/literal};
 
     </script>
 {/block}
