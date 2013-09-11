@@ -83,9 +83,9 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
         $calculator = new Calculator();
 
-        $taxRuleQuery = $this->getMock('\Thelia\Model\TaxRuleQuery', array('getTaxCalculatorGroupedCollection'));
+        $taxRuleQuery = $this->getMock('\Thelia\Model\TaxRuleQuery', array('getTaxCalculatorCollection'));
         $taxRuleQuery->expects($this->once())
-            ->method('getTaxCalculatorGroupedCollection')
+            ->method('getTaxCalculatorCollection')
             ->with($productQuery, $countryQuery)
             ->will($this->returnValue('foo'));
 
@@ -104,7 +104,7 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             'foo',
-            $this->getProperty('taxRulesGroupedCollection')->getValue($calculator)
+            $this->getProperty('taxRulesCollection')->getValue($calculator)
         );
     }
 
@@ -124,35 +124,37 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTaxAmountBadAmount()
     {
-        $taxRulesGroupedCollection = new ObjectCollection();
+        $taxRulesCollection = new ObjectCollection();
 
         $calculator = new Calculator();
 
-        $rewritingUrlQuery = $this->getProperty('taxRulesGroupedCollection');
-        $rewritingUrlQuery->setValue($calculator, $taxRulesGroupedCollection);
+        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
+        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
 
         $calculator->getTaxAmount('foo');
     }
 
     public function testGetTaxAmountAndGetTaxedPrice()
     {
-        $taxRulesGroupedCollection = new ObjectCollection();
-        $taxRulesGroupedCollection->setModel('\Thelia\Model\Tax');
+        $taxRulesCollection = new ObjectCollection();
+        $taxRulesCollection->setModel('\Thelia\Model\Tax');
 
         $tax = new Tax();
-        $tax->setVirtualColumn('taxRateSum', 10);
+        $tax->setType('PricePercentTaxType')
+            ->setRequirements(array('percent' => 10));
 
-        $taxRulesGroupedCollection->append($tax);
+        $taxRulesCollection->append($tax);
 
         $tax = new Tax();
-        $tax->setVirtualColumn('taxRateSum', 8);
+        $tax->setType('PricePercentTaxType')
+            ->setRequirements(array('percent' => 8));
 
-        $taxRulesGroupedCollection->append($tax);
+        $taxRulesCollection->append($tax);
 
         $calculator = new Calculator();
 
-        $rewritingUrlQuery = $this->getProperty('taxRulesGroupedCollection');
-        $rewritingUrlQuery->setValue($calculator, $taxRulesGroupedCollection);
+        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
+        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
 
         $taxAmount = $calculator->getTaxAmount(500);
         $taxedPrice = $calculator->getTaxedPrice(500);

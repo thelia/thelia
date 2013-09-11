@@ -2,7 +2,6 @@
 
 namespace Thelia\Model;
 
-use Symfony\Component\Form\Exception\Exception;
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Base\Tax as BaseTax;
 use Thelia\TaxEngine\TaxType\BaseTaxType;
@@ -49,7 +48,7 @@ class Tax extends BaseTax
         if(!$instance instanceof BaseTaxType) {
             throw new TaxEngineException('Recorded type does not extends BaseTaxType', TaxEngineException::BAD_RECORDED_TYPE);
         }
-        
+
         return $instance;
     }
 

@@ -22,6 +22,7 @@
 /*************************************************************************************/
 namespace Thelia\TaxEngine\TaxType;
 
+use Thelia\Exception\TaxEngineException;
 use Thelia\Type\TypeInterface;
 
 /**
@@ -42,24 +43,20 @@ abstract class BaseTaxType
         $this->requirements = $this->getRequirementsList();
 
         if(!is_array($this->requirements)) {
-            //@todo throw sg
-            exit('err_1');
+            throw new TaxEngineException('getRequirementsList must return an array', TaxEngineException::TAX_TYPE_BAD_ABSTRACT_METHOD);
         }
 
         foreach($this->requirements as $requirement => $requirementType) {
             if(!$requirementType instanceof TypeInterface) {
-                //@todo throw sg
-                exit('err_2');
+                throw new TaxEngineException('getRequirementsList must return an array of TypeInterface', TaxEngineException::TAX_TYPE_BAD_ABSTRACT_METHOD);
             }
 
             if(!array_key_exists($requirement, $requirementsValues)) {
-                //@todo throw sg
-                exit('err_3');
+                throw new TaxEngineException('Cannot load requirements : requirement value for `' . $requirement . '` not found', TaxEngineException::TAX_TYPE_REQUIREMENT_NOT_FOUND);
             }
 
             if(!$requirementType->isValid($requirementsValues[$requirement])) {
-                //@todo throw sg
-                exit('err_4');
+                throw new TaxEngineException('Requirement value for `' . $requirement . '` does not match required type', TaxEngineException::TAX_TYPE_BAD_REQUIREMENT_VALUE);
             }
 
             $this->requirements[$requirement] = $requirementsValues[$requirement];
@@ -69,13 +66,11 @@ abstract class BaseTaxType
     public function getRequirement($key)
     {
         if($this->requirements === null) {
-            //@todo throw sg
-            exit('err_5');
+            throw new TaxEngineException('Requirements are empty in BaseTaxType::getRequirement', TaxEngineException::UNDEFINED_REQUIREMENTS);
         }
 
         if(!array_key_exists($key, $this->requirements)) {
-            //@todo throw sg
-            exit('err_6');
+            throw new TaxEngineException('Requirement value for `' . $key . '` does not exists in BaseTaxType::$requirements', TaxEngineException::UNDEFINED_REQUIREMENT_VALUE);
         }
 
         return $this->requirements[$key];

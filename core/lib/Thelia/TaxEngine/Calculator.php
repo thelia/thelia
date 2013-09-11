@@ -34,6 +34,9 @@ use Thelia\Model\TaxRuleQuery;
  */
 class Calculator
 {
+    /**
+     * @var TaxRuleQuery
+     */
     protected $taxRuleQuery = null;
 
     protected $taxRulesCollection = null;
@@ -62,7 +65,7 @@ class Calculator
         $this->product = $product;
         $this->country = $country;
 
-        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorGroupedCollection($product, $country);
+        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($product, $country);
 
         return $this;
     }
