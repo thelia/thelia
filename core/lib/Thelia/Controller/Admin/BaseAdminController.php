@@ -39,6 +39,7 @@ use Thelia\Model\LangQuery;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
+use Symfony\Component\Routing\Router;
 
 class BaseAdminController extends BaseController
 {
