@@ -6,20 +6,20 @@ Index : {navigate to="index"}<br />
 
 {ifloop rel="product"}
 
-{loop type="product" name="product" current="true"}
+{loop type="product" name="product" current="true" min_price="50" max_price="100"}
 
 <div style="border: dashed 2px red; padding: 20px; margin: 10px;">
-    <h2>PRODUCT (#ID) : #REF</h2>
-    <h3>#TITLE</h3>
-    <p>#DESCRIPTION</p>
+    <h2>PRODUCT ({$ID}) : {$REF}</h2>
+    <h3>{$TITLE}</h3>
+    <p>{$DESCRIPTION}</p>
 
-    <p>Starting by #BEST_PRICE € HT (TAX : #BEST_PRICE_TAX ; #BEST_TAXED_PRICE € TTC)</p>
+    <p>Starting by {$BEST_PRICE} {currency attr="symbol"} HT (TAX : {$BEST_PRICE_TAX} ; {$BEST_TAXED_PRICE} {currency attr="symbol"} TTC)</p>
 
     {ifloop rel="acc"}
     <h4>Accessories</h4>
     <ul>
-        {loop name="acc" type="accessory" product="#ID" order="accessory"}
-        <li><a href="#URL">#REF</a></li>
+        {loop name="acc" type="accessory" product="$ID" order="accessory"}
+        <li><a href="{$URL}">{$REF}</a></li>
         {/loop}
     </ul>
     {/ifloop}
@@ -30,8 +30,8 @@ Index : {navigate to="index"}<br />
     {ifloop rel="prod_ass_cont"}
     <h4>Associated Content</h4>
     <ul>
-        {loop name="prod_ass_cont" type="associated_content" product="#ID" order="associated_content"}
-        <li>#TITLE</li>
+        {loop name="prod_ass_cont" type="associated_content" product="$ID" order="associated_content"}
+        <li>{$TITLE}</li>
         {/loop}
     </ul>
     {/ifloop}
@@ -42,12 +42,12 @@ Index : {navigate to="index"}<br />
     {ifloop rel="ft"}
     <h4>Features</h4>
     <ul>
-        {assign var=current_product value=#ID}
-        {loop name="ft" type="feature" order="manual" product="#ID"}
+        {assign var=current_product value=$ID}
+        {loop name="ft" type="feature" order="manual" product="$ID"}
         <li>
-            <strong>#TITLE</strong> :
-            {loop name="ft_v" type="feature_value" product="{$current_product}" feature="#ID"}
-            #TITLE / #PERSONAL_VALUE
+            <strong>{$TITLE}</strong> :
+            {loop name="ft_v" type="feature_value" product="{$current_product}" feature="$ID"}
+            {$TITLE} / {$PERSONAL_VALUE}
             {/loop}
         </li>
         {/loop}
@@ -59,18 +59,18 @@ Index : {navigate to="index"}<br />
 
     <h4>Product sale elements</h4>
 
-    {assign var=current_product value=#ID}
-    {loop name="pse" type="product_sale_elements" product="#ID"}
+    {assign var=current_product value=$ID}
+    {loop name="pse" type="product_sale_elements" product="$ID"}
     <div style="border: solid 2px darkorange; padding: 5px; margin: 5px;">
-        {loop name="combi" type="attribute_combination" product_sale_elements="#ID"}
-        #ATTRIBUTE_TITLE = #ATTRIBUTE_AVAILABILITY_TITLE<br />
+        {loop name="combi" type="attribute_combination" product_sale_elements="$ID"}
+        {$ATTRIBUTE_TITLE} = {$ATTRIBUTE_AVAILABILITY_TITLE}<br />
         {/loop}
-        <br />#WEIGHT g
-        <br /><strong>{if #IS_PROMO == 1} #PROMO_PRICE € HT // TAX : #PROMO_PRICE_TAX ; #TAXED_PROMO_PRICE € TTC (instead of #PRICE HT // TAX : #PRICE_TAX ; #TAXED_PRICE € TTC){else} #PRICE € HT // TAX : #PRICE_TAX ; #TAXED_PRICE € TTC{/if}</strong>
+        <br />{$WEIGHT} g
+        <br /><strong>{if $IS_PROMO == 1} {$PROMO_PRICE} {currency attr="symbol"} HT // TAX : {$PROMO_PRICE_TAX} ; {$TAXED_PROMO_PRICE} {currency attr="symbol"} TTC (instead of {$PRICE_HT} // TAX : {$PRICE_TAX} ; {$TAXED_PRICE} {currency attr="symbol"} TTC){else} {$PRICE} {currency attr="symbol"} HT // TAX : {$PRICE_TAX} ; {$TAXED_PRICE} {currency attr="symbol"} TTC{/if}</strong>
         <br /><br />
         Add
         <select>
-            {for $will=1 to #QUANTITY}
+            {for $will=1 to $QUANTITY}
             <option>{$will}</option>
             {/for}
         </select>

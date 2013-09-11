@@ -22,8 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Model\Cart;
 
 class ImageEvent extends ActionEvent
 {

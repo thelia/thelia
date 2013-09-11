@@ -23,11 +23,10 @@
 
 namespace Thelia\Core\Event;
 
-
 use Thelia\Model\Customer;
 
-class CustomerLoginEvent extends ActionEvent {
-
+class CustomerLoginEvent extends ActionEvent
+{
     protected $customer;
 
     public function __construct(Customer $customer)

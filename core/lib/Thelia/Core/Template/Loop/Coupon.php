@@ -34,13 +34,9 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Base\CategoryQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Coupon as MCoupon;
-use Thelia\Model\Map\ProductCategoryTableMap;
 use Thelia\Type;
-use Thelia\Type\BooleanOrBothType;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -94,7 +90,6 @@ class Coupon extends BaseI18nLoop
         $request = $this->container->get('request');
         /** @var Lang $lang */
         $lang = $request->getSession()->getLang();
-
 
         /** @var MCoupon $coupon */
         foreach ($coupons as $coupon) {

@@ -25,7 +25,6 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\ImageEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
@@ -86,8 +85,8 @@ class Image extends BaseAction implements EventSubscriberInterface
      *
      * @param ImageEvent $event
      */
-    public function clearCache(ImageEvent $event) {
-
+    public function clearCache(ImageEvent $event)
+    {
         $path = $this->getCachePath($event->getCacheSubdirectory(), false);
 
         $this->clearDirectory($path);
@@ -98,8 +97,8 @@ class Image extends BaseAction implements EventSubscriberInterface
      *
      * @param string $path the directory path
      */
-    protected function clearDirectory($path) {
-
+    protected function clearDirectory($path)
+    {
         $iterator = new \DirectoryIterator($path);
 
         foreach ($iterator as $fileinfo) {
@@ -108,8 +107,7 @@ class Image extends BaseAction implements EventSubscriberInterface
 
             if ($fileinfo->isFile() || $fileinfo->isLink()) {
                 @unlink($fileinfo->getPathname());
-            }
-            else if ($fileinfo->isDir()) {
+            } elseif ($fileinfo->isDir()) {
                 $this->clearDirectory($fileinfo->getPathname());
             }
         }
@@ -124,7 +122,7 @@ class Image extends BaseAction implements EventSubscriberInterface
      *
      * This method updates the cache_file_path and file_url attributes of the event
      *
-     * @param ImageEvent $event
+     * @param  ImageEvent                 $event
      * @throws \InvalidArgumentException, ImageException
      */
     public function processImage(ImageEvent $event)
@@ -160,8 +158,7 @@ class Image extends BaseAction implements EventSubscriberInterface
                     if (false == symlink($source_file, $originalImagePathInCache)) {
                          throw new ImageException(sprintf("Failed to create symbolic link for %s in %s image cache directory", basename($source_file), $subdir));
                     }
-                }
-                else {// mode = 'copy'
+                } else {// mode = 'copy'
                     if (false == @copy($source_file, $originalImagePathInCache)) {
                         throw new ImageException(sprintf("Failed to copy %s in %s image cache directory", basename($source_file), $subdir));
                     }
@@ -182,8 +179,7 @@ class Image extends BaseAction implements EventSubscriberInterface
 
                     if ($background_color != null) {
                         $bg_color = new Color($background_color);
-                    }
-                    else
+                    } else
                         $bg_color = null;
 
                     // Apply resize
@@ -252,8 +248,7 @@ class Image extends BaseAction implements EventSubscriberInterface
                             $cacheFilePath,
                             array('quality' => $quality)
                      );
-                }
-                else {
+                } else {
                     throw new ImageException(sprintf("Source file %s cannot be opened.", basename($source_file)));
                 }
             }
@@ -277,13 +272,13 @@ class Image extends BaseAction implements EventSubscriberInterface
      * Process image resizing, with borders or cropping. If $dest_width and $dest_height
      * are both null, no resize is performed.
      *
-     * @param ImagineInterface $imagine the Imagine instance
-     * @param ImageInterface $image the image to process
-     * @param int $dest_width the required width
-     * @param int $dest_height the required height
-     * @param int $resize_mode the resize mode (crop / bands / keep image ratio)p
-     * @param string $bg_color the bg_color used for bands
-     * @return ImageInterface the resized image.
+     * @param  ImagineInterface $imagine     the Imagine instance
+     * @param  ImageInterface   $image       the image to process
+     * @param  int              $dest_width  the required width
+     * @param  int              $dest_height the required height
+     * @param  int              $resize_mode the resize mode (crop / bands / keep image ratio)p
+     * @param  string           $bg_color    the bg_color used for bands
+     * @return ImageInterface   the resized image.
      */
     protected function applyResize(ImagineInterface $imagine, ImageInterface $image, $dest_width, $dest_height, $resize_mode, $bg_color)
     {
@@ -313,8 +308,7 @@ class Image extends BaseAction implements EventSubscriberInterface
 
                 $dest_width = ($resize_mode == self::EXACT_RATIO_WITH_BORDERS ? $dest_width : $next_width);
                 $dest_height = ($resize_mode == self::EXACT_RATIO_WITH_BORDERS ? $dest_height : $next_height);
-            }
-            else if ($width_diff > $height_diff) {
+            } elseif ($width_diff > $height_diff) {
                 // Image height > image width
 
                 $next_height = $dest_height;
@@ -324,12 +318,10 @@ class Image extends BaseAction implements EventSubscriberInterface
                     $next_width = $dest_width;
                     $next_height = intval($height_orig * $dest_width / $width_orig);
                     $delta_y = ($next_height - $dest_height) / 2;
-                }
-                else if ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
+                } elseif ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
                     $dest_width = $next_width;
                 }
-            }
-            else {
+            } else {
                 // Image width > image height
                 $next_width = $dest_width;
                 $next_height = intval($height_orig * $dest_width / $width_orig);
@@ -338,8 +330,7 @@ class Image extends BaseAction implements EventSubscriberInterface
                     $next_height = $dest_height;
                     $next_width  = intval(($width_orig * $next_height) / $height_orig);
                     $delta_x = ($next_width - $dest_width) / 2;
-                }
-                else if ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
+                } elseif ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
                     $dest_height = $next_height;
                 }
             }
@@ -357,9 +348,7 @@ class Image extends BaseAction implements EventSubscriberInterface
 
                 return $imagine->create($canvas, $bg_color)
                     ->paste($image, new Point($border_width, $border_height));
-            }
-
-            else if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
+            } elseif ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
                 $image->crop(
                     new Point($delta_x, $delta_y),
                     new Box($dest_width, $dest_height)
@@ -370,12 +359,11 @@ class Image extends BaseAction implements EventSubscriberInterface
         return $image;
     }
 
-
     /**
      * Return the absolute URL to the cached image
      *
-     * @param string $subdir the subdirectory related to cache base
-     * @param string $filename the safe filename, as returned by getCacheFilePath()
+     * @param  string $subdir   the subdirectory related to cache base
+     * @param  string $filename the safe filename, as returned by getCacheFilePath()
      * @return string the absolute URL to the cached image
      */
     protected function getCacheFileURL($subdir, $safe_filename)
@@ -388,10 +376,10 @@ class Image extends BaseAction implements EventSubscriberInterface
     /**
      * Return the full path of the cached file
      *
-     * @param string $subdir the subdirectory related to cache base
-     * @param string $filename the filename
-     * @param boolean $forceOriginalImage if true, the origiunal image path in the cache dir is returned.
-     * @return string the cache directory path relative to Web Root
+     * @param  string  $subdir             the subdirectory related to cache base
+     * @param  string  $filename           the filename
+     * @param  boolean $forceOriginalImage if true, the origiunal image path in the cache dir is returned.
+     * @return string  the cache directory path relative to Web Root
      */
     protected function getCacheFilePath($subdir, $filename, ImageEvent $event, $forceOriginalImage = false)
     {
@@ -409,7 +397,7 @@ class Image extends BaseAction implements EventSubscriberInterface
     /**
      * Return the cache directory path relative to Web Root
      *
-     * @param string $subdir the subdirectory related to cache base, or null to get the cache directory only.
+     * @param  string $subdir the subdirectory related to cache base, or null to get the cache directory only.
      * @return string the cache directory path relative to Web Root
      */
     protected function getCachePathFromWebRoot($subdir = null)
@@ -420,21 +408,19 @@ class Image extends BaseAction implements EventSubscriberInterface
             $safe_subdir = basename($subdir);
 
             $path = sprintf("%s/%s", $cache_dir_from_web_root, $safe_subdir);
-        }
-        else
+        } else
             $path = $cache_dir_from_web_root;
 
         // Check if path is valid, e.g. in the cache dir
-
         return $path;
     }
 
     /**
      * Return the absolute cache directory path
      *
-     * @param string $subdir the subdirectory related to cache base, or null to get the cache base directory.
+     * @param  string            $subdir the subdirectory related to cache base, or null to get the cache base directory.
      * @throws \RuntimeException if cache directory cannot be created
-     * @return string the absolute cache directory path
+     * @return string            the absolute cache directory path
      */
     protected function getCachePath($subdir = null, $create_if_not_exists = true)
     {

@@ -24,7 +24,6 @@
 namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-
 /**
  * Class AddressCreateForm
  * @package Thelia\Form

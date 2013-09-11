@@ -93,12 +93,12 @@ class SecurityContext
     /**
      * Check if a user has at least one of the required roles
      *
-     * @param UserInterface $user the user
-     * @param array $roles the roles
-     * @return boolean true if the user has the required role, false otherwise
+     * @param  UserInterface $user  the user
+     * @param  array         $roles the roles
+     * @return boolean       true if the user has the required role, false otherwise
      */
-    final public function hasRequiredRole($user, array $roles) {
-
+    final public function hasRequiredRole($user, array $roles)
+    {
         if ($user != null) {
             // Check if user's roles matches required roles
             $userRoles = $user->getRoles();

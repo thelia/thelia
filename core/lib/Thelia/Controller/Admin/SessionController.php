@@ -27,7 +27,6 @@ use Thelia\Form\AdminLogin;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Model\AdminLog;
 use Thelia\Core\Security\Exception\AuthenticationException;
-use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Event\TheliaEvents;
@@ -74,20 +73,17 @@ class SessionController extends BaseAdminController
             // Redirect to the success URL
             return Redirect::exec($adminLoginForm->getSuccessUrl());
 
-         }
-         catch (FormValidationException $ex) {
+         } catch (FormValidationException $ex) {
 
              // Validation problem
              $message = $this->createStandardFormValidationErrorMessage($ex);
-         }
-         catch (AuthenticationException $ex) {
+         } catch (AuthenticationException $ex) {
 
              // Log authentication failure
              AdminLog::append(sprintf("Authentication failure for username '%s'", $authenticator->getUsername()), $request);
 
              $message =  $this->getTranslator()->trans("Login failed. Please check your username and password.");
-         }
-         catch (\Exception $ex) {
+         } catch (\Exception $ex) {
 
              // Log authentication failure
              AdminLog::append(sprintf("Undefined error: %s", $ex->getMessage()), $request);

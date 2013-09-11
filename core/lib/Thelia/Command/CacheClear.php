@@ -61,7 +61,7 @@ class CacheClear extends ContainerAwareCommand
         $cacheDir = $this->getContainer()->getParameter("kernel.cache_dir");
 
         $this->clearCache($cacheDir, $output);
-        if(!$input->getOption("without-assets")) {
+        if (!$input->getOption("without-assets")) {
             $this->clearCache(THELIA_WEB_DIR . "/assets", $output);
         }
 

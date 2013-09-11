@@ -924,9 +924,8 @@
     <behavior name="timestampable" />
   </table>
   <table name="product_price" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="product_sale_elements_id" required="true" type="INTEGER" />
-    <column name="currency_id" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="price" required="true" type="FLOAT" />
     <column name="promo_price" type="FLOAT" />
     <foreign-key foreignTable="product_sale_elements" name="fk_product_price_product_sale_elements_id" onDelete="CASCADE">

@@ -24,7 +24,6 @@
 namespace Thelia\Coupon;
 
 use PHPUnit_Framework_TestCase;
-use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\Operators;
 use Thelia\Constraint\Validator\PriceParam;
 use Thelia\Constraint\Validator\RuleValidator;

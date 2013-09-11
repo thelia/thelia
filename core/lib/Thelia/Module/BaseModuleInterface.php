@@ -23,12 +23,11 @@
 
 namespace Thelia\Module;
 
-
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-interface BaseModuleInterface {
-
+interface BaseModuleInterface
+{
     public function setRequest(Request $request);
     public function getRequest();
 

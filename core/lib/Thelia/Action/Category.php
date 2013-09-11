@@ -31,7 +31,6 @@ use Thelia\Model\CategoryQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\CategoryTableMap;
-use Propel\Runtime\Exception\PropelException;
 
 use Thelia\Core\Event\CategoryCreateEvent;
 use Thelia\Core\Event\CategoryDeleteEvent;

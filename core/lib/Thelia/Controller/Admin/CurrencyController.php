@@ -28,9 +28,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Tools\URL;
 use Thelia\Core\Event\CurrencyUpdateEvent;
 use Thelia\Core\Event\CurrencyCreateEvent;
-use Thelia\Log\Tlog;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Form\CurrencyModificationForm;
 use Thelia\Form\CurrencyCreationForm;
@@ -48,8 +46,8 @@ class CurrencyController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    protected function renderList() {
-
+    protected function renderList()
+    {
         // Find the current order
         $order = $this->getRequest()->get(
                 'order',
@@ -67,10 +65,9 @@ class CurrencyController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function defaultAction() {
-
+    public function defaultAction()
+    {
         if (null !== $response = $this->checkAuth("admin.configuration.currencies.view")) return $response;
-
         return $this->renderList();
     }
 
@@ -79,8 +76,8 @@ class CurrencyController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function createAction() {
-
+    public function createAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.currencies.create")) return $response;
 
@@ -120,12 +117,10 @@ class CurrencyController extends BaseAdminController
 
             // Redirect to the success URL
             $this->redirect($successUrl);
-        }
-        catch (FormValidationException $ex) {
+        } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -141,8 +136,8 @@ class CurrencyController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function changeAction() {
-
+    public function changeAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
 
@@ -179,8 +174,8 @@ class CurrencyController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function saveChangeAction() {
-
+    public function saveChangeAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
 
@@ -231,12 +226,10 @@ class CurrencyController extends BaseAdminController
 
             // Redirect to the success URL
             $this->redirect($changeForm->getSuccessUrl());
-        }
-        catch (FormValidationException $ex) {
+        } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -250,7 +243,8 @@ class CurrencyController extends BaseAdminController
     /**
      * Sets the default currency
      */
-    public function setDefaultAction() {
+    public function setDefaultAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
 
@@ -261,8 +255,7 @@ class CurrencyController extends BaseAdminController
 
         try {
             $this->dispatch(TheliaEvents::CURRENCY_SET_DEFAULT, $changeEvent);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
@@ -273,14 +266,14 @@ class CurrencyController extends BaseAdminController
     /**
      * Update currencies rates
      */
-    public function updateRatesAction() {
+    public function updateRatesAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
 
         try {
             $this->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
@@ -291,7 +284,8 @@ class CurrencyController extends BaseAdminController
     /**
      * Update currencyposition
      */
-    public function updatePositionAction() {
+    public function updatePositionAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
 
@@ -314,8 +308,7 @@ class CurrencyController extends BaseAdminController
             );
 
             $this->dispatch(TheliaEvents::CURRENCY_UPDATE_POSITION, $event);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
@@ -323,14 +316,13 @@ class CurrencyController extends BaseAdminController
         $this->redirectToRoute('admin.configuration.currencies.default');
     }
 
-
     /**
      * Delete a currency object
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function deleteAction() {
-
+    public function deleteAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.currencies.delete")) return $response;
 

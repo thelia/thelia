@@ -97,8 +97,7 @@ class CacheClearTest extends \PHPUnit_Framework_TestCase
                 "command" => $command->getName(),
                 "--env" => "test"
             ));
-        }
-        else {
+        } else {
             throw new \RuntimeException("");
         }
     }

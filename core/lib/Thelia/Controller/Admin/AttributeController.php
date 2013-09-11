@@ -23,18 +23,6 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\MessageDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Tools\URL;
-use Thelia\Core\Event\MessageUpdateEvent;
-use Thelia\Core\Event\MessageCreateEvent;
-use Thelia\Log\Tlog;
-use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Security\Exception\AuthorizationException;
-use Thelia\Model\MessageQuery;
-use Thelia\Form\MessageModificationForm;
-use Thelia\Form\MessageCreationForm;
-
 /**
  * Manages messages sent by mail
  *
@@ -47,17 +35,15 @@ class AttributeController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function defaultAction() {
-
+    public function defaultAction()
+    {
         if (null !== $response = $this->checkAuth("admin.configuration.attributes.view")) return $response;
-
         return $this->render('product-attributes');
     }
 
-    public function updateAction() {
-
+    public function updateAction()
+    {
         if (null !== $response = $this->checkAuth("admin.configuration.attributes.update")) return $response;
-
         return $this->render('product-attributes-edit');
     }
 }

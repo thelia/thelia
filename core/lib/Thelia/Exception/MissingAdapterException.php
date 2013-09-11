@@ -41,8 +41,8 @@ class MissingAdapterException extends \RuntimeException
     /**
      * {@inheritdoc}
      */
-    public function __construct($message, $code = null, $previous = null) {
-
+    public function __construct($message, $code = null, $previous = null)
+    {
         Tlog::getInstance()->addError($message);
 
         parent::__construct($message, $code, $previous);

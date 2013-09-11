@@ -27,7 +27,6 @@ use Thelia\Core\Event\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Address as AddressModel;
 
-
 /**
  * Class Address
  * @package Thelia\Action
@@ -49,7 +48,6 @@ class Address extends BaseAction implements EventSubscriberInterface
 
         $this->createOrUpdate($addressModel, $event);
     }
-
 
     protected function createOrUpdate(AddressModel $addressModel, AddressCreateOrUpdateEvent $event)
     {

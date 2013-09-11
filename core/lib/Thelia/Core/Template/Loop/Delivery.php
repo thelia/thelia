@@ -26,7 +26,6 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-
 /**
  * Class Delivery
  * @package Thelia\Core\Template\Loop
@@ -60,7 +59,7 @@ class Delivery extends BaseSpecificModule
             $loopResultRow = new LoopResultRow($loopResult, $deliveryModule, $this->versionable, $this->timestampable, $this->countable);
 
             $moduleReflection = new \ReflectionClass($deliveryModule->getFullNamespace());
-            if($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
+            if ($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
                 throw new \RuntimeException(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $deliveryModule->getCode()));
             }
             $moduleInstance = $moduleReflection->newInstance();

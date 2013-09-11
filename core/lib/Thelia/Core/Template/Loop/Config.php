@@ -30,7 +30,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\LangQuery;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\BooleanOrBothType;
@@ -114,7 +113,7 @@ class Config extends BaseI18nLoop
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
                 case 'id':
                     $search->orderById(Criteria::ASC);

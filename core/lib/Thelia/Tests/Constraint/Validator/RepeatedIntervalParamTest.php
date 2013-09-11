@@ -23,7 +23,6 @@
 
 namespace Thelia\Coupon;
 
-use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Constraint\Validator\RepeatedIntervalParam;
 
 /**

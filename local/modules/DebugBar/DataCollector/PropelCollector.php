@@ -115,14 +115,52 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function log($level, $message, array $context = array())
     {
+        list($sql, $duration_str) = $this->parseAndLogSqlQuery($message);
+
+        $message = "$sql ($duration_str)";
+    }
+
+    /**
+     * Parse a log line to extract query information
+     *
+     * @param string $message
+     */
+    protected function parseAndLogSqlQuery($message)
+    {
+        $parts = explode('|', $message, 3);
+        $duration = 0;
+        $memory = 0;
+        if (count($parts) > 1) {
+            $sql = trim($parts[2]);
+
+            if (preg_match('/([0-9]+\.[0-9]+)/', $parts[0], $matches)) {
+                $duration = (float) $matches[1];
+            }
+
+            if (preg_match('/([0-9]+\.[0-9]+)([A-Z]{1,2})/', $parts[1], $matches)) {
+                $memory = (float) $matches[1];
+                if ($matches[2] == 'KB') {
+                    $memory *= 1024;
+                } else if ($matches[2] == 'MB') {
+                    $memory *= 1024 * 1024;
+                }
+            }
+        } else {
+            $sql = $parts[0];
+        }
+
+
         $this->statements[] = array(
-            'sql' => $message,
+            'sql' => $sql,
             'is_success' => true,
-            'duration' => 0,
-            'duration_str' => $this->formatDuration(1),
-            'memory' => 1,
-            'memory_str' => $this->formatBytes(1)
+            'duration' => $duration,
+            'duration_str' => $this->formatDuration($duration),
+            'memory' => $memory,
+            'memory_str' => $this->formatBytes($memory)
         );
+        $this->accumulatedTime += $duration;
+        $this->peakMemory = max($this->peakMemory, $memory);
+        return array($sql, $this->formatDuration($duration));
     }
 
     /**

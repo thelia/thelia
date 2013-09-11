@@ -76,7 +76,6 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
             AvailableForTotalAmountManager::INPUT2 => 'EUR');
         $rule1->setValidatorsFromForm($operators, $values);
 
-
         $rules = new CouponRuleCollection();
         $rules->add($rule1);
 
@@ -110,7 +109,6 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
             AvailableForTotalAmountManager::INPUT1 => 400.00,
             AvailableForTotalAmountManager::INPUT2 => 'EUR');
         $rule1->setValidatorsFromForm($operators, $values);
-
 
         $rules = new CouponRuleCollection();
         $rules->add($rule1);
@@ -215,7 +213,6 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $actual =$isValid;
         $this->assertEquals($expected, $actual, 'Constraints validator always think Customer is matching rules');
     }
-
 
     public function testVariableOpComparisonSuccess()
     {

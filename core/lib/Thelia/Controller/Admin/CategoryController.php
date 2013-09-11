@@ -23,18 +23,10 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Exception\AuthenticationException;
-use Thelia\Core\Security\Exception\AuthorizationException;
-use Thelia\Log\Tlog;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\CategoryCreateEvent;
 use Thelia\Form\CategoryCreationForm;
 use Thelia\Core\Event\CategoryDeleteEvent;
-use Thelia\Core\Event\CategoryToggleVisibilityEvent;
-use Thelia\Core\Event\CategoryChangePositionEvent;
-use Thelia\Form\CategoryDeletionForm;
-use Thelia\Model\Lang;
-use Thelia\Core\Translation\Translator;
 use Thelia\Core\Event\CategoryUpdatePositionEvent;
 use Thelia\Model\CategoryQuery;
 use Thelia\Form\CategoryModificationForm;
@@ -46,12 +38,13 @@ class CategoryController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    protected function renderList() {
+    protected function renderList()
+    {
         return $this->render('categories', $this->getTemplateArgs());
     }
 
-    protected function getTemplateArgs() {
-
+    protected function getTemplateArgs()
+    {
         // Get the category ID
         $category_id = $this->getRequest()->get('category_id', 0);
 
@@ -77,10 +70,9 @@ class CategoryController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function defaultAction() {
-
+    public function defaultAction()
+    {
         if (null !== $response = $this->checkAuth("admin.categories.view")) return $response;
-
         return $this->renderList();
     }
 
@@ -89,8 +81,8 @@ class CategoryController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function createAction() {
-
+    public function createAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.categories.create")) return $response;
 
@@ -126,12 +118,10 @@ class CategoryController extends BaseAdminController
 
             // Redirect to the success URL
             $this->redirect($successUrl);
-        }
-        catch (FormValidationException $ex) {
+        } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -147,8 +137,8 @@ class CategoryController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function changeAction() {
-
+    public function changeAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
 
@@ -189,8 +179,8 @@ class CategoryController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function saveChangeAction() {
-
+    public function saveChangeAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
 
@@ -241,12 +231,10 @@ class CategoryController extends BaseAdminController
 
             // Redirect to the success URL
             $this->redirect($changeForm->getSuccessUrl());
-        }
-        catch (FormValidationException $ex) {
+        } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -260,7 +248,8 @@ class CategoryController extends BaseAdminController
     /**
      * Online status toggle category
      */
-    public function setToggleVisibilityAction() {
+    public function setToggleVisibilityAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
 
@@ -271,8 +260,7 @@ class CategoryController extends BaseAdminController
 
         try {
             $this->dispatch(TheliaEvents::CATEGORY_SET_DEFAULT, $changeEvent);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
@@ -283,7 +271,8 @@ class CategoryController extends BaseAdminController
     /**
      * Update categoryposition
      */
-    public function updatePositionAction() {
+    public function updatePositionAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
 
@@ -306,8 +295,7 @@ class CategoryController extends BaseAdminController
             );
 
             $this->dispatch(TheliaEvents::CATEGORY_UPDATE_POSITION, $event);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
@@ -320,8 +308,8 @@ class CategoryController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function deleteAction() {
-
+    public function deleteAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.categories.delete")) return $response;
 

@@ -38,7 +38,6 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Tools\Redirect;
 use Thelia\Tools\URL;
 
-
 /**
  * Class RewritingRouter
  * @package Thelia\Core\Routing
@@ -114,8 +113,8 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      *
      * If there is no route with the given name, the generator must throw the RouteNotFoundException.
      *
-     * @param string $name          The name of the route
-     * @param mixed $parameters    An array of parameters
+     * @param string         $name          The name of the route
+     * @param mixed          $parameters    An array of parameters
      * @param Boolean|string $referenceType The type of reference to be generated (one of the constants)
      *
      * @return string The generated URL
@@ -163,16 +162,16 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      * @throws \Exception|\Thelia\Exception\UrlRewritingException
      * @throws \Symfony\Component\Routing\Exception\ResourceNotFoundException
      * @throws \Thelia\Exception\RedirectException
-     * @return array An array of parameters
+     * @return array                                                          An array of parameters
      *
      */
     public function matchRequest(Request $request)
     {
-        if(ConfigQuery::isRewritingEnable()) {
+        if (ConfigQuery::isRewritingEnable()) {
             try {
                 $rewrittenUrlData = URL::getInstance()->resolve($request->getPathInfo());
-            } catch(UrlRewritingException $e) {
-                switch($e->getCode()) {
+            } catch (UrlRewritingException $e) {
+                switch ($e->getCode()) {
                     case UrlRewritingException::URL_NOT_FOUND :
                         throw new ResourceNotFoundException();
                         break;
@@ -183,23 +182,23 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
             /* is the URL redirected ? */
 
-            if(null !== $rewrittenUrlData->redirectedToUrl) {
+            if (null !== $rewrittenUrlData->redirectedToUrl) {
                 $this->redirect($rewrittenUrlData->redirectedToUrl, 301);
             }
 
             /* define GET arguments in request */
 
-            if(null !== $rewrittenUrlData->view) {
+            if (null !== $rewrittenUrlData->view) {
                 $request->attributes->set('_view', $rewrittenUrlData->view);
-                if(null !== $rewrittenUrlData->viewId) {
+                if (null !== $rewrittenUrlData->viewId) {
                     $request->query->set($rewrittenUrlData->view . '_id', $rewrittenUrlData->viewId);
                 }
             }
-            if(null !== $rewrittenUrlData->locale) {
+            if (null !== $rewrittenUrlData->locale) {
                 $request->query->set('locale', $rewrittenUrlData->locale);
             }
 
-            foreach($rewrittenUrlData->otherParameters as $parameter => $value) {
+            foreach ($rewrittenUrlData->otherParameters as $parameter => $value) {
                 $request->query->set($parameter, $value);
             }
 

@@ -24,7 +24,6 @@
 namespace Thelia\Exception;
 
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
-use Thelia\Log\Tlog;
 
 /**
  * Created by JetBrains PhpStorm.

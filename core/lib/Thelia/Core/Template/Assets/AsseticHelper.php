@@ -29,8 +29,6 @@ use Assetic\Filter;
 use Assetic\Factory\AssetFactory;
 use Assetic\Factory\Worker\CacheBustingWorker;
 use Assetic\AssetWriter;
-use Assetic\Asset\AssetCache;
-use Assetic\Cache\FilesystemCache;
 
 /**
  * This class is a simple helper for generating assets using Assetic.
@@ -139,8 +137,7 @@ class AsseticHelper
             foreach ($filter_list as $filter) {
                 if ('?' != $filter[0]) {
                     $asset->ensureFilter($fm->get($filter));
-                }
-                elseif (!$debug) {
+                } elseif (!$debug) {
                     $asset->ensureFilter($fm->get(substr($filter, 1)));
                 }
             }

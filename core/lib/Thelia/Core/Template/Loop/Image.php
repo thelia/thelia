@@ -25,8 +25,6 @@ namespace Thelia\Core\Template\Loop;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\ImageEvent;
-use Thelia\Model\CategoryImageQuery;
-use Thelia\Model\ProductImageQuery;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Type\TypeCollection;
@@ -99,7 +97,7 @@ class Image extends BaseI18nLoop
         );
 
         // Add possible image sources
-        foreach($this->possible_sources as $source) {
+        foreach ($this->possible_sources as $source) {
             $collection->addArgument(Argument::createIntTypeArgument($source));
         }
 
@@ -109,12 +107,12 @@ class Image extends BaseI18nLoop
     /**
      * Dynamically create the search query, and set the proper filter and order
      *
-     * @param string $source a valid source identifier (@see $possible_sources)
-     * @param int $object_id the source object ID
+     * @param  string        $source    a valid source identifier (@see $possible_sources)
+     * @param  int           $object_id the source object ID
      * @return ModelCriteria the propel Query object
      */
-    protected function createSearchQuery($source, $object_id) {
-
+    protected function createSearchQuery($source, $object_id)
+    {
         $object = ucfirst($source);
 
         $queryClass   = sprintf("\Thelia\Model\%sImageQuery", $object);
@@ -159,12 +157,12 @@ class Image extends BaseI18nLoop
     /**
      * Dynamically create the search query, and set the proper filter and order
      *
-     * @param string $object_type (returned) the a valid source identifier (@see $possible_sources)
-     * @param string $object_id (returned) the ID of the source object
+     * @param  string        $object_type (returned) the a valid source identifier (@see $possible_sources)
+     * @param  string        $object_id   (returned) the ID of the source object
      * @return ModelCriteria the propel Query object
      */
-    protected function getSearchQuery(&$object_type, &$object_id) {
-
+    protected function getSearchQuery(&$object_type, &$object_id)
+    {
         $search = null;
 
         // Check form source="product" source_id="123" style arguments
@@ -184,10 +182,9 @@ class Image extends BaseI18nLoop
 
             $object_type = $source;
             $object_id   = $source_id;
-        }
-        else {
+        } else {
             // Check for product="id" folder="id", etc. style arguments
-            foreach($this->possible_sources as $source) {
+            foreach ($this->possible_sources as $source) {
 
                 $argValue = intval($this->getArgValue($source));
 
@@ -247,7 +244,7 @@ class Image extends BaseI18nLoop
             $effects = explode(',', $effects);
         }
 
-        switch($this->getResizeMode()) {
+        switch ($this->getResizeMode()) {
             case 'crop' :
                 $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_CROP;
                 break;
@@ -316,8 +313,7 @@ class Image extends BaseI18nLoop
                 ;
 
                 $loopResult->addRow($loopResultRow);
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 // Ignore the result and log an error
                 Tlog::getInstance()->addError("Failed to process image in image loop: ", $this->args);
             }

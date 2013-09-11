@@ -24,8 +24,6 @@
 namespace Thelia\Core\Event;
 
 use Symfony\Component\EventDispatcher\Event;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Form\BaseForm;
 /**
  *
  * Class thrown on Thelia.action event
