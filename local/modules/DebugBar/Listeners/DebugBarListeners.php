@@ -48,7 +48,7 @@ class DebugBarListeners extends BaseAction implements EventSubscriberInterface {
         $debugBar->addCollector(new PhpInfoCollector());
         //$debugBar->addCollector(new MessagesCollector());
         //$debugBar->addCollector(new RequestDataCollector());
-        //$debugBar->addCollector(new TimeDataCollector());
+        $debugBar->addCollector(new TimeDataCollector());
         $debugBar->addCollector(new MemoryCollector());
         $debugBar->addCollector(new PropelCollector());
     }
