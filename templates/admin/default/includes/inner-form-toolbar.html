@@ -12,7 +12,7 @@
 		<ul class="nav nav-pills">
 		    {loop name="lang_list" type="lang" default_only={$default_only}}
 		    <li {if $ID == $edit_language_id}class="active"{/if}>
-		        <a href="{$current_url nofilter}&amp;edit_language_id={$ID}" title="{intl l="Edit information in %lng" lng=$TITLE}">
+		        <a href="{url path=$current_url edit_language_id=$ID}" title="{intl l="Edit information in %lng" lng=$TITLE}">
 		            <img src="{image file="../assets/img/flags/{$CODE}.gif"}" alt="{intl l=$TITLE}" />
 		        </a>
 		    </li>

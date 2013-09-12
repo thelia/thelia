@@ -11,9 +11,9 @@
 
     <div class="customer">
         <div id="wrapper" class="container">
-            
+
             <ul class="breadcrumb">
-                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>                    
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                 <li><a href="{url path='/admin/customers'}">{intl l="Customers"}</a></li>
             </ul>
 
@@ -58,7 +58,7 @@
 
                                     <th>{intl l='order amount'}</th>
 
-                                    <th>{intl l='Actions'}</th>
+                                    <th class="actions">{intl l='Actions'}</th>
                                 </tr>
                                 </thead>
 
@@ -154,23 +154,23 @@
                {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
                <input type="hidden" name="{$name}" value="{url path='/admin/customer/update/_ID_'}" />
             {/form_field}
-            
+
             {form_field form=$form field='company'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Company'}">
                 </div>
             {/form_field}
-            
-            {form_field form=$form field='title'}                
+
+            {form_field form=$form field='title'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                    
+
                     <select name="{$name}" id="{$label_attr.for}" class="form-control">
                         {loop type="title" name="title1"}
                             <option value="{$ID}">{$LONG}</option>
                         {/loop}
-                    </select>                    
+                    </select>
                 </div>
             {/form_field}
 
@@ -191,13 +191,13 @@
             {form_field form=$form field='address1'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Address'}">                    
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Address'}">
                 </div>
 
                 <div class="form-group">
                     {form_field form=$form field='address2'}
                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Additional address'}">
-                    {/form_field}                    
+                    {/form_field}
                 </div>
 
                 <div class="form-group">
@@ -237,8 +237,8 @@
                     <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Email address'}">
                 </div>
-            {/form_field} 
-            
+            {/form_field}
+
         {/capture}
 
         {include
