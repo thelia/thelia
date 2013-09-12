@@ -28,7 +28,7 @@ use Symfony\Component\Validator\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
-class AttributeValueCreationForm extends BaseForm
+class AttributeAvCreationForm extends BaseForm
 {
     protected function buildForm()
     {
@@ -57,6 +57,6 @@ class AttributeValueCreationForm extends BaseForm
 
     public function getName()
     {
-        return "thelia_attribute_value_creation";
+        return "thelia_attributeav_creation";
     }
 }
