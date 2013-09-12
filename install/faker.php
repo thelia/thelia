@@ -159,20 +159,40 @@ try {
     for($i = 0; $i < 50; $i++) {
         $customer = new Thelia\Model\Customer();
         $customer->createOrUpdate(
-            1,
-            "thelia".$i,
-            "thelia".$i,
-            "5 rue rochon",
-            "",
-            "",
-            "0102030405",
-            "0601020304",
-            "63000",
-            "clermont-ferrand",
+            rand(1,3),
+            $faker->firstname,
+            $faker->lastname,
+            $faker->streetAddress,
+            $faker->streetAddress,
+            $faker->streetAddress,
+            $faker->phoneNumber,
+            $faker->phoneNumber,
+            $faker->postcode,
+            $faker->city,
             64,
-            sprintf("test%d@thelia.net", $i),
+            $faker->email,
             "azerty".$i
         );
+
+        for ($j = 0; $j <= 3; $j++) {
+            $address = new Thelia\Model\Address();
+            $address->setLabel($faker->text(20))
+                ->setTitleId(rand(1,3))
+                ->setFirstname($faker->firstname)
+                ->setLastname($faker->lastname)
+                ->setAddress1($faker->streetAddress)
+                ->setAddress2($faker->streetAddress)
+                ->setAddress3($faker->streetAddress)
+                ->setCellphone($faker->phoneNumber)
+                ->setPhone($faker->phoneNumber)
+                ->setZipcode($faker->postcode)
+                ->setCity($faker->city)
+                ->setCountryId(64)
+                ->setCustomer($customer)
+                ->save()
+            ;
+
+        }
     }
 
     //features and features_av

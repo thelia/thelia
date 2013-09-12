@@ -88,6 +88,7 @@ class Customer extends BaseCustomer implements UserInterface
                     ->setPhone($phone)
                     ->setCellphone($cellphone)
                     ->setZipcode($zipcode)
+                    ->setCity($city)
                     ->setCountryId($countryId)
                     ->setIsDefault(1)
                     ;
@@ -107,6 +108,7 @@ class Customer extends BaseCustomer implements UserInterface
                     ->setPhone($phone)
                     ->setCellphone($cellphone)
                     ->setZipcode($zipcode)
+                    ->setCity($city)
                     ->setCountryId($countryId)
                     ->save($con)
                 ;
