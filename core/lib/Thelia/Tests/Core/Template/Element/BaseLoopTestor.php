@@ -131,4 +131,42 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\Thelia\Core\Template\Element\LoopResult', $methodReturn);
     }
+
+    public function baseTestSearchById($id)
+    {
+        $this->instance->initializeArgs(array_merge(
+            $this->getMandatoryArguments(),
+            array(
+                "type" => "foo",
+                "name" => "foo",
+                "id" => $id,
+            )
+        ));
+
+        $dummy = null;
+        $loopResults = $this->instance->exec($dummy);
+
+        $this->assertEquals(1, $loopResults->getCount());
+
+        $substitutions = $loopResults->current()->getVarVal();
+
+        $this->assertEquals($id, $substitutions['ID']);
+    }
+
+    public function baseTestSearchWithLimit($limit)
+    {
+        $this->instance->initializeArgs(array_merge(
+            $this->getMandatoryArguments(),
+            array(
+                "type" => "foo",
+                "name" => "foo",
+                "limit" => $limit,
+            )
+        ));
+
+        $dummy = null;
+        $loopResults = $this->instance->exec($dummy);
+
+        $this->assertEquals($limit, $loopResults->getCount());
+    }
 }
