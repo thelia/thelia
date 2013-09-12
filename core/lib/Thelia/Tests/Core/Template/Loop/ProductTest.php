@@ -23,6 +23,7 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Thelia\Model\ProductQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 use Thelia\Core\Template\Loop\Product;
@@ -47,5 +48,24 @@ class ProductTest extends BaseLoopTestor
     public function getMandatoryArguments()
     {
         return array();
+    }
+
+    public function testSearchById()
+    {
+        $product = ProductQuery::create()->findOne();
+
+        $loop = new Product($this->container);
+        $loop->initializeArgs(array(
+            "type" => "product",
+            "name" => "product",
+            "id" => $product->getId(),
+        ));
+        $loopResults = $loop->exec($pagination);
+
+        $this->assertEquals(1, $loopResults->getCount());
+
+        $substitutions = $loopResults->current()->getVarVal();
+
+        $this->assertEquals($product->getId(), $substitutions['ID']);
     }
 }
