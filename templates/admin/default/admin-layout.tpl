@@ -228,13 +228,14 @@
 
 	{block name="after-javascript-include"}{/block}
 
+    {javascripts file='assets/js/bootstrap/bootstrap.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
     {block name="javascript-initialization"}{/block}
 
 	{* Modules scripts are included now *}
 	{module_include location='footer_js'}
 
-    {javascripts file='assets/js/bootstrap/bootstrap.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
 </body>
 </html>
