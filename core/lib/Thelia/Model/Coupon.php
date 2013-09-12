@@ -49,24 +49,25 @@ class Coupon extends BaseCoupon
 
 
     /**
-     * Constructor
+     * Create or Update this Coupon
      *
-     * @param string               $code                       Coupon Code
-     * @param string               $title                      Coupon title
-     * @param float                $amount                     Amount removed from the Total Checkout
-     * @param string               $effect                     Coupon effect
-     * @param string               $shortDescription           Coupon short description
-     * @param string               $description                Coupon description
-     * @param boolean              $isEnabled                  Enable/Disable
-     * @param \DateTime            $expirationDate             Coupon expiration date
-     * @param boolean              $isAvailableOnSpecialOffers Is available on special offers
-     * @param boolean              $isCumulative               Is cumulative
-     * @param boolean              $isRemovingPostage          Is removing Postage
-     * @param int                  $maxUsage                   Coupon quantity
-     * @param CouponRuleCollection $rules                      CouponRuleInterface to add
-     * @param string               $locale                       Coupon Language code ISO (ex: fr_FR)
+     * @param string    $code                       Coupon Code
+     * @param string    $title                      Coupon title
+     * @param float     $amount                     Amount removed from the Total Checkout
+     * @param string    $effect                     Coupon effect
+     * @param bool      $isRemovingPostage          Is removing Postage
+     * @param string    $shortDescription           Coupon short description
+     * @param string    $description                Coupon description
+     * @param boolean   $isEnabled                  Enable/Disable
+     * @param \DateTime $expirationDate             Coupon expiration date
+     * @param boolean   $isAvailableOnSpecialOffers Is available on special offers
+     * @param boolean   $isCumulative               Is cumulative
+     * @param int       $maxUsage                   Coupon quantity
+     * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
+     *
+     * @throws \Exception
      */
-    function createOrUpdate($code, $title, $amount, $effect, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $rules, $locale = null)
+    function createOrUpdate($code, $title, $amount, $effect, $isRemovingPostage, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $locale = null)
     {
         $this->setCode($code)
             ->setTitle($title)
@@ -74,13 +75,13 @@ class Coupon extends BaseCoupon
             ->setDescription($description)
             ->setType($effect)
             ->setAmount($amount)
+            ->setIsRemovingPostage($isRemovingPostage)
             ->setType($amount)
             ->setIsEnabled($isEnabled)
             ->setExpirationDate($expirationDate)
             ->setIsAvailableOnSpecialOffers($isAvailableOnSpecialOffers)
             ->setIsCumulative($isCumulative)
-            ->setMaxUsage($maxUsage)
-            ->setRules($rules);
+            ->setMaxUsage($maxUsage);
 
         // Set object language (i18n)
         if (!is_null($locale)) {
@@ -99,33 +100,34 @@ class Coupon extends BaseCoupon
         }
     }
 
-//    /**
-//     * Set the value of [serialized_rules] column.
-//     * Convert a CouponRuleCollection into a serialized array of SerializableRule
-//     *
-//     * @param CouponRuleCollection $rules A set of Rules
-//     *
-//     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
-//     */
-//    public function setRules(CouponRuleCollection $rules)
-//    {
-//        $serializedRules = null;
-//        if ($rules !== null) {
-//            /** @var $rule CouponRuleInterface */
-//            foreach ($rules->getRules() as $rule) {
-//                $serializedRules[] = $rule->getSerializableRule();
-//            }
-//
-//            $serializedRules = (string) base64_encode(serialize($serializedRules));
-//        }
-//
-//        if ($this->serialized_rules !== $serializedRules) {
-//            $this->serialized_rules = $serializedRules;
-//            $this->modifiedColumns[] = CouponTableMap::SERIALIZED_RULES;
-//        }
-//
-//        return $this;
-//    }
+    /**
+     * Create or Update this coupon rule
+     *
+     * @param string $serializableRules Serialized rules ready to be saved
+     * @param string $locale            Coupon Language code ISO (ex: fr_FR)
+     *
+     * @throws \Exception
+     */
+    function createOrUpdateRules($serializableRules, $locale)
+    {
+        $this->setSerializedRules($serializableRules);
+
+        // Set object language (i18n)
+        if (!is_null($locale)) {
+            $this->setLocale($locale);
+        }
+
+        $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+        try {
+            $this->save($con);
+            $con->commit();
+
+        } catch(\Exception $e) {
+            $con->rollback();
+            throw $e;
+        }
+    }
 
 
 

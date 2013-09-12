@@ -63,77 +63,6 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
         )
     );
 
-//    /** @var QuantityParam Quantity Validator */
-//    protected $quantityValidator = null;
-
-//    /**
-//     * Check if backoffice inputs are relevant or not
-//     *
-//     * @throws InvalidRuleOperatorException if Operator is not allowed
-//     * @throws InvalidRuleValueException    if Value is not allowed
-//     * @return bool
-//     */
-//    public function checkBackOfficeInput()
-//    {
-//        if (!isset($this->validators)
-//            || empty($this->validators)
-//            ||!isset($this->validators[self::PARAM1_QUANTITY])
-//            ||!isset($this->validators[self::PARAM1_QUANTITY])
-//        ) {
-//            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
-//        }
-//
-//        /** @var RuleValidator $ruleValidator */
-//        $ruleValidator = $this->validators[self::PARAM1_QUANTITY];
-//        /** @var QuantityParam $quantity */
-//        $quantity = $ruleValidator->getParam();
-//
-//        if (!$quantity instanceof QuantityParam) {
-//            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
-//        }
-//
-//        $this->checkBackOfficeInputsOperators();
-//
-//        return $this->isQuantityValid($quantity->getInteger());
-//    }
-
-//    /**
-//     * Generate current Rule param to be validated from adapter
-//     *
-//     * @param CouponAdapterInterface $adapter allowing to gather
-//     *                               all necessary Thelia variables
-//     *
-//     * @return $this
-//     */
-//    protected function setParametersToValidate()
-//    {
-//        $this->paramsToValidate = array(
-//            self::PARAM1_QUANTITY => $this->adapter->getNbArticlesInCart()
-//        );
-//
-//        return $this;
-//    }
-
-//    /**
-//     * Check if Checkout inputs are relevant or not
-//     *
-//     * @throws \Thelia\Exception\InvalidRuleValueException
-//     * @return bool
-//     */
-//    public function checkCheckoutInput()
-//    {
-//        if (!isset($this->paramsToValidate)
-//            || empty($this->paramsToValidate)
-//            ||!isset($this->paramsToValidate[self::PARAM1_QUANTITY])
-//        ) {
-//            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
-//        }
-//
-//        $price = $this->paramsToValidate[self::PARAM1_QUANTITY];
-//
-//        return $this->isQuantityValid($price);
-//    }
-
     /**
      * Check validators relevancy and store them
      *
@@ -174,7 +103,7 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
             );
         }
 
-        if (!is_int($quantityValue) || $quantityValue <= 0) {
+        if ((int) $quantityValue <= 0) {
             throw new \InvalidArgumentException(
                 'Value for quantity field is not legit'
             );
@@ -209,26 +138,6 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
         }
         return false;
     }
-
-//    /**
-//     * Check if a quantity is valid
-//     *
-//     * @param int $quantity Quantity to check
-//     *
-//     * @throws InvalidRuleValueException if Value is not allowed
-//     * @return bool
-//     */
-//    protected function isQuantityValid($quantity)
-//    {
-//        $quantityValidator = $this->quantityValidator;
-//        try {
-//            $quantityValidator->getParam()->compareTo($quantity);
-//        } catch(InvalidArgumentException $e) {
-//            throw new InvalidRuleValueException(get_class(), self::PARAM1_QUANTITY);
-//        }
-//
-//        return true;
-//    }
 
     /**
      * Get I18n name
@@ -266,36 +175,6 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
 
         return $toolTip;
     }
-
-//    /**
-//     * Populate a Rule from a form admin
-//     *
-//     * @param array $operators Rule Operator set by the Admin
-//     * @param array $values    Rule Values set by the Admin
-//     *
-//     * @throws InvalidArgumentException
-//     * @return $this
-//     */
-//    public function populateFromForm(array $operators, array $values)
-//    {
-//        if ($values[self::PARAM1_QUANTITY] === null) {
-//            throw new InvalidArgumentException(
-//                'The Rule ' . get_class() . 'needs at least a quantity set (' . self::PARAM1_QUANTITY. ')'
-//            );
-//        }
-//
-//        $this->quantityValidator = new RuleValidator(
-//            $operators[self::PARAM1_QUANTITY],
-//            new QuantityParam(
-//                $this->adapter,
-//                $values[self::PARAM1_QUANTITY]
-//            )
-//        );
-//
-//        $this->validators = array(self::PARAM1_QUANTITY => $this->quantityValidator);
-//
-//        return $this;
-//    }
 
     /**
      * Generate inputs ready to be drawn

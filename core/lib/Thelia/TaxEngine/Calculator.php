@@ -34,9 +34,15 @@ use Thelia\Model\TaxRuleQuery;
  */
 class Calculator
 {
+    /**
+     * @var TaxRuleQuery
+     */
     protected $taxRuleQuery = null;
 
-    protected $taxRulesGroupedCollection = null;
+    /**
+     * @var null|\Propel\Runtime\Collection\ObjectCollection
+     */
+    protected $taxRulesCollection = null;
 
     protected $product = null;
     protected $country = null;
@@ -50,7 +56,7 @@ class Calculator
     {
         $this->product = null;
         $this->country = null;
-        $this->taxRulesGroupedCollection = null;
+        $this->taxRulesCollection = null;
 
         if($product->getId() === null) {
             throw new TaxEngineException('Product id is empty in Calculator::load', TaxEngineException::UNDEFINED_PRODUCT);
@@ -62,34 +68,47 @@ class Calculator
         $this->product = $product;
         $this->country = $country;
 
-        $this->taxRulesGroupedCollection = $this->taxRuleQuery->getTaxCalculatorGroupedCollection($product, $country);
+        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($product, $country);
 
         return $this;
     }
 
-    public function getTaxAmount($amount)
+    public function getTaxAmount($untaxedPrice)
     {
-        if(null === $this->taxRulesGroupedCollection) {
+        return $this->getTaxedPrice($untaxedPrice) - $untaxedPrice;
+    }
+
+    public function getTaxedPrice($untaxedPrice)
+    {
+        if(null === $this->taxRulesCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxAmount', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
         }
 
-        if(false === filter_var($amount, FILTER_VALIDATE_FLOAT)) {
+        if(false === filter_var($untaxedPrice, FILTER_VALIDATE_FLOAT)) {
             throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
         }
 
-        $totalTaxAmount = 0;
-        foreach($this->taxRulesGroupedCollection as $taxRule) {
-            $rateSum = $taxRule->getTaxRuleRateSum();
-            $taxAmount = $amount * $rateSum * 0.01;
-            $totalTaxAmount += $taxAmount;
-            $amount += $taxAmount;
+        $taxedPrice = $untaxedPrice;
+        $currentPosition = 1;
+        $currentTax = 0;
+
+        foreach($this->taxRulesCollection as $taxRule) {
+            $position = (int)$taxRule->getTaxRuleCountryPosition();
+
+            $taxType = $taxRule->getTypeInstance();
+            $taxType->loadRequirements( $taxRule->getRequirements() );
+
+            if($currentPosition !== $position) {
+                $taxedPrice += $currentTax;
+                $currentTax = 0;
+                $currentPosition = $position;
+            }
+
+            $currentTax += $taxType->calculate($taxedPrice);
         }
 
-        return $totalTaxAmount;
-    }
+        $taxedPrice += $currentTax;
 
-    public function getTaxedPrice($amount)
-    {
-        return $amount + $this->getTaxAmount($amount);
+        return $taxedPrice;
     }
 }

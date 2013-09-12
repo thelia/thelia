@@ -104,23 +104,6 @@ class DebugBar extends AbstractSmartyPlugin
         return $render;
     }
 
-    public function renderHead($params, \Smarty_Internal_Template $template)
-    {
-        $render = "";
-        if ($this->debugMode) {
-            $javascriptRenderer = $this->debugBar->getJavascriptRenderer();
-            $assets = $javascriptRenderer->getAssets();
-
-            $cssCollection = $assets[0];
-            $jsCollection = $assets[1];
-
-            $render .= sprintf('<style media="screen" type="text/css">%s</style>', $cssCollection->dump());
-            $render .= sprintf('<script>%s</script>', $jsCollection->dump());
-        }
-
-        return $render;
-    }
-
     /**
      * @return an array of SmartyPluginDescriptor
      */

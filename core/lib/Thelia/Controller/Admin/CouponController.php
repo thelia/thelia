@@ -26,12 +26,17 @@ namespace Thelia\Controller\Admin;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 use Thelia\Constraint\ConstraintFactory;
+use Thelia\Constraint\ConstraintFactoryTest;
 use Thelia\Constraint\Rule\AvailableForTotalAmount;
 use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Constraint\Validator\PriceParam;
+use Thelia\Core\Event\Coupon\CouponCreateEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\Exception\AuthenticationException;
+use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Coupon\CouponManager;
@@ -153,6 +158,13 @@ class CouponController extends BaseAdminController
             );
         } else {
             // Prepare the data that will hydrate the form
+
+            /** @var ConstraintFactory $constraintFactory */
+            $constraintFactory = $this->container->get('thelia.constraint.factory');
+            $rules = $constraintFactory->unserializeCouponRuleCollection(
+                $coupon->getSerializedRules()
+            );
+
             $data = array(
                 'code' => $coupon->getCode(),
                 'title' => $coupon->getTitle(),
@@ -166,17 +178,11 @@ class CouponController extends BaseAdminController
                 'isCumulative' => ($coupon->getIsCumulative() == 1),
                 'isRemovingPostage' => ($coupon->getIsRemovingPostage() == 1),
                 'maxUsage' => $coupon->getMaxUsage(),
-                'rules' => new CouponRuleCollection(array()),
+                'rules' => $rules,
                 'locale' => $coupon->getLocale(),
             );
 
             $args['rulesObject'] = array();
-
-            /** @var ConstraintFactory $constraintFactory */
-            $constraintFactory = $this->container->get('thelia.constraint.factory');
-            $rules = $constraintFactory->unserializeCouponRuleCollection(
-                $coupon->getSerializedRules()
-            );
 
             /** @var CouponRuleInterface $rule */
             foreach ($rules->getRules() as $rule) {
@@ -187,6 +193,8 @@ class CouponController extends BaseAdminController
                     'validators' => $rule->getValidators()
                 );
             }
+
+            $args['rules'] = $this->cleanRuleForTemplate($rules);
 
             // Setup the object form
             $changeForm = new CouponCreationForm($this->getRequest(), 'form', $data);
@@ -211,99 +219,103 @@ class CouponController extends BaseAdminController
 
         $args['formAction'] = 'admin/coupon/update/' . $couponId;
 
-        return $this->render(
-            'coupon-update',
-            $args
-        );
+        return $this->render('coupon-update', $args);
     }
 
-    /**
-     * Manage Coupons Rule creation display
-     *
-     * @param int $couponId Coupon id
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function createRuleAction($couponId)
-    {
-        // Check current user authorization
-        $response = $this->checkAuth('admin.coupon.update');
-        if ($response !==  null) {
-            return $response;
-        }
 
-        /** @var Coupon $coupon */
-        $coupon = CouponQuery::create()->findOneById($couponId);
-        if (!$coupon) {
-            $this->pageNotFound();
-        }
-
-        // Parameters given to the template
-        $args = array();
-
-        $i18n = new I18n();
-        /** @var Lang $lang */
-        $lang = $this->getSession()->get('lang');
-        $eventToDispatch = TheliaEvents::COUPON_RULE_CREATE;
-
-        if ($this->getRequest()->isMethod('POST')) {
-            $this->validateCreateOrUpdateForm(
-                $i18n,
-                $lang,
-                $eventToDispatch,
-                'updated',
-                'update'
-            );
-        } else {
-            // Prepare the data that will hydrate the form
-            $data = array(
-                'code' => $coupon->getCode(),
-                'title' => $coupon->getTitle(),
-                'amount' => $coupon->getAmount(),
-                'effect' => $coupon->getType(),
-                'shortDescription' => $coupon->getShortDescription(),
-                'description' => $coupon->getDescription(),
-                'isEnabled' => ($coupon->getIsEnabled() == 1),
-                'expirationDate' => $coupon->getExpirationDate($lang->getDateFormat()),
-                'isAvailableOnSpecialOffers' => ($coupon->getIsAvailableOnSpecialOffers() == 1),
-                'isCumulative' => ($coupon->getIsCumulative() == 1),
-                'isRemovingPostage' => ($coupon->getIsRemovingPostage() == 1),
-                'maxUsage' => $coupon->getMaxUsage(),
-                'rules' => new CouponRuleCollection(array()),
-                'locale' => $coupon->getLocale(),
-            );
-
-            /** @var CouponAdapterInterface $adapter */
-            $adapter = $this->container->get('thelia.adapter');
-            /** @var Translator $translator */
-            $translator = $this->container->get('thelia.translator');
-
-            $args['rulesObject'] = array();
-            /** @var CouponRuleInterface $rule */
-            foreach ($coupon->getRules()->getRules() as $rule) {
-                $args['rulesObject'][] = array(
-                    'name' => $rule->getName($translator),
-                    'tooltip' => $rule->getToolTip($translator),
-                    'validators' => $rule->getValidators()
-                );
-            }
-
+//    /**
+//     * Manage Coupons Rule creation display
+//     *
+//     * @param int $couponId Coupon id
+//     *
+//     * @return \Symfony\Component\HttpFoundation\Response
+//     */
+//    public function createRuleAction($couponId)
+//    {
+//        // Check current user authorization
+//        $response = $this->checkAuth('admin.coupon.update');
+//        if ($response !==  null) {
+//            return $response;
+//        }
+//
+//        /** @var Coupon $coupon */
+//        $coupon = CouponQuery::create()->findOneById($couponId);
+//        if (!$coupon) {
+//            $this->pageNotFound();
+//        }
+//
+//        // Parameters given to the template
+//        $args = array();
+//
+//        $i18n = new I18n();
+//        /** @var Lang $lang */
+//        $lang = $this->getSession()->get('lang');
+//        $eventToDispatch = TheliaEvents::COUPON_RULE_CREATE;
+//
+//        if ($this->getRequest()->isMethod('POST')) {
+//            $this->validateCreateOrUpdateForm(
+//                $i18n,
+//                $lang,
+//                $eventToDispatch,
+//                'updated',
+//                'update'
+//            );
+//        } else {
+//            // Prepare the data that will hydrate the form
+//
+//            /** @var ConstraintFactory $constraintFactory */
+//            $constraintFactory = $this->container->get('thelia.constraint.factory');
+//
+//            $data = array(
+//                'code' => $coupon->getCode(),
+//                'title' => $coupon->getTitle(),
+//                'amount' => $coupon->getAmount(),
+//                'effect' => $coupon->getType(),
+//                'shortDescription' => $coupon->getShortDescription(),
+//                'description' => $coupon->getDescription(),
+//                'isEnabled' => ($coupon->getIsEnabled() == 1),
+//                'expirationDate' => $coupon->getExpirationDate($lang->getDateFormat()),
+//                'isAvailableOnSpecialOffers' => ($coupon->getIsAvailableOnSpecialOffers() == 1),
+//                'isCumulative' => ($coupon->getIsCumulative() == 1),
+//                'isRemovingPostage' => ($coupon->getIsRemovingPostage() == 1),
+//                'maxUsage' => $coupon->getMaxUsage(),
+//                'rules' => $constraintFactory->unserializeCouponRuleCollection($coupon->getSerializedRules()),
+//                'locale' => $coupon->getLocale(),
+//            );
+//
+//            /** @var CouponAdapterInterface $adapter */
+//            $adapter = $this->container->get('thelia.adapter');
+//            /** @var Translator $translator */
+//            $translator = $this->container->get('thelia.translator');
+//
+//            $args['rulesObject'] = array();
+//            /** @var CouponRuleInterface $rule */
+//            foreach ($coupon->getRules()->getRules() as $rule) {
+//                $args['rulesObject'][] = array(
+//                    'name' => $rule->getName($translator),
+//                    'tooltip' => $rule->getToolTip($translator),
+//                    'validators' => $rule->getValidators()
+//                );
+//            }
+//
 //            $args['rules'] = $this->cleanRuleForTemplate($coupon->getRules()->getRules());
+//
+//            // Setup the object form
+//            $changeForm = new CouponCreationForm($this->getRequest(), 'form', $data);
+//
+//            // Pass it to the parser
+//            $this->getParserContext()->addForm($changeForm);
+//        }
+//
+//        $args['formAction'] = 'admin/coupon/update/' . $couponId;
+//
+//        return $this->render(
+//            'coupon-update',
+//            $args
+//        );
+//    }
 
-            // Setup the object form
-            $changeForm = new CouponCreationForm($this->getRequest(), 'form', $data);
 
-            // Pass it to the parser
-            $this->getParserContext()->addForm($changeForm);
-        }
-
-        $args['formAction'] = 'admin/coupon/update/' . $couponId;
-
-        return $this->render(
-            'coupon-update',
-            $args
-        );
-    }
 
     /**
      * Manage Coupons read display
@@ -367,6 +379,7 @@ class CouponController extends BaseAdminController
         );
     }
 
+
     /**
      * Manage Coupons read display
      *
@@ -404,7 +417,6 @@ class CouponController extends BaseAdminController
         $constraintFactory = $this->container->get('thelia.constraint.factory');
         $rulesReceived = json_decode($this->getRequest()->get('rules'));
         foreach ($rulesReceived as $ruleReceived) {
-            var_dump('building ', $ruleReceived->values);
             $rule = $constraintFactory->build(
                 $ruleReceived->serviceId,
                 (array) $ruleReceived->operators,
@@ -433,6 +445,7 @@ class CouponController extends BaseAdminController
             $rules,
             $coupon->getLocale()
         );
+        $couponEvent->setCoupon($coupon);
 
         $eventToDispatch = TheliaEvents::COUPON_RULE_UPDATE;
         // Dispatch Event to the Action
@@ -687,5 +700,7 @@ class CouponController extends BaseAdminController
 //            return false;
 //        }
 //    }
+
+
 
 }

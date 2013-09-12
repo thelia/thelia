@@ -65,7 +65,10 @@ class CustomerCreation extends BaseForm
                 "label_attr" => array(
                     "for" => "address"
                 ),
-                "label" => Translator::getInstance()->trans("Street Address")
+                "label" => Translator::getInstance()->trans("Street Address"),
+                "label_attr" => array(
+                    "for" => "address1"
+                )
             ))
             ->add("address2", "text", array(
                 "label" => Translator::getInstance()->trans("Address Line 2"),
@@ -80,7 +83,7 @@ class CustomerCreation extends BaseForm
                 )
             ))
             ->add("company", "text", array(
-                "label" => Translator::getInstance()->trans("Company name"),
+                "label" => Translator::getInstance()->trans("Company Name"),
                 "label_attr" => array(
                     "for" => "company"
                 )
