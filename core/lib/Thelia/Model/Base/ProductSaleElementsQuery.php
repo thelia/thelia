@@ -23,6 +23,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  *
  * @method     ChildProductSaleElementsQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildProductSaleElementsQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
+ * @method     ChildProductSaleElementsQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildProductSaleElementsQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
  * @method     ChildProductSaleElementsQuery orderByPromo($order = Criteria::ASC) Order by the promo column
  * @method     ChildProductSaleElementsQuery orderByNewness($order = Criteria::ASC) Order by the newness column
@@ -32,6 +33,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  *
  * @method     ChildProductSaleElementsQuery groupById() Group by the id column
  * @method     ChildProductSaleElementsQuery groupByProductId() Group by the product_id column
+ * @method     ChildProductSaleElementsQuery groupByRef() Group by the ref column
  * @method     ChildProductSaleElementsQuery groupByQuantity() Group by the quantity column
  * @method     ChildProductSaleElementsQuery groupByPromo() Group by the promo column
  * @method     ChildProductSaleElementsQuery groupByNewness() Group by the newness column
@@ -64,6 +66,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  *
  * @method     ChildProductSaleElements findOneById(int $id) Return the first ChildProductSaleElements filtered by the id column
  * @method     ChildProductSaleElements findOneByProductId(int $product_id) Return the first ChildProductSaleElements filtered by the product_id column
+ * @method     ChildProductSaleElements findOneByRef(string $ref) Return the first ChildProductSaleElements filtered by the ref column
  * @method     ChildProductSaleElements findOneByQuantity(double $quantity) Return the first ChildProductSaleElements filtered by the quantity column
  * @method     ChildProductSaleElements findOneByPromo(int $promo) Return the first ChildProductSaleElements filtered by the promo column
  * @method     ChildProductSaleElements findOneByNewness(int $newness) Return the first ChildProductSaleElements filtered by the newness column
@@ -73,6 +76,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  *
  * @method     array findById(int $id) Return ChildProductSaleElements objects filtered by the id column
  * @method     array findByProductId(int $product_id) Return ChildProductSaleElements objects filtered by the product_id column
+ * @method     array findByRef(string $ref) Return ChildProductSaleElements objects filtered by the ref column
  * @method     array findByQuantity(double $quantity) Return ChildProductSaleElements objects filtered by the quantity column
  * @method     array findByPromo(int $promo) Return ChildProductSaleElements objects filtered by the promo column
  * @method     array findByNewness(int $newness) Return ChildProductSaleElements objects filtered by the newness column
@@ -167,7 +171,7 @@ abstract class ProductSaleElementsQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PRODUCT_ID, QUANTITY, PROMO, NEWNESS, WEIGHT, CREATED_AT, UPDATED_AT FROM product_sale_elements WHERE ID = :p0';
+        $sql = 'SELECT ID, PRODUCT_ID, REF, QUANTITY, PROMO, NEWNESS, WEIGHT, CREATED_AT, UPDATED_AT FROM product_sale_elements WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -338,6 +342,35 @@ abstract class ProductSaleElementsQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductSaleElementsTableMap::PRODUCT_ID, $productId, $comparison);
+    }
+
+    /**
+     * Filter the query on the ref column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByRef('fooValue');   // WHERE ref = 'fooValue'
+     * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $ref The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
+     */
+    public function filterByRef($ref = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($ref)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $ref)) {
+                $ref = str_replace('*', '%', $ref);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ProductSaleElementsTableMap::REF, $ref, $comparison);
     }
 
     /**

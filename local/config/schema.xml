@@ -264,6 +264,7 @@
   <table name="product_sale_elements" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
+    <column name="ref" required="true" size="45" type="VARCHAR" />
     <column name="quantity" required="true" type="FLOAT" />
     <column defaultValue="0" name="promo" type="TINYINT" />
     <column defaultValue="0" name="newness" type="TINYINT" />
@@ -274,6 +275,9 @@
     <index name="idx_product_sale_element_product_id">
       <index-column name="product_id" />
     </index>
+    <unique name="ref_UNIQUE">
+      <unique-column name="ref" />
+    </unique>
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="attribute_category" namespace="Thelia\Model">

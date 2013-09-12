@@ -349,6 +349,7 @@ CREATE TABLE `product_sale_elements`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
+    `ref` VARCHAR(45) NOT NULL,
     `quantity` FLOAT NOT NULL,
     `promo` TINYINT DEFAULT 0,
     `newness` TINYINT DEFAULT 0,
@@ -356,6 +357,7 @@ CREATE TABLE `product_sale_elements`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_product_sale_element_product_id` (`product_id`),
     CONSTRAINT `fk_product_sale_element_product_id`
         FOREIGN KEY (`product_id`)
