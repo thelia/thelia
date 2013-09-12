@@ -43,6 +43,10 @@ class AttributeModificationForm extends AttributeCreationForm
                         )
                     )
             ))
+            ->add('attribute_values', 'collection', array(
+                    'type'   => 'text',
+                    'options'  => array('required'  => false)
+            ))
         ;
 
         // Add standard description fields
