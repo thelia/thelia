@@ -37,7 +37,12 @@
         <default key="_controller">Thelia\Controller\Admin\CustomerController::indexAction</default>
     </route>
 
-    <route id="admin.customer.update.view" path="/admin/customer/update/{customer_id}">
+    <route id="admin.customer.update.view" path="/admin/customer/update/{customer_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::viewAction</default>
+        <requirement key="customer_id">\d+</requirement>
+    </route>
+
+    <route id="admin.customer.update.process" path="/admin/customer/update/{customer_id}" methods="post">
         <default key="_controller">Thelia\Controller\Admin\CustomerController::viewAction</default>
         <requirement key="customer_id">\d+</requirement>
     </route>

@@ -29,12 +29,15 @@
                                 <div class="col-md-12">
 
         						    {form name="thelia.customer.modification"}
-        						    	<form method="POST" action="{url path='/admin/customers/save'}" {form_enctype form=$form} class="clearfix">
+        						    	<form method="POST" action="{url path="/admin/customers/save/{$ID}"}" {form_enctype form=$form} class="clearfix">
 
-        	                                {* Be sure to get the customer ID, even if the form could not be validated *}
-        	                                <input type="hidden" name="customer_id" value="{$customer_id}" />
+                                            <div class="row inner-toolbar clearfix">
+                                                <div class="col-md-6 inner-actions pull-right">
+                                                    <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-primary" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
+                                                    <button type="submit" name="save_mode" value="close" class="btn btn-default btn-info" title="{intl l='Save and close'}">{intl l='Save and close'} <span class="glyphicon glyphicon-remove"></span></button>
+                                                </div>
+                                            </div>
 
-                                        	{include file="includes/inner-form-toolbar.html"}
 
         						        	{form_hidden_fields form=$form}
 
