@@ -56,12 +56,14 @@ class RewritingRetriever
      * @param      $viewLocale
      * @param null $viewId
      */
-    public function loadViewUrl($view, $viewLocale, $viewId = null)
+    public function loadViewUrl($view, $viewLocale = null, $viewId = null)
     {
         $this->search = $this->rewritingUrlQuery->getViewUrlQuery($view, $viewLocale, $viewId);
 
         $allParametersWithoutView = array();
-        $allParametersWithoutView['locale'] = $viewLocale;
+        if(null !== $viewId) {
+            $allParametersWithoutView['locale'] = $viewLocale;
+        }
         if(null !== $viewId) {
             $allParametersWithoutView[$view . '_id'] = $viewId;
         }
