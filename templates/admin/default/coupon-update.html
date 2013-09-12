@@ -112,13 +112,21 @@
                 }).done(function(data) {
                     $('#constraint-add-operators-values').html(data);
                     couponManager.ruleToSave.serviceId = ruleId;
-
+                    if (ruleId == -1) {
+                        // Placeholder can't be saved
+                        $('#constraint-save-btn').hide();
+                    } else {
+                        $('#constraint-save-btn').show();
+                    }
                     return callBack();
                 });
             };
 
             // Rules which will be saved
             couponManager.rulesToSave = couponManager.initRules();
+
+            $('#constraint-save-btn').hide();
+
         });
     </script>
 {/block}

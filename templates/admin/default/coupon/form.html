@@ -202,6 +202,7 @@
                 <div id="rule-add-type" class="form-group col-md-4">
                     <label for="categoryRule">{intl l='Rule\'s category :'}</label>
                     <select name="categoryRule" id="category-rule" class="form-control">
+                        <option value="-1" >{intl l='Please select a rule category'}</option>
                         {foreach from=$availableRules item=availableRule}
                             <option value="{$availableRule.serviceId}" data-description="{$availableRule.toolTip}">{$availableRule.name}</option>
                         {/foreach}

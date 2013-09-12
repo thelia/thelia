@@ -189,6 +189,116 @@ casper.thenOpen(thelia2_login_coupon_update_url, function() {
     this.test.assertSelectorHasText('tbody#constraint-list tr:nth-child(3)', 'If cart total amount is inferior or equal to 401 GBP','8) 4rd rule created found');
 });
 
+// Testing deleting all rules
+casper.then(function(){
+// Click on Delete button
+    this.click('tbody#constraint-list tr:nth-child(1) .constraint-delete-btn');
+});
+casper.wait(1000, function() {
+    this.echo("\nWaiting....");
+});
+casper.then(function(){
+// Click on Delete button
+    this.click('tbody#constraint-list tr:nth-child(1) .constraint-delete-btn');
+});
+casper.wait(1000, function() {
+    this.echo("\nWaiting....");
+});
+casper.then(function(){
+// Click on Delete button
+    this.click('tbody#constraint-list tr:nth-child(1) .constraint-delete-btn');
+});
+casper.wait(1000, function() {
+    this.echo("\nWaiting....");
+});
+casper.then(function(){
+    this.capture('tests/functionnal/casperjs/screenshot/coupons/rule-all-deleted.png');
+    this.test.assertSelectorHasText('tbody#constraint-list tr:nth-child(1)', 'No conditions','9) 1st default rule found');
+    test.assertDoesntExist('tbody#constraint-list tr:nth-child(2)');
+});
+
+// Check if created rule has been well saved
+casper.thenOpen(thelia2_login_coupon_update_url, function() {
+    this.test.comment('Now on : ' + this.getCurrentUrl());
+    this.capture('tests/functionnal/casperjs/screenshot/coupons/rule-all-deleted-refreshed.png');
+    this.test.assertSelectorHasText('tbody#constraint-list tr:nth-child(1)', 'No conditions','10) 1st default rule found');
+    test.assertDoesntExist('tbody#constraint-list tr:nth-child(2)');
+});
+
+
+// Test add no condition rule
+casper.then(function(){
+    this.evaluate(function() {
+        $('#category-rule').val('thelia.constraint.rule.available_for_x_articles').change();
+        return true;
+    });
+});
+
+casper.wait(1000, function() {
+    this.echo("\nWaiting....");
+});
+
+// Test Rule updating
+casper.then(function(){
+    this.evaluate(function() {
+        $('#quantity-operator').val('>').change();
+        return true;
+    });
+    this.sendKeys('input#quantity-value', '4');
+    this.click('#constraint-save-btn');
+});
+
+casper.wait(1000, function() {
+    this.echo("\nWaiting....");
+});
+
+casper.then(function(){
+    this.capture('tests/functionnal/casperjs/screenshot/coupons/rule-all-deleted.png');
+    this.test.assertSelectorHasText('tbody#constraint-list tr:nth-child(1)', 'If cart products quantity is superior to 4', '11) 1st default rule found');
+    test.assertDoesntExist('tbody#constraint-list tr:nth-child(2)');
+});
+
+// Check if created rule has been well saved
+casper.thenOpen(thelia2_login_coupon_update_url, function() {
+    this.test.comment('Now on : ' + this.getCurrentUrl());
+    this.capture('tests/functionnal/casperjs/screenshot/coupons/rule-all-deleted-refreshed.png');
+    this.test.assertSelectorHasText('tbody#constraint-list tr:nth-child(1)', 'If cart products quantity is superior to 4','12) 1st default rule found');
+    test.assertDoesntExist('tbody#constraint-list tr:nth-child(2)');
+});
+
+casper.then(function(){
+    this.evaluate(function() {
+        $('#category-rule').val('thelia.constraint.rule.available_for_everyone').change();
+        return true;
+    });
+});
+
+casper.wait(1000, function() {
+    this.echo("\nWaiting....");
+});
+
+// Test Rule updating
+casper.then(function(){
+    this.click('#constraint-save-btn');
+});
+
+casper.wait(1000, function() {
+    this.echo("\nWaiting....");
+});
+casper.then(function(){
+    this.capture('tests/functionnal/casperjs/screenshot/coupons/rule-all-deleted.png');
+    this.test.assertSelectorHasText('tbody#constraint-list tr:nth-child(1)', 'No conditions','13) 1st default rule found');
+    test.assertDoesntExist('tbody#constraint-list tr:nth-child(2)');
+});
+
+// Check if created rule has been well saved
+casper.thenOpen(thelia2_login_coupon_update_url, function() {
+    this.test.comment('Now on : ' + this.getCurrentUrl());
+    this.capture('tests/functionnal/casperjs/screenshot/coupons/rule-all-deleted-refreshed.png');
+    this.test.assertSelectorHasText('tbody#constraint-list tr:nth-child(1)', 'No conditions','14) 1st default rule found');
+    test.assertDoesntExist('tbody#constraint-list tr:nth-child(2)');
+});
+
 //RUN
 casper.run(function() {
     this.test.done();

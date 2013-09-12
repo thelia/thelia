@@ -78,7 +78,14 @@ $(function($){
     // Save rules on click
     couponManager.onClickSaveRule = function() {
         $('#constraint-save-btn').on('click', function () {
-            couponManager.createOrUpdateRuleAjax();
+            if($('#category-rule').val() == 'thelia.constraint.rule.available_for_everyone') {
+                // @todo translate + modal
+                var r= confirm("Do you really want to set this coupon available to everyone ?");
+                if (r == true) {
+                    couponManager.createOrUpdateRuleAjax();
+                }
+            }
+
         });
     };
     couponManager.onClickSaveRule();

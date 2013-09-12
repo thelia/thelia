@@ -34,6 +34,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Coupon as MCoupon;
 use Thelia\Type;
@@ -98,6 +99,27 @@ class Coupon extends BaseI18nLoop
                 $coupon->getSerializedRules()
             );
 
+            /** @var CouponInterface $couponManager */
+            $couponManager = $this->container->get($coupon->getType());
+            $couponManager->set(
+                $this->container->get('thelia.adapter'),
+                $coupon->getCode(),
+                $coupon->getTitle(),
+                $coupon->getShortDescription(),
+                $coupon->getDescription(),
+                $coupon->getAmount(),
+                $coupon->getIsCumulative(),
+                $coupon->getIsRemovingPostage(),
+                $coupon->getIsAvailableOnSpecialOffers(),
+                $coupon->getIsEnabled(),
+                $coupon->getMaxUsage(),
+                $coupon->getExpirationDate()
+            );
+
+            $now = time();
+            $datediff = $coupon->getExpirationDate()->getTimestamp() - $now;
+            $daysLeftBeforeExpiration = floor($datediff/(60*60*24));
+
             $cleanedRules = array();
             /** @var CouponRuleInterface $rule */
             foreach ($rules->getRules() as $key => $rule) {
@@ -114,9 +136,13 @@ class Coupon extends BaseI18nLoop
                 ->set("USAGE_LEFT", $coupon->getMaxUsage())
                 ->set("IS_CUMULATIVE", $coupon->getIsCumulative())
                 ->set("IS_REMOVING_POSTAGE", $coupon->getIsRemovingPostage())
+                ->set("IS_AVAILABLE_ON_SPECIAL_OFFERS", $coupon->getIsAvailableOnSpecialOffers())
                 ->set("IS_ENABLED", $coupon->getIsEnabled())
                 ->set("AMOUNT", $coupon->getAmount())
-                ->set("APPLICATION_CONDITIONS", $cleanedRules);
+                ->set("APPLICATION_CONDITIONS", $cleanedRules)
+                ->set("TOOLTIP", $couponManager->getToolTip())
+                ->set("DAY_LEFT_BEFORE_EXPIRATION", $daysLeftBeforeExpiration)
+                ->set("SERVICE_ID", $couponManager->getServiceId());
             $loopResult->addRow($loopResultRow);
         }
 
