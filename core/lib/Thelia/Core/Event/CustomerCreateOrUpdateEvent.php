@@ -32,6 +32,7 @@ class CustomerCreateOrUpdateEvent extends ActionEvent
     protected $reseller;
     protected $sponsor;
     protected $discount;
+    protected $company;
 
     /**
      * @var \Thelia\Model\Customer
@@ -39,7 +40,7 @@ class CustomerCreateOrUpdateEvent extends ActionEvent
     protected $customer;
 
     /**
-     * @param int    $title     the title customer id
+     * @param int $title     the title customer id
      * @param string $firstname
      * @param string $lastname
      * @param string $address1
@@ -49,15 +50,16 @@ class CustomerCreateOrUpdateEvent extends ActionEvent
      * @param string $cellphone
      * @param string $zipcode
      * @param string $city
-     * @param int    $country   the country id
+     * @param int $country   the country id
      * @param string $email
      * @param string $password  plain password, don't put hash password, it will hashes again
      * @param $lang
-     * @param int   $reseller if customer is a reseller
-     * @param int   $sponsor  customer's id sponsor
+     * @param int $reseller if customer is a reseller
+     * @param int $sponsor  customer's id sponsor
      * @param float $discount
+     * @param string $company
      */
-    public function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $country, $email, $password, $lang, $reseller, $sponsor, $discount)
+    public function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $country, $email, $password, $lang, $reseller, $sponsor, $discount, $company)
     {
         $this->address1 = $address1;
         $this->address2 = $address2;
@@ -75,6 +77,14 @@ class CustomerCreateOrUpdateEvent extends ActionEvent
         $this->reseller = $reseller;
         $this->sponsor = $sponsor;
         $this->discount = $discount;
+        $this->company = $company;
+    }
+    /**
+     * @return mixed
+     */
+    public function getCompany()
+    {
+        return $this->company;
     }
 
     /**

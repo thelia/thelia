@@ -278,7 +278,8 @@ class CustomerController extends BaseFrontController
             $this->getRequest()->getSession()->getLang()->getId(),
             isset($data["reseller"])?$data["reseller"]:null,
             isset($data["sponsor"])?$data["sponsor"]:null,
-            isset($data["discount"])?$data["discount"]:null
+            isset($data["discount"])?$data["discount"]:null,
+            isset($data["company"])?$data["company"]:null
         );
 
         return $customerCreateEvent;

@@ -54,7 +54,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @param int $discount
      * @throws \Exception|\Symfony\Component\Config\Definition\Exception\Exception
      */
-    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email = null, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0)
+    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email = null, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0, $company = null)
     {
         $this
         	->setTitleId($titleId)
@@ -79,6 +79,7 @@ class Customer extends BaseCustomer implements UserInterface
                 $address = new Address();
 
                 $address
+                    ->setCompany($company)
                     ->setTitleId($titleId)
                     ->setFirstname($firstname)
                     ->setLastname($lastname)
@@ -99,6 +100,7 @@ class Customer extends BaseCustomer implements UserInterface
                 $address = $this->getDefaultAddress();
 
                 $address
+                    ->setCompany($company)
                     ->setTitleId($titleId)
                     ->setFirstname($firstname)
                     ->setLastname($lastname)
