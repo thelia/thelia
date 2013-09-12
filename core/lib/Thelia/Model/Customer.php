@@ -246,7 +246,7 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONFIG, new CustomerEvent($this));
+        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECUSTOMER, new CustomerEvent($this));
         return true;
     }
 
@@ -255,6 +255,6 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETECONFIG, new CustomerEvent($this));
+        $this->dispatchEvent(TheliaEvents::AFTER_DELETECUSTOMER, new CustomerEvent($this));
     }
 }

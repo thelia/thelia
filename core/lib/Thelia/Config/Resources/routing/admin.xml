@@ -47,6 +47,10 @@
         <requirement key="customer_id">\d+</requirement>
     </route>
 
+    <route id="admin.customer.delete" path="/admin/customer/delete">
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::deleteAction</default>
+    </route>
+
     <!-- end Customer rule management -->
 
     <!-- Order rule management -->

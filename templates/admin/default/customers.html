@@ -260,7 +260,8 @@
     {* Delete confirmation dialog *}
 
     {capture "delete_customer_dialog"}
-        <input type="hidden" name="customer_id" id="customer_delete_id" value="" />
+        <input type="hidden" name="customer_page" value="{$customer_page}">
+        <input type="hidden" name="customer_id" id="delete_customer_id">
     {/capture}
 
     {include
@@ -271,7 +272,18 @@
         dialog_message  = {intl l="Do you really want to delete this customer ?"}
 
         form_action         = {url path='/admin/customer/delete'}
-        form_content        = {$smarty.capture.delete_dialog nofilter}
+        form_content        = {$smarty.capture.delete_customer_dialog nofilter}
+        form_id             = "form_delete_customer"
     }
+
+{/block}
+
+{block name="javascript-initialization"}
+
+        <script type="text/javascript">
+            $(".customer-delete").click(function(){
+                $("#delete_customer_id").val($(this).attr("data-id"));
+            });
+        </script>
 
 {/block}

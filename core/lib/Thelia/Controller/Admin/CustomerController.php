@@ -25,6 +25,7 @@ namespace Thelia\Controller\Admin;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\Form;
 use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CustomerModification;
 use Thelia\Form\Exception\FormValidationException;
@@ -39,22 +40,28 @@ class CustomerController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth("admin.customers.view")) return $response;
+        if (null !== $response = $this->checkAuth("admin.customer.view")) return $response;
         return $this->render("customers", array("display_customer" => 20));
     }
 
     public function viewAction($customer_id)
     {
-        if (null !== $response = $this->checkAuth("admin.customers.view")) return $response;
+        if (null !== $response = $this->checkAuth("admin.customer.view")) return $response;
 
     	return $this->render("customer-edit", array(
     		"customer_id" => $customer_id
     	));
     }
 
+    /**
+     * update customer action
+     *
+     * @param $customer_id
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     */
     public function updateAction($customer_id)
     {
-        if (null !== $response = $this->checkAuth("admin.customers.update")) return $response;
+        if (null !== $response = $this->checkAuth("admin.customer.update")) return $response;
 
         $message = false;
 
@@ -106,6 +113,39 @@ class CustomerController extends BaseAdminController
         return $this->render("customer-edit", array(
             "customer_id" => $customer_id
         ));
+    }
+
+    public function deleteAction()
+    {
+        if (null !== $response = $this->checkAuth("admin.customer.delete")) return $response;
+
+        $message = null;
+
+        try {
+            $customer_id = $this->getRequest()->get("customer_id");
+            $customer = CustomerQuery::create()->findPk($customer_id);
+
+            if(null === $customer) {
+                throw new \InvalidArgumentException("The customer you want to delete does not exists");
+            }
+
+            $event = new CustomerEvent($customer);
+
+            $this->dispatch(TheliaEvents::CUSTOMER_DELETEACCOUNT, $event);
+        } catch(\Exception $e) {
+            $message = $e->getMessage();
+        }
+
+        $params = array(
+            "customer_page" => $this->getRequest()->get("customer_page", 1)
+        );
+
+        if ($message) {
+            $param["delete_error_message"] = $message;
+        }
+
+        $this->redirectToRoute("admin.customers", $params);
+
     }
 
     /**
