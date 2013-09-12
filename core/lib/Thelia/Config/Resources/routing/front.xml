@@ -66,12 +66,19 @@
 
     <route id="address.edit" path="/address/edit/{address_id}">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">address_edit</default>
+        <default key="_view">address-edit</default>
     </route>
 
     <route id="address.update" path="/address/update" >
         <default key="_controller">Thelia\Controller\Front\AddressController::updateAction</default>
     </route>
+
+    <route id="address.generateModal" path="/address/modal/{address_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Front\AddressController::generateModalAction</default>
+        <default key="_view">modal-address</default>
+        <requirement key="address_id">\d+</requirement>
+    </route>
+
     <!-- end customer address routes -->
 
     <!-- cart routes -->
@@ -93,6 +100,8 @@
         <default key="_controller">Thelia\Controller\Front\CartController::changeItem</default>
         <default key="_view">cart</default>
     </route>
+
+    <!-- end cart routes -->
 
     <!-- order management process -->
     <route id="order.delivery.add" path="/delivery/choose/{delivery_id}">

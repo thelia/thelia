@@ -40,6 +40,15 @@ class AddressController extends BaseFrontController
 {
 
     /**
+     * Controller for generate modal containing update form
+     * Check if request is a XmlHttpRequest and address owner is the current customer
+     * @param $address_id
+     */
+    public function generateModalAction($address_id)
+    {
+        $this->checkXmlHttpRequest();
+    }
+    /**
      * Create controller.
      * Check if customer is logged in
      *
