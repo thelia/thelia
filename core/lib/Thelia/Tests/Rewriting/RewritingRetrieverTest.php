@@ -23,6 +23,7 @@
 
 namespace Thelia\Tests\Rewriting;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Model\RewritingUrl;
 use Thelia\Rewriting\RewritingRetriever;
 use Thelia\Tools\URL;
@@ -34,6 +35,36 @@ use Thelia\Tools\URL;
  */
 class RewritingRetrieverTest extends \PHPUnit_Framework_TestCase
 {
+    protected $container = null;
+
+    public function setUp()
+    {
+        $this->container = new ContainerBuilder();
+
+        $stubRouterAdmin = $this->getMockBuilder('\Symfony\Component\Routing\Router')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getContext'))
+            ->getMock();
+
+        $stubRequestContext = $this->getMockBuilder('\Symfony\Component\Routing\RequestContext')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHost'))
+            ->getMock();
+
+        $stubRequestContext->expects($this->any())
+            ->method('getHost')
+            ->will($this->returnValue('localhost'));
+
+        $stubRouterAdmin->expects($this->any())
+            ->method('getContext')
+            ->will($this->returnValue(
+                $stubRequestContext
+            ));
+
+        $this->container->set('router.admin', $stubRouterAdmin);
+        $this->container->set('thelia.url.manager', new URL($this->container));
+    }
+
     protected function getMethod($name)
     {
         $class = new \ReflectionClass('\Thelia\Rewriting\RewritingRetriever');
