@@ -87,6 +87,11 @@
                 }).done(function(data) {
                     $('#constraint-list').html(data);
                     $('#constraint-add-operators-values').html('');
+                    // Set the rule selector
+                    $("#category-rule option").filter(function() {
+                        return $(this).val() == 'thelia.constraint.rule.available_for_everyone';
+                    }).prop('selected', true);
+
                     couponManager.onClickUpdateRule();
                     couponManager.onClickDeleteRule();
                 });
@@ -108,6 +113,7 @@
                     }
                 }).done(function(data) {
                     $('#constraint-add-operators-values').html(data);
+                    couponManager.ruleToSave.serviceId = ruleId;
 
                     return callBack();
                 });
