@@ -27,9 +27,13 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
+use Thelia\Cart\CartTrait;
+use Thelia\Model\Currency;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -43,6 +47,10 @@ use Thelia\Model\CouponQuery;
  */
 class CouponBaseAdapter implements CouponAdapterInterface
 {
+    use CartTrait {
+        CartTrait::getCart as getCartFromTrait;
+    }
+
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
@@ -66,7 +74,7 @@ class CouponBaseAdapter implements CouponAdapterInterface
      */
     public function getCart()
     {
-        // TODO: Implement getCart() method.
+        return $this->getCartFromTrait($this->getRequest());
     }
 
     /**
@@ -86,7 +94,7 @@ class CouponBaseAdapter implements CouponAdapterInterface
      */
     public function getCustomer()
     {
-        // TODO: Implement getCustomer() method.
+        return $this->container->get('thelia.securityContext')->getCustomerUser();
     }
 
     /**
@@ -122,11 +130,11 @@ class CouponBaseAdapter implements CouponAdapterInterface
     /**
      * Return the Checkout currency EUR|USD
      *
-     * @return string
+     * @return Currency
      */
     public function getCheckoutCurrency()
     {
-        // TODO: Implement getCheckoutCurrency() method.
+        $this->getRequest()->getSession()->getCurrency();
     }
 
 
@@ -149,7 +157,7 @@ class CouponBaseAdapter implements CouponAdapterInterface
     {
         $couponFactory = $this->container->get('thelia.coupon.factory');
 
-        // @todo Get from Session
+        // @todo get from cart
         $couponCodes = array('XMAS', 'SPRINGBREAK');
 
         $coupons = array();
@@ -208,7 +216,7 @@ class CouponBaseAdapter implements CouponAdapterInterface
      */
     public function getContainer()
     {
-        // TODO: Implement getContainer() method.
+        return $this->container;
     }
 
     /**
@@ -231,5 +239,15 @@ class CouponBaseAdapter implements CouponAdapterInterface
     public function getMainCurrency()
     {
         // TODO: Implement getMainCurrency() method.
+    }
+
+    /**
+     * Return request
+     *
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->container->get('request');
     }
 }
