@@ -232,10 +232,10 @@ class URL
 
              $this->retriever->loadSpecificUrl($view, $viewLocale, $viewId, $allOtherParameters);
          } else {
-             $allParametersWithoutView = $viewOtherParameters;
-             $allParametersWithoutView['locale'] = $viewLocale;
-             if (null !== $viewId) {
-                 $allParametersWithoutView[$view . '_id'] = $viewId;
+             $allParametersWithoutView = $request->query->all();
+             $view = $request->attributes->get('_view');
+             if(isset($allOtherParameters['view'])) {
+                 unset($allOtherParameters['view']);
              }
              $this->retriever->rewrittenUrl = null;
              $this->retriever->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
