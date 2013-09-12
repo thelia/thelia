@@ -166,8 +166,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-echo "update =".$event->getObjectId();
-
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getObjectId())) {
 
             $currency->setDispatcher($this->getDispatcher());
@@ -182,7 +180,6 @@ echo "update =".$event->getObjectId();
             else if ($mode == UpdatePositionEvent::POSITION_DOWN)
                 return $currency->movePositionDown();
         }
-        exit;
     }
 
     /**

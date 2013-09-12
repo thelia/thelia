@@ -103,11 +103,6 @@ class CurrencyController extends AbstractCrudController
         );
     }
 
-    protected function createToggleVisibilityEvent() {
-
-        return new ToggleVisibilityEvent($this->getRequest()->get('currency_id', null));
-    }
-
     protected function getDeleteEvent() {
         return new CurrencyDeleteEvent($this->getRequest()->get('currency_id'));
     }
