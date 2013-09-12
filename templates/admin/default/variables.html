@@ -194,6 +194,9 @@
 		        {/loop}
 		    </div>
 		    {/form_field}
+
+
+            {module_include location='variable_create_form'}
         {/capture}
 
 	    {include
@@ -215,6 +218,9 @@
 
     {capture "delete_dialog"}
         <input type="hidden" name="variable_id" id="variable_delete_id" value="" />
+
+        {module_include location='variable_delete_form'}
+
     {/capture}
 
     {include

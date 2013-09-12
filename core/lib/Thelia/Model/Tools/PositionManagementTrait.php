@@ -67,6 +67,7 @@ trait PositionManagementTrait {
      * Move up a object
      */
     public function movePositionUp() {
+        echo "move up !";
         $this->movePositionUpOrDown(true);
     }
 

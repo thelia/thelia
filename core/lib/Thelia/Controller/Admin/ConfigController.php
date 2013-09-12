@@ -288,7 +288,7 @@ class ConfigController extends BaseAdminController
         $this->dispatch(TheliaEvents::CONFIG_DELETE, $event);
 
         if ($event->hasConfig())
-            $this->adminLogAppend(sprintf("Variable %s (ID %s) modified", $event->getConfig()->getName(), $event->getConfig()->getId()));
+            $this->adminLogAppend(sprintf("Variable %s (ID %s) deleted", $event->getConfig()->getName(), $event->getConfig()->getId()));
 
         $this->redirectToRoute('admin.configuration.variables.default');
     }

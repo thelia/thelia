@@ -23,7 +23,7 @@
 
 namespace Thelia\Core\Event;
 
-class BaseToggleVisibilityEvent  extends ActionEvent
+class ToggleVisibilityEvent  extends ActionEvent
 {
     protected $object_id;
 

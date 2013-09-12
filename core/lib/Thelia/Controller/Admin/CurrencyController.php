@@ -25,219 +25,167 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\CurrencyDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Tools\URL;
 use Thelia\Core\Event\CurrencyUpdateEvent;
 use Thelia\Core\Event\CurrencyCreateEvent;
-use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Form\CurrencyModificationForm;
 use Thelia\Form\CurrencyCreationForm;
-use Thelia\Core\Event\CurrencyUpdatePositionEvent;
+use Thelia\Core\Event\UpdatePositionEvent;
 
 /**
  * Manages currencies sent by mail
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class CurrencyController extends BaseAdminController
+class CurrencyController extends AbstractCrudController
 {
-    /**
-     * Render the currencies list, ensuring the sort order is set.
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    protected function renderList()
-    {
-        // Find the current order
-        $order = $this->getRequest()->get(
-                'order',
-                $this->getSession()->get('admin.currency_order', 'manual')
+    public function __construct() {
+        parent::__construct(
+            'currency',
+            'manual',
+
+            'admin.configuration.currencies.view',
+            'admin.configuration.currencies.create',
+            'admin.configuration.currencies.update',
+            'admin.configuration.currencies.delete',
+
+            TheliaEvents::CURRENCY_CREATE,
+            TheliaEvents::CURRENCY_UPDATE,
+            TheliaEvents::CURRENCY_DELETE,
+            null, // No visibility toggle
+            TheliaEvents::CURRENCY_UPDATE_POSITION
+        );
+    }
+
+    protected function getCreationForm() {
+        return new CurrencyCreationForm($this->getRequest());
+    }
+
+    protected function getUpdateForm() {
+        return new CurrencyModificationForm($this->getRequest());
+    }
+
+    protected function getCreationEvent($formData) {
+        $createEvent = new CurrencyCreateEvent();
+
+        $createEvent
+        ->setCurrencyName($formData['name'])
+        ->setLocale($formData["locale"])
+        ->setSymbol($formData['symbol'])
+        ->setCode($formData['code'])
+        ->setRate($formData['rate'])
+        ;
+
+        return $createEvent;
+    }
+
+    protected function getUpdateEvent($formData) {
+        $changeEvent = new CurrencyUpdateEvent($formData['id']);
+
+        // Create and dispatch the change event
+        $changeEvent
+        ->setCurrencyName($formData['name'])
+        ->setLocale($formData["locale"])
+        ->setSymbol($formData['symbol'])
+        ->setCode($formData['code'])
+        ->setRate($formData['rate'])
+        ;
+
+        return $changeEvent;
+    }
+
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue) {
+
+        return new UpdatePositionEvent(
+                $this->getRequest()->get('currency_id', null),
+                $positionChangeMode,
+                $positionValue
+        );
+    }
+
+    protected function createToggleVisibilityEvent() {
+
+        return new ToggleVisibilityEvent($this->getRequest()->get('currency_id', null));
+    }
+
+    protected function getDeleteEvent() {
+        return new CurrencyDeleteEvent($this->getRequest()->get('currency_id'));
+    }
+
+    protected function eventContainsObject($event) {
+        return $event->hasCurrency();
+    }
+
+    protected function hydrateObjectForm($object) {
+
+        // Prepare the data that will hydrate the form
+        $data = array(
+                'id'     => $object->getId(),
+                'name'   => $object->getName(),
+                'locale' => $object->getLocale(),
+                'code'   => $object->getCode(),
+                'symbol' => $object->getSymbol(),
+                'rate'   => $object->getRate()
         );
 
-        // Store the current sort order in session
-        $this->getSession()->set('admin.currency_order', $order);
-
-        return $this->render('currencies', array('order' => $order));
+        // Setup the object form
+        return new CurrencyModificationForm($this->getRequest(), "form", $data);
     }
 
-    /**
-     * The default action is displaying the currencies list.
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    public function defaultAction()
-    {
-        if (null !== $response = $this->checkAuth("admin.configuration.currencies.view")) return $response;
-        return $this->renderList();
+    protected function getObjectFromEvent($event) {
+        return $event->hasCurrency() ? $event->getCurrency() : null;
     }
 
-    /**
-     * Create a new currency object
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    public function createAction()
-    {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.currencies.create")) return $response;
-
-        $error_msg = false;
-
-        // Create the Creation Form
-        $creationForm = new CurrencyCreationForm($this->getRequest());
-
-        try {
-
-            // Validate the form, create the CurrencyCreation event and dispatch it.
-            $form = $this->validateForm($creationForm, "POST");
-
-            $data = $form->getData();
-
-            $createEvent = new CurrencyCreateEvent();
-
-            $createEvent
-                ->setCurrencyName($data['name'])
-                ->setLocale($data["locale"])
-                ->setSymbol($data['symbol'])
-                ->setCode($data['code'])
-                ->setRate($data['rate'])
-            ;
-
-            $this->dispatch(TheliaEvents::CURRENCY_CREATE, $createEvent);
-
-            if (! $createEvent->hasCurrency()) throw new \LogicException($this->getTranslator()->trans("No currency was created."));
-
-            $createdObject = $createEvent->getCurrency();
-
-            // Log currency creation
-            $this->adminLogAppend(sprintf("Currency %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
-
-            // Substitute _ID_ in the URL with the ID of the created object
-            $successUrl = str_replace('_ID_', $createdObject->getId(), $creationForm->getSuccessUrl());
-
-            // Redirect to the success URL
-            $this->redirect($successUrl);
-        } catch (FormValidationException $ex) {
-            // Form cannot be validated
-            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
-            // Any other error
-            $error_msg = $ex->getMessage();
-        }
-
-        $this->setupFormErrorContext("currency creation", $error_msg, $creationForm, $ex);
-
-        // At this point, the form has error, and should be redisplayed.
-        return $this->renderList();
+    protected function getExistingObject() {
+        return CurrencyQuery::create()
+        ->joinWithI18n($this->getCurrentEditionLocale())
+        ->findOneById($this->getRequest()->get('currency_id'));
     }
 
-    /**
-     * Load a currency object for modification, and display the edit template.
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    public function changeAction()
-    {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
+    protected function getObjectLabel($object) {
+        return $object->getName();
+    }
 
-        // Load the currency object
-        $currency = CurrencyQuery::create()
-                    ->joinWithI18n($this->getCurrentEditionLocale())
-                    ->findOneById($this->getRequest()->get('currency_id'));
+    protected function getObjectId($object) {
+        return $object->getId();
+    }
 
-        if ($currency != null) {
+    protected function renderListTemplate($currentOrder) {
+        return $this->render('currencies', array('order' => $currentOrder));
+    }
 
-            // Prepare the data that will hydrate the form
-            $data = array(
-                'id'     => $currency->getId(),
-                'name'   => $currency->getName(),
-                'locale' => $currency->getLocale(),
-                'code'   => $currency->getCode(),
-                'symbol' => $currency->getSymbol(),
-                'rate'   => $currency->getRate()
-            );
-
-            // Setup the object form
-            $changeForm = new CurrencyModificationForm($this->getRequest(), "form", $data);
-
-            // Pass it to the parser
-            $this->getParserContext()->addForm($changeForm);
-        }
-
-        // Render the edition template.
+    protected function renderEditionTemplate() {
         return $this->render('currency-edit', array('currency_id' => $this->getRequest()->get('currency_id')));
     }
 
+    protected function redirectToEditionTemplate() {
+        $this->redirectToRoute(
+                "admin.configuration.currencies.update",
+                array('currency_id' => $this->getRequest()->get('currency_id'))
+        );
+    }
+
+    protected function redirectToListTemplate() {
+        $this->redirectToRoute('admin.configuration.currencies.default');
+    }
+
+
     /**
-     * Save changes on a modified currency object, and either go back to the currency list, or stay on the edition page.
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * Update currencies rates
      */
-    public function saveChangeAction()
+    public function updateRatesAction()
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
 
-        $error_msg = false;
-
-        // Create the form from the request
-        $changeForm = new CurrencyModificationForm($this->getRequest());
-
-        // Get the currency ID
-        $currency_id = $this->getRequest()->get('currency_id');
-
         try {
-
-            // Check the form against constraints violations
-            $form = $this->validateForm($changeForm, "POST");
-
-            // Get the form field values
-            $data = $form->getData();
-
-            $changeEvent = new CurrencyUpdateEvent($data['id']);
-
-            // Create and dispatch the change event
-            $changeEvent
-                ->setCurrencyName($data['name'])
-                ->setLocale($data["locale"])
-                ->setSymbol($data['symbol'])
-                ->setCode($data['code'])
-                ->setRate($data['rate'])
-            ;
-
-            $this->dispatch(TheliaEvents::CURRENCY_UPDATE, $changeEvent);
-
-            if (! $changeEvent->hasCurrency()) throw new \LogicException($this->getTranslator()->trans("No currency was updated."));
-
-            // Log currency modification
-            $changedObject = $changeEvent->getCurrency();
-
-            $this->adminLogAppend(sprintf("Currency %s (ID %s) modified", $changedObject->getName(), $changedObject->getId()));
-
-            // If we have to stay on the same page, do not redirect to the succesUrl,
-            // just redirect to the edit page again.
-            if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirectToRoute(
-                        "admin.configuration.currencies.update",
-                        array('currency_id' => $currency_id)
-                );
-            }
-
-            // Redirect to the success URL
-            $this->redirect($changeForm->getSuccessUrl());
-        } catch (FormValidationException $ex) {
-            // Form cannot be validated
-            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+            $this->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES);
         } catch (\Exception $ex) {
-            // Any other error
-            $error_msg = $ex->getMessage();
+            // Any error
+            return $this->errorPage($ex);
         }
 
-        $this->setupFormErrorContext("currency modification", $error_msg, $changeForm, $ex);
-
-        // At this point, the form has errors, and should be redisplayed.
-        return $this->render('currency-edit', array('currency_id' => $currency_id));
+        $this->redirectToListTemplate();
     }
 
     /**
@@ -260,80 +208,7 @@ class CurrencyController extends BaseAdminController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToRoute('admin.configuration.currencies.default');
+        $this->redirectToListTemplate();
     }
 
-    /**
-     * Update currencies rates
-     */
-    public function updateRatesAction()
-    {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
-
-        try {
-            $this->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES);
-        } catch (\Exception $ex) {
-            // Any error
-            return $this->errorPage($ex);
-        }
-
-        $this->redirectToRoute('admin.configuration.currencies.default');
-    }
-
-    /**
-     * Update currencyposition
-     */
-    public function updatePositionAction()
-    {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.currencies.update")) return $response;
-
-        try {
-            $mode = $this->getRequest()->get('mode', null);
-
-            if ($mode == 'up')
-                $mode = CurrencyUpdatePositionEvent::POSITION_UP;
-            else if ($mode == 'down')
-                $mode = CurrencyUpdatePositionEvent::POSITION_DOWN;
-            else
-                $mode = CurrencyUpdatePositionEvent::POSITION_ABSOLUTE;
-
-            $position = $this->getRequest()->get('position', null);
-
-            $event = new CurrencyUpdatePositionEvent(
-                    $this->getRequest()->get('currency_id', null),
-                    $mode,
-                    $this->getRequest()->get('position', null)
-            );
-
-            $this->dispatch(TheliaEvents::CURRENCY_UPDATE_POSITION, $event);
-        } catch (\Exception $ex) {
-            // Any error
-            return $this->errorPage($ex);
-        }
-
-        $this->redirectToRoute('admin.configuration.currencies.default');
-    }
-
-    /**
-     * Delete a currency object
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    public function deleteAction()
-    {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.currencies.delete")) return $response;
-
-        // Get the currency id, and dispatch the delet request
-        $event = new CurrencyDeleteEvent($this->getRequest()->get('currency_id'));
-
-        $this->dispatch(TheliaEvents::CURRENCY_DELETE, $event);
-
-        if ($event->hasCurrency())
-            $this->adminLogAppend(sprintf("Currency %s (ID %s) modified", $event->getCurrency()->getName(), $event->getCurrency()->getId()));
-
-        $this->redirectToRoute('admin.configuration.currencies.default');
-    }
 }

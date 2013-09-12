@@ -34,7 +34,7 @@
                                     {* Be sure to get the variable ID, even if the form could not be validated *}
                                     <input type="hidden" name="variable_id" value="{$variable_id}" />
 
-                                    {include file="includes/inner-form-toolbar.html"}
+                                    {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/configuration/variables'}"}
 
 							        {form_hidden_fields form=$form}
 
@@ -57,27 +57,27 @@
 			                        {/form_field}
 
 						            {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-									
+
 									{form_field form=$form field='name'}
 						            <div class="form-group {if $error}has-error{/if}">
-    									<label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>				                    
-					                    <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="form-control">					                   						                
+    									<label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+					                    <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="form-control">
 						            </div>
 						            {/form_field}
-									
+
 									{form_field form=$form field='value'}
 						            <div class="form-group {if $error}has-error{/if}">
-    									<label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>	
-						                <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Variable value'}" placeholder="{intl l='Variable value'}" class="form-control"> 
+    									<label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+						                <input type="text" id="{$label_attr.for}" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Variable value'}" placeholder="{intl l='Variable value'}" class="form-control">
 						            </div>
 						            {/form_field}
-									
+
 									{form_field form=$form field='secured'}
 			                        <div class="checkbox {if $error}has-error{/if}">
 										<label>
 	                                        <input type="checkbox" name="{$name}" value="1" {if $value == 1}checked="checked"{/if}>
 	                                        {intl l="{$label}"}
-										</label>			                            
+										</label>
 			                        </div>
 			                        {/form_field}
 

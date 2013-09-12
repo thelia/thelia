@@ -247,7 +247,7 @@ class MessageController extends BaseAdminController
         $this->dispatch(TheliaEvents::MESSAGE_DELETE, $event);
 
         if ($event->hasMessage())
-            $this->adminLogAppend(sprintf("Message %s (ID %s) modified", $event->getMessage()->getName(), $event->getMessage()->getId()));
+            $this->adminLogAppend(sprintf("Message %s (ID %s) deleted", $event->getMessage()->getName(), $event->getMessage()->getId()));
 
         $this->redirectToRoute('admin.configuration.messages.default');
     }

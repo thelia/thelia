@@ -255,6 +255,8 @@
 			    </div>
 			{/form_field}
 
+            {module_include location='currency_create_form'}
+
         {/capture}
 
         {include
@@ -277,6 +279,9 @@
 
     {capture "delete_dialog"}
         <input type="hidden" name="currency_id" id="currency_delete_id" value="" />
+
+        {module_include location='currency_delete_form'}
+
     {/capture}
 
     {include

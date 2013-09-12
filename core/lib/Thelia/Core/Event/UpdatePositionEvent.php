@@ -23,6 +23,58 @@
 
 namespace Thelia\Core\Event;
 
-class CategoryUpdatePositionEvent extends BaseUpdatePositionEvent
+class UpdatePositionEvent extends ActionEvent
 {
+    const POSITION_UP = 1;
+    const POSITION_DOWN = 2;
+    const POSITION_ABSOLUTE = 3;
+
+    protected $object_id;
+    protected $mode;
+    protected $position;
+
+    protected $object;
+
+    public function __construct($object_id, $mode, $position = null)
+    {
+        $this->object_id = $object_id;
+        $this->mode = $mode;
+        $this->position = $position;
+    }
+
+    public function getMode()
+    {
+        return $this->mode;
+    }
+
+    public function setMode($mode)
+    {
+        $this->mode = $mode;
+
+        return $this;
+    }
+
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    public function setPosition($position)
+    {
+        $this->position = $position;
+
+        return $this;
+    }
+
+    public function getObjectId()
+    {
+        return $this->object_id;
+    }
+
+    public function setObjectId($object_id)
+    {
+        $this->object_id = $object_id;
+
+        return $this;
+    }
 }
