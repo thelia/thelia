@@ -29,6 +29,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Tools\URL;
 
 /**
  *
@@ -82,9 +83,32 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
 
         $this->securityContext = new SecurityContext($this->request);*/
 
+        $stubRouterAdmin = $this->getMockBuilder('\Symfony\Component\Routing\Router')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getContext'))
+            ->getMock();
+
+        $stubRequestContext = $this->getMockBuilder('\Symfony\Component\Routing\RequestContext')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getHost'))
+            ->getMock();
+
+        $stubRequestContext->expects($this->any())
+            ->method('getHost')
+            ->will($this->returnValue('localhost'));
+
+        $stubRouterAdmin->expects($this->any())
+            ->method('getContext')
+            ->will($this->returnValue(
+                $stubRequestContext
+            ));
+
+
         $this->container->set('request', $request);
         $this->container->set('event_dispatcher', new EventDispatcher());
         $this->container->set('thelia.securityContext', new SecurityContext($request));
+        $this->container->set('router.admin', $stubRouterAdmin);
+        $this->container->set('thelia.url.manager', new URL($this->container));
 
         $this->instance = $this->getTestedInstance();
         $this->instance->initializeArgs($this->getMandatoryArguments());
@@ -106,5 +130,43 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
         $methodReturn = $method->invokeArgs($this->instance, array(null));
 
         $this->assertInstanceOf('\Thelia\Core\Template\Element\LoopResult', $methodReturn);
+    }
+
+    public function baseTestSearchById($id)
+    {
+        $this->instance->initializeArgs(array_merge(
+            $this->getMandatoryArguments(),
+            array(
+                "type" => "foo",
+                "name" => "foo",
+                "id" => $id,
+            )
+        ));
+
+        $dummy = null;
+        $loopResults = $this->instance->exec($dummy);
+
+        $this->assertEquals(1, $loopResults->getCount());
+
+        $substitutions = $loopResults->current()->getVarVal();
+
+        $this->assertEquals($id, $substitutions['ID']);
+    }
+
+    public function baseTestSearchWithLimit($limit)
+    {
+        $this->instance->initializeArgs(array_merge(
+            $this->getMandatoryArguments(),
+            array(
+                "type" => "foo",
+                "name" => "foo",
+                "limit" => $limit,
+            )
+        ));
+
+        $dummy = null;
+        $loopResults = $this->instance->exec($dummy);
+
+        $this->assertEquals($limit, $loopResults->getCount());
     }
 }

@@ -66,8 +66,8 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
         return array(
             'nb_statements' => count($this->statements),
             'nb_failed_statements' => 0,
-            'accumulated_duration' => '10',
-            'accumulated_duration_str' => $this->formatDuration(1),
+            'accumulated_duration' => $this->accumulatedTime,
+            'accumulated_duration_str' => $this->formatDuration($this->accumulatedTime),
             'peak_memory_usage' => $this->peakMemory,
             'peak_memory_usage_str' => $this->formatBytes($this->peakMemory),
             'statements' => $this->statements

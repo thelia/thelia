@@ -12,7 +12,7 @@
     <!-- Customer routes -->
     <route id="customer.create.process" path="/customer/create" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::createAction</default>
-        <default key="_view">connexion</default>
+        <default key="_view">register</default>
     </route>
 
     <route id="customer.create.view" path="/register">
@@ -34,8 +34,18 @@
         <default key="_view">login</default>
     </route>
 
-    <route id="customer.logout.process" path="/customer/logout">
+    <route id="customer.logout.process" path="/logout">
         <default key="_controller">Thelia\Controller\Front\CustomerController::logoutAction</default>
+    </route>
+
+    <route id="customer.password.retrieve.view" path="/password" methods="get">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">password</default>
+    </route>
+
+    <route id="customer.password.retrieve.process" path="/password" methods="post">
+        <default key="_controller">Thelia\Controller\Front\CustomerController::newPasswordAction</default>
+        <default key="_view">password</default>
     </route>
 
     <!-- end customer routes -->
@@ -57,6 +67,10 @@
     <!-- end customer address routes -->
 
     <!-- cart routes -->
+    <route id="cart.view" path="/cart">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">cart</default>
+    </route>
     <route id="cart.add.process" path="/cart/add">
         <default key="_controller">Thelia\Controller\Front\CartController::addItem</default>
         <default key="_view">cart</default>

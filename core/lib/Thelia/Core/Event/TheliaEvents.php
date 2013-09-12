@@ -72,6 +72,10 @@ final class TheliaEvents
     const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
 
     /**
+     * sent when a customer need a new password
+     */
+    const LOST_PASSWORD = "action.lostPassword";
+    /**
      * Sent before the logout of the administrator.
      */
     const ADMIN_LOGOUT = "action.admin_logout";
@@ -294,21 +298,6 @@ final class TheliaEvents
      */
     const AFTER_COUPON_RULE_UPDATE 	= "action.after_update_coupon_rule";
 
-    /**
-     * Sent when attempting to delete Coupon Rule
-     */
-    const COUPON_RULE_DELETE 	= "action.delete_coupon_rule";
-
-    /**
-     * Sent just before an attempt to delete a Coupon Rule
-     */
-    const BEFORE_COUPON_RULE_DELETE 	= "action.before_delete_coupon_rule";
-
-    /**
-     * Sent just after an attempt to delete a Coupon Rule
-     */
-    const AFTER_COUPON_RULE_DELETE 	= "action.after_delete_coupon_rule";
-
     // -- Configuration management ---------------------------------------------
 
     const CONFIG_CREATE   = "action.createConfig";
@@ -357,5 +346,6 @@ final class TheliaEvents
 
     const BEFORE_DELETECURRENCY = "action.before_deleteCurrency";
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
+
 
 }

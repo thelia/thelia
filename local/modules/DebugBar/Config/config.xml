@@ -30,7 +30,7 @@
 
 
     <services>
-        <service id="debugBar" class="DebugBar\StandardDebugBar"/>
+        <service id="debugBar" class="DebugBar\DebugBar"/>
 
         <service id="smarty.debugbar" class="DebugBar\Smarty\Plugin\DebugBar">
             <argument type="service" id="debugBar"/>

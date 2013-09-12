@@ -319,6 +319,7 @@ try {
         for($i=0; $i<rand(1,7); $i++) {
             $stock = new \Thelia\Model\ProductSaleElements();
             $stock->setProductId($productId);
+            $stock->setRef($productId . '_' . $i . '_' . $faker->randomNumber(8));
             $stock->setQuantity($faker->randomNumber(1,50));
             $stock->setPromo($faker->randomNumber(0,1));
             $stock->setNewness($faker->randomNumber(0,1));
