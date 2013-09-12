@@ -86,6 +86,8 @@ class CustomerTest extends \PHPUnit_Framework_TestCase
 
         $addressCreated = $customerCreated->getDefaultAddress();
 
+        $this->assertInstanceOf("Thelia\Model\Address", $addressCreated);
+
         $this->assertEquals($customerCreateEvent->getFirstname(), $addressCreated->getFirstname());
         $this->assertEquals($customerCreateEvent->getLastname(), $addressCreated->getLastname());
         $this->assertEquals($customerCreateEvent->getTitle(), $addressCreated->getTitleId());
