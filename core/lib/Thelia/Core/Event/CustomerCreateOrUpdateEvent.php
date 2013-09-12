@@ -74,6 +74,7 @@ class CustomerCreateOrUpdateEvent extends ActionEvent
         $this->cellphone = $cellphone;
         $this->title = $title;
         $this->zipcode = $zipcode;
+        $this->city = $city;
         $this->reseller = $reseller;
         $this->sponsor = $sponsor;
         $this->discount = $discount;

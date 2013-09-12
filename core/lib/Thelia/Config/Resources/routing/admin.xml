@@ -43,7 +43,7 @@
     </route>
 
     <route id="admin.customer.update.process" path="/admin/customer/update/{customer_id}" methods="post">
-        <default key="_controller">Thelia\Controller\Admin\CustomerController::viewAction</default>
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::updateAction</default>
         <requirement key="customer_id">\d+</requirement>
     </route>
 
