@@ -58,6 +58,10 @@ class Address extends BaseAddress {
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        if($this->getIsDefault()) {
+            return false;
+        }
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEADDRESS, new AddressEvent($this));
         return true;
     }
@@ -69,16 +73,6 @@ class Address extends BaseAddress {
     public function postDelete(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEADDRESS, new AddressEvent($this));
-    }
-
-    public function preSave()
-    {
-        $valid = true;
-        if($this->getIsDefault()) {
-            $valid =  false;
-        }
-
-        return $valid;
     }
 
 }
