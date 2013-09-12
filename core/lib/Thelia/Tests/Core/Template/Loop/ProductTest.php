@@ -54,18 +54,36 @@ class ProductTest extends BaseLoopTestor
     {
         $product = ProductQuery::create()->findOne();
 
-        $loop = new Product($this->container);
-        $loop->initializeArgs(array(
-            "type" => "product",
-            "name" => "product",
-            "id" => $product->getId(),
+        $this->instance->initializeArgs(array_merge(
+            $this->getMandatoryArguments(),
+            array(
+                "type" => "product",
+                "name" => "product",
+                "id" => $product->getId(),
+            )
         ));
-        $loopResults = $loop->exec($pagination);
+
+        $dummy = null;
+        $loopResults = $this->instance->exec($dummy);
 
         $this->assertEquals(1, $loopResults->getCount());
 
         $substitutions = $loopResults->current()->getVarVal();
 
         $this->assertEquals($product->getId(), $substitutions['ID']);
+    }
+
+    public function testSearchLimit()
+    {
+        $this->instance->initializeArgs(array(
+            "type" => "product",
+            "name" => "product",
+            "limit" => 3,
+        ));
+
+        $dummy = null;
+        $loopResults = $this->instance->exec($dummy);
+
+        $this->assertEquals(3, $loopResults->getCount());
     }
 }
