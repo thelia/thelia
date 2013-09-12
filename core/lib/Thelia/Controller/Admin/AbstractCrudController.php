@@ -28,7 +28,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\ToggleVisibilityEvent;
 
 /**
- * Manages currencies sent by mail
+ * An abstract CRUD controller for Thelia ADMIN, to manage basic CRUD operations on a givent object.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -53,6 +53,23 @@ abstract class AbstractCrudController extends BaseAdminController
     protected $changePositionEventIdentifier;
 
 
+    /**
+     * @param string $objectName the lower case object name. Example. "message"
+     *
+     * @param string $defaultListOrder the default object list order, or null if list is not sortable. Example: manual
+     *
+     * @param string $viewPermissionIdentifier the 'view' permission identifier. Example: "admin.configuration.message.view"
+     * @param string $createPermissionIdentifier the 'create' permission identifier. Example: "admin.configuration.message.create"
+     * @param string $updatePermissionIdentifier the 'update' permission identifier. Example: "admin.configuration.message.update"
+     * @param string $deletePermissionIdentifier the 'delete' permission identifier. Example: "admin.configuration.message.delete"
+     *
+     * @param string $createEventIdentifier the dispatched create TheliaEvent identifier. Example: TheliaEvents::MESSAGE_CREATE
+     * @param string $updateEventIdentifier the dispatched update TheliaEvent identifier. Example: TheliaEvents::MESSAGE_UPDATE
+     * @param string $deleteEventIdentifier the dispatched delete TheliaEvent identifier. Example: TheliaEvents::MESSAGE_DELETE
+     *
+     * @param string $visibilityToggleEventIdentifier the dispatched visibility toggle TheliaEvent identifier, or null if the object has no visible options. Example: TheliaEvents::MESSAGE_TOGGLE_VISIBILITY
+     * @param string $changePositionEventIdentifier the dispatched position change TheliaEvent identifier, or null if the object has no position. Example: TheliaEvents::MESSAGE_UPDATE_POSITION
+     */
     public function __construct(
             $objectName,
 
@@ -187,15 +204,14 @@ abstract class AbstractCrudController extends BaseAdminController
     }
 
     /**
-     * Render the object list, ensuring the sort order is set.
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
+     * Return the current list order identifier, updating it in the same time.
      */
-    protected function renderList()
-    {
+    protected function getCurrentListOrder($update_session = true) {
+
         $order = null;
 
-        if ($this->defaultListOrder != null) {
+        if ($this->defaultListOrder) {
+
             $orderSessionIdentifier = sprintf("admin.%s.currentListOrder", $this->objectName);
 
             // Find the current order
@@ -204,11 +220,20 @@ abstract class AbstractCrudController extends BaseAdminController
                     $this->getSession()->get($orderSessionIdentifier, $this->defaultListOrder)
             );
 
-            // Store the current sort order in session
-            $this->getSession()->set($orderSessionIdentifier, $order);
+            if ($update_session) $this->getSession()->set($orderSessionIdentifier, $order);
         }
 
-        return $this->renderListTemplate($order);
+        return $order;
+    }
+
+    /**
+     * Render the object list, ensuring the sort order is set.
+     *
+     * @return Symfony\Component\HttpFoundation\Response the response
+     */
+    protected function renderList()
+    {
+        return $this->renderListTemplate($this->getCurrentListOrder());
     }
 
     /**
@@ -286,7 +311,7 @@ abstract class AbstractCrudController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function changeAction()
+    public function updateAction()
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
@@ -312,7 +337,7 @@ abstract class AbstractCrudController extends BaseAdminController
      *
      * @return Symfony\Component\HttpFoundation\Response the response
      */
-    public function saveChangeAction()
+    public function processUpdateAction()
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;

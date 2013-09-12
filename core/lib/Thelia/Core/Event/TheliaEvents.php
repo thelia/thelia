@@ -365,17 +365,17 @@ final class TheliaEvents
 
     // -- Attributes values management ----------------------------------------
 
-    const ATTRIBUTE_VALUE_CREATE          = "action.createAttributeValue";
-    const ATTRIBUTE_VALUE_UPDATE          = "action.updateAttributeValue";
-    const ATTRIBUTE_VALUE_DELETE          = "action.deleteAttributeValue";
-    const ATTRIBUTE_VALUE_UPDATE_POSITION = "action.updateAttributeValuePosition";
+    const ATTRIBUTE_AV_CREATE          = "action.createAttributeAv";
+    const ATTRIBUTE_AV_UPDATE          = "action.updateAttributeAv";
+    const ATTRIBUTE_AV_DELETE          = "action.deleteAttributeAv";
+    const ATTRIBUTE_AV_UPDATE_POSITION = "action.updateAttributeAvPosition";
 
-    const BEFORE_CREATEATTRIBUTE_VALUE = "action.before_createAttributeValue";
-    const AFTER_CREATEATTRIBUTE_VALUE  = "action.after_createAttributeValue";
+    const BEFORE_CREATEATTRIBUTE_AV = "action.before_createAttributeAv";
+    const AFTER_CREATEATTRIBUTE_AV  = "action.after_createAttributeAv";
 
-    const BEFORE_UPDATEATTRIBUTE_VALUE = "action.before_updateAttributeValue";
-    const AFTER_UPDATEATTRIBUTE_VALUE  = "action.after_updateAttributeValue";
+    const BEFORE_UPDATEATTRIBUTE_AV = "action.before_updateAttributeAv";
+    const AFTER_UPDATEATTRIBUTE_AV  = "action.after_updateAttributeAv";
 
-    const BEFORE_DELETEATTRIBUTE_VALUE = "action.before_deleteAttributeValue";
-    const AFTER_DELETEATTRIBUTE_VALUE  = "action.after_deleteAttributeValue";
+    const BEFORE_DELETEATTRIBUTE_AV = "action.before_deleteAttributeAv";
+    const AFTER_DELETEATTRIBUTE_AV  = "action.after_deleteAttributeAv";
 }
