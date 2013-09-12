@@ -146,8 +146,6 @@ class URL
 
                 $queryString .= sprintf("%s=%s&", urlencode($name), urlencode($value));
             }
-
-            $base = rtrim($base, '&');
         }
 
         $sepChar = strstr($base, '?') === false ? '?' : '&';
