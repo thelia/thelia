@@ -127,7 +127,7 @@ class BaseController extends ContainerAware
     /**
      * Returns the session from the current request
      *
-     * @return \Symfony\Component\HttpFoundation\Session\SessionInterface
+     * @return \Thelia\Core\HttpFoundation\Session\Session
      */
     protected function getSession()
     {
