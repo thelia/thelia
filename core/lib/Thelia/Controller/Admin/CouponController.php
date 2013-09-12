@@ -352,17 +352,7 @@ class CouponController extends BaseAdminController
     {
         $this->checkAuth('ADMIN', 'admin.coupon.read');
 
-        if ($this->isDebug()) {
-            if (!$this->getRequest()->isXmlHttpRequest()) {
-                $this->redirect(
-                    $this->getRoute(
-                        'admin',
-                        array(),
-                        Router::ABSOLUTE_URL
-                    )
-                );
-            }
-        }
+        $this->checkXmlHttpRequest();
 
         /** @var ConstraintFactory $constraintFactory */
         $constraintFactory = $this->container->get('thelia.constraint.factory');
@@ -393,17 +383,7 @@ class CouponController extends BaseAdminController
     {
         $this->checkAuth('ADMIN', 'admin.coupon.read');
 
-        if ($this->isDebug()) {
-            if (!$this->getRequest()->isXmlHttpRequest()) {
-                $this->redirect(
-                    $this->getRoute(
-                        'admin',
-                        array(),
-                        Router::ABSOLUTE_URL
-                    )
-                );
-            }
-        }
+        $this->checkXmlHttpRequest();
 
         $search = CouponQuery::create();
         /** @var Coupon $coupon */
