@@ -495,7 +495,7 @@ class CouponController extends BaseAdminController
             $couponConsumeEvent
         );
 
-        var_dump('test');
+        var_dump('test', $couponConsumeEvent->getCode(), $couponConsumeEvent->getDiscount(), $couponConsumeEvent->getIsValid());
 
         exit();
     }

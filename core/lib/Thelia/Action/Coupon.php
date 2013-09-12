@@ -29,6 +29,7 @@ use Thelia\Constraint\ConstraintFactory;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\Type\CouponInterface;
@@ -101,10 +102,24 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         /** @var CouponInterface $coupon */
         $coupon = $couponFactory->buildCouponFromCode($event->getCode());
 
-
         $isValid = $coupon->isMatching();
         if ($isValid) {
+            /** @var Request $request */
+            $request = $this->container->get('request');
+            $consumedCoupons = $request->getSession()->getConsumedCoupons();
+
+            if (!isset($consumedCoupons) || !$consumedCoupons) {
+                $consumedCoupons = array();
+            }
+
+            // Prevent accumulation of the same Coupon on a Checkout
+            $consumedCoupons[$event->getCode()] = $event->getCode();
+
+            $request->getSession()->setConsumedCoupons($consumedCoupons);
+
             $totalDiscount = $couponManager->getDiscount();
+
+            // @todo modify Cart total discount
         }
 
         $event->setIsValid($isValid);

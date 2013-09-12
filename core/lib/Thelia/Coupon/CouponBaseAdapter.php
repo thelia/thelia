@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
+use Thelia\Constraint\ConstraintValidator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Coupon\Type\CouponInterface;
@@ -155,6 +156,11 @@ class CouponBaseAdapter implements CouponAdapterInterface
      */
     public function getCurrentCoupons()
     {
+        // @todo implement
+//        $consumedCoupons = $this->getRequest()->getSession()->getConsumedCoupons();
+        // @todo convert coupon code to coupon Interface
+
+
         $couponFactory = $this->container->get('thelia.coupon.factory');
 
         // @todo get from cart
@@ -249,5 +255,15 @@ class CouponBaseAdapter implements CouponAdapterInterface
     public function getRequest()
     {
         return $this->container->get('request');
+    }
+
+    /**
+     * Return Constraint Validator
+     *
+     * @return ConstraintValidator
+     */
+    public function getConstraintValidator()
+    {
+        return $this->container->get('thelia.constraint.validator');
     }
 }
