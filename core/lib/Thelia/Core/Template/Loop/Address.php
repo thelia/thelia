@@ -63,7 +63,7 @@ class Address extends BaseLoop
                 ),
                 'current'
             ),
-            Argument::createBooleanTypeArgument('default', false),
+            Argument::createBooleanTypeArgument('default'),
             Argument::createIntListTypeArgument('exclude')
         );
     }
@@ -100,6 +100,8 @@ class Address extends BaseLoop
 
         if ($default === true) {
             $search->filterByIsDefault(1, Criteria::EQUAL);
+        } else if($default === false) {
+            $search->filterByIsDefault(0, Criteria::EQUAL);
         }
 
         $exclude = $this->getExclude();

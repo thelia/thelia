@@ -72,6 +72,11 @@ final class TheliaEvents
     const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
 
     /**
+     * sent on customer removal
+     */
+    const CUSTOMER_DELETEACCOUNT = "action.deleteCustomer";
+
+    /**
      * sent when a customer need a new password
      */
     const LOST_PASSWORD = "action.lostPassword";
@@ -102,6 +107,16 @@ final class TheliaEvents
      * Sent just after a successful update of a customer in the database.
      */
     const AFTER_UPDATECUSTOMER 	= "action.after_updateCustomer";
+
+    /**
+     * sent just before customer removal
+     */
+    const BEFORE_DELETECUSTOMER = "action.before_updateCustomer";
+
+    /**
+     * sent just after customer removal
+     */
+    const AFTER_DELETECUSTOMER = "action.after_deleteCustomer";
 
     // -- ADDRESS MANAGEMENT ---------------------------------------------------------
     /**
