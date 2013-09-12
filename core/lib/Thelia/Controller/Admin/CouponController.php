@@ -137,7 +137,7 @@ class CouponController extends BaseAdminController
         }
 
         /** @var Coupon $coupon */
-        $coupon = CouponQuery::create()->findOneById($couponId);
+        $coupon = CouponQuery::create()->findPk($couponId);
         if (!$coupon) {
             $this->pageNotFound();
         }
@@ -150,6 +150,7 @@ class CouponController extends BaseAdminController
         $lang = $this->getSession()->getLang();
         $eventToDispatch = TheliaEvents::COUPON_UPDATE;
 
+        // Create
         if ($this->getRequest()->isMethod('POST')) {
             $this->validateCreateOrUpdateForm(
                 $i18n,
@@ -158,9 +159,9 @@ class CouponController extends BaseAdminController
                 'updated',
                 'update'
             );
-        } else {
-            // Prepare the data that will hydrate the form
+        } else { // Update
 
+            // Prepare the data that will hydrate the form
             /** @var ConstraintFactory $constraintFactory */
             $constraintFactory = $this->container->get('thelia.constraint.factory');
             $rules = $constraintFactory->unserializeCouponRuleCollection(
