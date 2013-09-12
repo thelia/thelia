@@ -26,6 +26,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Core\Event\CustomerLoginEvent;
@@ -59,6 +60,13 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     }
 
+    public function delete(CustomerEvent $event)
+    {
+        $customer = $event->getCustomer();
+
+        $customer->delete();
+    }
+
     private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event)
     {
         $customer->setDispatcher($this->getDispatcher());
@@ -80,7 +88,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $event->getLang(),
             $event->getReseller(),
             $event->getSponsor(),
-            $event->getDiscount()
+            $event->getDiscount(),
+            $event->getCompany()
         );
 
         $event->setCustomer($customer);
@@ -143,6 +152,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CUSTOMER_UPDATEACCOUNT => array("modify", 128),
             TheliaEvents::CUSTOMER_LOGOUT        => array("logout", 128),
             TheliaEvents::CUSTOMER_LOGIN         => array("login" , 128),
+            TheliaEvents::CUSTOMER_DELETEACCOUNT => array("delete", 128),
         );
     }
 }

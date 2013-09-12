@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,46 +17,70 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints;
-use Thelia\Model\CurrencyQuery;
-use Symfony\Component\Validator\ExecutionContextInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
+namespace Thelia\Core\Event;
 
-class AttributeValueCreationForm extends BaseForm
+class AttributeAvUpdateEvent extends AttributeAvCreateEvent
 {
-    protected function buildForm()
+    protected $attributeAv_id;
+
+    protected $description;
+    protected $chapo;
+    protected $postscriptum;
+
+    public function __construct($attributeAv_id)
     {
-        $this->formBuilder
-            ->add("title"   , "text"  , array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Title *"),
-                "label_attr" => array(
-                    "for" => "title"
-                ))
-            )
-            ->add("locale" , "text"  , array(
-                "constraints" => array(
-                    new NotBlank()
-                ))
-            )
-            ->add("attribute_id", "hidden", array(
-                "constraints" => array(
-                        new NotBlank()
-                ))
-            )
-        ;
+        $this->setAttributeAvId($attributeAv_id);
     }
 
-    public function getName()
+    public function getAttributeAvId()
     {
-        return "thelia_attribute_value_creation";
+        return $this->attributeAv_id;
+    }
+
+    public function setAttributeAvId($attributeAv_id)
+    {
+        $this->attributeAv_id = $attributeAv_id;
+
+        return $this;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getChapo()
+    {
+        return $this->chapo;
+    }
+
+    public function setChapo($chapo)
+    {
+        $this->chapo = $chapo;
+
+        return $this;
+    }
+
+    public function getPostscriptum()
+    {
+        return $this->postscriptum;
+    }
+
+    public function setPostscriptum($postscriptum)
+    {
+        $this->postscriptum = $postscriptum;
+
+        return $this;
     }
 }

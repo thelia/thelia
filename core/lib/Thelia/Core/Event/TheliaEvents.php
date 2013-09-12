@@ -72,6 +72,11 @@ final class TheliaEvents
     const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
 
     /**
+     * sent on customer removal
+     */
+    const CUSTOMER_DELETEACCOUNT = "action.deleteCustomer";
+
+    /**
      * sent when a customer need a new password
      */
     const LOST_PASSWORD = "action.lostPassword";
@@ -102,6 +107,16 @@ final class TheliaEvents
      * Sent just after a successful update of a customer in the database.
      */
     const AFTER_UPDATECUSTOMER 	= "action.after_updateCustomer";
+
+    /**
+     * sent just before customer removal
+     */
+    const BEFORE_DELETECUSTOMER = "action.before_updateCustomer";
+
+    /**
+     * sent just after customer removal
+     */
+    const AFTER_DELETECUSTOMER = "action.after_deleteCustomer";
 
     // -- ADDRESS MANAGEMENT ---------------------------------------------------------
     /**
@@ -365,17 +380,17 @@ final class TheliaEvents
 
     // -- Attributes values management ----------------------------------------
 
-    const ATTRIBUTE_VALUE_CREATE          = "action.createAttributeValue";
-    const ATTRIBUTE_VALUE_UPDATE          = "action.updateAttributeValue";
-    const ATTRIBUTE_VALUE_DELETE          = "action.deleteAttributeValue";
-    const ATTRIBUTE_VALUE_UPDATE_POSITION = "action.updateAttributeValuePosition";
+    const ATTRIBUTE_AV_CREATE          = "action.createAttributeAv";
+    const ATTRIBUTE_AV_UPDATE          = "action.updateAttributeAv";
+    const ATTRIBUTE_AV_DELETE          = "action.deleteAttributeAv";
+    const ATTRIBUTE_AV_UPDATE_POSITION = "action.updateAttributeAvPosition";
 
-    const BEFORE_CREATEATTRIBUTE_VALUE = "action.before_createAttributeValue";
-    const AFTER_CREATEATTRIBUTE_VALUE  = "action.after_createAttributeValue";
+    const BEFORE_CREATEATTRIBUTE_AV = "action.before_createAttributeAv";
+    const AFTER_CREATEATTRIBUTE_AV  = "action.after_createAttributeAv";
 
-    const BEFORE_UPDATEATTRIBUTE_VALUE = "action.before_updateAttributeValue";
-    const AFTER_UPDATEATTRIBUTE_VALUE  = "action.after_updateAttributeValue";
+    const BEFORE_UPDATEATTRIBUTE_AV = "action.before_updateAttributeAv";
+    const AFTER_UPDATEATTRIBUTE_AV  = "action.after_updateAttributeAv";
 
-    const BEFORE_DELETEATTRIBUTE_VALUE = "action.before_deleteAttributeValue";
-    const AFTER_DELETEATTRIBUTE_VALUE  = "action.after_deleteAttributeValue";
+    const BEFORE_DELETEATTRIBUTE_AV = "action.before_deleteAttributeAv";
+    const AFTER_DELETEATTRIBUTE_AV  = "action.after_deleteAttributeAv";
 }

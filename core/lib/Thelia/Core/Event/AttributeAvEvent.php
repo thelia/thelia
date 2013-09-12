@@ -22,24 +22,30 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
+use Thelia\Model\AttributeAv;
 
-class AttributeValueDeleteEvent extends AttributeValueEvent
+class AttributeAvEvent extends ActionEvent
 {
-    protected $attributeValue_id;
+    protected $attributeAv = null;
 
-    public function __construct($attributeValue_id)
+    public function __construct(AttributeAv $attributeAv = null)
     {
-        $this->setAttributeValueId($attributeValue_id);
+        $this->attributeAv = $attributeAv;
     }
 
-    public function getAttributeValueId()
+    public function hasAttributeAv()
     {
-        return $this->attributeValue_id;
+        return ! is_null($this->attributeAv);
     }
 
-    public function setAttributeValueId($attributeValue_id)
+    public function getAttributeAv()
     {
-        $this->attributeValue_id = $attributeValue_id;
+        return $this->attributeAv;
+    }
+
+    public function setAttributeAv($attributeAv)
+    {
+        $this->attributeAv = $attributeAv;
 
         return $this;
     }

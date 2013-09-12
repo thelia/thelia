@@ -25,57 +25,51 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Thelia\Model\AttributeQuery;
-use Thelia\Model\Attribute as AttributeModel;
+use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\AttributeAv as AttributeAvModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\AttributeUpdateEvent;
-use Thelia\Core\Event\AttributeCreateEvent;
-use Thelia\Core\Event\AttributeDeleteEvent;
+use Thelia\Core\Event\AttributeAvUpdateEvent;
+use Thelia\Core\Event\AttributeAvCreateEvent;
+use Thelia\Core\Event\AttributeAvDeleteEvent;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\AttributeAv;
-use Thelia\Model\AttributeAvQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
 
-class Attribute extends BaseAction implements EventSubscriberInterface
+class AttributeAv extends BaseAction implements EventSubscriberInterface
 {
     /**
      * Create a new attribute entry
      *
-     * @param AttributeCreateEvent $event
+     * @param AttributeAvCreateEvent $event
      */
-    public function create(AttributeCreateEvent $event)
+    public function create(AttributeAvCreateEvent $event)
     {
-        $attribute = new AttributeModel();
+        $attribute = new AttributeAvModel();
 
         $attribute
             ->setDispatcher($this->getDispatcher())
 
+            ->setAttributeId($event->getAttributeId())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
 
             ->save()
         ;
 
-        $event->setAttribute($attribute);
-
-        // Add atribute to all product templates if required
-        if ($event->getAddToAllTemplates() != 0) {
-            // TODO: add to all product template
-        }
+        $event->setAttributeAv($attribute);
     }
 
     /**
      * Change a product attribute
      *
-     * @param AttributeUpdateEvent $event
+     * @param AttributeAvUpdateEvent $event
      */
-    public function update(AttributeUpdateEvent $event)
+    public function update(AttributeAvUpdateEvent $event)
     {
-        $search = AttributeQuery::create();
+        $search = AttributeAvQuery::create();
 
-        if (null !== $attribute = AttributeQuery::create()->findPk($event->getAttributeId())) {
+        if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId())) {
 
             $attribute
                 ->setDispatcher($this->getDispatcher())
@@ -88,26 +82,26 @@ class Attribute extends BaseAction implements EventSubscriberInterface
 
                 ->save();
 
-            $event->setAttribute($attribute);
+            $event->setAttributeAv($attribute);
         }
     }
 
     /**
      * Delete a product attribute entry
      *
-     * @param AttributeDeleteEvent $event
+     * @param AttributeAvDeleteEvent $event
      */
-    public function delete(AttributeDeleteEvent $event)
+    public function delete(AttributeAvDeleteEvent $event)
     {
 
-        if (null !== ($attribute = AttributeQuery::create()->findPk($event->getAttributeId()))) {
+        if (null !== ($attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId()))) {
 
             $attribute
                 ->setDispatcher($this->getDispatcher())
                 ->delete()
             ;
 
-            $event->setAttribute($attribute);
+            $event->setAttributeAv($attribute);
         }
     }
 
@@ -118,7 +112,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if (null !== $attribute = AttributeQuery::create()->findPk($event->getObjectId())) {
+        if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getObjectId())) {
 
             $attribute->setDispatcher($this->getDispatcher());
 
@@ -140,10 +134,10 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::ATTRIBUTE_CREATE          => array("create", 128),
-            TheliaEvents::ATTRIBUTE_UPDATE          => array("update", 128),
-            TheliaEvents::ATTRIBUTE_DELETE          => array("delete", 128),
-            TheliaEvents::ATTRIBUTE_UPDATE_POSITION => array("updatePosition", 128),
+            TheliaEvents::ATTRIBUTE_AV_CREATE          => array("create", 128),
+            TheliaEvents::ATTRIBUTE_AV_UPDATE          => array("update", 128),
+            TheliaEvents::ATTRIBUTE_AV_DELETE          => array("delete", 128),
+            TheliaEvents::ATTRIBUTE_AV_UPDATE_POSITION => array("updatePosition", 128),
         );
     }
 }

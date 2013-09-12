@@ -14,6 +14,7 @@ Parameters:
     form_action         = the form action URL, subtitted by a click on OK button
     form_method         = the form method, default "POST"
     form_content        = the form content
+    form_id             = the form id
 
 *}
 <div class="modal fade" id="{$dialog_id}" tabindex="-1" role="dialog" aria-hidden="true">
@@ -28,7 +29,7 @@ Parameters:
                 {$dialog_message nofilter}
             </div>
 
-            <form method="{$form_method|default:POST}" action="{$form_action}">
+            <form method="{$form_method|default:POST}" action="{$form_action}" id="{$form_id}">
 
                 {$form_content nofilter}
 

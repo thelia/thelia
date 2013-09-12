@@ -23,7 +23,7 @@
 
 namespace Thelia\Core\Event;
 
-class AttributeValueCreateEvent extends AttributeValueEvent
+class AttributeAvCreateEvent extends AttributeAvEvent
 {
     protected $title;
     protected $locale;

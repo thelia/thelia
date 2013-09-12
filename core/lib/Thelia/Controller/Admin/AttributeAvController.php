@@ -23,55 +23,55 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\AttributeDeleteEvent;
+use Thelia\Core\Event\AttributeAvDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\AttributeUpdateEvent;
-use Thelia\Core\Event\AttributeCreateEvent;
-use Thelia\Model\AttributeQuery;
-use Thelia\Form\AttributeModificationForm;
-use Thelia\Form\AttributeCreationForm;
+use Thelia\Core\Event\AttributeAvUpdateEvent;
+use Thelia\Core\Event\AttributeAvCreateEvent;
+use Thelia\Model\AttributeAvQuery;
+use Thelia\Form\AttributeAvModificationForm;
+use Thelia\Form\AttributeAvCreationForm;
 use Thelia\Core\Event\UpdatePositionEvent;
 
 /**
- * Manages attributes sent by mail
+ * Manages attributes-av sent by mail
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class AttributeController extends AbstractCrudController
+class AttributeAvController extends AbstractCrudController
 {
     public function __construct() {
         parent::__construct(
             'attribute',
             'manual',
 
-            'admin.configuration.attributes.view',
-            'admin.configuration.attributes.create',
-            'admin.configuration.attributes.update',
-            'admin.configuration.attributes.delete',
+            'admin.configuration.attributes-av.view',
+            'admin.configuration.attributes-av.create',
+            'admin.configuration.attributes-av.update',
+            'admin.configuration.attributes-av.delete',
 
-            TheliaEvents::ATTRIBUTE_CREATE,
-            TheliaEvents::ATTRIBUTE_UPDATE,
-            TheliaEvents::ATTRIBUTE_DELETE,
+            TheliaEvents::ATTRIBUTE_AV_CREATE,
+            TheliaEvents::ATTRIBUTE_AV_UPDATE,
+            TheliaEvents::ATTRIBUTE_AV_DELETE,
             null, // No visibility toggle
-            TheliaEvents::ATTRIBUTE_UPDATE_POSITION
+            TheliaEvents::ATTRIBUTE_AV_UPDATE_POSITION
         );
     }
 
     protected function getCreationForm() {
-        return new AttributeCreationForm($this->getRequest());
+        return new AttributeAvCreationForm($this->getRequest());
     }
 
     protected function getUpdateForm() {
-        return new AttributeModificationForm($this->getRequest());
+        return new AttributeAvModificationForm($this->getRequest());
     }
 
     protected function getCreationEvent($formData) {
-        $createEvent = new AttributeCreateEvent();
+        $createEvent = new AttributeAvCreateEvent();
 
         $createEvent
+            ->setAttributeId($formData['attribute_id'])
             ->setTitle($formData['title'])
             ->setLocale($formData["locale"])
-            ->setAddToAllTemplates($formData['add_to_all'])
         ;
 
         return $createEvent;
@@ -79,7 +79,7 @@ class AttributeController extends AbstractCrudController
 
     protected function getUpdateEvent($formData) {
 
-        $changeEvent = new AttributeUpdateEvent($formData['id']);
+        $changeEvent = new AttributeAvUpdateEvent($formData['id']);
 
         // Create and dispatch the change event
         $changeEvent
@@ -96,18 +96,18 @@ class AttributeController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue) {
 
         return new UpdatePositionEvent(
-                $this->getRequest()->get('attribute_id', null),
+                $this->getRequest()->get('attributeav_id', null),
                 $positionChangeMode,
                 $positionValue
         );
     }
 
     protected function getDeleteEvent() {
-        return new AttributeDeleteEvent($this->getRequest()->get('attribute_id'));
+        return new AttributeAvDeleteEvent($this->getRequest()->get('attributeav_id'));
     }
 
     protected function eventContainsObject($event) {
-        return $event->hasAttribute();
+        return $event->hasAttributeAv();
     }
 
     protected function hydrateObjectForm($object) {
@@ -122,17 +122,17 @@ class AttributeController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new AttributeModificationForm($this->getRequest(), "form", $data);
+        return new AttributeAvModificationForm($this->getRequest(), "form", $data);
     }
 
     protected function getObjectFromEvent($event) {
-        return $event->hasAttribute() ? $event->getAttribute() : null;
+        return $event->hasAttributeAv() ? $event->getAttributeAv() : null;
     }
 
     protected function getExistingObject() {
-        return AttributeQuery::create()
+        return AttributeAvQuery::create()
         ->joinWithI18n($this->getCurrentEditionLocale())
-        ->findOneById($this->getRequest()->get('attribute_id'));
+        ->findOneById($this->getRequest()->get('attributeav_id'));
     }
 
     protected function getObjectLabel($object) {
@@ -143,22 +143,38 @@ class AttributeController extends AbstractCrudController
         return $object->getId();
     }
 
+    protected function getViewArguments() {
+        return array(
+            'attribute_id' => $this->getRequest()->get('attribute_id'),
+            'order' => $this->getCurrentListOrder()
+        );
+    }
+
     protected function renderListTemplate($currentOrder) {
-        return $this->render('attributes', array('order' => $currentOrder));
+        // We always return to the attribute edition form
+        return $this->render(
+                'attribute-edit',
+                $this->getViewArguments()
+        );
     }
 
     protected function renderEditionTemplate() {
-        return $this->render('attribute-edit', array('attribute_id' => $this->getRequest()->get('attribute_id')));
+        // We always return to the attribute edition form
+        return $this->render('attribute-edit', $this->getViewArguments());
     }
 
     protected function redirectToEditionTemplate() {
+        // We always return to the attribute edition form
         $this->redirectToRoute(
                 "admin.configuration.attributes.update",
-                array('attribute_id' => $this->getRequest()->get('attribute_id'))
+                $this->getViewArguments()
         );
     }
 
     protected function redirectToListTemplate() {
-        $this->redirectToRoute('admin.configuration.attributes.default');
-    }
+        $this->redirectToRoute(
+                "admin.configuration.attributes.update",
+                $this->getViewArguments()
+        );
+     }
 }
