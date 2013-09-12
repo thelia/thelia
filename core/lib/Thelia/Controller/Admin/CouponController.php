@@ -30,6 +30,7 @@ use Thelia\Constraint\ConstraintFactoryTest;
 use Thelia\Constraint\Rule\AvailableForTotalAmount;
 use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Constraint\Validator\PriceParam;
+use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponEvent;
@@ -39,6 +40,7 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
+use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Coupon\Type\CouponInterface;
@@ -473,6 +475,29 @@ class CouponController extends BaseAdminController
                 'urlDelete' => $couponId
             )
         );
+    }
+
+    /**
+     * Test Coupon consuming
+     *
+     * @param string $couponCode Coupon code
+     *
+     */
+    public function consumeAction($couponCode)
+    {
+        // @todo remove (event dispatcher testing purpose)
+        $couponConsumeEvent = new CouponConsumeEvent($couponCode);
+        $eventToDispatch = TheliaEvents::COUPON_CONSUME;
+
+        // Dispatch Event to the Action
+        $this->dispatch(
+            $eventToDispatch,
+            $couponConsumeEvent
+        );
+
+        var_dump('test');
+
+        exit();
     }
 
     /**

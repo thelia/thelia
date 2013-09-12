@@ -23,10 +23,15 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Constraint\ConstraintFactory;
+use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Coupon\CouponFactory;
+use Thelia\Coupon\CouponManager;
+use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as CouponModel;
 
 /**
@@ -45,7 +50,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /**
      * Occurring when a Coupon is about to be created
      *
-     * @param CouponCreateOrUpdateEvent $event Event creation or update Event
+     * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
      */
     public function create(CouponCreateOrUpdateEvent $event)
     {
@@ -57,7 +62,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /**
      * Occurring when a Coupon is about to be updated
      *
-     * @param CouponCreateOrUpdateEvent $event Event creation or update Event
+     * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon
      */
     public function update(CouponCreateOrUpdateEvent $event)
     {
@@ -69,7 +74,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /**
      * Occurring when a Coupon rule is about to be updated
      *
-     * @param CouponCreateOrUpdateEvent $event Event creation or update Event
+     * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon Rule
      */
     public function updateRule(CouponCreateOrUpdateEvent $event)
     {
@@ -81,11 +86,29 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /**
      * Occurring when a Coupon rule is about to be consumed
      *
-     * @param CouponCreateOrUpdateEvent $event Event creation or update Event
+     * @param CouponConsumeEvent $event Event consuming Coupon
      */
-    public function consume(CouponCreateOrUpdateEvent $event)
+    public function consume(CouponConsumeEvent $event)
     {
-        // @todo implements
+        $totalDiscount = 0;
+
+        /** @var CouponFactory $couponFactory */
+        $couponFactory = $this->container->get('thelia.coupon.factory');
+
+        /** @var CouponManager $couponManager */
+        $couponManager = $this->container->get('thelia.coupon.manager');
+
+        /** @var CouponInterface $coupon */
+        $coupon = $couponFactory->buildCouponFromCode($event->getCode());
+
+
+        $isValid = $coupon->isMatching();
+        if ($isValid) {
+            $totalDiscount = $couponManager->getDiscount();
+        }
+
+        $event->setIsValid($isValid);
+        $event->setDiscount($totalDiscount);
     }
 
     /**
@@ -165,8 +188,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::COUPON_CREATE => array("create", 128),
             TheliaEvents::COUPON_UPDATE => array("update", 128),
-            TheliaEvents::COUPON_DISABLE => array("disable", 128),
-            TheliaEvents::COUPON_ENABLE => array("enable", 128),
             TheliaEvents::COUPON_CONSUME => array("consume", 128),
             TheliaEvents::COUPON_RULE_UPDATE => array("updateRule", 128)
         );

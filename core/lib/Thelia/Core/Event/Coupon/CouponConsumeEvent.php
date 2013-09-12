@@ -22,6 +22,8 @@
 /**********************************************************************************/
 
 namespace Thelia\Core\Event\Coupon;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Model\Coupon;
 
 /**
@@ -29,75 +31,112 @@ use Thelia\Model\Coupon;
  * Date: 8/29/13
  * Time: 3:45 PM
  *
- * Occurring when a Coupon is enabled
+ * Occurring when a Coupon is consumed
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponEnableEvent extends ActionEvent
+class CouponConsumeEvent extends ActionEvent
 {
-    /** @var int Coupon id  */
-    protected $couponId;
+    /** @var string Coupon code */
+    protected $code = null;
 
-    /** @var Coupon Coupon being enabled */
-    protected $enabledCoupon;
+    /** @var float Total discount given by this coupon */
+    protected $discount = 0;
+
+    /** @var bool If Coupon is valid or if Customer meets coupon conditions */
+    protected $isValid = null;
 
     /**
      * Constructor
      *
-     * @param int $id Coupon Id
+     * @param string $code     Coupon code
+     * @param float  $discount Total discount given by this coupon
+     * @param bool   $isValid  If Coupon is valid or
+     *                         if Customer meets coupon conditions
      */
-    public function __construct($id)
+    function __construct($code, $discount = null, $isValid  = null)
     {
-        $this->id = $id;
+        $this->code = $code;
+        $this->discount = $discount;
+        $this->isValid = $isValid;
     }
 
     /**
-     * Get Coupon id
+     * Set Coupon code
      *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Set Coupon id
-     *
-     * @param int $id Coupon id
+     * @param string $code Coupon code
      *
      * @return $this
      */
-    public function setId($id)
+    public function setCode($code)
     {
-        $this->id = $id;
+        $this->code = $code;
 
         return $this;
     }
 
     /**
-     * Get Coupon being enabled
+     * Get Coupon code
      *
-     * @return Coupon
+     * @return string
      */
-    public function getEnabledCoupon()
+    public function getCode()
     {
-        return $this->enabledCoupon;
+        return $this->code;
     }
 
     /**
-     * Set Coupon to be enabled
+     * Set total discount given by this coupon
      *
-     * @param Coupon $enabledCoupon Coupon to enabled
+     * @param float $discount Total discount given by this coupon
      *
      * @return $this
      */
-    public function setEnabledCoupon(Coupon $enabledCoupon)
+    public function setDiscount($discount)
     {
-        $this->enabledCoupon = $enabledCoupon;
+        $this->discount = $discount;
 
         return $this;
     }
+
+    /**
+     * Get total discount given by this coupon
+     *
+     * @return float
+     */
+    public function getDiscount()
+    {
+        return $this->discount;
+    }
+
+    /**
+     * Set if Coupon is valid or if Customer meets coupon conditions
+     *
+     * @param boolean $isValid if Coupon is valid or
+     *                         if Customer meets coupon conditions
+     *
+     * @return $this
+     */
+    public function setIsValid($isValid)
+    {
+        $this->isValid = $isValid;
+
+        return $this;
+    }
+
+    /**
+     * Get if Coupon is valid or if Customer meets coupon conditions
+     *
+     * @return boolean
+     */
+    public function getIsValid()
+    {
+        return $this->isValid;
+    }
+
+
+
+
 }

@@ -239,36 +239,6 @@ final class TheliaEvents
     const AFTER_UPDATE_COUPON 	= "action.after_update_coupon";
 
     /**
-     * Sent when disabling a Coupon
-     */
-    const COUPON_DISABLE = "action.disable_coupon";
-
-    /**
-     * Sent just before a successful disable of a new Coupon in the database.
-     */
-    const BEFORE_DISABLE_COUPON 	= "action.before_disable_coupon";
-
-    /**
-     * Sent just after a successful disable of a new Coupon in the database.
-     */
-    const AFTER_DISABLE_COUPON 	= "action.after_disable_coupon";
-
-    /**
-     * Sent when enabling a Coupon
-     */
-    const COUPON_ENABLE = "action.enable_coupon";
-
-    /**
-     * Sent just before a successful enable of a new Coupon in the database.
-     */
-    const BEFORE_ENABLE_COUPON 	= "action.before_enable_coupon";
-
-    /**
-     * Sent just after a successful enable of a new Coupon in the database.
-     */
-    const AFTER_ENABLE_COUPON 	= "action.after_enable_coupon";
-
-    /**
      * Sent when attempting to use a Coupon
      */
     const COUPON_CONSUME 	= "action.consume_coupon";
