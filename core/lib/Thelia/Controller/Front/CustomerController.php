@@ -22,6 +22,7 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Front;
 
+use Symfony\Component\Form\Form;
 use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
@@ -97,7 +98,7 @@ class CustomerController extends BaseFrontController
             try {
                 $form = $this->validateForm($customerCreation, "post");
 
-                $customerCreateEvent = $this->createEventInstance($form->getData());
+                $customerCreateEvent = $this->createEventInstance($form);
 
                 $this->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $customerCreateEvent);
 
@@ -146,7 +147,7 @@ class CustomerController extends BaseFrontController
 
                 $form = $this->validateForm($customerModification, "post");
 
-                $customerChangeEvent = $this->createEventInstance($form->getData());
+                $customerChangeEvent = $this->createEventInstance($form);
                 $customerChangeEvent->setCustomer($customer);
 
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEACCOUNT, $customerChangeEvent);
@@ -259,27 +260,27 @@ class CustomerController extends BaseFrontController
      * @param $data
      * @return CustomerCreateOrUpdateEvent
      */
-    private function createEventInstance($data)
+    private function createEventInstance(Form $form)
     {
         $customerCreateEvent = new CustomerCreateOrUpdateEvent(
-            $data["title"],
-            $data["firstname"],
-            $data["lastname"],
-            $data["address1"],
-            $data["address2"],
-            $data["address3"],
-            $data["phone"],
-            $data["cellphone"],
-            $data["zipcode"],
-            $data["city"],
-            $data["country"],
-            isset($data["email"])?$data["email"]:null,
-            isset($data["password"]) ? $data["password"]:null,
+            $form->get("title")->getData(),
+            $form->get("firstname")->getData(),
+            $form->get("lastname")->getData(),
+            $form->get("address1")->getData(),
+            $form->get("address2")->getData(),
+            $form->get("address3")->getData(),
+            $form->get("phone")->getData(),
+            $form->get("cellphone")->getData(),
+            $form->get("zipcode")->getData(),
+            $form->get("city")->getData(),
+            $form->get("country")->getData(),
+            $form->get("email")->getData(),
+            $form->get("password")->getData(),
             $this->getRequest()->getSession()->getLang()->getId(),
-            isset($data["reseller"])?$data["reseller"]:null,
-            isset($data["sponsor"])?$data["sponsor"]:null,
-            isset($data["discount"])?$data["discount"]:null,
-            isset($data["company"])?$data["company"]:null
+            $form->get("reseller")->getData(),
+            $form->get("sponsor")->getData(),
+            $form->get("discount")->getData(),
+            $form->get("company")->getData()
         );
 
         return $customerCreateEvent;
