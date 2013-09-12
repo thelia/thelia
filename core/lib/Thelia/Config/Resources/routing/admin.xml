@@ -50,6 +50,11 @@
         <default key="_controller">Thelia\Controller\Admin\OrderController::indexAction</default>
     </route>    
 
+    <route id="admin.order.update.view" path="/admin/order/update/{order_id}">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::viewAction</default>
+        <requirement key="order_id">\d+</requirement>
+    </route>
+
     <!-- end Customer rule management -->
 
     <!-- Categories management -->
