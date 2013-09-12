@@ -23,23 +23,63 @@
 
 namespace Thelia\Core\Event;
 
-class AttributeValueDeleteEvent extends AttributeValueEvent
+class AttributeAvUpdateEvent extends AttributeAvCreateEvent
 {
-    protected $attributeValue_id;
+    protected $attributeAv_id;
 
-    public function __construct($attributeValue_id)
+    protected $description;
+    protected $chapo;
+    protected $postscriptum;
+
+    public function __construct($attributeAv_id)
     {
-        $this->setAttributeValueId($attributeValue_id);
+        $this->setAttributeAvId($attributeAv_id);
     }
 
-    public function getAttributeValueId()
+    public function getAttributeAvId()
     {
-        return $this->attributeValue_id;
+        return $this->attributeAv_id;
     }
 
-    public function setAttributeValueId($attributeValue_id)
+    public function setAttributeAvId($attributeAv_id)
     {
-        $this->attributeValue_id = $attributeValue_id;
+        $this->attributeAv_id = $attributeAv_id;
+
+        return $this;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getChapo()
+    {
+        return $this->chapo;
+    }
+
+    public function setChapo($chapo)
+    {
+        $this->chapo = $chapo;
+
+        return $this;
+    }
+
+    public function getPostscriptum()
+    {
+        return $this->postscriptum;
+    }
+
+    public function setPostscriptum($postscriptum)
+    {
+        $this->postscriptum = $postscriptum;
 
         return $this;
     }

@@ -122,7 +122,7 @@ class AttributeController extends AbstractCrudController
         );
 
         // Setup the object form
-        $changeForm = new AttributeModificationForm($this->getRequest(), "form", $data);
+        return new AttributeModificationForm($this->getRequest(), "form", $data);
     }
 
     protected function getObjectFromEvent($event) {
@@ -136,7 +136,7 @@ class AttributeController extends AbstractCrudController
     }
 
     protected function getObjectLabel($object) {
-        return $object->getName();
+        return $object->getTitle();
     }
 
     protected function getObjectId($object) {
