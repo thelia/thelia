@@ -30,6 +30,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CustomerModification;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Class CustomerController
@@ -126,7 +127,7 @@ class CustomerController extends BaseAdminController
             $customer = CustomerQuery::create()->findPk($customer_id);
 
             if(null === $customer) {
-                throw new \InvalidArgumentException("The customer you want to delete does not exists");
+                throw new \InvalidArgumentException(Translator::getInstance("The customer you want to delete does not exists"));
             }
 
             $event = new CustomerEvent($customer);
@@ -141,7 +142,7 @@ class CustomerController extends BaseAdminController
         );
 
         if ($message) {
-            $param["delete_error_message"] = $message;
+            $params["delete_error_message"] = $message;
         }
 
         $this->redirectToRoute("admin.customers", $params);
