@@ -71,4 +71,14 @@ class Address extends BaseAddress {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEADDRESS, new AddressEvent($this));
     }
 
+    public function preSave()
+    {
+        $valid = true;
+        if($this->getIsDefault()) {
+            $valid =  false;
+        }
+
+        return $valid;
+    }
+
 }

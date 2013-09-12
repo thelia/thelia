@@ -32,27 +32,36 @@ use Thelia\Model\ConfigQuery;
 
 /**
  *
- * Class PageNotFound
+ * Class HttpException
  * @package Thelia\Action
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class PageNotFound extends BaseAction implements EventSubscriberInterface
+class HttpException extends BaseAction implements EventSubscriberInterface
 {
-    public function display404(GetResponseForExceptionEvent $event)
+    public function checkHttpException(GetResponseForExceptionEvent $event)
     {
         if ($event->getException() instanceof NotFoundHttpException) {
-
-            $parser = $this->container->get("thelia.parser");
-
-            // Define the template thant shoud be used
-            $parser->setTemplate(ConfigQuery::getActiveTemplate());
-
-            //$event->getRequest()->attributes->set('_view', ConfigQuery::getPageNotFoundView());
-
-            $response = new Response($parser->render(ConfigQuery::getPageNotFoundView()), 404);
-
-            $event->setResponse($response);
+            $this->display404($event);
         }
+    }
+
+    protected function display404(GetResponseForExceptionEvent $event)
+    {
+        $parser = $this->container->get("thelia.parser");
+
+        // Define the template thant shoud be used
+        $parser->setTemplate(ConfigQuery::getActiveTemplate());
+
+        //$event->getRequest()->attributes->set('_view', ConfigQuery::getPageNotFoundView());
+
+        $response = new Response($parser->render(ConfigQuery::getPageNotFoundView()), 404);
+
+        $event->setResponse($response);
+    }
+
+    protected function display403(GetResponseForExceptionEvent $event)
+    {
+        $event->setResponse(new Response("You don't have access to this resources", 403));
     }
 
     /**
@@ -78,7 +87,7 @@ class PageNotFound extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::EXCEPTION => array("display404", 128),
+            KernelEvents::EXCEPTION => array("checkHttpException", 128),
         );
     }
 }
