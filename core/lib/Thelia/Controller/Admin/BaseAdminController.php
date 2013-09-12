@@ -97,7 +97,7 @@ class BaseAdminController extends BaseController
     protected function errorPage($message)
     {
         if ($message instanceof \Exception) {
-            $message = sprintf($this->getTranslator()->trans("Sorry, an error occured: %msg"), array('msg' => $message->getMessage()));
+            $message = $this->getTranslator()->trans("Sorry, an error occured: %msg", array('%msg' => $message->getMessage()));
         }
 
         return $this->render('general_error', array(
@@ -273,6 +273,35 @@ class BaseAdminController extends BaseController
         return $this->getCurrentEditionLang()->getLocale();
     }
 
+
+    /**
+     * Return the current list order identifier for a given object name,
+     * updating in using the current request.
+     *
+     * @param unknown $objectName the object name (e.g. 'attribute', 'message')
+     * @param unknown $requestParameterName the name of the request parameter that defines the list order
+     * @param unknown $defaultListOrder the default order to use, if none is defined
+     * @param string $updateSession if true, the session will be updated with the current order.
+     *
+     * @return String the current liste order.
+     */
+    protected function getListOrderFromSession($objectName, $requestParameterName, $defaultListOrder, $updateSession = true) {
+
+        $order = $defaultListOrder;
+
+        $orderSessionIdentifier = sprintf("admin.%s.currentListOrder", $objectName);
+
+        // Find the current order
+        $order = $this->getRequest()->get(
+                $requestParameterName,
+                $this->getSession()->get($orderSessionIdentifier, $defaultListOrder)
+        );
+
+        if ($updateSession) $this->getSession()->set($orderSessionIdentifier, $order);
+
+        return $order;
+    }
+
     /**
      * Render the given template, and returns the result as an Http Response.
      *
@@ -314,7 +343,7 @@ class BaseAdminController extends BaseController
             'edit_language_id'     => $edition_language->getId(),
             'edit_language_locale' => $edition_language->getLocale(),
 
-            'current_url'          => htmlspecialchars($this->getRequest()->getUri())
+            'current_url'          => $this->getRequest()->getUri()
         ));
 
         // Update the current edition language in session

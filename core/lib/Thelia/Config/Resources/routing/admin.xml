@@ -236,6 +236,14 @@
         <default key="_controller">Thelia\Controller\Admin\AttributeController::updatePositionAction</default>
     </route>
 
+    <route id="admin.configuration.attributes.rem-from-all" path="/admin/configuration/attributes/remove-from-all-templates">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::removeFromAllTemplates</default>
+    </route>
+
+    <route id="admin.configuration.attributes.add-to-all" path="/admin/configuration/attributes/add-to-all-templates">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::addToAllTemplates</default>
+    </route>
+
 
     <route id="admin.configuration.attributes-av.create" path="/admin/configuration/attributes-av/create">
         <default key="_controller">Thelia\Controller\Admin\AttributeAvController::createAction</default>

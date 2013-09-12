@@ -369,6 +369,9 @@ final class TheliaEvents
     const ATTRIBUTE_DELETE          = "action.deleteAttribute";
     const ATTRIBUTE_UPDATE_POSITION = "action.updateAttributePosition";
 
+    const ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES = "action.addAttributeToAllTemplate";
+    const ATTRIBUTE_ADD_TO_ALL_TEMPLATES      = "action.removeAttributeFromAllTemplate";
+
     const BEFORE_CREATEATTRIBUTE = "action.before_createAttribute";
     const AFTER_CREATEATTRIBUTE  = "action.after_createAttribute";
 
