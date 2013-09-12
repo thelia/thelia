@@ -70,8 +70,6 @@
             // Save Rules AJAX
             couponManager.saveRuleAjax = function() {
                 $('#constraint-add-operators-values').html('<div class="loading" ></div>');
-                console.log('about to save');
-                console.log(couponManager.rulesToSave);
                 var $url = '{$urlAjaxUpdateRules}';
                 $.ajax({
                     type: "POST",

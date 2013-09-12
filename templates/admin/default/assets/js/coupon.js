@@ -24,15 +24,10 @@ $(function($){
     // Add 1 Rule / or update the temporary Rules array then Save Rules via AJAX
     couponManager.createOrUpdateRuleAjax = function() {
         var id = couponManager.ruleToUpdateId;
-        console.log('createOrUpdateRuleAjax  '+ id);
         // If create
         if(!id) {
-            console.log('pushing');
-            console.log(couponManager.ruleToSave);
             couponManager.rulesToSave.push(couponManager.ruleToSave);
         } else { // else update
-            console.log('editing ' + id);
-            console.log(couponManager.ruleToSave);
             couponManager.rulesToSave[id] = couponManager.ruleToSave;
             // reset edit mode to off
             couponManager.ruleToUpdateId = false;
@@ -46,10 +41,6 @@ $(function($){
     couponManager.updateRuleSelectAjax = function(id) {
         couponManager.ruleToUpdateId = id;
         couponManager.ruleToSave = couponManager.rulesToSave[id];
-        console.log('Set id to edit to ' + id);
-
-//        // Deleting this rule, we will reset it
-//        delete couponManager.rulesToSave[id];
 
         // Set the rule selector
         $("#category-rule option").filter(function() {
@@ -64,8 +55,6 @@ $(function($){
 
     // Fill in rule inputs
     couponManager.fillInRuleInputs = function() {
-        console.log('fillInRuleInputs with');
-        console.log(couponManager.ruleToSave);
         var operatorId = null;
         var valueId = null;
         var idName = null;
@@ -84,15 +73,6 @@ $(function($){
             valueId = idName + '-value';
             $('#' + valueId).val(couponManager.ruleToSave.values[idName]);
         }
-//        couponManager.ruleToSave = couponManager.ruleToUpdate;
-
-//        var id = couponManager.ruleToUpdateId;
-//        console.log('id to edit = ' + id);
-//        if(id) {
-//            console.log('setint rulesToSave[' + id + ']');
-//            console.log(couponManager.ruleToSave);
-//            couponManager.rulesToSave[id] = couponManager.ruleToSave;
-//        }
     };
 
     // Save rules on click
