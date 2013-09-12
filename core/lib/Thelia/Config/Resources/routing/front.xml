@@ -10,15 +10,31 @@
     </route>
 
     <!-- Customer routes -->
+    <route id="customer.create.view" path="/register">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">register</default>
+    </route>
+
+
+    <route id="customer.login.view" path="/login">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">login</default>
+    </route>
+
+    <route id="customer.logout.process" path="/logout">
+        <default key="_controller">Thelia\Controller\Front\CustomerController::logoutAction</default>
+    </route>
+
+    <route id="customer.account.view" path="/customer/account">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">account</default>
+    </route>
+
     <route id="customer.create.process" path="/customer/create" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::createAction</default>
         <default key="_view">register</default>
     </route>
 
-    <route id="customer.create.view" path="/register">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">register</default>
-    </route>
 
     <route id="customer.update.process" path="/customer/update" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::updateAction</default>
@@ -29,14 +45,6 @@
         <default key="_view">login</default>
     </route>
 
-    <route id="customer.login.view" path="/login">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">login</default>
-    </route>
-
-    <route id="customer.logout.process" path="/logout">
-        <default key="_controller">Thelia\Controller\Front\CustomerController::logoutAction</default>
-    </route>
 
     <route id="customer.password.retrieve.view" path="/password" methods="get">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>

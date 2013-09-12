@@ -57,7 +57,7 @@ class CartTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 8;
+    const NUM_COLUMNS = 9;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class CartTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 8;
+    const NUM_HYDRATE_COLUMNS = 9;
 
     /**
      * the column name for the ID field
@@ -100,6 +100,11 @@ class CartTableMap extends TableMap
     const CURRENCY_ID = 'cart.CURRENCY_ID';
 
     /**
+     * the column name for the DISCOUNT field
+     */
+    const DISCOUNT = 'cart.DISCOUNT';
+
+    /**
      * the column name for the CREATED_AT field
      */
     const CREATED_AT = 'cart.CREATED_AT';
@@ -121,12 +126,12 @@ class CartTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Token', 'CustomerId', 'AddressDeliveryId', 'AddressInvoiceId', 'CurrencyId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'token', 'customerId', 'addressDeliveryId', 'addressInvoiceId', 'currencyId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CartTableMap::ID, CartTableMap::TOKEN, CartTableMap::CUSTOMER_ID, CartTableMap::ADDRESS_DELIVERY_ID, CartTableMap::ADDRESS_INVOICE_ID, CartTableMap::CURRENCY_ID, CartTableMap::CREATED_AT, CartTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'TOKEN', 'CUSTOMER_ID', 'ADDRESS_DELIVERY_ID', 'ADDRESS_INVOICE_ID', 'CURRENCY_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'token', 'customer_id', 'address_delivery_id', 'address_invoice_id', 'currency_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
+        self::TYPE_PHPNAME       => array('Id', 'Token', 'CustomerId', 'AddressDeliveryId', 'AddressInvoiceId', 'CurrencyId', 'Discount', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'token', 'customerId', 'addressDeliveryId', 'addressInvoiceId', 'currencyId', 'discount', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CartTableMap::ID, CartTableMap::TOKEN, CartTableMap::CUSTOMER_ID, CartTableMap::ADDRESS_DELIVERY_ID, CartTableMap::ADDRESS_INVOICE_ID, CartTableMap::CURRENCY_ID, CartTableMap::DISCOUNT, CartTableMap::CREATED_AT, CartTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'TOKEN', 'CUSTOMER_ID', 'ADDRESS_DELIVERY_ID', 'ADDRESS_INVOICE_ID', 'CURRENCY_ID', 'DISCOUNT', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'token', 'customer_id', 'address_delivery_id', 'address_invoice_id', 'currency_id', 'discount', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -136,12 +141,12 @@ class CartTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Token' => 1, 'CustomerId' => 2, 'AddressDeliveryId' => 3, 'AddressInvoiceId' => 4, 'CurrencyId' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'token' => 1, 'customerId' => 2, 'addressDeliveryId' => 3, 'addressInvoiceId' => 4, 'currencyId' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
-        self::TYPE_COLNAME       => array(CartTableMap::ID => 0, CartTableMap::TOKEN => 1, CartTableMap::CUSTOMER_ID => 2, CartTableMap::ADDRESS_DELIVERY_ID => 3, CartTableMap::ADDRESS_INVOICE_ID => 4, CartTableMap::CURRENCY_ID => 5, CartTableMap::CREATED_AT => 6, CartTableMap::UPDATED_AT => 7, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TOKEN' => 1, 'CUSTOMER_ID' => 2, 'ADDRESS_DELIVERY_ID' => 3, 'ADDRESS_INVOICE_ID' => 4, 'CURRENCY_ID' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'token' => 1, 'customer_id' => 2, 'address_delivery_id' => 3, 'address_invoice_id' => 4, 'currency_id' => 5, 'created_at' => 6, 'updated_at' => 7, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Token' => 1, 'CustomerId' => 2, 'AddressDeliveryId' => 3, 'AddressInvoiceId' => 4, 'CurrencyId' => 5, 'Discount' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'token' => 1, 'customerId' => 2, 'addressDeliveryId' => 3, 'addressInvoiceId' => 4, 'currencyId' => 5, 'discount' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
+        self::TYPE_COLNAME       => array(CartTableMap::ID => 0, CartTableMap::TOKEN => 1, CartTableMap::CUSTOMER_ID => 2, CartTableMap::ADDRESS_DELIVERY_ID => 3, CartTableMap::ADDRESS_INVOICE_ID => 4, CartTableMap::CURRENCY_ID => 5, CartTableMap::DISCOUNT => 6, CartTableMap::CREATED_AT => 7, CartTableMap::UPDATED_AT => 8, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TOKEN' => 1, 'CUSTOMER_ID' => 2, 'ADDRESS_DELIVERY_ID' => 3, 'ADDRESS_INVOICE_ID' => 4, 'CURRENCY_ID' => 5, 'DISCOUNT' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'token' => 1, 'customer_id' => 2, 'address_delivery_id' => 3, 'address_invoice_id' => 4, 'currency_id' => 5, 'discount' => 6, 'created_at' => 7, 'updated_at' => 8, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -166,6 +171,7 @@ class CartTableMap extends TableMap
         $this->addForeignKey('ADDRESS_DELIVERY_ID', 'AddressDeliveryId', 'INTEGER', 'address', 'ID', false, null, null);
         $this->addForeignKey('ADDRESS_INVOICE_ID', 'AddressInvoiceId', 'INTEGER', 'address', 'ID', false, null, null);
         $this->addForeignKey('CURRENCY_ID', 'CurrencyId', 'INTEGER', 'currency', 'ID', false, null, null);
+        $this->addColumn('DISCOUNT', 'Discount', 'FLOAT', false, null, 0);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -339,6 +345,7 @@ class CartTableMap extends TableMap
             $criteria->addSelectColumn(CartTableMap::ADDRESS_DELIVERY_ID);
             $criteria->addSelectColumn(CartTableMap::ADDRESS_INVOICE_ID);
             $criteria->addSelectColumn(CartTableMap::CURRENCY_ID);
+            $criteria->addSelectColumn(CartTableMap::DISCOUNT);
             $criteria->addSelectColumn(CartTableMap::CREATED_AT);
             $criteria->addSelectColumn(CartTableMap::UPDATED_AT);
         } else {
@@ -348,6 +355,7 @@ class CartTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ADDRESS_DELIVERY_ID');
             $criteria->addSelectColumn($alias . '.ADDRESS_INVOICE_ID');
             $criteria->addSelectColumn($alias . '.CURRENCY_ID');
+            $criteria->addSelectColumn($alias . '.DISCOUNT');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

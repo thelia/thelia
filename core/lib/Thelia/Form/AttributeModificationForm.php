@@ -20,9 +20,41 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Form;
 
-namespace Thelia\Core\Event;
+use Symfony\Component\Validator\Constraints;
+use Thelia\Model\CurrencyQuery;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 
-class CategoryUpdatePositionEvent extends BaseUpdatePositionEvent
+class AttributeModificationForm extends AttributeCreationForm
 {
+    use StandardDescriptionFieldsTrait;
+
+    protected function buildForm()
+    {
+        $this->formBuilder
+            ->add("id", "hidden", array(
+                    "constraints" => array(
+                        new GreaterThan(
+                            array('value' => 0)
+                        )
+                    )
+            ))
+            ->add('attribute_values', 'collection', array(
+                    'type'   => 'text',
+                    'options'  => array('required'  => false)
+            ))
+        ;
+
+        // Add standard description fields
+        $this->addStandardDescFields();
+    }
+
+    public function getName()
+    {
+        return "thelia_attribute_modification";
+    }
 }

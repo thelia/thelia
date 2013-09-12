@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,63 +17,35 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
+use Thelia\Model\Attribute;
 
-class BaseUpdatePositionEvent extends ActionEvent
+class AttributeEvent extends ActionEvent
 {
-    const POSITION_UP = 1;
-    const POSITION_DOWN = 2;
-    const POSITION_ABSOLUTE = 3;
+    protected $attribute = null;
 
-    protected $object_id;
-    protected $mode;
-    protected $position;
-
-    protected $object;
-
-    public function __construct($object_id, $mode, $position = null)
+    public function __construct(Attribute $attribute = null)
     {
-        $this->object_id = $object_id;
-        $this->mode = $mode;
-        $this->position = $position;
+        $this->attribute = $attribute;
     }
 
-    public function getMode()
+    public function hasAttribute()
     {
-        return $this->mode;
+        return ! is_null($this->attribute);
     }
 
-    public function setMode($mode)
+    public function getAttribute()
     {
-        $this->mode = $mode;
-
-        return $this;
+        return $this->attribute;
     }
 
-    public function getPosition()
+    public function setAttribute($attribute)
     {
-        return $this->position;
-    }
-
-    public function setPosition($position)
-    {
-        $this->position = $position;
-
-        return $this;
-    }
-
-    public function getObjectId()
-    {
-        return $this->object_id;
-    }
-
-    public function setObjectId($object_id)
-    {
-        $this->object_id = $object_id;
+        $this->attribute = $attribute;
 
         return $this;
     }

@@ -45,22 +45,28 @@ trait PositionManagementTrait {
         return $class->getConstant('DATABASE_NAME');
     }
 
+    /**
+     * Implementors may add some search criteria (e.g., parent id) to the queries
+     * used to change/get position by overloading this method.
+     */
+    protected function addCriteriaToPositionQuery($query) {
+        // Add required criteria here...
+    }
 
     /**
      * Get the position of the next inserted object
      */
-    public function getNextPosition($parent = null) {
+    public function getNextPosition() {
 
          $query = $this->createQuery()
             ->orderByPosition(Criteria::DESC)
             ->limit(1);
 
-            if ($parent !== null) $query->filterByParent($parent);
+         $this->addCriteriaToPositionQuery($query);
 
-            $last = $query->findOne()
-        ;
+         $last = $query->findOne();
 
-        return $last != null ? $last->getPosition() + 1 : 1;
+         return $last != null ? $last->getPosition() + 1 : 1;
     }
 
     /**
@@ -90,7 +96,7 @@ trait PositionManagementTrait {
         // Find object to exchange position with
         $search = $this->createQuery();
 
-        if (method_exists($this, 'getParent')) $search->filterByParent($this->getParent());
+        $this->addCriteriaToPositionQuery($search);
 
         // Up or down ?
         if ($up === true) {
@@ -151,7 +157,7 @@ trait PositionManagementTrait {
              // Find categories to offset
             $search = $this->createQuery();
 
-            if (method_exists($this, 'getParent')) $search->filterByParent($this->getParent());
+            $this->addCriteriaToPositionQuery($search);
 
             if ($newPosition > $current_position) {
                 // The new position is after the current position -> we will offset + 1 all categories located between us and the new position

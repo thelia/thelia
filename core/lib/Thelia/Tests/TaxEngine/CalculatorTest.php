@@ -136,18 +136,21 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTaxAmountAndGetTaxedPrice()
     {
+        /* consecutives taxes */
         $taxRulesCollection = new ObjectCollection();
         $taxRulesCollection->setModel('\Thelia\Model\Tax');
 
         $tax = new Tax();
         $tax->setType('PricePercentTaxType')
-            ->setRequirements(array('percent' => 10));
+            ->setRequirements(array('percent' => 10))
+            ->setVirtualColumn('taxRuleCountryPosition', 1);
 
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
         $tax->setType('PricePercentTaxType')
-            ->setRequirements(array('percent' => 8));
+            ->setRequirements(array('percent' => 8))
+            ->setVirtualColumn('taxRuleCountryPosition', 2);
 
         $taxRulesCollection->append($tax);
 
@@ -167,5 +170,40 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
          */
         $this->assertEquals(94, $taxAmount);
         $this->assertEquals(594, $taxedPrice);
+
+        /* same position taxes */
+        $taxRulesCollection = new ObjectCollection();
+        $taxRulesCollection->setModel('\Thelia\Model\Tax');
+
+        $tax = new Tax();
+        $tax->setType('PricePercentTaxType')
+            ->setRequirements(array('percent' => 10))
+            ->setVirtualColumn('taxRuleCountryPosition', 1);
+
+        $taxRulesCollection->append($tax);
+
+        $tax = new Tax();
+        $tax->setType('PricePercentTaxType')
+            ->setRequirements(array('percent' => 8))
+            ->setVirtualColumn('taxRuleCountryPosition', 1);
+
+        $taxRulesCollection->append($tax);
+
+        $calculator = new Calculator();
+
+        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
+        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+
+        $taxAmount = $calculator->getTaxAmount(500);
+        $taxedPrice = $calculator->getTaxedPrice(500);
+
+        /*
+         * expect :
+         *  tax 1 = 500*0.10 = 50 // amout with tax 1 : 550
+         *  tax 2 = 500*0.08 = 40 // amout with tax 2 : 590
+         * total tax amount = 90
+         */
+        $this->assertEquals(90, $taxAmount);
+        $this->assertEquals(590, $taxedPrice);
     }
 }

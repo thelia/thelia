@@ -23,6 +23,7 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Thelia\Model\ContentQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 use Thelia\Core\Template\Loop\Content;
@@ -47,5 +48,17 @@ class ContentTest extends BaseLoopTestor
     public function getMandatoryArguments()
     {
         return array();
+    }
+
+    public function testSearchById()
+    {
+        $content = ContentQuery::create()->findOne();
+
+        $this->baseTestSearchById($content->getId());
+    }
+
+    public function testSearchLimit()
+    {
+        $this->baseTestSearchWithLimit(3);
     }
 }

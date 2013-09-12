@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,12 +17,52 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
 
-class CurrencyUpdatePositionEvent extends BaseUpdatePositionEvent
+class AttributeAvCreateEvent extends AttributeAvEvent
 {
+    protected $title;
+    protected $locale;
+    protected $attribute_id;
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getAttributeId()
+    {
+        return $this->attribute_id;
+    }
+
+    public function setAttributeId($attribute_id)
+    {
+        $this->attribute_id = $attribute_id;
+
+        return $this;
+    }
+
 }

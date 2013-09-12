@@ -20,29 +20,43 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Form;
 
-namespace Thelia\Core\Event;
+use Symfony\Component\Validator\Constraints;
+use Thelia\Model\CurrencyQuery;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
 
-class BaseToggleVisibilityEvent  extends ActionEvent
+class AttributeAvCreationForm extends BaseForm
 {
-    protected $object_id;
-
-    protected $object;
-
-    public function __construct($object_id)
+    protected function buildForm()
     {
-        $this->object_id = $object_id;
+        $this->formBuilder
+            ->add("title"   , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Title *"),
+                "label_attr" => array(
+                    "for" => "title"
+                ))
+            )
+            ->add("locale" , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ))
+            )
+            ->add("attribute_id", "hidden", array(
+                "constraints" => array(
+                        new NotBlank()
+                ))
+            )
+        ;
     }
 
-    public function getObjectId()
+    public function getName()
     {
-        return $this->object_id;
-    }
-
-    public function setObjectId($object_id)
-    {
-        $this->object_id = $object_id;
-
-        return $this;
+        return "thelia_attributeav_creation";
     }
 }

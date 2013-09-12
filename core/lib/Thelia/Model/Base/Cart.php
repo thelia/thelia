@@ -100,6 +100,13 @@ abstract class Cart implements ActiveRecordInterface
     protected $currency_id;
 
     /**
+     * The value for the discount field.
+     * Note: this column has a database default value of: 0
+     * @var        double
+     */
+    protected $discount;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -152,10 +159,23 @@ abstract class Cart implements ActiveRecordInterface
     protected $cartItemsScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->discount = 0;
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\Cart object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -472,6 +492,17 @@ abstract class Cart implements ActiveRecordInterface
     }
 
     /**
+     * Get the [discount] column value.
+     *
+     * @return   double
+     */
+    public function getDiscount()
+    {
+
+        return $this->discount;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -654,6 +685,27 @@ abstract class Cart implements ActiveRecordInterface
     } // setCurrencyId()
 
     /**
+     * Set the value of [discount] column.
+     *
+     * @param      double $v new value
+     * @return   \Thelia\Model\Cart The current object (for fluent API support)
+     */
+    public function setDiscount($v)
+    {
+        if ($v !== null) {
+            $v = (double) $v;
+        }
+
+        if ($this->discount !== $v) {
+            $this->discount = $v;
+            $this->modifiedColumns[] = CartTableMap::DISCOUNT;
+        }
+
+
+        return $this;
+    } // setDiscount()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -705,6 +757,10 @@ abstract class Cart implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->discount !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -750,13 +806,16 @@ abstract class Cart implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CartTableMap::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->currency_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CartTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CartTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->discount = (null !== $col) ? (double) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CartTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CartTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CartTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -769,7 +828,7 @@ abstract class Cart implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = CartTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = CartTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Cart object", 0, $e);
@@ -1075,6 +1134,9 @@ abstract class Cart implements ActiveRecordInterface
         if ($this->isColumnModified(CartTableMap::CURRENCY_ID)) {
             $modifiedColumns[':p' . $index++]  = 'CURRENCY_ID';
         }
+        if ($this->isColumnModified(CartTableMap::DISCOUNT)) {
+            $modifiedColumns[':p' . $index++]  = 'DISCOUNT';
+        }
         if ($this->isColumnModified(CartTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -1109,6 +1171,9 @@ abstract class Cart implements ActiveRecordInterface
                         break;
                     case 'CURRENCY_ID':
                         $stmt->bindValue($identifier, $this->currency_id, PDO::PARAM_INT);
+                        break;
+                    case 'DISCOUNT':
+                        $stmt->bindValue($identifier, $this->discount, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1197,9 +1262,12 @@ abstract class Cart implements ActiveRecordInterface
                 return $this->getCurrencyId();
                 break;
             case 6:
-                return $this->getCreatedAt();
+                return $this->getDiscount();
                 break;
             case 7:
+                return $this->getCreatedAt();
+                break;
+            case 8:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1237,8 +1305,9 @@ abstract class Cart implements ActiveRecordInterface
             $keys[3] => $this->getAddressDeliveryId(),
             $keys[4] => $this->getAddressInvoiceId(),
             $keys[5] => $this->getCurrencyId(),
-            $keys[6] => $this->getCreatedAt(),
-            $keys[7] => $this->getUpdatedAt(),
+            $keys[6] => $this->getDiscount(),
+            $keys[7] => $this->getCreatedAt(),
+            $keys[8] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1315,9 +1384,12 @@ abstract class Cart implements ActiveRecordInterface
                 $this->setCurrencyId($value);
                 break;
             case 6:
-                $this->setCreatedAt($value);
+                $this->setDiscount($value);
                 break;
             case 7:
+                $this->setCreatedAt($value);
+                break;
+            case 8:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1350,8 +1422,9 @@ abstract class Cart implements ActiveRecordInterface
         if (array_key_exists($keys[3], $arr)) $this->setAddressDeliveryId($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setAddressInvoiceId($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setCurrencyId($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[6], $arr)) $this->setDiscount($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
     }
 
     /**
@@ -1369,6 +1442,7 @@ abstract class Cart implements ActiveRecordInterface
         if ($this->isColumnModified(CartTableMap::ADDRESS_DELIVERY_ID)) $criteria->add(CartTableMap::ADDRESS_DELIVERY_ID, $this->address_delivery_id);
         if ($this->isColumnModified(CartTableMap::ADDRESS_INVOICE_ID)) $criteria->add(CartTableMap::ADDRESS_INVOICE_ID, $this->address_invoice_id);
         if ($this->isColumnModified(CartTableMap::CURRENCY_ID)) $criteria->add(CartTableMap::CURRENCY_ID, $this->currency_id);
+        if ($this->isColumnModified(CartTableMap::DISCOUNT)) $criteria->add(CartTableMap::DISCOUNT, $this->discount);
         if ($this->isColumnModified(CartTableMap::CREATED_AT)) $criteria->add(CartTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CartTableMap::UPDATED_AT)) $criteria->add(CartTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1439,6 +1513,7 @@ abstract class Cart implements ActiveRecordInterface
         $copyObj->setAddressDeliveryId($this->getAddressDeliveryId());
         $copyObj->setAddressInvoiceId($this->getAddressInvoiceId());
         $copyObj->setCurrencyId($this->getCurrencyId());
+        $copyObj->setDiscount($this->getDiscount());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1982,10 +2057,12 @@ abstract class Cart implements ActiveRecordInterface
         $this->address_delivery_id = null;
         $this->address_invoice_id = null;
         $this->currency_id = null;
+        $this->discount = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

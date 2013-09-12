@@ -39,6 +39,9 @@ class Calculator
      */
     protected $taxRuleQuery = null;
 
+    /**
+     * @var null|\Propel\Runtime\Collection\ObjectCollection
+     */
     protected $taxRulesCollection = null;
 
     protected $product = null;
@@ -72,6 +75,11 @@ class Calculator
 
     public function getTaxAmount($untaxedPrice)
     {
+        return $this->getTaxedPrice($untaxedPrice) - $untaxedPrice;
+    }
+
+    public function getTaxedPrice($untaxedPrice)
+    {
         if(null === $this->taxRulesCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxAmount', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
         }
@@ -80,23 +88,27 @@ class Calculator
             throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
         }
 
-        $totalTaxAmount = 0;
+        $taxedPrice = $untaxedPrice;
+        $currentPosition = 1;
+        $currentTax = 0;
+
         foreach($this->taxRulesCollection as $taxRule) {
+            $position = (int)$taxRule->getTaxRuleCountryPosition();
+
             $taxType = $taxRule->getTypeInstance();
+            $taxType->loadRequirements( $taxRule->getRequirements() );
 
-            $taxType->loadRequirements($taxRule->getRequirements());
+            if($currentPosition !== $position) {
+                $taxedPrice += $currentTax;
+                $currentTax = 0;
+                $currentPosition = $position;
+            }
 
-            $taxAmount = $taxType->calculate($untaxedPrice);
-
-            $totalTaxAmount += $taxAmount;
-            $untaxedPrice += $taxAmount;
+            $currentTax += $taxType->calculate($taxedPrice);
         }
 
-        return $totalTaxAmount;
-    }
+        $taxedPrice += $currentTax;
 
-    public function getTaxedPrice($untaxedPrice)
-    {
-        return $untaxedPrice + $this->getTaxAmount($untaxedPrice);
+        return $taxedPrice;
     }
 }
