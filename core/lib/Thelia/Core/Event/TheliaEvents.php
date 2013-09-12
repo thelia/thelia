@@ -358,4 +358,35 @@ final class TheliaEvents
     const BEFORE_DELETECURRENCY = "action.before_deleteCurrency";
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
 
+    // -- Attributes management ---------------------------------------------
+
+    const ATTRIBUTE_CREATE          = "action.createAttribute";
+    const ATTRIBUTE_UPDATE          = "action.updateAttribute";
+    const ATTRIBUTE_DELETE          = "action.deleteAttribute";
+    const ATTRIBUTE_UPDATE_POSITION = "action.updateAttributePosition";
+
+    const BEFORE_CREATEATTRIBUTE = "action.before_createAttribute";
+    const AFTER_CREATEATTRIBUTE  = "action.after_createAttribute";
+
+    const BEFORE_UPDATEATTRIBUTE = "action.before_updateAttribute";
+    const AFTER_UPDATEATTRIBUTE  = "action.after_updateAttribute";
+
+    const BEFORE_DELETEATTRIBUTE = "action.before_deleteAttribute";
+    const AFTER_DELETEATTRIBUTE  = "action.after_deleteAttribute";
+
+    // -- Attributes values management ----------------------------------------
+
+    const ATTRIBUTE_VALUE_CREATE          = "action.createAttributeValue";
+    const ATTRIBUTE_VALUE_UPDATE          = "action.updateAttributeValue";
+    const ATTRIBUTE_VALUE_DELETE          = "action.deleteAttributeValue";
+    const ATTRIBUTE_VALUE_UPDATE_POSITION = "action.updateAttributeValuePosition";
+
+    const BEFORE_CREATEATTRIBUTE_VALUE = "action.before_createAttributeValue";
+    const AFTER_CREATEATTRIBUTE_VALUE  = "action.after_createAttributeValue";
+
+    const BEFORE_UPDATEATTRIBUTE_VALUE = "action.before_updateAttributeValue";
+    const AFTER_UPDATEATTRIBUTE_VALUE  = "action.after_updateAttributeValue";
+
+    const BEFORE_DELETEATTRIBUTE_VALUE = "action.before_deleteAttributeValue";
+    const AFTER_DELETEATTRIBUTE_VALUE  = "action.after_deleteAttributeValue";
 }

@@ -79,12 +79,8 @@
     </route>
 
 
-
-
-
-
-
     <!-- Route to the Coupon controller (process Coupon browsing) -->
+
     <route id="admin.coupon.list" path="/admin/coupon">
         <default key="_controller">Thelia\Controller\Admin\CouponController::browseAction</default>
     </route>
@@ -103,10 +99,6 @@
     <route id="admin.coupon.rule.update" path="/admin/coupon/{couponId}/rule/update/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::updateRulesAction</default>
     </route>
-
-
-
-
 
 
     <!-- Routes to the Config (system variables) controller -->
@@ -197,12 +189,36 @@
 
     <!-- attribute and feature routes  management -->
 
-    <route id="admin.configuration.product-attribute.default" path="/admin/configuration/product-attributes">
+    <route id="admin.configuration.attributes.default" path="/admin/configuration/attributes">
         <default key="_controller">Thelia\Controller\Admin\AttributeController::defaultAction</default>
     </route>
 
-    <route id="admin.configuration.product-attribute.edit" path="/admin/configuration/product-attributes/update">
-        <default key="_controller">Thelia\Controller\Admin\AttributeController::updateAction</default>
+    <route id="admin.configuration.attributes.create" path="/admin/configuration/attributes/create">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.attributes.create" path="/admin/configuration/attributes/create-value">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::createValueAction</default>
+    </route>
+
+    <route id="admin.configuration.attributes.update" path="/admin/configuration/attributes/update">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::changeAction</default>
+    </route>
+
+    <route id="admin.configuration.attributes.save" path="/admin/configuration/attributes/save">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::saveChangeAction</default>
+    </route>
+
+    <route id="admin.configuration.attributes.delete" path="/admin/configuration/attributes/delete">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.attributes.delete" path="/admin/configuration/attributes/delete-value">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::deleteValueAction</default>
+    </route>
+
+    <route id="admin.configuration.attributes.update-position" path="/admin/configuration/attributes/update-position">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::updatePositionAction</default>
     </route>
 
     <!-- end attribute and feature routes  management -->

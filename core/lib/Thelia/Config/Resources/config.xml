@@ -66,6 +66,10 @@
         <form name="thelia.admin.currency.modification" class="Thelia\Form\CurrencyModificationForm"/>
 
         <form name="thelia.admin.coupon.creation" class="Thelia\Form\CouponCreationForm"/>
+
+        <form name="thelia.admin.attribute.creation" class="Thelia\Form\AttributeCreationForm"/>
+        <form name="thelia.admin.attribute.modification" class="Thelia\Form\AttributeModificationForm"/>
+        <form name="thelia.admin.attribute-value.creation" class="Thelia\Form\AttributeValueCreationForm"/>
     </forms>
 
 
