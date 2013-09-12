@@ -67,6 +67,10 @@ $(function($){
         var valueId = null;
         var idName = null;
 
+        if(id) {
+            couponManager.ruleToUpdate = couponManager.ruleToSave;
+        }
+
         for (idName in couponManager.ruleToUpdate.operators) {
             // Setting idName operator select
             operatorId = idName + '-operator';
