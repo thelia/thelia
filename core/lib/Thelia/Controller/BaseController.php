@@ -265,6 +265,11 @@ class BaseController extends ContainerAware
         return $this->container->getParameter('kernel.debug');
     }
 
+    protected function accessDenied()
+    {
+        throw new AccessDeniedHttpException();
+    }
+
     /**
      * check if the current http request is a XmlHttpRequest.
      *
@@ -273,7 +278,7 @@ class BaseController extends ContainerAware
     protected function checkXmlHttpRequest()
     {
         if(false === $this->getRequest()->isXmlHttpRequest() && false === $this->isDebug()) {
-            throw new AccessDeniedHttpException();
+            $this->accessDenied();
         }
     }
 }

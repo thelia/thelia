@@ -46,7 +46,13 @@ class AddressController extends BaseFrontController
      */
     public function generateModalAction($address_id)
     {
+        if ($this->getSecurityContext()->hasCustomerUser() === false) {
+            $this->accessDenied();
+        }
+
         $this->checkXmlHttpRequest();
+
+
     }
     /**
      * Create controller.
@@ -57,7 +63,7 @@ class AddressController extends BaseFrontController
     public function createAction()
     {
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirect(URL::getInstance()->getIndexPage());
+            $this->accessDenied()
         }
 
         $addressCreate = new AddressCreateForm($this->getRequest());
