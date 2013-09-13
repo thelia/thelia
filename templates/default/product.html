@@ -69,17 +69,17 @@
 
             <section id="product-details">
                 <div class="product-info">
-                    <h1 class="name"><span itemprop="name">Product #2</span></h1>
-                    <span itemprop="sku" class="sku">Ref.: 25418</span>
+                    <h1 class="name"><span itemprop="name">{$TITLE}</span></h1>
+                    <span itemprop="sku" class="sku">{intl l='Ref.'}: {$REF}</span>
 
                     <div class="short-description">
-                        <p>postremo agnitus saepe iamque, si prodisset, conspicuum se fore contemplans, non nisi luce palam egrediens ad agenda quae putabat.</p>
+                        <p>{$POSTSCRIPTUM}</p>
                     </div>
                 </div>
 
 
                 <div class="product-price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                    <div class="availability"><span class="availibity-label">Availability: </span><span itemprop="availability" href="http://schema.org/InStock" class="in-stock">In stock</span></div>
+                    <div class="availability"><span class="availibity-label">{intl l="Availability"}: </span><span itemprop="availability" href="http://schema.org/InStock" class="in-stock">In stock</span></div>
 
                     <div class="price-container">
                         <meta itemprop="category" content="Category1">
@@ -93,7 +93,7 @@
                             preorder : http://schema.org/PreOrder
                             online_only : http://schema.org/OnlineOnly
                         -->
-                        <span class="special-price"><span class="price-label">Special Price: </span><span itemprop="price" class="price">$26.00</span></span>
+                        <span class="special-price"><span class="price-label">{intl l="Special Price"}: </span><span itemprop="price" class="price">{currency attr="symbol"}26.00</span></span>
                         <span class="old-price"><span class="price-label">Regular Price: </span><span class="price">$36.00</span></span>
                     </div>
                 </div>
