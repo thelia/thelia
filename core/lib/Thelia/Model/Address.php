@@ -7,9 +7,23 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Address as BaseAddress;
+use Thelia\Model\AddressQuery;
 
 class Address extends BaseAddress {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
+    /**
+     * put the the current address as default one
+     */
+    public function makeItDefault()
+    {
+
+        AddressQuery::create()->filterByCustomerId($this->getCustomerId())
+            ->update(array('isDefault' => '0'));
+
+        $this->setIsDefault(1);
+        $this->save();
+    }
 
     /**
      * Code to be run before inserting to database

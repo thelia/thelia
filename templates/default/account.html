@@ -1,3 +1,4 @@
+{check_auth context="front" roles="CUSTOMER" login_tpl="login"}
 {extends file="layout.tpl"}
 
 {block name="breadcrumb"}
@@ -74,7 +75,7 @@
                     </div>
                     <div id="account-address" class="panel-collapse collapse">
                         <div class="panel-body">
-                            <a href="address.php" class="btn btn-add-address">{intl l="Add a new address"}</a>
+                            <a href="{url path="/address/create"}" class="btn btn-add-address">{intl l="Add a new address"}</a>
                             <table class="table table-address" role="presentation" summary="{intl l="My Address Books"}">
                                 <tbody>
                                 {loop type="address" name="customer.addresses"}

@@ -73,6 +73,10 @@ class Address extends BaseAction implements EventSubscriberInterface
             ->save()
         ;
 
+        if($event->getIsDefault()) {
+            $addressModel->makeItDefault();
+        }
+
         $event->setAddress($addressModel);
     }
 

@@ -46,14 +46,13 @@ class AddressController extends BaseFrontController
      */
     public function generateModalAction($address_id)
     {
-        if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->accessDenied();
-        }
-
+        $this->checkAuth();
         $this->checkXmlHttpRequest();
 
 
     }
+
+
     /**
      * Create controller.
      * Check if customer is logged in
@@ -62,9 +61,7 @@ class AddressController extends BaseFrontController
      */
     public function createAction()
     {
-        if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->accessDenied()
-        }
+        $this->checkAuth();
 
         $addressCreate = new AddressCreateForm($this->getRequest());
 
@@ -98,11 +95,9 @@ class AddressController extends BaseFrontController
 
     public function updateAction()
     {
+        $this->checkAuth();
         $request = $this->getRequest();
 
-        if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirectToRoute("home");
-        }
 
         if (null === $address_id =  $request->get("address_id")) {
             $this->redirectToRoute("home");
@@ -164,7 +159,8 @@ class AddressController extends BaseFrontController
             $form->get("country")->getData(),
             $form->get("cellphone")->getData(),
             $form->get("phone")->getData(),
-            $form->get("company")->getData()
+            $form->get("company")->getData(),
+            $form->get("is_default")->getData()
         );
     }
 }

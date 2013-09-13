@@ -60,7 +60,7 @@ class AddressCreateForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => Translator::getInstance()->trans("Address label *"),
+                "label" => Translator::getInstance()->trans("Address label"),
                 "label_attr" => array(
                     "for" => "label_create"
                 ),
@@ -154,9 +154,15 @@ class AddressCreateForm extends BaseForm
                 )
             ))
             ->add("company", "text", array(
-                "label" => Translator::getInstance()->trans("Compagny"),
+                "label" => Translator::getInstance()->trans("Company"),
                 "label_attr" => array(
                     "for" => "company_create"
+                )
+            ))
+            ->add("is_default", "integer", array(
+                "label" => Translator::getInstance()->trans("Make this address has my primary address"),
+                "label_attr" => array(
+                    "for" => "default_address"
                 )
             ))
             ;

@@ -59,7 +59,12 @@
     <!-- end customer routes -->
 
     <!-- customer address routes -->
-    <route id="address.create" path="/address/create" >
+    <route id="address.create.view" path="/address/create" methods="get">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">address</default>
+    </route>
+
+    <route id="address.create" path="/address/create" methods="post" >
         <default key="_controller">Thelia\Controller\Front\AddressController::createAction</default>
         <default key="_view">address</default>
     </route>
