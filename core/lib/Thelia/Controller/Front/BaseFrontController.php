@@ -50,4 +50,11 @@ class BaseFrontController extends BaseController
     {
         $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, array(), $referenceType), $urlParameters));
     }
+
+    public function checkAuth()
+    {
+        if($this->getSecurityContext()->hasCustomerUser() === false) {
+            $this->redirectToRoute("customer.login.view");
+        }
+    }
 }

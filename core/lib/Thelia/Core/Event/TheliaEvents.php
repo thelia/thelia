@@ -129,6 +129,11 @@ final class TheliaEvents
      */
     const ADDRESS_UPDATE = "action.updateAddress";
 
+    /**
+     * sent on address removal
+     */
+    const ADDRESS_DELETE = "action.deleteAddress";
+
     const BEFORE_CREATEADDRESS = "action.before_createAddress";
     const AFTER_CREATEADDRESS  = "action.after_createAddress";
 
