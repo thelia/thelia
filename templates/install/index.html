@@ -1,12 +1,46 @@
-{extends file="layout.html"}
-{block name="content"}
-    <h1>{intl l="Thelia installation wizard"}</h1>
-    <br />
+{extends file="layout.tpl"}
 
-    {intl l="Bienvenue au sein du programme d'installation de Thelia."}<br />
-    {intl l="Nous allons vous guider tout au long de ce processus afin d'installer l'application sur votre système."}<br /><br />
+{block name="page-title"}{intl l='Installation'}{/block}
 
-    <form action="{url path="/install/step/2" }" method="post">
-        <input type="submit" value="Continuer" />
-    </form>
+{block name="main-content"}
+<div class="install">
+	<div id="wrapper" class="container">
+	
+		<div class="row">
+            <div class="col-md-12">
+                <div class="general-block-decorator">
+										
+					<h3 class="title title-without-tabs">{intl l="Thelia installation wizard"}</h3>
+					
+					<div class="wizard">
+						<ul>
+							<li class="active"><span class="badge">1</span>{intl l="Welcome"}<span class="chevron"></span></li>
+							<li><span class="badge">2</span>{intl l="Checking permissions"}<span class="chevron"></span></li>
+							<li><span class="badge">3</span>{intl l="Database connection"}<span class="chevron"></span></li>
+							<li><span class="badge">4</span>{intl l="Database selection"}<span class="chevron"></span></li>
+							<li><span class="badge">5</span>{intl l="General information"}<span class="chevron"></span></li>
+							<li><span class="badge">6</span>{intl l="Thanks"}<span class="chevron"></span></li>
+						</ul>						
+					</div>
+
+					<div class="well">
+						<p class="lead text-center">
+						    {intl l="Welcome in the Thelia installation wizard."}
+						</p>
+						<p class="text-center">
+						    {intl l="We will guide you throughout this process to install any application on your system."}
+						</p>
+					    
+					</div>
+
+					<div class="clearfix">
+						<a href="install/step/2" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> {intl l="Continue"}</a>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</div>
 {/block}
