@@ -76,7 +76,6 @@ class Coupon extends BaseCoupon
             ->setType($effect)
             ->setAmount($amount)
             ->setIsRemovingPostage($isRemovingPostage)
-            ->setType($amount)
             ->setIsEnabled($isEnabled)
             ->setExpirationDate($expirationDate)
             ->setIsAvailableOnSpecialOffers($isAvailableOnSpecialOffers)

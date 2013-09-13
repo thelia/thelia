@@ -157,9 +157,10 @@ class CouponController extends BaseAdminController
             // If no input for expirationDate, now + 2 months
             $defaultDate = new \DateTime();
             $args['defaultDate'] = $defaultDate->modify('+2 month')
-                ->format($lang->getDateFormat());
+                ->format('Y-m-d');
         }
 
+        $args['dateFormat'] = $this->getSession()->getLang()->getDateFormat();
         $args['availableCoupons'] = $this->getAvailableCoupons();
         $args['formAction'] = 'admin/coupon/create/';
 
@@ -224,7 +225,7 @@ class CouponController extends BaseAdminController
                 'shortDescription' => $coupon->getShortDescription(),
                 'description' => $coupon->getDescription(),
                 'isEnabled' => ($coupon->getIsEnabled() == 1),
-                'expirationDate' => $coupon->getExpirationDate($lang->getDateFormat()),
+                'expirationDate' => $coupon->getExpirationDate('Y-m-d'),
                 'isAvailableOnSpecialOffers' => ($coupon->getIsAvailableOnSpecialOffers() == 1),
                 'isCumulative' => ($coupon->getIsCumulative() == 1),
                 'isRemovingPostage' => ($coupon->getIsRemovingPostage() == 1),
@@ -272,103 +273,6 @@ class CouponController extends BaseAdminController
 
         return $this->render('coupon-update', $args);
     }
-
-
-//    /**
-//     * Manage Coupons Rule creation display
-//     *
-//     * @param int $couponId Coupon id
-//     *
-//     * @return \Symfony\Component\HttpFoundation\Response
-//     */
-//    public function createRuleAction($couponId)
-//    {
-//        // Check current user authorization
-//        $response = $this->checkAuth('admin.coupon.update');
-//        if ($response !==  null) {
-//            return $response;
-//        }
-//
-//        /** @var Coupon $coupon */
-//        $coupon = CouponQuery::create()->findOneById($couponId);
-//        if (!$coupon) {
-//            $this->pageNotFound();
-//        }
-//
-//        // Parameters given to the template
-//        $args = array();
-//
-//        $i18n = new I18n();
-//        /** @var Lang $lang */
-//        $lang = $this->getSession()->get('lang');
-//        $eventToDispatch = TheliaEvents::COUPON_RULE_CREATE;
-//
-//        if ($this->getRequest()->isMethod('POST')) {
-//            $this->validateCreateOrUpdateForm(
-//                $i18n,
-//                $lang,
-//                $eventToDispatch,
-//                'updated',
-//                'update'
-//            );
-//        } else {
-//            // Prepare the data that will hydrate the form
-//
-//            /** @var ConstraintFactory $constraintFactory */
-//            $constraintFactory = $this->container->get('thelia.constraint.factory');
-//
-//            $data = array(
-//                'code' => $coupon->getCode(),
-//                'title' => $coupon->getTitle(),
-//                'amount' => $coupon->getAmount(),
-//                'effect' => $coupon->getType(),
-//                'shortDescription' => $coupon->getShortDescription(),
-//                'description' => $coupon->getDescription(),
-//                'isEnabled' => ($coupon->getIsEnabled() == 1),
-//                'expirationDate' => $coupon->getExpirationDate($lang->getDateFormat()),
-//                'isAvailableOnSpecialOffers' => ($coupon->getIsAvailableOnSpecialOffers() == 1),
-//                'isCumulative' => ($coupon->getIsCumulative() == 1),
-//                'isRemovingPostage' => ($coupon->getIsRemovingPostage() == 1),
-//                'maxUsage' => $coupon->getMaxUsage(),
-//                'rules' => $constraintFactory->unserializeCouponRuleCollection($coupon->getSerializedRules()),
-//                'locale' => $coupon->getLocale(),
-//            );
-//
-//            /** @var CouponAdapterInterface $adapter */
-//            $adapter = $this->container->get('thelia.adapter');
-//            /** @var Translator $translator */
-//            $translator = $this->container->get('thelia.translator');
-//
-//            $args['rulesObject'] = array();
-//            /** @var CouponRuleInterface $rule */
-//            foreach ($coupon->getRules()->getRules() as $rule) {
-//                $args['rulesObject'][] = array(
-//                    'name' => $rule->getName($translator),
-//                    'tooltip' => $rule->getToolTip($translator),
-//                    'validators' => $rule->getValidators()
-//                );
-//            }
-//
-//            $args['rules'] = $this->cleanRuleForTemplate($coupon->getRules()->getRules());
-//
-//            // Setup the object form
-//            $changeForm = new CouponCreationForm($this->getRequest(), 'form', $data);
-//
-//            // Pass it to the parser
-//            $this->getParserContext()->addForm($changeForm);
-//        }
-//
-//        $args['formAction'] = 'admin/coupon/update/' . $couponId;
-//
-//        return $this->render(
-//            'coupon-update',
-//            $args
-//        );
-//    }
-
-
-
-
 
     /**
      * Manage Coupons read display
@@ -569,7 +473,7 @@ class CouponController extends BaseAdminController
     /**
      * Validate the CreateOrUpdate form
      *
-     * @param string $i18n            Local code (fr_FR)
+     * @param I18n   $i18n            Local code (fr_FR)
      * @param Lang   $lang            Local variables container
      * @param string $eventToDispatch Event which will activate actions
      * @param string $log             created|edited
@@ -577,7 +481,7 @@ class CouponController extends BaseAdminController
      *
      * @return $this
      */
-    protected function validateCreateOrUpdateForm($i18n, $lang, $eventToDispatch, $log, $action)
+    protected function validateCreateOrUpdateForm(I18n $i18n, Lang $lang, $eventToDispatch, $log, $action)
     {
         // Create the form from the request
         $creationForm = new CouponCreationForm($this->getRequest());
@@ -597,7 +501,7 @@ class CouponController extends BaseAdminController
                 $data['shortDescription'],
                 $data['description'],
                 $data['isEnabled'],
-                $i18n->getDateTimeFromForm($lang, $data['expirationDate']),
+                \DateTime::createFromFormat('Y-m-d', $data['expirationDate']),
                 $data['isAvailableOnSpecialOffers'],
                 $data['isCumulative'],
                 $data['isRemovingPostage'],

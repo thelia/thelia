@@ -20,7 +20,6 @@
     {form name="thelia.admin.coupon.creation"}
     {include file='coupon/form.html' formAction={url path={$formAction}} noRules=true}
     {/form}
-
 </section> <!-- #wrapper -->
 
 {include file='includes/confirmation-modal.html'}
@@ -42,4 +41,13 @@
     {javascripts file='assets/js/coupon.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+
+    {*<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>*}
+    {*<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />*}
+    <script>
+        $(function($){
+            {*$('.datepicker').datepicker({ dateFormat: "{$dateFormat}", defaultDate: +60, minDate: "+0m" });*}
+        });
+    </script>
+
 {/block}

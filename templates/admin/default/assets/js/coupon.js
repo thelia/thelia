@@ -140,28 +140,21 @@ $(function($){
     couponManager.onUsageUnlimitedChange = function() {
         if (!$('#max-usage').parent().hasClass('has-error')) {
             $('#max-usage').hide().attr('value', '-1');
+            $('#max-usage-label').hide();
         }
         $('#is-unlimited').change(function(){
             var $this = $(this);
             if ($this.is(':checked')) {
                 $('#max-usage').hide().attr('value', '-1');
+                $('#max-usage-label').hide();
             } else {
                 $('#max-usage').show().val('').attr('value', '');
+                $('#max-usage-label').show();
             }
         });
     };
     couponManager.onUsageUnlimitedChange();
 
-//    // -- Effect description
-//    if($('[name=effect]').length){
-//        var $effectSelect 	= $('[name=effect]'),
-//            $helpBlock 		= $effectSelect.next('.help-block');
-//
-//        $effectSelect.change(function(){
-//            var description = $(this).find(":selected").data('description');
-//            $helpBlock.text(description);
-//        });
-//    }
 });
 
 // Rule to save
@@ -176,3 +169,4 @@ couponManager.ruleToSave.values = {};
 couponManager.rulesToSave = [];
 // Rule being updated id
 couponManager.ruleToUpdateId = false;
+

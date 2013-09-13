@@ -11,7 +11,7 @@
             {/form_field}
 
             {form_field form=$form field='success_url'}
-                <input type="hidden" name="{$name}" value="{url path='/admin/coupon/update/{id}'}" />
+                <input type="hidden" name="{$name}" value="{url path='/admin/coupon/update/{id}/'}" />
             {/form_field}
 
             <div class="span4">
@@ -35,40 +35,40 @@
 
                 {form_field form=$form field='isEnabled'}
                     <div class="form-group {if $error}has-error{/if}">
-                        <label for="enabled" class="checkbox control-label">
-                            <input id="enabled" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                        <label for="is-enabled" class="checkbox control-label">
+                            <input id="is-enabled" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
                             {if $error}{$message}{/if}
-                            {intl l='Is enabled ?'}
+                            {intl l='Is enabled'}
                         </label>
                     </div>
                 {/form_field}
 
                 {form_field form=$form field='isAvailableOnSpecialOffers'}
                     <div class="form-group {if $error}has-error{/if}">
-                        <label for="available-on-special-offers" class="checkbox control-label">
-                            <input id="available-on-special-offers" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                        <label for="is-available-on-special-offers" class="checkbox control-label">
+                            <input id="is-available-on-special-offers" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
                             {if $error}{$message}{/if}
-                            {intl l='Is available on special offers ?'}
+                            {intl l='Is available on special offers'}
                         </label>
                     </div>
                 {/form_field}
 
                 {form_field form=$form field='isCumulative'}
                     <div class="form-group {if $error}has-error{/if}">
-                        <label for="cumulative" class="checkbox control-label">
-                            <input id="cumulative" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                        <label for="is-cumulative" class="checkbox control-label">
+                            <input id="is-cumulative" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
                             {if $error}{$message}{/if}
-                            {intl l='Is cumulative ?'}
+                            {intl l='Is cumulative'}
                         </label>
                     </div>
                 {/form_field}
 
                 {form_field form=$form field='isRemovingPostage'}
                     <div class="form-group {if $error}has-error{/if}">
-                        <label for="renoving-postage" class="checkbox control-label">
-                            <input id="renoving-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                        <label for="is-removing-postage" class="checkbox control-label">
+                            <input id="is-removing-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
                             {if $error}{$message}{/if}
-                            {intl l='Is removing postage ?'}
+                            {intl l='Is removing postage'}
                         </label>
                     </div>
                 {/form_field}
@@ -77,7 +77,7 @@
                     <div class="form-group {if $error}has-error{/if}">
                         <label for="expiration-date" class="control-label">{intl l='Expiration date :'}</label>
                         <div class="input-append date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
-                            <input type="text" id="expiration-date" name="{$name}" class="form-control" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}">
+                            <input type="text" id="expiration-date" name="{$name}" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}" placeholder="{intl l='yyyy-mm-dd'}">
                             {if $error}{$message}{/if}
                             <span class="add-on"><span class="icon-th"></span></span>
                         </div>
@@ -86,11 +86,12 @@
 
                 {form_field form=$form field='maxUsage'}
                     <div class="form-group {if $error}has-error{/if}">
-                        <label for="max-usage" class="control-label">{intl l='Max usage :'}</label>
+
                         <label for="is-unlimited" class="checkbox control-label">
                             <input id="is-unlimited" type="checkbox" name="is-unlimited" {if $error}{else}checked{/if} >
-                            {intl l='Is unlimited ?'}
+                            {intl l='Is unlimited'}
                         </label>
+                        <label id="max-usage-label" for="max-usage" class="control-label">{intl l='Max usage :'}</label>
                         <input id="max-usage" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="{intl l='max usage'}">
                         {if $error}{$message}{/if}
                     </div>
@@ -118,6 +119,7 @@
                     <div class="col-md-6">
                         {form_field form=$form field='amount'}
                             <div class="form-group {if $error}has-error{/if}">
+                                {$value}
                                 <label for="amount" class="control-label">{intl l='Amount :'}</label>
                                 <input id="amount" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="{intl l='14.50'}">
                                 {if $error}{$message}{/if}
@@ -157,7 +159,7 @@
                     </div>
                 {/form_field}
 
-                <button type="submit" class="btn btn-default btn-primary">{intl l='Save your modifications'}</button>
+                <button id="save-coupon-btn" type="submit" class="btn btn-default btn-primary">{intl l='Save your modifications'}</button>
             </div>
 
         </div>
