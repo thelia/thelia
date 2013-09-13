@@ -102,6 +102,39 @@
                                     </tr>
                                 {/loop}
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="6">
+                                            
+                                            <div class="text-center">
+                                                <ul class="pagination pagination-centered">
+                                                    {if $customer_page != 1}
+                                                        <li><a href="{url path="/admin/customers" page="1"}">&laquo;</a></li>
+                                                    {else}
+                                                        <li class="disabled"><a href="#">&laquo;</a></li>
+                                                    {/if}
+
+                                                {pageloop rel="customer_list"}
+                                                    {if $PAGE != $CURRENT}
+                                                        <li><a href="{url path="/admin/customers" page="{$PAGE}"}">{$PAGE}</a></li>
+
+                                                    {else}
+                                                        <li class="active"><a href="#">{$PAGE}</a></li>
+                                                    {/if}
+
+
+                                                {/pageloop}
+                                                    {if $PAGE == $LAST && $LAST != $CURRENT}
+                                                        <li><a href="{url path="/admin/customers" page="$PAGE"}">&raquo;</a></li>
+                                                    {else}
+                                                        <li class="disabled"><a href="#">&raquo;</a></li>
+                                                    {/if}
+                                                </ul>
+                                            </div>
+                                            
+                                        </td>
+                                    </tr>
+                                </tfoot>
                             {/ifloop}
                         </table>
                     </div>
@@ -110,35 +143,6 @@
 
 
     {module_include location='customer_bottom'}
-    <div class="row">
-        <div class="col-md-12 text-center">
-
-            <ul class="pagination pagination-centered">
-                {if $customer_page != 1}
-                    <li><a href="{url path="/admin/customers" page="1"}">&laquo;</a></li>
-                {else}
-                    <li class="disabled"><a href="#">&laquo;</a></li>
-                {/if}
-
-            {pageloop rel="customer_list"}
-                {if $PAGE != $CURRENT}
-                    <li><a href="{url path="/admin/customers" page="{$PAGE}"}">{$PAGE}</a></li>
-
-                {else}
-                    <li class="active"><a href="#">{$PAGE}</a></li>
-                {/if}
-
-
-            {/pageloop}
-                {if $PAGE == $LAST && $LAST != $CURRENT}
-                    <li><a href="{url path="/admin/customers" page="$PAGE"}">&raquo;</a></li>
-                {else}
-                    <li class="disabled"><a href="#">&raquo;</a></li>
-                {/if}
-            </ul>
-
-        </div>
-    </div>
 
     {* Adding a new Category *}
 
