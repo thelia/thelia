@@ -164,10 +164,12 @@ class Session extends BaseSession
         $cart = null;
         if ($cart_id) {
             $cart = CartQuery::create()->findPk($cart_id);
-            try {
-                $this->verifyValidCart($cart);
-            } catch (InvalidCartException $e) {
-                $cart = null;
+            if($cart) {
+                try {
+                    $this->verifyValidCart($cart);
+                } catch (InvalidCartException $e) {
+                    $cart = null;
+                }
             }
         }
 
