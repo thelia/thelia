@@ -19,7 +19,7 @@ class Address extends BaseAddress {
     {
 
         AddressQuery::create()->filterByCustomerId($this->getCustomerId())
-            ->update(array('isDefault' => '0'));
+            ->update(array('IsDefault' => '0'));
 
         $this->setIsDefault(1);
         $this->save();

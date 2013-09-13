@@ -22,10 +22,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Address as AddressModel;
+use Thelia\Model\Map\AddressTableMap;
 
 /**
  * Class Address
@@ -52,32 +55,41 @@ class Address extends BaseAction implements EventSubscriberInterface
     protected function createOrUpdate(AddressModel $addressModel, AddressCreateOrUpdateEvent $event)
     {
         $addressModel->setDispatcher($this->getDispatcher());
+        $con = Propel::getWriteConnection(AddressTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+        try {
+            if ($addressModel->isNew()) {
+                $addressModel->setLabel($event->getLabel());
+            }
 
-        if ($addressModel->isNew()) {
-            $addressModel->setLabel($event->getLabel());
+            $addressModel
+                ->setTitleId($event->getTitle())
+                ->setFirstname($event->getFirstname())
+                ->setLastname($event->getLastname())
+                ->setAddress1($event->getAddress1())
+                ->setAddress2($event->getAddress2())
+                ->setAddress3($event->getAddress3())
+                ->setZipcode($event->getZipcode())
+                ->setCity($event->getCity())
+                ->setCountryId($event->getCountry())
+                ->setCellphone($event->getCellphone())
+                ->setPhone($event->getPhone())
+                ->setCompany($event->getCompany())
+                ->save()
+            ;
+
+            if($event->getIsDefault()) {
+                $addressModel->makeItDefault();
+            }
+
+            $event->setAddress($addressModel);
+            $con->commit();
+
+        } catch(PropelException $e) {
+            $con->rollback();
+            throw $e;
         }
 
-        $addressModel
-            ->setTitleId($event->getTitle())
-            ->setFirstname($event->getFirstname())
-            ->setLastname($event->getLastname())
-            ->setAddress1($event->getAddress1())
-            ->setAddress2($event->getAddress2())
-            ->setAddress3($event->getAddress3())
-            ->setZipcode($event->getZipcode())
-            ->setCity($event->getCity())
-            ->setCountryId($event->getCountry())
-            ->setCellphone($event->getCellphone())
-            ->setPhone($event->getPhone())
-            ->setCompany($event->getCompany())
-            ->save()
-        ;
-
-        if($event->getIsDefault()) {
-            $addressModel->makeItDefault();
-        }
-
-        $event->setAddress($addressModel);
     }
 
     /**
