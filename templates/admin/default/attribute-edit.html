@@ -37,6 +37,10 @@
 
 		                                <p class="title title-without-tabs">{intl l='Attribute information'}</p>
 
+                                        {form_field form=$form field='id'}
+                                            <input type="hidden" name="{$name}" value="{$attribute_id}" />
+                                        {/form_field}
+
      	                                {* Be sure to get the attribute ID, even if the form could not be validated *}
      	                                <input type="hidden" name="attribute_id" value="{$attribute_id}" />
 
@@ -52,7 +56,7 @@
 
      					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                        {include file="includes/standard-description-form-fields.html"}
+                                        {include file="includes/standard-description-form-fields.html" form=$form}
 		    						</div>
 
 		     						<div class="col-md-6">
@@ -79,9 +83,10 @@
 				                                <tr>
 				                                    <th>
 				                                        {admin_sortable_header
-				                                            current_order=$order
+				                                            current_order=$attributeav_order
 				                                            order='id'
 				                                            reverse_order='id_reverse'
+				                                            request_parameter_name='attributeav_order'
 				                                            path={url path='/admin/configuration/attributes/update' attribute_id=$attribute_id}
 				                                            label="{intl l='ID'}"
 				                                        }
@@ -89,9 +94,10 @@
 
 				                                    <th>
 				                                        {admin_sortable_header
-				                                            current_order=$order
+				                                            current_order=$attributeav_order
 				                                            order='alpha'
 				                                            reverse_order='alpha_reverse'
+				                                            request_parameter_name='attributeav_order'
 				                                            path={url path='/admin/configuration/attributes/update' attribute_id=$attribute_id}
 				                                            label="{intl l='Value'}"
 				                                        }
@@ -99,9 +105,10 @@
 
 				                                    <th class="text-center">
 				                                        {admin_sortable_header
-				                                            current_order=$order
+				                                            current_order=$attributeav_order
 				                                            order='manual'
 				                                            reverse_order='manual_reverse'
+				                                            request_parameter_name='attributeav_order'
 				                                            path={url path='/admin/configuration/attributes/update' attribute_id=$attribute_id}
 				                                            label="{intl l="Position"}"
 				                                        }
@@ -114,12 +121,13 @@
 				                            </thead>
 
 				                            <tbody>
-				                                {loop name="list" type="attribute_availability" attribute=$attribute_id backend_context="1" lang=$edit_language_id order=$order}
+				                                {loop name="list" type="attribute_availability" attribute=$attribute_id backend_context="1" lang=$edit_language_id order=$attributeav_order}
 				                                <tr>
 				                                    <td>{$ID}</td>
 
 				                                    <td>
-				                                        <input class="js-edit form-control" type="text" name="" value="{$TITLE}" />
+				                                        {* FIXME : integrate this in the encolsing form to provide standard form processing *}
+				                                        <input class="js-edit form-control" type="text" name="attribute_values[{$ID}]" value="{$TITLE}" />
 				                                    </td>
 
 				                                    <td class="text-center">
@@ -151,7 +159,7 @@
 				                                     <tr>
 				                                         <td colspan="4">
 				                                             <div class="alert alert-info">
-				                                                 {intl l="No product attribute has been created yet. Click the + button to create one."}
+				                                                 {intl l="No value has been created yet. Click the + button to create one."}
 				                                             </div>
 				                                         </td>
 				                                     </tr>

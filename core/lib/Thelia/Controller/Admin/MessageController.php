@@ -37,10 +37,12 @@ use Thelia\Form\MessageCreationForm;
  */
 class MessageController extends AbstractCrudController
 {
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct(
             'message',
-            null,
+            null, // no sort order change
+            null, // no sort order change
 
             'admin.configuration.messages.view',
             'admin.configuration.messages.create',
@@ -55,15 +57,18 @@ class MessageController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm() {
+    protected function getCreationForm()
+    {
         return new MessageCreationForm($this->getRequest());
     }
 
-    protected function getUpdateForm() {
+    protected function getUpdateForm()
+    {
         return new MessageModificationForm($this->getRequest());
     }
 
-    protected function getCreationEvent($formData) {
+    protected function getCreationEvent($formData)
+    {
         $createEvent = new MessageCreateEvent();
 
         $createEvent
@@ -76,7 +81,8 @@ class MessageController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData) {
+    protected function getUpdateEvent($formData)
+    {
         $changeEvent = new MessageUpdateEvent($formData['id']);
 
         // Create and dispatch the change event
@@ -93,16 +99,18 @@ class MessageController extends AbstractCrudController
         return $changeEvent;
     }
 
-    protected function getDeleteEvent() {
+    protected function getDeleteEvent()
+    {
         return new MessageDeleteEvent($this->getRequest()->get('message_id'));
     }
 
-    protected function eventContainsObject($event) {
+    protected function eventContainsObject($event)
+    {
         return $event->hasMessage();
     }
 
-    protected function hydrateObjectForm($object) {
-
+    protected function hydrateObjectForm($object)
+    {
         // Prepare the data that will hydrate the form
         $data = array(
             'id'           => $object->getId(),
@@ -119,40 +127,48 @@ class MessageController extends AbstractCrudController
         return new MessageModificationForm($this->getRequest(), "form", $data);
     }
 
-    protected function getObjectFromEvent($event) {
+    protected function getObjectFromEvent($event)
+    {
         return $event->hasMessage() ? $event->getMessage() : null;
     }
 
-    protected function getExistingObject() {
+    protected function getExistingObject()
+    {
         return MessageQuery::create()
         ->joinWithI18n($this->getCurrentEditionLocale())
         ->findOneById($this->getRequest()->get('message_id'));
     }
 
-    protected function getObjectLabel($object) {
+    protected function getObjectLabel($object)
+    {
         return $object->getName();
     }
 
-    protected function getObjectId($object) {
+    protected function getObjectId($object)
+    {
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder) {
+    protected function renderListTemplate($currentOrder)
+    {
         return $this->render('messages');
     }
 
-    protected function renderEditionTemplate() {
+    protected function renderEditionTemplate()
+    {
         return $this->render('message-edit', array('message_id' => $this->getRequest()->get('message_id')));
     }
 
-    protected function redirectToEditionTemplate() {
+    protected function redirectToEditionTemplate()
+    {
         $this->redirectToRoute(
                 "admin.configuration.messages.update",
                 array('message_id' => $this->getRequest()->get('message_id'))
         );
     }
 
-    protected function redirectToListTemplate() {
+    protected function redirectToListTemplate()
+    {
         $this->redirectToRoute('admin.configuration.messages.default');
     }
 }
