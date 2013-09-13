@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Util\PropelModelPager;
 use Thelia\Constraint\ConstraintFactory;
 use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Core\HttpFoundation\Request;
@@ -38,6 +39,7 @@ use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\Coupon as MCoupon;
 use Thelia\Type;
+use Thelia\Type\BooleanOrBothType;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -53,17 +55,22 @@ use Thelia\Type;
 class Coupon extends BaseI18nLoop
 {
     /**
+     * Define all args used in your loop
+     *
      * @return ArgumentCollection
      */
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id')
+            Argument::createIntListTypeArgument('id'),
+            Argument::createBooleanOrBothTypeArgument('is_enabled', 1)
         );
     }
 
     /**
-     * @param $pagination
+     * Execute Loop
+     *
+     * @param PropelModelPager $pagination
      *
      * @return \Thelia\Core\Template\Element\LoopResult
      */
@@ -75,9 +82,14 @@ class Coupon extends BaseI18nLoop
         $locale = $this->configureI18nProcessing($search, array('TITLE', 'DESCRIPTION', 'SHORT_DESCRIPTION'));
 
         $id = $this->getId();
+        $isEnabled = $this->getIsEnabled();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
+        }
+
+        if ($isEnabled != BooleanOrBothType::ANY) {
+            $search->filterByIsEnabled($isEnabled ? 1 : 0);
         }
 
         // Perform search
@@ -122,7 +134,7 @@ class Coupon extends BaseI18nLoop
 
             $cleanedRules = array();
             /** @var CouponRuleInterface $rule */
-            foreach ($rules->getRules() as $key => $rule) {
+            foreach ($rules->getRules() as $rule) {
                 $cleanedRules[] = $rule->getToolTip();
             }
             $loopResultRow->set("ID", $coupon->getId())

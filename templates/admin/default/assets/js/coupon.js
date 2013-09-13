@@ -115,6 +115,8 @@ $(function($){
 
     // Reload effect inputs when changing effect
     couponManager.onEffectChange = function() {
+        var optionSelected = $("option:selected", this);
+        $('#effectToolTip').html(optionSelected.attr("data-description"));
         $('#effect').on('change', function () {
             var optionSelected = $("option:selected", this);
             $('#effectToolTip').html(optionSelected.attr("data-description"));
@@ -134,6 +136,32 @@ $(function($){
     // var onInputsChange = function()
     // In AJAX response
 
+    // Set max usage to unlimited or not
+    couponManager.onUsageUnlimitedChange = function() {
+        if (!$('#max-usage').parent().hasClass('has-error')) {
+            $('#max-usage').hide().attr('value', '-1');
+        }
+        $('#is-unlimited').change(function(){
+            var $this = $(this);
+            if ($this.is(':checked')) {
+                $('#max-usage').hide().attr('value', '-1');
+            } else {
+                $('#max-usage').show().val('').attr('value', '');
+            }
+        });
+    };
+    couponManager.onUsageUnlimitedChange();
+
+//    // -- Effect description
+//    if($('[name=effect]').length){
+//        var $effectSelect 	= $('[name=effect]'),
+//            $helpBlock 		= $effectSelect.next('.help-block');
+//
+//        $effectSelect.change(function(){
+//            var description = $(this).find(":selected").data('description');
+//            $helpBlock.text(description);
+//        });
+//    }
 });
 
 // Rule to save

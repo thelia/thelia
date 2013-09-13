@@ -4,141 +4,146 @@
 
 {block name="main-content"}
     <section id="wrapper" class="container">
-
+        {loop type="coupon" name="read_coupon" id={$couponId} backend_context="true"}
         <nav>
             <ul class="breadcrumb">
-                {include file="includes/coupon_breadcrumb.html"}
+                <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
+                <li><a href="{url path='admin/coupon/'}">{intl l='Coupon'}</a></li>
+                <li>{$CODE}</li>
             </ul>
         </nav>
 
-        {loop type="coupon" name="read_coupon" id={$couponId} backend_context="true"}
-        <div class="page-header">
-            <h1>{intl l='Coupon : '}<small>{$CODE}</small></h1>
-        </div>
 
-        <section class="row">
-            <div class="col-md-12 general-block-decorator">
-
-                <div class="alert alert-info">
-                    <span class="glyphicon glyphicon-question-sign"></span>
-                    {if !$IS_ENABLED}{intl l='This coupon is disabled, you can enable to the bottom of this form.'}{/if}
-                </div>
-
-                <table class="table table-striped">
-                    <tbody>
-                    <tr>
-                        <td>{intl l='Title'}</td>
-                        <td>{$TITLE}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            {if $IS_ENABLED}
-                                <span class="label label-success">
-                                    {intl l="Is enabled"}
-                                </span>
-                            {else}
-                                <span class="label label-warning">
-                                    {intl l="Is disabled"}
-                                </span>
-                            {/if}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            {$TOOLTIP}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{intl l='Expiration date'}</td>
-                        <td>{$EXPIRATION_DATE} ({$DAY_LEFT_BEFORE_EXPIRATION} {intl l="days left"})</td>
-                    </tr>
-                    <tr>
-                        <td>{intl l='Usage left'}</td>
-                        <td>
-                            {if $USAGE_LEFT}
-                                <span class="label label-success">
-                                    {$USAGE_LEFT}
-                                </span>
-                            {else}
-                                <span class="label label-warning">
-                                    0
-                                </span>
-                            {/if}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">{$SHORT_DESCRIPTION}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">{$DESCRIPTION}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            {if $IS_CUMULATIVE}
-                                <span class="label label-success">
-                                    {intl l="May be cumulative"}
-                                </span>
-                            {else}
-                                <span class="label label-warning">
-                                    {intl l="Can't be cumulative"}
-                                </span>
-                            {/if}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            {if $IS_REMOVING_POSTAGE}
-                                <span class="label label-warning">
-                                    {intl l="Will remove postage"}
-                                </span>
-                            {else}
-                                <span class="label label-success">
-                                    {intl l="Won't remove postage"}
-                                </span>
-                            {/if}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            {if $IS_AVAILABLE_ON_SPECIAL_OFFERS}
-                                <span class="label label-warning">
-                                    {intl l="Will be available on special offers"}
-                                </span>
-                            {else}
-                                <span class="label label-success">
-                                    {intl l="Won't be available on special offers"}
-                                </span>
-                            {/if}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{intl l='Amount'}</td>
-                        <td>{$AMOUNT}</td>
-                    </tr>
-                    <tr>
-                        <td>{intl l='Application field'}</td>
-                        <td>
-                            <ul class="list-unstyled">
-                                {foreach from=$APPLICATION_CONDITIONS item=rule name=rulesForeach}
-                                    {if !$smarty.foreach.rulesForeach.first}
-                                        <li><span class="label label-info">{intl l='And'}</span></li>
-                                    {/if}
-                                    <li>{$rule nofilter}</li>
-                                {/foreach}
-                            </ul>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{intl l='Actions'}</td>
-                        <td>
-                            <a href="#url" class="btn btn-default btn-primary btn-medium"><span class="icon-edit icon-white"></span> {intl l='Edit'}</a>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                {/loop}
+            <div class="page-header">
+                <h1>{intl l='Coupon : '}<small>{$CODE}</small></h1>
             </div>
-        </section>
+
+            <section class="row">
+                <div class="col-md-12 general-block-decorator">
+
+                    {if !$IS_ENABLED}
+                        <div class="alert alert-info">
+                            <span class="glyphicon glyphicon-question-sign"></span>
+                            {intl l='This coupon is disabled, you can enable to the bottom of this form.'}
+                        </div>
+                    {/if}
+
+                    <table class="table table-striped">
+                        <tbody>
+                        <tr>
+                            <td>{intl l='Title'}</td>
+                            <td>{$TITLE}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                {if $IS_ENABLED}
+                                    <span class="label label-success">
+                                        {intl l="Is enabled"}
+                                    </span>
+                                {else}
+                                    <span class="label label-warning">
+                                        {intl l="Is disabled"}
+                                    </span>
+                                {/if}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                {$TOOLTIP}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{intl l='Amount'}</td>
+                            <td>{$AMOUNT}</td>
+                        </tr>
+                        <tr>
+                            <td>{intl l='Expiration date'}</td>
+                            <td>{$EXPIRATION_DATE} ({$DAY_LEFT_BEFORE_EXPIRATION} {intl l="days left"})</td>
+                        </tr>
+                        <tr>
+                            <td>{intl l='Usage left'}</td>
+                            <td>
+                                {if $USAGE_LEFT}
+                                    <span class="label label-success">
+                                        {$USAGE_LEFT}
+                                    </span>
+                                {else}
+                                    <span class="label label-warning">
+                                        0
+                                    </span>
+                                {/if}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                {if $IS_CUMULATIVE}
+                                    <span class="label label-success">
+                                        {intl l="May be cumulative"}
+                                    </span>
+                                {else}
+                                    <span class="label label-warning">
+                                        {intl l="Can't be cumulative"}
+                                    </span>
+                                {/if}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                {if $IS_REMOVING_POSTAGE}
+                                    <span class="label label-warning">
+                                        {intl l="Will remove postage"}
+                                    </span>
+                                {else}
+                                    <span class="label label-success">
+                                        {intl l="Won't remove postage"}
+                                    </span>
+                                {/if}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                {if $IS_AVAILABLE_ON_SPECIAL_OFFERS}
+                                    <span class="label label-warning">
+                                        {intl l="Will be available on special offers"}
+                                    </span>
+                                {else}
+                                    <span class="label label-success">
+                                        {intl l="Won't be available on special offers"}
+                                    </span>
+                                {/if}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{intl l='Application field'}</td>
+                            <td>
+                                <ul class="list-unstyled">
+                                    {foreach from=$APPLICATION_CONDITIONS item=rule name=rulesForeach}
+                                        {if !$smarty.foreach.rulesForeach.first}
+                                            <li><span class="label label-info">{intl l='And'}</span></li>
+                                        {/if}
+                                        <li>{$rule nofilter}</li>
+                                    {/foreach}
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">{$SHORT_DESCRIPTION}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">{$DESCRIPTION}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <a href="{$urlEditCoupon}" class="btn btn-default btn-primary btn-medium">
+                                <span class="icon-edit icon-white"></span> {intl l='Edit'}
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        {/loop}
     </section> <!-- #wrapper -->
 
     {include file='includes/confirmation-modal.html' id="enable" message="{intl l='Do you really want to enable this element ?'}"}

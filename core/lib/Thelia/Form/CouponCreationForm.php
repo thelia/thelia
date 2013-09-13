@@ -23,7 +23,10 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\Date;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotEqualTo;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -68,7 +71,6 @@ class CouponCreationForm extends BaseForm
                 'shortDescription',
                 'text',
                 array(
-                    'invalid_message' => 'test',
                     'constraints' => array(
                         new NotBlank()
                     )
@@ -78,7 +80,6 @@ class CouponCreationForm extends BaseForm
                 'description',
                 'textarea',
                 array(
-                    'invalid_message' => 'test',
                     'constraints' => array(
                         new NotBlank()
                     )
@@ -88,16 +89,23 @@ class CouponCreationForm extends BaseForm
                 'effect',
                 'text',
                 array(
-                    'invalid_message' => 'test',
                     'constraints' => array(
-                        new NotBlank()
+                        new NotBlank(),
+                        new NotEqualTo(
+                            array(
+                                'value' => -1
+                            )
+                        )
                     )
                 )
             )
             ->add(
                 'amount',
                 'money',
-                array()
+                array(
+                    'constraints' => array(
+                    new NotBlank()
+                ))
             )
             ->add(
                 'isEnabled',
@@ -109,7 +117,8 @@ class CouponCreationForm extends BaseForm
                 'text',
                 array(
                     'constraints' => array(
-                        new NotBlank()
+                        new NotBlank(),
+                        new Date()
                     )
                 )
             )
@@ -133,7 +142,12 @@ class CouponCreationForm extends BaseForm
                 'text',
                 array(
                     'constraints' => array(
-                        new NotBlank()
+                        new NotBlank(),
+                        new GreaterThanOrEqual(
+                            array(
+                                'value' => -1
+                            )
+                        )
                     )
                 )
             )

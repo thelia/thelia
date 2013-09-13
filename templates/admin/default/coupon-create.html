@@ -7,12 +7,14 @@
 
     <nav>
         <ul class="breadcrumb">
-            {include file="includes/coupon_breadcrumb.html"}
+            <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
+            <li><a href="{url path='admin/coupon/'}">{intl l='Coupon'}</a></li>
+            <li>{intl l='Create'}</li>
         </ul>
     </nav>
 
     <div class="page-header">
-        <h1>Coupons : <small>Add a coupon</small></h1>
+        <h1>{intl l='Coupons : '}<small>{intl l='Create a new coupon'}</small></h1>
     </div>
 
     {form name="thelia.admin.coupon.creation"}
@@ -33,9 +35,11 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
 
-    <script>
-        $(function($){
-            miniBrowser(0, '/test_to_remove/datas_coupon_edit.json');
-        });
-    </script>
+    {javascripts file='assets/js/json2.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/coupon.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 {/block}
