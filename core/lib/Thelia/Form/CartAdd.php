@@ -29,6 +29,7 @@ use Thelia\Form\Exception\ProductNotFoundException;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductQuery;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Class CartAdd
@@ -75,10 +76,12 @@ class CartAdd extends BaseForm
             ))
             ->add("product_sale_elements_id", "text", array(
                 "constraints" => array(
+                    new Constraints\NotBlank(),
                     new Constraints\Callback(array("methods" => array(
                             array($this, "checkStockAvailability")
                     )))
-                )
+                ),
+                "required" => true
 
             ))
             ->add("quantity", "text", array(
@@ -90,6 +93,10 @@ class CartAdd extends BaseForm
                     new Constraints\GreaterThanOrEqual(array(
                         "value" => 0
                     ))
+                ),
+                "label" => Translator::getInstance()->trans("Quantity"),
+                "label_attr" => array(
+                    "for" => "quantity"
                 )
             ))
             ->add("append", "hidden")
@@ -126,13 +133,17 @@ class CartAdd extends BaseForm
     {
         $data = $context->getRoot()->getData();
 
-        $productSaleElements = ProductSaleElementsQuery::create()
-            ->filterById($data["product_sale_elements_id"])
-            ->filterByProductId($data["product"])
-            ->findOne();
+        if (null === $data["product_sale_elements_id"]) {
+            $context->addViolationAt("quantity", Translator::getInstance()->trans("Invalid product_sale_elements"));
+        } else {
+            $productSaleElements = ProductSaleElementsQuery::create()
+                ->filterById($data["product_sale_elements_id"])
+                ->filterByProductId($data["product"])
+                ->findOne();
 
-        if ($productSaleElements->getQuantity() < $value && ConfigQuery::read("verifyStock", 1) == 1) {
-            $context->addViolation("quantity value is not valid");
+            if ($productSaleElements->getQuantity() < $value && ConfigQuery::read("verifyStock", 1) == 1) {
+                $context->addViolation("quantity value is not valid");
+            }
         }
     }
 

@@ -93,27 +93,46 @@
                             preorder : http://schema.org/PreOrder
                             online_only : http://schema.org/OnlineOnly
                         -->
-                        <span class="special-price"><span class="price-label">{intl l="Special Price"}: </span><span itemprop="price" class="price">{currency attr="symbol"}26.00</span></span>
-                        <span class="old-price"><span class="price-label">Regular Price: </span><span class="price">$36.00</span></span>
+                        {if $IS_PROMO }
+                        {loop name="productSaleElements_promo" type="product_sale_elements" product="{$ID}" limit="1"}
+                            {assign var="default_product_sale_elements" value="$ID"}
+                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$TAXED_PROMO_PRICE}"} {currency attr="symbol"}</span></span>
+                            <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                        {/loop}
+                        {else}
+                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                        {/if}
                     </div>
                 </div>
 
+                {form name="thelia.cart.add" }
+                <form id="form-product-details" action="{url path="/cart/add" }" method="post" role="form">
+                    {form_hidden_fields form=$form}
+                    <input type="hidden" name="view" value="product">
+                    <input type="hidden" name="product_id" value="{$ID}">
 
-                <form id="form-product-details" action="cart.php" method="post" role="form">
+                    {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
 
-                    <!-- Hidden fields -->
-                    <div class="hidden">
-                        <input type="hidden" name="product" value="1" />
-                    </div>
-
+                    {form_field form=$form field='product_sale_elements_id'}
+                    {if $default_product_sale_elements }
+                        <input type="hidden" name="{$name}" value="{$default_product_sale_elements}" {$attr}>
+                    {else}
+                    {loop name="productSaleElements_promo" type="product_sale_elements" product="{$ID}" limit="1"}
+                        <input type="hidden" name="{$name}" value="{$ID}" {$attr}>
+                    {/loop}
+                    {/if}
+                    {/form_field}
+                    {form_field form=$form field="product"}
+                    <input id="{$label_attr.for}" type="hidden" name="{$name}" value="{$ID}" {$attr} >
+                    {/form_field}
                     <fieldset class="product-options">
                         <div class="option option-color">
                             <label for="option-color" class="option-heading">Show</label>
                             <div class="option-content">
                                 <select id="option-color" name="option-color" class="form-control">
-                                    <?php foreach ($color as $key => $value) { ?>
-                                    <option value="<?php echo $key; ?>"><?php echo $value; ?></option>
-                                    <?php } ?>
+                                    <option value="0">Blue</option>
+                                    <option value="1">Red</option>
+                                    <option value="2">Purple</option>
                                 </select>
                             </div>
                         </div>
@@ -122,38 +141,50 @@
                             <fieldset>
                                 <legend class="option-heading">Size</legend>
                                 <div class="option-content">
-                                    <?php foreach ($size as $key => $value) { ?>
-                                    <label class="checkbox-inline" for="size<?php echo $key; ?>">
-                                        <input type="checkbox" name="size<?php echo $key; ?>" id="size<?php echo $key; ?>" value="<?php echo $key; ?>"> <?php echo $value; ?>
+                                    <label class="checkbox-inline" for="size1">
+                                        <input type="checkbox" name="size1" id="size1" value="1"> Large
                                     </label>
-                                    <?php } ?>
+                                    <label class="checkbox-inline" for="size2">
+                                        <input type="checkbox" name="size2" id="size2" value="2"> Medium
+                                    </label>
+                                    <label class="checkbox-inline" for="size3">
+                                        <input type="checkbox" name="size3" id="size3" value="3"> Small
+                                    </label>
                                 </div>
                             </fieldset>
                         </div>
                     </fieldset>
                     <fieldset class="product-cart form-inline">
-                        <div class="form-group group-qty">
-                            <label for="quantity">Quantity</label>
-                            <input type="number" name="quantity" id="quantity" class="form-control" value="1" min="0" required>
+                        {form_field form=$form field='quantity'}
+                        <div class="form-group group-qty {if $error}has-error{elseif $value != "" && !$error}has-success{/if}">
+                            <label for="{$label_attr.for}">{$label}</label>
+                                <input type="number" name="{$name}" id="{$label_attr.for}" class="form-control" value="{$value|default:1}" min="0" required>
+                                {if $error }
+                                    <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                {elseif $value != "" && !$error}
+                                    <span class="help-block"><i class="icon-ok"></i></span>
+                                {/if}
                         </div>
+                        {/form_field}
 
                         <div class="form-group group-btn">
-                            <button type="submit" class="btn btn_add_to_cart">Add to cart</button>
+                            <button type="submit" class="btn btn_add_to_cart">{intl l="Add to cart"}</button>
                         </div>
                     </fieldset>
                 </form>
+                {/form}
             </section>
 
             <section id="product-tabs">
                 <ul class="nav nav-tabs" role="tablist">
-                    <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">Description</a></li>
-                    <li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">Additional Info</a></li>
+                    <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
+                    <li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">{intl l="Additional Info"}</a></li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-panel active in" id="description" itemprop="description" role="tabpanel" aria-labelledby="tab1">
-                        <p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor, williamsburg carles vegan helvetica. Reprehenderit butcher retro keffiyeh dreamcatcher synth. Cosby sweater eu banh mi, qui irure terry richardson ex squid. Aliquip placeat salvia cillum iphone. Seitan aliquip quis cardigan american apparel, butcher voluptate nisi qui.</p>
+                    <div class="tab-pane active in" id="description" itemprop="description" role="tabpanel" aria-labelledby="tab1">
+                        <p>{$DESCRIPTION}</p>
                     </div>
-                    <div class="tab-panel" id="additional" role="tabpanel" aria-labelledby="tab2">
+                    <div class="tab-pane" id="additional" role="tabpanel" aria-labelledby="tab2">
                         <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit. Keytar helvetica VHS salvia yr, vero magna velit sapiente labore stumptown. Vegan fanny pack odio cillum wes anderson 8-bit, sustainable jean shorts beard ut DIY ethical culpa terry richardson biodiesel. Art party scenester stumptown, tumblr butcher vero sint qui sapiente accusamus tattooed echo park.</p>
                     </div>
                 </div>
