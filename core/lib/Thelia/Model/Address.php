@@ -7,9 +7,23 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Address as BaseAddress;
+use Thelia\Model\AddressQuery;
 
 class Address extends BaseAddress {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
+    /**
+     * put the the current address as default one
+     */
+    public function makeItDefault()
+    {
+
+        AddressQuery::create()->filterByCustomerId($this->getCustomerId())
+            ->update(array('IsDefault' => '0'));
+
+        $this->setIsDefault(1);
+        $this->save();
+    }
 
     /**
      * Code to be run before inserting to database
@@ -58,6 +72,10 @@ class Address extends BaseAddress {
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        if($this->getIsDefault()) {
+            return false;
+        }
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEADDRESS, new AddressEvent($this));
         return true;
     }
@@ -69,16 +87,6 @@ class Address extends BaseAddress {
     public function postDelete(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEADDRESS, new AddressEvent($this));
-    }
-
-    public function preSave()
-    {
-        $valid = true;
-        if($this->getIsDefault()) {
-            $valid =  false;
-        }
-
-        return $valid;
     }
 
 }

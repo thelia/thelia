@@ -112,6 +112,37 @@ class Form extends AbstractSmartyPlugin
         }
     }
 
+    protected function assignFieldValues($template, $fieldName, $fieldValue, $fieldVars)
+    {
+        $template->assign("name", $fieldName);
+
+        $template->assign("value", $fieldValue);
+
+        // If Checkbox input type
+        if ($fieldVars['checked'] !== null) {
+            $this->renderFormFieldCheckBox($template, $formFieldView['checked']);
+        }
+
+        $template->assign("label", $fieldVars["label"]);
+        $template->assign("label_attr", $fieldVars["label_attr"]);
+
+        $errors = $fieldVars["errors"];
+
+        $template->assign("error", empty($errors) ? false : true);
+
+        if (! empty($errors)) {
+            $this->assignFieldErrorVars($template, $errors);
+        }
+
+        $attr = array();
+
+        foreach ($fieldVars["attr"] as $key => $value) {
+            $attr[] = sprintf('%s="%s"', $key, $value);
+        }
+
+        $template->assign("attr", implode(" ", $attr));
+    }
+
     public function renderFormField($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
         if ($repeat) {
@@ -120,32 +151,29 @@ class Form extends AbstractSmartyPlugin
 
             $template->assign("options", $formFieldView->vars);
 
-            $template->assign("name", $formFieldView->vars["full_name"]);
-            $template->assign("value", $formFieldView->vars["value"]);
+            $value = $formFieldView->vars["value"];
+/* FIXME: doesnt work. We got "This form should not contain extra fields." error.
+            // We have a collection
+            if (is_array($value)) {
 
-            // If Checkbox input type
-            if ($formFieldView->vars['checked'] !== null) {
-                $this->renderFormFieldCheckBox($template, $formFieldView);
+                $key = $this->getParam($params, 'value_key');
+
+                if ($key != null) {
+
+                    if (isset($value[$key])) {
+
+                        $name  = sprintf("%s[%s]", $formFieldView->vars["full_name"], $key);
+                        $val   = $value[$key];
+
+                        $this->assignFieldValues($template, $name, $val, $formFieldView->vars);
+                    }
+                }
             }
-
-            $template->assign("label", $formFieldView->vars["label"]);
-            $template->assign("label_attr", $formFieldView->vars["label_attr"]);
-
-            $errors = $formFieldView->vars["errors"];
-
-            $template->assign("error", empty($errors) ? false : true);
-
-            if (! empty($errors)) {
-                $this->assignFieldErrorVars($template, $errors);
+            else {
+                $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVars["value"], $formFieldView->vars);
             }
-
-            $attr = array();
-
-            foreach ($formFieldView->vars["attr"] as $key => $value) {
-                $attr[] = sprintf('%s="%s"', $key, $value);
-            }
-
-            $template->assign("attr", implode(" ", $attr));
+*/
+            $this->assignFieldValues($template, $formFieldView->vars["full_name"], $formFieldView->vars["value"], $formFieldView->vars);
 
             $formFieldView->setRendered();
         } else {
@@ -275,12 +303,12 @@ class Form extends AbstractSmartyPlugin
      * @param \Smarty_Internal_Template $template
      * @param $formFieldView
      */
-    public function renderFormFieldCheckBox(\Smarty_Internal_Template $template, $formFieldView)
+    public function renderFormFieldCheckBox(\Smarty_Internal_Template $template, $isChecked)
     {
         $template->assign("value", 0);
-        if ($formFieldView->vars['checked']) {
+        if ($isChecked) {
             $template->assign("value", 1);
         }
-        $template->assign("value", $formFieldView->vars['checked']);
+        $template->assign("value", $isChecked);
     }
 }

@@ -129,6 +129,11 @@ final class TheliaEvents
      */
     const ADDRESS_UPDATE = "action.updateAddress";
 
+    /**
+     * sent on address removal
+     */
+    const ADDRESS_DELETE = "action.deleteAddress";
+
     const BEFORE_CREATEADDRESS = "action.before_createAddress";
     const AFTER_CREATEADDRESS  = "action.after_createAddress";
 
@@ -368,6 +373,9 @@ final class TheliaEvents
     const ATTRIBUTE_UPDATE          = "action.updateAttribute";
     const ATTRIBUTE_DELETE          = "action.deleteAttribute";
     const ATTRIBUTE_UPDATE_POSITION = "action.updateAttributePosition";
+
+    const ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES = "action.addAttributeToAllTemplate";
+    const ATTRIBUTE_ADD_TO_ALL_TEMPLATES      = "action.removeAttributeFromAllTemplate";
 
     const BEFORE_CREATEATTRIBUTE = "action.before_createAttribute";
     const AFTER_CREATEATTRIBUTE  = "action.after_createAttribute";

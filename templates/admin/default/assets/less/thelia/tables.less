@@ -1,3 +1,22 @@
+tfoot{
+
+	.pagination{
+		margin: 0;
+	}
+
+}
+
+.table-condensed {
+  tfoot {
+    > tr {
+      > th,
+      > td {
+        padding: 20px 5px 5px;
+      }
+    }
+  }
+}
+
 .table-striped {
 
 	caption {
@@ -55,6 +74,13 @@
 .table-left-aligned {
     th, td {
         text-align: left;
+
+        &.text-center {
+            text-align: center;
+        }
+        &.text-right {
+            text-align: right;
+        }
     }
 
     select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {

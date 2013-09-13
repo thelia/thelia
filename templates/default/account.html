@@ -1,3 +1,4 @@
+{check_auth context="front" roles="CUSTOMER" login_tpl="login"}
 {extends file="layout.tpl"}
 
 {block name="breadcrumb"}
@@ -74,11 +75,11 @@
                     </div>
                     <div id="account-address" class="panel-collapse collapse">
                         <div class="panel-body">
-                            <a href="address.php" class="btn btn-add-address">{intl l="Add a new address"}</a>
+                            <a href="{url path="/address/create"}" class="btn btn-add-address">{intl l="Add a new address"}</a>
                             <table class="table table-address" role="presentation" summary="{intl l="My Address Books"}">
                                 <tbody>
-                                {loop type="address" name="customer.addresses"}
-                                <tr class="{if $DEFAULT == 1}address-primary{else}address-additional{/if}">
+                                {loop type="address" name="customer.addresses" customer="current"}
+                                <tr class="{if $DEFAULT == 1}address-primary{else}address-additional{/if}" id="customer-address-{$ID}">
                                     <th>{$LABEL}</th>
                                     <td>
                                         <ul class="list-address">
@@ -113,9 +114,9 @@
                                     </td>
                                     <td>
                                         <div class="group-btn">
-                                            <a href="{url path="/address/edit/{$ID}"}" class="btn btn-edit-address" data-toggle="tooltip" title="Edit this address"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
+                                            <a href="{url path="/address/update/{$ID}"}" class="btn btn-edit-address" data-toggle="tooltip" title="Edit this address"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
                                             {if $DEFAULT != 1}
-                                                <a href="#" class="btn btn-remove-address" data-toggle="tooltip" title="Remove this address"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
+                                                <a href="{url path="/address/delete/{$ID}"}" class="btn btn-remove-address remove-address" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
                                             {/if}
                                         </div>
                                     </td>
@@ -171,5 +172,38 @@
         </article>
 
     </div><!-- /.layout -->
+
+    <div class="modal fade" id="address-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3>{intl l="Delete address"}</h3>
+                </div>
+                <div class="modal-body">
+                    {intl l="Do you really want to delete this address ?"}
+                </div>
+                    <div class="modal-footer">
+                        <a href="#" type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {intl l="No"}</a>
+                        <a href="#" id="address-delete-link" type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Yes"}</a>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+{/block}
+
+{block name="after-javascript-include"}
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $(".remove-address").click(function(e){
+                e.preventDefault();
+                $("#address-delete-link").attr("href", $(this).attr("href"));
+                $('#address-delete-modal').modal('show');
+            })
+        })
+    </script>
 
 {/block}

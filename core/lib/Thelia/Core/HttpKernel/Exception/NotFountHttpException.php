@@ -20,41 +20,27 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Controller\Front;
+namespace Thelia\Core\HttpKernel\Exceptions;
 
-use Symfony\Component\Routing\Router;
-use Thelia\Controller\BaseController;
-use Thelia\Tools\URL;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as BaseNotFountHttpException;
+/**
+ * Class NotFountHttpException
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+class NotFountHttpException extends BaseNotFountHttpException {
 
-class BaseFrontController extends BaseController
-{
-    /**
-     * Return the route path defined for the givent route ID
-     *
-     * @param string $routeId a route ID, as defines in Config/Resources/routing/front.xml
-     *
-     * @see \Thelia\Controller\BaseController::getRouteFromRouter()
-     */
-    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH)
+    protected $adminContext = false;
+
+    public function __construct($message = null, \Exception $previous = null, $code = 0, $adminContext = false)
     {
-        return $this->getRouteFromRouter('router.front', $routeId, $parameters, $referenceType);
+        $this->adminContext = $adminContext;
+
+        parent::__construct($message, $previous, $code);
     }
 
-    /**
-     * Redirect to à route ID related URL
-     *
-     * @param unknown $routeId       the route ID, as found in Config/Resources/routing/admin.xml
-     * @param unknown $urlParameters the URL parametrs, as a var/value pair array
-     */
-    public function redirectToRoute($routeId, $urlParameters = array(), $referenceType = Router::ABSOLUTE_PATH)
+    public function isAdminContext()
     {
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, array(), $referenceType), $urlParameters));
-    }
+        return $this->adminContext === true;
 
-    public function checkAuth()
-    {
-        if($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirectToRoute("customer.login.view");
-        }
     }
 }

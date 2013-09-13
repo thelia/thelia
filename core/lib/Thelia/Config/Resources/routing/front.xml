@@ -59,18 +59,29 @@
     <!-- end customer routes -->
 
     <!-- customer address routes -->
-    <route id="address.create" path="/address/create" >
+    <route id="address.create.view" path="/address/create" methods="get">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">address</default>
+    </route>
+
+    <route id="address.create" path="/address/create" methods="post" >
         <default key="_controller">Thelia\Controller\Front\AddressController::createAction</default>
         <default key="_view">address</default>
     </route>
 
-    <route id="address.edit" path="/address/edit/{address_id}">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">address-edit</default>
+    <route id="address.edit" path="/address/update/{address_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Front\AddressController::updateViewAction</default>
+        <default key="_view">address-update</default>
     </route>
 
-    <route id="address.update" path="/address/update" >
-        <default key="_controller">Thelia\Controller\Front\AddressController::updateAction</default>
+    <route id="address.update" path="/address/update/{address_id}" methods="post" >
+        <default key="_controller">Thelia\Controller\Front\AddressController::processUpdateAction</default>
+        <default key="_view">address-update</default>
+    </route>
+
+    <route id="address.delete" path="/address/delete/{address_id}">
+        <default key="_controller">Thelia\Controller\Front\AddressController::deleteAction</default>
+        <default key="_view">account</default>
     </route>
 
     <route id="address.generateModal" path="/address/modal/{address_id}" methods="get">
