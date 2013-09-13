@@ -20,43 +20,27 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
+namespace Thelia\Core\HttpKernel\Exceptions;
 
-use Symfony\Component\Validator\Constraints;
-use Thelia\Model\CurrencyQuery;
-use Symfony\Component\Validator\ExecutionContextInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
-use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as BaseNotFountHttpException;
+/**
+ * Class NotFountHttpException
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+class NotFountHttpException extends BaseNotFountHttpException {
 
-class AttributeModificationForm extends AttributeCreationForm
-{
-    use StandardDescriptionFieldsTrait;
+    protected $adminContext = false;
 
-    protected function buildForm()
+    public function __construct($message = null, \Exception $previous = null, $code = 0, $adminContext = false)
     {
-        $this->formBuilder
-            ->add("id", "hidden", array(
-                    "constraints" => array(
-                        new GreaterThan(
-                            array('value' => 0)
-                        )
-                    )
-            ))
-/* FIXME: doesn't work
-            ->add('attribute_values', 'collection', array(
-                    'type'   => 'text',
-                    'options'  => array('required'  => false)
-            ))
-*/
-        ;
+        $this->adminContext = $adminContext;
 
-        // Add standard description fields
-        $this->addStandardDescFields();
+        parent::__construct($message, $previous, $code);
     }
 
-    public function getName()
+    public function isAdminContext()
     {
-        return "thelia_attribute_modification";
+        return $this->adminContext === true;
+
     }
 }

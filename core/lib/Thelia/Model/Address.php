@@ -58,6 +58,10 @@ class Address extends BaseAddress {
      */
     public function preDelete(ConnectionInterface $con = null)
     {
+        if($this->getIsDefault()) {
+            return false;
+        }
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEADDRESS, new AddressEvent($this));
         return true;
     }

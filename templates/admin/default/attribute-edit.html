@@ -37,6 +37,10 @@
 
 		                                <p class="title title-without-tabs">{intl l='Attribute information'}</p>
 
+                                        {form_field form=$form field='id'}
+                                            <input type="hidden" name="{$name}" value="{$attribute_id}" />
+                                        {/form_field}
+
      	                                {* Be sure to get the attribute ID, even if the form could not be validated *}
      	                                <input type="hidden" name="attribute_id" value="{$attribute_id}" />
 
@@ -52,7 +56,7 @@
 
      					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                        {include file="includes/standard-description-form-fields.html"}
+                                        {include file="includes/standard-description-form-fields.html" form=$form}
 		    						</div>
 
 		     						<div class="col-md-6">
@@ -61,7 +65,7 @@
 
 		     						         {intl l='Attribute values'}
 
-		                                     {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.attribute-values.create"}
+		                                     {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.attribute-av.create"}
 		                                     <span class="pull-right">
 		                                         <a data-toggle="modal" href="#creation_dialog" title="Add a new attribute value" class="btn btn-default btn-primary">
 		                                             <span class="glyphicon glyphicon-plus-sign"></span>
@@ -79,9 +83,10 @@
 				                                <tr>
 				                                    <th>
 				                                        {admin_sortable_header
-				                                            current_order=$order
+				                                            current_order=$attributeav_order
 				                                            order='id'
 				                                            reverse_order='id_reverse'
+				                                            request_parameter_name='attributeav_order'
 				                                            path={url path='/admin/configuration/attributes/update' attribute_id=$attribute_id}
 				                                            label="{intl l='ID'}"
 				                                        }
@@ -89,9 +94,10 @@
 
 				                                    <th>
 				                                        {admin_sortable_header
-				                                            current_order=$order
+				                                            current_order=$attributeav_order
 				                                            order='alpha'
 				                                            reverse_order='alpha_reverse'
+				                                            request_parameter_name='attributeav_order'
 				                                            path={url path='/admin/configuration/attributes/update' attribute_id=$attribute_id}
 				                                            label="{intl l='Value'}"
 				                                        }
@@ -99,9 +105,10 @@
 
 				                                    <th class="text-center">
 				                                        {admin_sortable_header
-				                                            current_order=$order
+				                                            current_order=$attributeav_order
 				                                            order='manual'
 				                                            reverse_order='manual_reverse'
+				                                            request_parameter_name='attributeav_order'
 				                                            path={url path='/admin/configuration/attributes/update' attribute_id=$attribute_id}
 				                                            label="{intl l="Position"}"
 				                                        }
@@ -114,19 +121,20 @@
 				                            </thead>
 
 				                            <tbody>
-				                                {loop name="list" type="attribute_availability" attribute=$attribute_id backend_context="1" lang=$edit_language_id order=$order}
+				                                {loop name="list" type="attribute_availability" attribute=$attribute_id backend_context="1" lang=$edit_language_id order=$attributeav_order}
 				                                <tr>
 				                                    <td>{$ID}</td>
 
 				                                    <td>
-				                                        <input class="js-edit form-control" type="text" name="" value="{$TITLE}" />
+				                                        {* FIXME : integrate this in the encolsing form to provide standard form processing *}
+				                                        <input class="js-edit form-control" type="text" name="attribute_values[{$ID}]" value="{$TITLE}" />
 				                                    </td>
 
 				                                    <td class="text-center">
 				                                        {admin_position_block
 				                                        permission="admin.attributes.edit"
-				                                        path="/admin/configuration/attributes/update-value-position"
-				                                        url_parameter="attribute_id"
+				                                        path={url path='/admin/configuration/attributes-av/update-position' attribute_id=$attribute_id}
+				                                        url_parameter="attributeav_id"
 				                                        in_place_edit_class="positionChange"
 				                                        position="$POSITION"
 				                                        id="$ID"
@@ -137,7 +145,11 @@
 
 				                                    <td class="actions">
 				                                        <div class="btn-group">
-				                                            <a class="btn btn-default btn-xs value-delete" title="{intl l='Delete this value'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+				                                            {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.attribute-av.delete"}
+				                                               <a class="btn btn-default btn-xs value-delete" title="{intl l='Delete this value'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
+				                                                <span class="glyphicon glyphicon-trash"></span>
+				                                               </a>
+				                                            {/loop}
 				                                        </div>
 				                                    </td>
 				                                </tr>
@@ -147,7 +159,7 @@
 				                                     <tr>
 				                                         <td colspan="4">
 				                                             <div class="alert alert-info">
-				                                                 {intl l="No product attribute has been created yet. Click the + button to create one."}
+				                                                 {intl l="No value has been created yet. Click the + button to create one."}
 				                                             </div>
 				                                         </td>
 				                                     </tr>
@@ -181,7 +193,7 @@
 
 {* Adding a new attribute *}
 
-{form name="thelia.admin.attribute-value.creation"}
+{form name="thelia.admin.attributeav.creation"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
 
@@ -232,7 +244,7 @@
 
         dialog_ok_label     = {intl l="Create this value"}
 
-        form_action        = {url path='/admin/configuration/attributes-av'}
+        form_action        = {url path='/admin/configuration/attributes-av/create'}
         form_enctype       = {form_enctype form=$form}
         form_error_message = $form_error_message
     }
@@ -241,7 +253,8 @@
 {* Delete value confirmation dialog *}
 
 {capture "delete_dialog"}
-    <input type="hidden" name="attribute_value_id" id="value_delete_id" value="" />
+    <input type="hidden" name="attribute_id" value="{$attribute_id}" />
+    <input type="hidden" name="attributeav_id" id="value_delete_id" value="" />
 {/capture}
 
 {include
@@ -275,7 +288,7 @@
             {include
                 file      = "includes/generic-js-dialog.html"
                 dialog_id = "creation_dialog"
-                form_name = "thelia.admin.attribute-value.creation"
+                form_name = "thelia.admin.attributeav.creation"
             }
 
             {* Inline editing of object position using bootstrap-editable *}
@@ -288,7 +301,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url path='/admin/configuration/attributes/update-value-position' attribute_value_id='__ID__' position='__POS__'}";
+                    var url = "{url path='/admin/configuration/attributes-av/update-position' attributeav_id='__ID__' position='__POS__' attribute_id=$attribute_id}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);

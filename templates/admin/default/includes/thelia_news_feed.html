@@ -4,7 +4,8 @@
      <div class="span4 feed-list-item">
          <h3>{$DATE}</h3>
          <h2><a href="{$URL}" target="_blank" title="{intl l='Lire la suite'}">{$TITLE|strip_tags nofilter}</a></h2>
-         <p>{$DESCRIPTION|strip_tags|truncate:250:"...":true nofilter}</p>
+         {* we use unescape:"htmlall" to unescape var before truncate, to prevent a cut in the middel of an HTML entity, eg &ea... *}
+         <p>{$DESCRIPTION|strip_tags|unescape:"htmlall"|truncate:250:"...":true nofilter}</p>
          <p><a class="btn" href="{$URL}" target="_blank">{intl l='Lire la suite »'}</a></p>
      </div>
 {/loop}

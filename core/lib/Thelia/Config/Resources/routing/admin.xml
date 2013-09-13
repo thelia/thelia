@@ -37,9 +37,18 @@
         <default key="_controller">Thelia\Controller\Admin\CustomerController::indexAction</default>
     </route>
 
-    <route id="admin.customer.update.view" path="/admin/customer/update/{customer_id}">
+    <route id="admin.customer.update.view" path="/admin/customer/update/{customer_id}" methods="get">
         <default key="_controller">Thelia\Controller\Admin\CustomerController::viewAction</default>
         <requirement key="customer_id">\d+</requirement>
+    </route>
+
+    <route id="admin.customer.update.process" path="/admin/customer/update/{customer_id}" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::updateAction</default>
+        <requirement key="customer_id">\d+</requirement>
+    </route>
+
+    <route id="admin.customer.delete" path="/admin/customer/delete">
+        <default key="_controller">Thelia\Controller\Admin\CustomerController::deleteAction</default>
     </route>
 
     <!-- end Customer rule management -->
@@ -225,6 +234,14 @@
 
     <route id="admin.configuration.attributes.update-position" path="/admin/configuration/attributes/update-position">
         <default key="_controller">Thelia\Controller\Admin\AttributeController::updatePositionAction</default>
+    </route>
+
+    <route id="admin.configuration.attributes.rem-from-all" path="/admin/configuration/attributes/remove-from-all-templates">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::removeFromAllTemplates</default>
+    </route>
+
+    <route id="admin.configuration.attributes.add-to-all" path="/admin/configuration/attributes/add-to-all-templates">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::addToAllTemplates</default>
     </route>
 
 

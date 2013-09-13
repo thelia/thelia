@@ -67,7 +67,7 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.pageNotFound" class="Thelia\Action\PageNotFound">
+        <service id="thelia.action.httpException" class="Thelia\Action\HttpException">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>

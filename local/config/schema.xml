@@ -870,6 +870,7 @@
     <column name="address_delivery_id" type="INTEGER" />
     <column name="address_invoice_id" type="INTEGER" />
     <column name="currency_id" type="INTEGER" />
+    <column defaultValue="0" name="discount" type="FLOAT" />
     <foreign-key foreignTable="customer" name="fk_cart_customer_id">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
@@ -908,6 +909,7 @@
     <column name="price" type="FLOAT" />
     <column name="promo_price" type="FLOAT" />
     <column name="price_end_of_life" type="TIMESTAMP" />
+    <column defaultValue="0" name="discount" type="FLOAT" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id">
       <reference foreign="id" local="cart_id" />
     </foreign-key>

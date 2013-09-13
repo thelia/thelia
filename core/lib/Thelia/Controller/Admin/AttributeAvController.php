@@ -23,125 +23,130 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\MessageDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;use Thelia\Core\Event\MessageUpdateEvent;
-use Thelia\Core\Event\MessageCreateEvent;
-use Thelia\Model\MessageQuery;
-use Thelia\Form\MessageModificationForm;
-use Thelia\Form\MessageCreationForm;
+use Thelia\Core\Event\AttributeAvDeleteEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\AttributeAvUpdateEvent;
+use Thelia\Core\Event\AttributeAvCreateEvent;
+use Thelia\Model\AttributeAvQuery;
+use Thelia\Form\AttributeAvModificationForm;
+use Thelia\Form\AttributeAvCreationForm;
+use Thelia\Core\Event\UpdatePositionEvent;
 
 /**
- * Manages messages sent by mail
+ * Manages attributes-av sent by mail
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class MessageController extends AbstractCrudController
+class AttributeAvController extends AbstractCrudController
 {
     public function __construct()
     {
         parent::__construct(
-            'message',
-            null, // no sort order change
-            null, // no sort order change
+            'attributeav',
+            'manual',
+            'order',
 
-            'admin.configuration.messages.view',
-            'admin.configuration.messages.create',
-            'admin.configuration.messages.update',
-            'admin.configuration.messages.delete',
+            'admin.configuration.attributes-av.view',
+            'admin.configuration.attributes-av.create',
+            'admin.configuration.attributes-av.update',
+            'admin.configuration.attributes-av.delete',
 
-            TheliaEvents::MESSAGE_CREATE,
-            TheliaEvents::MESSAGE_UPDATE,
-            TheliaEvents::MESSAGE_DELETE,
+            TheliaEvents::ATTRIBUTE_AV_CREATE,
+            TheliaEvents::ATTRIBUTE_AV_UPDATE,
+            TheliaEvents::ATTRIBUTE_AV_DELETE,
             null, // No visibility toggle
-            null  // No position update
+            TheliaEvents::ATTRIBUTE_AV_UPDATE_POSITION
         );
     }
 
     protected function getCreationForm()
     {
-        return new MessageCreationForm($this->getRequest());
+        return new AttributeAvCreationForm($this->getRequest());
     }
 
     protected function getUpdateForm()
     {
-        return new MessageModificationForm($this->getRequest());
+        return new AttributeAvModificationForm($this->getRequest());
     }
 
     protected function getCreationEvent($formData)
     {
-        $createEvent = new MessageCreateEvent();
+        $createEvent = new AttributeAvCreateEvent();
 
         $createEvent
-            ->setMessageName($formData['name'])
-            ->setLocale($formData["locale"])
+            ->setAttributeId($formData['attribute_id'])
             ->setTitle($formData['title'])
-            ->setSecured($formData['secured'])
-            ;
+            ->setLocale($formData["locale"])
+        ;
 
         return $createEvent;
     }
 
     protected function getUpdateEvent($formData)
     {
-        $changeEvent = new MessageUpdateEvent($formData['id']);
+        $changeEvent = new AttributeAvUpdateEvent($formData['id']);
 
         // Create and dispatch the change event
         $changeEvent
-            ->setMessageName($formData['name'])
-            ->setSecured($formData['secured'])
             ->setLocale($formData["locale"])
             ->setTitle($formData['title'])
-            ->setSubject($formData['subject'])
-            ->setHtmlMessage($formData['html_message'])
-            ->setTextMessage($formData['text_message'])
+            ->setChapo($formData['chapo'])
+            ->setDescription($formData['description'])
+            ->setPostscriptum($formData['postscriptum'])
         ;
 
         return $changeEvent;
     }
 
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    {
+        return new UpdatePositionEvent(
+                $this->getRequest()->get('attributeav_id', null),
+                $positionChangeMode,
+                $positionValue
+        );
+    }
+
     protected function getDeleteEvent()
     {
-        return new MessageDeleteEvent($this->getRequest()->get('message_id'));
+        return new AttributeAvDeleteEvent($this->getRequest()->get('attributeav_id'));
     }
 
     protected function eventContainsObject($event)
     {
-        return $event->hasMessage();
+        return $event->hasAttributeAv();
     }
 
     protected function hydrateObjectForm($object)
     {
-        // Prepare the data that will hydrate the form
         $data = array(
             'id'           => $object->getId(),
-            'name'         => $object->getName(),
-            'secured'      => $object->getSecured(),
             'locale'       => $object->getLocale(),
             'title'        => $object->getTitle(),
-            'subject'      => $object->getSubject(),
-            'html_message' => $object->getHtmlMessage(),
-            'text_message' => $object->getTextMessage()
+            'chapo'        => $object->getChapo(),
+            'description'  => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum()
         );
 
         // Setup the object form
-        return new MessageModificationForm($this->getRequest(), "form", $data);
+        return new AttributeAvModificationForm($this->getRequest(), "form", $data);
     }
 
     protected function getObjectFromEvent($event)
     {
-        return $event->hasMessage() ? $event->getMessage() : null;
+        return $event->hasAttributeAv() ? $event->getAttributeAv() : null;
     }
 
     protected function getExistingObject()
     {
-        return MessageQuery::create()
+        return AttributeAvQuery::create()
         ->joinWithI18n($this->getCurrentEditionLocale())
-        ->findOneById($this->getRequest()->get('message_id'));
+        ->findOneById($this->getRequest()->get('attributeav_id'));
     }
 
     protected function getObjectLabel($object)
     {
-        return $object->getName();
+        return $object->getTitle();
     }
 
     protected function getObjectId($object)
@@ -149,26 +154,43 @@ class MessageController extends AbstractCrudController
         return $object->getId();
     }
 
+    protected function getViewArguments()
+    {
+        return array(
+            'attribute_id' => $this->getRequest()->get('attribute_id'),
+            'order' => $this->getCurrentListOrder()
+        );
+    }
+
     protected function renderListTemplate($currentOrder)
     {
-        return $this->render('messages');
+        // We always return to the attribute edition form
+        return $this->render(
+                'attribute-edit',
+                $this->getViewArguments()
+        );
     }
 
     protected function renderEditionTemplate()
     {
-        return $this->render('message-edit', array('message_id' => $this->getRequest()->get('message_id')));
+        // We always return to the attribute edition form
+        return $this->render('attribute-edit', $this->getViewArguments());
     }
 
     protected function redirectToEditionTemplate()
     {
+        // We always return to the attribute edition form
         $this->redirectToRoute(
-                "admin.configuration.messages.update",
-                array('message_id' => $this->getRequest()->get('message_id'))
+                "admin.configuration.attributes.update",
+                $this->getViewArguments()
         );
     }
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.messages.default');
-    }
+        $this->redirectToRoute(
+                "admin.configuration.attributes.update",
+                $this->getViewArguments()
+        );
+     }
 }

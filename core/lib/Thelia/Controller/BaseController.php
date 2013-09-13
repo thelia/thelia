@@ -25,6 +25,7 @@ namespace Thelia\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -262,5 +263,22 @@ class BaseController extends ContainerAware
     protected function isDebug()
     {
         return $this->container->getParameter('kernel.debug');
+    }
+
+    protected function accessDenied()
+    {
+        throw new AccessDeniedHttpException();
+    }
+
+    /**
+     * check if the current http request is a XmlHttpRequest.
+     *
+     * If not, send a
+     */
+    protected function checkXmlHttpRequest()
+    {
+        if(false === $this->getRequest()->isXmlHttpRequest() && false === $this->isDebug()) {
+            $this->accessDenied();
+        }
     }
 }

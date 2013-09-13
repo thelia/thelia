@@ -10,15 +10,31 @@
     </route>
 
     <!-- Customer routes -->
+    <route id="customer.create.view" path="/register">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">register</default>
+    </route>
+
+
+    <route id="customer.login.view" path="/login">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">login</default>
+    </route>
+
+    <route id="customer.logout.process" path="/logout">
+        <default key="_controller">Thelia\Controller\Front\CustomerController::logoutAction</default>
+    </route>
+
+    <route id="customer.account.view" path="/customer/account">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">account</default>
+    </route>
+
     <route id="customer.create.process" path="/customer/create" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::createAction</default>
         <default key="_view">register</default>
     </route>
 
-    <route id="customer.create.view" path="/register">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">register</default>
-    </route>
 
     <route id="customer.update.process" path="/customer/update" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::updateAction</default>
@@ -29,14 +45,6 @@
         <default key="_view">login</default>
     </route>
 
-    <route id="customer.login.view" path="/login">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">login</default>
-    </route>
-
-    <route id="customer.logout.process" path="/logout">
-        <default key="_controller">Thelia\Controller\Front\CustomerController::logoutAction</default>
-    </route>
 
     <route id="customer.password.retrieve.view" path="/password" methods="get">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
@@ -58,12 +66,19 @@
 
     <route id="address.edit" path="/address/edit/{address_id}">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">address_edit</default>
+        <default key="_view">address-edit</default>
     </route>
 
     <route id="address.update" path="/address/update" >
         <default key="_controller">Thelia\Controller\Front\AddressController::updateAction</default>
     </route>
+
+    <route id="address.generateModal" path="/address/modal/{address_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Front\AddressController::generateModalAction</default>
+        <default key="_view">modal-address</default>
+        <requirement key="address_id">\d+</requirement>
+    </route>
+
     <!-- end customer address routes -->
 
     <!-- cart routes -->
@@ -85,6 +100,8 @@
         <default key="_controller">Thelia\Controller\Front\CartController::changeItem</default>
         <default key="_view">cart</default>
     </route>
+
+    <!-- end cart routes -->
 
     <!-- order management process -->
     <route id="order.delivery.add" path="/delivery/choose/{delivery_id}">

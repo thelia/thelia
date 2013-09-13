@@ -50,6 +50,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
         $attribute
             ->setDispatcher($this->getDispatcher())
 
+            ->setAttributeId($event->getAttributeId())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
 
@@ -57,11 +58,6 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
         ;
 
         $event->setAttributeAv($attribute);
-
-        // Add atribute to all product templates if required
-        if ($event->getAddToAllTemplates() != 0) {
-            // TODO: add to all product template
-        }
     }
 
     /**

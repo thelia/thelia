@@ -156,6 +156,45 @@ try {
         "azerty"
     );
 
+    for($i = 0; $i < 50; $i++) {
+        $customer = new Thelia\Model\Customer();
+        $customer->createOrUpdate(
+            rand(1,3),
+            $faker->firstname,
+            $faker->lastname,
+            $faker->streetAddress,
+            $faker->streetAddress,
+            $faker->streetAddress,
+            $faker->phoneNumber,
+            $faker->phoneNumber,
+            $faker->postcode,
+            $faker->city,
+            64,
+            $faker->email,
+            "azerty".$i
+        );
+
+        for ($j = 0; $j <= 3; $j++) {
+            $address = new Thelia\Model\Address();
+            $address->setLabel($faker->text(20))
+                ->setTitleId(rand(1,3))
+                ->setFirstname($faker->firstname)
+                ->setLastname($faker->lastname)
+                ->setAddress1($faker->streetAddress)
+                ->setAddress2($faker->streetAddress)
+                ->setAddress3($faker->streetAddress)
+                ->setCellphone($faker->phoneNumber)
+                ->setPhone($faker->phoneNumber)
+                ->setZipcode($faker->postcode)
+                ->setCity($faker->city)
+                ->setCountryId(64)
+                ->setCustomer($customer)
+                ->save()
+            ;
+
+        }
+    }
+
     //features and features_av
     $featureList = array();
     for($i=0; $i<4; $i++) {

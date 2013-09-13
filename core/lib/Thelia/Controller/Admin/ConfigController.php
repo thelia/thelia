@@ -43,6 +43,7 @@ class ConfigController extends AbstractCrudController
         parent::__construct(
             'variable',
             'name',
+            'order',
 
             'admin.configuration.variables.view',
             'admin.configuration.variables.create',
