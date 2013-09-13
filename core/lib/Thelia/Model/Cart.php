@@ -76,4 +76,17 @@ class Cart extends BaseCart
     {
 
     }
+
+    public function getTotalAmount()
+    {
+        $total = 0;
+
+        foreach($this->getCartItems() as $cartItem) {
+            $total += $cartItem->getPrice()-$cartItem->getDiscount();
+        }
+
+        $total -= $this->getDiscount();
+
+        return $total;
+    }
 }
