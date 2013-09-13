@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Front;
 use Thelia\Core\Event\AddressCreateOrUpdateEvent;
+use Thelia\Core\Event\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;
@@ -152,6 +153,22 @@ class AddressController extends BaseFrontController
                 ->setGeneralError($message)
             ;
         }
+    }
+
+    public function deleteAction($address_id)
+    {
+        $this->checkAuth();
+
+        $customer = $this->getSecurityContext()->getCustomerUser();
+        $address = AddressQuery::create()->findPk($address_id);
+
+        if(!$address || $customer->getId() != $address->getCustomerId()) {
+            $this->redirectToRoute("home");
+        }
+
+        $this->dispatch(TheliaEvents::ADDRESS_DELETE, new AddressEvent($address));
+
+        $this->redirectToRoute("customer.account.view");
     }
 
     protected function createAddressEvent($form)

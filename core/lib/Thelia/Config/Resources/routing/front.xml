@@ -79,6 +79,11 @@
         <default key="_view">address-update</default>
     </route>
 
+    <route id="address.delete" path="/address/delete/{address_id}">
+        <default key="_controller">Thelia\Controller\Front\AddressController::deleteAction</default>
+        <default key="_view">account</default>
+    </route>
+
     <route id="address.generateModal" path="/address/modal/{address_id}" methods="get">
         <default key="_controller">Thelia\Controller\Front\AddressController::generateModalAction</default>
         <default key="_view">modal-address</default>

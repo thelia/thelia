@@ -26,6 +26,7 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\AddressCreateOrUpdateEvent;
+use Thelia\Core\Event\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Address as AddressModel;
 use Thelia\Model\Map\AddressTableMap;
@@ -50,6 +51,13 @@ class Address extends BaseAction implements EventSubscriberInterface
         $addressModel = $event->getAddress();
 
         $this->createOrUpdate($addressModel, $event);
+    }
+
+    public function delete(AddressEvent $event)
+    {
+        $address = $event->getAddress();
+
+        $address->delete();
     }
 
     protected function createOrUpdate(AddressModel $addressModel, AddressCreateOrUpdateEvent $event)
@@ -116,7 +124,8 @@ class Address extends BaseAction implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::ADDRESS_CREATE => array("create", 128),
-            TheliaEvents::ADDRESS_UPDATE => array("update", 128)
+            TheliaEvents::ADDRESS_UPDATE => array("update", 128),
+            TheliaEvents::ADDRESS_DELETE => array("delete", 128)
         );
     }
 }
