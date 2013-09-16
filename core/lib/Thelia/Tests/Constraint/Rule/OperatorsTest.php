@@ -96,6 +96,10 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
         $actual = Operators::getI18n($stubTranslator, Operators::OUT);
         $expected = 'not in';
         $this->assertEquals($expected, $actual);
+
+        $actual = Operators::getI18n($stubTranslator, 'unexpected operator');
+        $expected = 'unexpected operator';
+        $this->assertEquals($expected, $actual);
     }
 
 

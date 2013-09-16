@@ -26,19 +26,20 @@ namespace Thelia\Coupon;
 use Thelia\Constraint\ConstraintValidator;
 use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\Operators;
+use Thelia\Exception\InvalidRuleValueException;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test AvailableForTotalAmount Class
+ * Unit Test AvailableForTotalAmountManager Class
  *
  * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
+class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var CouponAdapterInterface $stubTheliaAdapter */
     protected $stubTheliaAdapter = null;
@@ -49,108 +50,168 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-//        /** @var CouponAdapterInterface $stubTheliaAdapter */
-//        $this->stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
+
     }
 
-//    /**
-//     * Generate valid CouponBaseAdapter
-//     *
-//     * @param float $cartTotalPrice Total amount of the current Cart
-//     *
-//     * @return CouponAdapterInterface
-//     */
-//    protected function generateValidCouponBaseAdapterMock($cartTotalPrice = 421.23)
-//    {
-//        /** @var CouponAdapterInterface $stubTheliaAdapter */
-//        $stubTheliaAdapter = $this->getMock(
-//            'Thelia\Coupon\CouponBaseAdapter',
-//            array('getCartTotalPrice'),
-//            array()
-//        );
-//        $stubTheliaAdapter->expects($this->any())
-//            ->method('getCartTotalPrice')
-//            ->will($this->returnValue($cartTotalPrice));
-//
-//        return $stubTheliaAdapter;
-//    }
+    /**
+     * Check if validity test on BackOffice inputs are working
+     *
+     * @covers Thelia\Coupon\Rule\AvailableForTotalAmountManager::setValidators
+     * @expectedException \Thelia\Exception\InvalidRuleOperatorException
+     *
+     */
+    public function testInValidBackOfficeInputOperator()
+    {
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-//    /**
-//     * Check if validity test on BackOffice inputs are working
-//     *
-//     * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::checkBackOfficeInput
-//     *
-//     */
-//    public function testValidBackOfficeInput()
-//    {
-//        $adapter = new CouponBaseAdapter();
-//
-//        $validators = array(
-//            AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
-//                Operators::SUPERIOR,
-//                new PriceParam(
-//                    $adapter, 421.23, 'EUR'
-//                )
-//            )
-//        );
-//        $rule = new AvailableForTotalAmount($adapter, $validators);
-//
-//        $expected = true;
-//        $actual = $rule->checkBackOfficeInput();
-//        $this->assertEquals($expected, $actual);
-//    }
+        $stubAdapter->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue(399));
+        $stubAdapter->expects($this->any())
+            ->method('getCheckoutCurrency')
+            ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
-//    /**
-//     * Check if validity test on BackOffice inputs are working
-//     *
-//     * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::checkBackOfficeInput
-//     * @expectedException \Thelia\Exception\InvalidRuleOperatorException
-//     *
-//     */
-//    public function testInValidBackOfficeInputOperator()
-//    {
-//        $adapter = new CouponBaseAdapter();
-//
-//        $validators = array(
-//            AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
-//                'X',
-//                new PriceParam(
-//                    $adapter, 421.23, 'EUR'
-//                )
-//            )
-//        );
-//
-//        $rule = new AvailableForTotalAmount($adapter, $validators);
-//
-//        $expected = false;
-//        $actual = $rule->checkBackOfficeInput();
-//        $this->assertEquals($expected, $actual);
-//    }
+        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
+        $operators = array(
+            AvailableForTotalAmountManager::INPUT1 => Operators::IN,
+            AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            AvailableForTotalAmountManager::INPUT1 => '400',
+            AvailableForTotalAmountManager::INPUT2 => 'EUR');
+        $rule1->setValidatorsFromForm($operators, $values);
 
-//    /**
-//     * Check if validity test on BackOffice inputs are working
-//     *
-//     * @covers Thelia\Coupon\Rule\AvailableForTotalAmount::checkBackOfficeInput
-//     * @expectedException \ErrorException
-//     *
-//     */
-//    public function testInValidBackOfficeInputValue()
-//    {
-//        $adapter = $this->generateValidCouponBaseAdapterMock();
-//
-//        $validators = array(
-//            AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
-//                Operators::SUPERIOR,
-//                421
-//            )
-//        );
-//
-//        $rule = new AvailableForTotalAmount($adapter, $validators);
-//
-//        $expected = false;
-//        $actual = $rule->checkBackOfficeInput();
-//        $this->assertEquals($expected, $actual);
-//    }
+        $isValid = $rule1->isMatching();
+
+        $expected = true;
+        $actual =$isValid;
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check if validity test on BackOffice inputs are working
+     *
+     * @covers Thelia\Coupon\Rule\AvailableForTotalAmountManager::setValidators
+     * @expectedException \Thelia\Exception\InvalidRuleOperatorException
+     *
+     */
+    public function testInValidBackOfficeInputOperator2()
+    {
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue(399));
+        $stubAdapter->expects($this->any())
+            ->method('getCheckoutCurrency')
+            ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
+
+        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
+        $operators = array(
+            AvailableForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+            AvailableForTotalAmountManager::INPUT2 => Operators::INFERIOR
+        );
+        $values = array(
+            AvailableForTotalAmountManager::INPUT1 => '400',
+            AvailableForTotalAmountManager::INPUT2 => 'EUR');
+        $rule1->setValidatorsFromForm($operators, $values);
+
+        $isValid = $rule1->isMatching();
+
+        $expected = true;
+        $actual =$isValid;
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check if validity test on BackOffice inputs are working
+     *
+     * @covers Thelia\Coupon\Rule\AvailableForTotalAmountManager::setValidators
+     * @expectedException \Thelia\Exception\InvalidRuleValueException
+     *
+     */
+    public function testInValidBackOfficeInputValue()
+    {
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue(399));
+        $stubAdapter->expects($this->any())
+            ->method('getCheckoutCurrency')
+            ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
+
+        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
+        $operators = array(
+            AvailableForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+            AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            AvailableForTotalAmountManager::INPUT1 => 'X',
+            AvailableForTotalAmountManager::INPUT2 => 'EUR');
+        $rule1->setValidatorsFromForm($operators, $values);
+
+        $isValid = $rule1->isMatching();
+
+        $expected = true;
+        $actual =$isValid;
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check if validity test on BackOffice inputs are working
+     *
+     * @covers Thelia\Coupon\Rule\AvailableForTotalAmountManager::setValidators
+     * @expectedException \Thelia\Exception\InvalidRuleValueException
+     *
+     */
+    public function testInValidBackOfficeInputValue2()
+    {
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue(399));
+        $stubAdapter->expects($this->any())
+            ->method('getCheckoutCurrency')
+            ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
+
+        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
+        $operators = array(
+            AvailableForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+            AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            AvailableForTotalAmountManager::INPUT1 => 400,
+            AvailableForTotalAmountManager::INPUT2 => 'FLA');
+        $rule1->setValidatorsFromForm($operators, $values);
+
+        $isValid = $rule1->isMatching();
+
+        $expected = true;
+        $actual =$isValid;
+        $this->assertEquals($expected, $actual);
+    }
 
     /**
      * Check if test inferior operator is working
