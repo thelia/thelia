@@ -22,46 +22,64 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
-class AdminLogin extends BaseForm
+class CountryCreationForm extends BaseForm
 {
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("username", "text", array(
-                "constraints" => array(
-                    new NotBlank(),
-                    new Length(array("min" => 3))
-                ),
-                "label" => Translator::getInstance()->trans("Username *"),
-                "label_attr" => array(
-                    "for" => "username"
-                )
-            ))
-            ->add("password", "password", array(
+            ->add("title", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => Translator::getInstance()->trans("Password *"),
+                "label" => Translator::getInstance()->trans("Country title *"),
                 "label_attr" => array(
-                    "for" => "password"
+                    "for" => "title"
                 )
-            ))
-            ->add("remember_me", "checkbox", array(
-                    'value' => 'yes',                    
-                    "label" => Translator::getInstance()->trans("Remember me ?"),
-                    "label_attr" => array(
-                        "for" => "remember_me"
-                    )
-            ))
-            ;
+            ))            
+            ->add("area", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Country area *"),
+                "label_attr" => array(
+                    "for" => "area"
+                )
+            ))            
+            ->add("isocode", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("ISO Code *"),
+                "label_attr" => array(
+                    "for" => "isocode"
+                )
+            ))            
+            ->add("isoalpha2", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Alpha code 2 *"),
+                "label_attr" => array(
+                    "for" => "isoalpha2"
+                )
+            ))            
+            ->add("isoalpha3", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Alpha code 3 *"),
+                "label_attr" => array(
+                    "for" => "isoalpha3"
+                )
+            ))            
+        ;
     }
 
     public function getName()
     {
-        return "thelia_admin_login";
+        return "thelia_country_creation";
     }
 }

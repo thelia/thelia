@@ -344,6 +344,12 @@ final class TheliaEvents
     const TEMPLATE_UPDATE          = "action.updateTemplate";
     const TEMPLATE_DELETE          = "action.deleteTemplate";
 
+    const TEMPLATE_ADD_ATTRIBUTE    = "action.templateAddAttribute";
+    const TEMPLATE_DELETE_ATTRIBUTE = "action.templateDeleteAttribute";
+
+    const TEMPLATE_ADD_FEATURE    = "action.templateAddFeature";
+    const TEMPLATE_DELETE_FEATURE = "action.templateDeleteFeature";
+
     const BEFORE_CREATETEMPLATE = "action.before_createTemplate";
     const AFTER_CREATETEMPLATE  = "action.after_createTemplate";
 
