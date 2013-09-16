@@ -38,7 +38,7 @@ Installation
 $ git clone --recursive https://github.com/thelia/thelia.git
 $ cd thelia
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar install
+$ php composer.phar install --optimize-autoloader
 ```
 
 Finish the installation using cli tools :
