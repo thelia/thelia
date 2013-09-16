@@ -34,7 +34,7 @@ use Thelia\Core\Event\CurrencyUpdateEvent;
 use Thelia\Core\Event\CurrencyCreateEvent;
 use Thelia\Core\Event\CurrencyDeleteEvent;
 use Thelia\Model\ConfigQuery;
-use Thelia\Core\Event\CurrencyUpdatePositionEvent;
+use Thelia\Core\Event\UpdatePositionEvent;
 
 class Currency extends BaseAction implements EventSubscriberInterface
 {
@@ -164,19 +164,20 @@ class Currency extends BaseAction implements EventSubscriberInterface
      *
      * @param CategoryChangePositionEvent $event
      */
-    public function updatePosition(CurrencyUpdatePositionEvent $event)
+    public function updatePosition(UpdatePositionEvent $event)
     {
-        if (null !== $currency = CurrencyQuery::create()->findOneById($event->getObjectId())) {
+        if (null !== $currency = CurrencyQuery::create()->findPk($event->getObjectId())) {
 
             $currency->setDispatcher($this->getDispatcher());
 
             $mode = $event->getMode();
+            echo "loaded $mode !";
 
-            if ($mode == CurrencyUpdatePositionEvent::POSITION_ABSOLUTE)
+            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
                 return $currency->changeAbsolutePosition($event->getPosition());
-            else if ($mode == CurrencyUpdatePositionEvent::POSITION_UP)
+            else if ($mode == UpdatePositionEvent::POSITION_UP)
                 return $currency->movePositionUp();
-            else if ($mode == CurrencyUpdatePositionEvent::POSITION_DOWN)
+            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
                 return $currency->movePositionDown();
         }
     }

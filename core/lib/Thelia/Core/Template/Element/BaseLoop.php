@@ -129,6 +129,7 @@ abstract class BaseLoop
         $loopType = isset($nameValuePairs['type']) ? $nameValuePairs['type'] : "undefined";
         $loopName = isset($nameValuePairs['name']) ? $nameValuePairs['name'] : "undefined";
 
+        $this->args->rewind();
         while (($argument = $this->args->current()) !== false) {
             $this->args->next();
 

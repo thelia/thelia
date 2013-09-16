@@ -82,7 +82,7 @@
                                     }
 		                            </th>
 
-		                            <th>{intl l='Actions'}</th>
+		                            <th class="actions">{intl l='Actions'}</th>
 		                        </tr>
 		                    </thead>
 
@@ -327,7 +327,6 @@
 
     {* Adding a new Category *}
 
-
     {form name="thelia.admin.category.creation"}
 
         {* Capture the dialog body, to pass it to the generic dialog *}
@@ -366,6 +365,9 @@
 				    {/loop}
 				</div>
 			{/form_field}
+
+            {module_include location='category_create_form'}
+
 	    {/capture}
 
 		{include
@@ -389,6 +391,9 @@
     {capture "category_delete_dialog"}
         <input type="hidden" name="current_category_id" value="{$current_category_id}" />
         <input type="hidden" name="category_id" id="delete_category_id" value"" />
+
+        {module_include location='category_delete_form'}
+
     {/capture}
 
     {include

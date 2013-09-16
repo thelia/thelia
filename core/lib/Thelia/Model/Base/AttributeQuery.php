@@ -44,9 +44,9 @@ use Thelia\Model\Map\AttributeTableMap;
  * @method     ChildAttributeQuery rightJoinAttributeCombination($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeCombination relation
  * @method     ChildAttributeQuery innerJoinAttributeCombination($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeCombination relation
  *
- * @method     ChildAttributeQuery leftJoinAttributeCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the AttributeCategory relation
- * @method     ChildAttributeQuery rightJoinAttributeCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeCategory relation
- * @method     ChildAttributeQuery innerJoinAttributeCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeCategory relation
+ * @method     ChildAttributeQuery leftJoinAttributeTemplate($relationAlias = null) Adds a LEFT JOIN clause to the query using the AttributeTemplate relation
+ * @method     ChildAttributeQuery rightJoinAttributeTemplate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeTemplate relation
+ * @method     ChildAttributeQuery innerJoinAttributeTemplate($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeTemplate relation
  *
  * @method     ChildAttributeQuery leftJoinAttributeI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the AttributeI18n relation
  * @method     ChildAttributeQuery rightJoinAttributeI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeI18n relation
@@ -556,40 +556,40 @@ abstract class AttributeQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\AttributeCategory object
+     * Filter the query by a related \Thelia\Model\AttributeTemplate object
      *
-     * @param \Thelia\Model\AttributeCategory|ObjectCollection $attributeCategory  the related object to use as filter
+     * @param \Thelia\Model\AttributeTemplate|ObjectCollection $attributeTemplate  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAttributeQuery The current query, for fluid interface
      */
-    public function filterByAttributeCategory($attributeCategory, $comparison = null)
+    public function filterByAttributeTemplate($attributeTemplate, $comparison = null)
     {
-        if ($attributeCategory instanceof \Thelia\Model\AttributeCategory) {
+        if ($attributeTemplate instanceof \Thelia\Model\AttributeTemplate) {
             return $this
-                ->addUsingAlias(AttributeTableMap::ID, $attributeCategory->getAttributeId(), $comparison);
-        } elseif ($attributeCategory instanceof ObjectCollection) {
+                ->addUsingAlias(AttributeTableMap::ID, $attributeTemplate->getAttributeId(), $comparison);
+        } elseif ($attributeTemplate instanceof ObjectCollection) {
             return $this
-                ->useAttributeCategoryQuery()
-                ->filterByPrimaryKeys($attributeCategory->getPrimaryKeys())
+                ->useAttributeTemplateQuery()
+                ->filterByPrimaryKeys($attributeTemplate->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByAttributeCategory() only accepts arguments of type \Thelia\Model\AttributeCategory or Collection');
+            throw new PropelException('filterByAttributeTemplate() only accepts arguments of type \Thelia\Model\AttributeTemplate or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the AttributeCategory relation
+     * Adds a JOIN clause to the query using the AttributeTemplate relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAttributeQuery The current query, for fluid interface
      */
-    public function joinAttributeCategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinAttributeTemplate($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('AttributeCategory');
+        $relationMap = $tableMap->getRelation('AttributeTemplate');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -604,14 +604,14 @@ abstract class AttributeQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'AttributeCategory');
+            $this->addJoinObject($join, 'AttributeTemplate');
         }
 
         return $this;
     }
 
     /**
-     * Use the AttributeCategory relation AttributeCategory object
+     * Use the AttributeTemplate relation AttributeTemplate object
      *
      * @see useQuery()
      *
@@ -619,13 +619,13 @@ abstract class AttributeQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\AttributeCategoryQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\AttributeTemplateQuery A secondary query class using the current class as primary query
      */
-    public function useAttributeCategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useAttributeTemplateQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinAttributeCategory($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'AttributeCategory', '\Thelia\Model\AttributeCategoryQuery');
+            ->joinAttributeTemplate($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'AttributeTemplate', '\Thelia\Model\AttributeTemplateQuery');
     }
 
     /**
@@ -702,19 +702,19 @@ abstract class AttributeQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Category object
-     * using the attribute_category table as cross reference
+     * Filter the query by a related Template object
+     * using the attribute_template table as cross reference
      *
-     * @param Category $category the related object to use as filter
+     * @param Template $template the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAttributeQuery The current query, for fluid interface
      */
-    public function filterByCategory($category, $comparison = Criteria::EQUAL)
+    public function filterByTemplate($template, $comparison = Criteria::EQUAL)
     {
         return $this
-            ->useAttributeCategoryQuery()
-            ->filterByCategory($category, $comparison)
+            ->useAttributeTemplateQuery()
+            ->filterByTemplate($template, $comparison)
             ->endUse();
     }
 

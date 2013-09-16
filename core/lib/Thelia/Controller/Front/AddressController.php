@@ -23,11 +23,12 @@
 
 namespace Thelia\Controller\Front;
 use Thelia\Core\Event\AddressCreateOrUpdateEvent;
+use Thelia\Core\Event\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Model\Base\AddressQuery;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\Customer;
 use Thelia\Tools\URL;
 
@@ -40,6 +41,20 @@ class AddressController extends BaseFrontController
 {
 
     /**
+     * Controller for generate modal containing update form
+     * Check if request is a XmlHttpRequest and address owner is the current customer
+     * @param $address_id
+     */
+    public function generateModalAction($address_id)
+    {
+        $this->checkAuth();
+        $this->checkXmlHttpRequest();
+
+
+    }
+
+
+    /**
      * Create controller.
      * Check if customer is logged in
      *
@@ -47,9 +62,7 @@ class AddressController extends BaseFrontController
      */
     public function createAction()
     {
-        if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirect(URL::getInstance()->getIndexPage());
-        }
+        $this->checkAuth();
 
         $addressCreate = new AddressCreateForm($this->getRequest());
 
@@ -81,19 +94,27 @@ class AddressController extends BaseFrontController
         }
     }
 
-    public function updateAction()
+    public function updateViewAction($address_id)
     {
+        $this->checkAuth();
+
+        $customer = $this->getSecurityContext()->getCustomerUser();
+        $address = AddressQuery::create()->findPk($address_id);
+
+        if(!$address || $customer->getId() != $address->getCustomerId()) {
+            $this->redirectToRoute("home");
+        }
+
+        $this->getParserContext()->set("address_id", $address_id);
+    }
+
+    public function processUpdateAction($address_id)
+    {
+        $this->checkAuth();
         $request = $this->getRequest();
 
-        if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirectToRoute("home");
-        }
-
-        if (null === $address_id =  $request->get("address_id")) {
-            $this->redirectToRoute("home");
-        }
-
         $addressUpdate = new AddressUpdateForm($request);
+
 
         try {
             $customer = $this->getSecurityContext()->getCustomerUser();
@@ -121,7 +142,7 @@ class AddressController extends BaseFrontController
         } catch (\Exception $e) {
             $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
         }
-
+        $this->getParserContext()->set("address_id", $address_id);
         if ($message !== false) {
             \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during address creation process : %s", $message));
 
@@ -132,6 +153,22 @@ class AddressController extends BaseFrontController
                 ->setGeneralError($message)
             ;
         }
+    }
+
+    public function deleteAction($address_id)
+    {
+        $this->checkAuth();
+
+        $customer = $this->getSecurityContext()->getCustomerUser();
+        $address = AddressQuery::create()->findPk($address_id);
+
+        if(!$address || $customer->getId() != $address->getCustomerId()) {
+            $this->redirectToRoute("home");
+        }
+
+        $this->dispatch(TheliaEvents::ADDRESS_DELETE, new AddressEvent($address));
+
+        $this->redirectToRoute("customer.account.view");
     }
 
     protected function createAddressEvent($form)
@@ -149,7 +186,8 @@ class AddressController extends BaseFrontController
             $form->get("country")->getData(),
             $form->get("cellphone")->getData(),
             $form->get("phone")->getData(),
-            $form->get("company")->getData()
+            $form->get("company")->getData(),
+            $form->get("is_default")->getData()
         );
     }
 }

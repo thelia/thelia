@@ -36,6 +36,10 @@ abstract class BaseTaxType
 
     public abstract function calculate($untaxedPrice);
 
+    public abstract function pricePercentRetriever();
+
+    public abstract function fixAmountRetriever();
+
     public abstract function getRequirementsList();
 
     public function loadRequirements($requirementsValues)

@@ -112,17 +112,17 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Thelia\Exception\TaxEngineException
      * @expectedExceptionCode 503
      */
-    public function testGetTaxAmountBadTaxRulesCollection()
+    public function testGetTaxedPriceBadTaxRulesCollection()
     {
         $calculator = new Calculator();
-        $calculator->getTaxAmount(500);
+        $calculator->getTaxedPrice(500);
     }
 
     /**
      * @expectedException \Thelia\Exception\TaxEngineException
      * @expectedExceptionCode 601
      */
-    public function testGetTaxAmountBadAmount()
+    public function testGetTaxedPriceBadAmount()
     {
         $taxRulesCollection = new ObjectCollection();
 
@@ -131,24 +131,36 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
         $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
 
-        $calculator->getTaxAmount('foo');
+        $calculator->getTaxedPrice('foo');
     }
 
-    public function testGetTaxAmountAndGetTaxedPrice()
+    public function testGetTaxedPriceAndGetTaxAmountFromUntaxedPrice()
     {
         $taxRulesCollection = new ObjectCollection();
         $taxRulesCollection->setModel('\Thelia\Model\Tax');
 
         $tax = new Tax();
         $tax->setType('PricePercentTaxType')
-            ->setRequirements(array('percent' => 10));
-
+            ->setRequirements(array('percent' => 10))
+            ->setVirtualColumn('taxRuleCountryPosition', 1);
         $taxRulesCollection->append($tax);
 
         $tax = new Tax();
         $tax->setType('PricePercentTaxType')
-            ->setRequirements(array('percent' => 8));
+            ->setRequirements(array('percent' => 8))
+            ->setVirtualColumn('taxRuleCountryPosition', 1);
+        $taxRulesCollection->append($tax);
 
+        $tax = new Tax();
+        $tax->setType('FixAmountTaxType')
+            ->setRequirements(array('amount' => 5))
+            ->setVirtualColumn('taxRuleCountryPosition', 2);
+        $taxRulesCollection->append($tax);
+
+        $tax = new Tax();
+        $tax->setType('PricePercentTaxType')
+            ->setRequirements(array('percent' => 1))
+            ->setVirtualColumn('taxRuleCountryPosition', 3);
         $taxRulesCollection->append($tax);
 
         $calculator = new Calculator();
@@ -156,16 +168,65 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
         $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
 
-        $taxAmount = $calculator->getTaxAmount(500);
+        $taxAmount = $calculator->getTaxAmountFromUntaxedPrice(500);
         $taxedPrice = $calculator->getTaxedPrice(500);
 
         /*
          * expect :
-         *  tax 1 = 500*0.10 = 50 // amout with tax 1 : 550
-         *  tax 2 = 550*0.08 = 44 // amout with tax 2 : 594
-         * total tax amount = 94
+         *  tax 1 = 500*0.10 = 50 + 500*0.08 = 40 // amount with tax 1 : 590
+         *  tax 2 = 5 // amount with tax 2 : 595
+         *  tax 3 = 595 * 0.01 = 5.95 // amount with tax 3 : 600.95
+         * total tax amount = 100.95
          */
-        $this->assertEquals(94, $taxAmount);
-        $this->assertEquals(594, $taxedPrice);
+        $this->assertEquals(100.95, $taxAmount);
+        $this->assertEquals(600.95, $taxedPrice);
+    }
+
+    public function testGetUntaxedPriceAndGetTaxAmountFromTaxedPrice()
+    {
+        $taxRulesCollection = new ObjectCollection();
+        $taxRulesCollection->setModel('\Thelia\Model\Tax');
+
+        $tax = new Tax();
+        $tax->setType('PricePercentTaxType')
+            ->setRequirements(array('percent' => 10))
+            ->setVirtualColumn('taxRuleCountryPosition', 1);
+        $taxRulesCollection->append($tax);
+
+        $tax = new Tax();
+        $tax->setType('PricePercentTaxType')
+            ->setRequirements(array('percent' => 8))
+            ->setVirtualColumn('taxRuleCountryPosition', 1);
+        $taxRulesCollection->append($tax);
+
+        $tax = new Tax();
+        $tax->setType('FixAmountTaxType')
+            ->setRequirements(array('amount' => 5))
+            ->setVirtualColumn('taxRuleCountryPosition', 2);
+        $taxRulesCollection->append($tax);
+
+        $tax = new Tax();
+        $tax->setType('PricePercentTaxType')
+            ->setRequirements(array('percent' => 1))
+            ->setVirtualColumn('taxRuleCountryPosition', 3);
+        $taxRulesCollection->append($tax);
+
+        $calculator = new Calculator();
+
+        $rewritingUrlQuery = $this->getProperty('taxRulesCollection');
+        $rewritingUrlQuery->setValue($calculator, $taxRulesCollection);
+
+        $taxAmount = $calculator->getTaxAmountFromTaxedPrice(600.95);
+        $untaxedPrice = $calculator->getUntaxedPrice(600.95);
+
+        /*
+         * expect :
+         *  tax 3 = 600.95 - 600.95 / (1 + 0.01) = 5,95 // amount without tax 3 : 595
+         *  tax 2 = 5 // amount without tax 2 : 590
+         *  tax 1 = 590 - 590 / (1 + 0.08 + 0.10) = 90 // amount without tax 1 : 500
+         * total tax amount = 100.95
+         */
+        $this->assertEquals(100.95, $taxAmount);
+        $this->assertEquals(500, $untaxedPrice);
     }
 }

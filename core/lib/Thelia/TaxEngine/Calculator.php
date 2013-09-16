@@ -39,6 +39,9 @@ class Calculator
      */
     protected $taxRuleQuery = null;
 
+    /**
+     * @var null|\Propel\Runtime\Collection\ObjectCollection
+     */
     protected $taxRulesCollection = null;
 
     protected $product = null;
@@ -70,7 +73,17 @@ class Calculator
         return $this;
     }
 
-    public function getTaxAmount($untaxedPrice)
+    public function getTaxAmountFromUntaxedPrice($untaxedPrice)
+    {
+        return $this->getTaxedPrice($untaxedPrice) - $untaxedPrice;
+    }
+
+    public function getTaxAmountFromTaxedPrice($taxedPrice)
+    {
+        return $taxedPrice - $this->getUntaxedPrice($taxedPrice);
+    }
+
+    public function getTaxedPrice($untaxedPrice)
     {
         if(null === $this->taxRulesCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxAmount', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
@@ -80,23 +93,95 @@ class Calculator
             throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
         }
 
-        $totalTaxAmount = 0;
+        $taxedPrice = $untaxedPrice;
+        $currentPosition = 1;
+        $currentTax = 0;
+
         foreach($this->taxRulesCollection as $taxRule) {
+            $position = (int)$taxRule->getTaxRuleCountryPosition();
+
             $taxType = $taxRule->getTypeInstance();
+            $taxType->loadRequirements( $taxRule->getRequirements() );
 
-            $taxType->loadRequirements($taxRule->getRequirements());
+            if($currentPosition !== $position) {
+                $taxedPrice += $currentTax;
+                $currentTax = 0;
+                $currentPosition = $position;
+            }
 
-            $taxAmount = $taxType->calculate($untaxedPrice);
-
-            $totalTaxAmount += $taxAmount;
-            $untaxedPrice += $taxAmount;
+            $currentTax += $taxType->calculate($taxedPrice);
         }
 
-        return $totalTaxAmount;
+        $taxedPrice += $currentTax;
+
+        return $taxedPrice;
     }
 
-    public function getTaxedPrice($untaxedPrice)
+    public function getUntaxedPrice($taxedPrice)
     {
-        return $untaxedPrice + $this->getTaxAmount($untaxedPrice);
+        if(null === $this->taxRulesCollection) {
+            throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxAmount', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
+        }
+
+        if(false === filter_var($taxedPrice, FILTER_VALIDATE_FLOAT)) {
+            throw new TaxEngineException('BAD AMOUNT FORMAT', TaxEngineException::BAD_AMOUNT_FORMAT);
+        }
+
+        $taxRule = $this->taxRulesCollection->getLast();
+
+        $untaxedPrice = $taxedPrice;
+        $currentPosition = (int)$taxRule->getTaxRuleCountryPosition();
+        $currentFixTax = 0;
+        $currentTaxFactor = 0;
+
+        do {
+            $position = (int)$taxRule->getTaxRuleCountryPosition();
+
+            $taxType = $taxRule->getTypeInstance();
+            $taxType->loadRequirements( $taxRule->getRequirements() );
+
+            if($currentPosition !== $position) {
+                $untaxedPrice -= $currentFixTax;
+                $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);
+                $currentFixTax = 0;
+                $currentTaxFactor = 0;
+                $currentPosition = $position;
+            }
+
+            $currentFixTax += $taxType->fixAmountRetriever();
+            $currentTaxFactor += $taxType->pricePercentRetriever();
+
+
+        } while($taxRule = $this->taxRulesCollection->getPrevious());
+
+        $untaxedPrice -= $currentFixTax;
+        $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);
+
+        /*do {
+
+            $taxType = $taxRule->getTypeInstance();
+            $taxType->loadRequirements( $taxRule->getRequirements() );
+
+            $untaxedPrice -= $taxType->fixAmountRetriever();
+
+        } while($taxRule = $this->taxRulesCollection->getPrevious());
+
+        $taxRule = $this->taxRulesCollection->getLast();
+
+        $currentTaxFactor = 0;
+        do {
+
+            $taxType = $taxRule->getTypeInstance();
+            $taxType->loadRequirements( $taxRule->getRequirements() );
+
+            $currentTaxFactor += $taxType->pricePercentRetriever($untaxedPrice);
+
+            $toto = true;
+
+        } while($taxRule = $this->taxRulesCollection->getPrevious());
+
+        $untaxedPrice = $untaxedPrice / (1+$currentTaxFactor);*/
+
+        return $untaxedPrice;
     }
 }

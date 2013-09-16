@@ -24,11 +24,8 @@
 namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\MessageDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Tools\URL;
-use Thelia\Core\Event\MessageUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;use Thelia\Core\Event\MessageUpdateEvent;
 use Thelia\Core\Event\MessageCreateEvent;
-use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\MessageQuery;
 use Thelia\Form\MessageModificationForm;
 use Thelia\Form\MessageCreationForm;
@@ -38,217 +35,140 @@ use Thelia\Form\MessageCreationForm;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class MessageController extends BaseAdminController
+class MessageController extends AbstractCrudController
 {
-    /**
-     * Render the messages list
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    protected function renderList()
+    public function __construct()
+    {
+        parent::__construct(
+            'message',
+            null, // no sort order change
+            null, // no sort order change
+
+            'admin.configuration.messages.view',
+            'admin.configuration.messages.create',
+            'admin.configuration.messages.update',
+            'admin.configuration.messages.delete',
+
+            TheliaEvents::MESSAGE_CREATE,
+            TheliaEvents::MESSAGE_UPDATE,
+            TheliaEvents::MESSAGE_DELETE,
+            null, // No visibility toggle
+            null  // No position update
+        );
+    }
+
+    protected function getCreationForm()
+    {
+        return new MessageCreationForm($this->getRequest());
+    }
+
+    protected function getUpdateForm()
+    {
+        return new MessageModificationForm($this->getRequest());
+    }
+
+    protected function getCreationEvent($formData)
+    {
+        $createEvent = new MessageCreateEvent();
+
+        $createEvent
+            ->setMessageName($formData['name'])
+            ->setLocale($formData["locale"])
+            ->setTitle($formData['title'])
+            ->setSecured($formData['secured'])
+            ;
+
+        return $createEvent;
+    }
+
+    protected function getUpdateEvent($formData)
+    {
+        $changeEvent = new MessageUpdateEvent($formData['id']);
+
+        // Create and dispatch the change event
+        $changeEvent
+            ->setMessageName($formData['name'])
+            ->setSecured($formData['secured'])
+            ->setLocale($formData["locale"])
+            ->setTitle($formData['title'])
+            ->setSubject($formData['subject'])
+            ->setHtmlMessage($formData['html_message'])
+            ->setTextMessage($formData['text_message'])
+        ;
+
+        return $changeEvent;
+    }
+
+    protected function getDeleteEvent()
+    {
+        return new MessageDeleteEvent($this->getRequest()->get('message_id'));
+    }
+
+    protected function eventContainsObject($event)
+    {
+        return $event->hasMessage();
+    }
+
+    protected function hydrateObjectForm($object)
+    {
+        // Prepare the data that will hydrate the form
+        $data = array(
+            'id'           => $object->getId(),
+            'name'         => $object->getName(),
+            'secured'      => $object->getSecured(),
+            'locale'       => $object->getLocale(),
+            'title'        => $object->getTitle(),
+            'subject'      => $object->getSubject(),
+            'html_message' => $object->getHtmlMessage(),
+            'text_message' => $object->getTextMessage()
+        );
+
+        // Setup the object form
+        return new MessageModificationForm($this->getRequest(), "form", $data);
+    }
+
+    protected function getObjectFromEvent($event)
+    {
+        return $event->hasMessage() ? $event->getMessage() : null;
+    }
+
+    protected function getExistingObject()
+    {
+        return MessageQuery::create()
+        ->joinWithI18n($this->getCurrentEditionLocale())
+        ->findOneById($this->getRequest()->get('message_id'));
+    }
+
+    protected function getObjectLabel($object)
+    {
+        return $object->getName();
+    }
+
+    protected function getObjectId($object)
+    {
+        return $object->getId();
+    }
+
+    protected function renderListTemplate($currentOrder)
     {
         return $this->render('messages');
     }
 
-    /**
-     * The default action is displaying the messages list.
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    public function defaultAction()
+    protected function renderEditionTemplate()
     {
-        if (null !== $response = $this->checkAuth("admin.configuration.messages.view")) return $response;
-        return $this->renderList();
-    }
-
-    /**
-     * Create a new message object
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    public function createAction()
-    {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.messages.create")) return $response;
-
-        $message = false;
-
-        // Create the creation Form
-        $creationForm = new MessageCreationForm($this->getRequest());
-
-        try {
-
-            // Validate the form, create the MessageCreation event and dispatch it.
-            $form = $this->validateForm($creationForm, "POST");
-
-            $data = $form->getData();
-
-            $createEvent = new MessageCreateEvent();
-
-            $createEvent
-                ->setMessageName($data['name'])
-                ->setLocale($data["locale"])
-                ->setTitle($data['title'])
-                ->setSecured($data['secured'])
-                ;
-
-            $this->dispatch(TheliaEvents::MESSAGE_CREATE, $createEvent);
-
-            if (! $createEvent->hasMessage()) throw new \LogicException($this->getTranslator()->trans("No message was created."));
-
-            $createdObject = $createEvent->getMessage();
-
-            $this->adminLogAppend(sprintf("Message %s (ID %s) created", $createdObject->getName(), $createdObject->getId()));
-
-            // Substitute _ID_ in the URL with the ID of the created object
-            $successUrl = str_replace('_ID_', $createdObject->getId(), $creationForm->getSuccessUrl());
-
-            // Redirect to the success URL
-            $this->redirect($successUrl);
-        } catch (FormValidationException $ex) {
-            // Form cannot be validated
-            $message = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
-            // Any other error
-            $message = $ex->getMessage();
-        }
-
-        $this->setupFormErrorContext("message modification", $message, $creationForm, $ex);
-
-        // At this point, the form has error, and should be redisplayed.
-        return $this->render('messages');
-    }
-
-    /**
-     * Load a message object for modification, and display the edit template.
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    public function changeAction()
-    {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.messages.update")) return $response;
-
-        // Load the message object
-        $message = MessageQuery::create()
-                    ->joinWithI18n($this->getCurrentEditionLocale())
-                    ->findOneById($this->getRequest()->get('message_id'));
-
-        if ($message != null) {
-
-            // Prepare the data that will hydrate the form
-            $data = array(
-                'id'           => $message->getId(),
-                'name'         => $message->getName(),
-                'secured'      => $message->getSecured(),
-                'locale'       => $message->getLocale(),
-                'title'        => $message->getTitle(),
-                'subject'      => $message->getSubject(),
-                'html_message' => $message->getHtmlMessage(),
-                'text_message' => $message->getTextMessage()
-            );
-
-            // Setup the object form
-            $changeForm = new MessageModificationForm($this->getRequest(), "form", $data);
-
-            // Pass it to the parser
-            $this->getParserContext()->addForm($changeForm);
-        }
-
-        // Render the edition template.
         return $this->render('message-edit', array('message_id' => $this->getRequest()->get('message_id')));
     }
 
-    /**
-     * Save changes on a modified message object, and either go back to the message list, or stay on the edition page.
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    public function saveChangeAction()
+    protected function redirectToEditionTemplate()
     {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.messages.update")) return $response;
-
-        $message = false;
-
-        // Create the form from the request
-        $changeForm = new MessageModificationForm($this->getRequest());
-
-        // Get the message ID
-        $message_id = $this->getRequest()->get('message_id');
-
-        try {
-
-            // Check the form against constraints violations
-            $form = $this->validateForm($changeForm, "POST");
-
-            // Get the form field values
-            $data = $form->getData();
-
-            $changeEvent = new MessageUpdateEvent($data['id']);
-
-            // Create and dispatch the change event
-            $changeEvent
-                ->setMessageName($data['name'])
-                ->setSecured($data['secured'])
-                ->setLocale($data["locale"])
-                ->setTitle($data['title'])
-                ->setSubject($data['subject'])
-                ->setHtmlMessage($data['html_message'])
-                ->setTextMessage($data['text_message'])
-            ;
-
-            $this->dispatch(TheliaEvents::MESSAGE_UPDATE, $changeEvent);
-
-            if (! $changeEvent->hasMessage()) throw new \LogicException($this->getTranslator()->trans("No message was updated."));
-
-            $changedObject = $changeEvent->getMessage();
-
-            $this->adminLogAppend(sprintf("Variable %s (ID %s) modified", $changedObject->getName(), $changedObject->getId()));
-
-            // If we have to stay on the same page, do not redirect to the succesUrl,
-            // just redirect to the edit page again.
-            if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirectToRoute(
-                        "admin.configuration.messages.update",
-                        array('message_id' => $message_id)
-                );
-            }
-
-            // Redirect to the success URL
-            $this->redirect($changeForm->getSuccessUrl());
-        } catch (FormValidationException $ex) {
-            // Form cannot be validated
-            $message = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
-            // Any other error
-            $message = $ex->getMessage();
-        }
-
-        $this->setupFormErrorContext("message modification", $message, $changeForm, $ex);
-
-        // At this point, the form has errors, and should be redisplayed.
-        return $this->render('message-edit', array('message_id' => $message_id));
+        $this->redirectToRoute(
+                "admin.configuration.messages.update",
+                array('message_id' => $this->getRequest()->get('message_id'))
+        );
     }
 
-    /**
-     * Delete a message object
-     *
-     * @return Symfony\Component\HttpFoundation\Response the response
-     */
-    public function deleteAction()
+    protected function redirectToListTemplate()
     {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.messages.delete")) return $response;
-
-        // Get the message id, and dispatch the delet request
-        $event = new MessageDeleteEvent($this->getRequest()->get('message_id'));
-
-        $this->dispatch(TheliaEvents::MESSAGE_DELETE, $event);
-
-        if ($event->hasMessage())
-            $this->adminLogAppend(sprintf("Message %s (ID %s) modified", $event->getMessage()->getName(), $event->getMessage()->getId()));
-
         $this->redirectToRoute('admin.configuration.messages.default');
     }
 }

@@ -37,6 +37,16 @@ class featureSlicePercentTaxType extends  BaseTaxType
 
     }
 
+    public function pricePercentRetriever()
+    {
+
+    }
+
+    public function fixAmountRetriever()
+    {
+
+    }
+
     public function getRequirementsList()
     {
         return array(

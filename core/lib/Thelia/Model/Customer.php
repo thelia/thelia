@@ -54,7 +54,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @param int $discount
      * @throws \Exception|\Symfony\Component\Config\Definition\Exception\Exception
      */
-    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email = null, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0)
+    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email = null, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0, $company = null)
     {
         $this
         	->setTitleId($titleId)
@@ -79,6 +79,7 @@ class Customer extends BaseCustomer implements UserInterface
                 $address = new Address();
 
                 $address
+                    ->setCompany($company)
                     ->setTitleId($titleId)
                     ->setFirstname($firstname)
                     ->setLastname($lastname)
@@ -88,6 +89,7 @@ class Customer extends BaseCustomer implements UserInterface
                     ->setPhone($phone)
                     ->setCellphone($cellphone)
                     ->setZipcode($zipcode)
+                    ->setCity($city)
                     ->setCountryId($countryId)
                     ->setIsDefault(1)
                     ;
@@ -98,6 +100,7 @@ class Customer extends BaseCustomer implements UserInterface
                 $address = $this->getDefaultAddress();
 
                 $address
+                    ->setCompany($company)
                     ->setTitleId($titleId)
                     ->setFirstname($firstname)
                     ->setLastname($lastname)
@@ -107,6 +110,7 @@ class Customer extends BaseCustomer implements UserInterface
                     ->setPhone($phone)
                     ->setCellphone($cellphone)
                     ->setZipcode($zipcode)
+                    ->setCity($city)
                     ->setCountryId($countryId)
                     ->save($con)
                 ;
@@ -204,8 +208,39 @@ class Customer extends BaseCustomer implements UserInterface
     /**
      * {@inheritDoc}
      */
+    public function getToken() {
+        return $this->getRememberMeToken();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setToken($token) {
+        $this->setRememberMeToken($token)->save();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSerial() {
+        return $this->getRememberMeSerial();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setSerial($serial) {
+        $this->setRememberMeSerial($serial)->save();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function preInsert(ConnectionInterface $con = null)
     {
+        // Set the serial number (for auto-login)
+        $this->setRememberMeSerial(uniqid());
+
         $this->setRef($this->generateRef());
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, new CustomerEvent($this));
@@ -242,7 +277,7 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function preDelete(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONFIG, new CustomerEvent($this));
+        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECUSTOMER, new CustomerEvent($this));
         return true;
     }
 
@@ -251,6 +286,6 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETECONFIG, new CustomerEvent($this));
+        $this->dispatchEvent(TheliaEvents::AFTER_DELETECUSTOMER, new CustomerEvent($this));
     }
 }

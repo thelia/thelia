@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -21,28 +21,37 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Security\Authentication;
 
-class BaseToggleVisibilityEvent  extends ActionEvent
+use Thelia\Core\Security\Authentication\AuthenticatorInterface;
+use Thelia\Core\Security\UserProvider\UserProviderInterface;
+use Thelia\Core\Security\UserProvider\TokenUserProvider;
+use Thelia\Core\Security\Exception\TokenAuthenticationException;
+
+class TokenAuthenticator implements AuthenticatorInterface
 {
-    protected $object_id;
+    protected $key;
 
-    protected $object;
+    protected $userProvider;
 
-    public function __construct($object_id)
+    public function __construct($key, TokenUserProvider $userProvider)
     {
-        $this->object_id = $object_id;
+        $this->key = $key;
+
+        $this->userProvider = $userProvider;
     }
 
-    public function getObjectId()
+    /**
+     * @see \Thelia\Core\Security\Authentication\AuthenticatorInterface::getAuthentifiedUser()
+     */
+    public function getAuthentifiedUser()
     {
-        return $this->object_id;
-    }
+        $keyData = $this->userProvider->decodeKey($this->key);
 
-    public function setObjectId($object_id)
-    {
-        $this->object_id = $object_id;
+        $user = $this->userProvider->getUser($keyData);
 
-        return $this;
+        if ($user === null) throw new TokenAuthenticationException("No user matches the provided token");
+
+        return $user;
     }
 }

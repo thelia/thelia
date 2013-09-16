@@ -168,9 +168,9 @@ class FeatureTableMap extends TableMap
     {
         $this->addRelation('FeatureAv', '\\Thelia\\Model\\FeatureAv', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT', 'FeatureAvs');
         $this->addRelation('FeatureProduct', '\\Thelia\\Model\\FeatureProduct', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT', 'FeatureProducts');
-        $this->addRelation('FeatureCategory', '\\Thelia\\Model\\FeatureCategory', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT', 'FeatureCategories');
+        $this->addRelation('FeatureTemplate', '\\Thelia\\Model\\FeatureTemplate', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT', 'FeatureTemplates');
         $this->addRelation('FeatureI18n', '\\Thelia\\Model\\FeatureI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'FeatureI18ns');
-        $this->addRelation('Category', '\\Thelia\\Model\\Category', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Categories');
+        $this->addRelation('Template', '\\Thelia\\Model\\Template', RelationMap::MANY_TO_MANY, array(), null, null, 'Templates');
     } // buildRelations()
 
     /**
@@ -195,7 +195,7 @@ class FeatureTableMap extends TableMap
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 FeatureAvTableMap::clearInstancePool();
                 FeatureProductTableMap::clearInstancePool();
-                FeatureCategoryTableMap::clearInstancePool();
+                FeatureTemplateTableMap::clearInstancePool();
                 FeatureI18nTableMap::clearInstancePool();
             }
 

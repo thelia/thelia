@@ -140,6 +140,10 @@ class URL
 
         if (! is_null($parameters)) {
             foreach ($parameters as $name => $value) {
+
+                // Remove this parameter from base URL to prevent duplicate parameters
+                $base = preg_replace('/([?&])'.$name.'=([^&])*(&|$)/', '$1', $base);
+
                 $queryString .= sprintf("%s=%s&", urlencode($name), urlencode($value));
             }
         }
@@ -232,10 +236,10 @@ class URL
 
              $this->retriever->loadSpecificUrl($view, $viewLocale, $viewId, $allOtherParameters);
          } else {
-             $allParametersWithoutView = $viewOtherParameters;
-             $allParametersWithoutView['locale'] = $viewLocale;
-             if (null !== $viewId) {
-                 $allParametersWithoutView[$view . '_id'] = $viewId;
+             $allParametersWithoutView = $request->query->all();
+             $view = $request->attributes->get('_view');
+             if(isset($allOtherParameters['view'])) {
+                 unset($allOtherParameters['view']);
              }
              $this->retriever->rewrittenUrl = null;
              $this->retriever->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);

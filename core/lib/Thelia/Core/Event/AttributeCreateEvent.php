@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,12 +17,52 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
 
-class CategoryToggleVisibilityEvent extends BaseToggleVisibilityEvent
+class AttributeCreateEvent extends AttributeEvent
 {
+    protected $title;
+    protected $locale;
+    protected $add_to_all_templates;
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getAddToAllTemplates()
+    {
+        return $this->add_to_all_templates;
+    }
+
+    public function setAddToAllTemplates($add_to_all_templates)
+    {
+        $this->add_to_all_templates = $add_to_all_templates;
+
+        return $this;
+    }
+
 }

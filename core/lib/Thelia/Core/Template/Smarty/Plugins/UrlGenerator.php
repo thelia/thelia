@@ -54,6 +54,7 @@ class UrlGenerator extends AbstractSmartyPlugin
         $url = URL::getInstance()->absoluteUrl($path, $this->getArgsFromParam($params, array('path', 'target')));
 
         if ($target != null) $url .= '#'.$target;
+
         return $url;
      }
 

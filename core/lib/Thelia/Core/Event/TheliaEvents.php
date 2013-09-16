@@ -72,6 +72,11 @@ final class TheliaEvents
     const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
 
     /**
+     * sent on customer removal
+     */
+    const CUSTOMER_DELETEACCOUNT = "action.deleteCustomer";
+
+    /**
      * sent when a customer need a new password
      */
     const LOST_PASSWORD = "action.lostPassword";
@@ -103,6 +108,16 @@ final class TheliaEvents
      */
     const AFTER_UPDATECUSTOMER 	= "action.after_updateCustomer";
 
+    /**
+     * sent just before customer removal
+     */
+    const BEFORE_DELETECUSTOMER = "action.before_updateCustomer";
+
+    /**
+     * sent just after customer removal
+     */
+    const AFTER_DELETECUSTOMER = "action.after_deleteCustomer";
+
     // -- ADDRESS MANAGEMENT ---------------------------------------------------------
     /**
      * sent for address creation
@@ -113,6 +128,11 @@ final class TheliaEvents
      * sent for address creation
      */
     const ADDRESS_UPDATE = "action.updateAddress";
+
+    /**
+     * sent on address removal
+     */
+    const ADDRESS_DELETE = "action.deleteAddress";
 
     const BEFORE_CREATEADDRESS = "action.before_createAddress";
     const AFTER_CREATEADDRESS  = "action.after_createAddress";
@@ -347,5 +367,53 @@ final class TheliaEvents
     const BEFORE_DELETECURRENCY = "action.before_deleteCurrency";
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
 
+    // -- Product templates management -----------------------------------------
 
+    const TEMPLATE_CREATE          = "action.createTemplate";
+    const TEMPLATE_UPDATE          = "action.updateTemplate";
+    const TEMPLATE_DELETE          = "action.deleteTemplate";
+
+    const BEFORE_CREATETEMPLATE = "action.before_createTemplate";
+    const AFTER_CREATETEMPLATE  = "action.after_createTemplate";
+
+    const BEFORE_UPDATETEMPLATE = "action.before_updateTemplate";
+    const AFTER_UPDATETEMPLATE  = "action.after_updateTemplate";
+
+    const BEFORE_DELETETEMPLATE = "action.before_deleteTemplate";
+    const AFTER_DELETETEMPLATE  = "action.after_deleteTemplate";
+
+    // -- Attributes management ---------------------------------------------
+
+    const ATTRIBUTE_CREATE          = "action.createAttribute";
+    const ATTRIBUTE_UPDATE          = "action.updateAttribute";
+    const ATTRIBUTE_DELETE          = "action.deleteAttribute";
+    const ATTRIBUTE_UPDATE_POSITION = "action.updateAttributePosition";
+
+    const ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES = "action.addAttributeToAllTemplate";
+    const ATTRIBUTE_ADD_TO_ALL_TEMPLATES      = "action.removeAttributeFromAllTemplate";
+
+    const BEFORE_CREATEATTRIBUTE = "action.before_createAttribute";
+    const AFTER_CREATEATTRIBUTE  = "action.after_createAttribute";
+
+    const BEFORE_UPDATEATTRIBUTE = "action.before_updateAttribute";
+    const AFTER_UPDATEATTRIBUTE  = "action.after_updateAttribute";
+
+    const BEFORE_DELETEATTRIBUTE = "action.before_deleteAttribute";
+    const AFTER_DELETEATTRIBUTE  = "action.after_deleteAttribute";
+
+    // -- Attributes values management ----------------------------------------
+
+    const ATTRIBUTE_AV_CREATE          = "action.createAttributeAv";
+    const ATTRIBUTE_AV_UPDATE          = "action.updateAttributeAv";
+    const ATTRIBUTE_AV_DELETE          = "action.deleteAttributeAv";
+    const ATTRIBUTE_AV_UPDATE_POSITION = "action.updateAttributeAvPosition";
+
+    const BEFORE_CREATEATTRIBUTE_AV = "action.before_createAttributeAv";
+    const AFTER_CREATEATTRIBUTE_AV  = "action.after_createAttributeAv";
+
+    const BEFORE_UPDATEATTRIBUTE_AV = "action.before_updateAttributeAv";
+    const AFTER_UPDATEATTRIBUTE_AV  = "action.after_updateAttributeAv";
+
+    const BEFORE_DELETEATTRIBUTE_AV = "action.before_deleteAttributeAv";
+    const AFTER_DELETEATTRIBUTE_AV  = "action.after_deleteAttributeAv";
 }

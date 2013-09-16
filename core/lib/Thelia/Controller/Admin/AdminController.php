@@ -23,6 +23,10 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
+use Thelia\Model\ConfigQuery;
+use Thelia\Core\Security\Exception\TokenAuthenticationException;
+
 class AdminController extends BaseAdminController
 {
     public function indexAction()

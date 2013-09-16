@@ -144,9 +144,9 @@
                         </li>
                         {/loop}
 
-                        {loop name="menu-auth-discount" type="auth" roles="ADMIN" permissions="admin.discount.view"}
-                        <li class="{if $admin_current_location == 'discount'}active{/if}" id="discount_menu">
-                            <a href="{url path='/admin/discount'}">{intl l="Discount"}</a>
+                        {loop name="menu-auth-coupon" type="auth" roles="ADMIN" permissions="admin.coupon.view"}
+                        <li class="{if $admin_current_location == 'coupon'}active{/if}" id="coupon_menu">
+                            <a href="{url path='/admin/coupon-list'}">{intl l="Coupons"}</a>
                         </li>
                         {/loop}
 
@@ -224,17 +224,18 @@
 	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 
     {debugbar_renderjs}
-
+    {debugbar_renderresult}
 
 	{block name="after-javascript-include"}{/block}
+
+    {javascripts file='assets/js/bootstrap/bootstrap.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
     {block name="javascript-initialization"}{/block}
 
 	{* Modules scripts are included now *}
 	{module_include location='footer_js'}
 
-    {javascripts file='assets/js/bootstrap/bootstrap.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
 </body>
 </html>

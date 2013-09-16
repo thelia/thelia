@@ -156,6 +156,45 @@ try {
         "azerty"
     );
 
+    for($i = 0; $i < 50; $i++) {
+        $customer = new Thelia\Model\Customer();
+        $customer->createOrUpdate(
+            rand(1,3),
+            $faker->firstname,
+            $faker->lastname,
+            $faker->streetAddress,
+            $faker->streetAddress,
+            $faker->streetAddress,
+            $faker->phoneNumber,
+            $faker->phoneNumber,
+            $faker->postcode,
+            $faker->city,
+            64,
+            $faker->email,
+            "azerty".$i
+        );
+
+        for ($j = 0; $j <= 3; $j++) {
+            $address = new Thelia\Model\Address();
+            $address->setLabel($faker->text(20))
+                ->setTitleId(rand(1,3))
+                ->setFirstname($faker->firstname)
+                ->setLastname($faker->lastname)
+                ->setAddress1($faker->streetAddress)
+                ->setAddress2($faker->streetAddress)
+                ->setAddress3($faker->streetAddress)
+                ->setCellphone($faker->phoneNumber)
+                ->setPhone($faker->phoneNumber)
+                ->setZipcode($faker->postcode)
+                ->setCity($faker->city)
+                ->setCountryId(64)
+                ->setCustomer($customer)
+                ->save()
+            ;
+
+        }
+    }
+
     //features and features_av
     $featureList = array();
     for($i=0; $i<4; $i++) {
@@ -199,6 +238,28 @@ try {
             $attributeAv->save();
             $attributeList[$attributeId][] = $attributeAv->getId();
         }
+    }
+
+    $template = new Thelia\Model\Template();
+    setI18n($faker, $template, array("Name" => 20));
+    $template->save();
+
+    foreach($attributeList as $attributeId => $attributeAvId) {
+        $at = new Thelia\Model\AttributeTemplate();
+
+        $at
+            ->setTemplate($template)
+            ->setAttributeId($attributeId)
+            ->save();
+    }
+
+    foreach($featureList as $featureId => $featureAvId) {
+        $ft = new Thelia\Model\FeatureTemplate();
+
+        $ft
+        ->setTemplate($template)
+        ->setFeatureId($featureId)
+        ->save();
     }
 
     //folders and contents
@@ -257,12 +318,12 @@ try {
             $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList, $contentIdList);
 
             for($k=0; $k<rand(0, 5); $k++) {
-                createProduct($faker, $subcategory, $k, $productIdList);
+                createProduct($faker, $subcategory, $k, $template, $productIdList);
             }
         }
 
         for($k=1; $k<rand(1, 6); $k++) {
-            createProduct($faker, $category, $k, $productIdList);
+            createProduct($faker, $category, $k, $template, $productIdList);
         }
     }
 
@@ -319,6 +380,7 @@ try {
         for($i=0; $i<rand(1,7); $i++) {
             $stock = new \Thelia\Model\ProductSaleElements();
             $stock->setProductId($productId);
+            $stock->setRef($productId . '_' . $i . '_' . $faker->randomNumber(8));
             $stock->setQuantity($faker->randomNumber(1,50));
             $stock->setPromo($faker->randomNumber(0,1));
             $stock->setNewness($faker->randomNumber(0,1));
@@ -376,7 +438,7 @@ try {
     $con->rollBack();
 }
 
-function createProduct($faker, $category, $position, &$productIdList)
+function createProduct($faker, $category, $position, $template, &$productIdList)
 {
     $product = new Thelia\Model\Product();
     $product->setRef($category->getId() . '_' . $position . '_' . $faker->randomNumber(8));
@@ -384,6 +446,8 @@ function createProduct($faker, $category, $position, &$productIdList)
     $product->setVisible(rand(1, 10)>7 ? 0 : 1);
     $product->setPosition($position);
     $product->setTaxRuleId(1);
+    $product->setTemplate($template);
+
     setI18n($faker, $product);
 
     $product->save();
@@ -481,18 +545,18 @@ function generate_image($image, $position, $typeobj, $id) {
     $image->save($image_file);
 }
 
-function setI18n($faker, &$object)
+function setI18n($faker, &$object, $fields = array('Title' => 20, 'Description' => 50) )
 {
-    $localeList = array('fr_FR', 'en_EN');
-
-    $title = $faker->text(20);
-    $description = $faker->text(50);
+    $localeList = $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
 
     foreach($localeList as $locale) {
         $object->setLocale($locale);
 
-        $object->setTitle($locale . ' : ' . $title);
-        $object->setDescription($locale . ' : ' . $description);
+        foreach($fields as $name => $length) {
+            $func = "set".ucfirst(strtolower($name));
+
+            $object->$func($locale . ' : ' . $faker->text($length));
+        }
     }
 }
 /**

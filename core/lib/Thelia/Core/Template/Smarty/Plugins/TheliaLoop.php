@@ -67,12 +67,12 @@ class TheliaLoop extends AbstractSmartyPlugin
      *
      * @return \PropelModelPager
      */
-    public static function getPagination($loopId)
+    public static function getPagination($loopName)
     {
-        if (!empty(self::$pagination[$loopId])) {
-            return self::$pagination[$loopId];
+        if (array_key_exists($loopName, self::$pagination)) {
+            return self::$pagination[$loopName];
         } else {
-            return null;
+            throw new \InvalidArgumentException("Loop $loopName  is not defined");
         }
     }
 
@@ -242,16 +242,10 @@ class TheliaLoop extends AbstractSmartyPlugin
         if (null == $loopName)
             throw new \InvalidArgumentException("Missing 'rel' parameter in page loop");
 
-        // Find loop results in the current template vars
-        /* $loopResults = $template->getTemplateVars($loopName);
-        if (empty($loopResults)) {
-            throw new \InvalidArgumentException("Loop $loopName is not defined.");
-        }*/
-
         // Find pagination
         $pagination = self::getPagination($loopName);
-        if ($pagination === null) {
-            throw new \InvalidArgumentException("Loop $loopName  is not defined");
+        if ($pagination === null) { // loop gas no result
+            return '';
         }
 
         if ($pagination->getNbResults() == 0) {

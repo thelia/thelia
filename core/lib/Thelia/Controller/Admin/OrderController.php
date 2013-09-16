@@ -36,4 +36,12 @@ class OrderController extends BaseAdminController
         return $this->render("orders", array("display_order" => 20));
     }
 
+    public function viewAction($order_id)
+    {
+
+    	return $this->render("order-edit", array(
+    		"order_id" => $order_id
+    	));
+    }
+
 }

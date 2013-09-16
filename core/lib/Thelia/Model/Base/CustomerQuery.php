@@ -33,6 +33,8 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomerQuery orderByLang($order = Criteria::ASC) Order by the lang column
  * @method     ChildCustomerQuery orderBySponsor($order = Criteria::ASC) Order by the sponsor column
  * @method     ChildCustomerQuery orderByDiscount($order = Criteria::ASC) Order by the discount column
+ * @method     ChildCustomerQuery orderByRememberMeToken($order = Criteria::ASC) Order by the remember_me_token column
+ * @method     ChildCustomerQuery orderByRememberMeSerial($order = Criteria::ASC) Order by the remember_me_serial column
  * @method     ChildCustomerQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCustomerQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -48,6 +50,8 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomerQuery groupByLang() Group by the lang column
  * @method     ChildCustomerQuery groupBySponsor() Group by the sponsor column
  * @method     ChildCustomerQuery groupByDiscount() Group by the discount column
+ * @method     ChildCustomerQuery groupByRememberMeToken() Group by the remember_me_token column
+ * @method     ChildCustomerQuery groupByRememberMeSerial() Group by the remember_me_serial column
  * @method     ChildCustomerQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCustomerQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -86,6 +90,8 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomer findOneByLang(string $lang) Return the first ChildCustomer filtered by the lang column
  * @method     ChildCustomer findOneBySponsor(string $sponsor) Return the first ChildCustomer filtered by the sponsor column
  * @method     ChildCustomer findOneByDiscount(double $discount) Return the first ChildCustomer filtered by the discount column
+ * @method     ChildCustomer findOneByRememberMeToken(string $remember_me_token) Return the first ChildCustomer filtered by the remember_me_token column
+ * @method     ChildCustomer findOneByRememberMeSerial(string $remember_me_serial) Return the first ChildCustomer filtered by the remember_me_serial column
  * @method     ChildCustomer findOneByCreatedAt(string $created_at) Return the first ChildCustomer filtered by the created_at column
  * @method     ChildCustomer findOneByUpdatedAt(string $updated_at) Return the first ChildCustomer filtered by the updated_at column
  *
@@ -101,6 +107,8 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     array findByLang(string $lang) Return ChildCustomer objects filtered by the lang column
  * @method     array findBySponsor(string $sponsor) Return ChildCustomer objects filtered by the sponsor column
  * @method     array findByDiscount(double $discount) Return ChildCustomer objects filtered by the discount column
+ * @method     array findByRememberMeToken(string $remember_me_token) Return ChildCustomer objects filtered by the remember_me_token column
+ * @method     array findByRememberMeSerial(string $remember_me_serial) Return ChildCustomer objects filtered by the remember_me_serial column
  * @method     array findByCreatedAt(string $created_at) Return ChildCustomer objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCustomer objects filtered by the updated_at column
  *
@@ -191,7 +199,7 @@ abstract class CustomerQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, REF, TITLE_ID, FIRSTNAME, LASTNAME, EMAIL, PASSWORD, ALGO, RESELLER, LANG, SPONSOR, DISCOUNT, CREATED_AT, UPDATED_AT FROM customer WHERE ID = :p0';
+        $sql = 'SELECT ID, REF, TITLE_ID, FIRSTNAME, LASTNAME, EMAIL, PASSWORD, ALGO, RESELLER, LANG, SPONSOR, DISCOUNT, REMEMBER_ME_TOKEN, REMEMBER_ME_SERIAL, CREATED_AT, UPDATED_AT FROM customer WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -676,6 +684,64 @@ abstract class CustomerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerTableMap::DISCOUNT, $discount, $comparison);
+    }
+
+    /**
+     * Filter the query on the remember_me_token column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByRememberMeToken('fooValue');   // WHERE remember_me_token = 'fooValue'
+     * $query->filterByRememberMeToken('%fooValue%'); // WHERE remember_me_token LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $rememberMeToken The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByRememberMeToken($rememberMeToken = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($rememberMeToken)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $rememberMeToken)) {
+                $rememberMeToken = str_replace('*', '%', $rememberMeToken);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerTableMap::REMEMBER_ME_TOKEN, $rememberMeToken, $comparison);
+    }
+
+    /**
+     * Filter the query on the remember_me_serial column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByRememberMeSerial('fooValue');   // WHERE remember_me_serial = 'fooValue'
+     * $query->filterByRememberMeSerial('%fooValue%'); // WHERE remember_me_serial LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $rememberMeSerial The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByRememberMeSerial($rememberMeSerial = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($rememberMeSerial)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $rememberMeSerial)) {
+                $rememberMeSerial = str_replace('*', '%', $rememberMeSerial);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerTableMap::REMEMBER_ME_SERIAL, $rememberMeSerial, $comparison);
     }
 
     /**

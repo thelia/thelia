@@ -40,13 +40,13 @@ class Tax extends BaseTax
 
         /* test type */
         if(!class_exists($class)) {
-            throw new TaxEngineException('Recorded type does not exists', TaxEngineException::BAD_RECORDED_TYPE);
+            throw new TaxEngineException('Recorded type `' . $class . '` does not exists', TaxEngineException::BAD_RECORDED_TYPE);
         }
 
         $instance = new $class;
 
         if(!$instance instanceof BaseTaxType) {
-            throw new TaxEngineException('Recorded type does not extends BaseTaxType', TaxEngineException::BAD_RECORDED_TYPE);
+            throw new TaxEngineException('Recorded type `' . $class . '` does not extends BaseTaxType', TaxEngineException::BAD_RECORDED_TYPE);
         }
 
         return $instance;
@@ -54,7 +54,7 @@ class Tax extends BaseTax
 
     public function setRequirements($requirements)
     {
-        parent::setSerializedRequirements(base64_encode(json_encode($requirements)));
+        return parent::setSerializedRequirements(base64_encode(json_encode($requirements)));
     }
 
     public function getRequirements()

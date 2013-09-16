@@ -11,9 +11,9 @@
 
     <div class="customer">
         <div id="wrapper" class="container">
-            
+
             <ul class="breadcrumb">
-                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>                    
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                 <li><a href="{url path='/admin/customers'}">{intl l="Customers"}</a></li>
             </ul>
 
@@ -58,7 +58,7 @@
 
                                     <th>{intl l='order amount'}</th>
 
-                                    <th>{intl l='Actions'}</th>
+                                    <th class="actions">{intl l='Actions'}</th>
                                 </tr>
                                 </thead>
 
@@ -102,6 +102,39 @@
                                     </tr>
                                 {/loop}
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="6">
+                                            
+                                            <div class="text-center">
+                                                <ul class="pagination pagination-centered">
+                                                    {if $customer_page != 1}
+                                                        <li><a href="{url path="/admin/customers" page="1"}">&laquo;</a></li>
+                                                    {else}
+                                                        <li class="disabled"><a href="#">&laquo;</a></li>
+                                                    {/if}
+
+                                                {pageloop rel="customer_list"}
+                                                    {if $PAGE != $CURRENT}
+                                                        <li><a href="{url path="/admin/customers" page="{$PAGE}"}">{$PAGE}</a></li>
+
+                                                    {else}
+                                                        <li class="active"><a href="#">{$PAGE}</a></li>
+                                                    {/if}
+
+
+                                                {/pageloop}
+                                                    {if $PAGE == $LAST && $LAST != $CURRENT}
+                                                        <li><a href="{url path="/admin/customers" page="$PAGE"}">&raquo;</a></li>
+                                                    {else}
+                                                        <li class="disabled"><a href="#">&raquo;</a></li>
+                                                    {/if}
+                                                </ul>
+                                            </div>
+                                            
+                                        </td>
+                                    </tr>
+                                </tfoot>
                             {/ifloop}
                         </table>
                     </div>
@@ -110,34 +143,6 @@
 
 
     {module_include location='customer_bottom'}
-    <div class="row">
-        <div class="col-md-12 text-center">
-
-            <ul class="pagination pagination-centered">
-                {if $customer_page != 1}
-                    <li><a href="{url path="/admin/customers" page="1"}">&laquo;</a></li>
-                {else}
-                    <li class="disabled"><a href="#">&laquo;</a></li>
-                {/if}
-
-            {pageloop rel="customer_list"}
-                {if $PAGE != $CURRENT}
-                    <li><a href="{url path="/admin/customers" page="{$PAGE}"}">{$PAGE}</a></li>
-
-                {else}
-                    <li class="active"><a href="#">{$PAGE}</a></li>
-                {/if}
-
-                {if $PAGE == $LAST && $LAST != $CURRENT}
-                    <li><a href="{url path="/admin/customers" page="$PAGE"}">&raquo;</a></li>
-                {else}
-                    <li class="disabled"><a href="#">&raquo;</a></li>
-                {/if}
-            {/pageloop}
-            </ul>
-
-        </div>
-    </div>
 
     {* Adding a new Category *}
 
@@ -153,23 +158,23 @@
                {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
                <input type="hidden" name="{$name}" value="{url path='/admin/customer/update/_ID_'}" />
             {/form_field}
-            
+
             {form_field form=$form field='company'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Company'}">
                 </div>
             {/form_field}
-            
-            {form_field form=$form field='title'}                
+
+            {form_field form=$form field='title'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                    
+
                     <select name="{$name}" id="{$label_attr.for}" class="form-control">
                         {loop type="title" name="title1"}
                             <option value="{$ID}">{$LONG}</option>
                         {/loop}
-                    </select>                    
+                    </select>
                 </div>
             {/form_field}
 
@@ -190,13 +195,13 @@
             {form_field form=$form field='address1'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Address'}">                    
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Address'}">
                 </div>
 
                 <div class="form-group">
                     {form_field form=$form field='address2'}
                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Additional address'}">
-                    {/form_field}                    
+                    {/form_field}
                 </div>
 
                 <div class="form-group">
@@ -236,8 +241,8 @@
                     <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Email address'}">
                 </div>
-            {/form_field} 
-            
+            {/form_field}
+
         {/capture}
 
         {include
@@ -259,7 +264,8 @@
     {* Delete confirmation dialog *}
 
     {capture "delete_customer_dialog"}
-        <input type="hidden" name="customer_id" id="customer_delete_id" value="" />
+        <input type="hidden" name="customer_page" value="{$customer_page}">
+        <input type="hidden" name="customer_id" id="delete_customer_id">
     {/capture}
 
     {include
@@ -270,7 +276,18 @@
         dialog_message  = {intl l="Do you really want to delete this customer ?"}
 
         form_action         = {url path='/admin/customer/delete'}
-        form_content        = {$smarty.capture.delete_dialog nofilter}
+        form_content        = {$smarty.capture.delete_customer_dialog nofilter}
+        form_id             = "form_delete_customer"
     }
+
+{/block}
+
+{block name="javascript-initialization"}
+
+        <script type="text/javascript">
+            $(".customer-delete").click(function(){
+                $("#delete_customer_id").val($(this).attr("data-id"));
+            });
+        </script>
 
 {/block}

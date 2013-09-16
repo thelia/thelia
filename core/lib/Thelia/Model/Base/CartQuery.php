@@ -27,6 +27,7 @@ use Thelia\Model\Map\CartTableMap;
  * @method     ChildCartQuery orderByAddressDeliveryId($order = Criteria::ASC) Order by the address_delivery_id column
  * @method     ChildCartQuery orderByAddressInvoiceId($order = Criteria::ASC) Order by the address_invoice_id column
  * @method     ChildCartQuery orderByCurrencyId($order = Criteria::ASC) Order by the currency_id column
+ * @method     ChildCartQuery orderByDiscount($order = Criteria::ASC) Order by the discount column
  * @method     ChildCartQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCartQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -36,6 +37,7 @@ use Thelia\Model\Map\CartTableMap;
  * @method     ChildCartQuery groupByAddressDeliveryId() Group by the address_delivery_id column
  * @method     ChildCartQuery groupByAddressInvoiceId() Group by the address_invoice_id column
  * @method     ChildCartQuery groupByCurrencyId() Group by the currency_id column
+ * @method     ChildCartQuery groupByDiscount() Group by the discount column
  * @method     ChildCartQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCartQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -72,6 +74,7 @@ use Thelia\Model\Map\CartTableMap;
  * @method     ChildCart findOneByAddressDeliveryId(int $address_delivery_id) Return the first ChildCart filtered by the address_delivery_id column
  * @method     ChildCart findOneByAddressInvoiceId(int $address_invoice_id) Return the first ChildCart filtered by the address_invoice_id column
  * @method     ChildCart findOneByCurrencyId(int $currency_id) Return the first ChildCart filtered by the currency_id column
+ * @method     ChildCart findOneByDiscount(double $discount) Return the first ChildCart filtered by the discount column
  * @method     ChildCart findOneByCreatedAt(string $created_at) Return the first ChildCart filtered by the created_at column
  * @method     ChildCart findOneByUpdatedAt(string $updated_at) Return the first ChildCart filtered by the updated_at column
  *
@@ -81,6 +84,7 @@ use Thelia\Model\Map\CartTableMap;
  * @method     array findByAddressDeliveryId(int $address_delivery_id) Return ChildCart objects filtered by the address_delivery_id column
  * @method     array findByAddressInvoiceId(int $address_invoice_id) Return ChildCart objects filtered by the address_invoice_id column
  * @method     array findByCurrencyId(int $currency_id) Return ChildCart objects filtered by the currency_id column
+ * @method     array findByDiscount(double $discount) Return ChildCart objects filtered by the discount column
  * @method     array findByCreatedAt(string $created_at) Return ChildCart objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCart objects filtered by the updated_at column
  *
@@ -171,7 +175,7 @@ abstract class CartQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, TOKEN, CUSTOMER_ID, ADDRESS_DELIVERY_ID, ADDRESS_INVOICE_ID, CURRENCY_ID, CREATED_AT, UPDATED_AT FROM cart WHERE ID = :p0';
+        $sql = 'SELECT ID, TOKEN, CUSTOMER_ID, ADDRESS_DELIVERY_ID, ADDRESS_INVOICE_ID, CURRENCY_ID, DISCOUNT, CREATED_AT, UPDATED_AT FROM cart WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -500,6 +504,47 @@ abstract class CartQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CartTableMap::CURRENCY_ID, $currencyId, $comparison);
+    }
+
+    /**
+     * Filter the query on the discount column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDiscount(1234); // WHERE discount = 1234
+     * $query->filterByDiscount(array(12, 34)); // WHERE discount IN (12, 34)
+     * $query->filterByDiscount(array('min' => 12)); // WHERE discount > 12
+     * </code>
+     *
+     * @param     mixed $discount The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCartQuery The current query, for fluid interface
+     */
+    public function filterByDiscount($discount = null, $comparison = null)
+    {
+        if (is_array($discount)) {
+            $useMinMax = false;
+            if (isset($discount['min'])) {
+                $this->addUsingAlias(CartTableMap::DISCOUNT, $discount['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($discount['max'])) {
+                $this->addUsingAlias(CartTableMap::DISCOUNT, $discount['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CartTableMap::DISCOUNT, $discount, $comparison);
     }
 
     /**

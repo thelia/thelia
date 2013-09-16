@@ -38,6 +38,9 @@ use Thelia\Model\Map\ProductCategoryTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
+use Thelia\Model\ProductQuery;
+use Thelia\Model\TemplateQuery;
+use Thelia\Model\AttributeTemplateQuery;
 
 /**
  *
@@ -60,13 +63,12 @@ class Attribute extends BaseI18nLoop
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('product'),
-            Argument::createIntListTypeArgument('category'),
-            Argument::createBooleanOrBothTypeArgument('visible', 1),
+            Argument::createIntListTypeArgument('template'),
             Argument::createIntListTypeArgument('exclude'),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
             )
@@ -101,26 +103,23 @@ class Attribute extends BaseI18nLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $visible = $this->getVisible();
-
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
-
         $product = $this->getProduct();
-        $category = $this->getCategory();
+        $template = $this->getTemplate();
 
         if (null !== $product) {
-            $productCategories = ProductCategoryQuery::create()->select(array(ProductCategoryTableMap::CATEGORY_ID))->filterByProductId($product, Criteria::IN)->find()->getData();
+            // Find the template assigned to the product.
+            $productObj = ProductQuery::create()->findPk($product);
 
-            if (null === $category) {
-                $category = $productCategories;
-            } else {
-                $category = array_merge($category, $productCategories);
-            }
-        }
+            // Ignore if the product cannot be found.
+            if ($productObj !== null)
+                $template = $productObj->getTemplate();
+         }
 
-        if (null !== $category) {
-            $search->filterByCategory(
-                CategoryQuery::create()->filterById($category)->find(),
+
+         // If we have to filter by template, find all attributes assigned to this template, and filter by found IDs
+        if (null !== $template) {
+            $search->filterById(
+                AttributeTemplateQuery::create()->filterByTemplateId($template)->select('id')->find(),
                 Criteria::IN
             );
         }
@@ -129,6 +128,12 @@ class Attribute extends BaseI18nLoop
 
         foreach ($orders as $order) {
             switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;

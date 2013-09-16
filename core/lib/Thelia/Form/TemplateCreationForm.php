@@ -20,9 +20,38 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Form;
 
-namespace Thelia\Core\Event;
+use Symfony\Component\Validator\Constraints;
+use Thelia\Model\CurrencyQuery;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
 
-class CurrencyUpdatePositionEvent extends BaseUpdatePositionEvent
+class TemplateCreationForm extends BaseForm
 {
+    protected function buildForm()
+    {
+        $this->formBuilder
+            ->add("name"   , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Template Name *"),
+                "label_attr" => array(
+                    "for" => "name"
+                ))
+            )
+            ->add("locale" , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ))
+            )
+        ;
+    }
+
+    public function getName()
+    {
+        return "thelia_template_creation";
+    }
 }

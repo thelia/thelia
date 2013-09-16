@@ -152,6 +152,9 @@
 
 	        </div>
 	        {/form_field}
+
+            {module_include location='message_create_form'}
+
         {/capture}
 
         {include
@@ -173,6 +176,9 @@
 
     {capture "delete_dialog"}
         <input type="hidden" name="message_id" id="message_delete_id" value="" />
+
+        {module_include location='message_delete_form'}
+
     {/capture}
 
     {include

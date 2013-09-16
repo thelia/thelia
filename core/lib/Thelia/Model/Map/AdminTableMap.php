@@ -57,7 +57,7 @@ class AdminTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 11;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class AdminTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 11;
 
     /**
      * the column name for the ID field
@@ -105,6 +105,16 @@ class AdminTableMap extends TableMap
     const SALT = 'admin.SALT';
 
     /**
+     * the column name for the REMEMBER_ME_TOKEN field
+     */
+    const REMEMBER_ME_TOKEN = 'admin.REMEMBER_ME_TOKEN';
+
+    /**
+     * the column name for the REMEMBER_ME_SERIAL field
+     */
+    const REMEMBER_ME_SERIAL = 'admin.REMEMBER_ME_SERIAL';
+
+    /**
      * the column name for the CREATED_AT field
      */
     const CREATED_AT = 'admin.CREATED_AT';
@@ -126,12 +136,12 @@ class AdminTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Firstname', 'Lastname', 'Login', 'Password', 'Algo', 'Salt', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'firstname', 'lastname', 'login', 'password', 'algo', 'salt', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AdminTableMap::ID, AdminTableMap::FIRSTNAME, AdminTableMap::LASTNAME, AdminTableMap::LOGIN, AdminTableMap::PASSWORD, AdminTableMap::ALGO, AdminTableMap::SALT, AdminTableMap::CREATED_AT, AdminTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'FIRSTNAME', 'LASTNAME', 'LOGIN', 'PASSWORD', 'ALGO', 'SALT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'firstname', 'lastname', 'login', 'password', 'algo', 'salt', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id', 'Firstname', 'Lastname', 'Login', 'Password', 'Algo', 'Salt', 'RememberMeToken', 'RememberMeSerial', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'firstname', 'lastname', 'login', 'password', 'algo', 'salt', 'rememberMeToken', 'rememberMeSerial', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AdminTableMap::ID, AdminTableMap::FIRSTNAME, AdminTableMap::LASTNAME, AdminTableMap::LOGIN, AdminTableMap::PASSWORD, AdminTableMap::ALGO, AdminTableMap::SALT, AdminTableMap::REMEMBER_ME_TOKEN, AdminTableMap::REMEMBER_ME_SERIAL, AdminTableMap::CREATED_AT, AdminTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'FIRSTNAME', 'LASTNAME', 'LOGIN', 'PASSWORD', 'ALGO', 'SALT', 'REMEMBER_ME_TOKEN', 'REMEMBER_ME_SERIAL', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'firstname', 'lastname', 'login', 'password', 'algo', 'salt', 'remember_me_token', 'remember_me_serial', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -141,12 +151,12 @@ class AdminTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Firstname' => 1, 'Lastname' => 2, 'Login' => 3, 'Password' => 4, 'Algo' => 5, 'Salt' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'firstname' => 1, 'lastname' => 2, 'login' => 3, 'password' => 4, 'algo' => 5, 'salt' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
-        self::TYPE_COLNAME       => array(AdminTableMap::ID => 0, AdminTableMap::FIRSTNAME => 1, AdminTableMap::LASTNAME => 2, AdminTableMap::LOGIN => 3, AdminTableMap::PASSWORD => 4, AdminTableMap::ALGO => 5, AdminTableMap::SALT => 6, AdminTableMap::CREATED_AT => 7, AdminTableMap::UPDATED_AT => 8, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'FIRSTNAME' => 1, 'LASTNAME' => 2, 'LOGIN' => 3, 'PASSWORD' => 4, 'ALGO' => 5, 'SALT' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'firstname' => 1, 'lastname' => 2, 'login' => 3, 'password' => 4, 'algo' => 5, 'salt' => 6, 'created_at' => 7, 'updated_at' => 8, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Firstname' => 1, 'Lastname' => 2, 'Login' => 3, 'Password' => 4, 'Algo' => 5, 'Salt' => 6, 'RememberMeToken' => 7, 'RememberMeSerial' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'firstname' => 1, 'lastname' => 2, 'login' => 3, 'password' => 4, 'algo' => 5, 'salt' => 6, 'rememberMeToken' => 7, 'rememberMeSerial' => 8, 'createdAt' => 9, 'updatedAt' => 10, ),
+        self::TYPE_COLNAME       => array(AdminTableMap::ID => 0, AdminTableMap::FIRSTNAME => 1, AdminTableMap::LASTNAME => 2, AdminTableMap::LOGIN => 3, AdminTableMap::PASSWORD => 4, AdminTableMap::ALGO => 5, AdminTableMap::SALT => 6, AdminTableMap::REMEMBER_ME_TOKEN => 7, AdminTableMap::REMEMBER_ME_SERIAL => 8, AdminTableMap::CREATED_AT => 9, AdminTableMap::UPDATED_AT => 10, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'FIRSTNAME' => 1, 'LASTNAME' => 2, 'LOGIN' => 3, 'PASSWORD' => 4, 'ALGO' => 5, 'SALT' => 6, 'REMEMBER_ME_TOKEN' => 7, 'REMEMBER_ME_SERIAL' => 8, 'CREATED_AT' => 9, 'UPDATED_AT' => 10, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'firstname' => 1, 'lastname' => 2, 'login' => 3, 'password' => 4, 'algo' => 5, 'salt' => 6, 'remember_me_token' => 7, 'remember_me_serial' => 8, 'created_at' => 9, 'updated_at' => 10, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
     );
 
     /**
@@ -172,6 +182,8 @@ class AdminTableMap extends TableMap
         $this->addColumn('PASSWORD', 'Password', 'VARCHAR', true, 128, null);
         $this->addColumn('ALGO', 'Algo', 'VARCHAR', false, 128, null);
         $this->addColumn('SALT', 'Salt', 'VARCHAR', false, 128, null);
+        $this->addColumn('REMEMBER_ME_TOKEN', 'RememberMeToken', 'VARCHAR', false, 255, null);
+        $this->addColumn('REMEMBER_ME_SERIAL', 'RememberMeSerial', 'VARCHAR', false, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -352,6 +364,8 @@ class AdminTableMap extends TableMap
             $criteria->addSelectColumn(AdminTableMap::PASSWORD);
             $criteria->addSelectColumn(AdminTableMap::ALGO);
             $criteria->addSelectColumn(AdminTableMap::SALT);
+            $criteria->addSelectColumn(AdminTableMap::REMEMBER_ME_TOKEN);
+            $criteria->addSelectColumn(AdminTableMap::REMEMBER_ME_SERIAL);
             $criteria->addSelectColumn(AdminTableMap::CREATED_AT);
             $criteria->addSelectColumn(AdminTableMap::UPDATED_AT);
         } else {
@@ -362,6 +376,8 @@ class AdminTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.PASSWORD');
             $criteria->addSelectColumn($alias . '.ALGO');
             $criteria->addSelectColumn($alias . '.SALT');
+            $criteria->addSelectColumn($alias . '.REMEMBER_ME_TOKEN');
+            $criteria->addSelectColumn($alias . '.REMEMBER_ME_SERIAL');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

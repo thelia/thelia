@@ -58,6 +58,12 @@ class CustomerModification extends BaseForm
 
         $this->formBuilder
             ->add('update_logged_in_user', 'integer') // In a front office context, update the in-memory logged-in user data
+            ->add("company", "text", array(
+                "label" => Translator::getInstance()->trans("Company"),
+                "label_attr" => array(
+                    "for" => "company"
+                )
+            ))
             ->add("firstname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()

@@ -22,7 +22,7 @@ Parameters:
 
 {* Always reset create dialog on close *}
 
-$('#{$dialog_id}').on('hidden', function() {
+$('#{$dialog_id}').on('hidden.bs.modal', function() {
 
     // Hide error message
     $('#{$dialog_id}_error').remove();
