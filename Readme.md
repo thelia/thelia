@@ -19,15 +19,13 @@ Requirements
 * apache 2
 * mysql 5
 
-If you use Mac OSX, they still don't use php 5.4 as default php version... There are many solutions for you :
+If you use Mac OSX, it still doesn't use php 5.4 as default php version... There are many solutions for you :
 
-* use linux (the better one)
-* use last MAMP version and put the php bin directory in your path and  :
+* use linux (the best one)
+* use last MAMP version and put the php bin directory in your path  :
 
 ```bash
-$ vim ~/.bash_profile
-then put this line : export PATH=/Applications/MAMP/bin/php/php5.4.x/bin/:$PATH
-$ . .bash_profile
+export PATH=/Applications/MAMP/bin/php/php5.4.x/bin/:$PATH
 ```
 
 * configure a complete development environment : http://php-osx.liip.ch/
