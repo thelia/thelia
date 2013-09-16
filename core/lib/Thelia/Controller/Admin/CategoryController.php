@@ -126,7 +126,7 @@ class CategoryController extends AbstractCrudController
             'description'  => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum(),
             'visible'      => $object->getVisible(),
-            'url'          => $object->getUrl($this->getCurrentEditionLocale()),
+            'url'          => $object->getRewritenUrl($this->getCurrentEditionLocale()),
             'parent'       => $object->getParent()
         );
 

@@ -8,20 +8,31 @@
 <div class="catalog edit-category">
 	<div id="wrapper" class="container">
 
-        {include file="includes/catalog-breadcrumb.html"}
+        {include file="includes/catalog-breadcrumb.html" editing_category="true"}
 
         <div class="row">
             {loop name="category_edit" type="category" visible="*" id="{$category_id}" backend_context="1" lang="$edit_language_id"}
             <div class="col-md-12 general-block-decorator">
                 <div class="row">
                     <div class="col-md-7 title">
-						{intl l='Edit category'}
+						{intl l='Edit category %title' title=$TITLE}
 		            </div>
 
 	                <div class="col-md-5 actions">
-		                <button class="btn btn-default" title="{intl l='Edit previous category'}"><i class="glyphicon glyphicon-arrow-left"></i></button>
-		                <button class="btn btn-default" title="{intl l='Preview category page'}"><i class="glyphicon glyphicon-eye-open"></i></button>
-		                <button class="btn btn-default" title="{intl l='Edit next category'}"><i class="glyphicon glyphicon-arrow-right"></i></button>
+
+	                    {if $HAS_PREVIOUS != 0}
+			                <a href="{url path='/admin/categories/update' category_id=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous category'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                        {else}
+                            <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
+		                {/if}
+
+		                <a  href="{$URL}" target="_blank" class="btn btn-default" title="{intl l='Preview category page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
+
+                        {if $HAS_NEXT != 0}
+                            <a href="{url path='/admin/categories/update' category_id=$NEXT}" class="btn btn-default" title="{intl l='Edit next category'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                        {else}
+                            <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                         {/if}
 	                </div>
                 </div>
 

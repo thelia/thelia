@@ -7,17 +7,25 @@ use Thelia\Tools\URL;
 
 class Folder extends BaseFolder
 {
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
+    use \Thelia\Model\Tools\PositionManagementTrait;
+
+    use \Thelia\Model\Tools\UrlRewritingTrait;
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getRewritenUrlViewName() {
+        return 'folder';
+    }
+
     /**
      * @return int number of contents for the folder
      */
     public function countChild()
     {
         return FolderQuery::countChild($this->getId());
-    }
-
-    public function getUrl($locale)
-    {
-        return URL::getInstance()->retrieve('folder', $this->getId(), $locale)->toString();
     }
 
     /**
@@ -42,5 +50,24 @@ class Folder extends BaseFolder
 
         return $contentsCount;
 
+    }
+
+    /**
+     * Calculate next position relative to our parent
+     */
+    protected function addCriteriaToPositionQuery($query) {
+        $query->filterByParent($this->getParent());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preInsert(ConnectionInterface $con = null)
+    {
+        $this->setPosition($this->getNextPosition());
+
+        $this->generateRewritenUrl($this->getLocale());
+
+        return true;
     }
 }

@@ -15,6 +15,8 @@ class Category extends BaseCategory
 
     use \Thelia\Model\Tools\PositionManagementTrait;
 
+    use \Thelia\Model\Tools\UrlRewritingTrait;
+
     /**
      * @return int number of child for the current category
      */
@@ -23,9 +25,11 @@ class Category extends BaseCategory
         return CategoryQuery::countChild($this->getId());
     }
 
-    public function getUrl($locale)
-    {
-        return URL::getInstance()->retrieve('category', $this->getId(), $locale)->toString();
+    /**
+     * {@inheritDoc}
+     */
+    protected function getRewritenUrlViewName() {
+        return 'category';
     }
 
     /**
@@ -51,20 +55,38 @@ class Category extends BaseCategory
         return $countProduct;
     }
 
+    /**
+     * Calculate next position relative to our parent
+     */
+    protected function addCriteriaToPositionQuery($query) {
+        $query->filterByParent($this->getParent());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function preInsert(ConnectionInterface $con = null)
     {
-        $this->setPosition($this->getNextPosition($this->parent));
+        $this->setPosition($this->getNextPosition());
+
+        $this->generateRewritenUrl($this->getLocale());
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECATEGORY, new CategoryEvent($this));
 
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function postInsert(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECATEGORY, new CategoryEvent($this));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function preUpdate(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECATEGORY, new CategoryEvent($this));
@@ -72,11 +94,17 @@ class Category extends BaseCategory
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function postUpdate(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATECATEGORY, new CategoryEvent($this));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function preDelete(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECATEGORY, new CategoryEvent($this));
@@ -84,6 +112,9 @@ class Category extends BaseCategory
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function postDelete(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECATEGORY, new CategoryEvent($this));
