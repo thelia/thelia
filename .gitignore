@@ -25,3 +25,4 @@ php-cs
 xhprof/
 phpunit.phar
 .DS_Store
+phpmyadmin
