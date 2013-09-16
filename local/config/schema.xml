@@ -910,6 +910,7 @@
     <column name="promo_price" type="FLOAT" />
     <column name="price_end_of_life" type="TIMESTAMP" />
     <column defaultValue="0" name="discount" type="FLOAT" />
+    <column name="promo" type="INTEGER" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id">
       <reference foreign="id" local="cart_id" />
     </foreign-key>

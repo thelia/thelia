@@ -1193,6 +1193,7 @@ CREATE TABLE `cart_item`
     `promo_price` FLOAT,
     `price_end_of_life` DATETIME,
     `discount` FLOAT DEFAULT 0,
+    `promo` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
