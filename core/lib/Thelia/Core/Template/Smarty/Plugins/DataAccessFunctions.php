@@ -155,6 +155,16 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         }
     }
 
+    public function countryDataAccess($params, $smarty)
+    {
+        $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
+
+        switch($params["attr"]) {
+            case "default":
+                return $defaultCountry->getId();
+        }
+    }
+
     public function cartDataAccess($params, $smarty)
     {
         $cart = $this->getCart($this->request);
@@ -287,6 +297,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'content', $this, 'contentDataAccess'),
             new SmartyPluginDescriptor('function', 'folder', $this, 'folderDataAccess'),
             new SmartyPluginDescriptor('function', 'currency', $this, 'currencyDataAccess'),
+            new SmartyPluginDescriptor('function', 'country', $this, 'countryDataAccess'),
             new SmartyPluginDescriptor('function', 'lang', $this, 'langDataAccess'),
             new SmartyPluginDescriptor('function', 'cart', $this, 'cartDataAccess'),
         );

@@ -42,7 +42,7 @@ class Delivery extends BaseSpecificModule
         $collection = parent::getArgDefinitions();
 
         $collection->addArgument(
-            Argument::createIntTypeArgument("country", null, true)
+            Argument::createIntTypeArgument("country")
         );
 
         return $collection;
@@ -56,9 +56,14 @@ class Delivery extends BaseSpecificModule
 
         $search->filterByType(BaseModule::DELIVERY_MODULE_TYPE, Criteria::EQUAL);
 
-        $country = $this->getCountry();
-        if(null !== $country) {
-            //@todo
+        $countryId = $this->getCountry();
+        if(null !== $countryId) {
+            $country = CountryQuery::create()->findPk($countryId);
+            if(null === $country) {
+                throw new \InvalidArgumentException('Cannot found country id: `' . $countryId . '` in delivery loop');
+            }
+        } else {
+            $country = CountryQuery::create()->findOneByByDefault(1);
         }
 
         /* perform search */
@@ -84,7 +89,7 @@ class Delivery extends BaseSpecificModule
                 ->set('CHAPO', $deliveryModule->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $deliveryModule->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set('POSTSCRIPTUM', $deliveryModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set('PRICE', $moduleInstance->calculate(CountryQuery::create()->findPk($country)))
+                ->set('PRICE', $moduleInstance->calculate($country))
             ;
 
             $loopResult->addRow($loopResultRow);

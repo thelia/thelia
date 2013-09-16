@@ -25,6 +25,73 @@
             </div>
 
             <form id="form-cart-delivery" action="cart-step3.php" method="post" role="form">
+
+                <div id="billing-address" class="panel">
+                    <div class="panel-heading clearfix">
+                        <a href="{url path="/address/create"}" class="btn btn-add-address">Add a new address</a>
+                        Chose your billing address
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-address" role="presentation" summary="Address Books">
+                            <tbody>
+
+                            {loop type="address" name="customer.addresses" customer="current"}
+
+                                <tr>
+                                    <th>
+                                        <div class="radio">
+                                            <label for="billing-address_<?php echo $count; ?>">
+                                                <input type="radio" name="billing-address" value"{$ID}">
+                                                {$LABEL}
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <td>
+                                        <ul class="list-address">
+                                            <li>
+                                                <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
+                                                <span class="org">{$COMPANY}</span>
+                                            </li>
+                                            <li>
+                                                <address class="adr">
+                                                    <span class="street-address">{$ADDRESS1}</span>
+                                                    {if $ADDRESS2 != ""}
+                                                        <br><span class="street-address">{$ADDRESS2}</span>
+                                                    {/if}
+                                                    {if $ADDRESS3 != ""}
+                                                        <br><span class="street-address">{$ADDRESS3}</span>
+                                                    {/if}
+                                                    <br><span class="postal-code">{$ZIPCODE}</span>
+                                                    <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                                </address>
+                                            </li>
+                                            <li>
+                                                {if $CELLPHONE != ""}
+                                                    <span class="tel">{$CELLPHONE}</span>
+                                                {/if}
+                                                {if $PHONE != ""}
+                                                    <br><span class="tel">{$PHONE}</span>
+                                                {/if}
+                                            </li>
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <div class="group-btn">
+                                            <a href="{url path="/address/update/{$ID}"}" class="btn btn-edit-address" data-toggle="tooltip" title="Edit this address"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
+                                            {if $DEFAULT != 1}
+                                                <a href="{url path="/address/delete/{$ID}"}" class="btn btn-remove-address js-remove-address" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
+                                            {/if}
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            {/loop}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div id="delivery-address" class="panel">
                     <div class="panel-heading clearfix">
                         <a href="{url path="/address/create"}" class="btn btn-add-address">Add a new address</a>
@@ -98,7 +165,7 @@
                         <div class="radio">
                             <label for="delivery-method_1">
                                 <input type="radio" name="delivery-method" id="delivery-method_1" value="1">
-                                <strong>Delivery method #1</strong> / $12.50
+                                <strong>{$TITLE}</strong> / {currency attr="symbol"} {$PRICE}
                             </label>
                         </div>
                         {/loop}
