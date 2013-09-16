@@ -31,6 +31,7 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Translation\Translator;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Template\ParserContext;
@@ -89,7 +90,7 @@ class BaseController extends ContainerAware
      *
      * return the Translator
      *
-     * @return mixed \Thelia\Core\Translation\Translator
+     * @return Translator
      */
     public function getTranslator()
     {
