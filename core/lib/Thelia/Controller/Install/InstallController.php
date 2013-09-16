@@ -26,12 +26,14 @@ use Thelia\Install\CheckPermission;
 
 /**
  * Class InstallController
+ *
  * @package Thelia\Controller\Install
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author  Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
 class InstallController extends BaseInstallController
 {
-    public function index()
+    public function indexAction()
     {
         //$this->verifyStep(1);
 
@@ -40,57 +42,109 @@ class InstallController extends BaseInstallController
         return $this->render("index.html");
     }
 
-    public function checkPermission()
+    /**
+     * Integration tests
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function checkPermissionAction()
     {
+        $args = array();
         var_dump('step2');
         //$this->verifyStep(2);
 
-        $permission = new CheckPermission();
+        $checkPermission = new CheckPermission(true, $this->getTranslator());
+        $args['isValid'] = $isValid = $checkPermission->exec();
+        $args['validationMessages'] = $checkPermission->getValidationMessages();
 
         $this->getSession()->set("step", 2);
-        return $this->render("step-2.html");
+
+        return $this->render("step-2.html", $args);
     }
 
+    /**
+     * Database connexion tests
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function databaseConnection()
     {
+        var_dump('step 3 bis');
+    }
+
+    /**
+     * Database connexion tests
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function databaseConnectionAction()
+    {
+        var_dump('step 3');
+        exit();
         //$this->verifyStep(2);
 
         //$permission = new CheckPermission();
 
         $this->getSession()->set("step", 3);
+
         return $this->render("step-3.html");
     }
 
-    public function databaseSelection()
+    /**
+     * Database selection
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function databaseSelectionAction()
     {
         //$this->verifyStep(2);
 
         //$permission = new CheckPermission();
 
         $this->getSession()->set("step", 4);
+
         return $this->render("step-4.html");
     }
 
-    public function generalInformation()
+    /**
+     * Set general informations
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function generalInformationAction()
     {
         //$this->verifyStep(2);
 
         //$permission = new CheckPermission();
 
         $this->getSession()->set("step", 5);
+
         return $this->render("step-5.html");
     }
 
-    public function thanks()
+    /**
+     * Display Thanks page
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function thanksAction()
     {
         //$this->verifyStep(2);
 
         //$permission = new CheckPermission();
 
         $this->getSession()->set("step", 6);
+
         return $this->render("thanks.html");
     }
 
+    /**
+     * Verify each steps and redirect if one step has already been passed
+     *
+     * @param int $step Step number
+     *
+     * @return bool
+     */
     protected function verifyStep($step)
     {
         $session = $this->getSession();

@@ -24,15 +24,14 @@
 					</div>
 
 					<div class="well">	
-						<p>We will check some rights to files and directories...</p>
+						<p>{intl l="Checking directory permissions ..."}</p>
 						<ul class="list-unstyled list-group">
-							<li class="list-group-item text-success">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
-							<li class="list-group-item text-success">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
-							<li class="list-group-item text-danger">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
-							<li class="list-group-item text-danger">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
-							<li class="list-group-item text-success">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
-							<li class="list-group-item text-danger">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
-							<li class="list-group-item text-success">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
+                            {foreach from=$validationMessages item=validationMessage}
+							    <li class="list-group-item {if $validationMessage.status}text-success{else}text-danger{/if}">
+                                    {$validationMessage.text nofilter}
+                                    {if !$validationMessage.status} - {$validationMessage.hint nofilter}{/if}
+                                </li>
+                            {/foreach}
 						</ul>
 
 					</div>
