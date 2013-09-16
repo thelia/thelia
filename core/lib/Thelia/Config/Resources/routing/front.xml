@@ -97,6 +97,12 @@
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">cart</default>
     </route>
+
+    <route id="cart.billing" path="/cart/billing">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">cart_billing</default>
+    </route>
+
     <route id="cart.add.process" path="/cart/add">
         <default key="_controller">Thelia\Controller\Front\CartController::addItem</default>
     </route>

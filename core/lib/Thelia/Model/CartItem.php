@@ -65,6 +65,11 @@ class CartItem extends BaseCartItem
         return $this;
     }
 
+    public function getRealPrice()
+    {
+        return $this->getPromo() == 1 ? $this->getPromoPrice() : $this->getPrice();
+    }
+
     public function getTaxedPrice(Country $country)
     {
         $taxCalculator = new Calculator();

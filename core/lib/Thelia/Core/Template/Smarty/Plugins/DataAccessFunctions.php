@@ -31,6 +31,7 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Product;
@@ -160,8 +161,15 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $result = "";
         switch($params["attr"]) {
             case "count_item":
-
                 $result = $cart->getCartItems()->count();
+                break;
+            case "total_price":
+                $result = $cart->getTotalAmount();
+                break;
+            case "total_taxed_price":
+                $result = $cart->getTaxedAmount(
+                    CountryQuery::create()->findOneById(64) // @TODO : make it magic
+                );
                 break;
         }
 

@@ -83,6 +83,7 @@ class Cart extends BaseLoop
 
         foreach ($cartItems as $cartItem) {
             $product = $cartItem->getProduct();
+            $productSaleElement = $cartItem->getProductSaleElements();
 
             $loopResultRow = new LoopResultRow($result, $cartItem, $this->versionable, $this->timestampable, $this->countable);
 
@@ -93,6 +94,7 @@ class Cart extends BaseLoop
             $loopResultRow->set("PRICE", $cartItem->getPrice());
             $loopResultRow->set("PRODUCT_ID", $product->getId());
             $loopResultRow->set("PRODUCT_URL", $product->getUrl($this->request->getSession()->getLang()->getLocale()))
+                ->set("STOCK", $productSaleElement->getQuantity())
                 ->set("PRICE", $cartItem->getPrice())
                 ->set("PROMO_PRICE", $cartItem->getPromoPrice())
                 ->set("TAXED_PRICE", $cartItem->getTaxedPrice(
