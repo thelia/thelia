@@ -80,6 +80,7 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <column name="by_default" type="TINYINT" />
     <foreign-key foreignTable="area" name="fk_country_area_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="area_id" />
     </foreign-key>

@@ -48,18 +48,29 @@
                                 <td>
                                     <ul class="list-address">
                                         <li>
-                                            <span class="fn">M. DUPONT Jean</span>
-                                            <span class="org">Agency XY</span>
+                                            <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
+                                            <span class="org">{$COMPANY}</span>
                                         </li>
                                         <li>
                                             <address class="adr">
-                                                <span class="street-address">street name of my business</span><br>
-                                                <span class="postal-code">75000</span>
-                                                <span class="locality">City, <span class="country-name">Country</span></span>
+                                                <span class="street-address">{$ADDRESS1}</span>
+                                                {if $ADDRESS2 != ""}
+                                                    <br><span class="street-address">{$ADDRESS2}</span>
+                                                {/if}
+                                                {if $ADDRESS3 != ""}
+                                                    <br><span class="street-address">{$ADDRESS3}</span>
+                                                {/if}
+                                                <br><span class="postal-code">{$ZIPCODE}</span>
+                                                <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
                                             </address>
                                         </li>
                                         <li>
-                                            <span class="tel">+33 09 08 07 06 05</span>
+                                            {if $CELLPHONE != ""}
+                                                <span class="tel">{$CELLPHONE}</span>
+                                            {/if}
+                                            {if $PHONE != ""}
+                                                <br><span class="tel">{$PHONE}</span>
+                                            {/if}
                                         </li>
                                     </ul>
                                 </td>
@@ -83,18 +94,14 @@
                 <div id="delivery-method" class="panel">
                     <div class="panel-heading">Choose your delivery method</div>
                     <div class="panel-body">
+                        {loop type="delivery" name="deliveries" force_return="true"}
                         <div class="radio">
                             <label for="delivery-method_1">
                                 <input type="radio" name="delivery-method" id="delivery-method_1" value="1">
                                 <strong>Delivery method #1</strong> / $12.50
                             </label>
                         </div>
-                        <div class="radio">
-                            <label for="delivery-method_2">
-                                <input type="radio" name="delivery-method" id="delivery-method_2" value="2">
-                                <strong>Delivery method #2</strong> / $6.00
-                            </label>
-                        </div>
+                        {/loop}
                     </div>
                 </div>
 

@@ -28,7 +28,8 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
-(1, 'DebugBar', 1, 1, 1, 'DebugBar\\DebugBar', NOW(), NOW());
+(1, 'DebugBar', 1, 1, 1, 'DebugBar\\DebugBar', NOW(), NOW()),
+(2, 'Colissimo', 2, 1, 1, 'Colissimo\\Colissimo', NOW(), NOW());
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
 (1, 1, 1, NOW(), NOW()),
