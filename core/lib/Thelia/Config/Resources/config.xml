@@ -51,7 +51,7 @@
         <form name="thelia.address.update" class="Thelia\Form\AddressUpdateForm" />
 
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
-        <form name="thelia.admin.category.deletion" class="Thelia\Form\CategoryModificationForm"/>
+        <form name="thelia.admin.category.modification" class="Thelia\Form\CategoryModificationForm"/>
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
         <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>

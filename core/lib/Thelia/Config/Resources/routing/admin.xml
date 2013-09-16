@@ -85,7 +85,7 @@
     </route>
 
     <route id="admin.categories.set-default" path="/admin/categories/toggle-online">
-        <default key="_controller">Thelia\Controller\Admin\CategoryController::toggleOnlineAction</default>
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::setToggleVisibilityAction</default>
     </route>
 
     <route id="admin.categories.delete" path="/admin/categories/delete">

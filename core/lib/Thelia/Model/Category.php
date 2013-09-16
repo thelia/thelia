@@ -29,26 +29,6 @@ class Category extends BaseCategory
     }
 
     /**
-     * Create a new category.
-     *
-     * @param string $title the category title
-     * @param int $parent the ID of the parent category
-     * @param string $locale the locale of the title
-     */
-    public function create($title, $parent, $locale)
-    {
-    	$this
-	    	->setLocale($locale)
-	    	->setTitle($title)
-	    	->setParent($parent)
-	    	->setVisible(1)
-	    	->setPosition($this->getNextPosition($parent))
-    	;
-
-    	$this->save();
-     }
-
-    /**
      *
      * count all products for current category and sub categories
      *
@@ -73,6 +53,8 @@ class Category extends BaseCategory
 
     public function preInsert(ConnectionInterface $con = null)
     {
+        $this->setPosition($this->getNextPosition($this->parent));
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECATEGORY, new CategoryEvent($this));
 
         return true;
@@ -98,6 +80,8 @@ class Category extends BaseCategory
     public function preDelete(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECATEGORY, new CategoryEvent($this));
+
+        return true;
     }
 
     public function postDelete(ConnectionInterface $con = null)

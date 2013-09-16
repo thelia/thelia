@@ -5,8 +5,8 @@
 	<li><a href="{url path='admin/catalog'}">Catalog</a>
 
 	{ifloop rel="category_path"}</li>
-		{loop name="category_path" type="category-path" visible="*" category=$current_category_id}
-			{if $ID == $current_category_id}
+		{loop name="category_path" type="category-path" visible="*" category=$category_id}
+			{if $ID == $category_id}
 				<li class="active">
 				   {if $action == 'edit'}
 				       {intl l='Editing %cat' cat="{$TITLE}"}

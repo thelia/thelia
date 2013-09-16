@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
-
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Thelia\Model\ConfigQuery;
@@ -45,18 +44,9 @@ class Config extends BaseAction implements EventSubscriberInterface
     {
         $config = new ConfigModel();
 
-        $config
-            ->setDispatcher($this->getDispatcher())
-
-            ->setName($event->getEventName())
-            ->setValue($event->getValue())
-            ->setLocale($event->getLocale())
-            ->setTitle($event->getTitle())
-            ->setHidden($event->getHidden())
-            ->setSecured($event->getSecured())
-
-            ->save()
-        ;
+        $config->setDispatcher($this->getDispatcher())->setName($event->getEventName())->setValue($event->getValue())
+                ->setLocale($event->getLocale())->setTitle($event->getTitle())->setHidden($event->getHidden())
+                ->setSecured($event->getSecured())->save();
 
         $event->setConfig($config);
     }
@@ -70,18 +60,13 @@ class Config extends BaseAction implements EventSubscriberInterface
     {
         $search = ConfigQuery::create();
 
-        if (null !== $config = $search->findOneById($event->getConfigId())) {
+        if (null !== $config = $search->findPk($event->getConfigId())) {
 
             if ($event->getValue() !== $config->getValue()) {
 
-                $config
-                    ->setDispatcher($this->getDispatcher())
+                $config->setDispatcher($this->getDispatcher())->setValue($event->getValue())->save();
 
-                    ->setValue($event->getValue())
-                    ->save()
-                ;
-
-               $event->setConfig($config);
+                $event->setConfig($config);
             }
         }
     }
@@ -95,23 +80,12 @@ class Config extends BaseAction implements EventSubscriberInterface
     {
         $search = ConfigQuery::create();
 
-        if (null !== $config = ConfigQuery::create()->findOneById($event->getConfigId())) {
+        if (null !== $config = ConfigQuery::create()->findPk($event->getConfigId())) {
 
-            $config
-                ->setDispatcher($this->getDispatcher())
-
-                ->setName($event->getEventName())
-                ->setValue($event->getValue())
-                ->setHidden($event->getHidden())
-                ->setSecured($event->getSecured())
-
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setDescription($event->getDescription())
-                ->setChapo($event->getChapo())
-                ->setPostscriptum($event->getPostscriptum())
-
-                ->save();
+            $config->setDispatcher($this->getDispatcher())->setName($event->getEventName())->setValue($event->getValue())
+                    ->setHidden($event->getHidden())->setSecured($event->getSecured())->setLocale($event->getLocale())
+                    ->setTitle($event->getTitle())->setDescription($event->getDescription())->setChapo($event->getChapo())
+                    ->setPostscriptum($event->getPostscriptum())->save();
 
             $event->setConfig($config);
         }
@@ -125,14 +99,11 @@ class Config extends BaseAction implements EventSubscriberInterface
     public function delete(ConfigDeleteEvent $event)
     {
 
-        if (null !== ($config = ConfigQuery::create()->findOneById($event->getConfigId()))) {
+        if (null !== ($config = ConfigQuery::create()->findPk($event->getConfigId()))) {
 
-            if (! $config->getSecured()) {
+            if (!$config->getSecured()) {
 
-                $config
-                    ->setDispatcher($this->getDispatcher())
-                    ->delete()
-                ;
+                $config->setDispatcher($this->getDispatcher())->delete();
 
                 $event->setConfig($config);
             }
@@ -145,10 +116,15 @@ class Config extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::CONFIG_CREATE   => array("create", 128),
-            TheliaEvents::CONFIG_SETVALUE => array("setValue", 128),
-            TheliaEvents::CONFIG_UPDATE   => array("modify", 128),
-            TheliaEvents::CONFIG_DELETE   => array("delete", 128),
+                TheliaEvents::CONFIG_CREATE => array(
+                    "create", 128
+                ), TheliaEvents::CONFIG_SETVALUE => array(
+                    "setValue", 128
+                ), TheliaEvents::CONFIG_UPDATE => array(
+                    "modify", 128
+                ), TheliaEvents::CONFIG_DELETE => array(
+                    "delete", 128
+                ),
         );
     }
 }
