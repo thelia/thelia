@@ -364,6 +364,7 @@ try {
             $productAssociatedContent = new Thelia\Model\ProductAssociatedContent();
             do {
                 $pick = array_rand($contentIdList, 1);
+                \Thelia\Log\Tlog::getInstance()->debug("pick : $pick");
             } while(in_array($pick, $alreadyPicked));
 
             $alreadyPicked[] = $pick;
