@@ -54,34 +54,10 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 
     }
 
-//    /**
-//     * Check if validity test on BackOffice inputs are working
-//     *
-//     * @covers Thelia\Coupon\Rule\AvailableForXArticles::checkBackOfficeInput
-//     *
-//     */
-//    public function testValidBackOfficeInput()
-//    {
-//        $translator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
-//            ->disableOriginalConstructor()
-//            ->getMock();
-//
-//        $rule = new AvailableForXArticles($translator);
-//        $operators = array(AvailableForXArticles::PARAM1_QUANTITY => Operators::SUPERIOR);
-//        $values = array(
-//            AvailableForXArticles::PARAM1_QUANTITY => 4
-//        );
-//        $rule->populateFromForm($operators, $values);
-//
-//        $expected = true;
-//        $actual = $rule->checkBackOfficeInput();
-//        $this->assertEquals($expected, $actual);
-//    }
-
     /**
      * Check if validity test on BackOffice inputs are working
      *
-     * @covers Thelia\Coupon\Rule\AvailableForXArticles::checkBackOfficeInput
+     * @covers Thelia\Coupon\Rule\AvailableForXArticlesManager::setValidators
      * @expectedException \Thelia\Exception\InvalidRuleOperatorException
      */
     public function testInValidBackOfficeInputOperator()
@@ -116,7 +92,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if validity test on BackOffice inputs are working
      *
-     * @covers Thelia\Coupon\Rule\AvailableForXArticles::checkBackOfficeInput
+     * @covers Thelia\Coupon\Rule\AvailableForXArticlesManager::setValidators
      * @expectedException \Thelia\Exception\InvalidRuleValueException
      */
     public function testInValidBackOfficeInputValue()
@@ -147,58 +123,6 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
         $actual =$isValid;
         $this->assertEquals($expected, $actual);
     }
-
-//    /**
-//     * Check if validity test on BackOffice inputs are working
-//     *
-//     * @covers Thelia\Coupon\Rule\AvailableForXArticles::checkBackOfficeInput
-//     * @expectedException \Thelia\Exception\InvalidRuleValueException
-//     */
-//    public function testInValidBackOfficeInputNegative()
-//    {
-//        $adapter = $this->stubTheliaAdapter;
-//
-//        $validators = array(
-//            AvailableForXArticles::PARAM1_QUANTITY => new RuleValidator(
-//                Operators::SUPERIOR,
-//                new QuantityParam(
-//                    $adapter,
-//                    -1
-//                )
-//            )
-//        );
-//        $rule = new AvailableForXArticles($adapter, $validators);
-//
-//        $expected = false;
-//        $actual = $rule->checkBackOfficeInput();
-//        $this->assertEquals($expected, $actual);
-//    }
-
-//    /**
-//     * Check if validity test on BackOffice inputs are working
-//     *
-//     * @covers Thelia\Coupon\Rule\AvailableForXArticles::checkBackOfficeInput
-//     * @expectedException \Thelia\Exception\InvalidRuleValueException
-//     */
-//    public function testInValidBackOfficeInputString()
-//    {
-//        $adapter = $this->stubTheliaAdapter;
-//
-//        $validators = array(
-//            AvailableForXArticles::PARAM1_QUANTITY => new RuleValidator(
-//                Operators::SUPERIOR,
-//                new QuantityParam(
-//                    $adapter,
-//                    'bad'
-//                )
-//            )
-//        );
-//        $rule = new AvailableForXArticles($adapter, $validators);
-//
-//        $expected = false;
-//        $actual = $rule->checkBackOfficeInput();
-//        $this->assertEquals($expected, $actual);
-//    }
 
     /**
      * Check if test inferior operator is working

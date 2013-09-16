@@ -30,6 +30,7 @@ use Thelia\Constraint\Validator\QuantityParam;
 use Thelia\Constraint\Validator\RuleValidator;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Exception\InvalidRuleException;
+use Thelia\Exception\InvalidRuleOperatorException;
 use Thelia\Exception\InvalidRuleValueException;
 use Thelia\Type\FloatType;
 
@@ -98,14 +99,14 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
             $this->availableOperators[self::INPUT1]
         );
         if (!$isOperator1Legit) {
-            throw new \InvalidArgumentException(
-                'Operator for quantity field is not legit'
+            throw new InvalidRuleOperatorException(
+                get_class(), 'quantity'
             );
         }
 
         if ((int) $quantityValue <= 0) {
-            throw new \InvalidArgumentException(
-                'Value for quantity field is not legit'
+            throw new InvalidRuleValueException(
+                get_class(), 'quantity'
             );
         }
 
