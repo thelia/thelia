@@ -22,14 +22,18 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
-class CountryCreationForm extends BaseForm
+class CountryModificationForm extends CurrencyCreationForm
 {
     protected function buildForm()
     {
+        parent::buildForm(true);
+
         $this->formBuilder
+            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
             ->add("title", "text", array(
                 "constraints" => array(
                     new NotBlank()
@@ -37,6 +41,24 @@ class CountryCreationForm extends BaseForm
                 "label" => Translator::getInstance()->trans("Country title *"),
                 "label_attr" => array(
                     "for" => "title"
+                )
+            ))            
+            ->add("short-description", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Country short description *"),
+                "label_attr" => array(
+                    "for" => "short-description"
+                )
+            ))            
+            ->add("description", "text", array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Country description *"),
+                "label_attr" => array(
+                    "for" => "description"
                 )
             ))            
             ->add("area", "text", array(
@@ -74,12 +96,12 @@ class CountryCreationForm extends BaseForm
                 "label_attr" => array(
                     "for" => "isoalpha3"
                 )
-            ))            
+            ))
         ;
     }
 
     public function getName()
     {
-        return "thelia_country_creation";
+        return "thelia_country_modification";
     }
 }

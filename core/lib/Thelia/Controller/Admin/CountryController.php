@@ -36,4 +36,17 @@ class CountryController extends BaseAdminController
         return $this->render("countries", array("display_country" => 20));
     }
 
+    /**
+     * update country action
+     *
+     * @param $country_id
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     */
+    public function updateAction($country_id)
+    {        
+        return $this->render("country-edit", array(
+            "country_id" => $country_id
+        ));
+    }
+
 }

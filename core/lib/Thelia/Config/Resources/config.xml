@@ -82,6 +82,9 @@
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>
 
+        <form name="thelia.admin.country.creation" class="Thelia\Form\CountryCreationForm"/>
+        <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
+
     </forms>
 
 
