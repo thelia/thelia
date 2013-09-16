@@ -28,6 +28,8 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     ChildAdminQuery orderByPassword($order = Criteria::ASC) Order by the password column
  * @method     ChildAdminQuery orderByAlgo($order = Criteria::ASC) Order by the algo column
  * @method     ChildAdminQuery orderBySalt($order = Criteria::ASC) Order by the salt column
+ * @method     ChildAdminQuery orderByRememberMeToken($order = Criteria::ASC) Order by the remember_me_token column
+ * @method     ChildAdminQuery orderByRememberMeSerial($order = Criteria::ASC) Order by the remember_me_serial column
  * @method     ChildAdminQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAdminQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -38,6 +40,8 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     ChildAdminQuery groupByPassword() Group by the password column
  * @method     ChildAdminQuery groupByAlgo() Group by the algo column
  * @method     ChildAdminQuery groupBySalt() Group by the salt column
+ * @method     ChildAdminQuery groupByRememberMeToken() Group by the remember_me_token column
+ * @method     ChildAdminQuery groupByRememberMeSerial() Group by the remember_me_serial column
  * @method     ChildAdminQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAdminQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -59,6 +63,8 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     ChildAdmin findOneByPassword(string $password) Return the first ChildAdmin filtered by the password column
  * @method     ChildAdmin findOneByAlgo(string $algo) Return the first ChildAdmin filtered by the algo column
  * @method     ChildAdmin findOneBySalt(string $salt) Return the first ChildAdmin filtered by the salt column
+ * @method     ChildAdmin findOneByRememberMeToken(string $remember_me_token) Return the first ChildAdmin filtered by the remember_me_token column
+ * @method     ChildAdmin findOneByRememberMeSerial(string $remember_me_serial) Return the first ChildAdmin filtered by the remember_me_serial column
  * @method     ChildAdmin findOneByCreatedAt(string $created_at) Return the first ChildAdmin filtered by the created_at column
  * @method     ChildAdmin findOneByUpdatedAt(string $updated_at) Return the first ChildAdmin filtered by the updated_at column
  *
@@ -69,6 +75,8 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     array findByPassword(string $password) Return ChildAdmin objects filtered by the password column
  * @method     array findByAlgo(string $algo) Return ChildAdmin objects filtered by the algo column
  * @method     array findBySalt(string $salt) Return ChildAdmin objects filtered by the salt column
+ * @method     array findByRememberMeToken(string $remember_me_token) Return ChildAdmin objects filtered by the remember_me_token column
+ * @method     array findByRememberMeSerial(string $remember_me_serial) Return ChildAdmin objects filtered by the remember_me_serial column
  * @method     array findByCreatedAt(string $created_at) Return ChildAdmin objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildAdmin objects filtered by the updated_at column
  *
@@ -159,7 +167,7 @@ abstract class AdminQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, FIRSTNAME, LASTNAME, LOGIN, PASSWORD, ALGO, SALT, CREATED_AT, UPDATED_AT FROM admin WHERE ID = :p0';
+        $sql = 'SELECT ID, FIRSTNAME, LASTNAME, LOGIN, PASSWORD, ALGO, SALT, REMEMBER_ME_TOKEN, REMEMBER_ME_SERIAL, CREATED_AT, UPDATED_AT FROM admin WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -461,6 +469,64 @@ abstract class AdminQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AdminTableMap::SALT, $salt, $comparison);
+    }
+
+    /**
+     * Filter the query on the remember_me_token column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByRememberMeToken('fooValue');   // WHERE remember_me_token = 'fooValue'
+     * $query->filterByRememberMeToken('%fooValue%'); // WHERE remember_me_token LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $rememberMeToken The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAdminQuery The current query, for fluid interface
+     */
+    public function filterByRememberMeToken($rememberMeToken = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($rememberMeToken)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $rememberMeToken)) {
+                $rememberMeToken = str_replace('*', '%', $rememberMeToken);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(AdminTableMap::REMEMBER_ME_TOKEN, $rememberMeToken, $comparison);
+    }
+
+    /**
+     * Filter the query on the remember_me_serial column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByRememberMeSerial('fooValue');   // WHERE remember_me_serial = 'fooValue'
+     * $query->filterByRememberMeSerial('%fooValue%'); // WHERE remember_me_serial LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $rememberMeSerial The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAdminQuery The current query, for fluid interface
+     */
+    public function filterByRememberMeSerial($rememberMeSerial = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($rememberMeSerial)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $rememberMeSerial)) {
+                $rememberMeSerial = str_replace('*', '%', $rememberMeSerial);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(AdminTableMap::REMEMBER_ME_SERIAL, $rememberMeSerial, $comparison);
     }
 
     /**

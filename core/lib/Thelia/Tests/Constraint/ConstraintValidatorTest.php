@@ -79,7 +79,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $rules = new CouponRuleCollection();
         $rules->add($rule1);
 
-        $isValid = $ConstraintValidator->test($rules);
+        $isValid = $ConstraintValidator->isMatching($rules);
 
         $expected = true;
         $actual =$isValid;
@@ -113,7 +113,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $rules = new CouponRuleCollection();
         $rules->add($rule1);
 
-        $isValid = $ConstraintValidator->test($rules);
+        $isValid = $ConstraintValidator->isMatching($rules);
 
         $expected = false;
         $actual =$isValid;
@@ -160,7 +160,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $rules->add($rule1);
         $rules->add($rule2);
 
-        $isValid = $ConstraintValidator->test($rules);
+        $isValid = $ConstraintValidator->isMatching($rules);
 
         $expected = true;
         $actual =$isValid;
@@ -207,7 +207,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $rules->add($rule1);
         $rules->add($rule2);
 
-        $isValid = $ConstraintValidator->test($rules);
+        $isValid = $ConstraintValidator->isMatching($rules);
 
         $expected = false;
         $actual =$isValid;

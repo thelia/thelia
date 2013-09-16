@@ -4,12 +4,28 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="home" path="/install" >
+    <route id="install.step1" path="/install" >
         <default key="_controller">Thelia\Controller\Install\InstallController::index</default>
     </route>
 
-    <route id="home" path="/install/step/2" >
+    <route id="install.step2" path="/install/step/2" >
         <default key="_controller">Thelia\Controller\Install\InstallController::checkPermission</default>
+    </route>
+
+    <route id="install.step3" path="/install/step/3" >
+        <default key="_controller">Thelia\Controller\Install\InstallController::databaseConnection</default>
+    </route>
+
+    <route id="install.step4" path="/install/step/4" >
+        <default key="_controller">Thelia\Controller\Install\InstallController::databaseSelection</default>
+    </route>
+
+    <route id="install.step5" path="/install/step/5" >
+        <default key="_controller">Thelia\Controller\Install\InstallController::generalInformation</default>
+    </route>
+
+    <route id="install.step6" path="/install/thanks" >
+        <default key="_controller">Thelia\Controller\Install\InstallController::thanks</default>
     </route>
 
 </routes>

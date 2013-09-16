@@ -36,6 +36,16 @@ class PricePercentTaxType extends BaseTaxType
         return $untaxedPrice * $this->getRequirement("percent") * 0.01;
     }
 
+    public function pricePercentRetriever()
+    {
+        return ($this->getRequirement("percent") * 0.01);
+    }
+
+    public function fixAmountRetriever()
+    {
+        return 0;
+    }
+
     public function getRequirementsList()
     {
         return array(
@@ -43,3 +53,5 @@ class PricePercentTaxType extends BaseTaxType
         );
     }
 }
+
+//600 / (1 + 0,10 + 0,10)  =/= 600 / (1 + 0,10 ) + 600 / (1 + 0,10 )

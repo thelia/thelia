@@ -39,6 +39,8 @@ use Thelia\Model\AttributeAvQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\CategoryEvent;
 use Thelia\Core\Event\AttributeEvent;
+use Thelia\Model\AttributeTemplate;
+use Thelia\Model\AttributeTemplateQuery;
 
 class Attribute extends BaseAction implements EventSubscriberInterface
 {
@@ -137,10 +139,10 @@ class Attribute extends BaseAction implements EventSubscriberInterface
 
     public function addToAllTemplates(AttributeEvent $event)
     {
-        $templates = ProductTemplateAttributeQuery::create()->find();
+        $templates = AttributeTemplateQuery::create()->find();
 
         foreach($templates as $template) {
-            $pat = new ProductTemplateAttribute();
+            $pat = new AttributeTemplate();
 
             $pat->setTemplate($template->getId())
                 ->setAttributeId($event->getAttribute()->getId())
@@ -151,7 +153,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     public function removeFromAllTemplates(AttributeEvent $event)
     {
         // Delete this attribute from all product templates
-        ProductTemplateAttributeQuery::create()->filterByAttributeId($event->getAttribute()->getId())->delete();
+        AttributeTemplateQuery::create()->filterByAttributeId($event->getAttribute()->getId())->delete();
     }
 
     /**

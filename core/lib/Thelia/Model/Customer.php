@@ -208,8 +208,39 @@ class Customer extends BaseCustomer implements UserInterface
     /**
      * {@inheritDoc}
      */
+    public function getToken() {
+        return $this->getRememberMeToken();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setToken($token) {
+        $this->setRememberMeToken($token)->save();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getSerial() {
+        return $this->getRememberMeSerial();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setSerial($serial) {
+        $this->setRememberMeSerial($serial)->save();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function preInsert(ConnectionInterface $con = null)
     {
+        // Set the serial number (for auto-login)
+        $this->setRememberMeSerial(uniqid());
+
         $this->setRef($this->generateRef());
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, new CustomerEvent($this));

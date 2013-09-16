@@ -222,4 +222,29 @@ class Session extends BaseSession
     {
         return $this->get("thelia.delivery_id");
     }
+
+
+    /**
+     * Set consumed coupons by the Customer
+     *
+     * @param array $couponsCode An array of Coupon code
+     *
+     * @return $this
+     */
+    public function setConsumedCoupons(array $couponsCode)
+    {
+        $this->set('thelia.consumed_coupons', $couponsCode);
+
+        return $this;
+    }
+
+    /**
+     * Get Customer consumed coupons
+     *
+     * @return array $couponsCode An array of Coupon code
+     */
+    public function getConsumedCoupons()
+    {
+        return $this->get('thelia.consumed_coupons');
+    }
 }

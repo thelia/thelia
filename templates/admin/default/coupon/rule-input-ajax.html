@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-lg-6">
             <select class="form-control" id="{$name}-operator" name="{$name}[operator]">
-                {foreach from=$input.availableOperators key=k item=availableOperator}
+                {foreach from=$input.availableOperators key=k item=availableOperator name=availableOperators}
                     <option value="{$k}">{$availableOperator}</option>
                 {/foreach}
             </select>
@@ -11,7 +11,7 @@
         <div class="input-group col-lg-6">
             {if $input.type == 'select'}
                 <select class="{$input.class}" id="{$name}-value" name="{$name}[value]">
-                    {foreach from=$input.availableValues key=code item=availableValue}
+                    {foreach from=$input.availableValues key=code item=availableValue name=availableValues}
                         <option value="{$code}">{$availableValue}</option>
                     {/foreach}
                 </select>
@@ -72,12 +72,16 @@
 <script>
 
     // Init Rules to set
-    couponManager.ruleToSave['serviceId'] = '{$ruleId}';
-    couponManager.ruleToSave['operators'] = {literal}{}{/literal};
-    couponManager.ruleToSave['values'] = {literal}{}{/literal};
+    // Update only if no rule are already set
+    if(!couponManager.ruleToSave){
+        couponManager.ruleToSave['serviceId'] = '{$ruleId}';
+        couponManager.ruleToSave['operators'] = {literal}{}{/literal};
+        couponManager.ruleToSave['values'] = {literal}{}{/literal};
+    } else {
+    }
 {foreach from=$inputs.inputs key=name item=input}
-    couponManager.ruleToSave['operators']['{$name nofilter}'] = '{foreach from=$inputs.inputs[$name].availableOperators key=keyOperator item=valueOperator name=operators}{if $smarty.foreach.operators.first}{$keyOperator nofilter}{/if}{/foreach}';
-    couponManager.ruleToSave['values']['{$name nofilter}'] = '{if count($inputs.inputs[$name].availableValues) != 0}{foreach from=$inputs.inputs[$name].availableValues key=keyValue item=valueValue name=values}{if $smarty.foreach.values.first}{$keyValue nofilter}{/if}{/foreach}{else}to set{/if}';
+        couponManager.ruleToSave['operators']['{$name nofilter}'] = '{foreach from=$inputs.inputs[$name].availableOperators key=keyOperator item=valueOperator name=operators}{if $smarty.foreach.operators.first}{$keyOperator nofilter}{/if}{/foreach}';
+        couponManager.ruleToSave['values']['{$name nofilter}'] = '{if count($inputs.inputs[$name].availableValues) != 0}{foreach from=$inputs.inputs[$name].availableValues key=keyValue item=valueValue name=values}{if $smarty.foreach.values.first}{$keyValue nofilter}{/if}{/foreach}{else}to set{/if}';
 {/foreach}
 
 
@@ -86,13 +90,11 @@
 {foreach from=$inputs.inputs key=name item=input}
         // Operator selector
         $('#{$name}-operator').change(function (e) {
-            console.log('changin operator');
             var $this = $(this);
             couponManager.ruleToSave['operators']['{$name nofilter}'] = $this.val();
         });
         // Value input
         $('#{$name}-value').change(function (e) {
-            console.log('changin value');
             var $this = $(this);
             couponManager.ruleToSave['values']['{$name nofilter}'] = $this.val();
         });

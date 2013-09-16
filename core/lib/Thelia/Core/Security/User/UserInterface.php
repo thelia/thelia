@@ -48,4 +48,24 @@ interface UserInterface
      * @return void
      */
     public function eraseCredentials();
+
+    /**
+     * return the user token (used by remember me authnetication system)
+     */
+    public function getToken();
+
+    /**
+     * Set a token in the user data (used by remember me authnetication system)
+     */
+    public function setToken($token);
+
+    /**
+     * return the user serial  (used by remember me authnetication system)
+     */
+    public function getSerial();
+
+    /**
+     * Set a serial number int the user data  (used by remember me authnetication system)
+     */
+    public function setSerial($serial);
 }

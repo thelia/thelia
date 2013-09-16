@@ -127,7 +127,7 @@ class BaseController extends ContainerAware
     /**
      * Returns the session from the current request
      *
-     * @return \Symfony\Component\HttpFoundation\Session\SessionInterface
+     * @return \Thelia\Core\HttpFoundation\Session\Session
      */
     protected function getSession()
     {
@@ -198,9 +198,9 @@ class BaseController extends ContainerAware
      *
      * @param string $url
      */
-    public function redirect($url, $status = 302)
+    public function redirect($url, $status = 302, $cookies = array())
     {
-        Redirect::exec($url, $status);
+        Redirect::exec($url, $status, $cookies);
     }
 
     /**

@@ -16,11 +16,32 @@ use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
  *
  */
 class ConfigQuery extends BaseConfigQuery {
+
+    protected static $cache = array();
+
     public static function read($search, $default = null)
     {
+        if (array_key_exists($search, self::$cache)) {
+            return self::$cache[$search];
+        }
+
         $value = self::create()->findOneByName($search);
 
-        return $value ? $value->getValue() : $default;
+        self::$cache[$search] = $value ? $value->getValue() : $default;
+
+        return self::$cache[$search];
+    }
+
+    public static function resetCache($key = null)
+    {
+        if($key) {
+            if(array_key_exists($key, self::$cache)) {
+                unset(self::$cache[$key]);
+                return true;
+            }
+        }
+        self::$cache = array();
+        return true;
     }
 
     public static function getDefaultLangWhenNoTranslationAvailable()

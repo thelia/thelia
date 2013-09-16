@@ -1,0 +1,72 @@
+{extends file="layout.tpl"}
+
+{block name="page-title"}{intl l='Installation step 4'}{/block}
+
+{block name="main-content"}
+<div class="install">
+	<div id="wrapper" class="container">
+		
+		<div class="row">
+		    <div class="col-md-12">
+		        <div class="general-block-decorator">
+										
+					<h3 class="title title-without-tabs">{intl l="Thelia installation wizard"}</h3>
+					
+					<div class="wizard">
+						<ul>
+							<li class="complete"><a href="#"><span class="badge">1</span>{intl l="Welcome"}<span class="chevron"></span></a></li>
+							<li class="complete"><a href="#"><span class="badge">2</span>{intl l="Checking permissions"}<span class="chevron"></span></a></li>
+							<li class="complete"><a href="#"><span class="badge">3</span>{intl l="Database connection"}<span class="chevron"></span></a></li>
+							<li class="complete"><a href="#"><span class="badge">4</span>{intl l="Database selection"}<span class="chevron"></span></a></li>
+							<li class="active"><span class="badge">5</span>{intl l="General information"}<span class="chevron"></span></li>
+							<li><span class="badge">6</span>{intl l="Thanks"}<span class="chevron"></span></li>
+						</ul>						
+					</div>								
+						
+					<div class="well">	
+						<form action="">
+							
+							<p>
+								The system will now you create a custom site access.
+							</p>
+						
+							<div class="form-group">
+								<label for="">{intl l="Login"} :</label>
+								<input id="" type="text" class="form-control">
+							</div>
+							
+							<div class="form-group">
+								<label for="">{intl l="Password"} :</label>
+								<input id="" type="password" class="form-control">
+							</div>
+							
+							<div class="form-group">
+								<label for="">{intl l="Password confirmation"} :</label>
+								<input id="" type="password" class="form-control">
+							</div>
+							
+							<div class="form-group">
+								<label for="">{intl l="Email address"} :</label>
+								<input id="" type="email" class="form-control">
+							</div>
+							
+							<div class="form-group">
+								<label for="">{intl l="Email address confirmation"} :</label>
+								<input id="" type="email" class="form-control">
+							</div>
+							
+						</form>
+					</div>					
+					
+					<div class="clearfix">
+						<a href="install/step/2" class="pull-left btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> {intl l="Return"}</a>
+						<a href="install/step/4" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> {intl l="Continue"}</a>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</div>
+{/block}

@@ -52,7 +52,7 @@ class ConstraintValidator
      *
      * @return bool
      */
-    public function test(CouponRuleCollection $rules)
+    public function isMatching(CouponRuleCollection $rules)
     {
         $isMatching = true;
         /** @var CouponRuleInterface $rule */

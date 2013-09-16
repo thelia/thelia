@@ -65,6 +65,7 @@ class Config extends BaseConfig {
      */
     public function postUpdate(ConnectionInterface $con = null)
     {
+        $this->resetQueryCache();
         $this->dispatchEvent(TheliaEvents::AFTER_UPDATECONFIG, new ConfigEvent($this));
     }
 
@@ -83,6 +84,12 @@ class Config extends BaseConfig {
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        $this->resetQueryCache();
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECONFIG, new ConfigEvent($this));
+    }
+
+    public function resetQueryCache()
+    {
+        ConfigQuery::resetCache($this->getName());
     }
 }

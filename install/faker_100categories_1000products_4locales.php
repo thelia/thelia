@@ -156,18 +156,18 @@ try {
     $con->rollBack();
 }
 
-function setI18n($faker, &$object)
+function setI18n($faker, &$object, $fields = array('Title' => 20, 'Description' => 50) )
 {
-    $localeList = array('fr_FR', 'en_EN', 'es_ES', 'it_IT');
-
-    $title = $faker->text(20);
-    $description = $faker->text(50);
+    $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
 
     foreach($localeList as $locale) {
         $object->setLocale($locale);
 
-        $object->setTitle($locale . ' : ' . $title);
-        $object->setDescription($locale . ' : ' . $description);
+        foreach($fields as $name => $length) {
+            $func = "set$name";
+
+            $object->$func($locale . ' : ' . $faker->text($length));
+        }
     }
 }
 

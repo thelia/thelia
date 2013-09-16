@@ -133,21 +133,21 @@ abstract class Operators
             break;
         case self::INFERIOR_OR_EQUAL:
             $ret = $translator->trans(
-                'inferior or equals to',
+                'inferior or equal to',
                 array(),
                 'constraint'
             );
             break;
         case self::EQUAL:
             $ret = $translator->trans(
-                'equals to',
+                'equal to',
                 array(),
                 'constraint'
             );
             break;
         case self::SUPERIOR_OR_EQUAL:
             $ret = $translator->trans(
-                'superior or equals to',
+                'superior or equal to',
                 array(),
                 'constraint'
             );

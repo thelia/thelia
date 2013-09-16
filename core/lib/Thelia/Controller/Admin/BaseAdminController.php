@@ -40,6 +40,8 @@ use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Symfony\Component\Routing\Router;
+use Thelia\Model\Admin;
+use Thelia\Core\Security\Token\CookieTokenProvider;
 
 class BaseAdminController extends BaseController
 {
@@ -300,6 +302,46 @@ class BaseAdminController extends BaseController
         if ($updateSession) $this->getSession()->set($orderSessionIdentifier, $order);
 
         return $order;
+    }
+
+    /**
+     * Create the remember me cookie for the given user.
+     */
+    protected function createAdminRememberMeCookie(Admin $user)
+    {
+        $ctp = new CookieTokenProvider();
+
+        $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
+        $cookieExpiration = ConfigQuery::read('admin_remember_me_cookie_expiration', 2592000 /* 1 month */);
+
+        $ctp->createCookie($user, $cookieName, $cookieExpiration);
+    }
+
+    /**
+     * Get the rememberme key from the cookie.
+     *
+     * @return string hte key found, or null if no key was found.
+     */
+    protected function getRememberMeKeyFromCookie()
+    {
+       // Check if we can authenticate the user with a cookie-based token
+        $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
+
+        $ctp = new CookieTokenProvider();
+
+        return $ctp->getKeyFromCookie($this->getRequest(), $cookieName);
+    }
+
+    /** Clear the remember me cookie.
+     *
+     */
+    protected function clearRememberMeCookie() {
+
+        $ctp = new CookieTokenProvider();
+
+        $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
+
+        $ctp->clearCookie($cookieName);
     }
 
     /**
