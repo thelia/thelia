@@ -26,8 +26,12 @@
     </div>
 
     {* -- Main page content section ----------------------------------------- *}
+    {if $isAlreadyInstalled}
+        <div>{intl l='Thelia is already installed'}</div>
+    {else}
+        {block name="main-content"}Put here the content of the template{/block}
+    {/if}
 
-    {block name="main-content"}Put here the content of the template{/block}
 
     {* -- Footer section ---------------------------------------------------- *}
 

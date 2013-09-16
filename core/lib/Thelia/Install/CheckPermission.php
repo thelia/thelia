@@ -52,6 +52,13 @@ class CheckPermission extends BaseInstall
         self::DIR_CACHE,
     );
 
+    /** @var array Minimum server configuration necessary */
+    protected $minServerConfigurationNecessary = array(
+        'memory_limit' => 134217728,
+        'post_max_size' => 20971520,
+        'upload_max_filesize' => 2097152
+    );
+
     protected $validationMessages = array();
 
     /** @var bool If permissions are OK */
@@ -71,6 +78,12 @@ class CheckPermission extends BaseInstall
     {
         $this->translator = $translator;
 
+        $this->validationMessages['php_version'] =  array(
+            'text' => $this->getI18nPhpVersionText('5.4', phpversion(), true),
+            'hint' =>  $this->getI18nPhpVersionHint(),
+            'status' => true
+        );
+
         foreach ($this->directoriesToBeWritable as $directory) {
             $this->validationMessages[$directory] =  array(
                 'text' => '',
@@ -78,6 +91,14 @@ class CheckPermission extends BaseInstall
                 'status' => true
             );
         }
+        foreach ($this->minServerConfigurationNecessary as $key => $value) {
+            $this->validationMessages[$key] =  array(
+                'text' => '',
+                'hint' =>  $this->getI18nConfigHint(),
+                'status' => true
+            );
+        }
+
         parent::__construct($verifyInstall);
     }
 
@@ -88,18 +109,34 @@ class CheckPermission extends BaseInstall
      */
     public function exec()
     {
+        if (version_compare(phpversion(), '5.4', '<')) {
+            $this->validationMessages['php_version'] = $this->getI18nPhpVersionText('5.4', phpversion(), false);
+        }
+
         foreach ($this->directoriesToBeWritable as $directory) {
             $fullDirectory = THELIA_ROOT . $directory;
-            $this->validationMessages[$directory]['text'] = $this->getI18nText($fullDirectory, true);
+            $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($fullDirectory, true);
             if (is_writable($fullDirectory) === false) {
                 if (!$this->makeDirectoryWritable($fullDirectory)) {
                     $this->isValid = false;
                     $this->validationMessages[$directory]['status'] = false;
-                    $this->validationMessages[$directory]['text'] = $this->getI18nText($fullDirectory, false);
-                    $this->validationMessages[$directory]['hint'] = $this->getI18nHint($fullDirectory);
+                    $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($fullDirectory, false);
+                    $this->validationMessages[$directory]['hint'] = $this->getI18nDirectoryHint($fullDirectory);
                 }
             }
         }
+
+        foreach ($this->minServerConfigurationNecessary as $key => $value) {
+            $this->validationMessages[$key]['text'] = $this->getI18nConfigText($key, $this->formatBytes($value), ini_get($key), true);
+            if (!$this->verifyServerMemoryValues($key, $value)) {
+                $this->isValid = false;
+                $this->validationMessages[$key]['status'] = false;
+                $this->validationMessages[$key]['text'] = $this->getI18nConfigText($key, $this->formatBytes($value), ini_get($key), false);;
+            }
+        }
+
+
+
 
         return $this->isValid;
     }
@@ -144,7 +181,7 @@ class CheckPermission extends BaseInstall
      *
      * @return string
      */
-    protected function getI18nText($directory, $isValid)
+    protected function getI18nDirectoryText($directory, $isValid)
     {
         if ($this->translator !== null) {
             if ($isValid) {
@@ -174,7 +211,7 @@ class CheckPermission extends BaseInstall
      *
      * @return string
      */
-    protected function getI18nHint($directory)
+    protected function getI18nDirectoryHint($directory)
     {
         if ($this->translator !== null) {
             $sentence = '<span class="label label-primary">chmod 777 %directory%</span> on your server with admin rights could help';
@@ -190,5 +227,160 @@ class CheckPermission extends BaseInstall
         }
 
         return $translatedText;
+    }
+
+
+    /**
+     * Get Translated text about the directory state
+     * Not usable with CLI
+     *
+     * @param string $key           .ini file key
+     * @param string $expectedValue Expected server value
+     * @param string $currentValue  Actual server value
+     * @param bool   $isValid       If server configuration is valid
+     *
+     * @return string
+     */
+    protected function getI18nConfigText($key, $expectedValue, $currentValue, $isValid)
+    {
+        if ($isValid) {
+            $sentence = 'Your <span class="label label-primary">%key%</span> server configuration (currently %currentValue%) is well enough to run Thelia2 (%expectedValue% needed)';
+        } else {
+            $sentence = 'Your <span class="label label-primary">%key%</span> server configuration (currently %currentValue%) is not sufficient enough in order to run Thelia2 (%expectedValue% needed)';
+        }
+
+        $translatedText = $this->translator->trans(
+            $sentence,
+            array(
+                '%key%' => $key,
+                '%expectedValue%' => $expectedValue,
+                '%currentValue%' => $currentValue,
+            ),
+            'install-wizard'
+        );
+
+        return $translatedText;
+    }
+
+    /**
+     * Get Translated hint about the config requirement issue
+     *
+     * @return string
+     */
+    protected function getI18nConfigHint()
+    {
+        $sentence = 'Modifying this value on your server <span class="label label-primary">php.ini</span> file with admin rights could help';
+        $translatedText = $this->translator->trans(
+            $sentence,
+            array(),
+            'install-wizard'
+        );
+
+        return $translatedText;
+    }
+
+    /**
+     * Get Translated hint about the PHP version requirement issue
+     *
+     * @param string $expectedValue
+     * @param string $currentValue
+     * @param bool   $isValid
+     *
+     * @return string
+     */
+    protected function getI18nPhpVersionText($expectedValue, $currentValue, $isValid)
+    {
+        if ($this->translator !== null) {
+            if ($isValid) {
+                $sentence = 'Your PHP version <span class="label label-primary">%currentValue%</span> is well enough to run Thelia2 (%expectedValue% needed)';
+            } else {
+                $sentence = 'Your PHP version <span class="label label-primary">%currentValue%</span> is not sufficient enough to run Thelia2 (%expectedValue% needed)';
+            }
+
+            $translatedText = $this->translator->trans(
+                $sentence,
+                array(
+                    '%expectedValue%' => $expectedValue,
+                    '%currentValue%' => $currentValue,
+                ),
+                'install-wizard'
+            );
+        } else {
+            $translatedText = sprintf('Thelia needs at least PHP %s (%s currently)', $expectedValue, $currentValue);
+        }
+
+        return $translatedText;
+    }
+
+    /**
+     * Get Translated hint about the config requirement issue
+     *
+     * @return string
+     */
+    protected function getI18nPhpVersionHint()
+    {
+        $sentence = 'Upgrading your version of PHP with admin rights could help';
+        $translatedText = $this->translator->trans(
+            $sentence,
+            array(),
+            'install-wizard'
+        );
+
+        return $translatedText;
+    }
+
+    /**
+     * Check if a server memory value is met or not
+     *
+     * @param string $key                   .ini file key
+     * @param int    $necessaryValueInBytes Expected value in bytes
+     *
+     * @return bool
+     */
+    protected function verifyServerMemoryValues($key, $necessaryValueInBytes)
+    {
+        $serverValueInBytes = $this->returnBytes(ini_get($key));
+
+        return ($serverValueInBytes >= $necessaryValueInBytes);
+    }
+
+    /**
+     * Return bytes from memory .ini value
+     *
+     * @param string $val .ini value
+     *
+     * @return int
+     */
+    protected function returnBytes($val)
+    {
+        $val = trim($val);
+        $last = strtolower($val[strlen($val)-1]);
+        switch($last) {
+            // The 'G' modifier is available since PHP 5.1.0
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+
+        return $val;
+    }
+
+    /**
+     * Convert bytes to readable string
+     *
+     * @param int $bytes     bytes
+     * @param int $precision conversion precision
+     *
+     * @return string
+     */
+    protected function formatBytes($bytes, $precision = 2)
+    {
+        $base = log($bytes) / log(1024);
+        $suffixes = array('', 'k', 'M', 'G', 'T');
+
+        return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
     }
 }

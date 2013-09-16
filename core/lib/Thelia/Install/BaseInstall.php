@@ -37,6 +37,8 @@ abstract class BaseInstall
      * Constructor
      *
      * @param bool $verifyInstall Verify if an installation already exists
+     *
+     * @throws Exception\AlreadyInstallException
      */
     public function __construct($verifyInstall = true)
     {
@@ -47,10 +49,9 @@ abstract class BaseInstall
         } else {
             $this->isConsoleMode = false;
         }
-        /* TODO : activate this part
         if (file_exists(THELIA_ROOT . '/local/config/database.yml') && $verifyInstall) {
             throw new AlreadyInstallException("Thelia is already installed");
-        }*/
+        }
 
 
         $this->exec();
