@@ -24,7 +24,7 @@
                 <a href="cart-step4.php" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">Secure payment</span></a>
             </div>
 
-            <form id="form-cart-delivery" action="cart-step3.php" method="post" role="form">
+            <form id="form-cart-delivery" action="{url path="/order/deliver"}" method="post" role="form">
 
                 <div id="billing-address" class="panel">
                     <div class="panel-heading clearfix">
@@ -164,7 +164,7 @@
                         {loop type="delivery" name="deliveries" force_return="true"}
                         <div class="radio">
                             <label for="delivery-method_1">
-                                <input type="radio" name="delivery-method" id="delivery-method_1" value="1">
+                                <input type="radio" name="delivery-module" value="{$ID}">
                                 <strong>{$TITLE}</strong> / {currency attr="symbol"} {$PRICE}
                             </label>
                         </div>
