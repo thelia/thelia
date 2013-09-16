@@ -103,25 +103,27 @@
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 
-    <route id="admin.coupon.list" path="/admin/coupon">
+    <route id="admin.coupon.list" path="/admin/coupon/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::browseAction</default>
     </route>
-    <route id="admin.coupon.create" path="/admin/coupon/create">
+    <route id="admin.coupon.create" path="/admin/coupon/create/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::createAction</default>
     </route>
-    <route id="admin.coupon.update" path="/admin/coupon/update/{couponId}">
+    <route id="admin.coupon.update" path="/admin/coupon/update/{couponId}/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::updateAction</default>
     </route>
-    <route id="admin.coupon.read" path="/admin/coupon/read/{couponId}">
+    <route id="admin.coupon.read" path="/admin/coupon/read/{couponId}/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
     </route>
-    <route id="admin.coupon.rule.input" path="/admin/coupon/rule/{ruleId}">
+    <route id="admin.coupon.rule.input" path="/admin/coupon/rule/{ruleId}/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::getRuleInputAction</default>
     </route>
     <route id="admin.coupon.rule.update" path="/admin/coupon/{couponId}/rule/update/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::updateRulesAction</default>
     </route>
-
+    <route id="admin.coupon.consume" path="/admin/coupon/consume/{couponCode}/">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::consumeAction</default>
+    </route>
 
     <!-- Routes to the Config (system variables) controller -->
 
