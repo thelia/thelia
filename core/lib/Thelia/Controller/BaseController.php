@@ -283,6 +283,9 @@ class BaseController extends ContainerAware
     }
 
     /**
+     *
+     * return an instance of \Swift_Mailer with good Transporter configured.
+     *
      * @return \Swift_Mailer
      */
     public function getMailer()
