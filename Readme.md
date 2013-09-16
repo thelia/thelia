@@ -12,13 +12,34 @@ Here is the most recent developed code for the next major version (v2). You can 
 
 Most part of the code can possibly change, a large part will be refactor soon, graphical setup does not exist yet.
 
+Requirements
+------------
+
+* php 5.4
+* apache 2
+* mysql 5
+
+If you use Mac OSX, they still don't use php 5.4 as default php version... There are many solutions for you :
+
+* use linux (the better one)
+* use last MAMP version and put the php bin directory in your path and  :
+
+```bash
+$ vim ~/.bash_profile
+then put this line : export PATH=/Applications/MAMP/bin/php/php5.4.x/bin/:$PATH
+$ . .bash_profile
+```
+
+* configure a complete development environment : http://php-osx.liip.ch/
+* use a virtual machine with vagrant and puppet : https://puphpet.com/
+
 Installation
 ------------
 
 ``` bash
 $ git clone --recursive https://github.com/thelia/thelia.git
 $ cd thelia
-$ wget http://getcomposer.org/composer.phar
+$ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
 
