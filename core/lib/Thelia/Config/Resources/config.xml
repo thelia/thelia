@@ -72,10 +72,18 @@
         <form name="thelia.admin.attribute.creation" class="Thelia\Form\AttributeCreationForm"/>
         <form name="thelia.admin.attribute.modification" class="Thelia\Form\AttributeModificationForm"/>
 
+        <form name="thelia.admin.feature.creation" class="Thelia\Form\FeatureCreationForm"/>
+        <form name="thelia.admin.feature.modification" class="Thelia\Form\FeatureModificationForm"/>
+
         <form name="thelia.admin.attributeav.creation" class="Thelia\Form\AttributeAvCreationForm"/>
+
+        <form name="thelia.admin.featureav.creation" class="Thelia\Form\FeatureAvCreationForm"/>
 
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>
+
+        <form name="thelia.admin.country.creation" class="Thelia\Form\CountryCreationForm"/>
+        <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
 
     </forms>
 

@@ -50,7 +50,7 @@ class DebugBarListeners extends BaseAction implements EventSubscriberInterface {
         //$debugBar->addCollector(new RequestDataCollector());
         $debugBar->addCollector(new TimeDataCollector());
         $debugBar->addCollector(new MemoryCollector());
-        $debugBar->addCollector(new PropelCollector());
+        $debugBar->addCollector(new PropelCollector(\Thelia\Log\Tlog::getInstance()));
     }
 
     /**

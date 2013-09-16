@@ -95,7 +95,7 @@ URL: http://www.thelia.net
                     {/elseloop}
                     <li class="dropdown">
                         <a href="cart.html" class="dropdown-toggle cart" data-toggle="dropdown">
-                            Cart <span class="badge">2</span>
+                            Cart <span class="badge">{cart attr="count_item"}</span>
                         </a>
                     </li>
                 </ul>

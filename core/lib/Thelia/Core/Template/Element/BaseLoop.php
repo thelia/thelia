@@ -89,6 +89,7 @@ abstract class BaseLoop
             Argument::createIntTypeArgument('page'),
             Argument::createIntTypeArgument('limit', PHP_INT_MAX),
             Argument::createBooleanTypeArgument('backend_context', false),
+            Argument::createBooleanTypeArgument('force_return', false),
         );
     }
 

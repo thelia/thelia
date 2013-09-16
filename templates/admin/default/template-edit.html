@@ -108,8 +108,8 @@
 
     <script>
         $(function() {
-        	$('#attribute_list_management').load("{admin_viewurl view='ajax/template-attribute-list' template_id=$template_id}");
-            $('#feature_list_management').load("{admin_viewurl view='ajax/template-feature-list' template_id=$template_id}");
+        	$('#feature_list_management').load("{url path='/admin/configuration/templates/features/list' template_id=$template_id}");
+            $('#attribute_list_management').load("{url path='/admin/configuration/templates/attributes/list'  template_id=$template_id}");
        });
     </script>
 {/block}

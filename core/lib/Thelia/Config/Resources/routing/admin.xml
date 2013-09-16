@@ -234,6 +234,30 @@
         <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteAction</default>
     </route>
 
+    <route id="admin.configuration.templates.features.list" path="/admin/configuration/templates/features/list">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::getAjaxFeaturesAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.features.add" path="/admin/configuration/templates/features/add">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::addFeatureAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.features.delete" path="/admin/configuration/templates/features/delete">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteFeatureAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.attributes.list" path="/admin/configuration/templates/attributes/list">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::getAjaxAttributesAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.attributes.add" path="/admin/configuration/templates/attributes/add">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::addAttributeAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.attributes.delete" path="/admin/configuration/templates/attributes/delete">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteAttributeAction</default>
+    </route>
+
 
     <!-- attribute and attributes value management -->
 
@@ -291,6 +315,80 @@
     </route>
 
     <!-- end attribute and feature routes  management -->
+
+    <!-- Countries routes management -->
+
+    <route id="admin.configuration.countries.default" path="/admin/configuration/countries">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::indexAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.create" path="/admin/configuration/countries/create">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.update.view" path="/admin/configuration/countries/update/{country_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::updateAction</default>
+        <requirement key="country_id">\d+</requirement>
+    </route>
+
+    <!-- end countries routes  management -->
+
+    <!-- feature and features value management -->
+
+    <route id="admin.configuration.features.default" path="/admin/configuration/features">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.features.create" path="/admin/configuration/features/create">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.features.update" path="/admin/configuration/features/update">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::updateAction</default>
+    </route>
+
+    <route id="admin.configuration.features.save" path="/admin/configuration/features/save">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.configuration.features.delete" path="/admin/configuration/features/delete">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.features.update-position" path="/admin/configuration/features/update-position">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::updatePositionAction</default>
+    </route>
+
+    <route id="admin.configuration.features.rem-from-all" path="/admin/configuration/features/remove-from-all-templates">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::removeFromAllTemplates</default>
+    </route>
+
+    <route id="admin.configuration.features.add-to-all" path="/admin/configuration/features/add-to-all-templates">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::addToAllTemplates</default>
+    </route>
+
+
+    <route id="admin.configuration.features-av.create" path="/admin/configuration/features-av/create">
+        <default key="_controller">Thelia\Controller\Admin\FeatureAvController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.features-av.update" path="/admin/configuration/features-av/update">
+        <default key="_controller">Thelia\Controller\Admin\FeatureAvController::updateAction</default>
+    </route>
+
+    <route id="admin.configuration.features-av.save" path="/admin/configuration/features-av/save">
+        <default key="_controller">Thelia\Controller\Admin\FeatureAvController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.configuration.features-av.delete" path="/admin/configuration/features-av/delete">
+        <default key="_controller">Thelia\Controller\Admin\FeatureAvController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.features-av.update-position" path="/admin/configuration/features-av/update-position">
+        <default key="_controller">Thelia\Controller\Admin\FeatureAvController::updatePositionAction</default>
+    </route>
+
+    <!-- end feature and feature routes  management -->
 
 	<!-- The default route, to display a template -->
 

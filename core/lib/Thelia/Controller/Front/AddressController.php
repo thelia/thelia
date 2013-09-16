@@ -47,6 +47,7 @@ class AddressController extends BaseFrontController
      */
     public function generateModalAction($address_id)
     {
+
         $this->checkAuth();
         $this->checkXmlHttpRequest();
 
@@ -62,6 +63,7 @@ class AddressController extends BaseFrontController
      */
     public function createAction()
     {
+
         $this->checkAuth();
 
         $addressCreate = new AddressCreateForm($this->getRequest());
