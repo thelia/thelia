@@ -23,6 +23,7 @@
 
 namespace Thelia\Coupon;
 
+use Thelia\Constraint\ConstraintValidator;
 use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\Operators;
 
@@ -169,6 +170,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -205,6 +209,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -241,6 +248,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -277,6 +287,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -313,6 +326,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -349,6 +365,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -385,6 +404,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -421,6 +443,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -457,6 +482,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -493,6 +521,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -529,6 +560,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -565,6 +599,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -601,6 +638,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -637,6 +677,9 @@ class AvailableForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(

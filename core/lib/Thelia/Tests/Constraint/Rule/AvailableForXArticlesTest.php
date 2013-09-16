@@ -23,6 +23,7 @@
 
 namespace Thelia\Coupon;
 
+use Thelia\Constraint\ConstraintValidator;
 use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
 use Thelia\Constraint\Rule\SerializableRule;
@@ -192,6 +193,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -224,6 +228,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -256,6 +263,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -288,6 +298,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -320,6 +333,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -352,6 +368,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -384,6 +403,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -416,6 +438,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -448,6 +473,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -480,6 +508,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -512,6 +543,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -544,6 +578,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -570,6 +607,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -602,6 +642,9 @@ class AvailableForXArticlesTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
