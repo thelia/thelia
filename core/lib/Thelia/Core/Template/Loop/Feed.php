@@ -73,9 +73,14 @@ class Feed extends BaseLoop
 
         $limit = min(count($items), $this->getLimit());
 
-        $loopResult = new LoopResult();
-
+        $indexes = array();
         for ($idx = 0; $idx < $limit; $idx++) {
+            $indexes[] = $idx;
+        }
+
+        $loopResult = new LoopResult($query);
+
+        foreach ($indexes as $idx) {
 
             $item = $items[$idx];
 
@@ -87,7 +92,7 @@ class Feed extends BaseLoop
 
             $date = $item->get_date('d/m/Y');
 
-            $loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow($loopResult, $item, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow->set("URL", $item->get_permalink());
             $loopResultRow->set("TITLE", $item->get_title());

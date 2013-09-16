@@ -37,7 +37,7 @@ class LoopResult implements \Iterator
     public function __construct($modelCollection = null)
     {
         $this->position = 0;
-        if ($modelCollection instanceof ObjectCollection || $modelCollection instanceof PropelModelPager) {
+        if ($modelCollection instanceof ObjectCollection || $modelCollection instanceof PropelModelPager || is_array($modelCollection)) {
             $this->modelCollection = $modelCollection;
         }
     }
