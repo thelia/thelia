@@ -8,6 +8,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\CartItem as BaseCartItem;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Event\CartEvent;
+use Thelia\TaxEngine\Calculator;
 
 class CartItem extends BaseCartItem
 {
@@ -64,4 +65,15 @@ class CartItem extends BaseCartItem
         return $this;
     }
 
+    public function getTaxedPrice(Country $country)
+    {
+        $taxCalculator = new Calculator();
+        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice()), 2);
+    }
+
+    public function getTaxedPromoPrice(Country $country)
+    {
+        $taxCalculator = new Calculator();
+        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()), 2);
+    }
 }

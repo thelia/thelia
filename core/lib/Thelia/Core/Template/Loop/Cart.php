@@ -13,6 +13,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\CountryQuery;
 
 class Cart extends BaseLoop
 {
@@ -82,7 +83,6 @@ class Cart extends BaseLoop
 
         foreach ($cartItems as $cartItem) {
             $product = $cartItem->getProduct();
-            //$product->setLocale($this->request->getSession()->getLocale());
 
             $loopResultRow = new LoopResultRow($result, $cartItem, $this->versionable, $this->timestampable, $this->countable);
 
@@ -92,6 +92,16 @@ class Cart extends BaseLoop
             $loopResultRow->set("QUANTITY", $cartItem->getQuantity());
             $loopResultRow->set("PRICE", $cartItem->getPrice());
             $loopResultRow->set("PRODUCT_ID", $product->getId());
+            $loopResultRow->set("PRODUCT_URL", $product->getUrl($this->request->getSession()->getLang()->getLocale()))
+                ->set("PRICE", $cartItem->getPrice())
+                ->set("PROMO_PRICE", $cartItem->getPromoPrice())
+                ->set("TAXED_PRICE", $cartItem->getTaxedPrice(
+                    CountryQuery::create()->findOneById(64) // @TODO : make it magic
+                ))
+                ->set("PROMO_TAXED_PRICE", $cartItem->getTaxedPromoPrice(
+                    CountryQuery::create()->findOneById(64) // @TODO : make it magic
+                ))
+                ->set("IS_PROMO", $cartItem->getPromo() === 1 ? 1 : 0);
             $result->addRow($loopResultRow);
         }
 

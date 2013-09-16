@@ -88,11 +88,17 @@
                                     <dd>Option 1</dd>*}
                                 </dl>
                             </div>
-                            <a href="?item=<?php echo $count; ?>&amp;qty=0" class="btn btn-remove">Remove</a>
+                            <a href="{url path="/cart/delete/{$ITEM_ID}"}" class="btn btn-remove">Remove</a>
                         </td>
                         <td class="unitprice">
-                            <div class="special-price"><span class="price">$50.00</span></div>
-                            <small class="old-price">instead of <span class="price">$59.99</span></small>
+                            {if $IS_PROMO == 1}
+                                {assign "real_price" $PROMO_TAXED_PRICE}
+                                <div class="special-price"><span class="price">{currency attr="symbol"} {$PROMO_TAXED_PRICE}</span></div>
+                                <small class="old-price">instead of <span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></small>
+                            {else}
+                                {assign "real_price" $TAXED_PRICE}
+                                <div class="special-price"><span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></div>
+                            {/if}
                         </td>
                         <td class="qty">
                             <div class="form-group group-qty">
@@ -100,7 +106,7 @@
                             </div>
                         </td>
                         <td class="subprice">
-                            <span class="price">$100.00</span>
+                            <span class="price">{currency attr="symbol"} {$real_price * $QUANTITY}</span>
                         </td>
                     </tr>
 
@@ -120,7 +126,7 @@
                     </tfoot>
                 </table>
 
-                <a href="#" role="button" class="btn btn-continue-shopping"><span>Continue Shopping</span></a>
+                <a href="{navigate to="index"}" role="button" class="btn btn-continue-shopping"><span>Continue Shopping</span></a>
                 <button type="submit" name="checkout" class="btn btn-checkout"><span>Proceed checkout</span></button>
             </form>
 
