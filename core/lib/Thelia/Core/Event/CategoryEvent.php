@@ -35,7 +35,8 @@ class CategoryEvent extends ActionEvent
         $this->category = $category;
     }
 
-    public function hasCategory() {
+    public function hasCategory()
+    {
         return ! is_null($this->category);
     }
 

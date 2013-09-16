@@ -25,6 +25,11 @@ namespace Thelia\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Router;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
@@ -35,7 +40,6 @@ use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Event\DefaultActionEvent;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -61,8 +65,8 @@ class BaseController extends ContainerAware
     /**
      * Dispatch a Thelia event
      *
-     * @param string    $eventName a TheliaEvent name, as defined in TheliaEvents class
-     * @param Event     $event the action event, or null (a DefaultActionEvent will be dispatched)
+     * @param string $eventName a TheliaEvent name, as defined in TheliaEvents class
+     * @param Event  $event     the action event, or null (a DefaultActionEvent will be dispatched)
      */
     protected function dispatch($eventName, ActionEvent $event = null)
     {
@@ -123,7 +127,7 @@ class BaseController extends ContainerAware
     /**
      * Returns the session from the current request
      *
-     * @return \Symfony\Component\HttpFoundation\Session\SessionInterface
+     * @return \Thelia\Core\HttpFoundation\Session\Session
      */
     protected function getSession()
     {
@@ -135,11 +139,11 @@ class BaseController extends ContainerAware
     /**
      * Get all errors that occured in a form
      *
-     * @param \Symfony\Component\Form\Form $form
-     * @return string the error string
+     * @param  \Symfony\Component\Form\Form $form
+     * @return string                       the error string
      */
-    private function getErrorMessages(\Symfony\Component\Form\Form $form) {
-
+    private function getErrorMessages(\Symfony\Component\Form\Form $form)
+    {
         $errors = '';
 
         foreach ($form->getErrors() as $key => $error) {
@@ -173,12 +177,17 @@ class BaseController extends ContainerAware
 
             if ($form->isValid()) {
                 return $form;
+            } else {
+                $errorMessage = null;
+                if ($form->get("error_message")->getData() != null) {
+                    $errorMessage = $form->get("error_message")->getData();
+                } else {
+                    $errorMessage = sprintf("Missing or invalid data: %s", $this->getErrorMessages($form));
+                }
+
+                throw new FormValidationException($errorMessage);
             }
-            else {
-                throw new FormValidationException(sprintf("Missing or invalid data: %s", $this->getErrorMessages($form)));
-            }
-        }
-        else {
+        } else {
             throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
         }
     }
@@ -189,9 +198,9 @@ class BaseController extends ContainerAware
      *
      * @param string $url
      */
-    public function redirect($url, $status = 302)
+    public function redirect($url, $status = 302, $cookies = array())
     {
-        Redirect::exec($url, $status);
+        Redirect::exec($url, $status, $cookies);
     }
 
     /**
@@ -203,12 +212,9 @@ class BaseController extends ContainerAware
     {
         if ($form != null) {
             $url = $form->getSuccessUrl();
-        }
-        else {
+        } else {
             $url = $this->getRequest()->get("success_url");
         }
-
-        echo "url=$url";
 
         if (null !== $url) $this->redirect($url);
     }
@@ -216,20 +222,28 @@ class BaseController extends ContainerAware
     /**
      * Get a route path from the route id.
      *
-     * @param $routerName
-     * @param $routeId
+     * @param string         $routerName    Router name
+     * @param string         $routeId       The name of the route
+     * @param mixed          $parameters    An array of parameters
+     * @param Boolean|string $referenceType The type of reference to be generated (one of the constants)
      *
-     * @return mixed
-     * @throws InvalidArgumentException
+     * @throws RouteNotFoundException              If the named route doesn't exist
+     * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
+     * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
+     *                                             it does not match the requirement
+     * @throws \InvalidArgumentException When the router doesn't exist
+     * @return string                    The generated URL
      */
-    protected function getRouteFromRouter($routerName, $routeId) {
-        $route = $this->container->get($routerName)->getRouteCollection()->get($routeId);
+    protected function getRouteFromRouter($routerName, $routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_URL)
+    {
+        /** @var Router $router */
+        $router =  $this->container->get($routerName);
 
-        if ($route == null) {
-            throw new \InvalidArgumentException(sprintf("Route ID '%s' does not exists.", $routeId));
+        if ($router == null) {
+            throw new \InvalidArgumentException(sprintf("Router '%s' does not exists.", $routerName));
         }
 
-        return $route->getPath();
+        return $router->generate($routeId, $parameters, $referenceType);
     }
 
     /**
@@ -239,5 +253,44 @@ class BaseController extends ContainerAware
     protected function pageNotFound()
     {
         throw new NotFoundHttpException();
+    }
+
+    /**
+     * Check if environment is in debug mode
+     *
+     * @return bool
+     */
+    protected function isDebug()
+    {
+        return $this->container->getParameter('kernel.debug');
+    }
+
+    protected function accessDenied()
+    {
+        throw new AccessDeniedHttpException();
+    }
+
+    /**
+     * check if the current http request is a XmlHttpRequest.
+     *
+     * If not, send a
+     */
+    protected function checkXmlHttpRequest()
+    {
+        if(false === $this->getRequest()->isXmlHttpRequest() && false === $this->isDebug()) {
+            $this->accessDenied();
+        }
+    }
+
+    /**
+     *
+     * return an instance of \Swift_Mailer with good Transporter configured.
+     *
+     * @return \Swift_Mailer
+     */
+    public function getMailer()
+    {
+        $mailer = $this->container->get('mailer');
+        return $mailer->getSwiftMailer();
     }
 }

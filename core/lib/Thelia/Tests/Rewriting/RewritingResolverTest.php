@@ -61,7 +61,7 @@ class RewritingResolverTest extends \PHPUnit_Framework_TestCase
         $resolver = new RewritingResolver();
 
         $method = $this->getMethod('getOtherParameters');
-        $actual = $method->invoke($resolver);
+        $method->invoke($resolver);
     }
 
     public function testGetOtherParameters()
@@ -120,7 +120,7 @@ class RewritingResolverTest extends \PHPUnit_Framework_TestCase
         $collection = new ObjectCollection();
         $collection->setModel('\Thelia\Model\RewritingArgument');
 
-        for($i=0; $i<3; $i++) {
+        for ($i=0; $i<3; $i++) {
             $ra = new RewritingArgument();
             $ra->setParameter('foo' . $i);
             $ra->setValue('bar' . $i);
@@ -131,7 +131,6 @@ class RewritingResolverTest extends \PHPUnit_Framework_TestCase
 
             $collection->append($ra);
         }
-
 
         $resolverQuery = $this->getMock('\Thelia\Model\RewritingUrlQuery', array('getResolverSearch'));
         $resolverQuery->expects($this->any())

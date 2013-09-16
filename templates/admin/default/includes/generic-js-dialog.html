@@ -15,14 +15,14 @@ Parameters:
 {* re-display the form creation dialog if it contains errors *}
 
 {form name="{$form_name}"}
-    {if #form_error}
+    {if $form_error}
         $('#{$dialog_id}').modal();
     {/if}
 {/form}
 
 {* Always reset create dialog on close *}
 
-$('#{$dialog_id}').on('hidden', function() {
+$('#{$dialog_id}').on('hidden.bs.modal', function() {
 
     // Hide error message
     $('#{$dialog_id}_error').remove();

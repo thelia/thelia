@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event;
 
-use Thelia\Model\Category;
-
 class CategoryCreateEvent extends CategoryEvent
 {
     protected $title;
@@ -46,6 +44,7 @@ class CategoryCreateEvent extends CategoryEvent
     public function setTitle($title)
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -57,6 +56,7 @@ class CategoryCreateEvent extends CategoryEvent
     public function setParent($parent)
     {
         $this->parent = $parent;
+
         return $this;
     }
 
@@ -68,6 +68,7 @@ class CategoryCreateEvent extends CategoryEvent
     public function setLocale($locale)
     {
         $this->locale = $locale;
+
         return $this;
     }
 }

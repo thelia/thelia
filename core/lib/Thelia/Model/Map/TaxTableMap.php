@@ -57,7 +57,7 @@ class TaxTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class TaxTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the ID field
@@ -75,9 +75,14 @@ class TaxTableMap extends TableMap
     const ID = 'tax.ID';
 
     /**
-     * the column name for the RATE field
+     * the column name for the TYPE field
      */
-    const RATE = 'tax.RATE';
+    const TYPE = 'tax.TYPE';
+
+    /**
+     * the column name for the SERIALIZED_REQUIREMENTS field
+     */
+    const SERIALIZED_REQUIREMENTS = 'tax.SERIALIZED_REQUIREMENTS';
 
     /**
      * the column name for the CREATED_AT field
@@ -110,12 +115,12 @@ class TaxTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Rate', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'rate', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(TaxTableMap::ID, TaxTableMap::RATE, TaxTableMap::CREATED_AT, TaxTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'RATE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'rate', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'Type', 'SerializedRequirements', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'type', 'serializedRequirements', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(TaxTableMap::ID, TaxTableMap::TYPE, TaxTableMap::SERIALIZED_REQUIREMENTS, TaxTableMap::CREATED_AT, TaxTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'TYPE', 'SERIALIZED_REQUIREMENTS', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'type', 'serialized_requirements', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -125,12 +130,12 @@ class TaxTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Rate' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'rate' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(TaxTableMap::ID => 0, TaxTableMap::RATE => 1, TaxTableMap::CREATED_AT => 2, TaxTableMap::UPDATED_AT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'RATE' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'rate' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Type' => 1, 'SerializedRequirements' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'type' => 1, 'serializedRequirements' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(TaxTableMap::ID => 0, TaxTableMap::TYPE => 1, TaxTableMap::SERIALIZED_REQUIREMENTS => 2, TaxTableMap::CREATED_AT => 3, TaxTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TYPE' => 1, 'SERIALIZED_REQUIREMENTS' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'type' => 1, 'serialized_requirements' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -150,7 +155,8 @@ class TaxTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('RATE', 'Rate', 'FLOAT', true, null, null);
+        $this->addColumn('TYPE', 'Type', 'VARCHAR', true, 255, null);
+        $this->addColumn('SERIALIZED_REQUIREMENTS', 'SerializedRequirements', 'LONGVARCHAR', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -160,7 +166,7 @@ class TaxTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('TaxRuleCountry', '\\Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'tax_id', ), 'SET NULL', 'RESTRICT', 'TaxRuleCountries');
+        $this->addRelation('TaxRuleCountry', '\\Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'tax_id', ), 'CASCADE', 'RESTRICT', 'TaxRuleCountries');
         $this->addRelation('TaxI18n', '\\Thelia\\Model\\TaxI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'TaxI18ns');
     } // buildRelations()
 
@@ -327,12 +333,14 @@ class TaxTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(TaxTableMap::ID);
-            $criteria->addSelectColumn(TaxTableMap::RATE);
+            $criteria->addSelectColumn(TaxTableMap::TYPE);
+            $criteria->addSelectColumn(TaxTableMap::SERIALIZED_REQUIREMENTS);
             $criteria->addSelectColumn(TaxTableMap::CREATED_AT);
             $criteria->addSelectColumn(TaxTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.RATE');
+            $criteria->addSelectColumn($alias . '.TYPE');
+            $criteria->addSelectColumn($alias . '.SERIALIZED_REQUIREMENTS');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

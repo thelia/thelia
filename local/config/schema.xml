@@ -28,14 +28,21 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <column name="template_id" required="true" type="INTEGER" />
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
+    </foreign-key>
+    <foreign-key foreignTable="template" name="fk_product_template1">
+      <reference foreign="id" local="template_id" />
     </foreign-key>
     <unique name="ref_UNIQUE">
       <unique-column name="ref" />
     </unique>
     <index name="idx_product_tax_rule_id">
       <index-column name="tax_rule_id" />
+    </index>
+    <index name="fk_product_template_id">
+      <index-column name="template_id" />
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
@@ -73,6 +80,7 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <column name="by_default" type="TINYINT" />
     <foreign-key foreignTable="area" name="fk_country_area_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="area_id" />
     </foreign-key>
@@ -86,7 +94,8 @@
   </table>
   <table name="tax" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="rate" required="true" type="FLOAT" />
+    <column name="type" required="true" size="255" type="VARCHAR" />
+    <column name="serialized_requirements" required="true" type="LONGVARCHAR" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="LONGVARCHAR" />
     <behavior name="timestampable" />
@@ -96,19 +105,19 @@
   </table>
   <table name="tax_rule" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="code" size="45" type="VARCHAR" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="LONGVARCHAR" />
     <behavior name="timestampable" />
-    <behavior name="i18n" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description" />
+    </behavior>
   </table>
   <table name="tax_rule_country" namespace="Thelia\Model">
-    <column name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="tax_rule_id" type="INTEGER" />
-    <column name="country_id" type="INTEGER" />
-    <column name="tax_id" type="INTEGER" />
-    <column name="none" type="TINYINT" />
-    <foreign-key foreignTable="tax" name="fk_tax_rule_country_tax_id" onDelete="SET NULL" onUpdate="RESTRICT">
+    <column name="tax_rule_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="country_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="tax_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="position" required="true" type="INTEGER" />
+    <foreign-key foreignTable="tax" name="fk_tax_rule_country_tax_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_id" />
     </foreign-key>
     <foreign-key foreignTable="tax_rule" name="fk_tax_rule_country_tax_rule_id" onDelete="CASCADE" onUpdate="RESTRICT">
@@ -187,21 +196,21 @@
     </index>
     <behavior name="timestampable" />
   </table>
-  <table isCrossRef="true" name="feature_category" namespace="Thelia\Model">
+  <table isCrossRef="true" name="feature_template" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="feature_id" required="true" type="INTEGER" />
-    <column name="category_id" required="true" type="INTEGER" />
-    <foreign-key foreignTable="category" name="fk_feature_category_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="category_id" />
-    </foreign-key>
-    <foreign-key foreignTable="feature" name="fk_feature_category_feature_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <column name="template_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="feature" name="fk_feature_template_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="feature_id" />
     </foreign-key>
-    <index name="idx_feature_category_category_id">
-      <index-column name="category_id" />
-    </index>
-    <index name="idx_feature_category_feature_id">
+    <foreign-key foreignTable="template" name="fk_feature_template">
+      <reference foreign="id" local="template_id" />
+    </foreign-key>
+    <index name="idx_feature_template_id">
       <index-column name="feature_id" />
+    </index>
+    <index name="fk_feature_template_idx">
+      <index-column name="template_id" />
     </index>
     <behavior name="timestampable" />
   </table>
@@ -263,6 +272,7 @@
   <table name="product_sale_elements" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
+    <column name="ref" required="true" size="45" type="VARCHAR" />
     <column name="quantity" required="true" type="FLOAT" />
     <column defaultValue="0" name="promo" type="TINYINT" />
     <column defaultValue="0" name="newness" type="TINYINT" />
@@ -273,23 +283,26 @@
     <index name="idx_product_sale_element_product_id">
       <index-column name="product_id" />
     </index>
+    <unique name="ref_UNIQUE">
+      <unique-column name="ref" />
+    </unique>
     <behavior name="timestampable" />
   </table>
-  <table isCrossRef="true" name="attribute_category" namespace="Thelia\Model">
+  <table isCrossRef="true" name="attribute_template" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="category_id" required="true" type="INTEGER" />
     <column name="attribute_id" required="true" type="INTEGER" />
-    <foreign-key foreignTable="category" name="fk_attribute_category_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="category_id" />
-    </foreign-key>
-    <foreign-key foreignTable="attribute" name="fk_attribute_category_attribute_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <column name="template_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="attribute" name="fk_attribute_template_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_id" />
     </foreign-key>
-    <index name="idx_attribute_category_category_id">
-      <index-column name="category_id" />
-    </index>
-    <index name="idx_attribute_category_attribute_id">
+    <foreign-key foreignTable="template" name="fk_attribute_template">
+      <reference foreign="id" local="template_id" />
+    </foreign-key>
+    <index name="idx_attribute_template_id">
       <index-column name="attribute_id" />
+    </index>
+    <index name="fk_attribute_template_idx">
+      <index-column name="template_id" />
     </index>
     <behavior name="timestampable" />
   </table>
@@ -324,6 +337,8 @@
     <column name="lang" size="10" type="VARCHAR" />
     <column name="sponsor" size="50" type="VARCHAR" />
     <column name="discount" type="FLOAT" />
+    <column name="remember_me_token" size="255" type="VARCHAR" />
+    <column name="remember_me_serial" size="255" type="VARCHAR" />
     <foreign-key foreignTable="customer_title" name="fk_customer_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="title_id" />
     </foreign-key>
@@ -689,6 +704,8 @@
     <column name="password" required="true" size="128" type="VARCHAR" />
     <column name="algo" size="128" type="VARCHAR" />
     <column name="salt" size="128" type="VARCHAR" />
+    <column name="remember_me_token" size="255" type="VARCHAR" />
+    <column name="remember_me_serial" size="255" type="VARCHAR" />
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="admin_group" namespace="Thelia\Model">
@@ -865,6 +882,7 @@
     <column name="address_delivery_id" type="INTEGER" />
     <column name="address_invoice_id" type="INTEGER" />
     <column name="currency_id" type="INTEGER" />
+    <column defaultValue="0" name="discount" type="FLOAT" />
     <foreign-key foreignTable="customer" name="fk_cart_customer_id">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
@@ -903,6 +921,8 @@
     <column name="price" type="FLOAT" />
     <column name="promo_price" type="FLOAT" />
     <column name="price_end_of_life" type="TIMESTAMP" />
+    <column defaultValue="0" name="discount" type="FLOAT" />
+    <column name="promo" type="INTEGER" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id">
       <reference foreign="id" local="cart_id" />
     </foreign-key>
@@ -924,9 +944,8 @@
     <behavior name="timestampable" />
   </table>
   <table name="product_price" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="product_sale_elements_id" required="true" type="INTEGER" />
-    <column name="currency_id" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="price" required="true" type="FLOAT" />
     <column name="promo_price" type="FLOAT" />
     <foreign-key foreignTable="product_sale_elements" name="fk_product_price_product_sale_elements_id" onDelete="CASCADE">
@@ -1132,6 +1151,14 @@
     <index name="idx_rewriting_argument_rewirting_url_id">
       <index-column name="rewriting_url_id" />
     </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="template" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="name" size="255" type="VARCHAR" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="name" />
+    </behavior>
     <behavior name="timestampable" />
   </table>
 </database>

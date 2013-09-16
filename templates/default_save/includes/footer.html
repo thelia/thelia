@@ -1,0 +1,19 @@
+ 		{* Include required JS files *}
+
+		{javascripts file='../assets/js/*'}
+			<script src="{$asset_url}"></script>
+		{/javascripts}
+
+		<script>
+			$(function() {
+				$('#jquery_block').html("Jquery is now loaded.").hover(function() {
+					$(this).css('font-weight', 'bold');
+				}, function() {
+					$(this).css('font-weight', 'normal');
+				});
+			});
+		</script>
+        {debugbar_renderjs}
+        {debugbar_renderresult}
+	</body>
+</html>

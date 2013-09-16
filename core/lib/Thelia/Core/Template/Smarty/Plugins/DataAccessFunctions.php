@@ -31,11 +31,13 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tools\ModelCriteriaTools;
 use Thelia\Tools\DateTimeFormat;
+use Thelia\Cart\CartTrait;
 
 /**
  * Implementation of data access to main Thelia objects (users, cart, etc.)
@@ -45,6 +47,8 @@ use Thelia\Tools\DateTimeFormat;
  */
 class DataAccessFunctions extends AbstractSmartyPlugin
 {
+    use CartTrait;
+
     private $securityContext;
     protected $parserContext;
     protected $request;
@@ -84,7 +88,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         $productId = $this->request->get('product_id');
 
-        if($productId !== null) {
+        if ($productId !== null) {
 
             $search = ProductQuery::create()
                 ->filterById($productId);
@@ -97,7 +101,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         $categoryId = $this->request->get('category_id');
 
-        if($categoryId !== null) {
+        if ($categoryId !== null) {
 
             $search = CategoryQuery::create()
                 ->filterById($categoryId);
@@ -110,7 +114,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         $contentId = $this->request->get('content_id');
 
-        if($contentId !== null) {
+        if ($contentId !== null) {
 
             $search = ContentQuery::create()
                 ->filterById($contentId);
@@ -123,13 +127,56 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         $folderId = $this->request->get('folder_id');
 
-        if($folderId !== null) {
+        if ($folderId !== null) {
 
             $search = FolderQuery::create()
                 ->filterById($folderId);
 
             return $this->dataAccessWithI18n("Folder",  $params, $search);
         }
+    }
+
+    /**
+     * currency global data
+     *
+     * @param $params
+     * @param $smarty
+     */
+    public function currencyDataAccess($params, $smarty)
+    {
+        $currency = $this->request->getSession()->getCurrency();
+
+        if ($currency) {
+            $currencyQuery = CurrencyQuery::create()
+                ->filterById($currency->getId());
+
+            return $this->dataAccessWithI18n("Currency", $params, $currencyQuery, array("NAME"));
+        }
+    }
+
+    public function cartDataAccess($params, $smarty)
+    {
+        $cart = $this->getCart($this->request);
+        $result = "";
+        switch($params["attr"]) {
+            case "count_item":
+
+                $result = $cart->getCartItems()->count();
+                break;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Lang global data
+     *
+     * @param $params
+     * @param $smarty
+     */
+    public function langDataAccess($params, $smarty)
+    {
+        return $this->dataAccess("Lang", $params, $this->request->getSession()->getLang());
     }
 
     /**
@@ -145,7 +192,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     protected function dataAccessWithI18n($objectLabel, $params, ModelCriteria $search, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID')
     {
         $lang = $this->getNormalizedParam($params, array('lang'));
-        if($lang === null) {
+        if ($lang === null) {
             $lang = $this->request->getSession()->getLang()->getId();
         }
 
@@ -163,7 +210,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $data = $search->findOne();
 
         $noGetterData = array();
-        foreach($columns as $column) {
+        foreach ($columns as $column) {
             $noGetterData[$column] = $data->getVirtualColumn('i18n_' . $column);
         }
 
@@ -188,7 +235,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             if (null != $data) {
 
                 $keyAttribute = strtoupper($attribute);
-                if(array_key_exists($keyAttribute, $noGetterData)) {
+                if (array_key_exists($keyAttribute, $noGetterData)) {
                     return $noGetterData[$keyAttribute];
                 }
 
@@ -196,7 +243,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 if (method_exists($data, $getter)) {
                     $return =  $data->$getter();
 
-                    if($return instanceof \DateTime) {
+                    if ($return instanceof \DateTime) {
                         if (array_key_exists("format", $params)) {
                             $format = $params["format"];
                         } else {
@@ -231,6 +278,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'category', $this, 'categoryDataAccess'),
             new SmartyPluginDescriptor('function', 'content', $this, 'contentDataAccess'),
             new SmartyPluginDescriptor('function', 'folder', $this, 'folderDataAccess'),
+            new SmartyPluginDescriptor('function', 'currency', $this, 'currencyDataAccess'),
+            new SmartyPluginDescriptor('function', 'lang', $this, 'langDataAccess'),
+            new SmartyPluginDescriptor('function', 'cart', $this, 'cartDataAccess'),
         );
     }
 }

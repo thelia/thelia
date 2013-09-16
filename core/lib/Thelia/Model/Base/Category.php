@@ -17,10 +17,6 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Attribute as ChildAttribute;
-use Thelia\Model\AttributeCategory as ChildAttributeCategory;
-use Thelia\Model\AttributeCategoryQuery as ChildAttributeCategoryQuery;
-use Thelia\Model\AttributeQuery as ChildAttributeQuery;
 use Thelia\Model\Category as ChildCategory;
 use Thelia\Model\CategoryAssociatedContent as ChildCategoryAssociatedContent;
 use Thelia\Model\CategoryAssociatedContentQuery as ChildCategoryAssociatedContentQuery;
@@ -33,10 +29,6 @@ use Thelia\Model\CategoryImageQuery as ChildCategoryImageQuery;
 use Thelia\Model\CategoryQuery as ChildCategoryQuery;
 use Thelia\Model\CategoryVersion as ChildCategoryVersion;
 use Thelia\Model\CategoryVersionQuery as ChildCategoryVersionQuery;
-use Thelia\Model\Feature as ChildFeature;
-use Thelia\Model\FeatureCategory as ChildFeatureCategory;
-use Thelia\Model\FeatureCategoryQuery as ChildFeatureCategoryQuery;
-use Thelia\Model\FeatureQuery as ChildFeatureQuery;
 use Thelia\Model\Product as ChildProduct;
 use Thelia\Model\ProductCategory as ChildProductCategory;
 use Thelia\Model\ProductCategoryQuery as ChildProductCategoryQuery;
@@ -140,18 +132,6 @@ abstract class Category implements ActiveRecordInterface
     protected $collProductCategoriesPartial;
 
     /**
-     * @var        ObjectCollection|ChildFeatureCategory[] Collection to store aggregation of ChildFeatureCategory objects.
-     */
-    protected $collFeatureCategories;
-    protected $collFeatureCategoriesPartial;
-
-    /**
-     * @var        ObjectCollection|ChildAttributeCategory[] Collection to store aggregation of ChildAttributeCategory objects.
-     */
-    protected $collAttributeCategories;
-    protected $collAttributeCategoriesPartial;
-
-    /**
      * @var        ObjectCollection|ChildCategoryImage[] Collection to store aggregation of ChildCategoryImage objects.
      */
     protected $collCategoryImages;
@@ -185,16 +165,6 @@ abstract class Category implements ActiveRecordInterface
      * @var        ChildProduct[] Collection to store aggregation of ChildProduct objects.
      */
     protected $collProducts;
-
-    /**
-     * @var        ChildFeature[] Collection to store aggregation of ChildFeature objects.
-     */
-    protected $collFeatures;
-
-    /**
-     * @var        ChildAttribute[] Collection to store aggregation of ChildAttribute objects.
-     */
-    protected $collAttributes;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -236,31 +206,7 @@ abstract class Category implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $featuresScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $attributesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
     protected $productCategoriesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $featureCategoriesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $attributeCategoriesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -1021,10 +967,6 @@ abstract class Category implements ActiveRecordInterface
 
             $this->collProductCategories = null;
 
-            $this->collFeatureCategories = null;
-
-            $this->collAttributeCategories = null;
-
             $this->collCategoryImages = null;
 
             $this->collCategoryDocuments = null;
@@ -1036,8 +978,6 @@ abstract class Category implements ActiveRecordInterface
             $this->collCategoryVersions = null;
 
             $this->collProducts = null;
-            $this->collFeatures = null;
-            $this->collAttributes = null;
         } // if (deep)
     }
 
@@ -1210,60 +1150,6 @@ abstract class Category implements ActiveRecordInterface
                 }
             }
 
-            if ($this->featuresScheduledForDeletion !== null) {
-                if (!$this->featuresScheduledForDeletion->isEmpty()) {
-                    $pks = array();
-                    $pk  = $this->getPrimaryKey();
-                    foreach ($this->featuresScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($pk, $remotePk);
-                    }
-
-                    FeatureCategoryQuery::create()
-                        ->filterByPrimaryKeys($pks)
-                        ->delete($con);
-                    $this->featuresScheduledForDeletion = null;
-                }
-
-                foreach ($this->getFeatures() as $feature) {
-                    if ($feature->isModified()) {
-                        $feature->save($con);
-                    }
-                }
-            } elseif ($this->collFeatures) {
-                foreach ($this->collFeatures as $feature) {
-                    if ($feature->isModified()) {
-                        $feature->save($con);
-                    }
-                }
-            }
-
-            if ($this->attributesScheduledForDeletion !== null) {
-                if (!$this->attributesScheduledForDeletion->isEmpty()) {
-                    $pks = array();
-                    $pk  = $this->getPrimaryKey();
-                    foreach ($this->attributesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($pk, $remotePk);
-                    }
-
-                    AttributeCategoryQuery::create()
-                        ->filterByPrimaryKeys($pks)
-                        ->delete($con);
-                    $this->attributesScheduledForDeletion = null;
-                }
-
-                foreach ($this->getAttributes() as $attribute) {
-                    if ($attribute->isModified()) {
-                        $attribute->save($con);
-                    }
-                }
-            } elseif ($this->collAttributes) {
-                foreach ($this->collAttributes as $attribute) {
-                    if ($attribute->isModified()) {
-                        $attribute->save($con);
-                    }
-                }
-            }
-
             if ($this->productCategoriesScheduledForDeletion !== null) {
                 if (!$this->productCategoriesScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\ProductCategoryQuery::create()
@@ -1275,40 +1161,6 @@ abstract class Category implements ActiveRecordInterface
 
                 if ($this->collProductCategories !== null) {
             foreach ($this->collProductCategories as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->featureCategoriesScheduledForDeletion !== null) {
-                if (!$this->featureCategoriesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\FeatureCategoryQuery::create()
-                        ->filterByPrimaryKeys($this->featureCategoriesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->featureCategoriesScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collFeatureCategories !== null) {
-            foreach ($this->collFeatureCategories as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->attributeCategoriesScheduledForDeletion !== null) {
-                if (!$this->attributeCategoriesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\AttributeCategoryQuery::create()
-                        ->filterByPrimaryKeys($this->attributeCategoriesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->attributeCategoriesScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collAttributeCategories !== null) {
-            foreach ($this->collAttributeCategories as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1629,12 +1481,6 @@ abstract class Category implements ActiveRecordInterface
             if (null !== $this->collProductCategories) {
                 $result['ProductCategories'] = $this->collProductCategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collFeatureCategories) {
-                $result['FeatureCategories'] = $this->collFeatureCategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collAttributeCategories) {
-                $result['AttributeCategories'] = $this->collAttributeCategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collCategoryImages) {
                 $result['CategoryImages'] = $this->collCategoryImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1847,18 +1693,6 @@ abstract class Category implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getFeatureCategories() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addFeatureCategory($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getAttributeCategories() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAttributeCategory($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getCategoryImages() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCategoryImage($relObj->copy($deepCopy));
@@ -1932,12 +1766,6 @@ abstract class Category implements ActiveRecordInterface
     {
         if ('ProductCategory' == $relationName) {
             return $this->initProductCategories();
-        }
-        if ('FeatureCategory' == $relationName) {
-            return $this->initFeatureCategories();
-        }
-        if ('AttributeCategory' == $relationName) {
-            return $this->initAttributeCategories();
         }
         if ('CategoryImage' == $relationName) {
             return $this->initCategoryImages();
@@ -2200,492 +2028,6 @@ abstract class Category implements ActiveRecordInterface
         $query->joinWith('Product', $joinBehavior);
 
         return $this->getProductCategories($query, $con);
-    }
-
-    /**
-     * Clears out the collFeatureCategories collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addFeatureCategories()
-     */
-    public function clearFeatureCategories()
-    {
-        $this->collFeatureCategories = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collFeatureCategories collection loaded partially.
-     */
-    public function resetPartialFeatureCategories($v = true)
-    {
-        $this->collFeatureCategoriesPartial = $v;
-    }
-
-    /**
-     * Initializes the collFeatureCategories collection.
-     *
-     * By default this just sets the collFeatureCategories collection to an empty array (like clearcollFeatureCategories());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initFeatureCategories($overrideExisting = true)
-    {
-        if (null !== $this->collFeatureCategories && !$overrideExisting) {
-            return;
-        }
-        $this->collFeatureCategories = new ObjectCollection();
-        $this->collFeatureCategories->setModel('\Thelia\Model\FeatureCategory');
-    }
-
-    /**
-     * Gets an array of ChildFeatureCategory objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCategory is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildFeatureCategory[] List of ChildFeatureCategory objects
-     * @throws PropelException
-     */
-    public function getFeatureCategories($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collFeatureCategoriesPartial && !$this->isNew();
-        if (null === $this->collFeatureCategories || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collFeatureCategories) {
-                // return empty collection
-                $this->initFeatureCategories();
-            } else {
-                $collFeatureCategories = ChildFeatureCategoryQuery::create(null, $criteria)
-                    ->filterByCategory($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collFeatureCategoriesPartial && count($collFeatureCategories)) {
-                        $this->initFeatureCategories(false);
-
-                        foreach ($collFeatureCategories as $obj) {
-                            if (false == $this->collFeatureCategories->contains($obj)) {
-                                $this->collFeatureCategories->append($obj);
-                            }
-                        }
-
-                        $this->collFeatureCategoriesPartial = true;
-                    }
-
-                    $collFeatureCategories->getInternalIterator()->rewind();
-
-                    return $collFeatureCategories;
-                }
-
-                if ($partial && $this->collFeatureCategories) {
-                    foreach ($this->collFeatureCategories as $obj) {
-                        if ($obj->isNew()) {
-                            $collFeatureCategories[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collFeatureCategories = $collFeatureCategories;
-                $this->collFeatureCategoriesPartial = false;
-            }
-        }
-
-        return $this->collFeatureCategories;
-    }
-
-    /**
-     * Sets a collection of FeatureCategory objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $featureCategories A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCategory The current object (for fluent API support)
-     */
-    public function setFeatureCategories(Collection $featureCategories, ConnectionInterface $con = null)
-    {
-        $featureCategoriesToDelete = $this->getFeatureCategories(new Criteria(), $con)->diff($featureCategories);
-
-
-        $this->featureCategoriesScheduledForDeletion = $featureCategoriesToDelete;
-
-        foreach ($featureCategoriesToDelete as $featureCategoryRemoved) {
-            $featureCategoryRemoved->setCategory(null);
-        }
-
-        $this->collFeatureCategories = null;
-        foreach ($featureCategories as $featureCategory) {
-            $this->addFeatureCategory($featureCategory);
-        }
-
-        $this->collFeatureCategories = $featureCategories;
-        $this->collFeatureCategoriesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related FeatureCategory objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related FeatureCategory objects.
-     * @throws PropelException
-     */
-    public function countFeatureCategories(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collFeatureCategoriesPartial && !$this->isNew();
-        if (null === $this->collFeatureCategories || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collFeatureCategories) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getFeatureCategories());
-            }
-
-            $query = ChildFeatureCategoryQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByCategory($this)
-                ->count($con);
-        }
-
-        return count($this->collFeatureCategories);
-    }
-
-    /**
-     * Method called to associate a ChildFeatureCategory object to this object
-     * through the ChildFeatureCategory foreign key attribute.
-     *
-     * @param    ChildFeatureCategory $l ChildFeatureCategory
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
-     */
-    public function addFeatureCategory(ChildFeatureCategory $l)
-    {
-        if ($this->collFeatureCategories === null) {
-            $this->initFeatureCategories();
-            $this->collFeatureCategoriesPartial = true;
-        }
-
-        if (!in_array($l, $this->collFeatureCategories->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddFeatureCategory($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param FeatureCategory $featureCategory The featureCategory object to add.
-     */
-    protected function doAddFeatureCategory($featureCategory)
-    {
-        $this->collFeatureCategories[]= $featureCategory;
-        $featureCategory->setCategory($this);
-    }
-
-    /**
-     * @param  FeatureCategory $featureCategory The featureCategory object to remove.
-     * @return ChildCategory The current object (for fluent API support)
-     */
-    public function removeFeatureCategory($featureCategory)
-    {
-        if ($this->getFeatureCategories()->contains($featureCategory)) {
-            $this->collFeatureCategories->remove($this->collFeatureCategories->search($featureCategory));
-            if (null === $this->featureCategoriesScheduledForDeletion) {
-                $this->featureCategoriesScheduledForDeletion = clone $this->collFeatureCategories;
-                $this->featureCategoriesScheduledForDeletion->clear();
-            }
-            $this->featureCategoriesScheduledForDeletion[]= clone $featureCategory;
-            $featureCategory->setCategory(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related FeatureCategories from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildFeatureCategory[] List of ChildFeatureCategory objects
-     */
-    public function getFeatureCategoriesJoinFeature($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildFeatureCategoryQuery::create(null, $criteria);
-        $query->joinWith('Feature', $joinBehavior);
-
-        return $this->getFeatureCategories($query, $con);
-    }
-
-    /**
-     * Clears out the collAttributeCategories collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addAttributeCategories()
-     */
-    public function clearAttributeCategories()
-    {
-        $this->collAttributeCategories = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collAttributeCategories collection loaded partially.
-     */
-    public function resetPartialAttributeCategories($v = true)
-    {
-        $this->collAttributeCategoriesPartial = $v;
-    }
-
-    /**
-     * Initializes the collAttributeCategories collection.
-     *
-     * By default this just sets the collAttributeCategories collection to an empty array (like clearcollAttributeCategories());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initAttributeCategories($overrideExisting = true)
-    {
-        if (null !== $this->collAttributeCategories && !$overrideExisting) {
-            return;
-        }
-        $this->collAttributeCategories = new ObjectCollection();
-        $this->collAttributeCategories->setModel('\Thelia\Model\AttributeCategory');
-    }
-
-    /**
-     * Gets an array of ChildAttributeCategory objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCategory is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildAttributeCategory[] List of ChildAttributeCategory objects
-     * @throws PropelException
-     */
-    public function getAttributeCategories($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collAttributeCategoriesPartial && !$this->isNew();
-        if (null === $this->collAttributeCategories || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collAttributeCategories) {
-                // return empty collection
-                $this->initAttributeCategories();
-            } else {
-                $collAttributeCategories = ChildAttributeCategoryQuery::create(null, $criteria)
-                    ->filterByCategory($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collAttributeCategoriesPartial && count($collAttributeCategories)) {
-                        $this->initAttributeCategories(false);
-
-                        foreach ($collAttributeCategories as $obj) {
-                            if (false == $this->collAttributeCategories->contains($obj)) {
-                                $this->collAttributeCategories->append($obj);
-                            }
-                        }
-
-                        $this->collAttributeCategoriesPartial = true;
-                    }
-
-                    $collAttributeCategories->getInternalIterator()->rewind();
-
-                    return $collAttributeCategories;
-                }
-
-                if ($partial && $this->collAttributeCategories) {
-                    foreach ($this->collAttributeCategories as $obj) {
-                        if ($obj->isNew()) {
-                            $collAttributeCategories[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collAttributeCategories = $collAttributeCategories;
-                $this->collAttributeCategoriesPartial = false;
-            }
-        }
-
-        return $this->collAttributeCategories;
-    }
-
-    /**
-     * Sets a collection of AttributeCategory objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $attributeCategories A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCategory The current object (for fluent API support)
-     */
-    public function setAttributeCategories(Collection $attributeCategories, ConnectionInterface $con = null)
-    {
-        $attributeCategoriesToDelete = $this->getAttributeCategories(new Criteria(), $con)->diff($attributeCategories);
-
-
-        $this->attributeCategoriesScheduledForDeletion = $attributeCategoriesToDelete;
-
-        foreach ($attributeCategoriesToDelete as $attributeCategoryRemoved) {
-            $attributeCategoryRemoved->setCategory(null);
-        }
-
-        $this->collAttributeCategories = null;
-        foreach ($attributeCategories as $attributeCategory) {
-            $this->addAttributeCategory($attributeCategory);
-        }
-
-        $this->collAttributeCategories = $attributeCategories;
-        $this->collAttributeCategoriesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related AttributeCategory objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related AttributeCategory objects.
-     * @throws PropelException
-     */
-    public function countAttributeCategories(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collAttributeCategoriesPartial && !$this->isNew();
-        if (null === $this->collAttributeCategories || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collAttributeCategories) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getAttributeCategories());
-            }
-
-            $query = ChildAttributeCategoryQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByCategory($this)
-                ->count($con);
-        }
-
-        return count($this->collAttributeCategories);
-    }
-
-    /**
-     * Method called to associate a ChildAttributeCategory object to this object
-     * through the ChildAttributeCategory foreign key attribute.
-     *
-     * @param    ChildAttributeCategory $l ChildAttributeCategory
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
-     */
-    public function addAttributeCategory(ChildAttributeCategory $l)
-    {
-        if ($this->collAttributeCategories === null) {
-            $this->initAttributeCategories();
-            $this->collAttributeCategoriesPartial = true;
-        }
-
-        if (!in_array($l, $this->collAttributeCategories->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddAttributeCategory($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param AttributeCategory $attributeCategory The attributeCategory object to add.
-     */
-    protected function doAddAttributeCategory($attributeCategory)
-    {
-        $this->collAttributeCategories[]= $attributeCategory;
-        $attributeCategory->setCategory($this);
-    }
-
-    /**
-     * @param  AttributeCategory $attributeCategory The attributeCategory object to remove.
-     * @return ChildCategory The current object (for fluent API support)
-     */
-    public function removeAttributeCategory($attributeCategory)
-    {
-        if ($this->getAttributeCategories()->contains($attributeCategory)) {
-            $this->collAttributeCategories->remove($this->collAttributeCategories->search($attributeCategory));
-            if (null === $this->attributeCategoriesScheduledForDeletion) {
-                $this->attributeCategoriesScheduledForDeletion = clone $this->collAttributeCategories;
-                $this->attributeCategoriesScheduledForDeletion->clear();
-            }
-            $this->attributeCategoriesScheduledForDeletion[]= clone $attributeCategory;
-            $attributeCategory->setCategory(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related AttributeCategories from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildAttributeCategory[] List of ChildAttributeCategory objects
-     */
-    public function getAttributeCategoriesJoinAttribute($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildAttributeCategoryQuery::create(null, $criteria);
-        $query->joinWith('Attribute', $joinBehavior);
-
-        return $this->getAttributeCategories($query, $con);
     }
 
     /**
@@ -3997,372 +3339,6 @@ abstract class Category implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collFeatures collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addFeatures()
-     */
-    public function clearFeatures()
-    {
-        $this->collFeatures = null; // important to set this to NULL since that means it is uninitialized
-        $this->collFeaturesPartial = null;
-    }
-
-    /**
-     * Initializes the collFeatures collection.
-     *
-     * By default this just sets the collFeatures collection to an empty collection (like clearFeatures());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @return void
-     */
-    public function initFeatures()
-    {
-        $this->collFeatures = new ObjectCollection();
-        $this->collFeatures->setModel('\Thelia\Model\Feature');
-    }
-
-    /**
-     * Gets a collection of ChildFeature objects related by a many-to-many relationship
-     * to the current object by way of the feature_category cross-reference table.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCategory is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      ConnectionInterface $con Optional connection object
-     *
-     * @return ObjectCollection|ChildFeature[] List of ChildFeature objects
-     */
-    public function getFeatures($criteria = null, ConnectionInterface $con = null)
-    {
-        if (null === $this->collFeatures || null !== $criteria) {
-            if ($this->isNew() && null === $this->collFeatures) {
-                // return empty collection
-                $this->initFeatures();
-            } else {
-                $collFeatures = ChildFeatureQuery::create(null, $criteria)
-                    ->filterByCategory($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    return $collFeatures;
-                }
-                $this->collFeatures = $collFeatures;
-            }
-        }
-
-        return $this->collFeatures;
-    }
-
-    /**
-     * Sets a collection of Feature objects related by a many-to-many relationship
-     * to the current object by way of the feature_category cross-reference table.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param  Collection $features A Propel collection.
-     * @param  ConnectionInterface $con Optional connection object
-     * @return ChildCategory The current object (for fluent API support)
-     */
-    public function setFeatures(Collection $features, ConnectionInterface $con = null)
-    {
-        $this->clearFeatures();
-        $currentFeatures = $this->getFeatures();
-
-        $this->featuresScheduledForDeletion = $currentFeatures->diff($features);
-
-        foreach ($features as $feature) {
-            if (!$currentFeatures->contains($feature)) {
-                $this->doAddFeature($feature);
-            }
-        }
-
-        $this->collFeatures = $features;
-
-        return $this;
-    }
-
-    /**
-     * Gets the number of ChildFeature objects related by a many-to-many relationship
-     * to the current object by way of the feature_category cross-reference table.
-     *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      boolean $distinct Set to true to force count distinct
-     * @param      ConnectionInterface $con Optional connection object
-     *
-     * @return int the number of related ChildFeature objects
-     */
-    public function countFeatures($criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        if (null === $this->collFeatures || null !== $criteria) {
-            if ($this->isNew() && null === $this->collFeatures) {
-                return 0;
-            } else {
-                $query = ChildFeatureQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByCategory($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collFeatures);
-        }
-    }
-
-    /**
-     * Associate a ChildFeature object to this object
-     * through the feature_category cross reference table.
-     *
-     * @param  ChildFeature $feature The ChildFeatureCategory object to relate
-     * @return ChildCategory The current object (for fluent API support)
-     */
-    public function addFeature(ChildFeature $feature)
-    {
-        if ($this->collFeatures === null) {
-            $this->initFeatures();
-        }
-
-        if (!$this->collFeatures->contains($feature)) { // only add it if the **same** object is not already associated
-            $this->doAddFeature($feature);
-            $this->collFeatures[] = $feature;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param    Feature $feature The feature object to add.
-     */
-    protected function doAddFeature($feature)
-    {
-        $featureCategory = new ChildFeatureCategory();
-        $featureCategory->setFeature($feature);
-        $this->addFeatureCategory($featureCategory);
-        // set the back reference to this object directly as using provided method either results
-        // in endless loop or in multiple relations
-        if (!$feature->getCategories()->contains($this)) {
-            $foreignCollection   = $feature->getCategories();
-            $foreignCollection[] = $this;
-        }
-    }
-
-    /**
-     * Remove a ChildFeature object to this object
-     * through the feature_category cross reference table.
-     *
-     * @param ChildFeature $feature The ChildFeatureCategory object to relate
-     * @return ChildCategory The current object (for fluent API support)
-     */
-    public function removeFeature(ChildFeature $feature)
-    {
-        if ($this->getFeatures()->contains($feature)) {
-            $this->collFeatures->remove($this->collFeatures->search($feature));
-
-            if (null === $this->featuresScheduledForDeletion) {
-                $this->featuresScheduledForDeletion = clone $this->collFeatures;
-                $this->featuresScheduledForDeletion->clear();
-            }
-
-            $this->featuresScheduledForDeletion[] = $feature;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Clears out the collAttributes collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addAttributes()
-     */
-    public function clearAttributes()
-    {
-        $this->collAttributes = null; // important to set this to NULL since that means it is uninitialized
-        $this->collAttributesPartial = null;
-    }
-
-    /**
-     * Initializes the collAttributes collection.
-     *
-     * By default this just sets the collAttributes collection to an empty collection (like clearAttributes());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @return void
-     */
-    public function initAttributes()
-    {
-        $this->collAttributes = new ObjectCollection();
-        $this->collAttributes->setModel('\Thelia\Model\Attribute');
-    }
-
-    /**
-     * Gets a collection of ChildAttribute objects related by a many-to-many relationship
-     * to the current object by way of the attribute_category cross-reference table.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCategory is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      ConnectionInterface $con Optional connection object
-     *
-     * @return ObjectCollection|ChildAttribute[] List of ChildAttribute objects
-     */
-    public function getAttributes($criteria = null, ConnectionInterface $con = null)
-    {
-        if (null === $this->collAttributes || null !== $criteria) {
-            if ($this->isNew() && null === $this->collAttributes) {
-                // return empty collection
-                $this->initAttributes();
-            } else {
-                $collAttributes = ChildAttributeQuery::create(null, $criteria)
-                    ->filterByCategory($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    return $collAttributes;
-                }
-                $this->collAttributes = $collAttributes;
-            }
-        }
-
-        return $this->collAttributes;
-    }
-
-    /**
-     * Sets a collection of Attribute objects related by a many-to-many relationship
-     * to the current object by way of the attribute_category cross-reference table.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param  Collection $attributes A Propel collection.
-     * @param  ConnectionInterface $con Optional connection object
-     * @return ChildCategory The current object (for fluent API support)
-     */
-    public function setAttributes(Collection $attributes, ConnectionInterface $con = null)
-    {
-        $this->clearAttributes();
-        $currentAttributes = $this->getAttributes();
-
-        $this->attributesScheduledForDeletion = $currentAttributes->diff($attributes);
-
-        foreach ($attributes as $attribute) {
-            if (!$currentAttributes->contains($attribute)) {
-                $this->doAddAttribute($attribute);
-            }
-        }
-
-        $this->collAttributes = $attributes;
-
-        return $this;
-    }
-
-    /**
-     * Gets the number of ChildAttribute objects related by a many-to-many relationship
-     * to the current object by way of the attribute_category cross-reference table.
-     *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      boolean $distinct Set to true to force count distinct
-     * @param      ConnectionInterface $con Optional connection object
-     *
-     * @return int the number of related ChildAttribute objects
-     */
-    public function countAttributes($criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        if (null === $this->collAttributes || null !== $criteria) {
-            if ($this->isNew() && null === $this->collAttributes) {
-                return 0;
-            } else {
-                $query = ChildAttributeQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByCategory($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collAttributes);
-        }
-    }
-
-    /**
-     * Associate a ChildAttribute object to this object
-     * through the attribute_category cross reference table.
-     *
-     * @param  ChildAttribute $attribute The ChildAttributeCategory object to relate
-     * @return ChildCategory The current object (for fluent API support)
-     */
-    public function addAttribute(ChildAttribute $attribute)
-    {
-        if ($this->collAttributes === null) {
-            $this->initAttributes();
-        }
-
-        if (!$this->collAttributes->contains($attribute)) { // only add it if the **same** object is not already associated
-            $this->doAddAttribute($attribute);
-            $this->collAttributes[] = $attribute;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param    Attribute $attribute The attribute object to add.
-     */
-    protected function doAddAttribute($attribute)
-    {
-        $attributeCategory = new ChildAttributeCategory();
-        $attributeCategory->setAttribute($attribute);
-        $this->addAttributeCategory($attributeCategory);
-        // set the back reference to this object directly as using provided method either results
-        // in endless loop or in multiple relations
-        if (!$attribute->getCategories()->contains($this)) {
-            $foreignCollection   = $attribute->getCategories();
-            $foreignCollection[] = $this;
-        }
-    }
-
-    /**
-     * Remove a ChildAttribute object to this object
-     * through the attribute_category cross reference table.
-     *
-     * @param ChildAttribute $attribute The ChildAttributeCategory object to relate
-     * @return ChildCategory The current object (for fluent API support)
-     */
-    public function removeAttribute(ChildAttribute $attribute)
-    {
-        if ($this->getAttributes()->contains($attribute)) {
-            $this->collAttributes->remove($this->collAttributes->search($attribute));
-
-            if (null === $this->attributesScheduledForDeletion) {
-                $this->attributesScheduledForDeletion = clone $this->collAttributes;
-                $this->attributesScheduledForDeletion->clear();
-            }
-
-            $this->attributesScheduledForDeletion[] = $attribute;
-        }
-
-        return $this;
-    }
-
-    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -4401,16 +3377,6 @@ abstract class Category implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collFeatureCategories) {
-                foreach ($this->collFeatureCategories as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collAttributeCategories) {
-                foreach ($this->collAttributeCategories as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collCategoryImages) {
                 foreach ($this->collCategoryImages as $o) {
                     $o->clearAllReferences($deep);
@@ -4441,16 +3407,6 @@ abstract class Category implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collFeatures) {
-                foreach ($this->collFeatures as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collAttributes) {
-                foreach ($this->collAttributes as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
         } // if ($deep)
 
         // i18n behavior
@@ -4461,14 +3417,6 @@ abstract class Category implements ActiveRecordInterface
             $this->collProductCategories->clearIterator();
         }
         $this->collProductCategories = null;
-        if ($this->collFeatureCategories instanceof Collection) {
-            $this->collFeatureCategories->clearIterator();
-        }
-        $this->collFeatureCategories = null;
-        if ($this->collAttributeCategories instanceof Collection) {
-            $this->collAttributeCategories->clearIterator();
-        }
-        $this->collAttributeCategories = null;
         if ($this->collCategoryImages instanceof Collection) {
             $this->collCategoryImages->clearIterator();
         }
@@ -4493,14 +3441,6 @@ abstract class Category implements ActiveRecordInterface
             $this->collProducts->clearIterator();
         }
         $this->collProducts = null;
-        if ($this->collFeatures instanceof Collection) {
-            $this->collFeatures->clearIterator();
-        }
-        $this->collFeatures = null;
-        if ($this->collAttributes instanceof Collection) {
-            $this->collAttributes->clearIterator();
-        }
-        $this->collAttributes = null;
     }
 
     /**

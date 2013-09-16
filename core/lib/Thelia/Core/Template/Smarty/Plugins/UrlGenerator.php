@@ -154,13 +154,13 @@ class UrlGenerator extends AbstractSmartyPlugin
 
     protected function getNavigateToMethod($to)
     {
-        if($to === null) {
+        if ($to === null) {
             throw new \InvalidArgumentException("Missing 'to' parameter in `navigate` substitution.");
         }
 
         $navigateToValues = $this->getNavigateToValues();
 
-        if(!array_key_exists($to, $navigateToValues)) {
+        if (!array_key_exists($to, $navigateToValues)) {
             throw new \InvalidArgumentException("Incorrect value for parameter `to` in `navigate` substitution.");
         }
 

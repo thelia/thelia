@@ -22,7 +22,11 @@
 /*************************************************************************************/
 
 namespace DebugBar\Listeners;
+use DebugBar\DataCollector\MemoryCollector;
+use DebugBar\DataCollector\MessagesCollector;
+use DebugBar\DataCollector\PhpInfoCollector;
 use DebugBar\DataCollector\PropelCollector;
+use DebugBar\DataCollector\TimeDataCollector;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Action\BaseAction;
@@ -40,7 +44,13 @@ class DebugBarListeners extends BaseAction implements EventSubscriberInterface {
     {
         $debugBar = $this->container->get("debugBar");
 
-        $debugBar->addCollector(new PropelCollector());
+
+        $debugBar->addCollector(new PhpInfoCollector());
+        //$debugBar->addCollector(new MessagesCollector());
+        //$debugBar->addCollector(new RequestDataCollector());
+        $debugBar->addCollector(new TimeDataCollector());
+        $debugBar->addCollector(new MemoryCollector());
+        $debugBar->addCollector(new PropelCollector(\Thelia\Log\Tlog::getInstance()));
     }
 
     /**

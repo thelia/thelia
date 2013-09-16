@@ -24,18 +24,17 @@ namespace Thelia\Controller\Front;
 
 use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\CustomerLoginEvent;
+use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
-use Thelia\Core\Security\SecurityContext;
 use Thelia\Form\CustomerCreation;
 use Thelia\Form\CustomerLogin;
+use Thelia\Form\CustomerLostPasswordForm;
 use Thelia\Form\CustomerModification;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\CustomerEvent;
-use Thelia\Core\Factory\ActionEventFactory;
 use Thelia\Tools\URL;
 use Thelia\Log\Tlog;
 use Thelia\Core\Security\Exception\WrongPasswordException;
@@ -47,6 +46,42 @@ use Thelia\Core\Security\Exception\WrongPasswordException;
  */
 class CustomerController extends BaseFrontController
 {
+    use \Thelia\Cart\CartTrait;
+
+    public function newPasswordAction()
+    {
+        if (! $this->getSecurityContext()->hasCustomerUser()) {
+            $message = false;
+
+            $passwordLost = new CustomerLostPasswordForm($this->getRequest());
+
+            try {
+
+                $form = $this->validateForm($passwordLost);
+
+                $event = new LostPasswordEvent($form->get("email")->getData());
+
+                $this->dispatch(TheliaEvents::LOST_PASSWORD, $event);
+
+            } catch (FormValidationException $e) {
+                $message = sprintf("Please check your input: %s", $e->getMessage());
+            } catch (\Exception $e) {
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+            }
+
+            if ($message !== false) {
+                Tlog::getInstance()->error(sprintf("Error during customer creation process : %s. Exception was %s", $message, $e->getMessage()));
+
+                $passwordLost->setErrorMessage($message);
+
+                $this->getParserContext()
+                    ->addForm($passwordLost)
+                    ->setGeneralError($message)
+                ;
+            }
+        }
+    }
+
     /**
      * Create a new customer.
      * On success, redirect to success_url if exists, otherwise, display the same view again.
@@ -68,12 +103,15 @@ class CustomerController extends BaseFrontController
 
                 $this->processLogin($customerCreateEvent->getCustomer());
 
-                $this->redirectSuccess($customerCreation);
-            }
-            catch (FormValidationException $e) {
+                $cart = $this->getCart($this->getRequest());
+                if($cart->getCartItems()->count() > 0) {
+                    $this->redirectToRoute("cart.view");
+                } else {
+                    $this->redirectSuccess($customerCreation);
+                }
+            } catch (FormValidationException $e) {
                 $message = sprintf("Please check your input: %s", $e->getMessage());
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
 
@@ -117,11 +155,9 @@ class CustomerController extends BaseFrontController
 
                 $this->redirectSuccess($customerModification);
 
-            }
-            catch (FormValidationException $e) {
+            } catch (FormValidationException $e) {
                 $message = sprintf("Please check your input: %s", $e->getMessage());
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
 
@@ -165,20 +201,24 @@ class CustomerController extends BaseFrontController
 
                 $this->redirectSuccess($customerLoginForm);
 
-            }
-            catch (FormValidationException $e) {
+            } catch (FormValidationException $e) {
+
+                if ($request->request->has("account")) {
+                    $account = $request->request->get("account");
+                    $form = $customerLoginForm->getForm();
+                    if ($account == 0 && $form->get("email")->getData() !== null) {
+                        $this->redirectToRoute("customer.create.view", array("email" => $form->get("email")->getData()));
+                    }
+                }
+
                 $message = sprintf("Please check your input: %s", $e->getMessage());
-            }
-            catch(UsernameNotFoundException $e) {
-                $message = "This customer email was not found.";
-            }
-            catch (WrongPasswordException $e) {
-                $message = "Wrong password. Please try again.";
-            }
-            catch(AuthenticationException $e) {
-                $message = "Sorry, we failed to authentify you. Please try again.";
-            }
-            catch (\Exception $e) {
+            } catch (UsernameNotFoundException $e) {
+                $message = "Wrong email or password. Please try again";
+            } catch (WrongPasswordException $e) {
+                $message = "Wrong email or password. Please try again";
+            } catch (AuthenticationException $e) {
+                $message = "Wrong email or password. Please try again";
+            } catch (\Exception $e) {
                 $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
 
@@ -235,10 +275,11 @@ class CustomerController extends BaseFrontController
             $data["country"],
             isset($data["email"])?$data["email"]:null,
             isset($data["password"]) ? $data["password"]:null,
-            $this->getRequest()->getSession()->getLang(),
+            $this->getRequest()->getSession()->getLang()->getId(),
             isset($data["reseller"])?$data["reseller"]:null,
             isset($data["sponsor"])?$data["sponsor"]:null,
-            isset($data["discount"])?$data["discount"]:null
+            isset($data["discount"])?$data["discount"]:null,
+            isset($data["company"])?$data["company"]:null
         );
 
         return $customerCreateEvent;

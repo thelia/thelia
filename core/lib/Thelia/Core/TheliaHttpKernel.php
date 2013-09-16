@@ -32,6 +32,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session;
 
+use Thelia\Core\Event\CurrencyEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model;
 
 /**
@@ -135,9 +137,29 @@ class TheliaHttpKernel extends HttpKernel
         if ($lang) {
             $request->getSession()
                 ->setLang($lang)
-                ->setLocale($lang->getLocale())
             ;
         }
+
+        $request->getSession()->setCurrency($this->defineCurrency($request));
+    }
+
+    protected function defineCurrency(Request $request)
+    {
+        $currency = null;
+        if ($request->query->has("currency")) {
+            $currency = Model\CurrencyQuery::create()->findOneByCode($request->query->get("currency"));
+            if($currency) {
+                $this->container->get("event_dispatcher")->dispatch(TheliaEvents::CHANGE_DEFAULT_CURRENCY, new CurrencyEvent($currency));
+            }
+        } else {
+            $currency = $request->getSession()->getCurrency(false);
+        }
+
+        if (null === $currency) {
+            $currency = Model\Currency::getDefaultCurrency();
+        }
+
+        return $currency;
     }
 
     /**
@@ -153,7 +175,7 @@ class TheliaHttpKernel extends HttpKernel
             $lang = Model\LangQuery::create()->findOneByCode($request->query->get("lang"));
 
             if (is_null($lang)) {
-                return;
+                return Model\Lang::getDefaultLanguage();
             }
 
             //if each lang had is own domain, we redirect the user to the good one.
@@ -175,7 +197,7 @@ class TheliaHttpKernel extends HttpKernel
         }
 
         //check if lang is not defined. If not we have to search the good one.
-        if (null === $request->getSession()->getLang()) {
+        if (null === $request->getSession()->getLang(false)) {
 
             if (Model\ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
                 //find lang with domain
@@ -183,7 +205,7 @@ class TheliaHttpKernel extends HttpKernel
             }
 
             //find default lang
-            return Model\LangQuery::create()->findOneByByDefault(1);
+            return Model\Lang::getDefaultLanguage();
         }
     }
 
@@ -195,7 +217,7 @@ class TheliaHttpKernel extends HttpKernel
         if (Model\ConfigQuery::read("session_config.default")) {
             $storage->setSaveHandler(new Session\Storage\Handler\NativeFileSessionHandler(Model\ConfigQuery::read("session_config.save_path", THELIA_ROOT . '/local/session/')));
         } else {
-            $handlerString = Model\ConfigQuery::read("session_config.handlers");
+            $handlerString = Model\ConfigQuery::read("session_config.handlers", 'Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler');
 
             $handler = new $handlerString;
 

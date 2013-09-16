@@ -82,7 +82,7 @@ class CouponRuleCollection
      */
     public function isEmpty()
     {
-        return isEmpty($this->rules);
+        return (empty($this->rules));
     }
 
     /**

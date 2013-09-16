@@ -1,49 +1,77 @@
-{include file="includes/header.html"}
+{extends file="layout.tpl"}
 
-<h1>{intl l='Please login'}</h1>
+{block name="breadcrumb"}
+    <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
+        <strong id="breadcrumb-label">{intl l="You are here"}: </strong>
+        <ul class="breadcrumb" itemprop="breadcrumb">
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{intl l="Login"}</span></li>
+        </ul>
+    </nav><!-- /.nav-breadcrumb -->
+{/block}
 
-{form name="thelia.customer.login" }
+{block name="main-content"}
 
-<form action="{url path='/customer/login'}" method="post" {form_enctype form=$form}>
-	{*
-	The field below are not par of the Login form, it defines view to render if the form cannot be validated
-	*}
-	<input type="hidden" name="view" value="login" /> 	{* the view to return to if the form cannot be validated *}
 
-	{*
-	This field is common to all BaseForm instances (thus, this one), and defines
-	the URL the customer is redirected to once the form has been successfully
-	processed
-	*}
+    <div class="main">
+        <article class="col-main" role="main" aria-labelledby="main-label">
+            <h1 id="main-label" class="page-header">{intl l="Login"}</h1>
+            {form name="thelia.customer.login"}
+            <form id="form-login" action="{url path="/customer/login"}" method="post" role="form" {form_enctype form=$form}>
+                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+                {form_field form=$form field='success_url'}
+                    <input type="hidden" name="{$name}" value="{navigate to="return_to"}" /> {* the url the user is redirected to on login success *}
+                {/form_field}
 
-	{form_field form=$form field='success_url'}
-	<input type="hidden" name="{$name}" value="{navigate to="return_to"}" /> {* the url the user is redirected to on login success *}
-	{/form_field}
+                {form_field form=$form field='error_message'}
+                    <input type="hidden" name="{$name}" value="{intl l="missing or invalid data"}" /> {* the url the user is redirected to on login success *}
+                {/form_field}
+                {form_hidden_fields form=$form}
+                <fieldset>
+                    {form_field form=$form field="email"}
+                        <div class="form-group group-email {if $error}has-error{/if} ">
+                            <label for="{$label_attr.for}">{$label}</label>
+                            <div class="control-input">
+                            <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" {$attr}  aria-required="true" autofocus required>
+                            {if $error}
+                                <span class="help-block"><span class="icon-remove"></span> {$message}</span>
+                            {/if}
+                            </div>
+                        </div>
+                    {/form_field}
 
-	{*
-	The form error status and the form error messages are defined in Customer action,
-	and passed back to the form plugin through the ParserContext.
-	*}
+                    <fieldset>
+                        <legend>{intl l="Do you have an account?"}</legend>
+                        <div class="radio radio-account0" >
+                            <label for="account0">
+                                <input type="radio" name="account" id="account0" data-toggle="password" value="0" > {intl l="No, I am a new customer."}
+                            </label>
+                        </div>
+                        <div class="radio radio-account1">
+                            <label for="account1">
+                                <input type="radio" name="account" id="account1" data-toggle="password" value="1" checked> {intl l="Yes, I have a password :"}
+                            </label>
+                        </div>
+                        {form_field form=$form field="password"}
+                        <div class="form-group group-password {if $error}has-error{/if} ">
+                            <label for="{$label_attr.for}" class="sr-only">{$label}</label>
+                            <div class="control-input">
+                            <input type="password" name="{$name}" id="{$label_attr.for}" class="form-control" autocomplete="off">
+                            {if $error}
+                                <span class="help-block"><span class="icon-remove"></span> {$message}</span>
+                            {/if}
+                            </div>
+                        </div>
+                        {/form_field}
+                    </fieldset>
+                </fieldset>
 
-	{if #form_error}<div class="alert alert-error">#form_error_message</div>{/if}
-
-    {form_hidden_fields form=$form}
-
-    {form_field form=$form field="email"}
-        {if #error}{#message}{/if}
-        <label>{intl l="Your e-mail address"}: </label><input type="email" name="{$name}" {$attr} value="{$value}"><br />
-    {/form_field}
-
-    {form_field form=$form field='password'}
-    <label>{intl l="Your password"}: </label><input type="password" name="{$name}" {$attr} value="{$value}"> <br />
-    {/form_field}
-
-	{form_field form=$form field='remember_me'}
-	<label class="checkbox"> <input type="checkbox" name="{$name}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {intl l='Remember me'}</label>
-	{/form_field}
-
-	<button type="submit">{intl l='Login'}</button>
-</form>
-{/form}
-
-{include file='includes/footer.html'}
+                <div class="group-btn">
+                    <a href="{url path="/password"}" class="forgot-password">{intl l="Forgot your Password ?"}</a>
+                    <button type="submit" class="btn btn-login">{intl l="Next"}</button>
+                </div>
+            </form>
+            {/form}
+        </article>
+    </div>
+{/block}

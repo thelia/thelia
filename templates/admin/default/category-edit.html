@@ -53,7 +53,7 @@
 								<div class="form-horizontal col-md-12">
 	                                <fieldset>
 
-	                                    {include file="includes/inner-form-toolbar.html"}
+	                                    {include file="includes/inner-form-toolbar.html" close_url="{url path='admin/catalog/category/edit' category_id=$current_category_id}"}
 
 	                                    <div class="row">
 	                                        <div class="col-md-12">
@@ -136,7 +136,7 @@
 	                       <div class="tab-pane form-container" id="details">
                                 <div class="form-horizontal col-md-12">
                                     <fieldset>
-                                        {include file="includes/inner-form-toolbar.html"}
+                                        {include file="includes/inner-form-toolbar.html" close_url="{url path='admin/catalog/category/edit' category_id=$current_category_id}"}
 
                                         <div class="row">
                                             <div class="col-md-6">
@@ -146,7 +146,7 @@
                                                     </label>
 
                                                     <div class="controls">
-                                                        <input type="text" name="id" disabled="disabled" value="#ID" />
+                                                        <input type="text" name="id" disabled="disabled" value="{$ID}" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -162,7 +162,7 @@
                                                             <option value="0">{intl l="Top level"}</option>
 
                                                             {loop name="cat-parent" type="category-tree" visible="*" category="0" exclude="{$current_category_id}"}
-                                                                 <option value="#ID" style="padding-left: {3 + $LEVEL * 20}px" {if $parent_category_id == $ID}selected="selected"{/if}>{$TITLE}</option>
+                                                                 <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $parent_category_id == $ID}selected="selected"{/if}>{$TITLE}</option>
                                                             {/loop}
 
                                                         </select>

@@ -22,7 +22,6 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Install;
-use Thelia\Install\BaseInstall;
 use Thelia\Install\CheckPermission;
 
 /**
@@ -30,22 +29,65 @@ use Thelia\Install\CheckPermission;
  * @package Thelia\Controller\Install
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class InstallController extends BaseInstallController {
-
+class InstallController extends BaseInstallController
+{
     public function index()
     {
-        $this->verifyStep(1);
+        //$this->verifyStep(1);
 
         $this->getSession()->set("step", 1);
 
-        $this->render("index.html");
+        return $this->render("index.html");
     }
 
     public function checkPermission()
     {
-        $this->verifyStep(2);
+        //$this->verifyStep(2);
 
-        $permission = new CheckPermission();
+        //$permission = new CheckPermission();
+
+        $this->getSession()->set("step", 2);
+        return $this->render("step-2.html");
+    }
+
+    public function databaseConnection()
+    {
+        //$this->verifyStep(2);
+
+        //$permission = new CheckPermission();
+
+        $this->getSession()->set("step", 3);
+        return $this->render("step-3.html");
+    }
+
+    public function databaseSelection()
+    {
+        //$this->verifyStep(2);
+
+        //$permission = new CheckPermission();
+
+        $this->getSession()->set("step", 4);
+        return $this->render("step-4.html");
+    }
+
+    public function generalInformation()
+    {
+        //$this->verifyStep(2);
+
+        //$permission = new CheckPermission();
+
+        $this->getSession()->set("step", 5);
+        return $this->render("step-5.html");
+    }
+
+    public function thanks()
+    {
+        //$this->verifyStep(2);
+
+        //$permission = new CheckPermission();
+
+        $this->getSession()->set("step", 6);
+        return $this->render("thanks.html");
     }
 
     protected function verifyStep($step)
@@ -58,7 +100,7 @@ class InstallController extends BaseInstallController {
            return true;
         }
 
-        switch($step) {
+        switch ($step) {
             case "1" :
                 if ($sessionStep > 1) {
                     $this->redirect("/install/step/2");

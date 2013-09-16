@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event;
 
-use Thelia\Model\Message;
-
 class MessageDeleteEvent extends MessageEvent
 {
     protected $message_id;

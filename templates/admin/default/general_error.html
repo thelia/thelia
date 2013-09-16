@@ -10,11 +10,13 @@
 
         <div class="row">
             <div class="col-md-12">
-                <h1>{intl l="Oops! An Error Occurred"}</h1>
+            	<div class="general-block-decorator text-center">
+	                <h1>{intl l="Oops! An Error Occurred"}</h1>
 
-                {block name="error-message"}<div class="alert alert-error">{$error_message}</div>{/block}
-
-                <p><i class="glyphicon glyphicon-backward"></i> <a href="{url path='/admin/home'}">{intl l="Go to administration home"}</a></p>
+	                {block name="error-message"}<p>{$error_message}</p>{/block}
+					
+					<a href="{url path='/admin/home'}" class="btn btn-default btn-info btn-lg"><span class="glyphicon glyphicon-home"></span> {intl l="Go to administration home"}</a>	                
+	            </div>
             </div>
         </div>
 

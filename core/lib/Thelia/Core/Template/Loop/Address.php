@@ -24,7 +24,6 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -48,7 +47,7 @@ use Thelia\Type;
 class Address extends BaseLoop
 {
     public $timestampable = true;
-    
+
     /**
      * @return ArgumentCollection
      */
@@ -64,7 +63,7 @@ class Address extends BaseLoop
                 ),
                 'current'
             ),
-            Argument::createBooleanTypeArgument('default', false),
+            Argument::createBooleanTypeArgument('default'),
             Argument::createIntListTypeArgument('exclude')
         );
     }
@@ -87,7 +86,7 @@ class Address extends BaseLoop
         $customer = $this->getCustomer();
 
         if ($customer === 'current') {
-            $currentCustomer = $this->request->getSession()->getCustomerUser();
+            $currentCustomer = $this->securityContext->getCustomerUser();
             if ($currentCustomer === null) {
                 return new LoopResult();
             } else {
@@ -99,9 +98,10 @@ class Address extends BaseLoop
 
         $default = $this->getDefault();
 
-
         if ($default === true) {
             $search->filterByIsDefault(1, Criteria::EQUAL);
+        } else if($default === false) {
+            $search->filterByIsDefault(0, Criteria::EQUAL);
         }
 
         $exclude = $this->getExclude();

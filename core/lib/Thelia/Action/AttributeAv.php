@@ -1,0 +1,143 @@
+<?php
+/*************************************************************************************/
+/*                                                                                   */
+/*      Thelia	                                                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : info@thelia.net                                                      */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      This program is free software; you can redistribute it and/or modify         */
+/*      it under the terms of the GNU General Public License as published by         */
+/*      the Free Software Foundation; either version 3 of the License                */
+/*                                                                                   */
+/*      This program is distributed in the hope that it will be useful,              */
+/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
+/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
+/*      GNU General Public License for more details.                                 */
+/*                                                                                   */
+/*      You should have received a copy of the GNU General Public License            */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*                                                                                   */
+/*************************************************************************************/
+
+namespace Thelia\Action;
+
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\AttributeAv as AttributeAvModel;
+
+use Thelia\Core\Event\TheliaEvents;
+
+use Thelia\Core\Event\AttributeAvUpdateEvent;
+use Thelia\Core\Event\AttributeAvCreateEvent;
+use Thelia\Core\Event\AttributeAvDeleteEvent;
+use Thelia\Model\ConfigQuery;
+use Thelia\Core\Event\UpdatePositionEvent;
+
+class AttributeAv extends BaseAction implements EventSubscriberInterface
+{
+    /**
+     * Create a new attribute entry
+     *
+     * @param AttributeAvCreateEvent $event
+     */
+    public function create(AttributeAvCreateEvent $event)
+    {
+        $attribute = new AttributeAvModel();
+
+        $attribute
+            ->setDispatcher($this->getDispatcher())
+
+            ->setAttributeId($event->getAttributeId())
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+
+            ->save()
+        ;
+
+        $event->setAttributeAv($attribute);
+    }
+
+    /**
+     * Change a product attribute
+     *
+     * @param AttributeAvUpdateEvent $event
+     */
+    public function update(AttributeAvUpdateEvent $event)
+    {
+        $search = AttributeAvQuery::create();
+
+        if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId())) {
+
+            $attribute
+                ->setDispatcher($this->getDispatcher())
+
+                ->setLocale($event->getLocale())
+                ->setTitle($event->getTitle())
+                ->setDescription($event->getDescription())
+                ->setChapo($event->getChapo())
+                ->setPostscriptum($event->getPostscriptum())
+
+                ->save();
+
+            $event->setAttributeAv($attribute);
+        }
+    }
+
+    /**
+     * Delete a product attribute entry
+     *
+     * @param AttributeAvDeleteEvent $event
+     */
+    public function delete(AttributeAvDeleteEvent $event)
+    {
+
+        if (null !== ($attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId()))) {
+
+            $attribute
+                ->setDispatcher($this->getDispatcher())
+                ->delete()
+            ;
+
+            $event->setAttributeAv($attribute);
+        }
+    }
+
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param CategoryChangePositionEvent $event
+     */
+    public function updatePosition(UpdatePositionEvent $event)
+    {
+        if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getObjectId())) {
+
+            $attribute->setDispatcher($this->getDispatcher());
+
+            $mode = $event->getMode();
+
+            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
+                return $attribute->changeAbsolutePosition($event->getPosition());
+            else if ($mode == UpdatePositionEvent::POSITION_UP)
+                return $attribute->movePositionUp();
+            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
+                return $attribute->movePositionDown();
+        }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            TheliaEvents::ATTRIBUTE_AV_CREATE          => array("create", 128),
+            TheliaEvents::ATTRIBUTE_AV_UPDATE          => array("update", 128),
+            TheliaEvents::ATTRIBUTE_AV_DELETE          => array("delete", 128),
+            TheliaEvents::ATTRIBUTE_AV_UPDATE_POSITION => array("updatePosition", 128),
+        );
+    }
+}

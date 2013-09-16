@@ -1,0 +1,77 @@
+{extends file="layout.tpl"}
+
+{block name="page-title"}{intl l='Installation step 4'}{/block}
+
+{block name="main-content"}
+<div class="install">
+	<div id="wrapper" class="container">
+		
+		<div class="row">
+		    <div class="col-md-12">
+		        <div class="general-block-decorator">
+										
+					<h3 class="title title-without-tabs">{intl l="Thelia installation wizard"}</h3>
+					
+					<div class="wizard">
+						<ul>
+							<li class="complete"><a href="#"><span class="badge">1</span>{intl l="Welcome"}<span class="chevron"></span></a></li>
+							<li class="complete"><a href="#"><span class="badge">2</span>{intl l="Checking permissions"}<span class="chevron"></span></a></li>
+							<li class="complete"><a href="#"><span class="badge">3</span>{intl l="Database connection"}<span class="chevron"></span></a></li>
+							<li class="active"><span class="badge">4</span>{intl l="Database selection"}<span class="chevron"></span></li>
+							<li><span class="badge">5</span>{intl l="General information"}<span class="chevron"></span></li>
+							<li><span class="badge">6</span>{intl l="Thanks"}<span class="chevron"></span></li>
+						</ul>						
+					</div>								
+						
+					<div class="well">	
+						<form action="">
+							<fieldset>
+								<legend>{intl l="Choose your database"}</legend>
+								<p>
+									The SQL server contains multiple databases.<br/>
+									Select below the one you want to use.
+								</p>
+							
+								<div class="radio">
+									<label>
+										<input type="radio" name="" id="" value="">
+										Database 1
+									</label>
+								</div>
+								<div class="radio">
+									<label>
+										<input type="radio" name="" id="" value="">
+										Database 2
+									</label>
+								</div>
+
+								<p>
+									{intl l="or"}
+								</p>
+								
+								<div class="radio">
+									<label>
+										<input type="radio" name="" id="" value="" checked>
+										Create an other database
+									</label>
+								</div>
+
+								<div class="form-group">
+									<input type="text" class="form-control">
+								</div>
+							</fieldset>
+						</form>
+					</div>					
+					
+					<div class="clearfix">
+						<a href="install/step/2" class="pull-left btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> {intl l="Return"}</a>
+						<a href="install/step/4" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> {intl l="Continue"}</a>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</div>
+{/block}

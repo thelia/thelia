@@ -62,8 +62,8 @@ class Format extends AbstractSmartyPlugin
      *  {format_date date=$dateTimeObject output="date"} will output the date using the default date system format
      *  {format_date date=$dateTimeObject} will output with the default datetime system format
      *
-     * @param array $params
-     * @param null $template
+     * @param  array                                                        $params
+     * @param  null                                                         $template
      * @throws \Thelia\Core\Template\Smarty\Exception\SmartyPluginException
      * @return string
      */
@@ -76,7 +76,7 @@ class Format extends AbstractSmartyPlugin
 
         $date = $params["date"];
 
-        if(!$date instanceof \DateTime) {
+        if (!$date instanceof \DateTime) {
             return "";
         }
 
@@ -103,9 +103,9 @@ class Format extends AbstractSmartyPlugin
      *  ex : {format_number number="1246.12" decimals="1" dec_point="," thousands_sep=" "} will output "1 246,1"
      *
      * @param $params
-     * @param null $template
+     * @param  null                                                         $template
      * @throws \Thelia\Core\Template\Smarty\Exception\SmartyPluginException
-     * @return string the expected number formatted
+     * @return string                                                       the expected number formatted
      */
     public function formatNumber($params, $template = null)
     {
@@ -113,9 +113,14 @@ class Format extends AbstractSmartyPlugin
             throw new SmartyPluginException("number is a mandatory parameter in format_number function");
         }
 
+        $number = $params["number"];
+
+        if (empty($number)) {
+            return "";
+        }
+
         $lang = $this->request->getSession()->getLang();
 
-        $number = $params["number"];
         $decimals = array_key_exists("decimals", $params) ? $params["decimals"] : $lang->getDecimals();
         $decPoint = array_key_exists("dec_point", $params) ? $params["dec_point"] : $lang->getDecimalSeparator();
         $thousandsSep = array_key_exists("thousands_sep", $params) ? $params["thousands_sep"] : $lang->getThousandsSeparator();

@@ -20,15 +20,15 @@ use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Attribute as ChildAttribute;
 use Thelia\Model\AttributeAv as ChildAttributeAv;
 use Thelia\Model\AttributeAvQuery as ChildAttributeAvQuery;
-use Thelia\Model\AttributeCategory as ChildAttributeCategory;
-use Thelia\Model\AttributeCategoryQuery as ChildAttributeCategoryQuery;
 use Thelia\Model\AttributeCombination as ChildAttributeCombination;
 use Thelia\Model\AttributeCombinationQuery as ChildAttributeCombinationQuery;
 use Thelia\Model\AttributeI18n as ChildAttributeI18n;
 use Thelia\Model\AttributeI18nQuery as ChildAttributeI18nQuery;
 use Thelia\Model\AttributeQuery as ChildAttributeQuery;
-use Thelia\Model\Category as ChildCategory;
-use Thelia\Model\CategoryQuery as ChildCategoryQuery;
+use Thelia\Model\AttributeTemplate as ChildAttributeTemplate;
+use Thelia\Model\AttributeTemplateQuery as ChildAttributeTemplateQuery;
+use Thelia\Model\Template as ChildTemplate;
+use Thelia\Model\TemplateQuery as ChildTemplateQuery;
 use Thelia\Model\Map\AttributeTableMap;
 
 abstract class Attribute implements ActiveRecordInterface
@@ -102,10 +102,10 @@ abstract class Attribute implements ActiveRecordInterface
     protected $collAttributeCombinationsPartial;
 
     /**
-     * @var        ObjectCollection|ChildAttributeCategory[] Collection to store aggregation of ChildAttributeCategory objects.
+     * @var        ObjectCollection|ChildAttributeTemplate[] Collection to store aggregation of ChildAttributeTemplate objects.
      */
-    protected $collAttributeCategories;
-    protected $collAttributeCategoriesPartial;
+    protected $collAttributeTemplates;
+    protected $collAttributeTemplatesPartial;
 
     /**
      * @var        ObjectCollection|ChildAttributeI18n[] Collection to store aggregation of ChildAttributeI18n objects.
@@ -114,9 +114,9 @@ abstract class Attribute implements ActiveRecordInterface
     protected $collAttributeI18nsPartial;
 
     /**
-     * @var        ChildCategory[] Collection to store aggregation of ChildCategory objects.
+     * @var        ChildTemplate[] Collection to store aggregation of ChildTemplate objects.
      */
-    protected $collCategories;
+    protected $collTemplates;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -144,7 +144,7 @@ abstract class Attribute implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $categoriesScheduledForDeletion = null;
+    protected $templatesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -162,7 +162,7 @@ abstract class Attribute implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $attributeCategoriesScheduledForDeletion = null;
+    protected $attributeTemplatesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -697,11 +697,11 @@ abstract class Attribute implements ActiveRecordInterface
 
             $this->collAttributeCombinations = null;
 
-            $this->collAttributeCategories = null;
+            $this->collAttributeTemplates = null;
 
             $this->collAttributeI18ns = null;
 
-            $this->collCategories = null;
+            $this->collTemplates = null;
         } // if (deep)
     }
 
@@ -835,29 +835,29 @@ abstract class Attribute implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->categoriesScheduledForDeletion !== null) {
-                if (!$this->categoriesScheduledForDeletion->isEmpty()) {
+            if ($this->templatesScheduledForDeletion !== null) {
+                if (!$this->templatesScheduledForDeletion->isEmpty()) {
                     $pks = array();
                     $pk  = $this->getPrimaryKey();
-                    foreach ($this->categoriesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($remotePk, $pk);
+                    foreach ($this->templatesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
                     }
 
-                    AttributeCategoryQuery::create()
+                    AttributeTemplateQuery::create()
                         ->filterByPrimaryKeys($pks)
                         ->delete($con);
-                    $this->categoriesScheduledForDeletion = null;
+                    $this->templatesScheduledForDeletion = null;
                 }
 
-                foreach ($this->getCategories() as $category) {
-                    if ($category->isModified()) {
-                        $category->save($con);
+                foreach ($this->getTemplates() as $template) {
+                    if ($template->isModified()) {
+                        $template->save($con);
                     }
                 }
-            } elseif ($this->collCategories) {
-                foreach ($this->collCategories as $category) {
-                    if ($category->isModified()) {
-                        $category->save($con);
+            } elseif ($this->collTemplates) {
+                foreach ($this->collTemplates as $template) {
+                    if ($template->isModified()) {
+                        $template->save($con);
                     }
                 }
             }
@@ -896,17 +896,17 @@ abstract class Attribute implements ActiveRecordInterface
                 }
             }
 
-            if ($this->attributeCategoriesScheduledForDeletion !== null) {
-                if (!$this->attributeCategoriesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\AttributeCategoryQuery::create()
-                        ->filterByPrimaryKeys($this->attributeCategoriesScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->attributeTemplatesScheduledForDeletion !== null) {
+                if (!$this->attributeTemplatesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\AttributeTemplateQuery::create()
+                        ->filterByPrimaryKeys($this->attributeTemplatesScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->attributeCategoriesScheduledForDeletion = null;
+                    $this->attributeTemplatesScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collAttributeCategories !== null) {
-            foreach ($this->collAttributeCategories as $referrerFK) {
+                if ($this->collAttributeTemplates !== null) {
+            foreach ($this->collAttributeTemplates as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1112,8 +1112,8 @@ abstract class Attribute implements ActiveRecordInterface
             if (null !== $this->collAttributeCombinations) {
                 $result['AttributeCombinations'] = $this->collAttributeCombinations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collAttributeCategories) {
-                $result['AttributeCategories'] = $this->collAttributeCategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collAttributeTemplates) {
+                $result['AttributeTemplates'] = $this->collAttributeTemplates->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collAttributeI18ns) {
                 $result['AttributeI18ns'] = $this->collAttributeI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1291,9 +1291,9 @@ abstract class Attribute implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getAttributeCategories() as $relObj) {
+            foreach ($this->getAttributeTemplates() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAttributeCategory($relObj->copy($deepCopy));
+                    $copyObj->addAttributeTemplate($relObj->copy($deepCopy));
                 }
             }
 
@@ -1350,8 +1350,8 @@ abstract class Attribute implements ActiveRecordInterface
         if ('AttributeCombination' == $relationName) {
             return $this->initAttributeCombinations();
         }
-        if ('AttributeCategory' == $relationName) {
-            return $this->initAttributeCategories();
+        if ('AttributeTemplate' == $relationName) {
+            return $this->initAttributeTemplates();
         }
         if ('AttributeI18n' == $relationName) {
             return $this->initAttributeI18ns();
@@ -1848,31 +1848,31 @@ abstract class Attribute implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collAttributeCategories collection
+     * Clears out the collAttributeTemplates collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addAttributeCategories()
+     * @see        addAttributeTemplates()
      */
-    public function clearAttributeCategories()
+    public function clearAttributeTemplates()
     {
-        $this->collAttributeCategories = null; // important to set this to NULL since that means it is uninitialized
+        $this->collAttributeTemplates = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collAttributeCategories collection loaded partially.
+     * Reset is the collAttributeTemplates collection loaded partially.
      */
-    public function resetPartialAttributeCategories($v = true)
+    public function resetPartialAttributeTemplates($v = true)
     {
-        $this->collAttributeCategoriesPartial = $v;
+        $this->collAttributeTemplatesPartial = $v;
     }
 
     /**
-     * Initializes the collAttributeCategories collection.
+     * Initializes the collAttributeTemplates collection.
      *
-     * By default this just sets the collAttributeCategories collection to an empty array (like clearcollAttributeCategories());
+     * By default this just sets the collAttributeTemplates collection to an empty array (like clearcollAttributeTemplates());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1881,17 +1881,17 @@ abstract class Attribute implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initAttributeCategories($overrideExisting = true)
+    public function initAttributeTemplates($overrideExisting = true)
     {
-        if (null !== $this->collAttributeCategories && !$overrideExisting) {
+        if (null !== $this->collAttributeTemplates && !$overrideExisting) {
             return;
         }
-        $this->collAttributeCategories = new ObjectCollection();
-        $this->collAttributeCategories->setModel('\Thelia\Model\AttributeCategory');
+        $this->collAttributeTemplates = new ObjectCollection();
+        $this->collAttributeTemplates->setModel('\Thelia\Model\AttributeTemplate');
     }
 
     /**
-     * Gets an array of ChildAttributeCategory objects which contain a foreign key that references this object.
+     * Gets an array of ChildAttributeTemplate objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1901,109 +1901,109 @@ abstract class Attribute implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildAttributeCategory[] List of ChildAttributeCategory objects
+     * @return Collection|ChildAttributeTemplate[] List of ChildAttributeTemplate objects
      * @throws PropelException
      */
-    public function getAttributeCategories($criteria = null, ConnectionInterface $con = null)
+    public function getAttributeTemplates($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collAttributeCategoriesPartial && !$this->isNew();
-        if (null === $this->collAttributeCategories || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collAttributeCategories) {
+        $partial = $this->collAttributeTemplatesPartial && !$this->isNew();
+        if (null === $this->collAttributeTemplates || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAttributeTemplates) {
                 // return empty collection
-                $this->initAttributeCategories();
+                $this->initAttributeTemplates();
             } else {
-                $collAttributeCategories = ChildAttributeCategoryQuery::create(null, $criteria)
+                $collAttributeTemplates = ChildAttributeTemplateQuery::create(null, $criteria)
                     ->filterByAttribute($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collAttributeCategoriesPartial && count($collAttributeCategories)) {
-                        $this->initAttributeCategories(false);
+                    if (false !== $this->collAttributeTemplatesPartial && count($collAttributeTemplates)) {
+                        $this->initAttributeTemplates(false);
 
-                        foreach ($collAttributeCategories as $obj) {
-                            if (false == $this->collAttributeCategories->contains($obj)) {
-                                $this->collAttributeCategories->append($obj);
+                        foreach ($collAttributeTemplates as $obj) {
+                            if (false == $this->collAttributeTemplates->contains($obj)) {
+                                $this->collAttributeTemplates->append($obj);
                             }
                         }
 
-                        $this->collAttributeCategoriesPartial = true;
+                        $this->collAttributeTemplatesPartial = true;
                     }
 
-                    $collAttributeCategories->getInternalIterator()->rewind();
+                    $collAttributeTemplates->getInternalIterator()->rewind();
 
-                    return $collAttributeCategories;
+                    return $collAttributeTemplates;
                 }
 
-                if ($partial && $this->collAttributeCategories) {
-                    foreach ($this->collAttributeCategories as $obj) {
+                if ($partial && $this->collAttributeTemplates) {
+                    foreach ($this->collAttributeTemplates as $obj) {
                         if ($obj->isNew()) {
-                            $collAttributeCategories[] = $obj;
+                            $collAttributeTemplates[] = $obj;
                         }
                     }
                 }
 
-                $this->collAttributeCategories = $collAttributeCategories;
-                $this->collAttributeCategoriesPartial = false;
+                $this->collAttributeTemplates = $collAttributeTemplates;
+                $this->collAttributeTemplatesPartial = false;
             }
         }
 
-        return $this->collAttributeCategories;
+        return $this->collAttributeTemplates;
     }
 
     /**
-     * Sets a collection of AttributeCategory objects related by a one-to-many relationship
+     * Sets a collection of AttributeTemplate objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $attributeCategories A Propel collection.
+     * @param      Collection $attributeTemplates A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildAttribute The current object (for fluent API support)
      */
-    public function setAttributeCategories(Collection $attributeCategories, ConnectionInterface $con = null)
+    public function setAttributeTemplates(Collection $attributeTemplates, ConnectionInterface $con = null)
     {
-        $attributeCategoriesToDelete = $this->getAttributeCategories(new Criteria(), $con)->diff($attributeCategories);
+        $attributeTemplatesToDelete = $this->getAttributeTemplates(new Criteria(), $con)->diff($attributeTemplates);
 
 
-        $this->attributeCategoriesScheduledForDeletion = $attributeCategoriesToDelete;
+        $this->attributeTemplatesScheduledForDeletion = $attributeTemplatesToDelete;
 
-        foreach ($attributeCategoriesToDelete as $attributeCategoryRemoved) {
-            $attributeCategoryRemoved->setAttribute(null);
+        foreach ($attributeTemplatesToDelete as $attributeTemplateRemoved) {
+            $attributeTemplateRemoved->setAttribute(null);
         }
 
-        $this->collAttributeCategories = null;
-        foreach ($attributeCategories as $attributeCategory) {
-            $this->addAttributeCategory($attributeCategory);
+        $this->collAttributeTemplates = null;
+        foreach ($attributeTemplates as $attributeTemplate) {
+            $this->addAttributeTemplate($attributeTemplate);
         }
 
-        $this->collAttributeCategories = $attributeCategories;
-        $this->collAttributeCategoriesPartial = false;
+        $this->collAttributeTemplates = $attributeTemplates;
+        $this->collAttributeTemplatesPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related AttributeCategory objects.
+     * Returns the number of related AttributeTemplate objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related AttributeCategory objects.
+     * @return int             Count of related AttributeTemplate objects.
      * @throws PropelException
      */
-    public function countAttributeCategories(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countAttributeTemplates(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collAttributeCategoriesPartial && !$this->isNew();
-        if (null === $this->collAttributeCategories || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collAttributeCategories) {
+        $partial = $this->collAttributeTemplatesPartial && !$this->isNew();
+        if (null === $this->collAttributeTemplates || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAttributeTemplates) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getAttributeCategories());
+                return count($this->getAttributeTemplates());
             }
 
-            $query = ChildAttributeCategoryQuery::create(null, $criteria);
+            $query = ChildAttributeTemplateQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -2013,53 +2013,53 @@ abstract class Attribute implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collAttributeCategories);
+        return count($this->collAttributeTemplates);
     }
 
     /**
-     * Method called to associate a ChildAttributeCategory object to this object
-     * through the ChildAttributeCategory foreign key attribute.
+     * Method called to associate a ChildAttributeTemplate object to this object
+     * through the ChildAttributeTemplate foreign key attribute.
      *
-     * @param    ChildAttributeCategory $l ChildAttributeCategory
+     * @param    ChildAttributeTemplate $l ChildAttributeTemplate
      * @return   \Thelia\Model\Attribute The current object (for fluent API support)
      */
-    public function addAttributeCategory(ChildAttributeCategory $l)
+    public function addAttributeTemplate(ChildAttributeTemplate $l)
     {
-        if ($this->collAttributeCategories === null) {
-            $this->initAttributeCategories();
-            $this->collAttributeCategoriesPartial = true;
+        if ($this->collAttributeTemplates === null) {
+            $this->initAttributeTemplates();
+            $this->collAttributeTemplatesPartial = true;
         }
 
-        if (!in_array($l, $this->collAttributeCategories->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddAttributeCategory($l);
+        if (!in_array($l, $this->collAttributeTemplates->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddAttributeTemplate($l);
         }
 
         return $this;
     }
 
     /**
-     * @param AttributeCategory $attributeCategory The attributeCategory object to add.
+     * @param AttributeTemplate $attributeTemplate The attributeTemplate object to add.
      */
-    protected function doAddAttributeCategory($attributeCategory)
+    protected function doAddAttributeTemplate($attributeTemplate)
     {
-        $this->collAttributeCategories[]= $attributeCategory;
-        $attributeCategory->setAttribute($this);
+        $this->collAttributeTemplates[]= $attributeTemplate;
+        $attributeTemplate->setAttribute($this);
     }
 
     /**
-     * @param  AttributeCategory $attributeCategory The attributeCategory object to remove.
+     * @param  AttributeTemplate $attributeTemplate The attributeTemplate object to remove.
      * @return ChildAttribute The current object (for fluent API support)
      */
-    public function removeAttributeCategory($attributeCategory)
+    public function removeAttributeTemplate($attributeTemplate)
     {
-        if ($this->getAttributeCategories()->contains($attributeCategory)) {
-            $this->collAttributeCategories->remove($this->collAttributeCategories->search($attributeCategory));
-            if (null === $this->attributeCategoriesScheduledForDeletion) {
-                $this->attributeCategoriesScheduledForDeletion = clone $this->collAttributeCategories;
-                $this->attributeCategoriesScheduledForDeletion->clear();
+        if ($this->getAttributeTemplates()->contains($attributeTemplate)) {
+            $this->collAttributeTemplates->remove($this->collAttributeTemplates->search($attributeTemplate));
+            if (null === $this->attributeTemplatesScheduledForDeletion) {
+                $this->attributeTemplatesScheduledForDeletion = clone $this->collAttributeTemplates;
+                $this->attributeTemplatesScheduledForDeletion->clear();
             }
-            $this->attributeCategoriesScheduledForDeletion[]= clone $attributeCategory;
-            $attributeCategory->setAttribute(null);
+            $this->attributeTemplatesScheduledForDeletion[]= clone $attributeTemplate;
+            $attributeTemplate->setAttribute(null);
         }
 
         return $this;
@@ -2071,7 +2071,7 @@ abstract class Attribute implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this Attribute is new, it will return
      * an empty collection; or if this Attribute has previously
-     * been saved, it will retrieve related AttributeCategories from storage.
+     * been saved, it will retrieve related AttributeTemplates from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -2080,14 +2080,14 @@ abstract class Attribute implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildAttributeCategory[] List of ChildAttributeCategory objects
+     * @return Collection|ChildAttributeTemplate[] List of ChildAttributeTemplate objects
      */
-    public function getAttributeCategoriesJoinCategory($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getAttributeTemplatesJoinTemplate($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildAttributeCategoryQuery::create(null, $criteria);
-        $query->joinWith('Category', $joinBehavior);
+        $query = ChildAttributeTemplateQuery::create(null, $criteria);
+        $query->joinWith('Template', $joinBehavior);
 
-        return $this->getAttributeCategories($query, $con);
+        return $this->getAttributeTemplates($query, $con);
     }
 
     /**
@@ -2316,38 +2316,38 @@ abstract class Attribute implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collCategories collection
+     * Clears out the collTemplates collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addCategories()
+     * @see        addTemplates()
      */
-    public function clearCategories()
+    public function clearTemplates()
     {
-        $this->collCategories = null; // important to set this to NULL since that means it is uninitialized
-        $this->collCategoriesPartial = null;
+        $this->collTemplates = null; // important to set this to NULL since that means it is uninitialized
+        $this->collTemplatesPartial = null;
     }
 
     /**
-     * Initializes the collCategories collection.
+     * Initializes the collTemplates collection.
      *
-     * By default this just sets the collCategories collection to an empty collection (like clearCategories());
+     * By default this just sets the collTemplates collection to an empty collection (like clearTemplates());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
      * @return void
      */
-    public function initCategories()
+    public function initTemplates()
     {
-        $this->collCategories = new ObjectCollection();
-        $this->collCategories->setModel('\Thelia\Model\Category');
+        $this->collTemplates = new ObjectCollection();
+        $this->collTemplates->setModel('\Thelia\Model\Template');
     }
 
     /**
-     * Gets a collection of ChildCategory objects related by a many-to-many relationship
-     * to the current object by way of the attribute_category cross-reference table.
+     * Gets a collection of ChildTemplate objects related by a many-to-many relationship
+     * to the current object by way of the attribute_template cross-reference table.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -2358,73 +2358,73 @@ abstract class Attribute implements ActiveRecordInterface
      * @param      Criteria $criteria Optional query object to filter the query
      * @param      ConnectionInterface $con Optional connection object
      *
-     * @return ObjectCollection|ChildCategory[] List of ChildCategory objects
+     * @return ObjectCollection|ChildTemplate[] List of ChildTemplate objects
      */
-    public function getCategories($criteria = null, ConnectionInterface $con = null)
+    public function getTemplates($criteria = null, ConnectionInterface $con = null)
     {
-        if (null === $this->collCategories || null !== $criteria) {
-            if ($this->isNew() && null === $this->collCategories) {
+        if (null === $this->collTemplates || null !== $criteria) {
+            if ($this->isNew() && null === $this->collTemplates) {
                 // return empty collection
-                $this->initCategories();
+                $this->initTemplates();
             } else {
-                $collCategories = ChildCategoryQuery::create(null, $criteria)
+                $collTemplates = ChildTemplateQuery::create(null, $criteria)
                     ->filterByAttribute($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    return $collCategories;
+                    return $collTemplates;
                 }
-                $this->collCategories = $collCategories;
+                $this->collTemplates = $collTemplates;
             }
         }
 
-        return $this->collCategories;
+        return $this->collTemplates;
     }
 
     /**
-     * Sets a collection of Category objects related by a many-to-many relationship
-     * to the current object by way of the attribute_category cross-reference table.
+     * Sets a collection of Template objects related by a many-to-many relationship
+     * to the current object by way of the attribute_template cross-reference table.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection $categories A Propel collection.
+     * @param  Collection $templates A Propel collection.
      * @param  ConnectionInterface $con Optional connection object
      * @return ChildAttribute The current object (for fluent API support)
      */
-    public function setCategories(Collection $categories, ConnectionInterface $con = null)
+    public function setTemplates(Collection $templates, ConnectionInterface $con = null)
     {
-        $this->clearCategories();
-        $currentCategories = $this->getCategories();
+        $this->clearTemplates();
+        $currentTemplates = $this->getTemplates();
 
-        $this->categoriesScheduledForDeletion = $currentCategories->diff($categories);
+        $this->templatesScheduledForDeletion = $currentTemplates->diff($templates);
 
-        foreach ($categories as $category) {
-            if (!$currentCategories->contains($category)) {
-                $this->doAddCategory($category);
+        foreach ($templates as $template) {
+            if (!$currentTemplates->contains($template)) {
+                $this->doAddTemplate($template);
             }
         }
 
-        $this->collCategories = $categories;
+        $this->collTemplates = $templates;
 
         return $this;
     }
 
     /**
-     * Gets the number of ChildCategory objects related by a many-to-many relationship
-     * to the current object by way of the attribute_category cross-reference table.
+     * Gets the number of ChildTemplate objects related by a many-to-many relationship
+     * to the current object by way of the attribute_template cross-reference table.
      *
      * @param      Criteria $criteria Optional query object to filter the query
      * @param      boolean $distinct Set to true to force count distinct
      * @param      ConnectionInterface $con Optional connection object
      *
-     * @return int the number of related ChildCategory objects
+     * @return int the number of related ChildTemplate objects
      */
-    public function countCategories($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countTemplates($criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        if (null === $this->collCategories || null !== $criteria) {
-            if ($this->isNew() && null === $this->collCategories) {
+        if (null === $this->collTemplates || null !== $criteria) {
+            if ($this->isNew() && null === $this->collTemplates) {
                 return 0;
             } else {
-                $query = ChildCategoryQuery::create(null, $criteria);
+                $query = ChildTemplateQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -2434,65 +2434,65 @@ abstract class Attribute implements ActiveRecordInterface
                     ->count($con);
             }
         } else {
-            return count($this->collCategories);
+            return count($this->collTemplates);
         }
     }
 
     /**
-     * Associate a ChildCategory object to this object
-     * through the attribute_category cross reference table.
+     * Associate a ChildTemplate object to this object
+     * through the attribute_template cross reference table.
      *
-     * @param  ChildCategory $category The ChildAttributeCategory object to relate
+     * @param  ChildTemplate $template The ChildAttributeTemplate object to relate
      * @return ChildAttribute The current object (for fluent API support)
      */
-    public function addCategory(ChildCategory $category)
+    public function addTemplate(ChildTemplate $template)
     {
-        if ($this->collCategories === null) {
-            $this->initCategories();
+        if ($this->collTemplates === null) {
+            $this->initTemplates();
         }
 
-        if (!$this->collCategories->contains($category)) { // only add it if the **same** object is not already associated
-            $this->doAddCategory($category);
-            $this->collCategories[] = $category;
+        if (!$this->collTemplates->contains($template)) { // only add it if the **same** object is not already associated
+            $this->doAddTemplate($template);
+            $this->collTemplates[] = $template;
         }
 
         return $this;
     }
 
     /**
-     * @param    Category $category The category object to add.
+     * @param    Template $template The template object to add.
      */
-    protected function doAddCategory($category)
+    protected function doAddTemplate($template)
     {
-        $attributeCategory = new ChildAttributeCategory();
-        $attributeCategory->setCategory($category);
-        $this->addAttributeCategory($attributeCategory);
+        $attributeTemplate = new ChildAttributeTemplate();
+        $attributeTemplate->setTemplate($template);
+        $this->addAttributeTemplate($attributeTemplate);
         // set the back reference to this object directly as using provided method either results
         // in endless loop or in multiple relations
-        if (!$category->getAttributes()->contains($this)) {
-            $foreignCollection   = $category->getAttributes();
+        if (!$template->getAttributes()->contains($this)) {
+            $foreignCollection   = $template->getAttributes();
             $foreignCollection[] = $this;
         }
     }
 
     /**
-     * Remove a ChildCategory object to this object
-     * through the attribute_category cross reference table.
+     * Remove a ChildTemplate object to this object
+     * through the attribute_template cross reference table.
      *
-     * @param ChildCategory $category The ChildAttributeCategory object to relate
+     * @param ChildTemplate $template The ChildAttributeTemplate object to relate
      * @return ChildAttribute The current object (for fluent API support)
      */
-    public function removeCategory(ChildCategory $category)
+    public function removeTemplate(ChildTemplate $template)
     {
-        if ($this->getCategories()->contains($category)) {
-            $this->collCategories->remove($this->collCategories->search($category));
+        if ($this->getTemplates()->contains($template)) {
+            $this->collTemplates->remove($this->collTemplates->search($template));
 
-            if (null === $this->categoriesScheduledForDeletion) {
-                $this->categoriesScheduledForDeletion = clone $this->collCategories;
-                $this->categoriesScheduledForDeletion->clear();
+            if (null === $this->templatesScheduledForDeletion) {
+                $this->templatesScheduledForDeletion = clone $this->collTemplates;
+                $this->templatesScheduledForDeletion->clear();
             }
 
-            $this->categoriesScheduledForDeletion[] = $category;
+            $this->templatesScheduledForDeletion[] = $template;
         }
 
         return $this;
@@ -2536,8 +2536,8 @@ abstract class Attribute implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collAttributeCategories) {
-                foreach ($this->collAttributeCategories as $o) {
+            if ($this->collAttributeTemplates) {
+                foreach ($this->collAttributeTemplates as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2546,8 +2546,8 @@ abstract class Attribute implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collCategories) {
-                foreach ($this->collCategories as $o) {
+            if ($this->collTemplates) {
+                foreach ($this->collTemplates as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2565,18 +2565,18 @@ abstract class Attribute implements ActiveRecordInterface
             $this->collAttributeCombinations->clearIterator();
         }
         $this->collAttributeCombinations = null;
-        if ($this->collAttributeCategories instanceof Collection) {
-            $this->collAttributeCategories->clearIterator();
+        if ($this->collAttributeTemplates instanceof Collection) {
+            $this->collAttributeTemplates->clearIterator();
         }
-        $this->collAttributeCategories = null;
+        $this->collAttributeTemplates = null;
         if ($this->collAttributeI18ns instanceof Collection) {
             $this->collAttributeI18ns->clearIterator();
         }
         $this->collAttributeI18ns = null;
-        if ($this->collCategories instanceof Collection) {
-            $this->collCategories->clearIterator();
+        if ($this->collTemplates instanceof Collection) {
+            $this->collTemplates->clearIterator();
         }
-        $this->collCategories = null;
+        $this->collTemplates = null;
     }
 
     /**

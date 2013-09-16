@@ -1,0 +1,129 @@
+.wizard {
+    background-color: #fff;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+    .box-shadow(0 1px 4px rgba(0, 0, 0, 0.065));
+    *zoom: 1;
+    margin-bottom: 20px;
+
+    &:before,
+    &:after {
+        display: table;
+        line-height: 0;
+        content: "";
+        clear: both;
+    }
+    
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style: none outside none;
+    }
+
+    li {
+        position: relative;
+        float: left;
+        height: 46px;
+        padding: 0 10px 0 30px;
+        margin: 0;
+        font-size: 15px;
+        line-height: 46px;
+        color: #999999;
+        cursor: default;
+        background: #ededed;
+        
+        &.complete {
+            color: #468847;
+            background: #f3f4f5;
+
+            &:hover{
+                background: #e8e8e8;
+
+                .chevron:before {
+                    border-left: 14px solid #e8e8e8;
+                }
+            }
+            
+            a{
+                color: inherit;
+                text-decoration: none;
+                font-weight: normal;
+            }
+
+            .chevron:before {
+                border-left: 14px solid #f3f4f5;
+            }
+
+        }
+
+        &.active {
+            color: @link-color;
+            background: #fff;
+
+            .chevron:before {
+                border-left: 14px solid #fff;
+            }
+        }
+
+        .chevron {
+            position: absolute;
+            top: 0;
+            right: -14px;
+            display: block;
+            border: 24px solid transparent;
+            border-right: 0;
+            border-left: 14px solid #d4d4d4;
+
+            &:before {
+                position: absolute;
+                top: -24px;
+                right: 1px;
+                display: block;
+                border: 24px solid transparent;
+                border-right: 0;
+                border-left: 14px solid #ededed;
+                content: "";
+            }            
+
+        }
+
+        .badge {
+            margin-right: 8px;
+        }
+
+        &:nth-child(1) {
+            z-index: 10;
+            padding-left: 20px;
+            border-radius: 4px 0 0 4px;
+        }
+        &:nth-child(2) {
+            z-index: 9;
+        }
+        &:nth-child(3) {
+            z-index: 8;
+        }
+        &:nth-child(4) {
+            z-index: 7;
+        }
+        &:nth-child(5) {
+            z-index: 6;
+        }
+        &:nth-child(6) {
+            z-index: 5;
+        }
+        &:nth-child(7) {
+            z-index: 4;
+        }
+        &:nth-child(8) {
+            z-index: 3;
+        }
+        &:nth-child(9) {
+            z-index: 2;
+        }
+        &:nth-child(10) {
+            z-index: 1;
+        }
+
+    }
+
+}

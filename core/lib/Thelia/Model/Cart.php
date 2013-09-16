@@ -44,16 +44,18 @@ class Cart extends BaseCart
                 $item->setQuantity($cartItem->getQuantity());
                 $item->setProductSaleElements($productSaleElements);
                 if ($currentDateTime <= $cartItem->getPriceEndOfLife()) {
-                    $item->setPrice($cartItem->getPrice());
-                    $item->setPromoPrice($cartItem->getPromoPrice());
+                    $item->setPrice($cartItem->getPrice())
+                        ->setPromoPrice($cartItem->getPromoPrice())
+                        ->setPromo($productSaleElements->getPromo())
                     // TODO : new price EOF or duplicate current priceEOF from $cartItem ?
-                    $item->setPriceEndOfLife($cartItem->getPriceEndOfLife());
+                        ->setPriceEndOfLife($cartItem->getPriceEndOfLife());
                 } else {
                     $productPrices = ProductPriceQuery::create()->filterByProductSaleElements($productSaleElements)->findOne();
 
-                    $item->setPrice($productPrices->getPrice());
-                    $item->setPromoPrice($productPrices->getPromoPrice());
-                    $item->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30));
+                    $item->setPrice($productPrices->getPrice())
+                        ->setPromoPrice($productPrices->getPromoPrice())
+                        ->setPromo($productSaleElements->getPromo())
+                        ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30));
                 }
                 $item->save();
             }
@@ -70,5 +72,23 @@ class Cart extends BaseCart
             ->orderByCreatedAt(Criteria::DESC)
             ->findOne()
         ;
+    }
+
+    public function getTaxedAmount()
+    {
+
+    }
+
+    public function getTotalAmount()
+    {
+        $total = 0;
+
+        foreach($this->getCartItems() as $cartItem) {
+            $total += $cartItem->getPrice()-$cartItem->getDiscount();
+        }
+
+        $total -= $this->getDiscount();
+
+        return $total;
     }
 }

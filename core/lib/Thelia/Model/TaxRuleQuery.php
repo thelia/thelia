@@ -2,8 +2,10 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Base\TaxRuleQuery as BaseTaxRuleQuery;
-
+use Thelia\Model\Map\TaxRuleCountryTableMap;
+use Thelia\Model\Map\TaxTableMap;
 
 /**
  * Skeleton subclass for performing query and update operations on the 'tax_rule' table.
@@ -15,6 +17,23 @@ use Thelia\Model\Base\TaxRuleQuery as BaseTaxRuleQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class TaxRuleQuery extends BaseTaxRuleQuery {
+class TaxRuleQuery extends BaseTaxRuleQuery
+{
+    const ALIAS_FOR_TAX_RULE_COUNTRY_POSITION = 'taxRuleCountryPosition';
 
+    public function getTaxCalculatorCollection(Product $product, Country $country)
+    {
+        $search = TaxQuery::create()
+            ->filterByTaxRuleCountry(
+                TaxRuleCountryQuery::create()
+                    ->filterByCountry($country, Criteria::EQUAL)
+                    ->filterByTaxRuleId($product->getTaxRuleId())
+                    ->orderByPosition()
+                    ->find()
+            )
+            ->withColumn(TaxRuleCountryTableMap::POSITION, self::ALIAS_FOR_TAX_RULE_COUNTRY_POSITION)
+        ;
+
+        return $search->find();
+    }
 } // TaxRuleQuery

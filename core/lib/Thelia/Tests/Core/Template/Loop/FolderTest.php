@@ -23,6 +23,7 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Thelia\Model\FolderQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 use Thelia\Core\Template\Loop\Folder;
@@ -41,11 +42,23 @@ class FolderTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new Folder($this->request, $this->dispatcher, $this->securityContext);
+        return new Folder($this->container);
     }
 
     public function getMandatoryArguments()
     {
         return array();
+    }
+
+    public function testSearchById()
+    {
+        $folder = FolderQuery::create()->findOne();
+
+        $this->baseTestSearchById($folder->getId());
+    }
+
+    public function testSearchLimit()
+    {
+        $this->baseTestSearchWithLimit(3);
     }
 }

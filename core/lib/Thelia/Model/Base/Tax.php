@@ -66,10 +66,16 @@ abstract class Tax implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the rate field.
-     * @var        double
+     * The value for the type field.
+     * @var        string
      */
-    protected $rate;
+    protected $type;
+
+    /**
+     * The value for the serialized_requirements field.
+     * @var        string
+     */
+    protected $serialized_requirements;
 
     /**
      * The value for the created_at field.
@@ -395,14 +401,25 @@ abstract class Tax implements ActiveRecordInterface
     }
 
     /**
-     * Get the [rate] column value.
+     * Get the [type] column value.
      *
-     * @return   double
+     * @return   string
      */
-    public function getRate()
+    public function getType()
     {
 
-        return $this->rate;
+        return $this->type;
+    }
+
+    /**
+     * Get the [serialized_requirements] column value.
+     *
+     * @return   string
+     */
+    public function getSerializedRequirements()
+    {
+
+        return $this->serialized_requirements;
     }
 
     /**
@@ -467,25 +484,46 @@ abstract class Tax implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [rate] column.
+     * Set the value of [type] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Tax The current object (for fluent API support)
      */
-    public function setRate($v)
+    public function setType($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
-        if ($this->rate !== $v) {
-            $this->rate = $v;
-            $this->modifiedColumns[] = TaxTableMap::RATE;
+        if ($this->type !== $v) {
+            $this->type = $v;
+            $this->modifiedColumns[] = TaxTableMap::TYPE;
         }
 
 
         return $this;
-    } // setRate()
+    } // setType()
+
+    /**
+     * Set the value of [serialized_requirements] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Tax The current object (for fluent API support)
+     */
+    public function setSerializedRequirements($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->serialized_requirements !== $v) {
+            $this->serialized_requirements = $v;
+            $this->modifiedColumns[] = TaxTableMap::SERIALIZED_REQUIREMENTS;
+        }
+
+
+        return $this;
+    } // setSerializedRequirements()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -569,16 +607,19 @@ abstract class Tax implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TaxTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TaxTableMap::translateFieldName('Rate', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->rate = (null !== $col) ? (double) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TaxTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->type = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TaxTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TaxTableMap::translateFieldName('SerializedRequirements', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->serialized_requirements = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TaxTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TaxTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TaxTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -591,7 +632,7 @@ abstract class Tax implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = TaxTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = TaxTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Tax object", 0, $e);
@@ -791,10 +832,9 @@ abstract class Tax implements ActiveRecordInterface
 
             if ($this->taxRuleCountriesScheduledForDeletion !== null) {
                 if (!$this->taxRuleCountriesScheduledForDeletion->isEmpty()) {
-                    foreach ($this->taxRuleCountriesScheduledForDeletion as $taxRuleCountry) {
-                        // need to save related object because we set the relation to null
-                        $taxRuleCountry->save($con);
-                    }
+                    \Thelia\Model\TaxRuleCountryQuery::create()
+                        ->filterByPrimaryKeys($this->taxRuleCountriesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
                     $this->taxRuleCountriesScheduledForDeletion = null;
                 }
             }
@@ -853,8 +893,11 @@ abstract class Tax implements ActiveRecordInterface
         if ($this->isColumnModified(TaxTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(TaxTableMap::RATE)) {
-            $modifiedColumns[':p' . $index++]  = 'RATE';
+        if ($this->isColumnModified(TaxTableMap::TYPE)) {
+            $modifiedColumns[':p' . $index++]  = 'TYPE';
+        }
+        if ($this->isColumnModified(TaxTableMap::SERIALIZED_REQUIREMENTS)) {
+            $modifiedColumns[':p' . $index++]  = 'SERIALIZED_REQUIREMENTS';
         }
         if ($this->isColumnModified(TaxTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -876,8 +919,11 @@ abstract class Tax implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'RATE':
-                        $stmt->bindValue($identifier, $this->rate, PDO::PARAM_STR);
+                    case 'TYPE':
+                        $stmt->bindValue($identifier, $this->type, PDO::PARAM_STR);
+                        break;
+                    case 'SERIALIZED_REQUIREMENTS':
+                        $stmt->bindValue($identifier, $this->serialized_requirements, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -951,12 +997,15 @@ abstract class Tax implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getRate();
+                return $this->getType();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getSerializedRequirements();
                 break;
             case 3:
+                return $this->getCreatedAt();
+                break;
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -989,9 +1038,10 @@ abstract class Tax implements ActiveRecordInterface
         $keys = TaxTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getRate(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[1] => $this->getType(),
+            $keys[2] => $this->getSerializedRequirements(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1044,12 +1094,15 @@ abstract class Tax implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setRate($value);
+                $this->setType($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setSerializedRequirements($value);
                 break;
             case 3:
+                $this->setCreatedAt($value);
+                break;
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1077,9 +1130,10 @@ abstract class Tax implements ActiveRecordInterface
         $keys = TaxTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setRate($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[1], $arr)) $this->setType($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setSerializedRequirements($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1092,7 +1146,8 @@ abstract class Tax implements ActiveRecordInterface
         $criteria = new Criteria(TaxTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(TaxTableMap::ID)) $criteria->add(TaxTableMap::ID, $this->id);
-        if ($this->isColumnModified(TaxTableMap::RATE)) $criteria->add(TaxTableMap::RATE, $this->rate);
+        if ($this->isColumnModified(TaxTableMap::TYPE)) $criteria->add(TaxTableMap::TYPE, $this->type);
+        if ($this->isColumnModified(TaxTableMap::SERIALIZED_REQUIREMENTS)) $criteria->add(TaxTableMap::SERIALIZED_REQUIREMENTS, $this->serialized_requirements);
         if ($this->isColumnModified(TaxTableMap::CREATED_AT)) $criteria->add(TaxTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(TaxTableMap::UPDATED_AT)) $criteria->add(TaxTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1158,7 +1213,8 @@ abstract class Tax implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setRate($this->getRate());
+        $copyObj->setType($this->getType());
+        $copyObj->setSerializedRequirements($this->getSerializedRequirements());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1346,7 +1402,10 @@ abstract class Tax implements ActiveRecordInterface
         $taxRuleCountriesToDelete = $this->getTaxRuleCountries(new Criteria(), $con)->diff($taxRuleCountries);
 
 
-        $this->taxRuleCountriesScheduledForDeletion = $taxRuleCountriesToDelete;
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->taxRuleCountriesScheduledForDeletion = clone $taxRuleCountriesToDelete;
 
         foreach ($taxRuleCountriesToDelete as $taxRuleCountryRemoved) {
             $taxRuleCountryRemoved->setTax(null);
@@ -1439,7 +1498,7 @@ abstract class Tax implements ActiveRecordInterface
                 $this->taxRuleCountriesScheduledForDeletion = clone $this->collTaxRuleCountries;
                 $this->taxRuleCountriesScheduledForDeletion->clear();
             }
-            $this->taxRuleCountriesScheduledForDeletion[]= $taxRuleCountry;
+            $this->taxRuleCountriesScheduledForDeletion[]= clone $taxRuleCountry;
             $taxRuleCountry->setTax(null);
         }
 
@@ -1727,7 +1786,8 @@ abstract class Tax implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->rate = null;
+        $this->type = null;
+        $this->serialized_requirements = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

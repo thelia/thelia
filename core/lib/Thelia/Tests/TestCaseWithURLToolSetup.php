@@ -28,15 +28,15 @@ namespace Thelia\Tests;
  *
  * @package Thelia\Tests\TestCaseWithURLSetup
  */
-class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase {
-
-
-    public function __construct() {
+class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase
+{
+    public function __construct()
+    {
         $this->setupURLTool();
     }
 
-    protected function setupURLTool() {
-
+    protected function setupURLTool()
+    {
         $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
 
         $context = new \Symfony\Component\Routing\RequestContext(

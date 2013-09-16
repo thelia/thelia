@@ -23,8 +23,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Model\LangQuery;
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 
 class MessageModificationForm extends BaseForm
@@ -41,7 +39,7 @@ class MessageModificationForm extends BaseForm
                 )
             ))
             ->add("secured"      , "text"  , array(
-                "label" => "Prevent mailing template modification or deletion, except for super-admin"                
+                "label" => "Prevent mailing template modification or deletion, except for super-admin"
             ))
             ->add("locale"       , "text"  , array())
             ->add("title"        , "text"  , array(

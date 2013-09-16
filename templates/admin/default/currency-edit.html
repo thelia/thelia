@@ -35,7 +35,7 @@
         	                                {* Be sure to get the currency ID, even if the form could not be validated *}
         	                                <input type="hidden" name="currency_id" value="{$currency_id}" />
 
-                                        	{include file="includes/inner-form-toolbar.html"}
+                                        	{include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/configuration/currencies'}"}
 
         						        	{form_hidden_fields form=$form}
 

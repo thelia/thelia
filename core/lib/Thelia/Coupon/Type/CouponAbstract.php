@@ -25,6 +25,8 @@ namespace Thelia\Coupon\Type;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Constraint\ConstraintManager;
+use Thelia\Constraint\ConstraintValidator;
+use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Coupon\RuleOrganizerInterface;
@@ -43,8 +45,11 @@ use Thelia\Exception\InvalidRuleException;
  */
 abstract class CouponAbstract implements CouponInterface
 {
-    /** @var CouponAdapterInterface Provides necessary value from Thelia */
+    /** @var  CouponAdapterInterface Provide necessary value from Thelia */
     protected $adapter = null;
+
+    /** @var Translator Service Translator */
+    protected $translator = null;
 
     /** @var RuleOrganizerInterface  */
     protected $organizer = null;
@@ -52,11 +57,21 @@ abstract class CouponAbstract implements CouponInterface
     /** @var CouponRuleCollection Array of CouponRuleInterface */
     protected $rules = null;
 
-    /** @var ConstraintManager CouponRuleInterface Manager*/
-    protected $constraintManager = null;
+    /** @var ConstraintValidator Constraint validator */
+    protected $constraintValidator = null;
+
+
+
+    /** @var string Service Id  */
+    protected $serviceId = null;
+
+    /** @var float Amount that will be removed from the Checkout (Coupon Effect)  */
+    protected $amount = 0;
 
     /** @var string Coupon code (ex: XMAS) */
     protected $code = null;
+
+
 
     /** @var string Coupon title (ex: Coupon for XMAS) */
     protected $title = null;
@@ -66,6 +81,8 @@ abstract class CouponAbstract implements CouponInterface
 
     /** @var string Coupon description */
     protected $description = null;
+
+
 
     /** @var bool if Coupon is enabled */
     protected $isEnabled = false;
@@ -79,14 +96,24 @@ abstract class CouponAbstract implements CouponInterface
     /** @var bool if Coupon is removing postage */
     protected $isRemovingPostage = false;
 
-    /** @var float Amount that will be removed from the Checkout (Coupon Effect)  */
-    protected $amount = 0;
-
     /** @var int Max time a Coupon can be used (-1 = unlimited) */
     protected $maxUsage = -1;
 
     /** @var bool if Coupon is available for Products already on special offers */
     protected $isAvailableOnSpecialOffers = false;
+
+
+    /**
+     * Constructor
+     *
+     * @param CouponAdapterInterface $adapter Service adapter
+     */
+    function __construct(CouponAdapterInterface $adapter)
+    {
+        $this->adapter = $adapter;
+        $this->translator = $adapter->getTranslator();
+        $this->constraintValidator = $adapter->getConstraintValidator();
+    }
 
     /**
      * Set Rule Organizer
@@ -197,26 +224,8 @@ abstract class CouponAbstract implements CouponInterface
     public function setRules(CouponRuleCollection $rules)
     {
         $this->rules = $rules;
-        $this->constraintManager = new ConstraintManager(
-            $this->adapter,
-            $this->rules
-        );
 
         return $this;
-    }
-
-    /**
-     * Check if the current Coupon is matching its conditions (Rules)
-     * Thelia variables are given by the CouponAdapterInterface
-     *
-     * @param CouponAdapterInterface $adapter allowing to gather
-     *                               all necessary Thelia variables
-     *
-     * @return bool
-     */
-    public function isMatching(CouponAdapterInterface $adapter)
-    {
-        return $this->constraintManager->isMatching();
     }
 
     /**
@@ -278,4 +287,28 @@ abstract class CouponAbstract implements CouponInterface
 
         return $ret;
     }
+
+    /**
+     * Get Coupon Manager service Id
+     *
+     * @return string
+     */
+    public function getServiceId()
+    {
+        return $this->serviceId;
+    }
+
+
+    /**
+     * Check if the current Coupon is matching its conditions (Rules)
+     * Thelia variables are given by the CouponAdapterInterface
+     *
+     * @return bool
+     */
+    public function isMatching()
+    {
+        return $this->constraintValidator->isMatching($this->rules);
+    }
+
+
 }

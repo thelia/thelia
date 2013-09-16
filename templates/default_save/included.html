@@ -1,0 +1,12 @@
+{loop name="included0" type="category" parent="0"}
+    <h2>Out before - CATEGORY : {$TITLE} ({$LOOP_COUNT} / {$LOOP_TOTAL})</h2>
+    {loop name="category1" type="category" parent="$ID"}
+        <h3>Inner - SUBCATEGORY : {$TITLE}  ({$LOOP_COUNT} / {$LOOP_TOTAL})</h3>
+    {/loop}
+
+    {loop name="category2" type="category" parent="$ID"}
+        <h3>Inner 2 - SUBCATEGORY : {$TITLE}  ({$LOOP_COUNT} / {$LOOP_TOTAL})</h3>
+    {/loop}
+    <h2>Out after  - CATEGORY : {$TITLE}  ({$LOOP_COUNT} / {$LOOP_TOTAL})</h2>
+    <hr />
+{/loop}

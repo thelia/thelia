@@ -30,10 +30,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\CategoryQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
@@ -81,7 +79,7 @@ class Category extends BaseI18nLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'visible', 'visible_reverse', 'random'))
+                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'visible', 'visible_reverse', 'random'))
                 ),
                 'manual'
             ),
@@ -101,7 +99,7 @@ class Category extends BaseI18nLoop
         /* manage translations */
         $locale = $this->configureI18nProcessing($search);
 
-		$id = $this->getId();
+        $id = $this->getId();
 
         if (!is_null($id)) {
             $search->filterById($id, Criteria::IN);
@@ -113,15 +111,13 @@ class Category extends BaseI18nLoop
             $search->filterByParent($parent);
         }
 
-
-		$current = $this->getCurrent();
+        $current = $this->getCurrent();
 
         if ($current === true) {
             $search->filterById($this->request->get("category_id"));
         } elseif ($current === false) {
             $search->filterById($this->request->get("category_id"), Criteria::NOT_IN);
         }
-
 
          $exclude = $this->getExclude();
 
@@ -130,12 +126,18 @@ class Category extends BaseI18nLoop
         }
 
         if ($this->getVisible() != BooleanOrBothType::ANY)
-        	$search->filterByVisible($this->getVisible() ? 1 : 0);
+            $search->filterByVisible($this->getVisible() ? 1 : 0);
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
@@ -179,19 +181,19 @@ class Category extends BaseI18nLoop
             $loopResultRow = new LoopResultRow($loopResult, $category, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow
-            	->set("ID", $category->getId())
+                ->set("ID", $category->getId())
                 ->set("IS_TRANSLATED",$category->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE",$locale)
-            	->set("TITLE", $category->getVirtualColumn('i18n_TITLE'))
-	            ->set("CHAPO", $category->getVirtualColumn('i18n_CHAPO'))
-	            ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
-	            ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
-	            ->set("PARENT", $category->getParent())
-	            ->set("URL", $category->getUrl($locale))
-	            ->set("PRODUCT_COUNT", $category->countChild())
-	            ->set("VISIBLE", $category->getVisible() ? "1" : "0")
-	            ->set("POSITION", $category->getPosition())
-			;
+                ->set("TITLE", $category->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $category->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("PARENT", $category->getParent())
+                ->set("URL", $category->getUrl($locale))
+                ->set("PRODUCT_COUNT", $category->countChild())
+                ->set("VISIBLE", $category->getVisible() ? "1" : "0")
+                ->set("POSITION", $category->getPosition())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

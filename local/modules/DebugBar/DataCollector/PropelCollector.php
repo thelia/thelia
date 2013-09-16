@@ -40,7 +40,9 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
 
     protected $peakMemory = 0;
 
-    public function __construct()
+    protected $alternativeLogger;
+
+    public function __construct(LoggerInterface $alternativeLogger = null)
     {
         $serviceContainer = Propel::getServiceContainer();
         $serviceContainer->setLogger('defaultLogger', $this);
@@ -54,6 +56,8 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
             'commit',
             'rollBack',
         ));
+
+        $this->alternativeLogger = $alternativeLogger;
     }
 
     /**
@@ -66,8 +70,8 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
         return array(
             'nb_statements' => count($this->statements),
             'nb_failed_statements' => 0,
-            'accumulated_duration' => '10',
-            'accumulated_duration_str' => $this->formatDuration(1),
+            'accumulated_duration' => $this->accumulatedTime,
+            'accumulated_duration_str' => $this->formatDuration($this->accumulatedTime),
             'peak_memory_usage' => $this->peakMemory,
             'peak_memory_usage_str' => $this->formatBytes($this->peakMemory),
             'statements' => $this->statements
@@ -115,14 +119,56 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function log($level, $message, array $context = array())
     {
+        list($sql, $duration_str) = $this->parseAndLogSqlQuery($message);
+
+        $message = "$sql ($duration_str)";
+
+        if ($this->alternativeLogger) {
+            $this->alternativeLogger->log($level, $message);
+        }
+    }
+
+    /**
+     * Parse a log line to extract query information
+     *
+     * @param string $message
+     */
+    protected function parseAndLogSqlQuery($message)
+    {
+        $parts = explode('|', $message, 3);
+        $duration = 0;
+        $memory = 0;
+        if (count($parts) > 1) {
+            $sql = trim($parts[2]);
+
+            if (preg_match('/([0-9]+\.[0-9]+)/', $parts[0], $matches)) {
+                $duration = (float) $matches[1];
+            }
+
+            if (preg_match('/([0-9]+\.[0-9]+)([A-Z]{1,2})/', $parts[1], $matches)) {
+                $memory = (float) $matches[1];
+                if ($matches[2] == 'KB') {
+                    $memory *= 1024;
+                } else if ($matches[2] == 'MB') {
+                    $memory *= 1024 * 1024;
+                }
+            }
+        } else {
+            $sql = $parts[0];
+        }
+
+
         $this->statements[] = array(
-            'sql' => $message,
+            'sql' => $sql,
             'is_success' => true,
-            'duration' => 0,
-            'duration_str' => $this->formatDuration(1),
-            'memory' => 1,
-            'memory_str' => $this->formatBytes(1)
+            'duration' => $duration,
+            'duration_str' => $this->formatDuration($duration),
+            'memory' => $memory,
+            'memory_str' => $this->formatBytes($memory)
         );
+        $this->accumulatedTime += $duration;
+        $this->peakMemory = max($this->peakMemory, $memory);
+        return array($sql, $this->formatDuration($duration));
     }
 
     /**
@@ -134,7 +180,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function emergency($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::EMERGENCY, $message, $context);
     }
 
     /**
@@ -149,7 +195,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function alert($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::ALERT, $message, $context);
     }
 
     /**
@@ -163,7 +209,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function critical($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::CRITICAL, $message, $context);
     }
 
     /**
@@ -176,7 +222,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function error($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::ERROR, $message, $context);
     }
 
     /**
@@ -191,7 +237,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function warning($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::WARNING, $message, $context);
     }
 
     /**
@@ -203,7 +249,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function notice($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::NOTICE, $message, $context);
     }
 
     /**
@@ -217,7 +263,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function info($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::INFO, $message, $context);
     }
 
     /**
@@ -229,7 +275,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function debug($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::DEBUG, $message, $context);
     }
 
 

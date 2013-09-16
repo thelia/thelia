@@ -22,6 +22,7 @@ web/cache/*
 web/.htaccess
 phpdoc*.log
 php-cs
-xhprof
+xhprof/
 phpunit.phar
 .DS_Store
+phpmyadmin

@@ -27,15 +27,47 @@ use Thelia\Form\AdminLogin;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Model\AdminLog;
 use Thelia\Core\Security\Exception\AuthenticationException;
-use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
+use Thelia\Core\Security\UserProvider\TokenProvider;
+use Symfony\Component\HttpFoundation\Cookie;
+use Thelia\Core\Security\UserProvider\CookieTokenProvider;
+use Thelia\Core\Security\Exception\TokenAuthenticationException;
 
 class SessionController extends BaseAdminController
 {
     public function showLoginAction()
     {
+        // Check if we can authenticate the user with a cookie-based token
+        if (null !== $key = $this->getRememberMeKeyFromCookie()) {
+
+            // Create the authenticator
+            $authenticator = new AdminTokenAuthenticator($key);
+
+            try {
+                // If have found a user, store it in the security context
+                $user = $authenticator->getAuthentifiedUser();
+
+                $this->getSecurityContext()->setAdminUser($user);
+
+                $this->adminLogAppend("Successful token authentication");
+
+                // Update the cookie
+                $cookie = $this->createAdminRememberMeCookie($user);
+
+                // Render the home page
+                return $this->render("home");
+            }
+            catch (TokenAuthenticationException $ex) {
+                $this->adminLogAppend("Token based authentication failed.");
+
+                // Clear the cookie
+                $this->clearRememberMeCookie();
+            }
+        }
+
         return $this->render("login");
     }
 
@@ -44,6 +76,9 @@ class SessionController extends BaseAdminController
         $this->dispatch(TheliaEvents::ADMIN_LOGOUT);
 
         $this->getSecurityContext()->clearAdminUser();
+
+        // Clear the remember me cookie, if any
+        $this->clearRememberMeCookie();
 
         // Go back to login page.
         $this->redirectToRoute('admin.login');
@@ -69,25 +104,31 @@ class SessionController extends BaseAdminController
             // Log authentication success
             AdminLog::append("Authentication successful", $request, $user);
 
+            /**
+             * FIXME: we have tou find a way to send cookie
+             */
+            if (intval($adminLoginForm->getForm()->get('remember_me')->getData()) > 0) {
+                // If a remember me field if present and set in the form, create
+                // the cookie thant store "remember me" information
+                $this->createAdminRememberMeCookie($user);
+            }
+
             $this->dispatch(TheliaEvents::ADMIN_LOGIN);
 
-            // Redirect to the success URL
-            return Redirect::exec($adminLoginForm->getSuccessUrl());
+            // Redirect to the success URL, passing the cookie if one exists.
+            $this->redirect($adminLoginForm->getSuccessUrl());
 
-         }
-         catch (FormValidationException $ex) {
+         } catch (FormValidationException $ex) {
 
              // Validation problem
              $message = $this->createStandardFormValidationErrorMessage($ex);
-         }
-         catch (AuthenticationException $ex) {
+         } catch (AuthenticationException $ex) {
 
              // Log authentication failure
              AdminLog::append(sprintf("Authentication failure for username '%s'", $authenticator->getUsername()), $request);
 
              $message =  $this->getTranslator()->trans("Login failed. Please check your username and password.");
-         }
-         catch (\Exception $ex) {
+         } catch (\Exception $ex) {
 
              // Log authentication failure
              AdminLog::append(sprintf("Undefined error: %s", $ex->getMessage()), $request);

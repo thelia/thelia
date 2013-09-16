@@ -24,6 +24,7 @@
 namespace Thelia\Constraint\Rule;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
+use Thelia\Constraint\ConstraintValidator;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Constraint\Validator\ComparableInterface;
@@ -44,10 +45,10 @@ use Thelia\Exception\InvalidRuleOperatorException;
  */
 abstract class CouponRuleAbstract implements CouponRuleInterface
 {
-    /** Operator key in $validators */
-    CONST OPERATOR = 'operator';
-    /** Value key in $validators */
-    CONST VALUE = 'value';
+//    /** Operator key in $validators */
+//    CONST OPERATOR = 'operator';
+//    /** Value key in $validators */
+//    CONST VALUE = 'value';
 
     /** @var string Service Id from Resources/config.xml  */
     protected $serviceId = null;
@@ -58,14 +59,23 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     /** @var array Parameters validating parameters against */
     protected $validators = array();
 
-    /** @var array Parameters to be validated */
-    protected $paramsToValidate = array();
+//    /** @var array Parameters to be validated */
+//    protected $paramsToValidate = array();
 
     /** @var  CouponAdapterInterface Provide necessary value from Thelia */
     protected $adapter = null;
 
     /** @var Translator Service Translator */
     protected $translator = null;
+
+    /** @var array Operators set by Admin in BackOffice */
+    protected $operators = array();
+
+    /** @var array Values set by Admin in BackOffice */
+    protected $values = array();
+
+    /** @var ConstraintValidator Constaints validator */
+    protected $constraintValidator = null;
 
     /**
      * Constructor
@@ -76,61 +86,64 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     {
         $this->adapter = $adapter;
         $this->translator = $adapter->getTranslator();
+        $this->constraintValidator = $adapter->getConstraintValidator();
     }
 
-    /**
-     * Check validator relevancy and store them
-     *
-     * @param array $validators Array of RuleValidator
-     *                          validating $paramsToValidate against
-     *
-     * @return $this
-     * @throws InvalidRuleException
-     */
-    protected function setValidators(array $validators)
-    {
-        foreach ($validators as $validator) {
-            if (!$validator instanceof RuleValidator) {
-                throw new InvalidRuleException(get_class());
-            }
-            if (!in_array($validator->getOperator(), $this->availableOperators)) {
-                throw new InvalidRuleOperatorException(
-                    get_class(),
-                    $validator->getOperator()
-                );
-            }
-        }
-        $this->validators = $validators;
+//    /**
+//     * Check validator relevancy and store them
+//     *
+//     * @param array $validators Array of RuleValidator
+//     *                          validating $paramsToValidate against
+//     *
+//     * @return $this
+//     * @throws InvalidRuleException
+//     */
+//    protected function setValidators(array $validators)
+//    {
+//        foreach ($validators as $validator) {
+//            if (!$validator instanceof RuleValidator) {
+//                throw new InvalidRuleException(get_class());
+//            }
+//            if (!in_array($validator->getOperator(), $this->availableOperators)) {
+//                throw new InvalidRuleOperatorException(
+//                    get_class(),
+//                    $validator->getOperator()
+//                );
+//            }
+//        }
+//        $this->validators = $validators;
+//
+//        return $this;
+//    }
 
-        return $this;
-    }
 
-    /**
-     * Check if the current Checkout matches this condition
-     *
-     * @return bool
-     */
-    public function isMatching()
-    {
-        $this->checkBackOfficeInput();
-        $this->checkCheckoutInput();
 
-        $isMatching = true;
-        /** @var $validator RuleValidator*/
-        foreach ($this->validators as $param => $validator) {
-            $a = $this->paramsToValidate[$param];
-            $operator = $validator->getOperator();
-            /** @var ComparableInterface, RuleParameterAbstract $b */
-            $b = $validator->getParam();
-
-            if (!Operators::isValid($a, $operator, $b)) {
-                $isMatching = false;
-            }
-        }
-
-        return $isMatching;
-
-    }
+//    /**
+//     * Check if the current Checkout matches this condition
+//     *
+//     * @return bool
+//     */
+//    public function isMatching()
+//    {
+//        $this->checkBackOfficeInput();
+//        $this->checkCheckoutInput();
+//
+//        $isMatching = true;
+//        /** @var $validator RuleValidator*/
+//        foreach ($this->validators as $param => $validator) {
+//            $a = $this->paramsToValidate[$param];
+//            $operator = $validator->getOperator();
+//            /** @var ComparableInterface, RuleParameterAbstract $b */
+//            $b = $validator->getParam();
+//
+//            if (!Operators::isValid($a, $operator, $b)) {
+//                $isMatching = false;
+//            }
+//        }
+//
+//        return $isMatching;
+//
+//    }
 
     /**
      * Return all available Operators for this Rule
@@ -142,46 +155,78 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
         return $this->availableOperators;
     }
 
-    /**
-     * Check if Operators set for this Rule in the BackOffice are legit
-     *
-     * @throws InvalidRuleOperatorException if Operator is not allowed
-     * @return bool
-     */
-    protected function checkBackOfficeInputsOperators()
-    {
-        /** @var RuleValidator $param */
-        foreach ($this->validators as $key => $param) {
-            $operator = $param->getOperator();
-            if (!isset($operator)
-                ||!in_array($operator, $this->availableOperators)
-            ) {
-                throw new InvalidRuleOperatorException(get_class(), $key);
-            }
-        }
-        return true;
-    }
+//    /**
+//     * Check if Operators set for this Rule in the BackOffice are legit
+//     *
+//     * @throws InvalidRuleOperatorException if Operator is not allowed
+//     * @return bool
+//     */
+//    protected function checkBackOfficeInputsOperators()
+//    {
+//        /** @var RuleValidator $param */
+//        foreach ($this->validators as $key => $param) {
+//            $operator = $param->getOperator();
+//            if (!isset($operator)
+//                ||!in_array($operator, $this->availableOperators)
+//            ) {
+//                throw new InvalidRuleOperatorException(get_class(), $key);
+//            }
+//        }
+//        return true;
+//    }
 
-    /**
-     * Generate current Rule param to be validated from adapter
-     *
-     * @throws \Thelia\Exception\NotImplementedException
-     * @return $this
-     */
-    protected function setParametersToValidate()
-    {
-        throw new \Thelia\Exception\NotImplementedException();
-    }
+//    /**
+//     * Generate current Rule param to be validated from adapter
+//     *
+//     * @throws \Thelia\Exception\NotImplementedException
+//     * @return $this
+//     */
+//    protected function setParametersToValidate()
+//    {
+//        throw new \Thelia\Exception\NotImplementedException();
+//    }
 
     /**
      * Return all validators
-     * Serialization purpose
      *
      * @return array
      */
     public function getValidators()
     {
-        return $this->validators;
+        $this->validators = $this->generateInputs();
+
+        $translatedInputs = array();
+        foreach ($this->validators as $key => $validator) {
+            $translatedOperators = array();
+            foreach ($validator['availableOperators'] as $availableOperators) {
+                $translatedOperators[$availableOperators] = Operators::getI18n(
+                    $this->translator,
+                    $availableOperators
+                );
+            }
+
+            $validator['availableOperators'] = $translatedOperators;
+            $translatedInputs[$key] = $validator;
+        }
+        $validators = array();
+        $validators['inputs'] = $translatedInputs;
+        $validators['setOperators'] = $this->operators;
+        $validators['setValues'] = $this->values;
+
+        return $validators;
+    }
+
+    /**
+     * Generate inputs ready to be drawn
+     *
+     * @throws \Thelia\Exception\NotImplementedException
+     * @return array
+     */
+    protected function generateInputs()
+    {
+        throw new \Thelia\Exception\NotImplementedException(
+            'The generateInputs method must be implemented in ' . get_class()
+        );
     }
 
     /**
@@ -194,6 +239,33 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
         return $this->serviceId;
     }
 
+    /**
+     * Validate if Operator given is available for this Coupon
+     *
+     * @param string $operator           Operator to validate ex <
+     * @param array  $availableOperators Available operators
+     *
+     * @return bool
+     */
+    protected function isOperatorLegit($operator, array $availableOperators)
+    {
+         return in_array($operator, $availableOperators);
+    }
 
+    /**
+     * Return a serializable Rule
+     *
+     * @return SerializableRule
+     */
+    public function getSerializableRule()
+    {
+        $serializableRule = new SerializableRule();
+        $serializableRule->ruleServiceId = $this->serviceId;
+        $serializableRule->operators = $this->operators;
+
+        $serializableRule->values = $this->values;
+
+        return $serializableRule;
+    }
 
 }

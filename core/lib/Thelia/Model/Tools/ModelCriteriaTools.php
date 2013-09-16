@@ -110,7 +110,7 @@ class ModelCriteriaTools
     {
         // If a lang has been requested, find the related Lang object, and get the locale
         if ($requestedLangId !== null) {
-            $localeSearch = LangQuery::create()->findOneById($requestedLangId);
+            $localeSearch = LangQuery::create()->findPk($requestedLangId);
 
             if ($localeSearch === null) {
                 throw new \InvalidArgumentException(sprintf('Incorrect lang argument given : lang ID %d not found', $requestedLangId));

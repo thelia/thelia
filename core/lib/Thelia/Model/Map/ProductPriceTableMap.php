@@ -57,7 +57,7 @@ class ProductPriceTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -67,12 +67,7 @@ class ProductPriceTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
-
-    /**
-     * the column name for the ID field
-     */
-    const ID = 'product_price.ID';
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the PRODUCT_SALE_ELEMENTS_ID field
@@ -116,12 +111,12 @@ class ProductPriceTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ProductSaleElementsId', 'CurrencyId', 'Price', 'PromoPrice', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'productSaleElementsId', 'currencyId', 'price', 'promoPrice', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProductPriceTableMap::ID, ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, ProductPriceTableMap::CURRENCY_ID, ProductPriceTableMap::PRICE, ProductPriceTableMap::PROMO_PRICE, ProductPriceTableMap::CREATED_AT, ProductPriceTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_SALE_ELEMENTS_ID', 'CURRENCY_ID', 'PRICE', 'PROMO_PRICE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'product_sale_elements_id', 'currency_id', 'price', 'promo_price', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('ProductSaleElementsId', 'CurrencyId', 'Price', 'PromoPrice', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('productSaleElementsId', 'currencyId', 'price', 'promoPrice', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, ProductPriceTableMap::CURRENCY_ID, ProductPriceTableMap::PRICE, ProductPriceTableMap::PROMO_PRICE, ProductPriceTableMap::CREATED_AT, ProductPriceTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('PRODUCT_SALE_ELEMENTS_ID', 'CURRENCY_ID', 'PRICE', 'PROMO_PRICE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('product_sale_elements_id', 'currency_id', 'price', 'promo_price', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -131,12 +126,12 @@ class ProductPriceTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductSaleElementsId' => 1, 'CurrencyId' => 2, 'Price' => 3, 'PromoPrice' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productSaleElementsId' => 1, 'currencyId' => 2, 'price' => 3, 'promoPrice' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(ProductPriceTableMap::ID => 0, ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID => 1, ProductPriceTableMap::CURRENCY_ID => 2, ProductPriceTableMap::PRICE => 3, ProductPriceTableMap::PROMO_PRICE => 4, ProductPriceTableMap::CREATED_AT => 5, ProductPriceTableMap::UPDATED_AT => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_SALE_ELEMENTS_ID' => 1, 'CURRENCY_ID' => 2, 'PRICE' => 3, 'PROMO_PRICE' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'product_sale_elements_id' => 1, 'currency_id' => 2, 'price' => 3, 'promo_price' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('ProductSaleElementsId' => 0, 'CurrencyId' => 1, 'Price' => 2, 'PromoPrice' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('productSaleElementsId' => 0, 'currencyId' => 1, 'price' => 2, 'promoPrice' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID => 0, ProductPriceTableMap::CURRENCY_ID => 1, ProductPriceTableMap::PRICE => 2, ProductPriceTableMap::PROMO_PRICE => 3, ProductPriceTableMap::CREATED_AT => 4, ProductPriceTableMap::UPDATED_AT => 5, ),
+        self::TYPE_RAW_COLNAME   => array('PRODUCT_SALE_ELEMENTS_ID' => 0, 'CURRENCY_ID' => 1, 'PRICE' => 2, 'PROMO_PRICE' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        self::TYPE_FIELDNAME     => array('product_sale_elements_id' => 0, 'currency_id' => 1, 'price' => 2, 'promo_price' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -153,11 +148,10 @@ class ProductPriceTableMap extends TableMap
         $this->setPhpName('ProductPrice');
         $this->setClassName('\\Thelia\\Model\\ProductPrice');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER', 'product_sale_elements', 'ID', true, null, null);
-        $this->addForeignKey('CURRENCY_ID', 'CurrencyId', 'INTEGER', 'currency', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER' , 'product_sale_elements', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('CURRENCY_ID', 'CurrencyId', 'INTEGER' , 'currency', 'ID', true, null, null);
         $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, null);
         $this->addColumn('PROMO_PRICE', 'PromoPrice', 'FLOAT', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
@@ -187,6 +181,59 @@ class ProductPriceTableMap extends TableMap
     } // getBehaviors()
 
     /**
+     * Adds an object to the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
+     *
+     * @param \Thelia\Model\ProductPrice $obj A \Thelia\Model\ProductPrice object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
+     */
+    public static function addInstanceToPool($obj, $key = null)
+    {
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getProductSaleElementsId(), (string) $obj->getCurrencyId()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \Thelia\Model\ProductPrice object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \Thelia\Model\ProductPrice) {
+                $key = serialize(array((string) $value->getProductSaleElementsId(), (string) $value->getCurrencyId()));
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\ProductPrice object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
+    }
+
+    /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
      *
      * For tables with a single-column primary key, that simple pkey value will be returned.  For tables with
@@ -200,11 +247,11 @@ class ProductPriceTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -222,11 +269,7 @@ class ProductPriceTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return (int) $row[
-                            $indexType == TableMap::TYPE_NUM
-                            ? 0 + $offset
-                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-                        ];
+            return $pks;
     }
 
     /**
@@ -324,7 +367,6 @@ class ProductPriceTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ProductPriceTableMap::ID);
             $criteria->addSelectColumn(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID);
             $criteria->addSelectColumn(ProductPriceTableMap::CURRENCY_ID);
             $criteria->addSelectColumn(ProductPriceTableMap::PRICE);
@@ -332,7 +374,6 @@ class ProductPriceTableMap extends TableMap
             $criteria->addSelectColumn(ProductPriceTableMap::CREATED_AT);
             $criteria->addSelectColumn(ProductPriceTableMap::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_SALE_ELEMENTS_ID');
             $criteria->addSelectColumn($alias . '.CURRENCY_ID');
             $criteria->addSelectColumn($alias . '.PRICE');
@@ -390,7 +431,17 @@ class ProductPriceTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(ProductPriceTableMap::DATABASE_NAME);
-            $criteria->add(ProductPriceTableMap::ID, (array) $values, Criteria::IN);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(ProductPriceTableMap::CURRENCY_ID, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
         $query = ProductPriceQuery::create()->mergeWith($criteria);
@@ -434,10 +485,6 @@ class ProductPriceTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from ProductPrice object
-        }
-
-        if ($criteria->containsKey(ProductPriceTableMap::ID) && $criteria->keyContainsValue(ProductPriceTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProductPriceTableMap::ID.')');
         }
 
 

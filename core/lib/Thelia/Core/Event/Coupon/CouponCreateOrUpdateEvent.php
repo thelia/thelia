@@ -102,7 +102,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param CouponRuleCollection $rules                      CouponRuleInterface to add
      * @param string               $locale                     Coupon Language code ISO (ex: fr_FR)
      */
-    function __construct(
+    public function __construct(
         $code,
         $title,
         $amount,
@@ -306,7 +306,5 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     {
         return $this->coupon;
     }
-
-
 
 }

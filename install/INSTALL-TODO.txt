@@ -3,7 +3,6 @@ A faire dans la procédure d'install
 
 Variables Config à initialiser:
 
-- base_url : url de base de la boutique avec / final (ex. http://www.boutique.com/, ou http://www.boutique.com/path/to/thelia2/ )
 - base_admin_template : chemin du template admin relatif au repertoire template (ex. admin/default)
 - default_locale : la locale par défaut (ex. en_US), à utiliser pour les fichiers de traduction
 - asset_dir_from_web_root : le chemin relatif à /web du repertoires des assets (ex. assets)
@@ -24,3 +23,4 @@ Variables Config à initialiser:
 - images_library_path : chemin vers le répertoire où sont stockés les images source (defaut: local/media/images)
 - image_cache_dir_from_web_root : le repértoire de base où sont cachées les images, relatif à /web (cache/images)
 - imagine_graphic_driver : le drivers utilisé par Imagine (gd, imagik, gmagick), defaut: 'gd'
+- process_assets : ne pas processer les assets pour de meilleurs perfs (attention, les modifs sur les fichiers ne seront plus reportées !)

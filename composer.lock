@@ -3,8 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "ba2f3e0943f00c7c3bf0c086bc611b0f",
-
+    "hash": "a40be01c82e68ba0c446dc204d2667da",
     "packages": [
         {
             "name": "imagine/imagine",
@@ -445,6 +444,55 @@
                 "templating"
             ],
             "time": "2013-07-02 16:38:47"
+        },
+        {
+            "name": "swiftmailer/swiftmailer",
+            "version": "v5.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/swiftmailer/swiftmailer.git",
+                "reference": "f3917ecef35a4e4d98b303eb9fee463bc983f379"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/f3917ecef35a4e4d98b303eb9fee463bc983f379",
+                "reference": "f3917ecef35a4e4d98b303eb9fee463bc983f379",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.1-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "lib/swift_required.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Chris Corbyn"
+                }
+            ],
+            "description": "Swiftmailer, free feature-rich PHP mailer",
+            "homepage": "http://swiftmailer.org",
+            "keywords": [
+                "mail",
+                "mailer"
+            ],
+            "time": "2013-08-30 12:35:21"
         },
         {
             "name": "symfony-cmf/routing",
@@ -1621,16 +1669,16 @@
         },
         {
             "name": "maximebf/debugbar",
-            "version": "1.5.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/maximebf/php-debugbar.git",
-                "reference": "37dccc40da52bf9f85571c30cf302da696db0d05"
+                "reference": "7fbe0a5d4ffc7f4e205c2b15542382308d34bd0d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/37dccc40da52bf9f85571c30cf302da696db0d05",
-                "reference": "37dccc40da52bf9f85571c30cf302da696db0d05",
+                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/7fbe0a5d4ffc7f4e205c2b15542382308d34bd0d",
+                "reference": "7fbe0a5d4ffc7f4e205c2b15542382308d34bd0d",
                 "shasum": ""
             },
             "require": {
@@ -1666,7 +1714,7 @@
             "keywords": [
                 "debug"
             ],
-            "time": "2013-08-17 02:02:49"
+            "time": "2013-09-11 13:01:19"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -2048,7 +2096,8 @@
         "ptachoire/cssembed": 20,
         "simplepie/simplepie": 20,
         "imagine/imagine": 20,
-        "fzaninotto/faker": 20
+        "fzaninotto/faker": 20,
+        "maximebf/debugbar": 20
     },
     "platform": {
         "php": ">=5.4"

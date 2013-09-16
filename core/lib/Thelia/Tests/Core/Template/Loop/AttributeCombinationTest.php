@@ -41,7 +41,7 @@ class AttributeCombinationTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new AttributeCombination($this->request, $this->dispatcher, $this->securityContext);
+        return new AttributeCombination($this->container);
     }
 
     public function getMandatoryArguments()

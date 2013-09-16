@@ -30,11 +30,11 @@
                          <div class="col-md-12">
 						    {form name="thelia.admin.message.modification"}
 						    <form method="POST" action="{url path='/admin/configuration/messages/save'}" {form_enctype form=$form}>
-                                
+
                                 {* Be sure to get the message ID, even if the form could not be validated *}
                                 <input type="hidden" name="message_id" value="{$message_id}" />
 
-                                {include file="includes/inner-form-toolbar.html"}
+                                {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/configuration/messages'}"}
 
 						        {form_hidden_fields form=$form}
 
@@ -50,34 +50,34 @@
 		                        <input type="hidden" name="{$name}" value="{{$edit_language_locale}}" />
 		                        {/form_field}
 
-					            {if #form_error}<div class="alert alert-danger">#form_error_message</div>{/if}
-								
+					            {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
 								{form_field form=$form field='name'}
 								<div class="form-group {if $error}has-error{/if}">
-									<label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>						                
+									<label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
 									<input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="form-control">
 								</div>
 					            {/form_field}
-								
+
 								{form_field form=$form field='secured'}
 		                        <div class="checkbox {if $error}has-error{/if}">
 		                            <label>
 		                                <input type="checkbox" name="{$name}" value="1" {if $value == 1}checked="checked"{/if}>
 		                                {intl l="{$label}"}
-									</label>			                              
+									</label>
 		                        </div>
 		                        {/form_field}
 
 								{form_field form=$form field='title'}
 								<div class="form-group {if $error}has-error{/if}">
-								    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>	
+								    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
 									<input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{$value|htmlspecialchars}">
 								</div>
 								{/form_field}
 
                                 {form_field form=$form field='subject'}
                                 <div class="form-group {if $error}has-error{/if}">
-                                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>	
+                                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
 									<input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Subject'}" placeholder="{intl l='Subject'}" class="form-control" value="{$value|htmlspecialchars}">
 								</div>
                                 {/form_field}
@@ -85,7 +85,7 @@
 								{form_field form=$form field='html_message'}
 								<div class="form-group {if $error}has-error{/if}">
 								    <label for="{$label_attr.for}" class="control-label">
-								    	{intl l="{$label}"} : 
+								    	{intl l="{$label}"} :
 								      <span class="label-help-block">{intl l="The mailing template in HTML format."}</span>
 								    </label>
 								    <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control">{$value|htmlspecialchars}</textarea>
@@ -95,17 +95,17 @@
                                 {form_field form=$form field='text_message'}
                                 <div class="form-group {if $error}has-error{/if}">
                                     <label for="{$label_attr.for}" class="control-label">
-                                    	{intl l="{$label}"} : 
+                                    	{intl l="{$label}"} :
                                       <span class="label-help-block">{intl l="The mailing template in text-only format."}</span>
                                     </label>
                                     <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control">{$value|htmlspecialchars}</textarea>
                                 </div>
                                 {/form_field}
 
-                                <div class="form-group">                                        
+                                <div class="form-group">
                                     <p>{intl l='Message created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}}</p>
                                 </div>
-                                
+
 							</form>
 							{/form}
 						</div>

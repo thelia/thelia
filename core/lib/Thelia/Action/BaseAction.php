@@ -22,10 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Action;
 
-use Thelia\Form\BaseForm;
-use Thelia\Action\Exception\FormValidationException;
-use Thelia\Core\Event\ActionEvent;
-use Symfony\Component\Form\Form;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class BaseAction

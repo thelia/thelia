@@ -36,11 +36,13 @@
         <loop class="Thelia\Core\Template\Loop\Coupon" name="coupon"/>
         <loop class="Thelia\Core\Template\Loop\Message" name="message"/>
         <loop class="Thelia\Core\Template\Loop\Delivery" name="delivery"/>
+        <loop class="Thelia\Core\Template\Loop\Template" name="template"/> <!--  This is product templates ;-) -->
     </loops>
 
     <forms>
         <form name="thelia.customer.creation" class="Thelia\Form\CustomerCreation"/>
         <form name="thelia.customer.modification" class="Thelia\Form\CustomerModification"/>
+        <form name="thelia.customer.lostpassword" class="Thelia\Form\CustomerLostPasswordForm"/>
 
         <form name="thelia.customer.login" class="Thelia\Form\CustomerLogin"/>
         <form name="thelia.admin.login" class="Thelia\Form\AdminLogin"/>
@@ -66,6 +68,23 @@
         <form name="thelia.admin.currency.modification" class="Thelia\Form\CurrencyModificationForm"/>
 
         <form name="thelia.admin.coupon.creation" class="Thelia\Form\CouponCreationForm"/>
+
+        <form name="thelia.admin.attribute.creation" class="Thelia\Form\AttributeCreationForm"/>
+        <form name="thelia.admin.attribute.modification" class="Thelia\Form\AttributeModificationForm"/>
+
+        <form name="thelia.admin.feature.creation" class="Thelia\Form\FeatureCreationForm"/>
+        <form name="thelia.admin.feature.modification" class="Thelia\Form\FeatureModificationForm"/>
+
+        <form name="thelia.admin.attributeav.creation" class="Thelia\Form\AttributeAvCreationForm"/>
+
+        <form name="thelia.admin.featureav.creation" class="Thelia\Form\FeatureAvCreationForm"/>
+
+        <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
+        <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>
+
+        <form name="thelia.admin.country.creation" class="Thelia\Form\CountryCreationForm"/>
+        <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
+
     </forms>
 
 
@@ -149,11 +168,7 @@
 
         <service id="smarty.plugin.thelialoop" class="Thelia\Core\Template\Smarty\Plugins\TheliaLoop" scope="request">
             <tag name="thelia.parser.register_plugin"/>
-
-            <argument type="service" id="request" />
-            <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="thelia.securityContext"/>
-
+            <argument type="service" id="service_container" />
             <call method="setLoopList">
                 <argument>%thelia.parser.loops%</argument>
             </call>
@@ -219,27 +234,41 @@
             <argument type="service" id="service_container" />
         </service>
         <service id="thelia.coupon.manager" class="Thelia\Coupon\CouponManager">
-            <argument type="service" id="thelia.adapter" />
-        </service>
-        <service id="thelia.constraint.manager" class="Thelia\Constraint\ConstraintManager">
             <argument type="service" id="service_container" />
         </service>
-        <service id="thelia.constraint.rule.available_for_x_articles" class="Thelia\Constraint\Rule\AvailableForXArticles">
-            <argument type="service" id="thelia.translator" />
+        <service id="thelia.coupon.factory" class="Thelia\Coupon\CouponFactory">
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="thelia.constraint.factory" class="Thelia\Constraint\ConstraintFactory">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="thelia.constraint.validator" class="Thelia\Constraint\ConstraintValidator">
+        </service>
+        <service id="thelia.constraint.rule.available_for_everyone" class="Thelia\Constraint\Rule\AvailableForEveryoneManager">
+            <argument type="service" id="thelia.adapter" />
             <tag name="thelia.coupon.addRule"/>
         </service>
-        <service id="thelia.constraint.rule.available_for_total_amount" class="Thelia\Constraint\Rule\AvailableForTotalAmount">
-            <argument type="service" id="thelia.translator" />
+        <service id="thelia.constraint.rule.available_for_x_articles" class="Thelia\Constraint\Rule\AvailableForXArticlesManager">
+            <argument type="service" id="thelia.adapter" />
+            <tag name="thelia.coupon.addRule"/>
+        </service>
+        <service id="thelia.constraint.rule.available_for_total_amount" class="Thelia\Constraint\Rule\AvailableForTotalAmountManager">
+            <argument type="service" id="thelia.adapter" />
             <tag name="thelia.coupon.addRule"/>
         </service>
 
-        <service id="thelia.coupon.type.remove_x_amount" class="Thelia\Coupon\Type\RemoveXAmount">
-            <argument type="service" id="thelia.translator" />
+        <service id="thelia.coupon.type.remove_x_amount" class="Thelia\Coupon\Type\RemoveXAmountManager">
+            <argument type="service" id="thelia.adapter" />
             <tag name="thelia.coupon.addCoupon"/>
         </service>
-        <service id="thelia.coupon.type.remove_x_percent" class="Thelia\Coupon\Type\RemoveXPercent">
-            <argument type="service" id="thelia.translator" />
+        <service id="thelia.coupon.type.remove_x_percent" class="Thelia\Coupon\Type\RemoveXPercentManager">
+            <argument type="service" id="thelia.adapter" />
             <tag name="thelia.coupon.addCoupon"/>
+        </service>
+
+        <service id="mailer" class="Thelia\Mailer\MailerFactory">
+            <argument type="service" id="event_dispatcher"/>
         </service>
 
 

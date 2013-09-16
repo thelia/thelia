@@ -23,7 +23,6 @@
 
 namespace Thelia\Action;
 
-
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Thelia\Model\CurrencyQuery;
@@ -35,7 +34,7 @@ use Thelia\Core\Event\CurrencyUpdateEvent;
 use Thelia\Core\Event\CurrencyCreateEvent;
 use Thelia\Core\Event\CurrencyDeleteEvent;
 use Thelia\Model\ConfigQuery;
-use Thelia\Core\Event\CurrencyUpdatePositionEvent;
+use Thelia\Core\Event\UpdatePositionEvent;
 
 class Currency extends BaseAction implements EventSubscriberInterface
 {
@@ -59,7 +58,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
             ->save()
         ;
-
 
         $event->setCurrency($currency);
     }
@@ -136,16 +134,15 @@ class Currency extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateRates() {
-
+    public function updateRates()
+    {
         $rates_url = ConfigQuery::read('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml');
 
         $rate_data = @file_get_contents($rates_url);
 
         if ($rate_data && $sxe = new \SimpleXMLElement($rate_data)) {
 
-            foreach ($sxe->Cube[0]->Cube[0]->Cube as $last)
-            {
+            foreach ($sxe->Cube[0]->Cube[0]->Cube as $last) {
                 $code = strtoupper($last["currency"]);
                 $rate = floatval($last['rate']);
 
@@ -157,8 +154,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                     ;
                 }
             }
-        }
-        else {
+        } else {
             throw new \RuntimeException(sprintf("Failed to get currency rates data from URL %s", $rates_url));
         }
     }
@@ -168,19 +164,20 @@ class Currency extends BaseAction implements EventSubscriberInterface
      *
      * @param CategoryChangePositionEvent $event
      */
-    public function updatePosition(CurrencyUpdatePositionEvent $event)
+    public function updatePosition(UpdatePositionEvent $event)
     {
-        if (null !== $currency = CurrencyQuery::create()->findOneById($event->getObjectId())) {
+        if (null !== $currency = CurrencyQuery::create()->findPk($event->getObjectId())) {
 
             $currency->setDispatcher($this->getDispatcher());
 
             $mode = $event->getMode();
+            echo "loaded $mode !";
 
-            if ($mode == CurrencyUpdatePositionEvent::POSITION_ABSOLUTE)
+            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
                 return $currency->changeAbsolutePosition($event->getPosition());
-            else if ($mode == CurrencyUpdatePositionEvent::POSITION_UP)
+            else if ($mode == UpdatePositionEvent::POSITION_UP)
                 return $currency->movePositionUp();
-            else if ($mode == CurrencyUpdatePositionEvent::POSITION_DOWN)
+            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
                 return $currency->movePositionDown();
         }
     }

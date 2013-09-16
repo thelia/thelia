@@ -62,9 +62,9 @@ class URL
      * @throws \RuntimeException if the class has not been instanciated.
      * @return \Thelia\Tools\URL the instance.
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (self::$instance == null) throw new \RuntimeException("URL instance is not initialized.");
-
         return self::$instance;
     }
 
@@ -90,7 +90,6 @@ class URL
 
             $schemeAuthority = "$scheme://$host"."$port";
         }
-
         return $schemeAuthority.$this->requestContext->getBaseUrl();
     }
 
@@ -121,6 +120,11 @@ class URL
 
             $base_url = $this->getBaseUrl();
 
+            // TODO fix this ugly patch
+            if (strpos($path, "index_dev.php")) {
+                $path = str_replace('index_dev.php', '', $path);
+            }
+
             // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
             if ($path_only == self::PATH_TO_FILE) {
                 // As the base_url always ends with '/', if we don't find / at the end, we have a script.
@@ -136,6 +140,10 @@ class URL
 
         if (! is_null($parameters)) {
             foreach ($parameters as $name => $value) {
+
+                // Remove this parameter from base URL to prevent duplicate parameters
+                $base = preg_replace('/([?&])'.$name.'=([^&])*(&|$)/', '$1', $base);
+
                 $queryString .= sprintf("%s=%s&", urlencode($name), urlencode($value));
             }
         }
@@ -143,7 +151,6 @@ class URL
         $sepChar = strstr($base, '?') === false ? '?' : '&';
 
         if ('' !== $queryString = rtrim($queryString, "&")) $queryString = $sepChar . $queryString;
-
         return $base . $queryString;
     }
 
@@ -187,8 +194,16 @@ class URL
       */
      public function retrieve($view, $viewId, $viewLocale)
      {
-         if(ConfigQuery::isRewritingEnable()) {
+         if (ConfigQuery::isRewritingEnable()) {
              $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
+         } else {
+             $allParametersWithoutView = array();
+             $allParametersWithoutView['locale'] = $viewLocale;
+             if (null !== $viewId) {
+                 $allParametersWithoutView[$view . '_id'] = $viewId;
+             }
+             $this->retriever->rewrittenUrl = null;
+             $this->retriever->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
          }
 
          return $this->retriever;
@@ -203,23 +218,31 @@ class URL
       */
      public function retrieveCurrent(Request $request)
      {
-         if(ConfigQuery::isRewritingEnable()) {
+         if (ConfigQuery::isRewritingEnable()) {
              $view = $request->attributes->get('_view', null);
              $viewLocale = $request->query->get('locale', null);
              $viewId = $view === null ? null : $request->query->get($view . '_id', null);
 
              $allOtherParameters = $request->query->all();
-             if($view !== null) {
+             if ($view !== null) {
                  unset($allOtherParameters['view']);
-                 if($viewId !== null) {
+                 if ($viewId !== null) {
                      unset($allOtherParameters[$view . '_id']);
                  }
              }
-             if($viewLocale !== null) {
+             if ($viewLocale !== null) {
                  unset($allOtherParameters['locale']);
              }
 
              $this->retriever->loadSpecificUrl($view, $viewLocale, $viewId, $allOtherParameters);
+         } else {
+             $allParametersWithoutView = $request->query->all();
+             $view = $request->attributes->get('_view');
+             if(isset($allOtherParameters['view'])) {
+                 unset($allOtherParameters['view']);
+             }
+             $this->retriever->rewrittenUrl = null;
+             $this->retriever->url = URL::getInstance()->viewUrl($view, $allParametersWithoutView);
          }
 
          return $this->retriever;
@@ -235,6 +258,7 @@ class URL
      public function resolve($url)
      {
          $this->resolver->load($url);
+
          return $this->resolver;
      }
 }

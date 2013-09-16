@@ -22,24 +22,24 @@
 
 	                    {module_include location='catalog_configuration_top'}
 
-                        {loop type="auth" name="pcc1" roles="ADMIN" permissions="admin.configuration.product_templates"}
+                        {loop type="auth" name="pcc1" roles="ADMIN" permissions="admin.configuration.templates"}
 		                <tr>
-		                    <td><a href="{url path='/admin/configuration/product_templates'}">{intl l='Product templates'}</a></td>
-		                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/product_templates'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+		                    <td><a href="{url path='/admin/configuration/templates'}">{intl l='Product templates'}</a></td>
+		                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/templates'}"><i class="glyphicon glyphicon-edit"></i></a></td>
 		                </tr>
 		                {/loop}
 
-                        {loop type="auth" name="pcc2" roles="ADMIN" permissions="admin.configuration.product_attributes"}
+                        {loop type="auth" name="pcc2" roles="ADMIN" permissions="admin.configuration.attributes"}
 	                    <tr>
-	                        <td><a href="{url path='/admin/configuration/product_attributes'}">{intl l='Product attributes'}</a></td>
-	                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/product_attributes'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+	                        <td><a href="{url path='/admin/configuration/attributes'}">{intl l='Product attributes'}</a></td>
+	                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/attributes'}"><i class="glyphicon glyphicon-edit"></i></a></td>
 	                    </tr>
                         {/loop}
 
-                        {loop type="auth" name="pcc3" roles="ADMIN" permissions="admin.configuration.product_features"}
+                        {loop type="auth" name="pcc3" roles="ADMIN" permissions="admin.configuration.features"}
 	                    <tr>
-	                        <td><a href="{url path='/admin/configuration/product_features'}">{intl l='Product features'}</a></td>
-	                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/product_features'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+	                        <td><a href="{url path='/admin/configuration/features'}">{intl l='Product features'}</a></td>
+	                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/features'}"><i class="glyphicon glyphicon-edit"></i></a></td>
 	                    </tr>
                         {/loop}
 

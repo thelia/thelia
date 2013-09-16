@@ -1,20 +1,37 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: manu
- * Date: 16/08/13
- * Time: 10:24
- * To change this template use File | Settings | File Templates.
- */
-
+/*************************************************************************************/
+/*                                                                                   */
+/*      Thelia	                                                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : info@thelia.net                                                      */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      This program is free software; you can redistribute it and/or modify         */
+/*      it under the terms of the GNU General Public License as published by         */
+/*      the Free Software Foundation; either version 3 of the License                */
+/*                                                                                   */
+/*      This program is distributed in the hope that it will be useful,              */
+/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
+/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
+/*      GNU General Public License for more details.                                 */
+/*                                                                                   */
+/*      You should have received a copy of the GNU General Public License            */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*                                                                                   */
+/*************************************************************************************/
 namespace Thelia\Core\Event;
-
 
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Model\Customer;
 
-class CustomerCreateOrUpdateEvent extends ActionEvent {
-
+/**
+ * Class CustomerCreateOrUpdateEvent
+ * @package Thelia\Core\Event
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+class CustomerCreateOrUpdateEvent extends ActionEvent
+{
     //base parameters for creating new customer
     protected $title;
     protected $firstname;
@@ -33,15 +50,15 @@ class CustomerCreateOrUpdateEvent extends ActionEvent {
     protected $reseller;
     protected $sponsor;
     protected $discount;
+    protected $company;
 
     /**
      * @var \Thelia\Model\Customer
      */
     protected $customer;
 
-
     /**
-     * @param int $title the title customer id
+     * @param int $title     the title customer id
      * @param string $firstname
      * @param string $lastname
      * @param string $address1
@@ -51,15 +68,16 @@ class CustomerCreateOrUpdateEvent extends ActionEvent {
      * @param string $cellphone
      * @param string $zipcode
      * @param string $city
-     * @param int $country the country id
+     * @param int $country   the country id
      * @param string $email
-     * @param string $password plain password, don't put hash password, it will hashes again
+     * @param string $password  plain password, don't put hash password, it will hashes again
      * @param $lang
      * @param int $reseller if customer is a reseller
-     * @param int $sponsor customer's id sponsor
+     * @param int $sponsor  customer's id sponsor
      * @param float $discount
+     * @param string $company
      */
-    function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $country, $email, $password, $lang, $reseller, $sponsor, $discount)
+    public function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $country, $email, $password, $lang, $reseller, $sponsor, $discount, $company)
     {
         $this->address1 = $address1;
         $this->address2 = $address2;
@@ -74,9 +92,18 @@ class CustomerCreateOrUpdateEvent extends ActionEvent {
         $this->cellphone = $cellphone;
         $this->title = $title;
         $this->zipcode = $zipcode;
+        $this->city = $city;
         $this->reseller = $reseller;
         $this->sponsor = $sponsor;
         $this->discount = $discount;
+        $this->company = $company;
+    }
+    /**
+     * @return mixed
+     */
+    public function getCompany()
+    {
+        return $this->company;
     }
 
     /**
@@ -230,8 +257,5 @@ class CustomerCreateOrUpdateEvent extends ActionEvent {
     {
         return $this->customer;
     }
-
-
-
 
 }

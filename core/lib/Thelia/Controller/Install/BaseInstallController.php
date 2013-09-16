@@ -25,7 +25,6 @@ namespace Thelia\Controller\Install;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Controller\BaseController;
 
-
 /**
  * Class BaseInstallController
  * @package Thelia\Controller\Install
@@ -40,7 +39,7 @@ class BaseInstallController extends BaseController
     {
         $parser = $this->container->get("thelia.parser");
 
-        // Define the template thant shoud be used
+        // Define the template that shoud be used
         $parser->setTemplate("install");
 
         return $parser;

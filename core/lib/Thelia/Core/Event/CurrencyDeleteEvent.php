@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event;
 
-use Thelia\Model\Currency;
-
 class CurrencyDeleteEvent extends CurrencyEvent
 {
     protected $currency_id;

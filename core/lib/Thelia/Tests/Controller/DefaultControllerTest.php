@@ -68,7 +68,6 @@ class DefaultControllerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($request->attributes->get('_view'), 'foo');
     }
 
-
     public function testNoActionWithAttribute()
     {
         $defaultController = new DefaultController();

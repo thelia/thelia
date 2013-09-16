@@ -26,6 +26,7 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\an;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use DebugBar\DebugBar as BaseDebugBar;
+use Thelia\Tools\URL;
 
 /**
  * Class DebugBar
@@ -52,20 +53,54 @@ class DebugBar extends AbstractSmartyPlugin
         return $render;
     }
 
-    public function renderHead($params, \Smarty_Internal_Template $template)
+    public function renderCss($params, \Smarty_Internal_Template $template)
     {
         $render = "";
-        if ($this->debugMode) {
-            $javascriptRenderer = $this->debugBar->getJavascriptRenderer();
-            $assets = $javascriptRenderer->getAsseticCollection();
+        if($this->debugMode)
+        {
+            $webFile = "cache/debugbar.css";
+            $cssFile = THELIA_WEB_DIR ."/".$webFile;
 
-            $cssCollection = $assets[0];
-            $jsCollection = $assets[1];
+            if(!file_exists($cssFile)) {
+                $javascriptRenderer = $this->debugBar->getJavascriptRenderer();
+                $assetCss = $javascriptRenderer->getAsseticCollection("css");
 
-            $render .= sprintf('<style media="screen" type="text/css">%s</style>', $cssCollection->dump());
-            $render .= sprintf('<script>%s</script>', $jsCollection->dump());
+                foreach($assetCss->all() as $asset) {
+                    if(strpos($asset->getSourcePath(), "font-awesome") !== false) {
+                        $assetCss->removeLeaf($asset);
+                    }
+                }
+
+                file_put_contents($cssFile, $assetCss->dump());
+            }
+            $render =  sprintf('<link rel="stylesheet" href="%s">', URL::getInstance()->absoluteUrl($webFile, array(), URL::PATH_TO_FILE));
         }
+        return $render;
+    }
 
+    public function renderJs($params, \Smarty_Internal_Template $template)
+    {
+        $render = "";
+        if($this->debugMode)
+        {
+            $webFile = "cache/debugbar.js";
+            $cacheFile = THELIA_WEB_DIR ."/".$webFile;
+
+            if (!file_exists($cacheFile)) {
+                $javascriptRenderer = $this->debugBar->getJavascriptRenderer();
+                $assetJs = $javascriptRenderer->getAsseticCollection("js");
+
+                foreach($assetJs->all() as $asset) {
+                    if(strpos($asset->getSourcePath(), "jquery") !== false) {
+                        $assetJs->removeLeaf($asset);
+                    }
+                }
+
+                file_put_contents($cacheFile, $assetJs->dump());
+            }
+
+            $render = sprintf('<script src="%s"></script>', URL::getInstance()->absoluteUrl($webFile, array(), URL::PATH_TO_FILE));
+        }
         return $render;
     }
 
@@ -75,8 +110,9 @@ class DebugBar extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor("function", "debugbar_renderHead", $this, "renderHead"),
-            new SmartyPluginDescriptor("function", "debugbar_render", $this, "render")
+            new SmartyPluginDescriptor("function", "debugbar_rendercss", $this, "renderCss"),
+            new SmartyPluginDescriptor("function", "debugbar_renderjs", $this, "renderJs"),
+            new SmartyPluginDescriptor("function", "debugbar_renderresult", $this, "render")
         );
     }
 }

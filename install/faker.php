@@ -1,6 +1,7 @@
 <?php
-use Thelia\Constraint\ConstraintManager;
-use Thelia\Constraint\Rule\AvailableForTotalAmount;
+use Thelia\Constraint\ConstraintFactory;
+use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
+use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
 use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Model\ProductImage;
@@ -35,14 +36,6 @@ try {
     $categoryAssociatedContent = Thelia\Model\CategoryAssociatedContentQuery::create()
         ->find();
     $categoryAssociatedContent->delete();
-
-    $attributeCategory = Thelia\Model\AttributeCategoryQuery::create()
-        ->find();
-    $attributeCategory->delete();
-
-    $featureCategory = Thelia\Model\FeatureCategoryQuery::create()
-        ->find();
-    $featureCategory->delete();
 
     $featureProduct = Thelia\Model\FeatureProductQuery::create()
         ->find();
@@ -153,6 +146,45 @@ try {
         "azerty"
     );
 
+    for($i = 0; $i < 50; $i++) {
+        $customer = new Thelia\Model\Customer();
+        $customer->createOrUpdate(
+            rand(1,3),
+            $faker->firstname,
+            $faker->lastname,
+            $faker->streetAddress,
+            $faker->streetAddress,
+            $faker->streetAddress,
+            $faker->phoneNumber,
+            $faker->phoneNumber,
+            $faker->postcode,
+            $faker->city,
+            64,
+            $faker->email,
+            "azerty".$i
+        );
+
+        for ($j = 0; $j <= 3; $j++) {
+            $address = new Thelia\Model\Address();
+            $address->setLabel($faker->text(20))
+                ->setTitleId(rand(1,3))
+                ->setFirstname($faker->firstname)
+                ->setLastname($faker->lastname)
+                ->setAddress1($faker->streetAddress)
+                ->setAddress2($faker->streetAddress)
+                ->setAddress3($faker->streetAddress)
+                ->setCellphone($faker->phoneNumber)
+                ->setPhone($faker->phoneNumber)
+                ->setZipcode($faker->postcode)
+                ->setCity($faker->city)
+                ->setCountryId(64)
+                ->setCustomer($customer)
+                ->save()
+            ;
+
+        }
+    }
+
     //features and features_av
     $featureList = array();
     for($i=0; $i<4; $i++) {
@@ -196,6 +228,28 @@ try {
             $attributeAv->save();
             $attributeList[$attributeId][] = $attributeAv->getId();
         }
+    }
+
+    $template = new Thelia\Model\Template();
+    setI18n($faker, $template, array("Name" => 20));
+    $template->save();
+
+    foreach($attributeList as $attributeId => $attributeAvId) {
+        $at = new Thelia\Model\AttributeTemplate();
+
+        $at
+            ->setTemplate($template)
+            ->setAttributeId($attributeId)
+            ->save();
+    }
+
+    foreach($featureList as $featureId => $featureAvId) {
+        $ft = new Thelia\Model\FeatureTemplate();
+
+        $ft
+        ->setTemplate($template)
+        ->setFeatureId($featureId)
+        ->save();
     }
 
     //folders and contents
@@ -254,28 +308,12 @@ try {
             $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList, $contentIdList);
 
             for($k=0; $k<rand(0, 5); $k++) {
-                createProduct($faker, $subcategory, $k, $productIdList);
+                createProduct($faker, $subcategory, $k, $template, $productIdList);
             }
         }
 
         for($k=1; $k<rand(1, 6); $k++) {
-            createProduct($faker, $category, $k, $productIdList);
-        }
-    }
-
-    //attribute_category and feature_category (all categories got all features/attributes)
-    foreach($categoryIdList as $categoryId) {
-        foreach($attributeList as $attributeId => $attributeAvId) {
-            $attributeCategory = new Thelia\Model\AttributeCategory();
-            $attributeCategory->setCategoryId($categoryId)
-                ->setAttributeId($attributeId)
-                ->save();
-        }
-        foreach($featureList as $featureId => $featureAvId) {
-            $featureCategory = new Thelia\Model\FeatureCategory();
-            $featureCategory->setCategoryId($categoryId)
-                ->setFeatureId($featureId)
-                ->save();
+            createProduct($faker, $category, $k, $template, $productIdList);
         }
     }
 
@@ -302,6 +340,7 @@ try {
             $productAssociatedContent = new Thelia\Model\ProductAssociatedContent();
             do {
                 $pick = array_rand($contentIdList, 1);
+                \Thelia\Log\Tlog::getInstance()->debug("pick : $pick");
             } while(in_array($pick, $alreadyPicked));
 
             $alreadyPicked[] = $pick;
@@ -316,6 +355,7 @@ try {
         for($i=0; $i<rand(1,7); $i++) {
             $stock = new \Thelia\Model\ProductSaleElements();
             $stock->setProductId($productId);
+            $stock->setRef($productId . '_' . $i . '_' . $faker->randomNumber(8));
             $stock->setQuantity($faker->randomNumber(1,50));
             $stock->setPromo($faker->randomNumber(0,1));
             $stock->setNewness($faker->randomNumber(0,1));
@@ -373,13 +413,16 @@ try {
     $con->rollBack();
 }
 
-function createProduct($faker, $category, $position, &$productIdList)
+function createProduct($faker, $category, $position, $template, &$productIdList)
 {
     $product = new Thelia\Model\Product();
     $product->setRef($category->getId() . '_' . $position . '_' . $faker->randomNumber(8));
     $product->addCategory($category);
     $product->setVisible(rand(1, 10)>7 ? 0 : 1);
     $product->setPosition($position);
+    $product->setTaxRuleId(1);
+    $product->setTemplate($template);
+
     setI18n($faker, $product);
 
     $product->save();
@@ -477,18 +520,18 @@ function generate_image($image, $position, $typeobj, $id) {
     $image->save($image_file);
 }
 
-function setI18n($faker, &$object)
+function setI18n($faker, &$object, $fields = array('Title' => 20, 'Description' => 50) )
 {
-    $localeList = array('fr_FR', 'en_EN');
-
-    $title = $faker->text(20);
-    $description = $faker->text(50);
+    $localeList = $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
 
     foreach($localeList as $locale) {
         $object->setLocale($locale);
 
-        $object->setTitle($locale . ' : ' . $title);
-        $object->setDescription($locale . ' : ' . $description);
+        foreach($fields as $name => $length) {
+            $func = "set".ucfirst(strtolower($name));
+
+            $object->$func($locale . ' : ' . $faker->text($length));
+        }
     }
 }
 /**
@@ -498,12 +541,11 @@ function generateCouponFixtures($thelia)
 {
     $container = $thelia->getContainer();
     $adapter = $container->get('thelia.adapter');
-    $translator = $container->get('thelia.translator');
 
     // Coupons
     $coupon1 = new Thelia\Model\Coupon();
     $coupon1->setCode('XMAS');
-    $coupon1->setType('Thelia\Coupon\Type\RemoveXAmount');
+    $coupon1->setType('thelia.coupon.type.remove_x_amount');
     $coupon1->setTitle('Christmas coupon');
     $coupon1->setShortDescription('Coupon for Christmas removing 10€ if your total checkout is more than 40€');
     $coupon1->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras at luctus tellus. Integer turpis mauris, aliquet vitae risus tristique, pellentesque vestibulum urna. Vestibulum sodales laoreet lectus dictum suscipit. Praesent vulputate, sem id varius condimentum, quam magna tempor elit, quis venenatis ligula nulla eget libero. Cras egestas euismod tellus, id pharetra leo suscipit quis. Donec lacinia ac lacus et ultricies. Nunc in porttitor neque. Proin at quam congue, consectetur orci sed, congue nulla. Nulla eleifend nunc ligula, nec pharetra elit tempus quis. Vivamus vel mauris sed est dictum blandit. Maecenas blandit dapibus velit ut sollicitudin. In in euismod mauris, consequat viverra magna. Cras velit velit, sollicitudin commodo tortor gravida, tempus varius nulla.
@@ -521,33 +563,95 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $date = new \DateTime();
     $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
 
-    $rule1 = new AvailableForTotalAmount($adapter);
-    $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::SUPERIOR);
-    $values = array(
-        AvailableForTotalAmount::PARAM1_PRICE => 40.00,
-        AvailableForTotalAmount::PARAM1_CURRENCY => 'EUR'
+    $rule1 = new AvailableForTotalAmountManager($adapter);
+    $operators = array(
+        AvailableForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+        AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
     );
-    $rule1->populateFromForm($operators, $values);
+    $values = array(
+        AvailableForTotalAmountManager::INPUT1 => 40.00,
+        AvailableForTotalAmountManager::INPUT2 => 'EUR'
+    );
+    $rule1->setValidatorsFromForm($operators, $values);
 
-    $rule2 = new AvailableForTotalAmount($adapter);
-    $operators = array(AvailableForTotalAmount::PARAM1_PRICE => Operators::INFERIOR);
-    $values = array(
-        AvailableForTotalAmount::PARAM1_PRICE => 400.00,
-        AvailableForTotalAmount::PARAM1_CURRENCY => 'EUR'
+    $rule2 = new AvailableForTotalAmountManager($adapter);
+    $operators = array(
+        AvailableForTotalAmountManager::INPUT1 => Operators::INFERIOR,
+        AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
     );
-    $rule2->populateFromForm($operators, $values);
+    $values = array(
+        AvailableForTotalAmountManager::INPUT1 => 400.00,
+        AvailableForTotalAmountManager::INPUT2 => 'EUR'
+    );
+    $rule2->setValidatorsFromForm($operators, $values);
 
     $rules = new CouponRuleCollection();
     $rules->add($rule1);
     $rules->add($rule2);
 
-    /** @var ConstraintManager $constraintManager */
-    $constraintManager = new ConstraintManager($container);
+    /** @var ConstraintFactory $constraintFactory */
+    $constraintFactory = $container->get('thelia.constraint.factory');
 
-    $serializedRules = $constraintManager->serializeCouponRuleCollection($rules);
+    $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
     $coupon1->setSerializedRules($serializedRules);
 
+    $coupon1->setMaxUsage(40);
     $coupon1->setIsCumulative(1);
     $coupon1->setIsRemovingPostage(0);
+    $coupon1->setIsAvailableOnSpecialOffers(1);
+
     $coupon1->save();
+
+
+
+
+
+
+
+
+    // Coupons
+    $coupon2 = new Thelia\Model\Coupon();
+    $coupon2->setCode('SPRINGBREAK');
+    $coupon2->setType('thelia.coupon.type.remove_x_percent');
+    $coupon2->setTitle('Springbreak coupon');
+    $coupon2->setShortDescription('Coupon for Springbreak removing 10% if you have more than 4 articles in your cart');
+    $coupon2->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras at luctus tellus. Integer turpis mauris, aliquet vitae risus tristique, pellentesque vestibulum urna. Vestibulum sodales laoreet lectus dictum suscipit. Praesent vulputate, sem id varius condimentum, quam magna tempor elit, quis venenatis ligula nulla eget libero. Cras egestas euismod tellus, id pharetra leo suscipit quis. Donec lacinia ac lacus et ultricies. Nunc in porttitor neque. Proin at quam congue, consectetur orci sed, congue nulla. Nulla eleifend nunc ligula, nec pharetra elit tempus quis. Vivamus vel mauris sed est dictum blandit. Maecenas blandit dapibus velit ut sollicitudin. In in euismod mauris, consequat viverra magna. Cras velit velit, sollicitudin commodo tortor gravida, tempus varius nulla.
+
+Donec rhoncus leo mauris, id porttitor ante luctus tempus. Curabitur quis augue feugiat, ullamcorper mauris ac, interdum mi. Quisque aliquam lorem vitae felis lobortis, id interdum turpis mattis. Vestibulum diam massa, ornare congue blandit quis, facilisis at nisl. In tortor metus, venenatis non arcu nec, sollicitudin ornare nisl. Nunc erat risus, varius nec urna at, iaculis lacinia elit. Aenean ut felis tempus, tincidunt odio non, sagittis nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec vitae hendrerit elit. Nunc sit amet gravida risus, euismod lobortis massa. Nam a erat mauris. Nam a malesuada lorem. Nulla id accumsan dolor, sed rhoncus tellus. Quisque dictum felis sed leo auctor, at volutpat lectus viverra. Morbi rutrum, est ac aliquam imperdiet, nibh sem sagittis justo, ac mattis magna lacus eu nulla.
+
+Duis interdum lectus nulla, nec pellentesque sapien condimentum at. Suspendisse potenti. Sed eu purus tellus. Nunc quis rhoncus metus. Fusce vitae tellus enim. Interdum et malesuada fames ac ante ipsum primis in faucibus. Etiam tempor porttitor erat vitae iaculis. Sed est elit, consequat non ornare vitae, vehicula eget lectus. Etiam consequat sapien mauris, eget consectetur magna imperdiet eget. Nunc sollicitudin luctus velit, in commodo nulla adipiscing fermentum. Fusce nisi sapien, posuere vitae metus sit amet, facilisis sollicitudin dui. Fusce ultricies auctor enim sit amet iaculis. Morbi at vestibulum enim, eget adipiscing eros.
+
+Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentesque elit erat, lacinia sed semper ac, sagittis vel elit. Nam eu convallis est. Curabitur rhoncus odio vitae consectetur pellentesque. Nam vitae arcu nec ante scelerisque dignissim vel nec neque. Suspendisse augue nulla, mollis eget dui et, tempor facilisis erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ac diam ipsum. Donec convallis dui ultricies velit auctor, non lobortis nulla ultrices. Morbi vitae dignissim ante, sit amet lobortis tortor. Nunc dapibus condimentum augue, in molestie neque congue non.
+
+Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
+    $coupon2->setAmount(10.00);
+    $coupon2->setIsUsed(1);
+    $coupon2->setIsEnabled(1);
+    $date = new \DateTime();
+    $coupon2->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
+
+    $rule1 = new AvailableForXArticlesManager($adapter);
+    $operators = array(
+        AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR,
+    );
+    $values = array(
+        AvailableForXArticlesManager::INPUT1 => 4,
+    );
+    $rule1->setValidatorsFromForm($operators, $values);
+
+    $rules = new CouponRuleCollection();
+    $rules->add($rule1);
+
+    /** @var ConstraintFactory $constraintFactory */
+    $constraintFactory = $container->get('thelia.constraint.factory');
+
+    $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
+    $coupon2->setSerializedRules($serializedRules);
+
+    $coupon2->setMaxUsage(-1);
+    $coupon2->setIsCumulative(0);
+    $coupon2->setIsRemovingPostage(1);
+    $coupon2->setIsAvailableOnSpecialOffers(1);
+
+    $coupon2->save();
 }

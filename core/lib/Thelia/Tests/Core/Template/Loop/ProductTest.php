@@ -23,6 +23,7 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Thelia\Model\ProductQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 use Thelia\Core\Template\Loop\Product;
@@ -32,7 +33,7 @@ use Thelia\Core\Template\Loop\Product;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-/*class ProductTest extends BaseLoopTestor
+class ProductTest extends BaseLoopTestor
 {
     public function getTestedClassName()
     {
@@ -41,11 +42,23 @@ use Thelia\Core\Template\Loop\Product;
 
     public function getTestedInstance()
     {
-        return new Product($this->request, $this->dispatcher, $this->securityContext);
+        return new Product($this->container);
     }
 
     public function getMandatoryArguments()
     {
         return array();
     }
-}*/
+
+    public function testSearchById()
+    {
+        $product = ProductQuery::create()->findOne();
+
+        $this->baseTestSearchById($product->getId());
+    }
+
+    public function testSearchLimit()
+    {
+        $this->baseTestSearchWithLimit(3);
+    }
+}

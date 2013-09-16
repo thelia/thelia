@@ -50,6 +50,7 @@ class PhpUnitUtils
         $class = new \ReflectionClass(get_class($obj));
         $method = $class->getMethod($name);
         $method->setAccessible(true);
+
         return $method->invokeArgs($obj, $args);
     }
 }

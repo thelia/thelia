@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
@@ -31,7 +32,6 @@ use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Thelia\Core\Template\Element\Exception\InvalidElementException;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Security\SecurityContext;
 
 class TheliaLoop extends AbstractSmartyPlugin
@@ -44,14 +44,22 @@ class TheliaLoop extends AbstractSmartyPlugin
     protected $dispatcher;
     protected $securityContext;
 
+    /** @var ContainerInterface Service Container */
+    protected $container = null;
+
     protected $loopstack = array();
     protected $varstack = array();
 
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher, SecurityContext $securityContext)
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
     {
-        $this->request = $request;
-        $this->dispatcher = $dispatcher;
-        $this->securityContext = $securityContext;
+        $this->container = $container;
+
+        $this->request = $container->get('request');
+        $this->dispatcher = $container->get('event_dispatcher');
+        $this->securityContext = $container->get('thelia.securityContext');
     }
 
     /**
@@ -59,12 +67,12 @@ class TheliaLoop extends AbstractSmartyPlugin
      *
      * @return \PropelModelPager
      */
-    public static function getPagination($loopId)
+    public static function getPagination($loopName)
     {
-        if(!empty(self::$pagination[$loopId])) {
-            return self::$pagination[$loopId];
+        if (array_key_exists($loopName, self::$pagination)) {
+            return self::$pagination[$loopName];
         } else {
-            return null;
+            throw new \InvalidArgumentException("Loop $loopName  is not defined");
         }
     }
 
@@ -75,7 +83,7 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
         $type = $this->getParam($params, 'type');
 
-    	if (null == $type) {
+        if (null == $type) {
             throw new \InvalidArgumentException("Missing 'type' parameter in count arguments");
         }
 
@@ -234,16 +242,10 @@ class TheliaLoop extends AbstractSmartyPlugin
         if (null == $loopName)
             throw new \InvalidArgumentException("Missing 'rel' parameter in page loop");
 
-        // Find loop results in the current template vars
-        /* $loopResults = $template->getTemplateVars($loopName);
-        if (empty($loopResults)) {
-            throw new \InvalidArgumentException("Loop $loopName is not defined.");
-        }*/
-
         // Find pagination
         $pagination = self::getPagination($loopName);
-        if ($pagination === null) {
-            throw new \InvalidArgumentException("Loop $loopName  is not defined");
+        if ($pagination === null) { // loop gas no result
+            return '';
         }
 
         if ($pagination->getNbResults() == 0) {
@@ -293,13 +295,11 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
+     * @param $smartyParams
      *
-     * find the loop class with his name and construct an instance of this class
-     *
-     * @param  string                                 $name
-     * @return \Thelia\Core\Template\Element\BaseLoop
-     * @throws InvalidElementException
-     * @throws ElementNotFoundException
+     * @return object
+     * @throws \Thelia\Core\Template\Element\Exception\InvalidElementException
+     * @throws \Thelia\Core\Template\Element\Exception\ElementNotFoundException
      */
     protected function createLoopInstance($smartyParams)
     {
@@ -317,9 +317,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         }
 
         $loop = $class->newInstance(
-                $this->request,
-                $this->dispatcher,
-                $this->securityContext
+            $this->container
         );
 
         $loop->initializeArgs($smartyParams);

@@ -23,6 +23,7 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Thelia\Model\CategoryQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 use Thelia\Core\Template\Loop\Category;
@@ -41,11 +42,23 @@ class CategoryTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new Category($this->request, $this->dispatcher, $this->securityContext);
+        return new Category($this->container);
     }
 
     public function getMandatoryArguments()
     {
         return array();
+    }
+
+    public function testSearchById()
+    {
+        $category = CategoryQuery::create()->findOne();
+
+        $this->baseTestSearchById($category->getId());
+    }
+
+    public function testSearchLimit()
+    {
+        $this->baseTestSearchWithLimit(3);
     }
 }

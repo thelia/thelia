@@ -36,6 +36,7 @@ CREATE TABLE `product`
     `ref` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER NOT NULL,
+    `template_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -44,11 +45,15 @@ CREATE TABLE `product`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_product_tax_rule_id` (`tax_rule_id`),
+    INDEX `fk_product_template_id` (`template_id`),
     CONSTRAINT `fk_product_tax_rule_id`
         FOREIGN KEY (`tax_rule_id`)
         REFERENCES `tax_rule` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_product_template1`
+        FOREIGN KEY (`template_id`)
+        REFERENCES `template` (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -91,6 +96,7 @@ CREATE TABLE `country`
     `isocode` VARCHAR(4) NOT NULL,
     `isoalpha2` VARCHAR(2),
     `isoalpha3` VARCHAR(4),
+    `by_default` TINYINT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -111,7 +117,8 @@ DROP TABLE IF EXISTS `tax`;
 CREATE TABLE `tax`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `rate` FLOAT NOT NULL,
+    `type` VARCHAR(255) NOT NULL,
+    `serialized_requirements` TEXT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -126,9 +133,6 @@ DROP TABLE IF EXISTS `tax_rule`;
 CREATE TABLE `tax_rule`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `code` VARCHAR(45),
-    `title` VARCHAR(255),
-    `description` TEXT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -142,14 +146,13 @@ DROP TABLE IF EXISTS `tax_rule_country`;
 
 CREATE TABLE `tax_rule_country`
 (
-    `id` INTEGER NOT NULL,
-    `tax_rule_id` INTEGER,
-    `country_id` INTEGER,
-    `tax_id` INTEGER,
-    `none` TINYINT,
+    `tax_rule_id` INTEGER NOT NULL,
+    `country_id` INTEGER NOT NULL,
+    `tax_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`tax_rule_id`,`country_id`,`tax_id`),
     INDEX `idx_tax_rule_country_tax_id` (`tax_id`),
     INDEX `idx_tax_rule_country_tax_rule_id` (`tax_rule_id`),
     INDEX `idx_tax_rule_country_country_id` (`country_id`),
@@ -157,7 +160,7 @@ CREATE TABLE `tax_rule_country`
         FOREIGN KEY (`tax_id`)
         REFERENCES `tax` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL,
+        ON DELETE CASCADE,
     CONSTRAINT `fk_tax_rule_country_tax_rule_id`
         FOREIGN KEY (`tax_rule_id`)
         REFERENCES `tax_rule` (`id`)
@@ -246,31 +249,29 @@ CREATE TABLE `feature_product`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- feature_category
+-- feature_template
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `feature_category`;
+DROP TABLE IF EXISTS `feature_template`;
 
-CREATE TABLE `feature_category`
+CREATE TABLE `feature_template`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `feature_id` INTEGER NOT NULL,
-    `category_id` INTEGER NOT NULL,
+    `template_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_feature_category_category_id` (`category_id`),
-    INDEX `idx_feature_category_feature_id` (`feature_id`),
-    CONSTRAINT `fk_feature_category_category_id`
-        FOREIGN KEY (`category_id`)
-        REFERENCES `category` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_feature_category_feature_id`
+    INDEX `idx_feature_template_id` (`feature_id`),
+    INDEX `fk_feature_template_idx` (`template_id`),
+    CONSTRAINT `fk_feature_template_id`
         FOREIGN KEY (`feature_id`)
         REFERENCES `feature` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_feature_template`
+        FOREIGN KEY (`template_id`)
+        REFERENCES `template` (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -352,6 +353,7 @@ CREATE TABLE `product_sale_elements`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
+    `ref` VARCHAR(45) NOT NULL,
     `quantity` FLOAT NOT NULL,
     `promo` TINYINT DEFAULT 0,
     `newness` TINYINT DEFAULT 0,
@@ -359,6 +361,7 @@ CREATE TABLE `product_sale_elements`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_product_sale_element_product_id` (`product_id`),
     CONSTRAINT `fk_product_sale_element_product_id`
         FOREIGN KEY (`product_id`)
@@ -368,31 +371,29 @@ CREATE TABLE `product_sale_elements`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- attribute_category
+-- attribute_template
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `attribute_category`;
+DROP TABLE IF EXISTS `attribute_template`;
 
-CREATE TABLE `attribute_category`
+CREATE TABLE `attribute_template`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `category_id` INTEGER NOT NULL,
     `attribute_id` INTEGER NOT NULL,
+    `template_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_attribute_category_category_id` (`category_id`),
-    INDEX `idx_attribute_category_attribute_id` (`attribute_id`),
-    CONSTRAINT `fk_attribute_category_category_id`
-        FOREIGN KEY (`category_id`)
-        REFERENCES `category` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_attribute_category_attribute_id`
+    INDEX `idx_attribute_template_id` (`attribute_id`),
+    INDEX `fk_attribute_template_idx` (`template_id`),
+    CONSTRAINT `fk_attribute_template_id`
         FOREIGN KEY (`attribute_id`)
         REFERENCES `attribute` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_attribute_template`
+        FOREIGN KEY (`template_id`)
+        REFERENCES `template` (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -434,6 +435,8 @@ CREATE TABLE `customer`
     `lang` VARCHAR(10),
     `sponsor` VARCHAR(50),
     `discount` FLOAT,
+    `remember_me_token` VARCHAR(255),
+    `remember_me_serial` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -924,6 +927,8 @@ CREATE TABLE `admin`
     `password` VARCHAR(128) NOT NULL,
     `algo` VARCHAR(128),
     `salt` VARCHAR(128),
+    `remember_me_token` VARCHAR(255),
+    `remember_me_serial` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -1154,6 +1159,7 @@ CREATE TABLE `cart`
     `address_delivery_id` INTEGER,
     `address_invoice_id` INTEGER,
     `currency_id` INTEGER,
+    `discount` FLOAT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1192,6 +1198,8 @@ CREATE TABLE `cart_item`
     `price` FLOAT,
     `promo_price` FLOAT,
     `price_end_of_life` DATETIME,
+    `discount` FLOAT DEFAULT 0,
+    `promo` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1217,14 +1225,13 @@ DROP TABLE IF EXISTS `product_price`;
 
 CREATE TABLE `product_price`
 (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_sale_elements_id` INTEGER NOT NULL,
     `currency_id` INTEGER NOT NULL,
     `price` FLOAT NOT NULL,
     `promo_price` FLOAT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`product_sale_elements_id`,`currency_id`),
     INDEX `idx_product_price_product_sale_elements_id` (`product_sale_elements_id`),
     INDEX `idx_product_price_currency_id` (`currency_id`),
     CONSTRAINT `fk_product_price_product_sale_elements_id`
@@ -1483,6 +1490,20 @@ CREATE TABLE `rewriting_argument`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- template
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `template`;
+
+CREATE TABLE `template`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 
@@ -1574,6 +1595,8 @@ CREATE TABLE `tax_rule_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` TEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `tax_rule_i18n_FK_1`
         FOREIGN KEY (`id`)
@@ -2059,6 +2082,24 @@ CREATE TABLE `folder_document_i18n`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- template_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `template_i18n`;
+
+CREATE TABLE `template_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `name` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `template_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `template` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- category_version
 -- ---------------------------------------------------------------------
 
@@ -2095,6 +2136,7 @@ CREATE TABLE `product_version`
     `ref` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER NOT NULL,
+    `template_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

@@ -59,12 +59,6 @@ abstract class ProductPrice implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the id field.
-     * @var        int
-     */
-    protected $id;
-
-    /**
      * The value for the product_sale_elements_id field.
      * @var        int
      */
@@ -373,17 +367,6 @@ abstract class ProductPrice implements ActiveRecordInterface
     }
 
     /**
-     * Get the [id] column value.
-     *
-     * @return   int
-     */
-    public function getId()
-    {
-
-        return $this->id;
-    }
-
-    /**
      * Get the [product_sale_elements_id] column value.
      *
      * @return   int
@@ -466,27 +449,6 @@ abstract class ProductPrice implements ActiveRecordInterface
             return $this->updated_at !== null ? $this->updated_at->format($format) : null;
         }
     }
-
-    /**
-     * Set the value of [id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductPrice The current object (for fluent API support)
-     */
-    public function setId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[] = ProductPriceTableMap::ID;
-        }
-
-
-        return $this;
-    } // setId()
 
     /**
      * Set the value of [product_sale_elements_id] column.
@@ -659,28 +621,25 @@ abstract class ProductPrice implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProductPriceTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductPriceTableMap::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProductPriceTableMap::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_sale_elements_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductPriceTableMap::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductPriceTableMap::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->currency_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductPriceTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductPriceTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
             $this->price = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductPriceTableMap::translateFieldName('PromoPrice', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductPriceTableMap::translateFieldName('PromoPrice', TableMap::TYPE_PHPNAME, $indexType)];
             $this->promo_price = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductPriceTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductPriceTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductPriceTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductPriceTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -693,7 +652,7 @@ abstract class ProductPrice implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = ProductPriceTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = ProductPriceTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ProductPrice object", 0, $e);
@@ -934,15 +893,8 @@ abstract class ProductPrice implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ProductPriceTableMap::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProductPriceTableMap::ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ProductPriceTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
-        }
         if ($this->isColumnModified(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID)) {
             $modifiedColumns[':p' . $index++]  = 'PRODUCT_SALE_ELEMENTS_ID';
         }
@@ -972,9 +924,6 @@ abstract class ProductPrice implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case 'PRODUCT_SALE_ELEMENTS_ID':
                         $stmt->bindValue($identifier, $this->product_sale_elements_id, PDO::PARAM_INT);
                         break;
@@ -1000,13 +949,6 @@ abstract class ProductPrice implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
-
-        try {
-            $pk = $con->lastInsertId();
-        } catch (Exception $e) {
-            throw new PropelException('Unable to get autoincrement id.', 0, $e);
-        }
-        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -1056,24 +998,21 @@ abstract class ProductPrice implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getProductSaleElementsId();
                 break;
-            case 2:
+            case 1:
                 return $this->getCurrencyId();
                 break;
-            case 3:
+            case 2:
                 return $this->getPrice();
                 break;
-            case 4:
+            case 3:
                 return $this->getPromoPrice();
                 break;
-            case 5:
+            case 4:
                 return $this->getCreatedAt();
                 break;
-            case 6:
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1099,19 +1038,18 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['ProductPrice'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['ProductPrice'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['ProductPrice'][$this->getPrimaryKey()] = true;
+        $alreadyDumpedObjects['ProductPrice'][serialize($this->getPrimaryKey())] = true;
         $keys = ProductPriceTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getProductSaleElementsId(),
-            $keys[2] => $this->getCurrencyId(),
-            $keys[3] => $this->getPrice(),
-            $keys[4] => $this->getPromoPrice(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[0] => $this->getProductSaleElementsId(),
+            $keys[1] => $this->getCurrencyId(),
+            $keys[2] => $this->getPrice(),
+            $keys[3] => $this->getPromoPrice(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1161,24 +1099,21 @@ abstract class ProductPrice implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setProductSaleElementsId($value);
                 break;
-            case 2:
+            case 1:
                 $this->setCurrencyId($value);
                 break;
-            case 3:
+            case 2:
                 $this->setPrice($value);
                 break;
-            case 4:
+            case 3:
                 $this->setPromoPrice($value);
                 break;
-            case 5:
+            case 4:
                 $this->setCreatedAt($value);
                 break;
-            case 6:
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1205,13 +1140,12 @@ abstract class ProductPrice implements ActiveRecordInterface
     {
         $keys = ProductPriceTableMap::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setProductSaleElementsId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCurrencyId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setPrice($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPromoPrice($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[0], $arr)) $this->setProductSaleElementsId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setCurrencyId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPrice($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPromoPrice($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -1223,7 +1157,6 @@ abstract class ProductPrice implements ActiveRecordInterface
     {
         $criteria = new Criteria(ProductPriceTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ProductPriceTableMap::ID)) $criteria->add(ProductPriceTableMap::ID, $this->id);
         if ($this->isColumnModified(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID)) $criteria->add(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
         if ($this->isColumnModified(ProductPriceTableMap::CURRENCY_ID)) $criteria->add(ProductPriceTableMap::CURRENCY_ID, $this->currency_id);
         if ($this->isColumnModified(ProductPriceTableMap::PRICE)) $criteria->add(ProductPriceTableMap::PRICE, $this->price);
@@ -1245,29 +1178,36 @@ abstract class ProductPrice implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(ProductPriceTableMap::DATABASE_NAME);
-        $criteria->add(ProductPriceTableMap::ID, $this->id);
+        $criteria->add(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
+        $criteria->add(ProductPriceTableMap::CURRENCY_ID, $this->currency_id);
 
         return $criteria;
     }
 
     /**
-     * Returns the primary key for this object (row).
-     * @return   int
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        $pks = array();
+        $pks[0] = $this->getProductSaleElementsId();
+        $pks[1] = $this->getCurrencyId();
+
+        return $pks;
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Set the [composite] primary key.
      *
-     * @param       int $key Primary key.
+     * @param      array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey($keys)
     {
-        $this->setId($key);
+        $this->setProductSaleElementsId($keys[0]);
+        $this->setCurrencyId($keys[1]);
     }
 
     /**
@@ -1277,7 +1217,7 @@ abstract class ProductPrice implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return null === $this->getId();
+        return (null === $this->getProductSaleElementsId()) && (null === $this->getCurrencyId());
     }
 
     /**
@@ -1301,7 +1241,6 @@ abstract class ProductPrice implements ActiveRecordInterface
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1434,7 +1373,6 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function clear()
     {
-        $this->id = null;
         $this->product_sale_elements_id = null;
         $this->currency_id = null;
         $this->price = null;

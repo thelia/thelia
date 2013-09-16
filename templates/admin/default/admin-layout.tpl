@@ -23,7 +23,7 @@
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
-    {debugbar_renderHead}
+    {debugbar_rendercss}
 
     {block name="after-bootstrap-css"}{/block}
 
@@ -144,9 +144,9 @@
                         </li>
                         {/loop}
 
-                        {loop name="menu-auth-discount" type="auth" roles="ADMIN" permissions="admin.discount.view"}
-                        <li class="{if $admin_current_location == 'discount'}active{/if}" id="discount_menu">
-                            <a href="{url path='/admin/discount'}">{intl l="Discount"}</a>
+                        {loop name="menu-auth-coupon" type="auth" roles="ADMIN" permissions="admin.coupon.view"}
+                        <li class="{if $admin_current_location == 'coupon'}active{/if}" id="coupon_menu">
+                            <a href="{url path='/admin/coupon/'}">{intl l="Coupons"}</a>
                         </li>
                         {/loop}
 
@@ -206,7 +206,6 @@
             - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Édité par OpenStudio'}</a>
             - <a href="http://forum.thelia.net/" target="_blank">{intl l='Forum Thelia'}</a>
             - <a href="http://contrib.thelia.net/" target="_blank">{intl l='Contributions Thelia'}</a>
-                  <span class="pull-right">{intl l='interface par <a target="_blank" href="http://www.steaw-webdesign.com/">Steaw-Webdesign</a>'}</span>
             </p>
 
             {module_include location='in_footer'}
@@ -223,15 +222,19 @@
 
 	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 
-	{block name="after-javascript-include"}{/block}	
+    {debugbar_renderjs}
+    {debugbar_renderresult}
 
-    {block name="javascript-initialization"}{/block}
-    {debugbar_render}
-	{* Modules scripts are included now *}
-	{module_include location='footer_js'}
+	{block name="after-javascript-include"}{/block}
 
     {javascripts file='assets/js/bootstrap/bootstrap.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+
+    {block name="javascript-initialization"}{/block}
+
+	{* Modules scripts are included now *}
+	{module_include location='footer_js'}
+
 </body>
 </html>

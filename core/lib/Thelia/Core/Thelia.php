@@ -32,17 +32,16 @@ namespace Thelia\Core;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
+use Propel\Runtime\Connection\ConnectionWrapper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Validator\Tests\Fixtures\Reference;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 use Thelia\Core\Bundle;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Log\Tlog;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
 use Thelia\Core\TheliaContainerBuilder;
@@ -76,16 +75,15 @@ class Thelia extends Kernel
 
         $definePropel = new DefinePropel(new DatabaseConfiguration(),
             Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
-        $propelConfig = $definePropel->getConfig();
         $serviceContainer = Propel::getServiceContainer();
         $serviceContainer->setAdapterClass('thelia', 'mysql');
         $manager = new ConnectionManagerSingle();
         $manager->setConfiguration($definePropel->getConfig());
         $serviceContainer->setConnectionManager('thelia', $manager);
-
+        $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
+        $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
         if ($this->isDebug()) {
-            //$serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
-            $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
+            $serviceContainer->setLogger('defaultLogger', \Thelia\Log\Tlog::getInstance());
             $con->useDebug(true);
         }
     }

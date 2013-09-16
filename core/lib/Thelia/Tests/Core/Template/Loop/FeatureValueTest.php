@@ -41,7 +41,7 @@ class FeatureValueTest extends BaseLoopTestor
 
     public function getTestedInstance()
     {
-        return new FeatureValue($this->request, $this->dispatcher, $this->securityContext);
+        return new FeatureValue($this->container);
     }
 
     public function getMandatoryArguments()

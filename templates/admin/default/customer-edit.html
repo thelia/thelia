@@ -1,0 +1,484 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a customer'}{/block}
+
+{block name="check-permissions"}admin.customer.edit{/block}
+
+{block name="main-content"}
+    <div class="customers edit-customer">
+
+        <div id="wrapper" class="container">
+
+            {loop name="customer_edit" type="customer" current="false" id="$customer_id" backend_context="1" lang="$edit_language_id"}
+
+                <ul class="breadcrumb">
+        			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                    <li><a href="{url path='/admin/customers'}">{intl l="Customers"}</a></li>
+                    <li>{intl l='Editing customer "%name"' name="{$FIRSTNAME} {$LASTNAME}"}</li>
+                </ul>
+
+        		<div class="row">
+        			<div class="col-md-12 general-block-decorator">
+        				<div class="row">
+
+        					<div class="col-md-12 title title-without-tabs">
+        					   {intl l="Edit customer $FIRSTNAME $LASTNAME"}
+        					</div>
+
+                            <div class="form-container">
+                                <div class="col-md-12">
+
+        						    {form name="thelia.customer.modification"}
+        						    	<form method="POST" action="{url path="/admin/customer/update/{$ID}"}" {form_enctype form=$form} class="clearfix">
+
+                                            <div class="row inner-toolbar clearfix">
+                                                <div class="col-md-6 inner-actions pull-right">
+                                                    <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-primary" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
+                                                    <button type="submit" name="save_mode" value="close" class="btn btn-default btn-info" title="{intl l='Save and close'}">{intl l='Save and close'} <span class="glyphicon glyphicon-remove"></span></button>
+                                                </div>
+                                            </div>
+        						        	{form_hidden_fields form=$form}
+
+        						        	{form_field form=$form field='success_url'}
+        						        		<input type="hidden" name="{$name}" value="{url path="/admin/customer/update/{$ID}"}" />
+        						        	{/form_field}
+
+        					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                            <div class="col-md-6">
+                                                <p class="title title-without-tabs">{intl l="Customer informations"}</p>
+
+                                                {form_field form=$form field='title'}
+                                                    <div class="form-group {if $error}has-error{/if}">
+                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+
+                                                        <select name="{$name}" id="{$label_attr.for}" class="form-control">
+                                                            {loop type="title" name="title1" backend_context="1"}
+                                                                <option value="{$ID}" {if $ID == $TITLE}selected{/if}>{$LONG}</option>
+                                                            {/loop}
+                                                        </select>
+                                                    </div>
+                                                {/form_field}
+
+                                                {form_field form=$form field='firstname'}
+                                                    <div class="form-group {if $error}has-error{/if}">
+                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$FIRSTNAME}" title="{intl l="{$label}"}" placeholder="{intl l='Firstname'}">
+                                                    </div>
+                                                {/form_field}
+
+                                                {form_field form=$form field='lastname'}
+                                                    <div class="form-group {if $error}has-error{/if}">
+                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$LASTNAME}" title="{intl l="{$label}"}" placeholder="{intl l='Lastname'}">
+                                                    </div>
+                                                {/form_field}
+
+                                                {loop name="address" type="address" customer="$customer_id" backend_context="1" default="true"}
+
+                                                    <p class="title title-without-tabs">{intl l="Default address"}</p>
+
+                                                    {form_field form=$form field='company'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$COMPANY}" title="{intl l="{$label}"}" placeholder="{intl l='Company'}">
+                                                        </div>
+                                                    {/form_field}
+
+                                                    {form_field form=$form field='address1'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$ADDRESS1}" title="{intl l="{$label}"}" placeholder="{intl l='Address'}">
+                                                        </div>
+                                                    {/form_field}
+
+                                                    {form_field form=$form field='address2'}
+                                                        <div class="form-group">
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$ADDRESS2}" title="{intl l="{$label}"}" placeholder="{intl l='Additional address'}">
+                                                        </div>
+                                                    {/form_field}
+
+                                                    {form_field form=$form field='address3'}
+                                                        <div class="form-group">
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$ADDRESS3}" title="{intl l="{$label}"}" placeholder="{intl l='Additional address'}">
+                                                        </div>
+                                                    {/form_field}
+
+                                                    {form_field form=$form field='zipcode'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$ZIPCODE}" title="{intl l="{$label}"}" placeholder="{intl l='Zip code'}">
+                                                        </div>
+                                                    {/form_field}
+
+                                                    {form_field form=$form field='city'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$CITY}" title="{intl l="{$label}"}" placeholder="{intl l='City'}">
+                                                        </div>
+                                                    {/form_field}
+
+                                                    {form_field form=$form field='country'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <select name="{$name}" id="{$label_attr.for}" class="form-control">
+                                                                {loop type="country" name="country1"}
+                                                                    <option value="{$ID}">{$TITLE}</option>
+                                                                {/loop}
+                                                            </select>
+                                                        </div>
+                                                    {/form_field}
+
+                                                {/loop}
+
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <p class="title title-without-tabs clearfix">
+                                                    {intl l="Other addresses"}
+                                                    <span class="pull-right">
+                                                        <a class="btn btn-default btn-primary" title="{intl l='Add a new address'}" href="#address_creation_dialog" data-toggle="modal">
+                                                            <span class="glyphicon glyphicon-plus-sign"></span>
+                                                        </a>
+                                                    </span>
+                                                </p>
+
+                                                <table class="table table-bordered table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>{intl l="Address"}</th>
+                                                            <th>{intl l="Actions"}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {loop name="address" type="address" customer="$customer_id" backend_context="1" default="0"}
+                                                        <tr>
+                                                            <td>
+                                                                <address>
+                                                                    <strong>{loop name="address.title" type="title" id=$TITLE}{$SHORT}{/loop} {$FIRSTNAME} {$LASTNAME}</strong><br>
+                                                                    {$ADDRESS1}<br>
+                                                                    {$ADDRESS2}<br>
+                                                                    {$ADDRESS3}<br>
+                                                                    {if $PHONE}
+                                                                        <abbr title="{intl l="Phone"}">P:</abbr> {$PHONE}<br>
+                                                                    {/if}
+                                                                    {if $CELLPHONE}
+                                                                        <abbr title="{intl l="cell phone"}">P:</abbr> {$CELLPHONE}
+                                                                    {/if}
+                                                                </address>
+                                                            </td>
+                                                            <td>
+                                                                <div class="btn-group">
+
+                                                                    <a class="btn btn-default btn-xs" title="{intl l='Edit this address'}" href="#edit_address_dialog" data-toggle="modal">
+                                                                        <span class="glyphicon glyphicon-edit"></span>
+                                                                    </a>
+
+                                                                    <a class="btn btn-default btn-xs" title="{intl l='Use this address by default'}" href="#use_address_dialog" data-toggle="modal" rel="tooltip">
+                                                                        <span class="glyphicon glyphicon-pushpin"></span>
+                                                                    </a>
+
+                                                                    <a class="btn btn-default btn-xs customer-delete" title="{intl l='Delete this customer and all his orders'}"  href="#delete_address_dialog" data-id="{$ID}" data-toggle="modal">
+                                                                        <span class="glyphicon glyphicon-trash"></span>
+                                                                    </a>
+
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    {/loop}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                        </form>
+        							{/form}
+
+        						</div>
+        					</div>
+
+        				</div>
+        			</div>
+
+        		</div>
+
+    		{/loop}
+
+            {elseloop rel="customer_edit"}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-error">
+                            {intl l="Sorry, customer ID=$customer_id was not found."}
+                        </div>
+                    </div>
+                </div>
+            {/elseloop}
+
+        </div>
+    </div>
+
+
+    {* Add an Address *}
+
+    {form name="thelia.address.create"}
+
+        {* Capture the dialog body, to pass it to the generic dialog *}
+        {capture "address_creation_dialog"}
+
+            {form_hidden_fields form=$form}
+
+            {form_field form=$form field='label'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Label'}">
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='company'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Company'}">
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='title'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+
+                    <select name="{$name}" id="{$label_attr.for}" class="form-control">
+                        {loop type="title" name="title1"}
+                            <option value="{$ID}">{$LONG}</option>
+                        {/loop}
+                    </select>
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='firstname'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Firstname'}">
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='lastname'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Lastname'}">
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='address1'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Address'}">
+                </div>
+
+                <div class="form-group">
+                    {form_field form=$form field='address2'}
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Additional address'}">
+                    {/form_field}
+                </div>
+
+                <div class="form-group">
+                    {form_field form=$form field='address3'}
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Additional address'}">
+                    {/form_field}
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='zipcode'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Zip code'}">
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='city'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='City'}">
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='country'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <select name="{$name}" id="{$label_attr.for}" class="form-control">
+                        {loop type="country" name="country1"}
+                            <option value="{$ID}">{$TITLE}</option>
+                        {/loop}
+                    </select>
+                </div>
+            {/form_field}
+
+        {/capture}
+
+        {include
+            file = "includes/generic-create-dialog.html"
+
+            dialog_id    = "address_creation_dialog"
+            dialog_title = {intl l="Create an address"}
+            dialog_body  = {$smarty.capture.address_creation_dialog nofilter}
+
+            dialog_ok_label     = {intl l="Create this address"}
+            dialog_cancel_label = {intl l="Cancel"}
+
+            form_action        = {url path='/admin/address/create'}
+            form_enctype       = {form_enctype form=$form}
+            form_error_message = $form_error_message
+        }
+
+    {/form}
+
+    {* Update an Address *}
+
+    {form name="thelia.address.update"}
+
+        {* Capture the dialog body, to pass it to the generic dialog *}
+        {capture "edit_address_dialog"}
+
+            {form_hidden_fields form=$form}
+
+            {form_field form=$form field='label'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Label'}">
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='company'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Company'}">
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='title'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+
+                    <select name="{$name}" id="{$label_attr.for}" class="form-control">
+                        {loop type="title" name="title1"}
+                            <option value="{$ID}">{$LONG}</option>
+                        {/loop}
+                    </select>
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='firstname'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Firstname'}">
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='lastname'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Lastname'}">
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='address1'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Address'}">
+                </div>
+
+                <div class="form-group">
+                    {form_field form=$form field='address2'}
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Additional address'}">
+                    {/form_field}
+                </div>
+
+                <div class="form-group">
+                    {form_field form=$form field='address3'}
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Additional address'}">
+                    {/form_field}
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='zipcode'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Zip code'}">
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='city'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='City'}">
+                </div>
+            {/form_field}
+
+            {form_field form=$form field='country'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                    <select name="{$name}" id="{$label_attr.for}" class="form-control">
+                        {loop type="country" name="country1"}
+                            <option value="{$ID}">{$TITLE}</option>
+                        {/loop}
+                    </select>
+                </div>
+            {/form_field}
+
+        {/capture}
+
+        {include
+            file = "includes/generic-create-dialog.html"
+
+            dialog_id    = "edit_address_dialog"
+            dialog_title = {intl l="Edit an address"}
+            dialog_body  = {$smarty.capture.edit_address_dialog nofilter}
+
+            dialog_ok_label     = {intl l="Edit this address"}
+            dialog_cancel_label = {intl l="Cancel"}
+
+            form_action        = {url path='/admin/address/update'}
+            form_enctype       = {form_enctype form=$form}
+            form_error_message = $form_error_message
+        }
+
+    {/form}
+
+
+    {* Default confirmation dialog *}
+
+    {capture "use_address_dialog"}
+        <input type="hidden" name="address_id" id="address_use_id" value="" />
+    {/capture}
+
+    {include
+        file = "includes/generic-confirm-dialog.html"
+
+        dialog_id       = "use_address_dialog"
+        dialog_title    = {intl l="Use address by default"}
+        dialog_message  = {intl l="Do you really want to use this address by default ?"}
+
+        form_action         = {url path='/admin/address/use'}
+        form_content        = {$smarty.capture.use_address_dialog nofilter}
+    }
+
+    {* Delete confirmation dialog *}
+
+    {capture "delete_address_dialog"}
+        <input type="hidden" name="address_id" id="address_delete_id" value="" />
+    {/capture}
+
+    {include
+        file = "includes/generic-confirm-dialog.html"
+
+        dialog_id       = "delete_address_dialog"
+        dialog_title    = {intl l="Delete address"}
+        dialog_message  = {intl l="Do you really want to delete this address ?"}
+
+        form_action         = {url path='/admin/address/delete'}
+        form_content        = {$smarty.capture.delete_dialog nofilter}
+    }
+{/block}
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/js/main.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+{/block}

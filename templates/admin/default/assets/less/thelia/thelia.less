@@ -8,6 +8,7 @@
 @import "modals.less";
 @import "tables.less";
 @import "tablesorter.less";
+@import "wizard.less";
 @import "bootstrap-editable.less";
 @import "bootstrap-switch.less";
 
@@ -40,7 +41,7 @@
         line-height: @topBarHeight;
         height: @topBarHeight;
 		background: url("@{imgDir}/top-bar-logo.png") left -3px no-repeat;
-		padding-left: 100px;
+		padding-left: 170px;
         text-shadow: 0px 1px 1px black;
         color: #6d737b;
 	}
@@ -201,10 +202,20 @@
         border-bottom: 2px solid #A5CED8;
         margin-bottom: 0.5em;
     }
-
+    
     // The action bar on the right
     .actions {
         text-align: right;
+    }
+}
+
+.tab-pane{
+    caption, .title{
+        margin-top: 0.5em;
+
+        .btn{
+            text-transform: none;
+        }
     }
 }
 
@@ -247,4 +258,10 @@
 
 .ui-slider{
 	margin-top: 23px;
+}
+
+.loading{
+  background: url("@{imgDir}/ajax-loader.gif") no-repeat;
+  height: 30px;
+  width: 30px;
 }

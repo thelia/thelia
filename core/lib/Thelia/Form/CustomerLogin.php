@@ -24,22 +24,33 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
+use Thelia\Core\Translation\Translator;
 
 class CustomerLogin extends BaseForm
 {
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("email", "text", array(
+            ->add("email", "email", array(
                 "constraints" => array(
                     new NotBlank(),
                     new Email()
-                )
+                ),
+                "label" => Translator::getInstance()->trans("Please enter your email address"),
+                "label_attr" => array(
+                    "for" => "email"
+                ),
+                "required" => true
             ))
             ->add("password", "password", array(
                 "constraints" => array(
                     new NotBlank()
-                )
+                ),
+                "label" => Translator::getInstance()->trans("Please enter your password"),
+                "label_attr" => array(
+                    "for" => "password"
+                ),
+                "required" => true
             ))
             ->add("remember_me", "checkbox")
            ;
@@ -49,4 +60,5 @@ class CustomerLogin extends BaseForm
     {
         return "thelia_customer_login";
     }
+
 }

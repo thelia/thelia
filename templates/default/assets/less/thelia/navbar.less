@@ -1,0 +1,204 @@
+
+// Thelia: Navbars
+.navbar {
+    .navbar-default;
+    .navbar-brand { .visible-xs; } // Visible only Small screen
+    /*.nav-main {
+        font-size: @navbar-font-size;
+
+li > a {
+            color: @navbar-default-link-color;
+            padding: @navbar-link-padding;
+
+            &:hover,
+            &:focus {
+                color: @navbar-default-link-hover-color;
+                background-color: @navbar-default-link-hover-bg;
+            }
+
+            // Uncollapse the nav
+            @media (min-width: @grid-float-breakpoint) {
+                padding-top: ((@navbar-height - @line-height-computed) / 2);
+                padding-bottom: ((@navbar-height - @line-height-computed) / 2);
+            }
+        }
+        .active > a {
+            color: @navbar-default-link-active-color;
+            background-color: @navbar-default-link-active-bg;
+        }
+
+        .open > a {
+            color: @navbar-default-link-hover-color!important;
+            background-color: @navbar-default-link-hover-bg!important;
+        }
+    }*/
+
+    // Subnav Links
+    @media (min-width: @grid-float-breakpoint) {
+        .list-subnav {
+            background-color: @navbar-subnav-bg;
+            border: 1px solid @navbar-subnav-border;
+            border-radius: @navbar-subnav-border-radius;
+            .box-shadow(@navbar-subnav-shadow);
+/*
+            float: left;
+            min-width: 160px;
+            position: absolute;
+            top: 100%; left: 0;
+            z-index: @zindex-dropdown;
+*/
+
+            // Links within the sub navigation
+            > li > a {
+                color: @navbar-subnav-link-color;
+                padding: @navbar-subnav-link-padding;
+
+                // Hover/Focus state
+                &:hover,
+                &:focus {
+                    color: @navbar-subnav-link-hover-color;
+                    background-color: @navbar-subnav-link-hover-bg;
+                }
+            }
+
+            // Active state
+            > .active > a {
+                &,
+                &:hover,
+                &:focus {
+                    background-color: @navbar-subnav-link-hover-bg;
+                    color: @navbar-subnav-link-hover-color;
+                }
+            }
+        }
+    }
+
+
+    // Subnav Full width
+    .full-width {
+        position: static;
+        .dropdown-menu {
+            width: 100%;
+            left: 0; right: 0;
+            .dropdown-content {
+                padding: 20px;
+                .dropdown-subheading {
+                    display: block;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+
+/*
+    .subnav {
+        position: relative;
+        > ul {
+            //display: none; // none by default, but block on "open" of the menu
+            font-size: @font-size-base;
+            list-style: none;
+            margin: 0; padding: 0;
+
+            // Links within the sub navigation
+            > li > a {
+                clear: both;
+                display: block;
+                font-weight: normal;
+                line-height: @line-height-base;
+                white-space: nowrap; // prevent links from randomly breaking onto new lines
+
+                &:hover,
+                &:focus {
+                    text-decoration: none;
+                }
+            }
+
+            // Active state
+            > .active > a {
+                &,
+                &:hover,
+                &:focus {
+                    outline: 0;
+                    text-decoration: none;
+                }
+            }
+
+            @media (min-width: @grid-float-breakpoint) {
+                background-color: @navbar-subnav-bg;
+                background-clip: padding-box;
+                border: 1px solid @navbar-subnav-border;
+                border-radius: @navbar-subnav-border-radius;
+                .box-shadow(@navbar-subnav-shadow);
+                float: left;
+                min-width: 160px;
+                position: absolute;
+                top: 100%; left: 0;
+                z-index: @zindex-dropdown;
+
+                // Links within the sub navigation
+                > li > a {
+                    color: @navbar-subnav-link-color;
+                    padding: @navbar-subnav-link-padding;
+
+                    // Hover/Focus state
+                    &:hover,
+                    &:focus {
+                        color: @navbar-subnav-link-hover-color;
+                        background-color: @navbar-subnav-link-hover-bg;
+                    }
+                }
+
+                // Active state
+                > .active > a {
+                    &,
+                    &:hover,
+                    &:focus {
+                        background-color: @navbar-subnav-link-hover-bg;
+                        color: @navbar-subnav-link-hover-color;
+                    }
+                }
+            }
+        }
+
+        /* Add support for multilevel dropdown menus
+        .subnav {
+            > ul {
+                top:0; left: 100%;
+            }
+
+            .accordion-toggle:after {
+                float:right;
+                padding-left: .3em;
+                .icon(@chevron-down);
+                @media (min-width: @screen-desktop) { .icon(@chevron-right); margin-right: -14px; padding-left: 0; }
+            }
+        }*/
+        // Sub
+        /*
+ > .active > a,
+        > .open > a {
+            &,
+            &:hover,
+            &:focus {
+                background-color: @navbar-subnav-link-hover-bg;
+                color: @navbar-subnav-link-hover-color;
+           }
+        }
+*//*
+    }
+
+    .navbar-nav > .subnav > ul { border-top-color: @navbar-default-link-hover-bg; }
+*/
+}
+
+
+// Icons (Accordion and Dropdown)
+//.accordion-toggle,
+.dropdown-toggle {
+    &:after {
+        .icon(@chevron-down);
+        float:right;
+        padding-left: .3em;
+        @media (min-width: @screen-desktop) { float: none; }
+    }
+}
