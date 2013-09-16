@@ -8,7 +8,7 @@ echo -e "\n\e[01;34m[INFO] Clearing caches\e[00m\n"
 php Thelia cache:clear
 
 echo -e "\n\e[01;34m[INFO] Downloading vendors\e[00m\n"
-composer install --prefer-dist
+composer install --prefer-dist --optimize-autoloader
 
 cd local/config/
 

@@ -401,4 +401,9 @@ final class TheliaEvents
     const BEFORE_DELETEFEATURE_AV = "action.before_deleteFeatureAv";
     const AFTER_DELETEFEATURE_AV  = "action.after_deleteFeatureAv";
 
+    /**
+     * sent when system find a mailer transporter.
+     */
+    const MAILTRANSPORTER_CONFIG = 'action.mailertransporter.config';
+
 }
