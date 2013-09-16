@@ -73,7 +73,7 @@ abstract class BaseI18nLoop extends BaseLoop
             $columns,
             $foreignTable,
             $foreignKey,
-            $forceReturn
+            $this->getForce_return()
         );
     }
 }

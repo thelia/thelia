@@ -337,6 +337,7 @@ final class TheliaEvents
     const BEFORE_DELETECURRENCY = "action.before_deleteCurrency";
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
 
+    const CHANGE_DEFAULT_CURRENCY = 'action.changeDefaultCurrency';
     // -- Product templates management -----------------------------------------
 
     const TEMPLATE_CREATE          = "action.createTemplate";
@@ -371,6 +372,25 @@ final class TheliaEvents
     const BEFORE_DELETEATTRIBUTE = "action.before_deleteAttribute";
     const AFTER_DELETEATTRIBUTE  = "action.after_deleteAttribute";
 
+    // -- Features management ---------------------------------------------
+
+    const FEATURE_CREATE          = "action.createFeature";
+    const FEATURE_UPDATE          = "action.updateFeature";
+    const FEATURE_DELETE          = "action.deleteFeature";
+    const FEATURE_UPDATE_POSITION = "action.updateFeaturePosition";
+
+    const FEATURE_REMOVE_FROM_ALL_TEMPLATES = "action.addFeatureToAllTemplate";
+    const FEATURE_ADD_TO_ALL_TEMPLATES      = "action.removeFeatureFromAllTemplate";
+
+    const BEFORE_CREATEFEATURE = "action.before_createFeature";
+    const AFTER_CREATEFEATURE  = "action.after_createFeature";
+
+    const BEFORE_UPDATEFEATURE = "action.before_updateFeature";
+    const AFTER_UPDATEFEATURE  = "action.after_updateFeature";
+
+    const BEFORE_DELETEFEATURE = "action.before_deleteFeature";
+    const AFTER_DELETEFEATURE  = "action.after_deleteFeature";
+
     // -- Attributes values management ----------------------------------------
 
     const ATTRIBUTE_AV_CREATE          = "action.createAttributeAv";
@@ -386,4 +406,22 @@ final class TheliaEvents
 
     const BEFORE_DELETEATTRIBUTE_AV = "action.before_deleteAttributeAv";
     const AFTER_DELETEATTRIBUTE_AV  = "action.after_deleteAttributeAv";
+
+
+    // -- Features values management ----------------------------------------
+
+    const FEATURE_AV_CREATE          = "action.createFeatureAv";
+    const FEATURE_AV_UPDATE          = "action.updateFeatureAv";
+    const FEATURE_AV_DELETE          = "action.deleteFeatureAv";
+    const FEATURE_AV_UPDATE_POSITION = "action.updateFeatureAvPosition";
+
+    const BEFORE_CREATEFEATURE_AV = "action.before_createFeatureAv";
+    const AFTER_CREATEFEATURE_AV  = "action.after_createFeatureAv";
+
+    const BEFORE_UPDATEFEATURE_AV = "action.before_updateFeatureAv";
+    const AFTER_UPDATEFEATURE_AV  = "action.after_updateFeatureAv";
+
+    const BEFORE_DELETEFEATURE_AV = "action.before_deleteFeatureAv";
+    const AFTER_DELETEFEATURE_AV  = "action.after_deleteFeatureAv";
+
 }

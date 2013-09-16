@@ -37,6 +37,7 @@ use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tools\ModelCriteriaTools;
 use Thelia\Tools\DateTimeFormat;
+use Thelia\Cart\CartTrait;
 
 /**
  * Implementation of data access to main Thelia objects (users, cart, etc.)
@@ -46,6 +47,8 @@ use Thelia\Tools\DateTimeFormat;
  */
 class DataAccessFunctions extends AbstractSmartyPlugin
 {
+    use CartTrait;
+
     private $securityContext;
     protected $parserContext;
     protected $request;
@@ -149,6 +152,20 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
             return $this->dataAccessWithI18n("Currency", $params, $currencyQuery, array("NAME"));
         }
+    }
+
+    public function cartDataAccess($params, $smarty)
+    {
+        $cart = $this->getCart($this->request);
+        $result = "";
+        switch($params["attr"]) {
+            case "count_item":
+
+                $result = $cart->getCartItems()->count();
+                break;
+        }
+
+        return $result;
     }
 
     /**
@@ -263,6 +280,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'folder', $this, 'folderDataAccess'),
             new SmartyPluginDescriptor('function', 'currency', $this, 'currencyDataAccess'),
             new SmartyPluginDescriptor('function', 'lang', $this, 'langDataAccess'),
+            new SmartyPluginDescriptor('function', 'cart', $this, 'cartDataAccess'),
         );
     }
 }

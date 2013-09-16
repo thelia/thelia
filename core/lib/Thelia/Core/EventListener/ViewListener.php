@@ -94,7 +94,7 @@ class ViewListener implements EventSubscriberInterface
     {
         $request = $this->container->get('request');
 
-        if (!$view = $request->attributes->get('_view')) {
+        if (null === $view = $request->attributes->get('_view')) {
             $request->attributes->set('_view', $this->findView($request));
         }
 

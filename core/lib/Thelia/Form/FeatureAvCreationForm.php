@@ -20,76 +20,43 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Form;
 
-namespace Thelia\Model;
+use Symfony\Component\Validator\Constraints;
+use Thelia\Model\CurrencyQuery;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
 
-use Thelia\Model\Base\Config as BaseConfig;
-use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\ConfigEvent;
-
-class Config extends BaseConfig {
-
-    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preInsert(ConnectionInterface $con = null)
+class FeatureAvCreationForm extends BaseForm
+{
+    protected function buildForm()
     {
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECONFIG, new ConfigEvent($this));
-
-        return true;
+        $this->formBuilder
+            ->add("title"   , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Title *"),
+                "label_attr" => array(
+                    "for" => "title"
+                ))
+            )
+            ->add("locale" , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ))
+            )
+            ->add("feature_id", "hidden", array(
+                "constraints" => array(
+                        new NotBlank()
+                ))
+            )
+        ;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function postInsert(ConnectionInterface $con = null)
+    public function getName()
     {
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATECONFIG, new ConfigEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preUpdate(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATECONFIG, new ConfigEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postUpdate(ConnectionInterface $con = null)
-    {
-        $this->resetQueryCache();
-        $this->dispatchEvent(TheliaEvents::AFTER_UPDATECONFIG, new ConfigEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preDelete(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::BEFORE_DELETECONFIG, new ConfigEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postDelete(ConnectionInterface $con = null)
-    {
-        $this->resetQueryCache();
-        $this->dispatchEvent(TheliaEvents::AFTER_DELETECONFIG, new ConfigEvent($this));
-    }
-
-    public function resetQueryCache()
-    {
-        ConfigQuery::resetCache($this->getName());
+        return "thelia_featureav_creation";
     }
 }
