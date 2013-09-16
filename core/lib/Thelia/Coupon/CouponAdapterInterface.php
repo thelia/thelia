@@ -155,4 +155,18 @@ interface CouponAdapterInterface
      */
     public function getMainCurrency();
 
+    /**
+     * Return request
+     *
+     * @return Request
+     */
+    public function getRequest();
+
+    /**
+     * Return Constraint Validator
+     *
+     * @return ConstraintValidator
+     */
+    public function getConstraintValidator();
+
 }

@@ -26,6 +26,7 @@ namespace Thelia\Coupon\Type;
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Constraint\ConstraintManager;
 use Thelia\Constraint\ConstraintValidator;
+use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Coupon\RuleOrganizerInterface;
@@ -44,9 +45,6 @@ use Thelia\Exception\InvalidRuleException;
  */
 abstract class CouponAbstract implements CouponInterface
 {
-    /** @var string Service Id  */
-    protected $serviceId = null;
-
     /** @var  CouponAdapterInterface Provide necessary value from Thelia */
     protected $adapter = null;
 
@@ -62,8 +60,18 @@ abstract class CouponAbstract implements CouponInterface
     /** @var ConstraintValidator Constraint validator */
     protected $constraintValidator = null;
 
+
+
+    /** @var string Service Id  */
+    protected $serviceId = null;
+
+    /** @var float Amount that will be removed from the Checkout (Coupon Effect)  */
+    protected $amount = 0;
+
     /** @var string Coupon code (ex: XMAS) */
     protected $code = null;
+
+
 
     /** @var string Coupon title (ex: Coupon for XMAS) */
     protected $title = null;
@@ -73,6 +81,8 @@ abstract class CouponAbstract implements CouponInterface
 
     /** @var string Coupon description */
     protected $description = null;
+
+
 
     /** @var bool if Coupon is enabled */
     protected $isEnabled = false;
@@ -85,9 +95,6 @@ abstract class CouponAbstract implements CouponInterface
 
     /** @var bool if Coupon is removing postage */
     protected $isRemovingPostage = false;
-
-    /** @var float Amount that will be removed from the Checkout (Coupon Effect)  */
-    protected $amount = 0;
 
     /** @var int Max time a Coupon can be used (-1 = unlimited) */
     protected $maxUsage = -1;
@@ -105,6 +112,7 @@ abstract class CouponAbstract implements CouponInterface
     {
         $this->adapter = $adapter;
         $this->translator = $adapter->getTranslator();
+        $this->constraintValidator = $adapter->getConstraintValidator();
     }
 
     /**
@@ -221,17 +229,6 @@ abstract class CouponAbstract implements CouponInterface
     }
 
     /**
-     * Check if the current Coupon is matching its conditions (Rules)
-     * Thelia variables are given by the CouponAdapterInterface
-     *
-     * @return bool
-     */
-    public function isMatching()
-    {
-        return $this->constraintValidator->test($this->rules);
-    }
-
-    /**
      * Return Coupon expiration date
      *
      * @return \DateTime
@@ -299,6 +296,18 @@ abstract class CouponAbstract implements CouponInterface
     public function getServiceId()
     {
         return $this->serviceId;
+    }
+
+
+    /**
+     * Check if the current Coupon is matching its conditions (Rules)
+     * Thelia variables are given by the CouponAdapterInterface
+     *
+     * @return bool
+     */
+    public function isMatching()
+    {
+        return $this->constraintValidator->isMatching($this->rules);
     }
 
 

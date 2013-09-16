@@ -183,6 +183,7 @@ class CouponManager
         $discount = 0.00;
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
+            // @todo modify Cart with discount for each cart item
             $discount += $coupon->getDiscount($this->adapter);
         }
 

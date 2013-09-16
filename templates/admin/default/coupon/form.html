@@ -11,152 +11,155 @@
             {/form_field}
 
             {form_field form=$form field='success_url'}
-                <input type="hidden" name="{$name}" value="{url path='/admin/coupon/read/{id}'}" />
+                <input type="hidden" name="{$name}" value="{url path='/admin/coupon/update/{id}/'}" />
             {/form_field}
 
             <div class="span4">
                 <div class="control-group">
             <div class="col-md-4">
-                <div class="form-group">
-                    <label for="code">{intl l='Code :'}</label>
-                    {form_field form=$form field='code'}
+                {form_field form=$form field='code'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label class="control-label" for="code">{intl l='Code :'}</label>
                         <input id="code" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='code'}">
                         {if $error}{$message}{/if}
-                    {/form_field}
-                </div>
+                    </div>
+                {/form_field}
 
-                <div class="form-group">
-                    <label for="title">{intl l='Title :'}</label>
-                    {form_field form=$form field='title'}
+                {form_field form=$form field='title'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="title" class="control-label" >{intl l='Title :'}</label>
                         <input id="title" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='title'}">
                         {if $error}{$message}{/if}
-                    {/form_field}
-                </div>
-
-                <div class="form-group">
-                    <label for="enabled" class="checkbox">
-                        {form_field form=$form field='isEnabled'}
-                            <input id="enabled" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
-                            {if $error}{$message}{/if}
-                        {/form_field}
-                        {intl l='Is enabled ?'}
-                    </label>
-                </div>
-
-                <div class="form-group">
-                    <label for="available-on-special-offers" class="checkbox">
-                        {form_field form=$form field='isAvailableOnSpecialOffers'}
-                            <input id="available-on-special-offers" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
-                            {if $error}{$message}{/if}
-                        {/form_field}
-                        {intl l='Is available on special offers ?'}
-                    </label>
-                </div>
-
-                <div class="form-group">
-                    <label for="cumulative" class="checkbox">
-                        {form_field form=$form field='isCumulative'}
-                            <input id="cumulative" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
-                            {if $error}{$message}{/if}
-                        {/form_field}
-                        {intl l='Is cumulative ?'}
-                    </label>
-                </div>
-
-                <div class="form-group">
-                    <label for="renoving-postage" class="checkbox">
-                        {form_field form=$form field='isRemovingPostage'}
-                            <input id="renoving-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
-                            {if $error}{$message}{/if}
-                        {/form_field}
-                        {intl l='Is removing postage ?'}
-                    </label>
-                </div>
-
-                <div class="form-group">
-                    <label for="expiration-date">{intl l='Expiration date :'}</label>
-                    <div class="input-append date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
-                        {form_field form=$form field='expirationDate'}
-                            <input type="text" id="expiration-date" name="{$name}" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}">
-                            {if $error}{$message}{/if}
-                        {/form_field}
-                        <span class="add-on"><span class="icon-th"></span></span>
                     </div>
-                </div>
+                {/form_field}
 
-                <div class="form-group">
-                    <label for="max-usage">{intl l='Max usage :'}</label>
-                    <label for="is-unlimited" class="checkbox">
-                        <input id="is-unlimited" type="checkbox" name="is-unlimited" checked >
-                        {intl l='Is unlimited ?'}
-                    </label>
-                    {form_field form=$form field='maxUsage'}
+                {form_field form=$form field='isEnabled'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="is-enabled" class="checkbox control-label">
+                            <input id="is-enabled" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                            {if $error}{$message}{/if}
+                            {intl l='Is enabled'}
+                        </label>
+                    </div>
+                {/form_field}
+
+                {form_field form=$form field='isAvailableOnSpecialOffers'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="is-available-on-special-offers" class="checkbox control-label">
+                            <input id="is-available-on-special-offers" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                            {if $error}{$message}{/if}
+                            {intl l='Is available on special offers'}
+                        </label>
+                    </div>
+                {/form_field}
+
+                {form_field form=$form field='isCumulative'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="is-cumulative" class="checkbox control-label">
+                            <input id="is-cumulative" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                            {if $error}{$message}{/if}
+                            {intl l='Is cumulative'}
+                        </label>
+                    </div>
+                {/form_field}
+
+                {form_field form=$form field='isRemovingPostage'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="is-removing-postage" class="checkbox control-label">
+                            <input id="is-removing-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                            {if $error}{$message}{/if}
+                            {intl l='Is removing postage'}
+                        </label>
+                    </div>
+                {/form_field}
+
+                {form_field form=$form field='expirationDate'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="expiration-date" class="control-label">{intl l='Expiration date :'}</label>
+                        <div class="input-append date" data-date="12/02/2012" data-date-format="dd/mm/yyyy">
+                            <input type="text" id="expiration-date" name="{$name}" class="form-control datepicker" data-date-format="yyyy-mm-dd" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}" placeholder="{intl l='yyyy-mm-dd'}">
+                            {if $error}{$message}{/if}
+                            <span class="add-on"><span class="icon-th"></span></span>
+                        </div>
+                    </div>
+                {/form_field}
+
+                {form_field form=$form field='maxUsage'}
+                    <div class="form-group {if $error}has-error{/if}">
+
+                        <label for="is-unlimited" class="checkbox control-label">
+                            <input id="is-unlimited" type="checkbox" name="is-unlimited" {if $error}{else}checked{/if} >
+                            {intl l='Is unlimited'}
+                        </label>
+                        <label id="max-usage-label" for="max-usage" class="control-label">{intl l='Max usage :'}</label>
                         <input id="max-usage" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="{intl l='max usage'}">
                         {if $error}{$message}{/if}
-                    {/form_field}
-                </div>
+                    </div>
+                {/form_field}
             </div>
 
             <div class="col-md-8">
                 <div class="well clearfix">
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="effect">{intl l='Effect :'}</label>
-                            {form_field form=$form field='effect'}
+                        {form_field form=$form field='effect'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="effect" class="control-label">{intl l='Effect :'}</label>
                                 <select name="{$name}" value="{$value}" id="effect" class="col-md-12 form-control">
+                                    <option value="-1" data-description="">{intl l='Please select an effect'}</option>
                                     {foreach from=$availableCoupons item=availableCoupon}
-                                        <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}">{$availableCoupon.name}</option>
+                                        <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" {if $value == $availableCoupon.serviceId}selected="selected"{/if}>{$availableCoupon.name}</option>
                                     {/foreach}
                                 </select>
                                 {if $error}{$message}{/if}
-                            {/form_field}
-                            <span id="effectToolTip" class="help-block">{$availableCoupons.0.toolTip}</span>
-                        </div>
+                                <span id="effectToolTip" class="help-block">{$availableCoupons.0.toolTip}</span>
+                            </div>
+                        {/form_field}
                     </div>
 
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="amount">{intl l='Amount :'}</label>
-                            {form_field form=$form field='amount'}
+                        {form_field form=$form field='amount'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                {$value}
+                                <label for="amount" class="control-label">{intl l='Amount :'}</label>
                                 <input id="amount" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="{intl l='14.50'}">
                                 {if $error}{$message}{/if}
-                            {/form_field}
-                        </div>
-                        <div class="form-group">
-                            <label for="category">Category :</label>
+                            </div>
+                        {/form_field}
+                        {*<div class="form-group {if $error}has-error{/if}">*}
+                            {*<label for="category">Category :</label>*}
                             {*form_field form=$form field='category'*}
-                                <select name="{$name}" value="{$value}" id="category" class="form-control">
-                                    <option value="1">Category 1</option>
-                                    <option value="1">Category 2</option>
-                                    <option value="1">Category 3</option>
-                                </select>
+                                {*<select name="{$name}" value="{$value}" id="category" class="form-control">*}
+                                    {*<option value="1">Category 1</option>*}
+                                    {*<option value="1">Category 2</option>*}
+                                    {*<option value="1">Category 3</option>*}
+                                {*</select>*}
                                 {*if $error}{$message}{/if}*}
                             {*/form_field*}
-                        </div>
+                        {*</div>*}
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="short-description">{intl l='Short description :'}</label>
-                    {form_field form=$form field='shortDescription'}
-                        <textarea id="short-description" name="{$name}" placeholder="{intl l='short description'}" class="span12" rows="5">{$value nofilter}</textarea>
+                {form_field form=$form field='shortDescription'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="short-description" class="control-label">{intl l='Short description :'}</label>
+                        <textarea id="short-description" name="{$name}" class="form-control" placeholder="{intl l='short description'}" class="span12" rows="5">{$value nofilter}</textarea>
                         {if $error}{$message}{/if}
-                    {/form_field}
-                </div>
+                    </div>
+                {/form_field}
             </div>
             
             <div class="clearfix"></div>
             <div class="col-md-12">
 
-                <div class="form-group">
-                    <label for="description">{intl l='Long description :'}</label>
-                    {form_field form=$form field='description'}
+                {form_field form=$form field='description'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="description" class="control-label">{intl l='Long description :'}</label>
                         <textarea id="description" name="{$name}" placeholder="{intl l='long description'}" class="form-control wysiwyg" rows="10">{$value nofilter}</textarea>
                         {if $error}{$message}{/if}
-                    {/form_field}
-                </div>
+                    </div>
+                {/form_field}
 
-                <button type="submit" class="btn btn-default btn-primary">{intl l='Save'}</button>
+                <button id="save-coupon-btn" type="submit" class="btn btn-default btn-primary">{intl l='Save your modifications'}</button>
             </div>
 
         </div>
@@ -186,22 +189,23 @@
         <section class="row">
             <div class="col-md-12 general-block-decorator clearfix">
                 <a id="constraint-save-btn" title="{intl l='Save this rule'}" class="btn btn-default btn-primary pull-right">
-                    <span class="glyphicon glyphicon-plus-sign"></span>
+                    <span class="glyphicon glyphicon-plus-sign"></span> {intl l='Save this rule'}
                 </a>
 
                 <div id="rule-add-organizer" class="form-group col-md-2">
                     <label for="type">{intl l='Condition type :'}</label>
                     <label class="radio">
-                        <input type="radio" name="type" id="type" value="1" checked> {intl l='And'}
+                        <input type="radio" name="type" class="form-control" id="type" value="1" checked> {intl l='And'}
                     </label>
                     <label class="radio">
-                        <input type="radio" name="type" value="2"> {intl l='Or'}
+                        <input type="radio" name="type" class="form-control" value="2"> {intl l='Or'}
                     </label>
                 </div>
 
                 <div id="rule-add-type" class="form-group col-md-4">
                     <label for="categoryRule">{intl l='Rule\'s category :'}</label>
                     <select name="categoryRule" id="category-rule" class="form-control">
+                        <option value="-1" >{intl l='Please select a rule category'}</option>
                         {foreach from=$availableRules item=availableRule}
                             <option value="{$availableRule.serviceId}" data-description="{$availableRule.toolTip}">{$availableRule.name}</option>
                         {/foreach}

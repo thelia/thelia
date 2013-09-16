@@ -235,6 +235,8 @@
         <service id="thelia.constraint.factory" class="Thelia\Constraint\ConstraintFactory">
             <argument type="service" id="service_container" />
         </service>
+        <service id="thelia.constraint.validator" class="Thelia\Constraint\ConstraintValidator">
+        </service>
         <service id="thelia.constraint.rule.available_for_everyone" class="Thelia\Constraint\Rule\AvailableForEveryoneManager">
             <argument type="service" id="thelia.adapter" />
             <tag name="thelia.coupon.addRule"/>
