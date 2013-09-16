@@ -4,12 +4,7 @@ use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
 use Thelia\Coupon\CouponRuleCollection;
-use Thelia\Model\ProductImage;
-use Thelia\Model\CategoryImage;
-use Thelia\Model\FolderImage;
-use Thelia\Model\ContentImage;
-use Imagine\Image\Color;
-use Imagine\Image\Point;
+
 
 require __DIR__ . '/../core/bootstrap.php';
 
@@ -23,11 +18,16 @@ $con = \Propel\Runtime\Propel::getConnection(
 );
 $con->beginTransaction();
 
+// Intialize URL management
+$url = new Thelia\Tools\URL();
+
 $currency = \Thelia\Model\CurrencyQuery::create()->filterByCode('EUR')->findOne();
 
 try {
     $stmt = $con->prepare("SET foreign_key_checks = 0");
     $stmt->execute();
+
+    echo "Clearing tables\n";
 
     $productAssociatedContent = Thelia\Model\ProductAssociatedContentQuery::create()
         ->find();
@@ -125,8 +125,21 @@ try {
         ->find();
     $productPrice->delete();
 
+    \Thelia\Model\ProductImageQuery::create()->find()->delete();
+    \Thelia\Model\CategoryImageQuery::create()->find()->delete();
+    \Thelia\Model\FolderImageQuery::create()->find()->delete();
+    \Thelia\Model\ContentImageQuery::create()->find()->delete();
+
+    \Thelia\Model\ProductDocumentQuery::create()->find()->delete();
+    \Thelia\Model\CategoryDocumentQuery::create()->find()->delete();
+    \Thelia\Model\FolderDocumentQuery::create()->find()->delete();
+    \Thelia\Model\ContentDocumentQuery::create()->find()->delete();
+
     $stmt = $con->prepare("SET foreign_key_checks = 1");
+
     $stmt->execute();
+
+    echo "Creating customer\n";
 
     //customer
     $customer = new Thelia\Model\Customer();
@@ -185,6 +198,8 @@ try {
         }
     }
 
+    echo "Creating features\n";
+
     //features and features_av
     $featureList = array();
     for($i=0; $i<4; $i++) {
@@ -208,6 +223,8 @@ try {
         }
     }
 
+    echo "Creating attributes\n";
+
     //attributes and attributes_av
     $attributeList = array();
     for($i=0; $i<4; $i++) {
@@ -229,6 +246,8 @@ try {
             $attributeList[$attributeId][] = $attributeAv->getId();
         }
     }
+
+    echo "Creating templates\n";
 
     $template = new Thelia\Model\Template();
     setI18n($faker, $template, array("Name" => 20));
@@ -252,6 +271,8 @@ try {
         ->save();
     }
 
+    echo "Creating folders and content\n";
+
     //folders and contents
     $contentIdList = array();
     for($i=0; $i<4; $i++) {
@@ -263,9 +284,13 @@ try {
 
         $folder->save();
 
-        $image = new FolderImage();
+        $image = new \Thelia\Model\FolderImage();
         $image->setFolderId($folder->getId());
         generate_image($image, 1, 'folder', $folder->getId());
+
+        $document = new \Thelia\Model\FolderDocument();
+        $document->setFolderId($folder->getId());
+        generate_document($document, 1, 'folder', $folder->getId());
 
         for($j=1; $j<rand(0, 5); $j++) {
             $subfolder = new Thelia\Model\Folder();
@@ -276,9 +301,13 @@ try {
 
             $subfolder->save();
 
-            $image = new FolderImage();
+            $image = new \Thelia\Model\FolderImage();
             $image->setFolderId($subfolder->getId());
             generate_image($image, 1, 'folder', $subfolder->getId());
+
+            $document = new \Thelia\Model\FolderDocument();
+            $document->setFolderId($folder->getId());
+            generate_document($document, 1, 'folder', $subfolder->getId());
 
             for($k=0; $k<rand(0, 5); $k++) {
                 $content = new Thelia\Model\Content();
@@ -291,12 +320,19 @@ try {
                 $contentId = $content->getId();
                 $contentIdList[] = $contentId;
 
-                $image = new ContentImage();
-                $image->setContentId($content->getId());
+                $image = new \Thelia\Model\ContentImage();
+                $image->setContentId($contentId);
                 generate_image($image, 1, 'content', $contentId);
+
+                $document = new \Thelia\Model\ContentDocument();
+                $document->setContentId($contentId);
+                generate_document($document, 1, 'content', $contentId);
+
             }
         }
     }
+
+    echo "Creating categories and products\n";
 
     //categories and products
     $productIdList = array();
@@ -405,6 +441,8 @@ try {
         }
     }
 
+    echo "Generating coupns fixtures\n";
+
     generateCouponFixtures($thelia);
 
     $con->commit();
@@ -429,9 +467,13 @@ function createProduct($faker, $category, $position, $template, &$productIdList)
     $productId = $product->getId();
     $productIdList[] = $productId;
 
-    $image = new ProductImage();
+    $image = new \Thelia\Model\ProductImage();
     $image->setProductId($productId);
     generate_image($image, 1, 'product', $productId);
+
+    $document = new \Thelia\Model\ProductDocument();
+    $document->setProductId($productId);
+    generate_document($document, 1, 'product', $productId);
 
     return $product;
 }
@@ -464,9 +506,13 @@ function createCategory($faker, $parent, $position, &$categoryIdList, $contentId
             ->save();
     }
 
-    $image = new CategoryImage();
+    $image = new \Thelia\Model\CategoryImage();
     $image->setCategoryId($categoryId);
     generate_image($image, 1, 'category', $categoryId);
+
+    $document = new \Thelia\Model\CategoryDocument();
+    $document->setCategoryId($categoryId);
+    generate_document($document, 1, 'category', $categoryId);
 
     return $category;
 }
@@ -480,37 +526,36 @@ function generate_image($image, $position, $typeobj, $id) {
         ->setDescription($faker->text(250))
         ->setChapo($faker->text(40))
         ->setPostscriptum($faker->text(40))
-        ->setPosition($position)
         ->setFile(sprintf("sample-image-%s.png", $id))
         ->save()
     ;
 
     // Generate images
     $imagine = new Imagine\Gd\Imagine();
-    $image   = $imagine->create(new Imagine\Image\Box(320,240), new Color('#E9730F'));
+    $image   = $imagine->create(new Imagine\Image\Box(320,240), new Imagine\Image\Color('#E9730F'));
 
-    $white = new Color('#FFF');
+    $white = new Imagine\Image\Color('#FFF');
 
     $font = $imagine->font(__DIR__.'/faker-assets/FreeSans.ttf', 14, $white);
 
     $tbox = $font->box("THELIA");
-    $image->draw()->text("THELIA", $font, new Point((320 - $tbox->getWidth()) / 2, 30));
+    $image->draw()->text("THELIA", $font, new Imagine\Image\Point((320 - $tbox->getWidth()) / 2, 30));
 
     $str = sprintf("%s sample image", ucfirst($typeobj));
     $tbox = $font->box($str);
-    $image->draw()->text($str, $font, new Point((320 - $tbox->getWidth()) / 2, 80));
+    $image->draw()->text($str, $font, new Imagine\Image\Point((320 - $tbox->getWidth()) / 2, 80));
 
     $font = $imagine->font(__DIR__.'/faker-assets/FreeSans.ttf', 18, $white);
 
     $str = sprintf("%s ID %d", strtoupper($typeobj), $id);
     $tbox = $font->box($str);
-    $image->draw()->text($str, $font, new Point((320 - $tbox->getWidth()) / 2, 180));
+    $image->draw()->text($str, $font, new Imagine\Image\Point((320 - $tbox->getWidth()) / 2, 180));
 
     $image->draw()
-        ->line(new Point(0, 0), new Point(319, 0), $white)
-        ->line(new Point(319, 0), new Point(319, 239), $white)
-        ->line(new Point(319, 239), new Point(0,239), $white)
-        ->line(new Point(0, 239), new Point(0, 0), $white)
+        ->line(new Imagine\Image\Point(0, 0), new Imagine\Image\Point(319, 0), $white)
+        ->line(new Imagine\Image\Point(319, 0), new Imagine\Image\Point(319, 239), $white)
+        ->line(new Imagine\Image\Point(319, 239), new Imagine\Image\Point(0,239), $white)
+        ->line(new Imagine\Image\Point(0, 239), new Imagine\Image\Point(0, 0), $white)
     ;
 
     $image_file = sprintf("%s/../local/media/images/%s/sample-image-%s.png", __DIR__, $typeobj, $id);
@@ -518,6 +563,26 @@ function generate_image($image, $position, $typeobj, $id) {
     if (! is_dir(dirname($image_file))) mkdir(dirname($image_file), 0777, true);
 
     $image->save($image_file);
+}
+
+function generate_document($document, $position, $typeobj, $id) {
+
+    global $faker;
+
+    $document
+    ->setTitle($faker->text(20))
+    ->setDescription($faker->text(250))
+    ->setChapo($faker->text(40))
+    ->setPostscriptum($faker->text(40))
+    ->setFile(sprintf("sample-document-%s.txt", $id))
+    ->save()
+    ;
+
+    $document_file = sprintf("%s/../local/media/documents/%s/sample-document-%s.txt", __DIR__, $typeobj, $id);
+
+    if (! is_dir(dirname($document_file))) mkdir(dirname($document_file), 0777, true);
+
+    file_put_contents($document_file, $faker->text(256));
 }
 
 function setI18n($faker, &$object, $fields = array('Title' => 20, 'Description' => 50) )

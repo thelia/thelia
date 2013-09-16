@@ -24,7 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Core\Event\ImageEvent;
+use Thelia\Core\Event\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Type\TypeCollection;
@@ -37,16 +37,16 @@ use Thelia\Type\EnumType;
 use Thelia\Log\Tlog;
 
 /**
- * The image loop
+ * The document loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Image extends BaseI18nLoop
+class Document extends BaseI18nLoop
 {
     public $timestampable = true;
 
     /**
-     * @var array Possible image sources
+     * @var array Possible document sources
      */
     protected $possible_sources = array('category', 'product', 'folder', 'content');
 
@@ -68,20 +68,6 @@ class Image extends BaseI18nLoop
                 ),
                 Argument::createIntTypeArgument('lang'),
 
-                Argument::createIntTypeArgument('width'),
-                Argument::createIntTypeArgument('height'),
-                Argument::createIntTypeArgument('rotation', 0),
-                Argument::createAnyTypeArgument('background_color'),
-                Argument::createIntTypeArgument('quality'),
-                new Argument(
-                        'resize_mode',
-                        new TypeCollection(
-                                new EnumType(array('crop', 'borders', 'none'))
-                        ),
-                        'none'
-                ),
-                Argument::createAnyTypeArgument('effects'),
-
                 Argument::createIntTypeArgument('category'),
                 Argument::createIntTypeArgument('product'),
                 Argument::createIntTypeArgument('folder'),
@@ -96,7 +82,7 @@ class Image extends BaseI18nLoop
                 Argument::createIntTypeArgument('source_id')
         );
 
-        // Add possible image sources
+        // Add possible document sources
         foreach ($this->possible_sources as $source) {
             $collection->addArgument(Argument::createIntTypeArgument($source));
         }
@@ -115,10 +101,10 @@ class Image extends BaseI18nLoop
     {
         $object = ucfirst($source);
 
-        $queryClass   = sprintf("\Thelia\Model\%sImageQuery", $object);
+        $queryClass   = sprintf("\Thelia\Model\%sDocumentQuery", $object);
         $filterMethod = sprintf("filterBy%sId", $object);
 
-        // xxxImageQuery::create()
+        // xxxDocumentQuery::create()
         $method = new \ReflectionMethod($queryClass, 'create');
         $search = $method->invoke(null); // Static !
 
@@ -175,10 +161,10 @@ class Image extends BaseI18nLoop
             $source_id = $this->getSourceId();
             $id = $this->getId();
 
-            //echo "source = ".$this->getSource()."source_id=$source_id, id=$id<br />";
+            // echo "source = ".$this->getSource().", id=".$source_id." - ".$this->getArg('source_id')->getValue()."<br />";
 
             if (is_null($source_id) && is_null($id)) {
-                throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
+                            throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
 
             $search = $this->createSearchQuery($source, $source_id);
@@ -204,7 +190,7 @@ class Image extends BaseI18nLoop
         }
 
         if ($search == null)
-            throw new \InvalidArgumentException(sprintf("Unable to find image source. Valid sources are %s", implode(',', $this->possible_sources)));
+            throw new \InvalidArgumentException(sprintf("Unable to find document source. Valid sources are %s", implode(',', $this->possible_sources)));
 
         return $search;
     }
@@ -232,59 +218,24 @@ class Image extends BaseI18nLoop
         if (!is_null($exclude))
             $search->filterById($exclude, Criteria::NOT_IN);
 
-        // Create image processing event
-        $event = new ImageEvent($this->request);
+        // Create document processing event
+        $event = new DocumentEvent($this->request);
 
-        // Prepare tranformations
-        $width = $this->getWidth();
-        $height = $this->getHeight();
-        $rotation = $this->getRotation();
-        $background_color = $this->getBackgroundColor();
-        $quality = $this->getQuality();
-        $effects = $this->getEffects();
-
-        if (! is_null($effects)) {
-            $effects = explode(',', $effects);
-        }
-
-        switch ($this->getResizeMode()) {
-            case 'crop' :
-                $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_CROP;
-                break;
-
-            case 'borders' :
-                $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_BORDERS;
-                break;
-
-            case 'none' :
-            default:
-                $resize_mode = \Thelia\Action\Image::KEEP_IMAGE_RATIO;
-
-        }
-
-        //echo "sql=".$search->toString();
+        // echo "sql=".$search->toString();
 
         $results = $this->search($search, $pagination);
 
         $loopResult = new LoopResult($results);
 
         foreach ($results as $result) {
-            // Create image processing event
-            $event = new ImageEvent($this->request);
 
-            // Setup required transformations
-            if (! is_null($width)) $event->setWidth($width);
-            if (! is_null($height)) $event->setHeight($height);
-            $event->setResizeMode($resize_mode);
-            if (! is_null($rotation)) $event->setRotation($rotation);
-            if (! is_null($background_color)) $event->setBackgroundColor($background_color);
-            if (! is_null($quality)) $event->setQuality($quality);
-            if (! is_null($effects)) $event->setEffects($effects);
+            // Create document processing event
+            $event = new DocumentEvent($this->request);
 
-            // Put source image file path
+            // Put source document file path
             $source_filepath = sprintf("%s%s/%s/%s",
                 THELIA_ROOT,
-                ConfigQuery::read('images_library_path', 'local/media/images'),
+                ConfigQuery::read('documents_library_path', 'local/media/documents'),
                 $object_type,
                 $result->getFile()
              );
@@ -293,31 +244,31 @@ class Image extends BaseI18nLoop
             $event->setCacheSubdirectory($object_type);
 
             try {
-                // Dispatch image processing event
-                $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
+                // Dispatch document processing event
+                $this->dispatcher->dispatch(TheliaEvents::DOCUMENT_PROCESS, $event);
 
                 $loopResultRow = new LoopResultRow($loopResult, $result, $this->versionable, $this->timestampable, $this->countable);
 
                 $loopResultRow
-                    ->set("ID"                  , $result->getId())
-                    ->set("LOCALE"              ,$locale)
-                    ->set("IMAGE_URL"           , $event->getFileUrl())
-                    ->set("ORIGINAL_IMAGE_URL"  , $event->getOriginalFileUrl())
-                    ->set("IMAGE_PATH"          , $event->getCacheFilepath())
-                    ->set("ORIGINAL_IMAGE_PATH" , $source_filepath)
-                    ->set("TITLE"               , $result->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO"               , $result->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION"         , $result->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("POSTSCRIPTUM"        , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                    ->set("POSITION"            , $result->getPosition())
-                    ->set("OBJECT_TYPE"         , $object_type)
-                    ->set("OBJECT_ID"           , $object_id)
+                    ->set("ID"                    , $result->getId())
+                    ->set("LOCALE"                ,$locale)
+                    ->set("DOCUMENT_URL"          , $event->getFileUrl())
+                    ->set("DOCUMENT_PATH"         , $event->getCacheFilepath())
+                    ->set("ORIGINAL_DOCUMENT_PATH", $source_filepath)
+                    ->set("TITLE"                 , $result->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO"                 , $result->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION"           , $result->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM"          , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set("POSITION"              , $result->getPosition())
+                    ->set("OBJECT_TYPE"           , $object_type)
+                    ->set("OBJECT_ID"             , $object_id)
                 ;
 
                 $loopResult->addRow($loopResultRow);
-            } catch (\Exception $ex) {
+            }
+            catch (\Exception $ex) {
                 // Ignore the result and log an error
-                Tlog::getInstance()->addError("Failed to process image in image loop: ", $this->args);
+                Tlog::getInstance()->addError("Failed to process document in document loop: ", $this->args);
             }
         }
 
