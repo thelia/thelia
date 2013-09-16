@@ -259,36 +259,6 @@ final class TheliaEvents
     const AFTER_UPDATE_COUPON 	= "action.after_update_coupon";
 
     /**
-     * Sent when disabling a Coupon
-     */
-    const COUPON_DISABLE = "action.disable_coupon";
-
-    /**
-     * Sent just before a successful disable of a new Coupon in the database.
-     */
-    const BEFORE_DISABLE_COUPON 	= "action.before_disable_coupon";
-
-    /**
-     * Sent just after a successful disable of a new Coupon in the database.
-     */
-    const AFTER_DISABLE_COUPON 	= "action.after_disable_coupon";
-
-    /**
-     * Sent when enabling a Coupon
-     */
-    const COUPON_ENABLE = "action.enable_coupon";
-
-    /**
-     * Sent just before a successful enable of a new Coupon in the database.
-     */
-    const BEFORE_ENABLE_COUPON 	= "action.before_enable_coupon";
-
-    /**
-     * Sent just after a successful enable of a new Coupon in the database.
-     */
-    const AFTER_ENABLE_COUPON 	= "action.after_enable_coupon";
-
-    /**
      * Sent when attempting to use a Coupon
      */
     const COUPON_CONSUME 	= "action.consume_coupon";
@@ -368,6 +338,20 @@ final class TheliaEvents
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
 
     const CHANGE_DEFAULT_CURRENCY = 'action.changeDefaultCurrency';
+    // -- Product templates management -----------------------------------------
+
+    const TEMPLATE_CREATE          = "action.createTemplate";
+    const TEMPLATE_UPDATE          = "action.updateTemplate";
+    const TEMPLATE_DELETE          = "action.deleteTemplate";
+
+    const BEFORE_CREATETEMPLATE = "action.before_createTemplate";
+    const AFTER_CREATETEMPLATE  = "action.after_createTemplate";
+
+    const BEFORE_UPDATETEMPLATE = "action.before_updateTemplate";
+    const AFTER_UPDATETEMPLATE  = "action.after_updateTemplate";
+
+    const BEFORE_DELETETEMPLATE = "action.before_deleteTemplate";
+    const AFTER_DELETETEMPLATE  = "action.after_deleteTemplate";
 
     // -- Attributes management ---------------------------------------------
 

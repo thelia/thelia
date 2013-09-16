@@ -46,9 +46,9 @@ use Thelia\Model\Map\FeatureTableMap;
  * @method     ChildFeatureQuery rightJoinFeatureProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureProduct relation
  * @method     ChildFeatureQuery innerJoinFeatureProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureProduct relation
  *
- * @method     ChildFeatureQuery leftJoinFeatureCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureCategory relation
- * @method     ChildFeatureQuery rightJoinFeatureCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureCategory relation
- * @method     ChildFeatureQuery innerJoinFeatureCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureCategory relation
+ * @method     ChildFeatureQuery leftJoinFeatureTemplate($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureTemplate relation
+ * @method     ChildFeatureQuery rightJoinFeatureTemplate($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureTemplate relation
+ * @method     ChildFeatureQuery innerJoinFeatureTemplate($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureTemplate relation
  *
  * @method     ChildFeatureQuery leftJoinFeatureI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureI18n relation
  * @method     ChildFeatureQuery rightJoinFeatureI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureI18n relation
@@ -601,40 +601,40 @@ abstract class FeatureQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\FeatureCategory object
+     * Filter the query by a related \Thelia\Model\FeatureTemplate object
      *
-     * @param \Thelia\Model\FeatureCategory|ObjectCollection $featureCategory  the related object to use as filter
+     * @param \Thelia\Model\FeatureTemplate|ObjectCollection $featureTemplate  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
-    public function filterByFeatureCategory($featureCategory, $comparison = null)
+    public function filterByFeatureTemplate($featureTemplate, $comparison = null)
     {
-        if ($featureCategory instanceof \Thelia\Model\FeatureCategory) {
+        if ($featureTemplate instanceof \Thelia\Model\FeatureTemplate) {
             return $this
-                ->addUsingAlias(FeatureTableMap::ID, $featureCategory->getFeatureId(), $comparison);
-        } elseif ($featureCategory instanceof ObjectCollection) {
+                ->addUsingAlias(FeatureTableMap::ID, $featureTemplate->getFeatureId(), $comparison);
+        } elseif ($featureTemplate instanceof ObjectCollection) {
             return $this
-                ->useFeatureCategoryQuery()
-                ->filterByPrimaryKeys($featureCategory->getPrimaryKeys())
+                ->useFeatureTemplateQuery()
+                ->filterByPrimaryKeys($featureTemplate->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByFeatureCategory() only accepts arguments of type \Thelia\Model\FeatureCategory or Collection');
+            throw new PropelException('filterByFeatureTemplate() only accepts arguments of type \Thelia\Model\FeatureTemplate or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the FeatureCategory relation
+     * Adds a JOIN clause to the query using the FeatureTemplate relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
-    public function joinFeatureCategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinFeatureTemplate($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('FeatureCategory');
+        $relationMap = $tableMap->getRelation('FeatureTemplate');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -649,14 +649,14 @@ abstract class FeatureQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'FeatureCategory');
+            $this->addJoinObject($join, 'FeatureTemplate');
         }
 
         return $this;
     }
 
     /**
-     * Use the FeatureCategory relation FeatureCategory object
+     * Use the FeatureTemplate relation FeatureTemplate object
      *
      * @see useQuery()
      *
@@ -664,13 +664,13 @@ abstract class FeatureQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\FeatureCategoryQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\FeatureTemplateQuery A secondary query class using the current class as primary query
      */
-    public function useFeatureCategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useFeatureTemplateQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinFeatureCategory($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'FeatureCategory', '\Thelia\Model\FeatureCategoryQuery');
+            ->joinFeatureTemplate($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FeatureTemplate', '\Thelia\Model\FeatureTemplateQuery');
     }
 
     /**
@@ -747,19 +747,19 @@ abstract class FeatureQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Category object
-     * using the feature_category table as cross reference
+     * Filter the query by a related Template object
+     * using the feature_template table as cross reference
      *
-     * @param Category $category the related object to use as filter
+     * @param Template $template the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
-    public function filterByCategory($category, $comparison = Criteria::EQUAL)
+    public function filterByTemplate($template, $comparison = Criteria::EQUAL)
     {
         return $this
-            ->useFeatureCategoryQuery()
-            ->filterByCategory($category, $comparison)
+            ->useFeatureTemplateQuery()
+            ->filterByTemplate($template, $comparison)
             ->endUse();
     }
 

@@ -55,4 +55,15 @@ class Request extends BaseRequest
 
         return $uri . $additionalQs;
     }
+
+    /**
+     * Gets the Session.
+     *
+     * @return \Thelia\Core\HttpFoundation\Session\Session The session
+     * @api
+     */
+    public function getSession()
+    {
+        return parent::getSession();
+    }
 }

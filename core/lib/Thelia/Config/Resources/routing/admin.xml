@@ -103,25 +103,27 @@
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 
-    <route id="admin.coupon.list" path="/admin/coupon">
+    <route id="admin.coupon.list" path="/admin/coupon/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::browseAction</default>
     </route>
-    <route id="admin.coupon.create" path="/admin/coupon/create">
+    <route id="admin.coupon.create" path="/admin/coupon/create/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::createAction</default>
     </route>
-    <route id="admin.coupon.update" path="/admin/coupon/update/{couponId}">
+    <route id="admin.coupon.update" path="/admin/coupon/update/{couponId}/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::updateAction</default>
     </route>
-    <route id="admin.coupon.read" path="/admin/coupon/read/{couponId}">
+    <route id="admin.coupon.read" path="/admin/coupon/read/{couponId}/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
     </route>
-    <route id="admin.coupon.rule.input" path="/admin/coupon/rule/{ruleId}">
+    <route id="admin.coupon.rule.input" path="/admin/coupon/rule/{ruleId}/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::getRuleInputAction</default>
     </route>
     <route id="admin.coupon.rule.update" path="/admin/coupon/{couponId}/rule/update/">
         <default key="_controller">Thelia\Controller\Admin\CouponController::updateRulesAction</default>
     </route>
-
+    <route id="admin.coupon.consume" path="/admin/coupon/consume/{couponCode}/">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::consumeAction</default>
+    </route>
 
     <!-- Routes to the Config (system variables) controller -->
 
@@ -207,6 +209,29 @@
 
     <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
+    </route>
+
+
+    <!-- Product templates management -->
+
+    <route id="admin.configuration.templates.default" path="/admin/configuration/templates">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.create" path="/admin/configuration/templates/create">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.update" path="/admin/configuration/templates/update">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::updateAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.save" path="/admin/configuration/templates/save">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.delete" path="/admin/configuration/templates/delete">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteAction</default>
     </route>
 
 

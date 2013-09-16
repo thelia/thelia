@@ -217,7 +217,7 @@ class TheliaHttpKernel extends HttpKernel
         if (Model\ConfigQuery::read("session_config.default")) {
             $storage->setSaveHandler(new Session\Storage\Handler\NativeFileSessionHandler(Model\ConfigQuery::read("session_config.save_path", THELIA_ROOT . '/local/session/')));
         } else {
-            $handlerString = Model\ConfigQuery::read("session_config.handlers");
+            $handlerString = Model\ConfigQuery::read("session_config.handlers", 'Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler');
 
             $handler = new $handlerString;
 

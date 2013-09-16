@@ -1,6 +1,6 @@
 INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`date_format`,`time_format`,`datetime_format`,`decimal_separator`,`thousands_separator`,`decimals`,`by_default`,`created_at`,`updated_at`)VALUES
-(1, 'Français', 'fr', 'fr_FR', '', 'd/m/Y', 'H:i:s', 'd/m/y H:i:s', ',', ' ', '2', '1', NOW(), NOW()),
-(2, 'English', 'en', 'en_US', '', 'm-d-Y', 'h:i:s', 'm-d-Y h:i:s', '.', ' ', '2', '0', NOW(), NOW()),
+(1, 'Français', 'fr', 'fr_FR', '', 'd/m/Y', 'H:i:s', 'd/m/y H:i:s', ',', ' ', '2', '0', NOW(), NOW()),
+(2, 'English', 'en', 'en_US', '', 'm-d-Y', 'h:i:s', 'm-d-Y h:i:s', '.', ' ', '2', '1', NOW(), NOW()),
 (3, 'castellano', 'es', 'es_ES', '', 'm-d-Y', 'h:i:s', 'm-d-Y h:i:s', ',', '.', '2', '0', NOW(), NOW()),
 (4, 'Italiano', 'it', 'it_IT', '', 'd/m/Y', 'H:i:s', 'd/m/y H:i:s', ',', ' ', '2', '0', NOW(), NOW());
 
@@ -17,8 +17,14 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('image_cache_dir_from_web_root', 'cache/images', 0, 0, NOW(), NOW()),
 ('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', 0, 0, NOW(), NOW()),
 ('page_not_found_view', '404.html', 0, 0, NOW(), NOW()),
-('use_tax_free_amounts', 0, 1, 0, NOW(), NOW()),
-('process_assets', '1', 0, 0, NOW(), NOW());
+('use_tax_free_amounts', 0, 0, 0, NOW(), NOW()),
+('process_assets', '1', 0, 0, NOW(), NOW()),
+('thelia_admin_remember_me_cookie_name', 'tarmcn', 0, 0, NOW(), NOW()),
+('thelia_admin_remember_me_cookie_expiration', 2592000, 0, 0, NOW(), NOW()),
+('thelia_customer_remember_me_cookie_name', 'tcrmcn', 0, 0, NOW(), NOW()),
+('thelia_customer_remember_me_cookie_expiration', 31536000, 0, 0, NOW(), NOW()),
+('session_config.handlers', 'Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler', 0, 0, NOW(), NOW())
+;
 
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
