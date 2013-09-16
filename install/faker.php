@@ -1,7 +1,5 @@
 <?php
 use Thelia\Constraint\ConstraintFactory;
-use Thelia\Constraint\ConstraintManager;
-use Thelia\Constraint\Rule\AvailableForTotalAmount;
 use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
