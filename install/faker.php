@@ -37,14 +37,6 @@ try {
         ->find();
     $categoryAssociatedContent->delete();
 
-    $attributeCategory = Thelia\Model\AttributeCategoryQuery::create()
-        ->find();
-    $attributeCategory->delete();
-
-    $featureCategory = Thelia\Model\FeatureCategoryQuery::create()
-        ->find();
-    $featureCategory->delete();
-
     $featureProduct = Thelia\Model\FeatureProductQuery::create()
         ->find();
     $featureProduct->delete();
@@ -322,22 +314,6 @@ try {
 
         for($k=1; $k<rand(1, 6); $k++) {
             createProduct($faker, $category, $k, $template, $productIdList);
-        }
-    }
-
-    //attribute_category and feature_category (all categories got all features/attributes)
-    foreach($categoryIdList as $categoryId) {
-        foreach($attributeList as $attributeId => $attributeAvId) {
-            $attributeCategory = new Thelia\Model\AttributeCategory();
-            $attributeCategory->setCategoryId($categoryId)
-                ->setAttributeId($attributeId)
-                ->save();
-        }
-        foreach($featureList as $featureId => $featureAvId) {
-            $featureCategory = new Thelia\Model\FeatureCategory();
-            $featureCategory->setCategoryId($categoryId)
-                ->setFeatureId($featureId)
-                ->save();
         }
     }
 
