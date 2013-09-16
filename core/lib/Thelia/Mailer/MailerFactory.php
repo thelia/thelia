@@ -41,7 +41,7 @@ class MailerFactory {
 
     protected $dispatcher;
 
-    public function _construct(EventDispatcherInterface $dispatcher)
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
 
         $this->dispatcher = $dispatcher;
