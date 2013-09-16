@@ -37,10 +37,11 @@ class ConfigQuery extends BaseConfigQuery {
         if($key) {
             if(array_key_exists($key, self::$cache)) {
                 unset(self::$cache[$key]);
+                return true;
             }
-        } else {
-            self::$cache = array();
         }
+        self::$cache = array();
+        return true;
     }
 
     public static function getDefaultLangWhenNoTranslationAvailable()
