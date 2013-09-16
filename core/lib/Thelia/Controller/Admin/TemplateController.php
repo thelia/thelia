@@ -41,7 +41,7 @@ use Thelia\Core\Event\TemplateAddFeatureEvent;
 use Thelia\Core\Event\TemplateDeleteFeatureEvent;
 
 /**
- * Manages templates sent by mail
+ * Manages product templates
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */

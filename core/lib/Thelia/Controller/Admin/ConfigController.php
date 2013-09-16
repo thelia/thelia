@@ -33,7 +33,7 @@ use Thelia\Form\ConfigCreationForm;
 use Thelia\Core\Event\UpdatePositionEvent;
 
 /**
- * Manages variables sent by mail
+ * Manages variables
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */

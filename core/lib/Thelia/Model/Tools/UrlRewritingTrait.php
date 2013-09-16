@@ -20,44 +20,59 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
+namespace Thelia\Model\Tools;
 
-class CategoryCreationForm extends BaseForm
-{
-    protected function buildForm()
+use Thelia\Tools\URL;
+/**
+ * A trait for managing Rewriten URLs from model classes
+ */
+trait UrlRewritingTrait {
+
+    /**
+     * @returns string the view name of the rewriten object (e.g., 'category', 'product')
+     */
+    protected abstract function getRewritenUrlViewName();
+
+    /**
+     * Get the object URL for the given locale, rewriten if rewriting is enabled.
+     *
+     * @param string $locale a valid locale (e.g. en_US)
+     */
+    public function getUrl($locale)
     {
-        $this->formBuilder
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Category title *"),
-                "label_attr" => array(
-                    "for" => "title"
-                )
-            ))
-            ->add("parent", "text", array(
-                "label" => Translator::getInstance()->trans("Parent category *"),
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This category is online on the front office.")
-            ))
-        ;
+        return URL::getInstance()->retrieve($this->getRewritenUrlViewName(), $this->getId(), $locale)->toString();
     }
 
-    public function getName()
+    /**
+     * Generate a rewriten URL from the object title, and store it in the rewriting table
+     *
+     * @param string $locale a valid locale (e.g. en_US)
+     */
+    public function generateRewritenUrl($locale)
     {
-        return "thelia_category_creation";
+        URL::getInstance()->generateRewritenUrl($this->getRewritenUrlViewName(), $this->getId(), $locale, $this->getTitle());
+    }
+
+    /**
+     * return the rewriten URL for the given locale
+     *
+     * @param string $locale a valid locale (e.g. en_US)
+     */
+    public function getRewritenUrl($locale)
+    {
+        return "fake url - TODO";
+    }
+
+    /**
+     * Set the rewriten URL for the given locale
+     *
+     * @param string $locale a valid locale (e.g. en_US)
+     */
+    public function setRewritenUrl($locale, $url)
+    {
+        // TODO - code me !
+
+        return $this;
     }
 }

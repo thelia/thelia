@@ -33,7 +33,7 @@ use Thelia\Form\FeatureAvCreationForm;
 use Thelia\Core\Event\UpdatePositionEvent;
 
 /**
- * Manages features-av sent by mail
+ * Manages features-av
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
