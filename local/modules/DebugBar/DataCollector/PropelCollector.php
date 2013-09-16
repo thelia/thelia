@@ -40,7 +40,9 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
 
     protected $peakMemory = 0;
 
-    public function __construct()
+    protected $alternativeLogger;
+
+    public function __construct(LoggerInterface $alternativeLogger = null)
     {
         $serviceContainer = Propel::getServiceContainer();
         $serviceContainer->setLogger('defaultLogger', $this);
@@ -54,6 +56,8 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
             'commit',
             'rollBack',
         ));
+
+        $this->alternativeLogger = $alternativeLogger;
     }
 
     /**
@@ -118,6 +122,10 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
         list($sql, $duration_str) = $this->parseAndLogSqlQuery($message);
 
         $message = "$sql ($duration_str)";
+
+        if ($this->alternativeLogger) {
+            $this->alternativeLogger->info($message);
+        }
     }
 
     /**
