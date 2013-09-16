@@ -22,46 +22,45 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints;
+use Thelia\Model\CurrencyQuery;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 
-class AdminLogin extends BaseForm
+class FeatureCreationForm extends BaseForm
 {
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("username", "text", array(
-                "constraints" => array(
-                    new NotBlank(),
-                    new Length(array("min" => 3))
-                ),
-                "label" => Translator::getInstance()->trans("Username *"),
-                "label_attr" => array(
-                    "for" => "username"
-                )
-            ))
-            ->add("password", "password", array(
+            ->add("title"   , "text"  , array(
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => Translator::getInstance()->trans("Password *"),
+                "label" => Translator::getInstance()->trans("Title *"),
                 "label_attr" => array(
-                    "for" => "password"
-                )
-            ))
-            ->add("remember_me", "checkbox", array(
-                    'value' => 'yes',                    
-                    "label" => Translator::getInstance()->trans("Remember me ?"),
-                    "label_attr" => array(
-                        "for" => "remember_me"
-                    )
-            ))
-            ;
+                    "for" => "title"
+                ))
+            )
+            ->add("locale" , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ))
+            )
+            ->add("add_to_all"   , "checkbox"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Add to all product templates"),
+                "label_attr" => array(
+                    "for" => "add_to_all"
+                ))
+            )
+        ;
     }
 
     public function getName()
     {
-        return "thelia_admin_login";
+        return "thelia_feature_creation";
     }
 }

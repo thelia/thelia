@@ -20,48 +20,33 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
+namespace Thelia\Controller\Admin;
 
-class AdminLogin extends BaseForm
+/**
+ * Class CustomerController
+ * @package Thelia\Controller\Admin
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+class CountryController extends BaseAdminController
 {
-    protected function buildForm()
+    public function indexAction()
     {
-        $this->formBuilder
-            ->add("username", "text", array(
-                "constraints" => array(
-                    new NotBlank(),
-                    new Length(array("min" => 3))
-                ),
-                "label" => Translator::getInstance()->trans("Username *"),
-                "label_attr" => array(
-                    "for" => "username"
-                )
-            ))
-            ->add("password", "password", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Password *"),
-                "label_attr" => array(
-                    "for" => "password"
-                )
-            ))
-            ->add("remember_me", "checkbox", array(
-                    'value' => 'yes',                    
-                    "label" => Translator::getInstance()->trans("Remember me ?"),
-                    "label_attr" => array(
-                        "for" => "remember_me"
-                    )
-            ))
-            ;
+        if (null !== $response = $this->checkAuth("admin.country.view")) return $response;
+        return $this->render("countries", array("display_country" => 20));
     }
 
-    public function getName()
-    {
-        return "thelia_admin_login";
+    /**
+     * update country action
+     *
+     * @param $country_id
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     */
+    public function updateAction($country_id)
+    {        
+        return $this->render("country-edit", array(
+            "country_id" => $country_id
+        ));
     }
+
 }

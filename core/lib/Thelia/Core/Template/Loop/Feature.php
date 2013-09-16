@@ -38,6 +38,7 @@ use Thelia\Model\Map\ProductCategoryTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
+use Thelia\Model\FeatureTemplateQuery;
 
 /**
  *
@@ -60,7 +61,8 @@ class Feature extends BaseI18nLoop
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('product'),
-            Argument::createIntListTypeArgument('category'),
+            Argument::createIntListTypeArgument('template'),
+            Argument::createIntListTypeArgument('exclude_template'),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createIntListTypeArgument('exclude'),
             new Argument(
@@ -102,22 +104,33 @@ class Feature extends BaseI18nLoop
         if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
 
         $product = $this->getProduct();
-        $category = $this->getCategory();
+        $template = $this->getTemplate();
 
         if (null !== $product) {
-            $productCategories = ProductCategoryQuery::create()->select(array(ProductCategoryTableMap::CATEGORY_ID))->filterByProductId($product, Criteria::IN)->find()->getData();
+            // Find the template assigned to the product.
+            $productObj = ProductQuery::create()->findPk($product);
 
-            if (null === $category) {
-                $category = $productCategories;
-            } else {
-                $category = array_merge($category, $productCategories);
-            }
+            // Ignore if the product cannot be found.
+            if ($productObj !== null)
+                $template = $productObj->getTemplate();
+         }
+
+         // If we have to filter by template, find all features assigned to this template, and filter by found IDs
+        if (null !== $template) {
+            $search->filterById(
+                FeatureTemplateQuery::create()->filterByTemplateId($template)->select('feature_id')->find(),
+                Criteria::IN
+            );
         }
 
-        if (null !== $category) {
-            $search->filterByCategory(
-                CategoryQuery::create()->filterById($category)->find(),
-                Criteria::IN
+        $exclude_template = $this->getExcludeTemplate();
+
+        // If we have to filter by template, find all features assigned to this template, and filter by found IDs
+        if (null !== $exclude_template) {
+            // Exclure tous les attribut qui sont attachés aux templates indiqués
+            $search->filterById(
+                    FeatureTemplateQuery::create()->filterByTemplateId($exclude_template)->select('feature_id')->find(),
+                    Criteria::NOT_IN
             );
         }
 

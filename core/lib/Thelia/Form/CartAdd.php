@@ -84,7 +84,7 @@ class CartAdd extends BaseForm
                 "required" => true
 
             ))
-            ->add("quantity", "text", array(
+            ->add("quantity", "number", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array("methods" => array(

@@ -24,6 +24,7 @@
 namespace Thelia\Constraint\Rule;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
+use Thelia\Constraint\ConstraintValidator;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Constraint\Validator\ComparableInterface;
@@ -72,6 +73,9 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
 
     /** @var array Values set by Admin in BackOffice */
     protected $values = array();
+
+    /** @var ConstraintValidator Constaints validator */
+    protected $constraintValidator = null;
 
     /**
      * Constructor

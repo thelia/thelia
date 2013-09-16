@@ -57,6 +57,17 @@ class LoopResult implements \Iterator
         return count($this->collection);
     }
 
+    public function getModelCollectionCount()
+    {
+        if ($this->modelCollection instanceof ObjectCollection || $this->modelCollection instanceof PropelModelPager) {
+            return $this->modelCollection->count();
+        } elseif (is_array($this->modelCollection)) {
+            return count($this->modelCollection);
+        } else {
+            return 0;
+        }
+    }
+
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the current element

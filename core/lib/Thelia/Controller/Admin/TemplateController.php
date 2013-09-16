@@ -35,6 +35,10 @@ use Thelia\Model\TemplateAv;
 use Thelia\Model\TemplateAvQuery;
 use Thelia\Core\Event\TemplateAvUpdateEvent;
 use Thelia\Core\Event\TemplateEvent;
+use Thelia\Core\Event\TemplateDeleteAttributeEvent;
+use Thelia\Core\Event\TemplateAddAttributeEvent;
+use Thelia\Core\Event\TemplateAddFeatureEvent;
+use Thelia\Core\Event\TemplateDeleteFeatureEvent;
 
 /**
  * Manages templates sent by mail
@@ -191,6 +195,108 @@ class TemplateController extends AbstractCrudController
 
         // Normal delete processing
         return null;
+    }
+
+    public function getAjaxFeaturesAction() {
+        return $this->render(
+                'ajax/template-feature-list',
+                array('template_id' => $this->getRequest()->get('template_id'))
+        );
+    }
+
+    public function getAjaxAttributesAction() {
+        return $this->render(
+                'ajax/template-attribute-list',
+                array('template_id' => $this->getRequest()->get('template_id'))
+        );
+    }
+
+    public function addAttributeAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.configuration.template.attribute.add")) return $response;
+
+        $attribute_id = intval($this->getRequest()->get('attribute_id'));
+
+        if ($attribute_id > 0) {
+            $event = new TemplateAddAttributeEvent(
+                    $this->getExistingObject(),
+                    $attribute_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::TEMPLATE_ADD_ATTRIBUTE, $event);
+            } catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    public function deleteAttributeAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.configuration.template.attribute.delete")) return $response;
+
+        $event = new TemplateDeleteAttributeEvent(
+                $this->getExistingObject(),
+                intval($this->getRequest()->get('attribute_id'))
+        );
+
+        try {
+            $this->dispatch(TheliaEvents::TEMPLATE_DELETE_ATTRIBUTE, $event);
+        } catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    public function addFeatureAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.configuration.template.feature.add")) return $response;
+
+        $feature_id = intval($this->getRequest()->get('feature_id'));
+
+        if ($feature_id > 0) {
+            $event = new TemplateAddFeatureEvent(
+                    $this->getExistingObject(),
+                    $feature_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::TEMPLATE_ADD_FEATURE, $event);
+            } catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    public function deleteFeatureAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.configuration.template.feature.delete")) return $response;
+
+        $event = new TemplateDeleteFeatureEvent(
+                $this->getExistingObject(),
+                intval($this->getRequest()->get('feature_id'))
+        );
+
+        try {
+            $this->dispatch(TheliaEvents::TEMPLATE_DELETE_FEATURE, $event);
+        } catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        $this->redirectToEditionTemplate();
     }
 
 }

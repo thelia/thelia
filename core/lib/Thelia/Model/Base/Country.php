@@ -94,6 +94,12 @@ abstract class Country implements ActiveRecordInterface
     protected $isoalpha3;
 
     /**
+     * The value for the by_default field.
+     * @var        int
+     */
+    protected $by_default;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -478,6 +484,17 @@ abstract class Country implements ActiveRecordInterface
     }
 
     /**
+     * Get the [by_default] column value.
+     *
+     * @return   int
+     */
+    public function getByDefault()
+    {
+
+        return $this->by_default;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -627,6 +644,27 @@ abstract class Country implements ActiveRecordInterface
     } // setIsoalpha3()
 
     /**
+     * Set the value of [by_default] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Country The current object (for fluent API support)
+     */
+    public function setByDefault($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->by_default !== $v) {
+            $this->by_default = $v;
+            $this->modifiedColumns[] = CountryTableMap::BY_DEFAULT;
+        }
+
+
+        return $this;
+    } // setByDefault()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -720,13 +758,16 @@ abstract class Country implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CountryTableMap::translateFieldName('Isoalpha3', TableMap::TYPE_PHPNAME, $indexType)];
             $this->isoalpha3 = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CountryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CountryTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->by_default = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CountryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CountryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CountryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -739,7 +780,7 @@ abstract class Country implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = CountryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = CountryTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Country object", 0, $e);
@@ -1043,6 +1084,9 @@ abstract class Country implements ActiveRecordInterface
         if ($this->isColumnModified(CountryTableMap::ISOALPHA3)) {
             $modifiedColumns[':p' . $index++]  = 'ISOALPHA3';
         }
+        if ($this->isColumnModified(CountryTableMap::BY_DEFAULT)) {
+            $modifiedColumns[':p' . $index++]  = 'BY_DEFAULT';
+        }
         if ($this->isColumnModified(CountryTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -1074,6 +1118,9 @@ abstract class Country implements ActiveRecordInterface
                         break;
                     case 'ISOALPHA3':
                         $stmt->bindValue($identifier, $this->isoalpha3, PDO::PARAM_STR);
+                        break;
+                    case 'BY_DEFAULT':
+                        $stmt->bindValue($identifier, $this->by_default, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1152,9 +1199,12 @@ abstract class Country implements ActiveRecordInterface
                 return $this->getIsoalpha3();
                 break;
             case 5:
-                return $this->getCreatedAt();
+                return $this->getByDefault();
                 break;
             case 6:
+                return $this->getCreatedAt();
+                break;
+            case 7:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1191,8 +1241,9 @@ abstract class Country implements ActiveRecordInterface
             $keys[2] => $this->getIsocode(),
             $keys[3] => $this->getIsoalpha2(),
             $keys[4] => $this->getIsoalpha3(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[5] => $this->getByDefault(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1263,9 +1314,12 @@ abstract class Country implements ActiveRecordInterface
                 $this->setIsoalpha3($value);
                 break;
             case 5:
-                $this->setCreatedAt($value);
+                $this->setByDefault($value);
                 break;
             case 6:
+                $this->setCreatedAt($value);
+                break;
+            case 7:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1297,8 +1351,9 @@ abstract class Country implements ActiveRecordInterface
         if (array_key_exists($keys[2], $arr)) $this->setIsocode($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setIsoalpha2($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setIsoalpha3($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[5], $arr)) $this->setByDefault($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
     }
 
     /**
@@ -1315,6 +1370,7 @@ abstract class Country implements ActiveRecordInterface
         if ($this->isColumnModified(CountryTableMap::ISOCODE)) $criteria->add(CountryTableMap::ISOCODE, $this->isocode);
         if ($this->isColumnModified(CountryTableMap::ISOALPHA2)) $criteria->add(CountryTableMap::ISOALPHA2, $this->isoalpha2);
         if ($this->isColumnModified(CountryTableMap::ISOALPHA3)) $criteria->add(CountryTableMap::ISOALPHA3, $this->isoalpha3);
+        if ($this->isColumnModified(CountryTableMap::BY_DEFAULT)) $criteria->add(CountryTableMap::BY_DEFAULT, $this->by_default);
         if ($this->isColumnModified(CountryTableMap::CREATED_AT)) $criteria->add(CountryTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CountryTableMap::UPDATED_AT)) $criteria->add(CountryTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1385,6 +1441,7 @@ abstract class Country implements ActiveRecordInterface
         $copyObj->setIsocode($this->getIsocode());
         $copyObj->setIsoalpha2($this->getIsoalpha2());
         $copyObj->setIsoalpha3($this->getIsoalpha3());
+        $copyObj->setByDefault($this->getByDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -2287,6 +2344,7 @@ abstract class Country implements ActiveRecordInterface
         $this->isocode = null;
         $this->isoalpha2 = null;
         $this->isoalpha3 = null;
+        $this->by_default = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

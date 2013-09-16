@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,51 +17,70 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
+namespace Thelia\Core\Event;
 
-class AdminLogin extends BaseForm
+class FeatureAvUpdateEvent extends FeatureAvCreateEvent
 {
-    protected function buildForm()
+    protected $featureAv_id;
+
+    protected $description;
+    protected $chapo;
+    protected $postscriptum;
+
+    public function __construct($featureAv_id)
     {
-        $this->formBuilder
-            ->add("username", "text", array(
-                "constraints" => array(
-                    new NotBlank(),
-                    new Length(array("min" => 3))
-                ),
-                "label" => Translator::getInstance()->trans("Username *"),
-                "label_attr" => array(
-                    "for" => "username"
-                )
-            ))
-            ->add("password", "password", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Password *"),
-                "label_attr" => array(
-                    "for" => "password"
-                )
-            ))
-            ->add("remember_me", "checkbox", array(
-                    'value' => 'yes',                    
-                    "label" => Translator::getInstance()->trans("Remember me ?"),
-                    "label_attr" => array(
-                        "for" => "remember_me"
-                    )
-            ))
-            ;
+        $this->setFeatureAvId($featureAv_id);
     }
 
-    public function getName()
+    public function getFeatureAvId()
     {
-        return "thelia_admin_login";
+        return $this->featureAv_id;
+    }
+
+    public function setFeatureAvId($featureAv_id)
+    {
+        $this->featureAv_id = $featureAv_id;
+
+        return $this;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getChapo()
+    {
+        return $this->chapo;
+    }
+
+    public function setChapo($chapo)
+    {
+        $this->chapo = $chapo;
+
+        return $this;
+    }
+
+    public function getPostscriptum()
+    {
+        return $this->postscriptum;
+    }
+
+    public function setPostscriptum($postscriptum)
+    {
+        $this->postscriptum = $postscriptum;
+
+        return $this;
     }
 }

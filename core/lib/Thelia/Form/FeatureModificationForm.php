@@ -22,46 +22,41 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints;
+use Thelia\Model\CurrencyQuery;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 
-class AdminLogin extends BaseForm
+class FeatureModificationForm extends FeatureCreationForm
 {
+    use StandardDescriptionFieldsTrait;
+
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("username", "text", array(
-                "constraints" => array(
-                    new NotBlank(),
-                    new Length(array("min" => 3))
-                ),
-                "label" => Translator::getInstance()->trans("Username *"),
-                "label_attr" => array(
-                    "for" => "username"
-                )
-            ))
-            ->add("password", "password", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Password *"),
-                "label_attr" => array(
-                    "for" => "password"
-                )
-            ))
-            ->add("remember_me", "checkbox", array(
-                    'value' => 'yes',                    
-                    "label" => Translator::getInstance()->trans("Remember me ?"),
-                    "label_attr" => array(
-                        "for" => "remember_me"
+            ->add("id", "hidden", array(
+                    "constraints" => array(
+                        new GreaterThan(
+                            array('value' => 0)
+                        )
                     )
             ))
-            ;
+/* FIXME: doesn't work
+            ->add('feature_values', 'collection', array(
+                    'type'   => 'text',
+                    'options'  => array('required'  => false)
+            ))
+*/
+        ;
+
+        // Add standard description fields
+        $this->addStandardDescFields();
     }
 
     public function getName()
     {
-        return "thelia_admin_login";
+        return "thelia_feature_modification";
     }
 }
