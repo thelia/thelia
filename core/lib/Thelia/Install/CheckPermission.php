@@ -31,9 +31,10 @@ namespace Thelia\Install;
  */
 class CheckPermission extends BaseInstall
 {
-    const CONF = "const";
-    const LOG  = "log";
-    const CACHE = "cache";
+
+    const DIR_CONF = 'local/config';
+    const DIR_LOG  = 'log';
+    const DIR_CACHE = 'cache';
 
     private $directories = array();
     private $validation = array();
@@ -44,22 +45,22 @@ class CheckPermission extends BaseInstall
 
 
         $this->directories = array(
-            self::CONF => THELIA_ROOT . "local/config",
-            self::LOG => THELIA_ROOT . "log",
-            self::CACHE => THELIA_ROOT . "cache"
+            self::DIR_CONF => THELIA_ROOT . 'local/config',
+            self::DIR_LOG => THELIA_ROOT . 'DIR_LOG',
+            self::DIR_CACHE => THELIA_ROOT . 'DIR_CACHE'
         );
 
         $this->validation = array(
-            self::CONF => array(
-                "text" => sprintf("config directory(%s)...", $this->directories[self::CONF]),
+            self::DIR_CONF => array(
+                "text" => sprintf("config directory(%s)...", $this->directories[self::DIR_CONF]),
                 "status" => true
             ),
-            self::LOG => array(
-                "text" => sprintf("cache directory(%s)...", $this->directories[self::LOG]),
+            self::DIR_LOG => array(
+                "text" => sprintf("DIR_CACHE directory(%s)...", $this->directories[self::DIR_LOG]),
                 "status" => true
             ),
-            self::CACHE => array(
-                "text" => sprintf("log directory(%s)...", $this->directories[self::CACHE]),
+            self::DIR_CACHE => array(
+                "text" => sprintf("DIR_LOG directory(%s)...", $this->directories[self::DIR_CACHE]),
                 "status" => true
             )
         );

@@ -42,9 +42,10 @@ class InstallController extends BaseInstallController
 
     public function checkPermission()
     {
+        var_dump('step2');
         //$this->verifyStep(2);
 
-        //$permission = new CheckPermission();
+        $permission = new CheckPermission();
 
         $this->getSession()->set("step", 2);
         return $this->render("step-2.html");
