@@ -65,6 +65,9 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue($ConstraintValidator));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -99,6 +102,9 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue($ConstraintValidator));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -136,6 +142,9 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(5));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue($ConstraintValidator));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -183,6 +192,9 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(5));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue($ConstraintValidator));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
