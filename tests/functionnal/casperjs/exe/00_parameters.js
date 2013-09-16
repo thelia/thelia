@@ -7,11 +7,6 @@ var thelia2_login_coupon_create_url = thelia2_base_url + 'admin/coupon/create/';
 var thelia2_login_coupon_read_url = thelia2_base_url + 'admin/coupon/read/1';
 var thelia2_login_coupon_update_url = thelia2_base_url + 'admin/coupon/update/1';
 
-
-
-//var findMyId = /([0-9]+)$/;
-//var currentId;
-
 casper.test.comment('Variables are set');
 
 casper.test.done(0);
