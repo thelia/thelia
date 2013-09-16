@@ -198,9 +198,9 @@ class BaseController extends ContainerAware
      *
      * @param string $url
      */
-    public function redirect($url, $status = 302)
+    public function redirect($url, $status = 302, $cookies = array())
     {
-        Redirect::exec($url, $status);
+        Redirect::exec($url, $status, $cookies);
     }
 
     /**

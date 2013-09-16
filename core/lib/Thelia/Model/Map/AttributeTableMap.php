@@ -162,9 +162,9 @@ class AttributeTableMap extends TableMap
     {
         $this->addRelation('AttributeAv', '\\Thelia\\Model\\AttributeAv', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT', 'AttributeAvs');
         $this->addRelation('AttributeCombination', '\\Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT', 'AttributeCombinations');
-        $this->addRelation('AttributeCategory', '\\Thelia\\Model\\AttributeCategory', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT', 'AttributeCategories');
+        $this->addRelation('AttributeTemplate', '\\Thelia\\Model\\AttributeTemplate', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT', 'AttributeTemplates');
         $this->addRelation('AttributeI18n', '\\Thelia\\Model\\AttributeI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'AttributeI18ns');
-        $this->addRelation('Category', '\\Thelia\\Model\\Category', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Categories');
+        $this->addRelation('Template', '\\Thelia\\Model\\Template', RelationMap::MANY_TO_MANY, array(), null, null, 'Templates');
     } // buildRelations()
 
     /**
@@ -189,7 +189,7 @@ class AttributeTableMap extends TableMap
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 AttributeAvTableMap::clearInstancePool();
                 AttributeCombinationTableMap::clearInstancePool();
-                AttributeCategoryTableMap::clearInstancePool();
+                AttributeTemplateTableMap::clearInstancePool();
                 AttributeI18nTableMap::clearInstancePool();
             }
 

@@ -210,31 +210,34 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param unknown $createdObject the created object
+     * @param unknown $createEvent the create event
+     * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalCreateAction($createdObject)
+    protected function performAdditionalCreateAction($createEvent)
     {
-        // Nothing to do
+        return null;
     }
 
     /**
      * Put in this method post object update processing if required.
      *
-     * @param unknown $updatedObject the updated object
+     * @param unknown $updateEvent the update event
+     * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalUpdateAction($updatedObject)
+    protected function performAdditionalUpdateAction($updateeEvent)
     {
-        // Nothing to do
+        return null;
     }
 
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param unknown $deletedObject the deleted object
+     * @param unknown $deleteEvent the delete event
+     * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalDeleteAction($deletedObject)
+    protected function performAdditionalDeleteAction($deleteEvent)
     {
-        // Nothing to do
+        return null;
     }
 
     /**
@@ -306,7 +309,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $this->adminLogAppend(sprintf("%s %s (ID %s) created", ucfirst($this->objectName), $this->getObjectLabel($createdObject), $this->getObjectId($createdObject)));
             }
 
-            $this->performAdditionalCreateAction($createdObject);
+            $this->performAdditionalCreateAction($createEvent);
 
             // Substitute _ID_ in the URL with the ID of the created object
             $successUrl = str_replace('_ID_', $this->getObjectId($createdObject), $creationForm->getSuccessUrl());
@@ -393,7 +396,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $this->adminLogAppend(sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
             }
 
-            $this->performAdditionalUpdateAction($changedObject);
+            $this->performAdditionalUpdateAction($changeEvent);
 
             // If we have to stay on the same page, do not redirect to the succesUrl,
             // just redirect to the edit page again.
@@ -494,8 +497,12 @@ abstract class AbstractCrudController extends BaseAdminController
             $this->adminLogAppend(
                     sprintf("%s %s (ID %s) deleted", ucfirst($this->objectName), $this->getObjectLabel($deletedObject), $this->getObjectId($deletedObject)));
         }
-        $this->performAdditionalDeleteAction($deletedObject);
 
-        $this->redirectToListTemplate();
+        $response = $this->performAdditionalDeleteAction($deleteEvent);
+
+        if ($response == null)
+            $this->redirectToListTemplate();
+        else
+            return $response;
     }
 }

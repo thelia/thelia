@@ -17,8 +17,14 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('image_cache_dir_from_web_root', 'cache/images', 0, 0, NOW(), NOW()),
 ('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', 0, 0, NOW(), NOW()),
 ('page_not_found_view', '404.html', 0, 0, NOW(), NOW()),
-('use_tax_free_amounts', 0, 1, 0, NOW(), NOW()),
-('process_assets', '1', 0, 0, NOW(), NOW());
+('use_tax_free_amounts', 0, 0, 0, NOW(), NOW()),
+('process_assets', '1', 0, 0, NOW(), NOW()),
+('thelia_admin_remember_me_cookie_name', 'tarmcn', 0, 0, NOW(), NOW()),
+('thelia_admin_remember_me_cookie_expiration', 2592000, 0, 0, NOW(), NOW()),
+('thelia_customer_remember_me_cookie_name', 'tcrmcn', 0, 0, NOW(), NOW()),
+('thelia_customer_remember_me_cookie_expiration', 31536000, 0, 0, NOW(), NOW()),
+('session_config.handlers', 'Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler', 0, 0, NOW(), NOW())
+;
 
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES

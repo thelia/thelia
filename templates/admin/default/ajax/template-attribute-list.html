@@ -1,0 +1,15 @@
+<div class="form-group">
+    {ifloop rel="free_attributes"}
+    <select name="free_attributes" id="free_attributes" class="form-control">
+        <option value="">Select an attribute...</option>
+        {loop name="free_attributes" type="attribute" template="$template_id" backend_context="1" lang="$edit_language_id"}
+            <option value="{$ID}">{$TITLE}</option>
+        {/loop}
+    </select>
+    <span class="help-block">{intl l='Select an attribute and click (+) to add it to this template'}</span>
+    {/ifloop}
+    {elseloop rel="free_attributes"}
+    <div class="alert alert-info">There is currently no available attributes.</div>
+    {/elseloop}
+</div>
+
