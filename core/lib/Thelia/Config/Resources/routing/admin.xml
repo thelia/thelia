@@ -292,6 +292,63 @@
 
     <!-- end attribute and feature routes  management -->
 
+    <!-- feature and features value management -->
+
+    <route id="admin.configuration.features.default" path="/admin/configuration/features">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.features.create" path="/admin/configuration/features/create">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.features.update" path="/admin/configuration/features/update">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::updateAction</default>
+    </route>
+
+    <route id="admin.configuration.features.save" path="/admin/configuration/features/save">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.configuration.features.delete" path="/admin/configuration/features/delete">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.features.update-position" path="/admin/configuration/features/update-position">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::updatePositionAction</default>
+    </route>
+
+    <route id="admin.configuration.features.rem-from-all" path="/admin/configuration/features/remove-from-all-templates">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::removeFromAllTemplates</default>
+    </route>
+
+    <route id="admin.configuration.features.add-to-all" path="/admin/configuration/features/add-to-all-templates">
+        <default key="_controller">Thelia\Controller\Admin\FeatureController::addToAllTemplates</default>
+    </route>
+
+
+    <route id="admin.configuration.features-av.create" path="/admin/configuration/features-av/create">
+        <default key="_controller">Thelia\Controller\Admin\FeatureAvController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.features-av.update" path="/admin/configuration/features-av/update">
+        <default key="_controller">Thelia\Controller\Admin\FeatureAvController::updateAction</default>
+    </route>
+
+    <route id="admin.configuration.features-av.save" path="/admin/configuration/features-av/save">
+        <default key="_controller">Thelia\Controller\Admin\FeatureAvController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.configuration.features-av.delete" path="/admin/configuration/features-av/delete">
+        <default key="_controller">Thelia\Controller\Admin\FeatureAvController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.features-av.update-position" path="/admin/configuration/features-av/update-position">
+        <default key="_controller">Thelia\Controller\Admin\FeatureAvController::updatePositionAction</default>
+    </route>
+
+    <!-- end feature and feature routes  management -->
+
 	<!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">

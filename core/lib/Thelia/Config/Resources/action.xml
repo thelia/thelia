@@ -67,7 +67,17 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.feature" class="Thelia\Action\Feature">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.attributeav" class="Thelia\Action\AttributeAv">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.featureav" class="Thelia\Action\FeatureAv">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
