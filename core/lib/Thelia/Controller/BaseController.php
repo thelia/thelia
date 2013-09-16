@@ -281,4 +281,13 @@ class BaseController extends ContainerAware
             $this->accessDenied();
         }
     }
+
+    /**
+     * @return \Swift_Mailer
+     */
+    public function getMailer()
+    {
+        $mailer = $this->container->get('mailer');
+        return $mailer->getSwiftMailer();
+    }
 }
