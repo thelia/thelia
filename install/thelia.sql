@@ -36,6 +36,7 @@ CREATE TABLE `product`
     `ref` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER NOT NULL,
+    `template_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -44,11 +45,15 @@ CREATE TABLE `product`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_product_tax_rule_id` (`tax_rule_id`),
+    INDEX `fk_product_template1_idx` (`template_id`),
     CONSTRAINT `fk_product_tax_rule_id`
         FOREIGN KEY (`tax_rule_id`)
         REFERENCES `tax_rule` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL
+        ON DELETE SET NULL,
+    CONSTRAINT `fk_product_template1`
+        FOREIGN KEY (`template_id`)
+        REFERENCES `template` (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -243,31 +248,29 @@ CREATE TABLE `feature_product`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- feature_category
+-- feature_template
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `feature_category`;
+DROP TABLE IF EXISTS `feature_template`;
 
-CREATE TABLE `feature_category`
+CREATE TABLE `feature_template`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `feature_id` INTEGER NOT NULL,
-    `category_id` INTEGER NOT NULL,
+    `template_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_feature_category_category_id` (`category_id`),
-    INDEX `idx_feature_category_feature_id` (`feature_id`),
-    CONSTRAINT `fk_feature_category_category_id`
-        FOREIGN KEY (`category_id`)
-        REFERENCES `category` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_feature_category_feature_id`
+    INDEX `idx_feature_template_id` (`feature_id`),
+    INDEX `fk_feature_template_idx` (`template_id`),
+    CONSTRAINT `fk_feature_template_id`
         FOREIGN KEY (`feature_id`)
         REFERENCES `feature` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_feature_template`
+        FOREIGN KEY (`template_id`)
+        REFERENCES `template` (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -367,31 +370,29 @@ CREATE TABLE `product_sale_elements`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- attribute_category
+-- attribute_template
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `attribute_category`;
+DROP TABLE IF EXISTS `attribute_template`;
 
-CREATE TABLE `attribute_category`
+CREATE TABLE `attribute_template`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `category_id` INTEGER NOT NULL,
     `attribute_id` INTEGER NOT NULL,
+    `template_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_attribute_category_category_id` (`category_id`),
-    INDEX `idx_attribute_category_attribute_id` (`attribute_id`),
-    CONSTRAINT `fk_attribute_category_category_id`
-        FOREIGN KEY (`category_id`)
-        REFERENCES `category` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_attribute_category_attribute_id`
+    INDEX `idx_attribute_template_id` (`attribute_id`),
+    INDEX `fk_attribute_template_idx` (`template_id`),
+    CONSTRAINT `fk_attribute_template_id`
         FOREIGN KEY (`attribute_id`)
         REFERENCES `attribute` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_attribute_template`
+        FOREIGN KEY (`template_id`)
+        REFERENCES `template` (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -433,6 +434,8 @@ CREATE TABLE `customer`
     `lang` VARCHAR(10),
     `sponsor` VARCHAR(50),
     `discount` FLOAT,
+    `remember_me_token` VARCHAR(255),
+    `remember_me_serial` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -923,6 +926,8 @@ CREATE TABLE `admin`
     `password` VARCHAR(128) NOT NULL,
     `algo` VARCHAR(128),
     `salt` VARCHAR(128),
+    `remember_me_token` VARCHAR(255),
+    `remember_me_serial` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -1480,6 +1485,20 @@ CREATE TABLE `rewriting_argument`
         REFERENCES `rewriting_url` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- template
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `template`;
+
+CREATE TABLE `template`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -2061,6 +2080,24 @@ CREATE TABLE `folder_document_i18n`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- template_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `template_i18n`;
+
+CREATE TABLE `template_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `name` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `template_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `template` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- category_version
 -- ---------------------------------------------------------------------
 
@@ -2097,6 +2134,7 @@ CREATE TABLE `product_version`
     `ref` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER NOT NULL,
+    `template_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

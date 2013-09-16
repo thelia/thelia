@@ -106,6 +106,9 @@ class AdminUtilities extends AbstractSmartyPlugin
         // The column label
         $label = $this->getParam($params, 'label');
 
+        // The request parameter
+        $request_parameter_name = $this->getParam($params, 'request_parameter_name', 'order');
+
         if ($current_order == $order) {
             $icon = 'up';
             $order_change = $reverse_order;
@@ -121,7 +124,7 @@ class AdminUtilities extends AbstractSmartyPlugin
         else
             $output = '';
 
-        return sprintf('%s<a href="%s">%s</a>', $output, URL::getInstance()->absoluteUrl($path, array('order' => $order_change)), $label);
+        return sprintf('%s<a href="%s">%s</a>', $output, URL::getInstance()->absoluteUrl($path, array($request_parameter_name => $order_change)), $label);
     }
 
     /**

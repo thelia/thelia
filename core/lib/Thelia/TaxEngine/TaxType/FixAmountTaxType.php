@@ -36,6 +36,16 @@ class FixAmountTaxType extends BaseTaxType
         return $this->getRequirement("amount");
     }
 
+    public function pricePercentRetriever()
+    {
+        return 0;
+    }
+
+    public function fixAmountRetriever()
+    {
+        return $this->getRequirement("amount");
+    }
+
     public function getRequirementsList()
     {
         return array(

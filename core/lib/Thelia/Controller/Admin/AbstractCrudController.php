@@ -38,6 +38,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
     // List ordering
     protected $defaultListOrder;
+    protected $orderRequestParameterName;
 
     // Permissions
     protected $viewPermissionIdentifier;
@@ -74,6 +75,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $objectName,
 
             $defaultListOrder = null,
+            $orderRequestParameterName = null,
 
             $viewPermissionIdentifier,
             $createPermissionIdentifier,
@@ -89,8 +91,9 @@ abstract class AbstractCrudController extends BaseAdminController
             $this->objectName = $objectName;
 
             $this->defaultListOrder = $defaultListOrder;
+            $this->orderRequestParameterName = $orderRequestParameterName;
 
-            $this->viewPermissionIdentifier = $viewPermissionIdentifier;
+            $this->viewPermissionIdentifier  = $viewPermissionIdentifier;
             $this->createPermissionIdentifier = $createPermissionIdentifier;
             $this->updatePermissionIdentifier = $updatePermissionIdentifier;
             $this->deletePermissionIdentifier = $deletePermissionIdentifier;
@@ -194,36 +197,59 @@ abstract class AbstractCrudController extends BaseAdminController
     protected abstract function redirectToListTemplate();
 
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue) {
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    {
         throw new \LogicException ("Position Update is not supported for this object");
     }
 
-    protected function createToggleVisibilityEvent() {
-
+    protected function createToggleVisibilityEvent()
+    {
         throw new \LogicException ("Toggle Visibility is not supported for this object");
+    }
+
+    /**
+     * Put in this method post object creation processing if required.
+     *
+     * @param unknown $createEvent the create event
+     * @return Response a response, or null to continue normal processing
+     */
+    protected function performAdditionalCreateAction($createEvent)
+    {
+        return null;
+    }
+
+    /**
+     * Put in this method post object update processing if required.
+     *
+     * @param unknown $updateEvent the update event
+     * @return Response a response, or null to continue normal processing
+     */
+    protected function performAdditionalUpdateAction($updateeEvent)
+    {
+        return null;
+    }
+
+    /**
+     * Put in this method post object delete processing if required.
+     *
+     * @param unknown $deleteEvent the delete event
+     * @return Response a response, or null to continue normal processing
+     */
+    protected function performAdditionalDeleteAction($deleteEvent)
+    {
+        return null;
     }
 
     /**
      * Return the current list order identifier, updating it in the same time.
      */
-    protected function getCurrentListOrder($update_session = true) {
-
-        $order = null;
-
-        if ($this->defaultListOrder) {
-
-            $orderSessionIdentifier = sprintf("admin.%s.currentListOrder", $this->objectName);
-
-            // Find the current order
-            $order = $this->getRequest()->get(
-                    'order',
-                    $this->getSession()->get($orderSessionIdentifier, $this->defaultListOrder)
-            );
-
-            if ($update_session) $this->getSession()->set($orderSessionIdentifier, $order);
-        }
-
-        return $order;
+    protected function getCurrentListOrder($update_session = true)
+    {
+        return $this->getListOrderFromSession(
+                $this->objectName,
+                $this->orderRequestParameterName,
+                $this->defaultListOrder
+        );
     }
 
     /**
@@ -283,6 +309,8 @@ abstract class AbstractCrudController extends BaseAdminController
                 $this->adminLogAppend(sprintf("%s %s (ID %s) created", ucfirst($this->objectName), $this->getObjectLabel($createdObject), $this->getObjectId($createdObject)));
             }
 
+            $this->performAdditionalCreateAction($createEvent);
+
             // Substitute _ID_ in the URL with the ID of the created object
             $successUrl = str_replace('_ID_', $this->getObjectId($createdObject), $creationForm->getSuccessUrl());
 
@@ -317,7 +345,7 @@ abstract class AbstractCrudController extends BaseAdminController
         if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
 
         // Load the object
-        $object = $this->getExistingObject($this->getRequest());
+        $object = $this->getExistingObject();
 
         if ($object != null) {
 
@@ -367,6 +395,8 @@ abstract class AbstractCrudController extends BaseAdminController
             if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
                 $this->adminLogAppend(sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
             }
+
+            $this->performAdditionalUpdateAction($changeEvent);
 
             // If we have to stay on the same page, do not redirect to the succesUrl,
             // just redirect to the edit page again.
@@ -468,6 +498,11 @@ abstract class AbstractCrudController extends BaseAdminController
                     sprintf("%s %s (ID %s) deleted", ucfirst($this->objectName), $this->getObjectLabel($deletedObject), $this->getObjectId($deletedObject)));
         }
 
-        $this->redirectToListTemplate();
+        $response = $this->performAdditionalDeleteAction($deleteEvent);
+
+        if ($response == null)
+            $this->redirectToListTemplate();
+        else
+            return $response;
     }
 }

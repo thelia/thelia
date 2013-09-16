@@ -97,6 +97,17 @@
                                     {module_include location='attributes_table_row'}
 
                                     <td class="actions">
+                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.attributes.change"}
+                                        <div class="btn-group">
+                                            <a class="btn btn-default btn-xs attribute-remove-from-all" title="{intl l='Remove this attribute from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
+                                                <span class="glyphicon glyphicon-minus"></span>
+                                            </a>
+                                            <a class="btn btn-default btn-xs attribute-add-to-all" title="{intl l='Add this attribute to all product templates'}" href="#add_to_all_dialog" data-id="{$ID}" data-toggle="modal">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </a>
+                                        </div>
+                                        {/loop}
+
                                         <div class="btn-group">
 	                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.attributes.change"}
 	                                            <a class="btn btn-default btn-xs attribute-change" title="{intl l='Change this product attribute'}" href="{url path='/admin/configuration/attributes/update' attribute_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
@@ -217,6 +228,47 @@
     form_content    = {$smarty.capture.delete_dialog nofilter}
 }
 
+
+{* Add to all dialog *}
+
+{capture "add_to_all_dialog"}
+    <input type="hidden" name="attribute_id" id="attribute_add_to_all_id" value="" />
+
+    {module_include location='attribute_add_to_all_form'}
+
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "add_to_all_dialog"
+    dialog_title    = {intl l="Add to all product templates"}
+    dialog_message  = {intl l="Do you really want to add this attribute to all product templates ?"}
+
+    form_action         = {url path='/admin/configuration/attributes/add-to-all-templates'}
+    form_content        = {$smarty.capture.add_to_all_dialog nofilter}
+}
+
+{* Remove from all dialog *}
+
+{capture "remove_from_all_dialog"}
+    <input type="hidden" name="attribute_id" id="attribute_remove_from_all_id" value="" />
+
+    {module_include location='attribute_add_to_all_form'}
+
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "remove_from_all_dialog"
+    dialog_title    = {intl l="Remove from all product templates"}
+    dialog_message  = {intl l="Do you really want to remove this attribute from all product templates ? You'll loose all product related data for this attribute."}
+
+    form_action         = {url path='/admin/configuration/attributes/remove-from-all-templates'}
+    form_content        = {$smarty.capture.remove_from_all_dialog nofilter}
+}
+
 {/block}
 
 {block name="javascript-initialization"}
@@ -231,6 +283,14 @@
             // Set proper attribute ID in delete from
             $('a.attribute-delete').click(function(ev) {
                 $('#attribute_delete_id').val($(this).data('id'));
+            });
+
+            $('a.attribute-add-to-all').click(function(ev) {
+                $('#attribute_add_to_all_id').val($(this).data('id'));
+            });
+
+            $('a.attribute-remove-from-all').click(function(ev) {
+                $('#attribute_remove_from_all_id').val($(this).data('id'));
             });
 
             // JS stuff for creation form

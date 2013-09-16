@@ -43,6 +43,7 @@ class CurrencyController extends AbstractCrudController
         parent::__construct(
             'currency',
             'manual',
+            'order',
 
             'admin.configuration.currencies.view',
             'admin.configuration.currencies.create',

@@ -37,6 +37,10 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Event\CategoryEvent;
+use Thelia\Core\Event\AttributeEvent;
+use Thelia\Model\AttributeTemplate;
+use Thelia\Model\AttributeTemplateQuery;
 
 class Attribute extends BaseAction implements EventSubscriberInterface
 {
@@ -133,6 +137,24 @@ class Attribute extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function addToAllTemplates(AttributeEvent $event)
+    {
+        $templates = AttributeTemplateQuery::create()->find();
+
+        foreach($templates as $template) {
+            $pat = new AttributeTemplate();
+
+            $pat->setTemplate($template->getId())
+                ->setAttributeId($event->getAttribute()->getId())
+                ->save();
+        }
+    }
+
+    public function removeFromAllTemplates(AttributeEvent $event)
+    {
+        // Delete this attribute from all product templates
+        AttributeTemplateQuery::create()->filterByAttributeId($event->getAttribute()->getId())->delete();
+    }
 
     /**
      * {@inheritDoc}
@@ -144,6 +166,10 @@ class Attribute extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ATTRIBUTE_UPDATE          => array("update", 128),
             TheliaEvents::ATTRIBUTE_DELETE          => array("delete", 128),
             TheliaEvents::ATTRIBUTE_UPDATE_POSITION => array("updatePosition", 128),
+
+            TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES => array("removeFromAllTemplates", 128),
+            TheliaEvents::ATTRIBUTE_ADD_TO_ALL_TEMPLATES      => array("addToAllTemplates", 128),
+
         );
     }
 }

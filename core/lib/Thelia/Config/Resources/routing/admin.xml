@@ -212,6 +212,29 @@
     </route>
 
 
+    <!-- Product templates management -->
+
+    <route id="admin.configuration.templates.default" path="/admin/configuration/templates">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.create" path="/admin/configuration/templates/create">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.update" path="/admin/configuration/templates/update">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::updateAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.save" path="/admin/configuration/templates/save">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.delete" path="/admin/configuration/templates/delete">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteAction</default>
+    </route>
+
+
     <!-- attribute and attributes value management -->
 
     <route id="admin.configuration.attributes.default" path="/admin/configuration/attributes">
@@ -236,6 +259,14 @@
 
     <route id="admin.configuration.attributes.update-position" path="/admin/configuration/attributes/update-position">
         <default key="_controller">Thelia\Controller\Admin\AttributeController::updatePositionAction</default>
+    </route>
+
+    <route id="admin.configuration.attributes.rem-from-all" path="/admin/configuration/attributes/remove-from-all-templates">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::removeFromAllTemplates</default>
+    </route>
+
+    <route id="admin.configuration.attributes.add-to-all" path="/admin/configuration/attributes/add-to-all-templates">
+        <default key="_controller">Thelia\Controller\Admin\AttributeController::addToAllTemplates</default>
     </route>
 
 

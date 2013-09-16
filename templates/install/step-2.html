@@ -1,0 +1,51 @@
+{extends file="layout.tpl"}
+
+{block name="page-title"}{intl l='Installation step 2'}{/block}
+
+{block name="main-content"}
+<div class="install">
+	<div id="wrapper" class="container">
+		
+		<div class="row">
+		    <div class="col-md-12">
+		        <div class="general-block-decorator">
+										
+					<h3 class="title title-without-tabs">{intl l="Thelia installation wizard"}</h3>
+					
+					<div class="wizard">
+						<ul>
+							<li class="complete"><a href="#"><span class="badge">1</span>{intl l="Welcome"}<span class="chevron"></span></a></li>
+							<li class="active"><span class="badge">2</span>{intl l="Checking permissions"}<span class="chevron"></span></li>
+							<li><span class="badge">3</span>{intl l="Database connection"}<span class="chevron"></span></li>
+							<li><span class="badge">4</span>{intl l="Database selection"}<span class="chevron"></span></li>
+							<li><span class="badge">5</span>{intl l="General information"}<span class="chevron"></span></li>
+							<li><span class="badge">6</span>{intl l="Thanks"}<span class="chevron"></span></li>
+						</ul>						
+					</div>
+
+					<div class="well">	
+						<p>We will check some rights to files and directories...</p>
+						<ul class="list-unstyled list-group">
+							<li class="list-group-item text-success">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
+							<li class="list-group-item text-success">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
+							<li class="list-group-item text-danger">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
+							<li class="list-group-item text-danger">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
+							<li class="list-group-item text-success">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
+							<li class="list-group-item text-danger">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
+							<li class="list-group-item text-success">Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</li>
+						</ul>
+
+					</div>
+					
+					<div class="clearfix">
+						<a href="install" class="pull-left btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span> {intl l="Return"}</a>
+						<a href="install/step/3" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> {intl l="Continue"}</a>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</div>
+{/block}
