@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,53 +17,36 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\Request as BaseRequest;
+namespace Thelia\Core\Event;
+use Thelia\Model\FeatureAv;
 
-/**
- * extends Symfony\Component\HttpFoundation\Request for adding some helpers
- *
- * Class Request
- * @package Thelia\Core\HttpFoundation
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class Request extends BaseRequest
+class FeatureAvEvent extends ActionEvent
 {
+    protected $featureAv = null;
 
-    public function getProductId()
+    public function __construct(FeatureAv $featureAv = null)
     {
-        return $this->get("product_id");
+        $this->featureAv = $featureAv;
     }
 
-    public function getUriAddingParameters(array $parameters = null)
+    public function hasFeatureAv()
     {
-        $uri = $this->getUri();
-
-        $additionalQs = '';
-
-        foreach ($parameters as $key => $value) {
-            $additionalQs .= sprintf("&%s=%s", $key, $value);
-        }
-
-        if ('' == $this->getQueryString()) {
-            $additionalQs = '?'. ltrim($additionalQs, '&');
-        }
-
-        return $uri . $additionalQs;
+        return ! is_null($this->featureAv);
     }
 
-    /**
-     * Gets the Session.
-     *
-     * @return \Thelia\Core\HttpFoundation\Session\Session The session
-     * @api
-     */
-    public function getSession()
+    public function getFeatureAv()
     {
-        return parent::getSession();
+        return $this->featureAv;
+    }
+
+    public function setFeatureAv($featureAv)
+    {
+        $this->featureAv = $featureAv;
+
+        return $this;
     }
 }

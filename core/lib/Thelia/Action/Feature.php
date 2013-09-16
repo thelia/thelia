@@ -25,36 +25,36 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Thelia\Model\AttributeQuery;
-use Thelia\Model\Attribute as AttributeModel;
+use Thelia\Model\FeatureQuery;
+use Thelia\Model\Feature as FeatureModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\AttributeUpdateEvent;
-use Thelia\Core\Event\AttributeCreateEvent;
-use Thelia\Core\Event\AttributeDeleteEvent;
+use Thelia\Core\Event\FeatureUpdateEvent;
+use Thelia\Core\Event\FeatureCreateEvent;
+use Thelia\Core\Event\FeatureDeleteEvent;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\AttributeAv;
-use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\FeatureAv;
+use Thelia\Model\FeatureAvQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\CategoryEvent;
-use Thelia\Core\Event\AttributeEvent;
-use Thelia\Model\AttributeTemplate;
-use Thelia\Model\AttributeTemplateQuery;
+use Thelia\Core\Event\FeatureEvent;
+use Thelia\Model\FeatureTemplate;
+use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Model\TemplateQuery;
 
-class Attribute extends BaseAction implements EventSubscriberInterface
+class Feature extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * Create a new attribute entry
+     * Create a new feature entry
      *
-     * @param AttributeCreateEvent $event
+     * @param FeatureCreateEvent $event
      */
-    public function create(AttributeCreateEvent $event)
+    public function create(FeatureCreateEvent $event)
     {
-        $attribute = new AttributeModel();
+        $feature = new FeatureModel();
 
-        $attribute
+        $feature
             ->setDispatcher($this->getDispatcher())
 
             ->setLocale($event->getLocale())
@@ -63,7 +63,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
             ->save()
         ;
 
-        $event->setAttribute($attribute);
+        $event->setFeature($feature);
 
         // Add atribute to all product templates if required
         if ($event->getAddToAllTemplates() != 0) {
@@ -72,17 +72,17 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Change a product attribute
+     * Change a product feature
      *
-     * @param AttributeUpdateEvent $event
+     * @param FeatureUpdateEvent $event
      */
-    public function update(AttributeUpdateEvent $event)
+    public function update(FeatureUpdateEvent $event)
     {
-        $search = AttributeQuery::create();
+        $search = FeatureQuery::create();
 
-        if (null !== $attribute = AttributeQuery::create()->findPk($event->getAttributeId())) {
+        if (null !== $feature = FeatureQuery::create()->findPk($event->getFeatureId())) {
 
-            $attribute
+            $feature
                 ->setDispatcher($this->getDispatcher())
 
                 ->setLocale($event->getLocale())
@@ -93,26 +93,26 @@ class Attribute extends BaseAction implements EventSubscriberInterface
 
                 ->save();
 
-            $event->setAttribute($attribute);
+            $event->setFeature($feature);
         }
     }
 
     /**
-     * Delete a product attribute entry
+     * Delete a product feature entry
      *
-     * @param AttributeDeleteEvent $event
+     * @param FeatureDeleteEvent $event
      */
-    public function delete(AttributeDeleteEvent $event)
+    public function delete(FeatureDeleteEvent $event)
     {
 
-        if (null !== ($attribute = AttributeQuery::create()->findPk($event->getAttributeId()))) {
+        if (null !== ($feature = FeatureQuery::create()->findPk($event->getFeatureId()))) {
 
-            $attribute
+            $feature
                 ->setDispatcher($this->getDispatcher())
                 ->delete()
             ;
 
-            $event->setAttribute($attribute);
+            $event->setFeature($feature);
         }
     }
 
@@ -123,32 +123,32 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if (null !== $attribute = AttributeQuery::create()->findPk($event->getObjectId())) {
+        if (null !== $feature = FeatureQuery::create()->findPk($event->getObjectId())) {
 
-            $attribute->setDispatcher($this->getDispatcher());
+            $feature->setDispatcher($this->getDispatcher());
 
             $mode = $event->getMode();
 
             if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $attribute->changeAbsolutePosition($event->getPosition());
+                return $feature->changeAbsolutePosition($event->getPosition());
             else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $attribute->movePositionUp();
+                return $feature->movePositionUp();
             else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $attribute->movePositionDown();
+                return $feature->movePositionDown();
         }
     }
 
-    protected function doAddToAllTemplates(AttributeModel $attribute)
+    protected function doAddToAllTemplates(FeatureModel $feature)
     {
         $templates = TemplateQuery::create()->find();
 
         foreach($templates as $template) {
 
-            $attribute_template = new AttributeTemplate();
+            $feature_template = new FeatureTemplate();
 
-            if (null === AttributeTemplateQuery::create()->filterByAttribute($attribute)->filterByTemplate($template)->findOne()) {
-                $attribute_template
-                    ->setAttribute($attribute)
+            if (null === FeatureTemplateQuery::create()->filterByFeature($feature)->filterByTemplate($template)->findOne()) {
+                $feature_template
+                    ->setFeature($feature)
                     ->setTemplate($template)
                     ->save()
                 ;
@@ -156,15 +156,15 @@ class Attribute extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function addToAllTemplates(AttributeEvent $event)
+    public function addToAllTemplates(FeatureEvent $event)
     {
-        $this->doAddToAllTemplates($event->getAttribute());
+        $this->doAddToAllTemplates($event->getFeature());
     }
 
-    public function removeFromAllTemplates(AttributeEvent $event)
+    public function removeFromAllTemplates(FeatureEvent $event)
     {
-        // Delete this attribute from all product templates
-        AttributeTemplateQuery::create()->filterByAttribute($event->getAttribute())->delete();
+        // Delete this feature from all product templates
+        FeatureTemplateQuery::create()->filterByFeature($event->getFeature())->delete();
     }
 
     /**
@@ -173,13 +173,13 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::ATTRIBUTE_CREATE          => array("create", 128),
-            TheliaEvents::ATTRIBUTE_UPDATE          => array("update", 128),
-            TheliaEvents::ATTRIBUTE_DELETE          => array("delete", 128),
-            TheliaEvents::ATTRIBUTE_UPDATE_POSITION => array("updatePosition", 128),
+            TheliaEvents::FEATURE_CREATE          => array("create", 128),
+            TheliaEvents::FEATURE_UPDATE          => array("update", 128),
+            TheliaEvents::FEATURE_DELETE          => array("delete", 128),
+            TheliaEvents::FEATURE_UPDATE_POSITION => array("updatePosition", 128),
 
-            TheliaEvents::ATTRIBUTE_REMOVE_FROM_ALL_TEMPLATES => array("removeFromAllTemplates", 128),
-            TheliaEvents::ATTRIBUTE_ADD_TO_ALL_TEMPLATES      => array("addToAllTemplates", 128),
+            TheliaEvents::FEATURE_REMOVE_FROM_ALL_TEMPLATES => array("removeFromAllTemplates", 128),
+            TheliaEvents::FEATURE_ADD_TO_ALL_TEMPLATES      => array("addToAllTemplates", 128),
 
         );
     }

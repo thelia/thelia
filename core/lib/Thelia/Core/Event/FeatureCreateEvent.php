@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,53 +17,52 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\Request as BaseRequest;
+namespace Thelia\Core\Event;
 
-/**
- * extends Symfony\Component\HttpFoundation\Request for adding some helpers
- *
- * Class Request
- * @package Thelia\Core\HttpFoundation
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class Request extends BaseRequest
+class FeatureCreateEvent extends FeatureEvent
 {
+    protected $title;
+    protected $locale;
+    protected $add_to_all_templates;
 
-    public function getProductId()
+    public function getLocale()
     {
-        return $this->get("product_id");
+        return $this->locale;
     }
 
-    public function getUriAddingParameters(array $parameters = null)
+    public function setLocale($locale)
     {
-        $uri = $this->getUri();
+        $this->locale = $locale;
 
-        $additionalQs = '';
-
-        foreach ($parameters as $key => $value) {
-            $additionalQs .= sprintf("&%s=%s", $key, $value);
-        }
-
-        if ('' == $this->getQueryString()) {
-            $additionalQs = '?'. ltrim($additionalQs, '&');
-        }
-
-        return $uri . $additionalQs;
+        return $this;
     }
 
-    /**
-     * Gets the Session.
-     *
-     * @return \Thelia\Core\HttpFoundation\Session\Session The session
-     * @api
-     */
-    public function getSession()
+    public function getTitle()
     {
-        return parent::getSession();
+        return $this->title;
     }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getAddToAllTemplates()
+    {
+        return $this->add_to_all_templates;
+    }
+
+    public function setAddToAllTemplates($add_to_all_templates)
+    {
+        $this->add_to_all_templates = $add_to_all_templates;
+
+        return $this;
+    }
+
 }

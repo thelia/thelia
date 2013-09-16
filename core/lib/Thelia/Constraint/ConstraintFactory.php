@@ -25,6 +25,7 @@ namespace Thelia\Constraint;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Thelia\Constraint\Rule\AvailableForEveryoneManager;
 use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Constraint\Rule\SerializableRule;
@@ -74,11 +75,22 @@ class ConstraintFactory
      */
     public function serializeCouponRuleCollection(CouponRuleCollection $collection)
     {
+        if ($collection->isEmpty()) {
+            /** @var CouponRuleInterface $ruleNoCondition */
+            $ruleNoCondition = $this->container->get(
+                'thelia.constraint.rule.available_for_everyone'
+            );
+            $collection->add($ruleNoCondition);
+        }
         $serializableRules = array();
         $rules = $collection->getRules();
         if ($rules !== null) {
             /** @var $rule CouponRuleInterface */
             foreach ($rules as $rule) {
+                // Remove all rule if the "no condition" rule is found
+//                if ($rule->getServiceId() == 'thelia.constraint.rule.available_for_everyone') {
+//                    return base64_encode(json_encode(array($rule->getSerializableRule())));
+//                }
                 $serializableRules[] = $rule->getSerializableRule();
             }
         }

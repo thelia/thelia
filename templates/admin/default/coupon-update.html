@@ -7,18 +7,19 @@
 
     <nav>
         <ul class="breadcrumb">
-            {include file="includes/coupon_breadcrumb.html"}
+            <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
+            <li><a href="{url path='admin/coupon/'}">{intl l='Coupon'}</a></li>
+            <li>{intl l='Update'} {$couponCode}</li>
         </ul>
     </nav>
 
     <div class="page-header">
-        <h1>Coupons : <small>Update a coupon</small></h1>
+        <h1>{intl l='Coupons : '}<small>{intl l='Update'} {$couponCode}</small></h1>
     </div>
 
     {form name="thelia.admin.coupon.creation"}
         {include file='coupon/form.html' formAction={url path={$formAction}} form=$form noRules=false}
     {/form}
-
 
 </section> <!-- #wrapper -->
 {/block}
@@ -71,8 +72,6 @@
             // Save Rules AJAX
             couponManager.saveRuleAjax = function() {
                 $('#constraint-add-operators-values').html('<div class="loading" ></div>');
-                console.log('about to save');
-                console.log(couponManager.rulesToSave);
                 var $url = '{$urlAjaxUpdateRules}';
                 $.ajax({
                     type: "POST",
@@ -88,6 +87,11 @@
                 }).done(function(data) {
                     $('#constraint-list').html(data);
                     $('#constraint-add-operators-values').html('');
+                    // Set the rule selector
+                    $("#category-rule option").filter(function() {
+                        return $(this).val() == 'thelia.constraint.rule.available_for_everyone';
+                    }).prop('selected', true);
+
                     couponManager.onClickUpdateRule();
                     couponManager.onClickDeleteRule();
                 });
@@ -109,13 +113,22 @@
                     }
                 }).done(function(data) {
                     $('#constraint-add-operators-values').html(data);
-
+                    couponManager.ruleToSave.serviceId = ruleId;
+                    if (ruleId == -1) {
+                        // Placeholder can't be saved
+                        $('#constraint-save-btn').hide();
+                    } else {
+                        $('#constraint-save-btn').show();
+                    }
                     return callBack();
                 });
             };
 
             // Rules which will be saved
             couponManager.rulesToSave = couponManager.initRules();
+
+            $('#constraint-save-btn').hide();
+
         });
     </script>
 {/block}

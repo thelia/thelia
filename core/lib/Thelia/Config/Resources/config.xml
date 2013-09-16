@@ -72,7 +72,12 @@
         <form name="thelia.admin.attribute.creation" class="Thelia\Form\AttributeCreationForm"/>
         <form name="thelia.admin.attribute.modification" class="Thelia\Form\AttributeModificationForm"/>
 
+        <form name="thelia.admin.feature.creation" class="Thelia\Form\FeatureCreationForm"/>
+        <form name="thelia.admin.feature.modification" class="Thelia\Form\FeatureModificationForm"/>
+
         <form name="thelia.admin.attributeav.creation" class="Thelia\Form\AttributeAvCreationForm"/>
+
+        <form name="thelia.admin.featureav.creation" class="Thelia\Form\FeatureAvCreationForm"/>
 
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>
@@ -234,6 +239,8 @@
 
         <service id="thelia.constraint.factory" class="Thelia\Constraint\ConstraintFactory">
             <argument type="service" id="service_container" />
+        </service>
+        <service id="thelia.constraint.validator" class="Thelia\Constraint\ConstraintValidator">
         </service>
         <service id="thelia.constraint.rule.available_for_everyone" class="Thelia\Constraint\Rule\AvailableForEveryoneManager">
             <argument type="service" id="thelia.adapter" />

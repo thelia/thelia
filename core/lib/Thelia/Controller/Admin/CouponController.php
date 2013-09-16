@@ -30,6 +30,7 @@ use Thelia\Constraint\ConstraintFactoryTest;
 use Thelia\Constraint\Rule\AvailableForTotalAmount;
 use Thelia\Constraint\Rule\CouponRuleInterface;
 use Thelia\Constraint\Validator\PriceParam;
+use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponEvent;
@@ -39,6 +40,7 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponAdapterInterface;
+use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Coupon\Type\CouponInterface;
@@ -72,7 +74,54 @@ class CouponController extends BaseAdminController
     {
         $this->checkAuth('ADMIN', 'admin.coupon.view');
 
-        return $this->render('coupon-list');
+        $args['urlReadCoupon'] = $this->getRoute(
+            'admin.coupon.read',
+            array('couponId' => 'couponId'),
+            Router::ABSOLUTE_URL
+        );
+
+        $args['urlEditCoupon'] = $this->getRoute(
+            'admin.coupon.update',
+            array('couponId' => 'couponId'),
+            Router::ABSOLUTE_URL
+        );
+
+        $args['urlCreateCoupon'] = $this->getRoute(
+            'admin.coupon.create',
+            array(),
+            Router::ABSOLUTE_URL
+        );
+
+        return $this->render('coupon-list', $args);
+    }
+
+    /**
+     * Manage Coupons read display
+     *
+     * @param int $couponId Coupon Id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function readAction($couponId)
+    {
+        $this->checkAuth('ADMIN', 'admin.coupon.read');
+
+        // Database request repeated in the loop but cached
+        $search = CouponQuery::create();
+        $coupon = $search->findOneById($couponId);
+
+        if ($coupon === null) {
+            return $this->pageNotFound();
+        }
+
+        $args['couponId'] = $couponId;
+        $args['urlEditCoupon'] = $this->getRoute(
+            'admin.coupon.update',
+            array('couponId' => $couponId),
+            Router::ABSOLUTE_URL
+        );
+
+        return $this->render('coupon-read', $args);
     }
 
     /**
@@ -93,7 +142,7 @@ class CouponController extends BaseAdminController
 
         $i18n = new I18n();
         /** @var Lang $lang */
-        $lang = $this->getSession()->get('lang');
+        $lang = $this->getSession()->getLang();
         $eventToDispatch = TheliaEvents::COUPON_CREATE;
 
         if ($this->getRequest()->isMethod('POST')) {
@@ -108,10 +157,12 @@ class CouponController extends BaseAdminController
             // If no input for expirationDate, now + 2 months
             $defaultDate = new \DateTime();
             $args['defaultDate'] = $defaultDate->modify('+2 month')
-                ->format($lang->getDateFormat());
+                ->format('Y-m-d');
         }
 
-        $args['formAction'] = 'admin/coupon/create';
+        $args['dateFormat'] = $this->getSession()->getLang()->getDateFormat();
+        $args['availableCoupons'] = $this->getAvailableCoupons();
+        $args['formAction'] = 'admin/coupon/create/';
 
         return $this->render(
             'coupon-create',
@@ -135,7 +186,7 @@ class CouponController extends BaseAdminController
         }
 
         /** @var Coupon $coupon */
-        $coupon = CouponQuery::create()->findOneById($couponId);
+        $coupon = CouponQuery::create()->findPk($couponId);
         if (!$coupon) {
             $this->pageNotFound();
         }
@@ -148,6 +199,7 @@ class CouponController extends BaseAdminController
         $lang = $this->getSession()->getLang();
         $eventToDispatch = TheliaEvents::COUPON_UPDATE;
 
+        // Create
         if ($this->getRequest()->isMethod('POST')) {
             $this->validateCreateOrUpdateForm(
                 $i18n,
@@ -156,9 +208,9 @@ class CouponController extends BaseAdminController
                 'updated',
                 'update'
             );
-        } else {
-            // Prepare the data that will hydrate the form
+        } else { // Update
 
+            // Prepare the data that will hydrate the form
             /** @var ConstraintFactory $constraintFactory */
             $constraintFactory = $this->container->get('thelia.constraint.factory');
             $rules = $constraintFactory->unserializeCouponRuleCollection(
@@ -173,7 +225,7 @@ class CouponController extends BaseAdminController
                 'shortDescription' => $coupon->getShortDescription(),
                 'description' => $coupon->getDescription(),
                 'isEnabled' => ($coupon->getIsEnabled() == 1),
-                'expirationDate' => $coupon->getExpirationDate($lang->getDateFormat()),
+                'expirationDate' => $coupon->getExpirationDate('Y-m-d'),
                 'isAvailableOnSpecialOffers' => ($coupon->getIsAvailableOnSpecialOffers() == 1),
                 'isCumulative' => ($coupon->getIsCumulative() == 1),
                 'isRemovingPostage' => ($coupon->getIsRemovingPostage() == 1),
@@ -202,7 +254,7 @@ class CouponController extends BaseAdminController
             // Pass it to the parser
             $this->getParserContext()->addForm($changeForm);
         }
-
+        $args['couponCode'] = $coupon->getCode();
         $args['availableCoupons'] = $this->getAvailableCoupons();
         $args['availableRules'] = $this->getAvailableRules();
         $args['urlAjaxGetRuleInput'] = $this->getRoute(
@@ -222,123 +274,6 @@ class CouponController extends BaseAdminController
         return $this->render('coupon-update', $args);
     }
 
-
-//    /**
-//     * Manage Coupons Rule creation display
-//     *
-//     * @param int $couponId Coupon id
-//     *
-//     * @return \Symfony\Component\HttpFoundation\Response
-//     */
-//    public function createRuleAction($couponId)
-//    {
-//        // Check current user authorization
-//        $response = $this->checkAuth('admin.coupon.update');
-//        if ($response !==  null) {
-//            return $response;
-//        }
-//
-//        /** @var Coupon $coupon */
-//        $coupon = CouponQuery::create()->findOneById($couponId);
-//        if (!$coupon) {
-//            $this->pageNotFound();
-//        }
-//
-//        // Parameters given to the template
-//        $args = array();
-//
-//        $i18n = new I18n();
-//        /** @var Lang $lang */
-//        $lang = $this->getSession()->get('lang');
-//        $eventToDispatch = TheliaEvents::COUPON_RULE_CREATE;
-//
-//        if ($this->getRequest()->isMethod('POST')) {
-//            $this->validateCreateOrUpdateForm(
-//                $i18n,
-//                $lang,
-//                $eventToDispatch,
-//                'updated',
-//                'update'
-//            );
-//        } else {
-//            // Prepare the data that will hydrate the form
-//
-//            /** @var ConstraintFactory $constraintFactory */
-//            $constraintFactory = $this->container->get('thelia.constraint.factory');
-//
-//            $data = array(
-//                'code' => $coupon->getCode(),
-//                'title' => $coupon->getTitle(),
-//                'amount' => $coupon->getAmount(),
-//                'effect' => $coupon->getType(),
-//                'shortDescription' => $coupon->getShortDescription(),
-//                'description' => $coupon->getDescription(),
-//                'isEnabled' => ($coupon->getIsEnabled() == 1),
-//                'expirationDate' => $coupon->getExpirationDate($lang->getDateFormat()),
-//                'isAvailableOnSpecialOffers' => ($coupon->getIsAvailableOnSpecialOffers() == 1),
-//                'isCumulative' => ($coupon->getIsCumulative() == 1),
-//                'isRemovingPostage' => ($coupon->getIsRemovingPostage() == 1),
-//                'maxUsage' => $coupon->getMaxUsage(),
-//                'rules' => $constraintFactory->unserializeCouponRuleCollection($coupon->getSerializedRules()),
-//                'locale' => $coupon->getLocale(),
-//            );
-//
-//            /** @var CouponAdapterInterface $adapter */
-//            $adapter = $this->container->get('thelia.adapter');
-//            /** @var Translator $translator */
-//            $translator = $this->container->get('thelia.translator');
-//
-//            $args['rulesObject'] = array();
-//            /** @var CouponRuleInterface $rule */
-//            foreach ($coupon->getRules()->getRules() as $rule) {
-//                $args['rulesObject'][] = array(
-//                    'name' => $rule->getName($translator),
-//                    'tooltip' => $rule->getToolTip($translator),
-//                    'validators' => $rule->getValidators()
-//                );
-//            }
-//
-//            $args['rules'] = $this->cleanRuleForTemplate($coupon->getRules()->getRules());
-//
-//            // Setup the object form
-//            $changeForm = new CouponCreationForm($this->getRequest(), 'form', $data);
-//
-//            // Pass it to the parser
-//            $this->getParserContext()->addForm($changeForm);
-//        }
-//
-//        $args['formAction'] = 'admin/coupon/update/' . $couponId;
-//
-//        return $this->render(
-//            'coupon-update',
-//            $args
-//        );
-//    }
-
-
-
-    /**
-     * Manage Coupons read display
-     *
-     * @param int $couponId Coupon Id
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function readAction($couponId)
-    {
-        $this->checkAuth('ADMIN', 'admin.coupon.read');
-
-        // Database request repeated in the loop but cached
-        $search = CouponQuery::create();
-        $coupon = $search->findOneById($couponId);
-
-        if ($coupon === null) {
-            return $this->pageNotFound();
-        }
-
-        return $this->render('coupon-read', array('couponId' => $couponId));
-    }
-
     /**
      * Manage Coupons read display
      *
@@ -350,17 +285,7 @@ class CouponController extends BaseAdminController
     {
         $this->checkAuth('ADMIN', 'admin.coupon.read');
 
-        if ($this->isDebug()) {
-            if (!$this->getRequest()->isXmlHttpRequest()) {
-                $this->redirect(
-                    $this->getRoute(
-                        'admin',
-                        array(),
-                        Router::ABSOLUTE_URL
-                    )
-                );
-            }
-        }
+        $this->checkXmlHttpRequest();
 
         /** @var ConstraintFactory $constraintFactory */
         $constraintFactory = $this->container->get('thelia.constraint.factory');
@@ -391,17 +316,7 @@ class CouponController extends BaseAdminController
     {
         $this->checkAuth('ADMIN', 'admin.coupon.read');
 
-        if ($this->isDebug()) {
-            if (!$this->getRequest()->isXmlHttpRequest()) {
-                $this->redirect(
-                    $this->getRoute(
-                        'admin',
-                        array(),
-                        Router::ABSOLUTE_URL
-                    )
-                );
-            }
-        }
+        $this->checkXmlHttpRequest();
 
         $search = CouponQuery::create();
         /** @var Coupon $coupon */
@@ -476,6 +391,29 @@ class CouponController extends BaseAdminController
     }
 
     /**
+     * Test Coupon consuming
+     *
+     * @param string $couponCode Coupon code
+     *
+     */
+    public function consumeAction($couponCode)
+    {
+        // @todo remove (event dispatcher testing purpose)
+        $couponConsumeEvent = new CouponConsumeEvent($couponCode);
+        $eventToDispatch = TheliaEvents::COUPON_CONSUME;
+
+        // Dispatch Event to the Action
+        $this->dispatch(
+            $eventToDispatch,
+            $couponConsumeEvent
+        );
+
+        var_dump('test', $couponConsumeEvent->getCode(), $couponConsumeEvent->getDiscount(), $couponConsumeEvent->getIsValid());
+
+        exit();
+    }
+
+    /**
      * Build a Coupon from its form
      *
      * @param array $data Form data
@@ -535,7 +473,7 @@ class CouponController extends BaseAdminController
     /**
      * Validate the CreateOrUpdate form
      *
-     * @param string $i18n            Local code (fr_FR)
+     * @param I18n   $i18n            Local code (fr_FR)
      * @param Lang   $lang            Local variables container
      * @param string $eventToDispatch Event which will activate actions
      * @param string $log             created|edited
@@ -543,7 +481,7 @@ class CouponController extends BaseAdminController
      *
      * @return $this
      */
-    protected function validateCreateOrUpdateForm($i18n, $lang, $eventToDispatch, $log, $action)
+    protected function validateCreateOrUpdateForm(I18n $i18n, Lang $lang, $eventToDispatch, $log, $action)
     {
         // Create the form from the request
         $creationForm = new CouponCreationForm($this->getRequest());
@@ -563,7 +501,7 @@ class CouponController extends BaseAdminController
                 $data['shortDescription'],
                 $data['description'],
                 $data['isEnabled'],
-                $i18n->getDateTimeFromForm($lang, $data['expirationDate']),
+                \DateTime::createFromFormat('Y-m-d', $data['expirationDate']),
                 $data['isAvailableOnSpecialOffers'],
                 $data['isCumulative'],
                 $data['isRemovingPostage'],
@@ -651,17 +589,17 @@ class CouponController extends BaseAdminController
         /** @var CouponManager $couponManager */
         $couponManager = $this->container->get('thelia.coupon.manager');
         $availableCoupons = $couponManager->getAvailableCoupons();
-        $cleanedRules = array();
+        $cleanedCoupons = array();
         /** @var CouponInterface $availableCoupon */
         foreach ($availableCoupons as $availableCoupon) {
             $rule = array();
             $rule['serviceId'] = $availableCoupon->getServiceId();
             $rule['name'] = $availableCoupon->getName();
             $rule['toolTip'] = $availableCoupon->getToolTip();
-            $cleanedRules[] = $rule;
+            $cleanedCoupons[] = $rule;
         }
 
-        return $cleanedRules;
+        return $cleanedCoupons;
     }
 
     /**

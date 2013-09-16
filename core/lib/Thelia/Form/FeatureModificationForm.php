@@ -20,50 +20,43 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\HttpFoundation;
+namespace Thelia\Form;
 
-use Symfony\Component\HttpFoundation\Request as BaseRequest;
+use Symfony\Component\Validator\Constraints;
+use Thelia\Model\CurrencyQuery;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 
-/**
- * extends Symfony\Component\HttpFoundation\Request for adding some helpers
- *
- * Class Request
- * @package Thelia\Core\HttpFoundation
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class Request extends BaseRequest
+class FeatureModificationForm extends FeatureCreationForm
 {
+    use StandardDescriptionFieldsTrait;
 
-    public function getProductId()
+    protected function buildForm()
     {
-        return $this->get("product_id");
+        $this->formBuilder
+            ->add("id", "hidden", array(
+                    "constraints" => array(
+                        new GreaterThan(
+                            array('value' => 0)
+                        )
+                    )
+            ))
+/* FIXME: doesn't work
+            ->add('feature_values', 'collection', array(
+                    'type'   => 'text',
+                    'options'  => array('required'  => false)
+            ))
+*/
+        ;
+
+        // Add standard description fields
+        $this->addStandardDescFields();
     }
 
-    public function getUriAddingParameters(array $parameters = null)
+    public function getName()
     {
-        $uri = $this->getUri();
-
-        $additionalQs = '';
-
-        foreach ($parameters as $key => $value) {
-            $additionalQs .= sprintf("&%s=%s", $key, $value);
-        }
-
-        if ('' == $this->getQueryString()) {
-            $additionalQs = '?'. ltrim($additionalQs, '&');
-        }
-
-        return $uri . $additionalQs;
-    }
-
-    /**
-     * Gets the Session.
-     *
-     * @return \Thelia\Core\HttpFoundation\Session\Session The session
-     * @api
-     */
-    public function getSession()
-    {
-        return parent::getSession();
+        return "thelia_feature_modification";
     }
 }

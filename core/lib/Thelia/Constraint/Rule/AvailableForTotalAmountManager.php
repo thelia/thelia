@@ -25,7 +25,6 @@ namespace Thelia\Constraint\Rule;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Symfony\Component\Translation\Translator;
-use Thelia\Constraint\ConstraintValidator;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Constraint\Validator\PriceParam;
 use Thelia\Constraint\Validator\RuleValidator;
@@ -168,13 +167,12 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
             return false;
         }
 
-        $constrainValidator = new ConstraintValidator();
-        $constraint1 =$constrainValidator->variableOpComparison(
+        $constraint1 = $this->constraintValidator->variableOpComparison(
             $this->adapter->getCartTotalPrice(),
             $this->operators[self::INPUT1],
             $this->values[self::INPUT1]
         );
-        $constraint2 =$constrainValidator->variableOpComparison(
+        $constraint2 = $this->constraintValidator->variableOpComparison(
             $this->adapter->getCheckoutCurrency(),
             $this->operators[self::INPUT2],
             $this->values[self::INPUT2]

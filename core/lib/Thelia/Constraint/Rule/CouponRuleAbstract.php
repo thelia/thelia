@@ -82,6 +82,7 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     {
         $this->adapter = $adapter;
         $this->translator = $adapter->getTranslator();
+        $this->constraintValidator = $adapter->getConstraintValidator();
     }
 
 //    /**
