@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
-    <vendor type="mysql">
-        <parameter name="Engine" value="InnoDB"/>
-        <parameter name="Charset" value="utf8"/>
-    </vendor>
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="parent" type="INTEGER" />
@@ -84,6 +80,7 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <column name="by_default" type="TINYINT" />
     <foreign-key foreignTable="area" name="fk_country_area_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="area_id" />
     </foreign-key>
