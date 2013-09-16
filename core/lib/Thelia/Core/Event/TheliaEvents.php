@@ -337,6 +337,7 @@ final class TheliaEvents
     const BEFORE_DELETECURRENCY = "action.before_deleteCurrency";
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
 
+    const CHANGE_DEFAULT_CURRENCY = 'action.changeDefaultCurrency';
     // -- Product templates management -----------------------------------------
 
     const TEMPLATE_CREATE          = "action.createTemplate";
