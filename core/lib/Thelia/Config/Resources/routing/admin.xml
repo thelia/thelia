@@ -290,6 +290,18 @@
 
     <!-- end attribute and feature routes  management -->
 
+    <!-- Countries routes management -->
+
+    <route id="admin.configuration.countries.default" path="/admin/configuration/countries">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::indexAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.create" path="/admin/configuration/countries/create">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::createAction</default>
+    </route>
+
+    <!-- end countries routes  management -->
+
 	<!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">
