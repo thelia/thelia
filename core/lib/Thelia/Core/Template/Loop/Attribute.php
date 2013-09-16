@@ -64,6 +64,7 @@ class Attribute extends BaseI18nLoop
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('product'),
             Argument::createIntListTypeArgument('template'),
+            Argument::createIntListTypeArgument('exclude_template'),
             Argument::createIntListTypeArgument('exclude'),
             new Argument(
                 'order',
@@ -115,12 +116,22 @@ class Attribute extends BaseI18nLoop
                 $template = $productObj->getTemplate();
          }
 
-
          // If we have to filter by template, find all attributes assigned to this template, and filter by found IDs
         if (null !== $template) {
             $search->filterById(
-                AttributeTemplateQuery::create()->filterByTemplateId($template)->select('id')->find(),
+                AttributeTemplateQuery::create()->filterByTemplateId($template)->select('attribute_id')->find(),
                 Criteria::IN
+            );
+        }
+
+        $exclude_template = $this->getExcludeTemplate();
+
+        // If we have to filter by template, find all attributes assigned to this template, and filter by found IDs
+        if (null !== $exclude_template) {
+            // Exclure tous les attribut qui sont attachés aux templates indiqués
+            $search->filterById(
+                    AttributeTemplateQuery::create()->filterByTemplateId($exclude_template)->select('attribute_id')->find(),
+                    Criteria::NOT_IN
             );
         }
 

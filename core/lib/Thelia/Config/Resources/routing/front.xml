@@ -99,7 +99,6 @@
     </route>
     <route id="cart.add.process" path="/cart/add">
         <default key="_controller">Thelia\Controller\Front\CartController::addItem</default>
-        <default key="_view">cart</default>
     </route>
 
     <route id="cart.delete.process" path="/cart/delete/{cart_item}">

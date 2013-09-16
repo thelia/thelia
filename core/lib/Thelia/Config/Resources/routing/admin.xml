@@ -234,6 +234,30 @@
         <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteAction</default>
     </route>
 
+    <route id="admin.configuration.templates.features.list" path="/admin/configuration/templates/features/list">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::getAjaxFeaturesAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.features.add" path="/admin/configuration/templates/features/add">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::addFeatureAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.features.delete" path="/admin/configuration/templates/features/delete">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteFeatureAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.attributes.list" path="/admin/configuration/templates/attributes/list">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::getAjaxAttributesAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.attributes.add" path="/admin/configuration/templates/attributes/add">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::addAttributeAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.attributes.delete" path="/admin/configuration/templates/attributes/delete">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteAttributeAction</default>
+    </route>
+
 
     <!-- attribute and attributes value management -->
 

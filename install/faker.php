@@ -1,7 +1,5 @@
 <?php
 use Thelia\Constraint\ConstraintFactory;
-use Thelia\Constraint\ConstraintManager;
-use Thelia\Constraint\Rule\AvailableForTotalAmount;
 use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
@@ -38,14 +36,6 @@ try {
     $categoryAssociatedContent = Thelia\Model\CategoryAssociatedContentQuery::create()
         ->find();
     $categoryAssociatedContent->delete();
-
-    $attributeCategory = Thelia\Model\AttributeCategoryQuery::create()
-        ->find();
-    $attributeCategory->delete();
-
-    $featureCategory = Thelia\Model\FeatureCategoryQuery::create()
-        ->find();
-    $featureCategory->delete();
 
     $featureProduct = Thelia\Model\FeatureProductQuery::create()
         ->find();
@@ -327,22 +317,6 @@ try {
         }
     }
 
-    //attribute_category and feature_category (all categories got all features/attributes)
-    foreach($categoryIdList as $categoryId) {
-        foreach($attributeList as $attributeId => $attributeAvId) {
-            $attributeCategory = new Thelia\Model\AttributeCategory();
-            $attributeCategory->setCategoryId($categoryId)
-                ->setAttributeId($attributeId)
-                ->save();
-        }
-        foreach($featureList as $featureId => $featureAvId) {
-            $featureCategory = new Thelia\Model\FeatureCategory();
-            $featureCategory->setCategoryId($categoryId)
-                ->setFeatureId($featureId)
-                ->save();
-        }
-    }
-
     foreach($productIdList as $productId) {
         //add random accessories - or not
         $alreadyPicked = array();
@@ -366,6 +340,7 @@ try {
             $productAssociatedContent = new Thelia\Model\ProductAssociatedContent();
             do {
                 $pick = array_rand($contentIdList, 1);
+                \Thelia\Log\Tlog::getInstance()->debug("pick : $pick");
             } while(in_array($pick, $alreadyPicked));
 
             $alreadyPicked[] = $pick;
@@ -623,6 +598,8 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $coupon1->setMaxUsage(40);
     $coupon1->setIsCumulative(1);
     $coupon1->setIsRemovingPostage(0);
+    $coupon1->setIsAvailableOnSpecialOffers(1);
+
     $coupon1->save();
 
 
@@ -671,8 +648,10 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
     $coupon2->setSerializedRules($serializedRules);
 
-    $coupon1->setMaxUsage(-1);
+    $coupon2->setMaxUsage(-1);
     $coupon2->setIsCumulative(0);
     $coupon2->setIsRemovingPostage(1);
+    $coupon2->setIsAvailableOnSpecialOffers(1);
+
     $coupon2->save();
 }
