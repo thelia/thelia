@@ -6,6 +6,7 @@ use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Base\Product as BaseProduct;
 use Thelia\Tools\URL;
 use Thelia\TaxEngine\Calculator;
+use Propel\Runtime\Connection\ConnectionInterface;
 
 class Product extends BaseProduct
 {
