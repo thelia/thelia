@@ -46,7 +46,8 @@ class Product extends BaseProduct
     /**
      * @return the current default category for this product
      */
-    public function getDefaultCategory() {
+    public function getDefaultCategory()
+    {
         // Find default category
         $default_category = ProductCategoryQuery::create()
             ->filterByProductId($this->getId())
@@ -61,8 +62,8 @@ class Product extends BaseProduct
      *
      * @param integer $categoryId the new default category id
      */
-    public function setDefaultCategory($categoryId) {
-
+    public function setDefaultCategory($categoryId)
+    {
         // Unset previous category
         ProductCategoryQuery::create()
             ->filterByProductId($this->getId())
@@ -85,11 +86,17 @@ class Product extends BaseProduct
     /**
      * Calculate next position relative to our default category
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
+        // Retrourver les produits qui ont la même categorie par defaut
+        $produits = ProductCategoryQuery::create()
+            ->filterByCategory($this->getDefaultCategory())
+            ->filterByDefaultCategory(true)
+            ->select('product_id')
+            ->find();
 
-        // TODO: Find the default category for this product,
-        // and generate the position relative to this category
-
+        // Filtrer la requete sur ces produits
+        if ($produits != null) $query->filterById($produits);
     }
 
     /**
