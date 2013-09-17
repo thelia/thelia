@@ -169,4 +169,11 @@ interface CouponAdapterInterface
      */
     public function getConstraintValidator();
 
+    /**
+     * Return all available currencies
+     *
+     * @return array of Currency
+     */
+    public function getAvailableCurrencies();
+
 }

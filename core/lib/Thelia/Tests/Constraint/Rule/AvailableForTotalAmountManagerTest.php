@@ -27,6 +27,7 @@ use Thelia\Constraint\ConstraintValidator;
 use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\Operators;
 use Thelia\Exception\InvalidRuleValueException;
+use Thelia\Model\Currency;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -43,6 +44,43 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var CouponAdapterInterface $stubTheliaAdapter */
     protected $stubTheliaAdapter = null;
+
+    /**
+     * Generate adapter stub
+     *
+     * @param int    $cartTotalPrice   Cart total price
+     * @param string $checkoutCurrency Checkout currency
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    public function generateAdapterStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR')
+    {
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getCartTotalPrice')
+            ->will($this->returnValue($cartTotalPrice));
+
+        $stubAdapter->expects($this->any())
+            ->method('getCheckoutCurrency')
+            ->will($this->returnValue($checkoutCurrency));
+
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue(new ConstraintValidator()));
+
+        $currency1 = new Currency();
+        $currency1->setCode('EUR');
+        $currency2 = new Currency();
+        $currency2->setCode('USD');
+        $stubAdapter->expects($this->any())
+            ->method('getAvailableCurrencies')
+            ->will($this->returnValue(array($currency1, $currency2)));
+
+        return $stubAdapter;
+    }
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -62,19 +100,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputOperator()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(399));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -102,19 +128,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputOperator2()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(399));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -142,19 +156,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputValue()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(399));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -182,19 +184,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputValue2()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(399));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -221,19 +211,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleInferior()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(399));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -260,19 +238,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleInferior()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(400));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(400, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -299,19 +265,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleInferiorEquals()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(400));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(400, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -338,19 +292,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleInferiorEquals2()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(399));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -377,19 +319,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleInferiorEquals()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(401));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(401, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -416,19 +346,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleEqual()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(400));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(400, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -455,19 +373,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleEqual()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(399));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -494,19 +400,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleSuperiorEquals()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(401));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(401, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -533,19 +427,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleSuperiorEquals2()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(400));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(400, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -572,19 +454,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleSuperiorEquals()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(399.00));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -611,19 +481,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleSuperior()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(401));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(401, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -650,19 +508,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleSuperior()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(399.00));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -689,19 +535,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleCurrency()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(400.00));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(400, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -728,19 +562,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleCurrency()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubAdapter->expects($this->any())
-            ->method('getCartTotalPrice')
-            ->will($this->returnValue(400.00));
-        $stubAdapter->expects($this->any())
-            ->method('getCheckoutCurrency')
-            ->will($this->returnValue('EUR'));
-        $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+        $stubAdapter = $this->generateAdapterStub(400.00, 'EUR');
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(

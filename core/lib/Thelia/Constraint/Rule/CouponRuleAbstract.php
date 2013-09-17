@@ -31,6 +31,9 @@ use Thelia\Constraint\Validator\ComparableInterface;
 use Thelia\Constraint\Validator\RuleValidator;
 use Thelia\Exception\InvalidRuleException;
 use Thelia\Exception\InvalidRuleOperatorException;
+use Thelia\Exception\InvalidRuleValueException;
+use Thelia\Model\Currency;
+use Thelia\Type\FloatType;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -266,6 +269,54 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
         $serializableRule->values = $this->values;
 
         return $serializableRule;
+    }
+
+
+    /**
+     * Check if currency if valid or not
+     *
+     * @param string $currencyValue Currency EUR|USD|..
+     *
+     * @return bool
+     * @throws \Thelia\Exception\InvalidRuleValueException
+     */
+    protected function IsCurrencyValid($currencyValue)
+    {
+        $availableCurrencies = $this->adapter->getAvailableCurrencies();
+        /** @var Currency $currency */
+        $currencyFound = false;
+        foreach ($availableCurrencies as $key => $currency) {
+            if ($currencyValue == $currency->getCode()) {
+                $currencyFound = true;
+            }
+        }
+        if (!$currencyFound) {
+            throw new InvalidRuleValueException(
+                get_class(), 'currency'
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if price is valid
+     *
+     * @param float $priceValue Price value to check
+     *
+     * @return bool
+     * @throws \Thelia\Exception\InvalidRuleValueException
+     */
+    protected function isPriceValid($priceValue)
+    {
+        $floatType = new FloatType();
+        if (!$floatType->isValid($priceValue) || $priceValue <= 0) {
+            throw new InvalidRuleValueException(
+                get_class(), 'price'
+            );
+        }
+
+        return true;
     }
 
 }

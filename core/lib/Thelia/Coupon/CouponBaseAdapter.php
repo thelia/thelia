@@ -35,6 +35,8 @@ use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Cart\CartTrait;
 use Thelia\Model\Currency;
+use Thelia\Model\CurrencyQuery;
+use Thelia\Model\LangQuery;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -265,5 +267,18 @@ class CouponBaseAdapter implements CouponAdapterInterface
     public function getConstraintValidator()
     {
         return $this->container->get('thelia.constraint.validator');
+    }
+
+
+    /**
+     * Return all available currencies
+     *
+     * @return array of Currency
+     */
+    public function getAvailableCurrencies()
+    {
+        $currencies = CurrencyQuery::create();
+
+        return $currencies->find();
     }
 }

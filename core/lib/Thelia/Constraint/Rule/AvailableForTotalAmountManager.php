@@ -126,14 +126,11 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
             );
         }
 
-        $floatType = new FloatType();
-        if (!$floatType->isValid($priceValue) || $priceValue <= 0) {
-            throw new InvalidRuleValueException(
-                get_class(), 'price'
-            );
-        }
+        $this->isPriceValid($priceValue);
 
-        // @todo check currency is legit or not
+
+        $this->IsCurrencyValid($currencyValue);
+
 
         $this->operators = array(
             self::INPUT1 => $priceOperator,
