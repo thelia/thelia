@@ -18,7 +18,7 @@ echo -e "\n\e[01;34m[INFO] Building Models file\e[00m\n"
 echo -e "\n\e[01;34m[INFO] Building SQL CREATE file\e[00m\n"
 ../../bin/propel sql:build -v --output-dir=../../install/
 
-echo -e "\n\e[01;34m[INFO] Reloaded Thelia2 database\e[00m\n"
+echo -e "\n\e[01;34m[INFO] Reloading Thelia2 database\e[00m\n"
 cd ../..
 rm install/sqldb.map
 php Thelia thelia:dev:reloadDB

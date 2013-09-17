@@ -453,11 +453,16 @@ try {
     $con->rollBack();
 }
 
-function createProduct($faker, $category, $position, $template, &$productIdList)
+function createProduct($faker, Thelia\Model\Category $category, $position, $template, &$productIdList)
 {
     $product = new Thelia\Model\Product();
     $product->setRef($category->getId() . '_' . $position . '_' . $faker->randomNumber(8));
     $product->addCategory($category);
+    $productCategories = $product->getProductCategories();
+    $productCategories[0]->setDefaultCategory(true);
+    $collection = new \Propel\Runtime\Collection\Collection();
+    $collection->append($productCategories[0]->setDefaultCategory(true));
+    $product->setProductCategories($collection);
     $product->setVisible(rand(1, 10)>7 ? 0 : 1);
     $product->setPosition($position);
     $product->setTaxRuleId(1);
