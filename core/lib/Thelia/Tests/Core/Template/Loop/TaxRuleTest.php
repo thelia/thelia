@@ -23,27 +23,26 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-use Thelia\Model\ProductQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
-use Thelia\Core\Template\Loop\Product;
-use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Template\Loop\TaxRule;
+use Thelia\Model\TaxRuleQuery;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class ProductTest extends BaseLoopTestor
+class TaxRuleTest extends BaseLoopTestor
 {
     public function getTestedClassName()
     {
-        return 'Thelia\Core\Template\Loop\Product';
+        return 'Thelia\Core\Template\Loop\TaxRule';
     }
 
     public function getTestedInstance()
     {
-        return new Product($this->container);
+        return new TaxRule($this->container);
     }
 
     public function getMandatoryArguments()
@@ -53,13 +52,9 @@ class ProductTest extends BaseLoopTestor
 
     public function testSearchById()
     {
-        $product = ProductQuery::create()->orderById(Criteria::ASC)->findOne();
+        $tr = TaxRuleQuery::create()->findOne();
 
-        $this->baseTestSearchById($product->getId());
+        $this->baseTestSearchById($tr->getId());
     }
 
-    public function testSearchLimit()
-    {
-        $this->baseTestSearchWithLimit(3);
-    }
 }

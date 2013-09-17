@@ -58,32 +58,27 @@ class DocumentTest extends BaseLoopTestor
     {
         $document = ProductDocumentQuery::create()->findOne();
 
-        $this->baseTestSearchById($document->getId());
+        $this->baseTestSearchById($document->getId(), array('source' => 'product'));
     }
 
     public function testSearchByFolderId()
     {
         $document = FolderDocumentQuery::create()->findOne();
 
-        $this->baseTestSearchById($document->getId());
+        $this->baseTestSearchById($document->getId(), array('source' => 'folder'));
     }
 
     public function testSearchByContentId()
     {
         $document = ContentDocumentQuery::create()->findOne();
 
-        $this->baseTestSearchById($document->getId());
+        $this->baseTestSearchById($document->getId(), array('source' => 'content'));
     }
 
     public function testSearchByCategoryId()
     {
         $document = CategoryDocumentQuery::create()->findOne();
 
-        $this->baseTestSearchById($document->getId());
-    }
-
-    public function testSearchLimit()
-    {
-        $this->baseTestSearchWithLimit(1);
+        $this->baseTestSearchById($document->getId(), array('source' => 'category'));
     }
 }

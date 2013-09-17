@@ -78,7 +78,7 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
-        $productQuery = ProductQuery::create()->findOneById(1);
+        $productQuery = ProductQuery::create()->findOne();
         $countryQuery = CountryQuery::create()->findOneById(64);
 
         $calculator = new Calculator();

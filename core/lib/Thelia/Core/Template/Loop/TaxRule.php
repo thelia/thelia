@@ -31,11 +31,9 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Base\CategoryQuery;
-use Thelia\Model\Base\ProductCategoryQuery;
-use Thelia\Model\Base\TaxRuleQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Model\TaxRuleQuery;
 
 /**
  *
@@ -57,7 +55,8 @@ class TaxRule extends BaseI18nLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            new Argument(
+            Argument::createIntListTypeArgument('exclude'),
+                new Argument(
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse'))
@@ -77,7 +76,7 @@ class TaxRule extends BaseI18nLoop
         $search = TaxRuleQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search, 'TITLE', 'DESCRIPTION');
+        $locale = $this->configureI18nProcessing($search, array('TITLE', 'DESCRIPTION'));
 
         $id = $this->getId();
 
