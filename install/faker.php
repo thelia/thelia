@@ -462,7 +462,7 @@ function createProduct($faker, Thelia\Model\Category $category, $position, $temp
     $productCategories = $product->getProductCategories();
     $productCategories[0]->setDefaultCategory(true);
     $collection = new \Propel\Runtime\Collection\Collection();
-    $collection->append($productCategories[0]->setDefaultCategory(true));
+    $collection->prepend($productCategories[0]->setDefaultCategory(1));
     $product->setProductCategories($collection);
     $product->setVisible(1);
     $product->setPosition($position);
