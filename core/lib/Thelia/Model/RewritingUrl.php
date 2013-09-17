@@ -2,25 +2,25 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Base\RewritingUrl as BaseRewritingUrl;
 use Thelia\Model\RewritingUrlQuery;
 
 class RewritingUrl extends BaseRewritingUrl {
 
-    public function preSave(ConnectionInterface $con = null)
+    public function postInsert(ConnectionInterface $con = null)
     {
-        if($this->getRedirected() == 0) {
-            //check if rewriting url alredy exists and put redirect to 1
+        if(null !== $this->getRedirected()) {
+            //check if rewriting url alredy exists and put redirect to the new one
             RewritingUrlQuery::create()
                 ->filterByView($this->getView())
                 ->filterByViewId($this->getViewId())
                 ->filterByViewLocale($this->getViewLocale())
+                ->filterByRedirected($this->getId(), Criteria::NOT_IN)
                 ->update(array(
-                    "redirect" => 1
+                    "Redirected" => $this->getId()
                 ));
         }
-
-        return true;
     }
 }
