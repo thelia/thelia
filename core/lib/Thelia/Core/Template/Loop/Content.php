@@ -61,6 +61,7 @@ class Content extends BaseI18nLoop
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('folder'),
+            Argument::createIntListTypeArgument('folder_default'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_folder'),
             Argument::createIntTypeArgument('depth', 1),
@@ -97,9 +98,18 @@ class Content extends BaseI18nLoop
         }
 
         $folder = $this->getFolder();
+        $folderDefault = $this->getFolderDefault();
 
-        if (!is_null($folder)) {
-            $folders = FolderQuery::create()->filterById($folder, Criteria::IN)->find();
+        if (!is_null($folder) || !is_null($folderDefault)) {
+
+            if (!is_null($folder)) {
+                $folders = FolderQuery::create()->filterById($folder, Criteria::IN)->find();
+            }
+
+            if (!is_null($folderDefault)) {
+                $folders = FolderQuery::create()->filterById($folderDefault, Criteria::IN)->find();
+            }
+
 
             $depth = $this->getDepth();
 
