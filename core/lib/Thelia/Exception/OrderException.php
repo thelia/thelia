@@ -20,49 +20,20 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Controller\Front;
 
-use Symfony\Component\Routing\Router;
-use Thelia\Controller\BaseController;
-use Thelia\Tools\URL;
+namespace Thelia\Exception;
 
-class BaseFrontController extends BaseController
+class OrderException extends \RuntimeException
 {
-    /**
-     * Return the route path defined for the givent route ID
-     *
-     * @param string $routeId a route ID, as defines in Config/Resources/routing/front.xml
-     *
-     * @see \Thelia\Controller\BaseController::getRouteFromRouter()
-     */
-    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH)
-    {
-        return $this->getRouteFromRouter('router.front', $routeId, $parameters, $referenceType);
-    }
+    const UNKNOWN_EXCEPTION = 0;
 
-    /**
-     * Redirect to à route ID related URL
-     *
-     * @param unknown $routeId       the route ID, as found in Config/Resources/routing/admin.xml
-     * @param unknown $urlParameters the URL parametrs, as a var/value pair array
-     */
-    public function redirectToRoute($routeId, $urlParameters = array(), $referenceType = Router::ABSOLUTE_PATH)
-    {
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, array(), $referenceType), $urlParameters));
-    }
+    const CART_EMPTY = 100;
 
-    public function checkAuth()
+    public function __construct($message, $code = null, $previous = null)
     {
-        if($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirectToRoute("customer.login.view");
+        if ($code === null) {
+            $code = self::UNKNOWN_EXCEPTION;
         }
-    }
-
-    protected function checkCartNotEmpty()
-    {
-        $cart = $this->getSession()->getCart();
-        if($cart===null || $cart->countCartItems() == 0) {
-            $this->redirectToRoute("cart.view");
-        }
+        parent::__construct($message, $code, $previous);
     }
 }

@@ -29,7 +29,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Form\OrderDelivery;
 use Thelia\Log\Tlog;
-use Thelia\Model\Base\AddressQuery;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Order;
 
 /**
@@ -53,9 +54,6 @@ class OrderController extends BaseFrontController
 
         $orderDelivery = new OrderDelivery($this->getRequest());
 
-        $x = $this->getRequest();
-        $y = $_POST;
-
         try {
             $form = $this->validateForm($orderDelivery, "post");
 
@@ -69,7 +67,12 @@ class OrderController extends BaseFrontController
             }
 
             /* check that the delivery module fetch the delivery address area */
-            
+            if(AreaDeliveryModuleQuery::create()
+                ->filterByAreaId($deliveryAddress->getCountry()->getAreaId())
+                ->filterByDeliveryModuleId()
+                ->count() == 0) {
+                throw new \Exception("PUKE");
+            }
 
 
             $orderEvent = $this->getOrderEvent();

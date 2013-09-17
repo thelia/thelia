@@ -695,6 +695,10 @@
     <index name="idx_area_delivery_module_delivery_module_id">
       <index-column name="delivery_module_id" />
     </index>
+    <unique name="delivery_module_id_area_id_UNIQUE">
+      <unique-column name="area_id" />
+      <unique-column name="delivery_module_id" />
+    </unique>
     <behavior name="timestampable" />
   </table>
   <table name="group" namespace="Thelia\Model">

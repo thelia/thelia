@@ -34,7 +34,7 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 (1, 'DebugBar', 1, 1, 1, 'DebugBar\\DebugBar', NOW(), NOW()),
 (2, 'Colissimo', 2, 1, 1, 'Colissimo\\Colissimo', NOW(), NOW());
 
-INSERT INTO  `thelia_2`.`module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 ('2',  'en_US',  '72h delivery', NULL,  NULL,  NULL),
 ('2',  'fr_FR',  'Livraison par colissimo en 72h', NULL,  NULL,  NULL);
 
