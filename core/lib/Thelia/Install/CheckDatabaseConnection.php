@@ -63,6 +63,11 @@ class CheckDatabaseConnection extends BaseInstall
     protected $port = null;
 
     /**
+     * @var \PDO instance
+     */
+    protected $connection = null;
+
+    /**
      * Constructor
      *
      * @param string     $host          Database host information
@@ -90,11 +95,28 @@ class CheckDatabaseConnection extends BaseInstall
      */
     public function exec()
     {
-        $link = mysql_connect($this->host . ':' . $this->port, $this->user, $this->password);
-        if (!$link) {
-            throw new InstallException('Can\'t connect to the given credentials');
+
+        $dsn = "mysql:host=%s";
+
+        try {
+            $this->connection = new \PDO(
+                sprintf($dsn, $this->host),
+                $this->user,
+                $this->password
+            );
+        } catch (\PDOException $e) {
+
+            $this->validationMessages = 'Wrong connection information';
+
+            $this->isValid = false;
         }
-        mysql_close($link);
+
+        return $this->isValid;
+    }
+
+    public function getConnection()
+    {
+        return $this->connection;
     }
 
 }
