@@ -123,8 +123,10 @@ class Image extends BaseI18nLoop
         $search = $method->invoke(null); // Static !
 
         // $query->filterByXXX(id)
-        $method = new \ReflectionMethod($queryClass, $filterMethod);
-        $method->invoke($search, $object_id);
+        if (! is_null($object_id)) {
+            $method = new \ReflectionMethod($queryClass, $filterMethod);
+            $method->invoke($search, $object_id);
+        }
 
         $orders  = $this->getOrder();
 
@@ -171,11 +173,12 @@ class Image extends BaseI18nLoop
         if (! is_null($source)) {
 
             $source_id = $this->getSourceId();
+            $id = $this->getId();
 
-            // echo "source = ".$this->getSource().", id=".$source_id." - ".$this->getArg('source_id')->getValue()."<br />";
+            //echo "source = ".$this->getSource()."source_id=$source_id, id=$id<br />";
 
-            if (is_null($source_id)) {
-                throw new \InvalidArgumentException("'source_id' argument cannot be null if 'source' argument is specified.");
+            if (is_null($source_id) && is_null($id)) {
+                throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
 
             $search = $this->createSearchQuery($source, $source_id);
@@ -259,14 +262,13 @@ class Image extends BaseI18nLoop
 
         }
 
-        // echo "sql=".$search->toString();
+        //echo "sql=".$search->toString();
 
         $results = $this->search($search, $pagination);
 
         $loopResult = new LoopResult($results);
 
         foreach ($results as $result) {
-
             // Create image processing event
             $event = new ImageEvent($this->request);
 
@@ -282,7 +284,7 @@ class Image extends BaseI18nLoop
             // Put source image file path
             $source_filepath = sprintf("%s%s/%s/%s",
                 THELIA_ROOT,
-                ConfigQuery::read('documents_library_path', 'local/media/images'),
+                ConfigQuery::read('images_library_path', 'local/media/images'),
                 $object_type,
                 $result->getFile()
              );

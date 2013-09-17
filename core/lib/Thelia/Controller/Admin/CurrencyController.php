@@ -33,7 +33,7 @@ use Thelia\Form\CurrencyCreationForm;
 use Thelia\Core\Event\UpdatePositionEvent;
 
 /**
- * Manages currencies sent by mail
+ * Manages currencies
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */

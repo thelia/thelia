@@ -23,22 +23,8 @@
 
 namespace Thelia\Core\Event;
 
-class ImageEvent extends ActionEvent
+class ImageEvent extends CachedFileEvent
 {
-    /**
-     * @var string The complete file name (with path) of the source image
-     */
-    protected $source_filepath = null;
-    /**
-     * @var string The target subdirectory in the image cache
-     */
-    protected $cache_subdirectory = null;
-
-    /**
-     * @var string The absolute URL of the cached image (in the web space)
-     */
-    protected $file_url = null;
-
     /**
      * @var string The absolute path of the cached image file
      */
@@ -121,6 +107,8 @@ class ImageEvent extends ActionEvent
     public function setCategory($category)
     {
         $this->category = $category;
+
+        return $this;
     }
 
     public function getWidth()
@@ -131,6 +119,8 @@ class ImageEvent extends ActionEvent
     public function setWidth($width)
     {
         $this->width = $width;
+
+        return $this;
     }
 
     public function getHeight()
@@ -141,6 +131,8 @@ class ImageEvent extends ActionEvent
     public function setHeight($height)
     {
         $this->height = $height;
+
+        return $this;
     }
 
     public function getResizeMode()
@@ -151,6 +143,8 @@ class ImageEvent extends ActionEvent
     public function setResizeMode($resize_mode)
     {
         $this->resize_mode = $resize_mode;
+
+        return $this;
     }
 
     public function getBackgroundColor()
@@ -161,6 +155,8 @@ class ImageEvent extends ActionEvent
     public function setBackgroundColor($background_color)
     {
         $this->background_color = $background_color;
+
+        return $this;
     }
 
     public function getEffects()
@@ -171,6 +167,8 @@ class ImageEvent extends ActionEvent
     public function setEffects(array $effects)
     {
         $this->effects = $effects;
+
+        return $this;
     }
 
     public function getRotation()
@@ -181,46 +179,8 @@ class ImageEvent extends ActionEvent
     public function setRotation($rotation)
     {
         $this->rotation = $rotation;
-    }
 
-    public function getFileUrl()
-    {
-        return $this->file_url;
-    }
-
-    public function setFileUrl($file_url)
-    {
-        $this->file_url = $file_url;
-    }
-
-    public function getCacheFilepath()
-    {
-        return $this->cache_filepath;
-    }
-
-    public function setCacheFilepath($cache_filepath)
-    {
-        $this->cache_filepath = $cache_filepath;
-    }
-
-    public function getSourceFilepath()
-    {
-        return $this->source_filepath;
-    }
-
-    public function setSourceFilepath($source_filepath)
-    {
-        $this->source_filepath = $source_filepath;
-    }
-
-    public function getCacheSubdirectory()
-    {
-        return $this->cache_subdirectory;
-    }
-
-    public function setCacheSubdirectory($cache_subdirectory)
-    {
-        $this->cache_subdirectory = $cache_subdirectory;
+        return $this;
     }
 
     public function getQuality()
@@ -231,6 +191,8 @@ class ImageEvent extends ActionEvent
     public function setQuality($quality)
     {
         $this->quality = $quality;
+
+        return $this;
     }
 
     public function getOriginalFileUrl()
@@ -241,6 +203,8 @@ class ImageEvent extends ActionEvent
     public function setOriginalFileUrl($original_file_url)
     {
         $this->original_file_url = $original_file_url;
+
+        return $this;
     }
 
     public function getCacheOriginalFilepath()
@@ -251,5 +215,7 @@ class ImageEvent extends ActionEvent
     public function setCacheOriginalFilepath($cache_original_filepath)
     {
         $this->cache_original_filepath = $cache_original_filepath;
+
+        return $this;
     }
 }

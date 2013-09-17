@@ -39,7 +39,8 @@ class CategoryCreationForm extends BaseForm
                     "for" => "title"
                 )
             ))
-            ->add("parent", "integer", array(
+            ->add("parent", "text", array(
+                "label" => Translator::getInstance()->trans("Parent category *"),
                 "constraints" => array(
                     new NotBlank()
                 )
@@ -48,6 +49,9 @@ class CategoryCreationForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 )
+            ))
+            ->add("visible", "integer", array(
+                "label" => Translator::getInstance()->trans("This category is online on the front office.")
             ))
         ;
     }

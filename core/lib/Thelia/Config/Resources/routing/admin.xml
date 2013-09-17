@@ -85,7 +85,7 @@
     </route>
 
     <route id="admin.categories.set-default" path="/admin/categories/toggle-online">
-        <default key="_controller">Thelia\Controller\Admin\CategoryController::toggleOnlineAction</default>
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::setToggleVisibilityAction</default>
     </route>
 
     <route id="admin.categories.delete" path="/admin/categories/delete">
@@ -234,6 +234,30 @@
         <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteAction</default>
     </route>
 
+    <route id="admin.configuration.templates.features.list" path="/admin/configuration/templates/features/list">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::getAjaxFeaturesAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.features.add" path="/admin/configuration/templates/features/add">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::addFeatureAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.features.delete" path="/admin/configuration/templates/features/delete">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteFeatureAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.attributes.list" path="/admin/configuration/templates/attributes/list">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::getAjaxAttributesAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.attributes.add" path="/admin/configuration/templates/attributes/add">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::addAttributeAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.attributes.delete" path="/admin/configuration/templates/attributes/delete">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteAttributeAction</default>
+    </route>
+
 
     <!-- attribute and attributes value management -->
 
@@ -291,6 +315,23 @@
     </route>
 
     <!-- end attribute and feature routes  management -->
+
+    <!-- Countries routes management -->
+
+    <route id="admin.configuration.countries.default" path="/admin/configuration/countries">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::indexAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.create" path="/admin/configuration/countries/create">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.update.view" path="/admin/configuration/countries/update/{country_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::updateAction</default>
+        <requirement key="country_id">\d+</requirement>
+    </route>
+
+    <!-- end countries routes  management -->
 
     <!-- feature and features value management -->
 

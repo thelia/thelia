@@ -107,7 +107,7 @@ class LoopResultRow
         }
         if (true === $this->countable) {
             $this->set('LOOP_COUNT', 1 + $this->loopResult->getCount());
-            $this->set('LOOP_TOTAL', $this->loopResult->modelCollection->count());
+            $this->set('LOOP_TOTAL', $this->loopResult->getModelCollectionCount());
         }
     }
 }

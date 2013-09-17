@@ -37,7 +37,7 @@ class LoopResult implements \Iterator
     public function __construct($modelCollection = null)
     {
         $this->position = 0;
-        if ($modelCollection instanceof ObjectCollection || $modelCollection instanceof PropelModelPager) {
+        if ($modelCollection instanceof ObjectCollection || $modelCollection instanceof PropelModelPager || is_array($modelCollection)) {
             $this->modelCollection = $modelCollection;
         }
     }
@@ -55,6 +55,17 @@ class LoopResult implements \Iterator
     public function getCount()
     {
         return count($this->collection);
+    }
+
+    public function getModelCollectionCount()
+    {
+        if ($this->modelCollection instanceof ObjectCollection || $this->modelCollection instanceof PropelModelPager) {
+            return $this->modelCollection->count();
+        } elseif (is_array($this->modelCollection)) {
+            return count($this->modelCollection);
+        } else {
+            return 0;
+        }
     }
 
     /**

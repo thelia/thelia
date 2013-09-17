@@ -37,7 +37,7 @@ use Thelia\Core\Event\AttributeAvUpdateEvent;
 use Thelia\Core\Event\AttributeEvent;
 
 /**
- * Manages attributes sent by mail
+ * Manages attributes
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
