@@ -32,12 +32,12 @@ class ProductSaleElements extends BaseProductSaleElements
     public function getTaxedPrice(Country $country)
     {
         $taxCalculator = new Calculator();
-        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice());
+        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice()), 2);
     }
 
     public function getTaxedPromoPrice(Country $country)
     {
         $taxCalculator = new Calculator();
-        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice());
+        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()), 2);
     }
 }

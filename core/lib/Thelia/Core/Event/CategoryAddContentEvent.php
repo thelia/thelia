@@ -21,64 +21,28 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Colissimo;
+namespace Thelia\Core\Event;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Model\Country;
-use Thelia\Module\BaseModule;
-use Thelia\Module\DeliveryModuleInterface;
+use Thelia\Model\Category;
 
-class Colissimo extends BaseModule implements DeliveryModuleInterface
+class CategoryAddContentEvent extends CategoryEvent
 {
-    protected $request;
-    protected $dispatcher;
+    protected $content_id;
 
-    public function setRequest(Request $request)
+    public function __construct(Category $category, $content_id)
     {
-        $this->request = $request;
+        parent::__construct($category);
+
+        $this->content_id = $content_id;
     }
 
-    public function getRequest()
+    public function getContentId()
     {
-        return $this->request;
+        return $this->content_id;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setContentId($content_id)
     {
-        $this->dispatcher = $dispatcher;
+        $this->content_id = $content_id;
     }
-
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
-    /**
-     *
-     * calculate and return delivery price
-     *
-     * @param Country $country
-     * @return mixed
-     */
-    public function calculate(Country $country)
-    {
-        // TODO: Implement calculate() method.
-        return 2;
-    }
-
-    /**
-     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
-     * Like install and destroy
-     */
-    public function install()
-    {
-        // TODO: Implement install() method.
-    }
-
-    public function destroy()
-    {
-        // TODO: Implement destroy() method.
-    }
-
 }

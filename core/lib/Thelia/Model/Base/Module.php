@@ -17,6 +17,8 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
+use Thelia\Model\AreaDeliveryModule as ChildAreaDeliveryModule;
+use Thelia\Model\AreaDeliveryModuleQuery as ChildAreaDeliveryModuleQuery;
 use Thelia\Model\GroupModule as ChildGroupModule;
 use Thelia\Model\GroupModuleQuery as ChildGroupModuleQuery;
 use Thelia\Model\Module as ChildModule;
@@ -122,6 +124,12 @@ abstract class Module implements ActiveRecordInterface
     protected $collOrdersRelatedByDeliveryModuleIdPartial;
 
     /**
+     * @var        ObjectCollection|ChildAreaDeliveryModule[] Collection to store aggregation of ChildAreaDeliveryModule objects.
+     */
+    protected $collAreaDeliveryModules;
+    protected $collAreaDeliveryModulesPartial;
+
+    /**
      * @var        ObjectCollection|ChildGroupModule[] Collection to store aggregation of ChildGroupModule objects.
      */
     protected $collGroupModules;
@@ -166,6 +174,12 @@ abstract class Module implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $ordersRelatedByDeliveryModuleIdScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $areaDeliveryModulesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -846,6 +860,8 @@ abstract class Module implements ActiveRecordInterface
 
             $this->collOrdersRelatedByDeliveryModuleId = null;
 
+            $this->collAreaDeliveryModules = null;
+
             $this->collGroupModules = null;
 
             $this->collModuleI18ns = null;
@@ -1011,6 +1027,23 @@ abstract class Module implements ActiveRecordInterface
 
                 if ($this->collOrdersRelatedByDeliveryModuleId !== null) {
             foreach ($this->collOrdersRelatedByDeliveryModuleId as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->areaDeliveryModulesScheduledForDeletion !== null) {
+                if (!$this->areaDeliveryModulesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\AreaDeliveryModuleQuery::create()
+                        ->filterByPrimaryKeys($this->areaDeliveryModulesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->areaDeliveryModulesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collAreaDeliveryModules !== null) {
+            foreach ($this->collAreaDeliveryModules as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1273,6 +1306,9 @@ abstract class Module implements ActiveRecordInterface
             if (null !== $this->collOrdersRelatedByDeliveryModuleId) {
                 $result['OrdersRelatedByDeliveryModuleId'] = $this->collOrdersRelatedByDeliveryModuleId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collAreaDeliveryModules) {
+                $result['AreaDeliveryModules'] = $this->collAreaDeliveryModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collGroupModules) {
                 $result['GroupModules'] = $this->collGroupModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1476,6 +1512,12 @@ abstract class Module implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getAreaDeliveryModules() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAreaDeliveryModule($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getGroupModules() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addGroupModule($relObj->copy($deepCopy));
@@ -1534,6 +1576,9 @@ abstract class Module implements ActiveRecordInterface
         }
         if ('OrderRelatedByDeliveryModuleId' == $relationName) {
             return $this->initOrdersRelatedByDeliveryModuleId();
+        }
+        if ('AreaDeliveryModule' == $relationName) {
+            return $this->initAreaDeliveryModules();
         }
         if ('GroupModule' == $relationName) {
             return $this->initGroupModules();
@@ -2280,6 +2325,249 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collAreaDeliveryModules collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAreaDeliveryModules()
+     */
+    public function clearAreaDeliveryModules()
+    {
+        $this->collAreaDeliveryModules = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collAreaDeliveryModules collection loaded partially.
+     */
+    public function resetPartialAreaDeliveryModules($v = true)
+    {
+        $this->collAreaDeliveryModulesPartial = $v;
+    }
+
+    /**
+     * Initializes the collAreaDeliveryModules collection.
+     *
+     * By default this just sets the collAreaDeliveryModules collection to an empty array (like clearcollAreaDeliveryModules());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAreaDeliveryModules($overrideExisting = true)
+    {
+        if (null !== $this->collAreaDeliveryModules && !$overrideExisting) {
+            return;
+        }
+        $this->collAreaDeliveryModules = new ObjectCollection();
+        $this->collAreaDeliveryModules->setModel('\Thelia\Model\AreaDeliveryModule');
+    }
+
+    /**
+     * Gets an array of ChildAreaDeliveryModule objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildAreaDeliveryModule[] List of ChildAreaDeliveryModule objects
+     * @throws PropelException
+     */
+    public function getAreaDeliveryModules($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collAreaDeliveryModulesPartial && !$this->isNew();
+        if (null === $this->collAreaDeliveryModules || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAreaDeliveryModules) {
+                // return empty collection
+                $this->initAreaDeliveryModules();
+            } else {
+                $collAreaDeliveryModules = ChildAreaDeliveryModuleQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collAreaDeliveryModulesPartial && count($collAreaDeliveryModules)) {
+                        $this->initAreaDeliveryModules(false);
+
+                        foreach ($collAreaDeliveryModules as $obj) {
+                            if (false == $this->collAreaDeliveryModules->contains($obj)) {
+                                $this->collAreaDeliveryModules->append($obj);
+                            }
+                        }
+
+                        $this->collAreaDeliveryModulesPartial = true;
+                    }
+
+                    $collAreaDeliveryModules->getInternalIterator()->rewind();
+
+                    return $collAreaDeliveryModules;
+                }
+
+                if ($partial && $this->collAreaDeliveryModules) {
+                    foreach ($this->collAreaDeliveryModules as $obj) {
+                        if ($obj->isNew()) {
+                            $collAreaDeliveryModules[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAreaDeliveryModules = $collAreaDeliveryModules;
+                $this->collAreaDeliveryModulesPartial = false;
+            }
+        }
+
+        return $this->collAreaDeliveryModules;
+    }
+
+    /**
+     * Sets a collection of AreaDeliveryModule objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $areaDeliveryModules A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildModule The current object (for fluent API support)
+     */
+    public function setAreaDeliveryModules(Collection $areaDeliveryModules, ConnectionInterface $con = null)
+    {
+        $areaDeliveryModulesToDelete = $this->getAreaDeliveryModules(new Criteria(), $con)->diff($areaDeliveryModules);
+
+
+        $this->areaDeliveryModulesScheduledForDeletion = $areaDeliveryModulesToDelete;
+
+        foreach ($areaDeliveryModulesToDelete as $areaDeliveryModuleRemoved) {
+            $areaDeliveryModuleRemoved->setModule(null);
+        }
+
+        $this->collAreaDeliveryModules = null;
+        foreach ($areaDeliveryModules as $areaDeliveryModule) {
+            $this->addAreaDeliveryModule($areaDeliveryModule);
+        }
+
+        $this->collAreaDeliveryModules = $areaDeliveryModules;
+        $this->collAreaDeliveryModulesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related AreaDeliveryModule objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related AreaDeliveryModule objects.
+     * @throws PropelException
+     */
+    public function countAreaDeliveryModules(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collAreaDeliveryModulesPartial && !$this->isNew();
+        if (null === $this->collAreaDeliveryModules || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAreaDeliveryModules) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getAreaDeliveryModules());
+            }
+
+            $query = ChildAreaDeliveryModuleQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModule($this)
+                ->count($con);
+        }
+
+        return count($this->collAreaDeliveryModules);
+    }
+
+    /**
+     * Method called to associate a ChildAreaDeliveryModule object to this object
+     * through the ChildAreaDeliveryModule foreign key attribute.
+     *
+     * @param    ChildAreaDeliveryModule $l ChildAreaDeliveryModule
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function addAreaDeliveryModule(ChildAreaDeliveryModule $l)
+    {
+        if ($this->collAreaDeliveryModules === null) {
+            $this->initAreaDeliveryModules();
+            $this->collAreaDeliveryModulesPartial = true;
+        }
+
+        if (!in_array($l, $this->collAreaDeliveryModules->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddAreaDeliveryModule($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param AreaDeliveryModule $areaDeliveryModule The areaDeliveryModule object to add.
+     */
+    protected function doAddAreaDeliveryModule($areaDeliveryModule)
+    {
+        $this->collAreaDeliveryModules[]= $areaDeliveryModule;
+        $areaDeliveryModule->setModule($this);
+    }
+
+    /**
+     * @param  AreaDeliveryModule $areaDeliveryModule The areaDeliveryModule object to remove.
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeAreaDeliveryModule($areaDeliveryModule)
+    {
+        if ($this->getAreaDeliveryModules()->contains($areaDeliveryModule)) {
+            $this->collAreaDeliveryModules->remove($this->collAreaDeliveryModules->search($areaDeliveryModule));
+            if (null === $this->areaDeliveryModulesScheduledForDeletion) {
+                $this->areaDeliveryModulesScheduledForDeletion = clone $this->collAreaDeliveryModules;
+                $this->areaDeliveryModulesScheduledForDeletion->clear();
+            }
+            $this->areaDeliveryModulesScheduledForDeletion[]= clone $areaDeliveryModule;
+            $areaDeliveryModule->setModule(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related AreaDeliveryModules from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildAreaDeliveryModule[] List of ChildAreaDeliveryModule objects
+     */
+    public function getAreaDeliveryModulesJoinArea($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildAreaDeliveryModuleQuery::create(null, $criteria);
+        $query->joinWith('Area', $joinBehavior);
+
+        return $this->getAreaDeliveryModules($query, $con);
+    }
+
+    /**
      * Clears out the collGroupModules collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2789,6 +3077,11 @@ abstract class Module implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collAreaDeliveryModules) {
+                foreach ($this->collAreaDeliveryModules as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collGroupModules) {
                 foreach ($this->collGroupModules as $o) {
                     $o->clearAllReferences($deep);
@@ -2813,6 +3106,10 @@ abstract class Module implements ActiveRecordInterface
             $this->collOrdersRelatedByDeliveryModuleId->clearIterator();
         }
         $this->collOrdersRelatedByDeliveryModuleId = null;
+        if ($this->collAreaDeliveryModules instanceof Collection) {
+            $this->collAreaDeliveryModules->clearIterator();
+        }
+        $this->collAreaDeliveryModules = null;
         if ($this->collGroupModules instanceof Collection) {
             $this->collGroupModules->clearIterator();
         }

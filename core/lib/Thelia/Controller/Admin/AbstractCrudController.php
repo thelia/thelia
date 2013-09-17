@@ -224,7 +224,7 @@ abstract class AbstractCrudController extends BaseAdminController
      * @param unknown $updateEvent the update event
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalUpdateAction($updateeEvent)
+    protected function performAdditionalUpdateAction($updateEvent)
     {
         return null;
     }

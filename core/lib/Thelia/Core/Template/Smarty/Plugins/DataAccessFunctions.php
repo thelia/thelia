@@ -31,6 +31,7 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Product;
@@ -154,19 +155,41 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         }
     }
 
+    public function countryDataAccess($params, $smarty)
+    {
+        $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
+
+        switch($params["attr"]) {
+            case "default":
+                return $defaultCountry->getId();
+        }
+    }
+
     public function cartDataAccess($params, $smarty)
     {
         $cart = $this->getCart($this->request);
         $result = "";
         switch($params["attr"]) {
             case "count_item":
-
                 $result = $cart->getCartItems()->count();
+                break;
+            case "total_price":
+                $result = $cart->getTotalAmount();
+                break;
+            case "total_taxed_price":
+                $result = $cart->getTaxedAmount(
+                    CountryQuery::create()->findOneById(64) // @TODO : make it magic
+                );
                 break;
         }
 
         return $result;
     }
+
+    public function orderDataAccess($params, &$smarty)
+    {
+        return $this->dataAccess("Order", $params, $this->request->getSession()->getOrder());
+     }
 
     /**
      * Lang global data
@@ -279,8 +302,10 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'content', $this, 'contentDataAccess'),
             new SmartyPluginDescriptor('function', 'folder', $this, 'folderDataAccess'),
             new SmartyPluginDescriptor('function', 'currency', $this, 'currencyDataAccess'),
+            new SmartyPluginDescriptor('function', 'country', $this, 'countryDataAccess'),
             new SmartyPluginDescriptor('function', 'lang', $this, 'langDataAccess'),
             new SmartyPluginDescriptor('function', 'cart', $this, 'cartDataAccess'),
+            new SmartyPluginDescriptor('function', 'order', $this, 'orderDataAccess'),
         );
     }
 }

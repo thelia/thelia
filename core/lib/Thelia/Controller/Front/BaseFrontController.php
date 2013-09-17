@@ -57,4 +57,11 @@ class BaseFrontController extends BaseController
             $this->redirectToRoute("customer.login.view");
         }
     }
+
+    protected function checkCartNotEmpty()
+    {
+        if($this->getSession()->getCart()->countCartItems() == 0) {
+            $this->redirectToRoute("cart.view");
+        }
+    }
 }

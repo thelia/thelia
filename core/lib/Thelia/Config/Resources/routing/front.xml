@@ -97,6 +97,7 @@
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">cart</default>
     </route>
+
     <route id="cart.add.process" path="/cart/add">
         <default key="_controller">Thelia\Controller\Front\CartController::addItem</default>
     </route>
@@ -109,6 +110,21 @@
     <route id="cart.update.quantity" path="/cart/update">
         <default key="_controller">Thelia\Controller\Front\CartController::changeItem</default>
         <default key="_view">cart</default>
+    </route>
+
+    <route id="order.delivery" path="/order/delivery" methods="post">
+        <default key="_controller">Thelia\Controller\Front\OrderController::deliver</default>
+        <default key="_view">order_delivery</default>
+    </route>
+
+    <route id="order.delivery.process" path="/order/delivery">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">order_delivery</default>
+    </route>
+
+    <route id="order.invoice" path="/order/invoice">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">order_invoice</default>
     </route>
 
     <!-- end cart routes -->

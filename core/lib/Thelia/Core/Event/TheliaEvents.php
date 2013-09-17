@@ -153,6 +153,9 @@ final class TheliaEvents
     const CATEGORY_TOGGLE_VISIBILITY = "action.toggleCategoryVisibility";
     const CATEGORY_UPDATE_POSITION   = "action.updateCategoryPosition";
 
+    const CATEGORY_ADD_CONTENT      = "action.categoryAddContent";
+    const CATEGORY_REMOVE_CONTENT   = "action.categoryRemoveContent";
+
     const BEFORE_CREATECATEGORY = "action.before_createcategory";
     const AFTER_CREATECATEGORY 	= "action.after_createcategory";
 
@@ -190,6 +193,13 @@ final class TheliaEvents
     const CART_DELETEITEM = "action.deleteArticle";
 
     /**
+     * Order linked event
+     */
+    const ORDER_SET_BILLING_ADDRESS = "action.order.setBillingAddress";
+    const ORDER_SET_DELIVERY_ADDRESS = "action.order.setDeliveryAddress";
+    const ORDER_SET_DELIVERY_MODULE = "action.order.setDeliveryModule";
+
+    /**
      * Sent on image processing
      */
     const IMAGE_PROCESS = "action.processImage";
@@ -200,7 +210,7 @@ final class TheliaEvents
     const DOCUMENT_PROCESS = "action.processDocument";
 
     /**
-     * Sent on cimage cache clear request
+     * Sent on image cache clear request
      */
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
 
