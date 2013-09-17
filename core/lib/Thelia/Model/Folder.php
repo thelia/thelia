@@ -67,7 +67,6 @@ class Folder extends BaseFolder
     {
         $this->setPosition($this->getNextPosition());
 
-
         return true;
     }
 }
