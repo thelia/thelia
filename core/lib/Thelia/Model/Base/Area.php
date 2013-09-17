@@ -18,11 +18,11 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Area as ChildArea;
+use Thelia\Model\AreaDeliveryModule as ChildAreaDeliveryModule;
+use Thelia\Model\AreaDeliveryModuleQuery as ChildAreaDeliveryModuleQuery;
 use Thelia\Model\AreaQuery as ChildAreaQuery;
 use Thelia\Model\Country as ChildCountry;
 use Thelia\Model\CountryQuery as ChildCountryQuery;
-use Thelia\Model\Delivzone as ChildDelivzone;
-use Thelia\Model\DelivzoneQuery as ChildDelivzoneQuery;
 use Thelia\Model\Map\AreaTableMap;
 
 abstract class Area implements ActiveRecordInterface
@@ -72,10 +72,10 @@ abstract class Area implements ActiveRecordInterface
     protected $name;
 
     /**
-     * The value for the unit field.
+     * The value for the postage field.
      * @var        double
      */
-    protected $unit;
+    protected $postage;
 
     /**
      * The value for the created_at field.
@@ -96,10 +96,10 @@ abstract class Area implements ActiveRecordInterface
     protected $collCountriesPartial;
 
     /**
-     * @var        ObjectCollection|ChildDelivzone[] Collection to store aggregation of ChildDelivzone objects.
+     * @var        ObjectCollection|ChildAreaDeliveryModule[] Collection to store aggregation of ChildAreaDeliveryModule objects.
      */
-    protected $collDelivzones;
-    protected $collDelivzonesPartial;
+    protected $collAreaDeliveryModules;
+    protected $collAreaDeliveryModulesPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -119,7 +119,7 @@ abstract class Area implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $delivzonesScheduledForDeletion = null;
+    protected $areaDeliveryModulesScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Thelia\Model\Base\Area object.
@@ -398,14 +398,14 @@ abstract class Area implements ActiveRecordInterface
     }
 
     /**
-     * Get the [unit] column value.
+     * Get the [postage] column value.
      *
      * @return   double
      */
-    public function getUnit()
+    public function getPostage()
     {
 
-        return $this->unit;
+        return $this->postage;
     }
 
     /**
@@ -491,25 +491,25 @@ abstract class Area implements ActiveRecordInterface
     } // setName()
 
     /**
-     * Set the value of [unit] column.
+     * Set the value of [postage] column.
      *
      * @param      double $v new value
      * @return   \Thelia\Model\Area The current object (for fluent API support)
      */
-    public function setUnit($v)
+    public function setPostage($v)
     {
         if ($v !== null) {
             $v = (double) $v;
         }
 
-        if ($this->unit !== $v) {
-            $this->unit = $v;
-            $this->modifiedColumns[] = AreaTableMap::UNIT;
+        if ($this->postage !== $v) {
+            $this->postage = $v;
+            $this->modifiedColumns[] = AreaTableMap::POSTAGE;
         }
 
 
         return $this;
-    } // setUnit()
+    } // setPostage()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -596,8 +596,8 @@ abstract class Area implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AreaTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
             $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AreaTableMap::translateFieldName('Unit', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->unit = (null !== $col) ? (double) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AreaTableMap::translateFieldName('Postage', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->postage = (null !== $col) ? (double) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AreaTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
@@ -681,7 +681,7 @@ abstract class Area implements ActiveRecordInterface
 
             $this->collCountries = null;
 
-            $this->collDelivzones = null;
+            $this->collAreaDeliveryModules = null;
 
         } // if (deep)
     }
@@ -834,18 +834,17 @@ abstract class Area implements ActiveRecordInterface
                 }
             }
 
-            if ($this->delivzonesScheduledForDeletion !== null) {
-                if (!$this->delivzonesScheduledForDeletion->isEmpty()) {
-                    foreach ($this->delivzonesScheduledForDeletion as $delivzone) {
-                        // need to save related object because we set the relation to null
-                        $delivzone->save($con);
-                    }
-                    $this->delivzonesScheduledForDeletion = null;
+            if ($this->areaDeliveryModulesScheduledForDeletion !== null) {
+                if (!$this->areaDeliveryModulesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\AreaDeliveryModuleQuery::create()
+                        ->filterByPrimaryKeys($this->areaDeliveryModulesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->areaDeliveryModulesScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collDelivzones !== null) {
-            foreach ($this->collDelivzones as $referrerFK) {
+                if ($this->collAreaDeliveryModules !== null) {
+            foreach ($this->collAreaDeliveryModules as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -884,8 +883,8 @@ abstract class Area implements ActiveRecordInterface
         if ($this->isColumnModified(AreaTableMap::NAME)) {
             $modifiedColumns[':p' . $index++]  = 'NAME';
         }
-        if ($this->isColumnModified(AreaTableMap::UNIT)) {
-            $modifiedColumns[':p' . $index++]  = 'UNIT';
+        if ($this->isColumnModified(AreaTableMap::POSTAGE)) {
+            $modifiedColumns[':p' . $index++]  = 'POSTAGE';
         }
         if ($this->isColumnModified(AreaTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -910,8 +909,8 @@ abstract class Area implements ActiveRecordInterface
                     case 'NAME':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
-                    case 'UNIT':
-                        $stmt->bindValue($identifier, $this->unit, PDO::PARAM_STR);
+                    case 'POSTAGE':
+                        $stmt->bindValue($identifier, $this->postage, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -988,7 +987,7 @@ abstract class Area implements ActiveRecordInterface
                 return $this->getName();
                 break;
             case 2:
-                return $this->getUnit();
+                return $this->getPostage();
                 break;
             case 3:
                 return $this->getCreatedAt();
@@ -1027,7 +1026,7 @@ abstract class Area implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
-            $keys[2] => $this->getUnit(),
+            $keys[2] => $this->getPostage(),
             $keys[3] => $this->getCreatedAt(),
             $keys[4] => $this->getUpdatedAt(),
         );
@@ -1041,8 +1040,8 @@ abstract class Area implements ActiveRecordInterface
             if (null !== $this->collCountries) {
                 $result['Countries'] = $this->collCountries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collDelivzones) {
-                $result['Delivzones'] = $this->collDelivzones->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collAreaDeliveryModules) {
+                $result['AreaDeliveryModules'] = $this->collAreaDeliveryModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1085,7 +1084,7 @@ abstract class Area implements ActiveRecordInterface
                 $this->setName($value);
                 break;
             case 2:
-                $this->setUnit($value);
+                $this->setPostage($value);
                 break;
             case 3:
                 $this->setCreatedAt($value);
@@ -1119,7 +1118,7 @@ abstract class Area implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setUnit($arr[$keys[2]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPostage($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
@@ -1135,7 +1134,7 @@ abstract class Area implements ActiveRecordInterface
 
         if ($this->isColumnModified(AreaTableMap::ID)) $criteria->add(AreaTableMap::ID, $this->id);
         if ($this->isColumnModified(AreaTableMap::NAME)) $criteria->add(AreaTableMap::NAME, $this->name);
-        if ($this->isColumnModified(AreaTableMap::UNIT)) $criteria->add(AreaTableMap::UNIT, $this->unit);
+        if ($this->isColumnModified(AreaTableMap::POSTAGE)) $criteria->add(AreaTableMap::POSTAGE, $this->postage);
         if ($this->isColumnModified(AreaTableMap::CREATED_AT)) $criteria->add(AreaTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(AreaTableMap::UPDATED_AT)) $criteria->add(AreaTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1202,7 +1201,7 @@ abstract class Area implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setName($this->getName());
-        $copyObj->setUnit($this->getUnit());
+        $copyObj->setPostage($this->getPostage());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1217,9 +1216,9 @@ abstract class Area implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getDelivzones() as $relObj) {
+            foreach ($this->getAreaDeliveryModules() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addDelivzone($relObj->copy($deepCopy));
+                    $copyObj->addAreaDeliveryModule($relObj->copy($deepCopy));
                 }
             }
 
@@ -1267,8 +1266,8 @@ abstract class Area implements ActiveRecordInterface
         if ('Country' == $relationName) {
             return $this->initCountries();
         }
-        if ('Delivzone' == $relationName) {
-            return $this->initDelivzones();
+        if ('AreaDeliveryModule' == $relationName) {
+            return $this->initAreaDeliveryModules();
         }
     }
 
@@ -1491,31 +1490,31 @@ abstract class Area implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collDelivzones collection
+     * Clears out the collAreaDeliveryModules collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addDelivzones()
+     * @see        addAreaDeliveryModules()
      */
-    public function clearDelivzones()
+    public function clearAreaDeliveryModules()
     {
-        $this->collDelivzones = null; // important to set this to NULL since that means it is uninitialized
+        $this->collAreaDeliveryModules = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collDelivzones collection loaded partially.
+     * Reset is the collAreaDeliveryModules collection loaded partially.
      */
-    public function resetPartialDelivzones($v = true)
+    public function resetPartialAreaDeliveryModules($v = true)
     {
-        $this->collDelivzonesPartial = $v;
+        $this->collAreaDeliveryModulesPartial = $v;
     }
 
     /**
-     * Initializes the collDelivzones collection.
+     * Initializes the collAreaDeliveryModules collection.
      *
-     * By default this just sets the collDelivzones collection to an empty array (like clearcollDelivzones());
+     * By default this just sets the collAreaDeliveryModules collection to an empty array (like clearcollAreaDeliveryModules());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1524,17 +1523,17 @@ abstract class Area implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initDelivzones($overrideExisting = true)
+    public function initAreaDeliveryModules($overrideExisting = true)
     {
-        if (null !== $this->collDelivzones && !$overrideExisting) {
+        if (null !== $this->collAreaDeliveryModules && !$overrideExisting) {
             return;
         }
-        $this->collDelivzones = new ObjectCollection();
-        $this->collDelivzones->setModel('\Thelia\Model\Delivzone');
+        $this->collAreaDeliveryModules = new ObjectCollection();
+        $this->collAreaDeliveryModules->setModel('\Thelia\Model\AreaDeliveryModule');
     }
 
     /**
-     * Gets an array of ChildDelivzone objects which contain a foreign key that references this object.
+     * Gets an array of ChildAreaDeliveryModule objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1544,109 +1543,109 @@ abstract class Area implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildDelivzone[] List of ChildDelivzone objects
+     * @return Collection|ChildAreaDeliveryModule[] List of ChildAreaDeliveryModule objects
      * @throws PropelException
      */
-    public function getDelivzones($criteria = null, ConnectionInterface $con = null)
+    public function getAreaDeliveryModules($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collDelivzonesPartial && !$this->isNew();
-        if (null === $this->collDelivzones || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collDelivzones) {
+        $partial = $this->collAreaDeliveryModulesPartial && !$this->isNew();
+        if (null === $this->collAreaDeliveryModules || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAreaDeliveryModules) {
                 // return empty collection
-                $this->initDelivzones();
+                $this->initAreaDeliveryModules();
             } else {
-                $collDelivzones = ChildDelivzoneQuery::create(null, $criteria)
+                $collAreaDeliveryModules = ChildAreaDeliveryModuleQuery::create(null, $criteria)
                     ->filterByArea($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collDelivzonesPartial && count($collDelivzones)) {
-                        $this->initDelivzones(false);
+                    if (false !== $this->collAreaDeliveryModulesPartial && count($collAreaDeliveryModules)) {
+                        $this->initAreaDeliveryModules(false);
 
-                        foreach ($collDelivzones as $obj) {
-                            if (false == $this->collDelivzones->contains($obj)) {
-                                $this->collDelivzones->append($obj);
+                        foreach ($collAreaDeliveryModules as $obj) {
+                            if (false == $this->collAreaDeliveryModules->contains($obj)) {
+                                $this->collAreaDeliveryModules->append($obj);
                             }
                         }
 
-                        $this->collDelivzonesPartial = true;
+                        $this->collAreaDeliveryModulesPartial = true;
                     }
 
-                    $collDelivzones->getInternalIterator()->rewind();
+                    $collAreaDeliveryModules->getInternalIterator()->rewind();
 
-                    return $collDelivzones;
+                    return $collAreaDeliveryModules;
                 }
 
-                if ($partial && $this->collDelivzones) {
-                    foreach ($this->collDelivzones as $obj) {
+                if ($partial && $this->collAreaDeliveryModules) {
+                    foreach ($this->collAreaDeliveryModules as $obj) {
                         if ($obj->isNew()) {
-                            $collDelivzones[] = $obj;
+                            $collAreaDeliveryModules[] = $obj;
                         }
                     }
                 }
 
-                $this->collDelivzones = $collDelivzones;
-                $this->collDelivzonesPartial = false;
+                $this->collAreaDeliveryModules = $collAreaDeliveryModules;
+                $this->collAreaDeliveryModulesPartial = false;
             }
         }
 
-        return $this->collDelivzones;
+        return $this->collAreaDeliveryModules;
     }
 
     /**
-     * Sets a collection of Delivzone objects related by a one-to-many relationship
+     * Sets a collection of AreaDeliveryModule objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $delivzones A Propel collection.
+     * @param      Collection $areaDeliveryModules A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildArea The current object (for fluent API support)
      */
-    public function setDelivzones(Collection $delivzones, ConnectionInterface $con = null)
+    public function setAreaDeliveryModules(Collection $areaDeliveryModules, ConnectionInterface $con = null)
     {
-        $delivzonesToDelete = $this->getDelivzones(new Criteria(), $con)->diff($delivzones);
+        $areaDeliveryModulesToDelete = $this->getAreaDeliveryModules(new Criteria(), $con)->diff($areaDeliveryModules);
 
 
-        $this->delivzonesScheduledForDeletion = $delivzonesToDelete;
+        $this->areaDeliveryModulesScheduledForDeletion = $areaDeliveryModulesToDelete;
 
-        foreach ($delivzonesToDelete as $delivzoneRemoved) {
-            $delivzoneRemoved->setArea(null);
+        foreach ($areaDeliveryModulesToDelete as $areaDeliveryModuleRemoved) {
+            $areaDeliveryModuleRemoved->setArea(null);
         }
 
-        $this->collDelivzones = null;
-        foreach ($delivzones as $delivzone) {
-            $this->addDelivzone($delivzone);
+        $this->collAreaDeliveryModules = null;
+        foreach ($areaDeliveryModules as $areaDeliveryModule) {
+            $this->addAreaDeliveryModule($areaDeliveryModule);
         }
 
-        $this->collDelivzones = $delivzones;
-        $this->collDelivzonesPartial = false;
+        $this->collAreaDeliveryModules = $areaDeliveryModules;
+        $this->collAreaDeliveryModulesPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Delivzone objects.
+     * Returns the number of related AreaDeliveryModule objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related Delivzone objects.
+     * @return int             Count of related AreaDeliveryModule objects.
      * @throws PropelException
      */
-    public function countDelivzones(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countAreaDeliveryModules(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collDelivzonesPartial && !$this->isNew();
-        if (null === $this->collDelivzones || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collDelivzones) {
+        $partial = $this->collAreaDeliveryModulesPartial && !$this->isNew();
+        if (null === $this->collAreaDeliveryModules || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAreaDeliveryModules) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getDelivzones());
+                return count($this->getAreaDeliveryModules());
             }
 
-            $query = ChildDelivzoneQuery::create(null, $criteria);
+            $query = ChildAreaDeliveryModuleQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1656,56 +1655,81 @@ abstract class Area implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collDelivzones);
+        return count($this->collAreaDeliveryModules);
     }
 
     /**
-     * Method called to associate a ChildDelivzone object to this object
-     * through the ChildDelivzone foreign key attribute.
+     * Method called to associate a ChildAreaDeliveryModule object to this object
+     * through the ChildAreaDeliveryModule foreign key attribute.
      *
-     * @param    ChildDelivzone $l ChildDelivzone
+     * @param    ChildAreaDeliveryModule $l ChildAreaDeliveryModule
      * @return   \Thelia\Model\Area The current object (for fluent API support)
      */
-    public function addDelivzone(ChildDelivzone $l)
+    public function addAreaDeliveryModule(ChildAreaDeliveryModule $l)
     {
-        if ($this->collDelivzones === null) {
-            $this->initDelivzones();
-            $this->collDelivzonesPartial = true;
+        if ($this->collAreaDeliveryModules === null) {
+            $this->initAreaDeliveryModules();
+            $this->collAreaDeliveryModulesPartial = true;
         }
 
-        if (!in_array($l, $this->collDelivzones->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddDelivzone($l);
+        if (!in_array($l, $this->collAreaDeliveryModules->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddAreaDeliveryModule($l);
         }
 
         return $this;
     }
 
     /**
-     * @param Delivzone $delivzone The delivzone object to add.
+     * @param AreaDeliveryModule $areaDeliveryModule The areaDeliveryModule object to add.
      */
-    protected function doAddDelivzone($delivzone)
+    protected function doAddAreaDeliveryModule($areaDeliveryModule)
     {
-        $this->collDelivzones[]= $delivzone;
-        $delivzone->setArea($this);
+        $this->collAreaDeliveryModules[]= $areaDeliveryModule;
+        $areaDeliveryModule->setArea($this);
     }
 
     /**
-     * @param  Delivzone $delivzone The delivzone object to remove.
+     * @param  AreaDeliveryModule $areaDeliveryModule The areaDeliveryModule object to remove.
      * @return ChildArea The current object (for fluent API support)
      */
-    public function removeDelivzone($delivzone)
+    public function removeAreaDeliveryModule($areaDeliveryModule)
     {
-        if ($this->getDelivzones()->contains($delivzone)) {
-            $this->collDelivzones->remove($this->collDelivzones->search($delivzone));
-            if (null === $this->delivzonesScheduledForDeletion) {
-                $this->delivzonesScheduledForDeletion = clone $this->collDelivzones;
-                $this->delivzonesScheduledForDeletion->clear();
+        if ($this->getAreaDeliveryModules()->contains($areaDeliveryModule)) {
+            $this->collAreaDeliveryModules->remove($this->collAreaDeliveryModules->search($areaDeliveryModule));
+            if (null === $this->areaDeliveryModulesScheduledForDeletion) {
+                $this->areaDeliveryModulesScheduledForDeletion = clone $this->collAreaDeliveryModules;
+                $this->areaDeliveryModulesScheduledForDeletion->clear();
             }
-            $this->delivzonesScheduledForDeletion[]= $delivzone;
-            $delivzone->setArea(null);
+            $this->areaDeliveryModulesScheduledForDeletion[]= clone $areaDeliveryModule;
+            $areaDeliveryModule->setArea(null);
         }
 
         return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Area is new, it will return
+     * an empty collection; or if this Area has previously
+     * been saved, it will retrieve related AreaDeliveryModules from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Area.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildAreaDeliveryModule[] List of ChildAreaDeliveryModule objects
+     */
+    public function getAreaDeliveryModulesJoinModule($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildAreaDeliveryModuleQuery::create(null, $criteria);
+        $query->joinWith('Module', $joinBehavior);
+
+        return $this->getAreaDeliveryModules($query, $con);
     }
 
     /**
@@ -1715,7 +1739,7 @@ abstract class Area implements ActiveRecordInterface
     {
         $this->id = null;
         $this->name = null;
-        $this->unit = null;
+        $this->postage = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1742,8 +1766,8 @@ abstract class Area implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collDelivzones) {
-                foreach ($this->collDelivzones as $o) {
+            if ($this->collAreaDeliveryModules) {
+                foreach ($this->collAreaDeliveryModules as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1753,10 +1777,10 @@ abstract class Area implements ActiveRecordInterface
             $this->collCountries->clearIterator();
         }
         $this->collCountries = null;
-        if ($this->collDelivzones instanceof Collection) {
-            $this->collDelivzones->clearIterator();
+        if ($this->collAreaDeliveryModules instanceof Collection) {
+            $this->collAreaDeliveryModules->clearIterator();
         }
-        $this->collDelivzones = null;
+        $this->collAreaDeliveryModules = null;
     }
 
     /**

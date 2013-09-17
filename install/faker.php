@@ -135,6 +135,8 @@ try {
     \Thelia\Model\FolderDocumentQuery::create()->find()->delete();
     \Thelia\Model\ContentDocumentQuery::create()->find()->delete();
 
+    \Thelia\Model\CouponQuery::create()->find()->delete();
+
     $stmt = $con->prepare("SET foreign_key_checks = 1");
 
     $stmt->execute();
@@ -204,7 +206,7 @@ try {
     $featureList = array();
     for($i=0; $i<4; $i++) {
         $feature = new Thelia\Model\Feature();
-        $feature->setVisible(rand(1, 10)>7 ? 0 : 1);
+        $feature->setVisible(1);
         $feature->setPosition($i);
         setI18n($faker, $feature);
 
@@ -278,7 +280,7 @@ try {
     for($i=0; $i<4; $i++) {
         $folder = new Thelia\Model\Folder();
         $folder->setParent(0);
-        $folder->setVisible(rand(1, 10)>7 ? 0 : 1);
+        $folder->setVisible(1);
         $folder->setPosition($i);
         setI18n($faker, $folder);
 
@@ -295,7 +297,7 @@ try {
         for($j=1; $j<rand(0, 5); $j++) {
             $subfolder = new Thelia\Model\Folder();
             $subfolder->setParent($folder->getId());
-            $subfolder->setVisible(rand(1, 10)>7 ? 0 : 1);
+            $subfolder->setVisible(1);
             $subfolder->setPosition($j);
             setI18n($faker, $subfolder);
 
@@ -312,7 +314,7 @@ try {
             for($k=0; $k<rand(0, 5); $k++) {
                 $content = new Thelia\Model\Content();
                 $content->addFolder($subfolder);
-                $content->setVisible(rand(1, 10)>7 ? 0 : 1);
+                $content->setVisible(1);
                 $content->setPosition($k);
                 setI18n($faker, $content);
 
@@ -456,7 +458,7 @@ function createProduct($faker, $category, $position, $template, &$productIdList)
     $product = new Thelia\Model\Product();
     $product->setRef($category->getId() . '_' . $position . '_' . $faker->randomNumber(8));
     $product->addCategory($category);
-    $product->setVisible(rand(1, 10)>7 ? 0 : 1);
+    $product->setVisible(1);
     $product->setPosition($position);
     $product->setTaxRuleId(1);
     $product->setTemplate($template);
@@ -482,7 +484,7 @@ function createCategory($faker, $parent, $position, &$categoryIdList, $contentId
 {
     $category = new Thelia\Model\Category();
     $category->setParent($parent);
-    $category->setVisible(rand(1, 10)>7 ? 0 : 1);
+    $category->setVisible(1);
     $category->setPosition($position);
     setI18n($faker, $category);
 

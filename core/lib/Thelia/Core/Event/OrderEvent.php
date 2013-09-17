@@ -21,64 +21,89 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Colissimo;
+namespace Thelia\Core\Event;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Model\Country;
-use Thelia\Module\BaseModule;
-use Thelia\Module\DeliveryModuleInterface;
+use Thelia\Model\Address;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\Module;
+use Thelia\Model\Order;
 
-class Colissimo extends BaseModule implements DeliveryModuleInterface
+class OrderEvent extends ActionEvent
 {
-    protected $request;
-    protected $dispatcher;
+    protected $order = null;
+    protected $billingAddress = null;
+    protected $deliveryAddress = null;
+    protected $deliveryModule = null;
 
-    public function setRequest(Request $request)
+    /**
+     * @param Order $order
+     */
+    public function __construct(Order $order)
     {
-        $this->request = $request;
-    }
-
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
+        $this->setOrder($order);
     }
 
     /**
-     *
-     * calculate and return delivery price
-     *
-     * @param Country $country
-     * @return mixed
+     * @param Order $order
      */
-    public function calculate(Country $country)
+    public function setOrder(Order $order)
     {
-        // TODO: Implement calculate() method.
-        return 2;
+        $this->order = $order;
     }
 
     /**
-     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
-     * Like install and destroy
+     * @param $address
      */
-    public function install()
+    public function setBillingAddress($address)
     {
-        // TODO: Implement install() method.
+        $this->deliveryAddress = $address;
     }
 
-    public function destroy()
+    /**
+     * @param $address
+     */
+    public function setDeliveryAddress($address)
     {
-        // TODO: Implement destroy() method.
+        $this->deliveryAddress = $address;
     }
 
+    /**
+     * @param $module
+     */
+    public function setDeliveryModule($module)
+    {
+        $this->deliveryModule = $module;
+    }
+
+    /**
+     * @return null|Order
+     */
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    /**
+     * @return array|mixed|Address
+     */
+    public function getBillingAddress()
+    {
+        return $this->billingAddress;
+    }
+
+    /**
+     * @return array|mixed|Address
+     */
+    public function getDeliveryAddress()
+    {
+        return $this->deliveryAddress;
+    }
+
+    /**
+     * @return array|mixed|Address
+     */
+    public function getDeliveryModule()
+    {
+        return $this->deliveryModule;
+    }
 }

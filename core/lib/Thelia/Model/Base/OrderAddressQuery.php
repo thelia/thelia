@@ -55,13 +55,13 @@ use Thelia\Model\Map\OrderAddressTableMap;
  * @method     ChildOrderAddressQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildOrderAddressQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildOrderAddressQuery leftJoinOrderRelatedByAddressInvoice($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderRelatedByAddressInvoice relation
- * @method     ChildOrderAddressQuery rightJoinOrderRelatedByAddressInvoice($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderRelatedByAddressInvoice relation
- * @method     ChildOrderAddressQuery innerJoinOrderRelatedByAddressInvoice($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderRelatedByAddressInvoice relation
+ * @method     ChildOrderAddressQuery leftJoinOrderRelatedByInvoiceOrderAddressId($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderRelatedByInvoiceOrderAddressId relation
+ * @method     ChildOrderAddressQuery rightJoinOrderRelatedByInvoiceOrderAddressId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderRelatedByInvoiceOrderAddressId relation
+ * @method     ChildOrderAddressQuery innerJoinOrderRelatedByInvoiceOrderAddressId($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderRelatedByInvoiceOrderAddressId relation
  *
- * @method     ChildOrderAddressQuery leftJoinOrderRelatedByAddressDelivery($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderRelatedByAddressDelivery relation
- * @method     ChildOrderAddressQuery rightJoinOrderRelatedByAddressDelivery($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderRelatedByAddressDelivery relation
- * @method     ChildOrderAddressQuery innerJoinOrderRelatedByAddressDelivery($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderRelatedByAddressDelivery relation
+ * @method     ChildOrderAddressQuery leftJoinOrderRelatedByDeliveryOrderAddressId($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderRelatedByDeliveryOrderAddressId relation
+ * @method     ChildOrderAddressQuery rightJoinOrderRelatedByDeliveryOrderAddressId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderRelatedByDeliveryOrderAddressId relation
+ * @method     ChildOrderAddressQuery innerJoinOrderRelatedByDeliveryOrderAddressId($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderRelatedByDeliveryOrderAddressId relation
  *
  * @method     ChildOrderAddress findOne(ConnectionInterface $con = null) Return the first ChildOrderAddress matching the query
  * @method     ChildOrderAddress findOneOrCreate(ConnectionInterface $con = null) Return the first ChildOrderAddress matching the query, or a new ChildOrderAddress object populated from the query conditions when no match is found
@@ -750,33 +750,33 @@ abstract class OrderAddressQuery extends ModelCriteria
      *
      * @return ChildOrderAddressQuery The current query, for fluid interface
      */
-    public function filterByOrderRelatedByAddressInvoice($order, $comparison = null)
+    public function filterByOrderRelatedByInvoiceOrderAddressId($order, $comparison = null)
     {
         if ($order instanceof \Thelia\Model\Order) {
             return $this
-                ->addUsingAlias(OrderAddressTableMap::ID, $order->getAddressInvoice(), $comparison);
+                ->addUsingAlias(OrderAddressTableMap::ID, $order->getInvoiceOrderAddressId(), $comparison);
         } elseif ($order instanceof ObjectCollection) {
             return $this
-                ->useOrderRelatedByAddressInvoiceQuery()
+                ->useOrderRelatedByInvoiceOrderAddressIdQuery()
                 ->filterByPrimaryKeys($order->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByOrderRelatedByAddressInvoice() only accepts arguments of type \Thelia\Model\Order or Collection');
+            throw new PropelException('filterByOrderRelatedByInvoiceOrderAddressId() only accepts arguments of type \Thelia\Model\Order or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the OrderRelatedByAddressInvoice relation
+     * Adds a JOIN clause to the query using the OrderRelatedByInvoiceOrderAddressId relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderAddressQuery The current query, for fluid interface
      */
-    public function joinOrderRelatedByAddressInvoice($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinOrderRelatedByInvoiceOrderAddressId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('OrderRelatedByAddressInvoice');
+        $relationMap = $tableMap->getRelation('OrderRelatedByInvoiceOrderAddressId');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -791,14 +791,14 @@ abstract class OrderAddressQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'OrderRelatedByAddressInvoice');
+            $this->addJoinObject($join, 'OrderRelatedByInvoiceOrderAddressId');
         }
 
         return $this;
     }
 
     /**
-     * Use the OrderRelatedByAddressInvoice relation Order object
+     * Use the OrderRelatedByInvoiceOrderAddressId relation Order object
      *
      * @see useQuery()
      *
@@ -808,11 +808,11 @@ abstract class OrderAddressQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
      */
-    public function useOrderRelatedByAddressInvoiceQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useOrderRelatedByInvoiceOrderAddressIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinOrderRelatedByAddressInvoice($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'OrderRelatedByAddressInvoice', '\Thelia\Model\OrderQuery');
+            ->joinOrderRelatedByInvoiceOrderAddressId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderRelatedByInvoiceOrderAddressId', '\Thelia\Model\OrderQuery');
     }
 
     /**
@@ -823,33 +823,33 @@ abstract class OrderAddressQuery extends ModelCriteria
      *
      * @return ChildOrderAddressQuery The current query, for fluid interface
      */
-    public function filterByOrderRelatedByAddressDelivery($order, $comparison = null)
+    public function filterByOrderRelatedByDeliveryOrderAddressId($order, $comparison = null)
     {
         if ($order instanceof \Thelia\Model\Order) {
             return $this
-                ->addUsingAlias(OrderAddressTableMap::ID, $order->getAddressDelivery(), $comparison);
+                ->addUsingAlias(OrderAddressTableMap::ID, $order->getDeliveryOrderAddressId(), $comparison);
         } elseif ($order instanceof ObjectCollection) {
             return $this
-                ->useOrderRelatedByAddressDeliveryQuery()
+                ->useOrderRelatedByDeliveryOrderAddressIdQuery()
                 ->filterByPrimaryKeys($order->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByOrderRelatedByAddressDelivery() only accepts arguments of type \Thelia\Model\Order or Collection');
+            throw new PropelException('filterByOrderRelatedByDeliveryOrderAddressId() only accepts arguments of type \Thelia\Model\Order or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the OrderRelatedByAddressDelivery relation
+     * Adds a JOIN clause to the query using the OrderRelatedByDeliveryOrderAddressId relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderAddressQuery The current query, for fluid interface
      */
-    public function joinOrderRelatedByAddressDelivery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinOrderRelatedByDeliveryOrderAddressId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('OrderRelatedByAddressDelivery');
+        $relationMap = $tableMap->getRelation('OrderRelatedByDeliveryOrderAddressId');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -864,14 +864,14 @@ abstract class OrderAddressQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'OrderRelatedByAddressDelivery');
+            $this->addJoinObject($join, 'OrderRelatedByDeliveryOrderAddressId');
         }
 
         return $this;
     }
 
     /**
-     * Use the OrderRelatedByAddressDelivery relation Order object
+     * Use the OrderRelatedByDeliveryOrderAddressId relation Order object
      *
      * @see useQuery()
      *
@@ -881,11 +881,11 @@ abstract class OrderAddressQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
      */
-    public function useOrderRelatedByAddressDeliveryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useOrderRelatedByDeliveryOrderAddressIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinOrderRelatedByAddressDelivery($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'OrderRelatedByAddressDelivery', '\Thelia\Model\OrderQuery');
+            ->joinOrderRelatedByDeliveryOrderAddressId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderRelatedByDeliveryOrderAddressId', '\Thelia\Model\OrderQuery');
     }
 
     /**

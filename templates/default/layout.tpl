@@ -94,7 +94,7 @@ URL: http://www.thelia.net
                     <li><a href="{url path="/login"}" class="login">{intl l="Log In!"}</a></li>
                     {/elseloop}
                     <li class="dropdown">
-                        <a href="cart.html" class="dropdown-toggle cart" data-toggle="dropdown">
+                        <a href="{url path="/cart"}" class="dropdown-toggle cart" data-toggle="dropdown">
                             Cart <span class="badge">{cart attr="count_item"}</span>
                         </a>
                     </li>

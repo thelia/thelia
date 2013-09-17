@@ -31,7 +31,13 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
-(1, 'DebugBar', 1, 1, 1, 'DebugBar\\DebugBar', NOW(), NOW());
+(1, 'DebugBar', 1, 1, 1, 'DebugBar\\DebugBar', NOW(), NOW()),
+(2, 'Colissimo', 2, 1, 1, 'Colissimo\\Colissimo', NOW(), NOW());
+
+INSERT INTO  `thelia_2`.`module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+('2',  'en_US',  '72h delivery', NULL,  NULL,  NULL),
+('2',  'fr_FR',  'Livraison par colissimo en 72h', NULL,  NULL,  NULL);
+
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
 (1, 1, 1, NOW(), NOW()),
@@ -46,13 +52,13 @@ INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
 (3, 'fr_FR', 'Mlle', 'Madamemoiselle'),
 (3, 'en_US', 'Miss', 'Miss');
 
-INSERT INTO `currency` (`id` ,`code` ,`symbol` ,`rate`, `position` ,`by_default` ,`created_at` ,`updated_at`)
+INSERT INTO `currency` (`id`, `code`, `symbol`, `rate`, `position`, `by_default`, `created_at`, `updated_at`)
 VALUES
-(1, 'EUR', '€', '1', 1, '1', NOW() , NOW()),
+(1, 'EUR', '€', '1', 1, '1', NOW(),  NOW()),
 (2, 'USD', '$', '1.26', 2, '0', NOW(), NOW()),
 (3, 'GBP', '£', '0.89', 3, '0', NOW(), NOW());
 
-INSERT INTO `currency_i18n` (`id` ,`locale` ,`name`)
+INSERT INTO `currency_i18n` (`id`, `locale`, `name`)
 VALUES
 (1, 'fr_FR', 'Euro'),
 (1, 'en_US', 'Euro'),

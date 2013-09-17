@@ -57,7 +57,7 @@ class ContentFolderTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class ContentFolderTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the CONTENT_ID field
@@ -78,6 +78,11 @@ class ContentFolderTableMap extends TableMap
      * the column name for the FOLDER_ID field
      */
     const FOLDER_ID = 'content_folder.FOLDER_ID';
+
+    /**
+     * the column name for the DEFAULT_FOLDER field
+     */
+    const DEFAULT_FOLDER = 'content_folder.DEFAULT_FOLDER';
 
     /**
      * the column name for the CREATED_AT field
@@ -101,12 +106,12 @@ class ContentFolderTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('ContentId', 'FolderId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('contentId', 'folderId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ContentFolderTableMap::CONTENT_ID, ContentFolderTableMap::FOLDER_ID, ContentFolderTableMap::CREATED_AT, ContentFolderTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('CONTENT_ID', 'FOLDER_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('content_id', 'folder_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('ContentId', 'FolderId', 'DefaultFolder', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('contentId', 'folderId', 'defaultFolder', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ContentFolderTableMap::CONTENT_ID, ContentFolderTableMap::FOLDER_ID, ContentFolderTableMap::DEFAULT_FOLDER, ContentFolderTableMap::CREATED_AT, ContentFolderTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('CONTENT_ID', 'FOLDER_ID', 'DEFAULT_FOLDER', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('content_id', 'folder_id', 'default_folder', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -116,12 +121,12 @@ class ContentFolderTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('ContentId' => 0, 'FolderId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('contentId' => 0, 'folderId' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(ContentFolderTableMap::CONTENT_ID => 0, ContentFolderTableMap::FOLDER_ID => 1, ContentFolderTableMap::CREATED_AT => 2, ContentFolderTableMap::UPDATED_AT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('CONTENT_ID' => 0, 'FOLDER_ID' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        self::TYPE_FIELDNAME     => array('content_id' => 0, 'folder_id' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('ContentId' => 0, 'FolderId' => 1, 'DefaultFolder' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('contentId' => 0, 'folderId' => 1, 'defaultFolder' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(ContentFolderTableMap::CONTENT_ID => 0, ContentFolderTableMap::FOLDER_ID => 1, ContentFolderTableMap::DEFAULT_FOLDER => 2, ContentFolderTableMap::CREATED_AT => 3, ContentFolderTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('CONTENT_ID' => 0, 'FOLDER_ID' => 1, 'DEFAULT_FOLDER' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('content_id' => 0, 'folder_id' => 1, 'default_folder' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -143,6 +148,7 @@ class ContentFolderTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('CONTENT_ID', 'ContentId', 'INTEGER' , 'content', 'ID', true, null, null);
         $this->addForeignPrimaryKey('FOLDER_ID', 'FolderId', 'INTEGER' , 'folder', 'ID', true, null, null);
+        $this->addColumn('DEFAULT_FOLDER', 'DefaultFolder', 'BOOLEAN', false, 1, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -358,11 +364,13 @@ class ContentFolderTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(ContentFolderTableMap::CONTENT_ID);
             $criteria->addSelectColumn(ContentFolderTableMap::FOLDER_ID);
+            $criteria->addSelectColumn(ContentFolderTableMap::DEFAULT_FOLDER);
             $criteria->addSelectColumn(ContentFolderTableMap::CREATED_AT);
             $criteria->addSelectColumn(ContentFolderTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.CONTENT_ID');
             $criteria->addSelectColumn($alias . '.FOLDER_ID');
+            $criteria->addSelectColumn($alias . '.DEFAULT_FOLDER');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

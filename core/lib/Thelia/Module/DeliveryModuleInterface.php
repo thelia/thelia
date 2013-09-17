@@ -23,13 +23,16 @@
 
 namespace Thelia\Module;
 
+use Thelia\Model\Country;
+
 interface DeliveryModuleInterface extends BaseModuleInterface
 {
     /**
-     *
      * calculate and return delivery price
+     *
+     * @param Country $country
      *
      * @return mixed
      */
-    public function calculate($country = null);
+    public function calculate(Country $country);
 }

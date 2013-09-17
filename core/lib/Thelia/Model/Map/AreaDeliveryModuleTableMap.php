@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Delivzone;
-use Thelia\Model\DelivzoneQuery;
+use Thelia\Model\AreaDeliveryModule;
+use Thelia\Model\AreaDeliveryModuleQuery;
 
 
 /**
- * This class defines the structure of the 'delivzone' table.
+ * This class defines the structure of the 'area_delivery_module' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\DelivzoneQuery;
  * (i.e. if it's a text column type).
  *
  */
-class DelivzoneTableMap extends TableMap
+class AreaDeliveryModuleTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.DelivzoneTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.AreaDeliveryModuleTableMap';
 
     /**
      * The default database name for this class
@@ -42,17 +42,17 @@ class DelivzoneTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'delivzone';
+    const TABLE_NAME = 'area_delivery_module';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Delivzone';
+    const OM_CLASS = '\\Thelia\\Model\\AreaDeliveryModule';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Delivzone';
+    const CLASS_DEFAULT = 'Thelia.Model.AreaDeliveryModule';
 
     /**
      * The total number of columns
@@ -72,27 +72,27 @@ class DelivzoneTableMap extends TableMap
     /**
      * the column name for the ID field
      */
-    const ID = 'delivzone.ID';
+    const ID = 'area_delivery_module.ID';
 
     /**
      * the column name for the AREA_ID field
      */
-    const AREA_ID = 'delivzone.AREA_ID';
+    const AREA_ID = 'area_delivery_module.AREA_ID';
 
     /**
-     * the column name for the DELIVERY field
+     * the column name for the DELIVERY_MODULE_ID field
      */
-    const DELIVERY = 'delivzone.DELIVERY';
+    const DELIVERY_MODULE_ID = 'area_delivery_module.DELIVERY_MODULE_ID';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'delivzone.CREATED_AT';
+    const CREATED_AT = 'area_delivery_module.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'delivzone.UPDATED_AT';
+    const UPDATED_AT = 'area_delivery_module.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -106,11 +106,11 @@ class DelivzoneTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'AreaId', 'Delivery', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'areaId', 'delivery', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(DelivzoneTableMap::ID, DelivzoneTableMap::AREA_ID, DelivzoneTableMap::DELIVERY, DelivzoneTableMap::CREATED_AT, DelivzoneTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'AREA_ID', 'DELIVERY', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'area_id', 'delivery', 'created_at', 'updated_at', ),
+        self::TYPE_PHPNAME       => array('Id', 'AreaId', 'DeliveryModuleId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'areaId', 'deliveryModuleId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AreaDeliveryModuleTableMap::ID, AreaDeliveryModuleTableMap::AREA_ID, AreaDeliveryModuleTableMap::DELIVERY_MODULE_ID, AreaDeliveryModuleTableMap::CREATED_AT, AreaDeliveryModuleTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'AREA_ID', 'DELIVERY_MODULE_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'area_id', 'delivery_module_id', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
@@ -121,11 +121,11 @@ class DelivzoneTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'AreaId' => 1, 'Delivery' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'areaId' => 1, 'delivery' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        self::TYPE_COLNAME       => array(DelivzoneTableMap::ID => 0, DelivzoneTableMap::AREA_ID => 1, DelivzoneTableMap::DELIVERY => 2, DelivzoneTableMap::CREATED_AT => 3, DelivzoneTableMap::UPDATED_AT => 4, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'AREA_ID' => 1, 'DELIVERY' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'area_id' => 1, 'delivery' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'AreaId' => 1, 'DeliveryModuleId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'areaId' => 1, 'deliveryModuleId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(AreaDeliveryModuleTableMap::ID => 0, AreaDeliveryModuleTableMap::AREA_ID => 1, AreaDeliveryModuleTableMap::DELIVERY_MODULE_ID => 2, AreaDeliveryModuleTableMap::CREATED_AT => 3, AreaDeliveryModuleTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'AREA_ID' => 1, 'DELIVERY_MODULE_ID' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'area_id' => 1, 'delivery_module_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
@@ -139,15 +139,15 @@ class DelivzoneTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('delivzone');
-        $this->setPhpName('Delivzone');
-        $this->setClassName('\\Thelia\\Model\\Delivzone');
+        $this->setName('area_delivery_module');
+        $this->setPhpName('AreaDeliveryModule');
+        $this->setClassName('\\Thelia\\Model\\AreaDeliveryModule');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('AREA_ID', 'AreaId', 'INTEGER', 'area', 'ID', false, null, null);
-        $this->addColumn('DELIVERY', 'Delivery', 'VARCHAR', true, 45, null);
+        $this->addForeignKey('AREA_ID', 'AreaId', 'INTEGER', 'area', 'ID', true, null, null);
+        $this->addForeignKey('DELIVERY_MODULE_ID', 'DeliveryModuleId', 'INTEGER', 'module', 'ID', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -157,7 +157,8 @@ class DelivzoneTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Area', '\\Thelia\\Model\\Area', RelationMap::MANY_TO_ONE, array('area_id' => 'id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('Area', '\\Thelia\\Model\\Area', RelationMap::MANY_TO_ONE, array('area_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Module', '\\Thelia\\Model\\Module', RelationMap::MANY_TO_ONE, array('delivery_module_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
 
     /**
@@ -229,7 +230,7 @@ class DelivzoneTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? DelivzoneTableMap::CLASS_DEFAULT : DelivzoneTableMap::OM_CLASS;
+        return $withPrefix ? AreaDeliveryModuleTableMap::CLASS_DEFAULT : AreaDeliveryModuleTableMap::OM_CLASS;
     }
 
     /**
@@ -243,21 +244,21 @@ class DelivzoneTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Delivzone object, last column rank)
+     * @return array (AreaDeliveryModule object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = DelivzoneTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = DelivzoneTableMap::getInstanceFromPool($key))) {
+        $key = AreaDeliveryModuleTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = AreaDeliveryModuleTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + DelivzoneTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + AreaDeliveryModuleTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = DelivzoneTableMap::OM_CLASS;
+            $cls = AreaDeliveryModuleTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            DelivzoneTableMap::addInstanceToPool($obj, $key);
+            AreaDeliveryModuleTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -280,8 +281,8 @@ class DelivzoneTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = DelivzoneTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = DelivzoneTableMap::getInstanceFromPool($key))) {
+            $key = AreaDeliveryModuleTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = AreaDeliveryModuleTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -290,7 +291,7 @@ class DelivzoneTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                DelivzoneTableMap::addInstanceToPool($obj, $key);
+                AreaDeliveryModuleTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -311,15 +312,15 @@ class DelivzoneTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(DelivzoneTableMap::ID);
-            $criteria->addSelectColumn(DelivzoneTableMap::AREA_ID);
-            $criteria->addSelectColumn(DelivzoneTableMap::DELIVERY);
-            $criteria->addSelectColumn(DelivzoneTableMap::CREATED_AT);
-            $criteria->addSelectColumn(DelivzoneTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(AreaDeliveryModuleTableMap::ID);
+            $criteria->addSelectColumn(AreaDeliveryModuleTableMap::AREA_ID);
+            $criteria->addSelectColumn(AreaDeliveryModuleTableMap::DELIVERY_MODULE_ID);
+            $criteria->addSelectColumn(AreaDeliveryModuleTableMap::CREATED_AT);
+            $criteria->addSelectColumn(AreaDeliveryModuleTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.AREA_ID');
-            $criteria->addSelectColumn($alias . '.DELIVERY');
+            $criteria->addSelectColumn($alias . '.DELIVERY_MODULE_ID');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -334,7 +335,7 @@ class DelivzoneTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(DelivzoneTableMap::DATABASE_NAME)->getTable(DelivzoneTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(AreaDeliveryModuleTableMap::DATABASE_NAME)->getTable(AreaDeliveryModuleTableMap::TABLE_NAME);
     }
 
     /**
@@ -342,16 +343,16 @@ class DelivzoneTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(DelivzoneTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(DelivzoneTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new DelivzoneTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(AreaDeliveryModuleTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(AreaDeliveryModuleTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new AreaDeliveryModuleTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Delivzone or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a AreaDeliveryModule or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Delivzone object or primary key or array of primary keys
+     * @param mixed               $values Criteria or AreaDeliveryModule object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -362,25 +363,25 @@ class DelivzoneTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(DelivzoneTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AreaDeliveryModuleTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Delivzone) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\AreaDeliveryModule) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(DelivzoneTableMap::DATABASE_NAME);
-            $criteria->add(DelivzoneTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(AreaDeliveryModuleTableMap::DATABASE_NAME);
+            $criteria->add(AreaDeliveryModuleTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = DelivzoneQuery::create()->mergeWith($criteria);
+        $query = AreaDeliveryModuleQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { DelivzoneTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { AreaDeliveryModuleTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { DelivzoneTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { AreaDeliveryModuleTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -388,20 +389,20 @@ class DelivzoneTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the delivzone table.
+     * Deletes all rows from the area_delivery_module table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return DelivzoneQuery::create()->doDeleteAll($con);
+        return AreaDeliveryModuleQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Delivzone or Criteria object.
+     * Performs an INSERT on the database, given a AreaDeliveryModule or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Delivzone object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or AreaDeliveryModule object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -410,22 +411,22 @@ class DelivzoneTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(DelivzoneTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AreaDeliveryModuleTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Delivzone object
+            $criteria = $criteria->buildCriteria(); // build Criteria from AreaDeliveryModule object
         }
 
-        if ($criteria->containsKey(DelivzoneTableMap::ID) && $criteria->keyContainsValue(DelivzoneTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.DelivzoneTableMap::ID.')');
+        if ($criteria->containsKey(AreaDeliveryModuleTableMap::ID) && $criteria->keyContainsValue(AreaDeliveryModuleTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.AreaDeliveryModuleTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = DelivzoneQuery::create()->mergeWith($criteria);
+        $query = AreaDeliveryModuleQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -441,7 +442,7 @@ class DelivzoneTableMap extends TableMap
         return $pk;
     }
 
-} // DelivzoneTableMap
+} // AreaDeliveryModuleTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-DelivzoneTableMap::buildTableMap();
+AreaDeliveryModuleTableMap::buildTableMap();

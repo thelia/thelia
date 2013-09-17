@@ -94,13 +94,13 @@
                             online_only : http://schema.org/OnlineOnly
                         -->
                         {if $IS_PROMO }
-                        {loop name="productSaleElements_promo" type="product_sale_elements" product="{$ID}" limit="1"}
+                        {loop name="productSaleElements_promo" type="product_sale_elements" product="{$ID}" limit="1" order="min_price"}
                             {assign var="default_product_sale_elements" value="$ID"}
                             <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$TAXED_PROMO_PRICE}"} {currency attr="symbol"}</span></span>
                             <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                         {/loop}
                         {else}
-                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                         {/if}
                     </div>
                 </div>

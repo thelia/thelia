@@ -1,0 +1,203 @@
+{extends file="layout.tpl"}
+
+{block name="breadcrumb"}
+    <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
+        <strong id="breadcrumb-label">You are here: </strong>
+        <ul class="breadcrumb" itemprop="breadcrumb">
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">Home</span></a></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/cart"}" itemprop="url"><span itemprop="title">Cart</span></a></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">My order</span></li>
+        </ul>
+    </nav><!-- /.nav-breadcrumb -->
+{/block}
+
+{block name="main-content"}
+    <div class="main">
+        <article class="col-main" role="main" aria-labelledby="main-label">
+
+            <h1 id="main-label" class="page-header">Your Cart</h1>
+
+            <div class="btn-group checkout-progress">
+                <a href="cart.php" role="button" class="btn btn-step"><span class="step-nb">1</span> <span class="step-label"> <span>Your Cart</span></a>
+                <a href="cart-step2.php" role="button" class="btn btn-step"><span class="step-nb">2</span> <span class="step-label">Billing and delivery</span></a>
+                <a href="cart-step3.php" role="button" class="btn btn-step active"><span class="step-nb">3</span> <span class="step-label">Check my order</span></a>
+                <a href="cart-step4.php" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">Secure payment</span></a>
+            </div>
+
+            <form id="form-cart" action="cart-step4.php" method="post" role="form">
+                <table class="table table-cart">
+                    <colgroup>
+                        <col width="150">
+                        <col>
+                        <col width="200">
+                        <col width="250">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th class="image">&nbsp;</th>
+                        <th class="product">
+                            <span class="hidden-xs">Product Name</span>
+                            <span class="visible-xs">Name</span>
+                        </th>
+                        <th class="unitprice">
+                            <span class="hidden-xs">Unit Price</span>
+                            <span class="visible-xs">Price</span>
+                        </th>
+                        <th class="subprice">
+                            <span class="hidden-xs">Total <abbr title="Tax Inclusive">TTC</abbr></span>
+                            <span class="visible-xs">Total</span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {loop type="cart" name="cartloop"}
+
+                    <tr>
+                        <td class="image">
+                            <a href="{$PRODUCT_URL}" class="thumbnail">
+
+                            {assign "cart_count" $LOOP_COUNT}
+                            {ifloop rel='product-image'}
+                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                    <img src="{$IMAGE_URL}" alt="Product #{$cart_count}"></a>
+                                {/loop}
+                            {/ifloop}
+                            {elseloop rel="product-image"}
+                                {images file='assets/img/product/1/118x85.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{$cart_count}">{/images}
+                            {/elseloop}
+                        </td>
+                        <td class="product" >
+                            <h3 class="name">
+                                Product #{$cart_count}
+                            </h3>
+                            <div class="product-options">
+                                <dl class="dl-horizontal">
+                                    <dt>Available :</dt>
+                                    <dd>In Stock</dd>
+                                    <dt>No.</dt>
+                                    <dd>{$REF}</dd>
+                                    {*<dt>Select Size</dt>
+                                    <dd>Large</dd>
+                                    <dt>Select Delivery Date</dt>
+                                    <dd>Jan 2, 2013</dd>
+                                    <dt>Additional Option</dt>
+                                    <dd>Option 1</dd>*}
+                                </dl>
+                            </div>
+                        </td>
+                        <td class="unitprice">
+                            {if $IS_PROMO == 1}
+                                {assign "real_price" $PROMO_TAXED_PRICE}
+                                <div class="special-price"><span class="price">{currency attr="symbol"} {$PROMO_TAXED_PRICE}</span></div>
+                                <small class="old-price">instead of <span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></small>
+                            {else}
+                                {assign "real_price" $TAXED_PRICE}
+                                <div class="special-price"><span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></div>
+                            {/if}
+                        </td>
+                        <td class="subprice">
+                            <span class="price">{currency attr="symbol"} {$real_price * $QUANTITY}</span>
+                        </td>
+                    </tr>
+
+                    {/loop}
+
+                    </tbody>
+                    <tfoot>
+                    <tr >
+                        <td rowspan="3" colspan="2" class="empty">&nbsp;</td>
+                        <th class="shipping">Shipping Tax</th>
+                        <td class="shipping">
+                            <div class="shipping-price">
+                                <span class="price">{order attr="postage"}</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr >
+                        <th class="coupon"><label for="coupon">Enter your coupon code if you have one</label></th>
+                        <td class="coupon">
+                            <div class="input-group">
+                                <input type="text" name="coupon" id="coupon" class="form-control">
+												<span class="input-group-btn">
+													<button type="button" class="btn btn-coupon">Ok</button>
+												</span>
+                            </div><!-- /input-group -->
+                        </td>
+                    </tr>
+                    <tr >
+                        <th class="total">Total <abbr title="Tax Inclusive">TTC</abbr></th>
+                        <td class="total">
+                            <div class="total-price">
+                                <span class="price">$200.00</span>
+                            </div>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+
+                <div id="cart-address">
+                    <div class="panel">
+                        <div class="panel-heading">Delivery address</div>
+                        <div class="panel-body">
+                            <span class="fn">M. DUPONT Jean</span>
+                            <span class="org">Agency XY</span>
+                            <address class="adr">
+                                <span class="street-address">street name of my business</span><br>
+                                <span class="postal-code">75000</span>
+                                <span class="locality">City, <span class="country-name">Country</span></span>
+                            </address>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-heading">Billing address</div>
+                        <div class="panel-body">
+                            <span class="fn">M. DUPONT Jean</span>
+                            <span class="org">Agency XY</span>
+                            <address class="adr">
+                                <span class="street-address">street name of my business</span><br>
+                                <span class="postal-code">75000</span>
+                                <span class="locality">City, <span class="country-name">Country</span></span>
+                            </address>
+                            <a href="address.php" class="btn btn-change-address">Change address</a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="payment-method" class="panel">
+                    <div class="panel-heading">Choose your payment method</div>
+                    <div class="panel-body">
+                        <ul class="list-payment">
+                            <?php foreach ($payment as $key => $value) { ?>
+                            <li>
+                                <div class="radio">
+                                    <label for="payment_<?php echo $key; ?>">
+                                        <input type="radio" name="payment" id="payment_<?php echo $key; ?>" value="<?php echo $value; ?>">
+                                        <img src="img/payment/<?php echo $value; ?>.png">
+                                    </label>
+                                </div>
+                            </li>
+                            <?php } ?>
+                    </div>
+                </div>
+
+                <a href="cart-step2.php" role="button" class="btn btn-back"><span>Back</span></a>
+                <button type="submit" class="btn btn-checkout-next"><span>Next Step</span></button>
+            </form>
+
+
+        </article>
+
+
+
+    </div>
+{/block}
+
+{block name="javascript-initialization"}
+<script type="text/javascript">
+jQuery(function($cart) {
+
+});
+</script>
+{/block}
