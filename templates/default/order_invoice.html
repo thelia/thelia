@@ -258,11 +258,15 @@
 
                 {/form_field}
 
+                {form_field form=$form field='payment-module'}
+
                 <div id="payment-method" class="panel">
                     <div class="panel-heading">Choose your payment method</div>
                     <div class="panel-body">
                         <ul class="list-payment">
-                            <?php foreach ($payment as $key => $value) { ?>
+
+                            {loop type="payment" name="payments" force_return="true"}
+
                             <li>
                                 <div class="radio">
                                     <label for="payment_<?php echo $key; ?>">
@@ -271,9 +275,13 @@
                                     </label>
                                 </div>
                             </li>
-                            <?php } ?>
+
+                            {/loop}
+
                     </div>
                 </div>
+
+                {/form_field}
 
                 <a href="{url path="/order/delivery"}" role="button" class="btn btn-back"><span>Back</span></a>
                 <button type="submit" class="btn btn-checkout-next"><span>TO REMOVE</span></button>
