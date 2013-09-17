@@ -189,7 +189,7 @@ class ProductTableMap extends TableMap
         $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
         $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, 0);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
-        $this->addForeignKey('TEMPLATE_ID', 'TemplateId', 'INTEGER', 'template', 'ID', true, null, null);
+        $this->addForeignKey('TEMPLATE_ID', 'TemplateId', 'INTEGER', 'template', 'ID', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('VERSION', 'Version', 'INTEGER', false, null, 0);

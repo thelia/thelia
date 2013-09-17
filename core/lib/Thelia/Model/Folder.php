@@ -67,8 +67,12 @@ class Folder extends BaseFolder
     {
         $this->setPosition($this->getNextPosition());
 
-        $this->generateRewrittenUrl($this->getLocale());
 
         return true;
+    }
+
+    public function postInsert(ConnectionInterface $con = null)
+    {
+        //$this->generateRewrittenUrl($this->getLocale());
     }
 }

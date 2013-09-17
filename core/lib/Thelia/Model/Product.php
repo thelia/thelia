@@ -107,7 +107,7 @@ class Product extends BaseProduct
     {
         $this->setPosition($this->getNextPosition());
 
-        $this->generateRewrittenUrl($this->getLocale());
+
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEPRODUCT, new ProductEvent($this));
 
@@ -119,6 +119,7 @@ class Product extends BaseProduct
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        //$this->generateRewrittenUrl($this->getLocale());
         $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
     }
 
