@@ -28,7 +28,7 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <column name="template_id" required="true" type="INTEGER" />
+    <column name="template_id" type="INTEGER" />
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
     </foreign-key>
@@ -102,6 +102,7 @@
     <column name="serialized_requirements" required="true" type="LONGVARCHAR" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="LONGVARCHAR" />
+    <column defaultValue="0" name="is_default" type="BOOLEAN" />
     <behavior name="timestampable" />
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description" />

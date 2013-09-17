@@ -40,6 +40,7 @@ use Thelia\Core\Event\ProductAddContentEvent;
 use Thelia\Core\Event\ProductDeleteContentEvent;
 use Thelia\Model\ProductAssociatedContent;
 use Thelia\Model\ProductAssociatedContentQuery;
+use Thelia\Model\ProductCategory;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
@@ -55,13 +56,13 @@ class Product extends BaseAction implements EventSubscriberInterface
         $product
             ->setDispatcher($this->getDispatcher())
 
-            ->setLocale($event->getLocale())
+            ->setRef($event->getRef())
             ->setTitle($event->getTitle())
-            ->setParent($event->getParent())
+            ->setLocale($event->getLocale())
             ->setVisible($event->getVisible())
 
-            ->save()
-        ;
+            ->create($event->getDefaultCategory())
+         ;
 
         $event->setProduct($product);
     }

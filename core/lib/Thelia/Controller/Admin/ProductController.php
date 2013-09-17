@@ -83,9 +83,10 @@ class ProductController extends AbstractCrudController
         $createEvent = new ProductCreateEvent();
 
         $createEvent
+            ->setRef($formData['ref'])
             ->setTitle($formData['title'])
-            ->setLocale($formData["locale"])
-            ->setParent($formData['parent'])
+            ->setLocale($formData['locale'])
+            ->setDefaultCategory($formData['default_category'])
             ->setVisible($formData['visible'])
         ;
 
@@ -134,15 +135,15 @@ class ProductController extends AbstractCrudController
     {
         // Prepare the data that will hydrate the form
         $data = array(
-            'id'           => $object->getId(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'chapo'        => $object->getChapo(),
-            'description'  => $object->getDescription(),
-            'postscriptum' => $object->getPostscriptum(),
-            'visible'      => $object->getVisible(),
-            'url'          => $object->getRewritenUrl($this->getCurrentEditionLocale()),
-            'parent'       => $object->getParent()
+            'id'               => $object->getId(),
+            'locale'           => $object->getLocale(),
+            'title'            => $object->getTitle(),
+            'chapo'            => $object->getChapo(),
+            'description'      => $object->getDescription(),
+            'postscriptum'     => $object->getPostscriptum(),
+            'visible'          => $object->getVisible(),
+            'url'              => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
+            'default_category' => $object->getDefaultCategoryId()
         );
 
         // Setup the object form
@@ -174,10 +175,24 @@ class ProductController extends AbstractCrudController
     protected function getEditionArguments()
     {
         return array(
-                'product_id' => $this->getRequest()->get('product_id', 0),
-                'folder_id' => $this->getRequest()->get('folder_id', 0),
+                'category_id' => $this->getCategoryId(),
+                'product_id'  => $this->getRequest()->get('product_id', 0),
+                'folder_id'   => $this->getRequest()->get('folder_id', 0),
                 'current_tab' => $this->getRequest()->get('current_tab', 'general')
         );
+    }
+
+    protected function getCategoryId() {
+        // Trouver le category_id, soit depuis la reques, souit depuis le produit courant
+        $category_id = $this->getRequest()->get('category_id', null);
+
+        if ($category_id == null) {
+            $product = $this->getExistingObject();
+
+            if ($product !== null) $category_id = $product->getDefaultCategoryId();
+        }
+
+        return $category_id != null ? $category_id : 0;
     }
 
     protected function renderListTemplate($currentOrder)
@@ -187,18 +202,15 @@ class ProductController extends AbstractCrudController
         return $this->render('categories',
                 array(
                     'product_order' => $currentOrder,
-                    'product_id' => $this->getRequest()->get('product_id', 0)
+                    'category_id' => $this->getCategoryId()
         ));
     }
 
     protected function redirectToListTemplate()
     {
-        // Redirect to the product default category list
-        $product = $this->getExistingObject();
-
         $this->redirectToRoute(
                 'admin.products.default',
-                array('category_id' => $product != null ? $product->getDefaultCategory() : 0)
+                array('category_id' => $this->getCategoryId())
         );
     }
 
@@ -238,7 +250,7 @@ class ProductController extends AbstractCrudController
         // Redirect to parent product list
         $this->redirectToRoute(
                 'admin.products.default',
-                array('category_id' => $deleteEvent->getProduct()->getDefaultCategory())
+                array('category_id' => $deleteEvent->getProduct()->getDefaultCategoryId())
         );
     }
 
@@ -249,24 +261,18 @@ class ProductController extends AbstractCrudController
             // Redirect to parent product list
             $this->redirectToRoute(
                     'admin.categories.default',
-                    array('category_id' => $product->getDefaultCategory())
+                    array('category_id' => $updateEvent->getProduct()->getDefaultCategoryId())
             );
         }
     }
 
-    protected function performAdditionalUpdatePositionAction($event)
+    protected function performAdditionalUpdatePositionAction($positionEvent)
     {
-        $product = ProductQuery::create()->findPk($event->getObjectId());
-
-        if ($product != null) {
-            // Redirect to parent product list
-            $this->redirectToRoute(
-                    'admin.categories.default',
-                    array('category_id' => $product->getDefaultCategory())
-            );
-        }
-
-        return null;
+        // Redirect to parent product list
+        $this->redirectToRoute(
+                'admin.categories.default',
+                array('category_id' => $positionEvent->getProduct()->getDefaultCategoryId())
+        );
     }
 
     public function getAvailableRelatedContentAction($productId, $folderId)

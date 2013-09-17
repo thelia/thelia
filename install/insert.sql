@@ -1128,9 +1128,9 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (268, 'es_ES', 'USA - Alabama', '', '', ''),
 (268, 'fr_FR', 'USA - Alabama', '', '', '');
 
-INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `updated_at`)
+INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `is_default`, `created_at`, `updated_at`)
   VALUES
-  (1, 'PricePercentTaxType', 'eyJwZXJjZW50IjoxOS42fQ==', NOW(), NOW());
+  (1, 'PricePercentTaxType', 'eyJwZXJjZW50IjoxOS42fQ==', 1, NOW(), NOW());
 
 INSERT INTO `tax_i18n` (`id`, `locale`, `title`)
   VALUES

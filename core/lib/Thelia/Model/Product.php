@@ -21,12 +21,10 @@ class Product extends BaseProduct
 
     use \Thelia\Model\Tools\UrlRewritingTrait;
 
-    protected $defaultCategory = null;
-
     /**
      * {@inheritDoc}
      */
-    protected function getRewritenUrlViewName() {
+    protected function getRewrittenUrlViewName() {
         return 'product';
     }
 
@@ -45,7 +43,8 @@ class Product extends BaseProduct
     public function getTaxedPrice(Country $country)
     {
         $taxCalculator = new Calculator();
-        return round($taxCalculator->load($this, $country)->getTaxedPrice($this->getRealLowestPrice()), 2);
+
+        return $taxCalculator->load($this, $country)->getTaxedPrice($this->getRealLowestPrice());
     }
 
     /**
@@ -99,10 +98,12 @@ class Product extends BaseProduct
 
         $con->beginTransaction();
 
+        $this->dispatchEvent(TheliaEvents::BEFORE_CREATEPRODUCT, new ProductEvent($this));
+
         try {
             // Create the product
             $this->save($con);
-
+echo "1";
             // Add the default category
             $pc = new ProductCategory();
 
@@ -113,13 +114,44 @@ class Product extends BaseProduct
                 ->save($con)
             ;
 
+            // Set the position
+            $this->setPosition($this->getNextPosition())->save($con);
+            echo "2";
+            // Create an empty product sale element
+            $sale_elements = new ProductSaleElements();
+
+            $sale_elements
+                ->setProduct($this)
+                ->setRef('')
+                ->setPromo(0)
+                ->setNewness(0)
+                ->setWeight(0)
+                ->save($con)
+            ;
+            echo "3";
+            // Create an empty product price in the default currency
+            $product_price = new ProductPrice();
+
+            $product_price
+                ->setProductSaleElements($sale_elements)
+                ->setPromoPrice(0)
+                ->setPrice(0)
+                ->setCurrency(CurrencyQuery::create()->findByByDefault(true))
+                ->save($con)
+            ;
+            echo "4";
             // Store all the stuff !
             $con->commit();
+echo "commited !!!: ".$this->getId();
+
+
+            $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
         }
         catch(PropelException $ex) {
 
             $con->rollback();
-
+echo("error !");
+exit;
             throw $ex;
         }
     }
@@ -138,30 +170,6 @@ class Product extends BaseProduct
 
         // Filtrer la requete sur ces produits
         if ($produits != null) $query->filterById($produits, Criteria::IN);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preInsert(ConnectionInterface $con = null)
-    {
-        $this->generateRewritenUrl($this->getLocale());
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATEPRODUCT, new ProductEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        $this->setPosition($this->getNextPosition());
-
-        $this->save();
-
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
     }
 
     /**
@@ -199,5 +207,4 @@ class Product extends BaseProduct
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }
-
 }

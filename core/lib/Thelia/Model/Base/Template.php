@@ -864,9 +864,10 @@ abstract class Template implements ActiveRecordInterface
 
             if ($this->productsScheduledForDeletion !== null) {
                 if (!$this->productsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\ProductQuery::create()
-                        ->filterByPrimaryKeys($this->productsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
+                    foreach ($this->productsScheduledForDeletion as $product) {
+                        // need to save related object because we set the relation to null
+                        $product->save($con);
+                    }
                     $this->productsScheduledForDeletion = null;
                 }
             }
@@ -1553,7 +1554,7 @@ abstract class Template implements ActiveRecordInterface
                 $this->productsScheduledForDeletion = clone $this->collProducts;
                 $this->productsScheduledForDeletion->clear();
             }
-            $this->productsScheduledForDeletion[]= clone $product;
+            $this->productsScheduledForDeletion[]= $product;
             $product->setTemplate(null);
         }
 
