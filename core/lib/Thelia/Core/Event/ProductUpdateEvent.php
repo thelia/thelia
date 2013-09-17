@@ -20,52 +20,94 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Thelia\Core\Event;
 
-class ProductCreationForm extends BaseForm
+class ProductUpdateEvent extends ProductCreateEvent
 {
-    protected function buildForm()
+    protected $product_id;
+
+    protected $chapo;
+    protected $description;
+    protected $postscriptum;
+
+    protected $url;
+    protected $parent;
+
+    public function __construct($product_id)
     {
-        $this->formBuilder
-            ->add("ref", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Product reference *",
-                "label_attr" => array(
-                    "for" => "ref"
-                )
-            ))
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Product title *",
-                "label_attr" => array(
-                    "for" => "title"
-                )
-            ))
-            ->add("default_category", "integer", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This product is online."),
-                "label_attr" => array("for" => "visible_create")
-            ))
-            ;
+        $this->product_id = $product_id;
     }
 
-    public function getName()
+    public function getProductId()
     {
-        return "thelia_product_creation";
+        return $this->product_id;
+    }
+
+    public function setProductId($product_id)
+    {
+        $this->product_id = $product_id;
+
+        return $this;
+    }
+
+    public function getChapo()
+    {
+        return $this->chapo;
+    }
+
+    public function setChapo($chapo)
+    {
+        $this->chapo = $chapo;
+
+        return $this;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getPostscriptum()
+    {
+        return $this->postscriptum;
+    }
+
+    public function setPostscriptum($postscriptum)
+    {
+        $this->postscriptum = $postscriptum;
+
+        return $this;
+    }
+
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+
+        return $this;
     }
 }

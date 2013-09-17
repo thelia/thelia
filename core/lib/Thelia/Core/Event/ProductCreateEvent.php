@@ -20,52 +20,61 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Thelia\Core\Event;
 
-class ProductCreationForm extends BaseForm
+class ProductCreateEvent extends ProductEvent
 {
-    protected function buildForm()
+    protected $title;
+    protected $parent;
+    protected $locale;
+    protected $visible;
+
+    public function getTitle()
     {
-        $this->formBuilder
-            ->add("ref", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Product reference *",
-                "label_attr" => array(
-                    "for" => "ref"
-                )
-            ))
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Product title *",
-                "label_attr" => array(
-                    "for" => "title"
-                )
-            ))
-            ->add("default_category", "integer", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This product is online."),
-                "label_attr" => array("for" => "visible_create")
-            ))
-            ;
+        return $this->title;
     }
 
-    public function getName()
+    public function setTitle($title)
     {
-        return "thelia_product_creation";
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getVisible()
+    {
+        return $this->visible;
+    }
+
+    public function setVisible($visible)
+    {
+        $this->visible = $visible;
+
+        return $this;
     }
 }

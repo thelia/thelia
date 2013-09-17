@@ -20,52 +20,29 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Thelia\Core\Event;
 
-class ProductCreationForm extends BaseForm
+use Thelia\Model\Product;
+
+class ProductDeleteContentEvent extends ProductEvent
 {
-    protected function buildForm()
+    protected $content_id;
+
+    public function __construct(Product $product, $content_id)
     {
-        $this->formBuilder
-            ->add("ref", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Product reference *",
-                "label_attr" => array(
-                    "for" => "ref"
-                )
-            ))
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Product title *",
-                "label_attr" => array(
-                    "for" => "title"
-                )
-            ))
-            ->add("default_category", "integer", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This product is online."),
-                "label_attr" => array("for" => "visible_create")
-            ))
-            ;
+        parent::__construct($product);
+
+        $this->content_id = $content_id;
     }
 
-    public function getName()
+    public function getContentId()
     {
-        return "thelia_product_creation";
+        return $this->content_id;
+    }
+
+    public function setContentId($content_id)
+    {
+        $this->content_id = $content_id;
     }
 }

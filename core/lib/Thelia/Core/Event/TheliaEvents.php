@@ -165,6 +165,26 @@ final class TheliaEvents
     const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
     const AFTER_UPDATECATEGORY 	= "action.after_updateCategory";
 
+    // -- Product management -----------------------------------------------
+
+    const PRODUCT_CREATE            = "action.createProduct";
+    const PRODUCT_UPDATE            = "action.updateProduct";
+    const PRODUCT_DELETE            = "action.deleteProduct";
+    const PRODUCT_TOGGLE_VISIBILITY = "action.toggleProductVisibility";
+    const PRODUCT_UPDATE_POSITION   = "action.updateProductPosition";
+
+    const PRODUCT_ADD_CONTENT      = "action.productAddContent";
+    const PRODUCT_REMOVE_CONTENT   = "action.productRemoveContent";
+
+    const BEFORE_CREATEPRODUCT = "action.before_createproduct";
+    const AFTER_CREATEPRODUCT  = "action.after_createproduct";
+
+    const BEFORE_DELETEPRODUCT = "action.before_deleteproduct";
+    const AFTER_DELETEPRODUCT  = "action.after_deleteproduct";
+
+    const BEFORE_UPDATEPRODUCT = "action.before_updateProduct";
+    const AFTER_UPDATEPRODUCT  = "action.after_updateProduct";
+
     /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart
      */
