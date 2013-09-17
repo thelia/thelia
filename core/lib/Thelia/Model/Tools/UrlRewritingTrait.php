@@ -23,6 +23,8 @@
 
 namespace Thelia\Model\Tools;
 
+use Thelia\Exception\UrlRewritingException;
+use Thelia\Model\Rewriting;
 use Thelia\Tools\URL;
 /**
  * A trait for managing Rewriten URLs from model classes
@@ -51,7 +53,26 @@ trait UrlRewritingTrait {
      */
     public function generateRewritenUrl($locale)
     {
-        URL::getInstance()->generateRewritenUrl($this->getRewritenUrlViewName(), $this->getId(), $locale, $this->getTitle());
+        // Borrowed from http://stackoverflow.com/questions/2668854/sanitizing-strings-to-make-them-url-and-filename-safe
+
+        $this->setLocale($locale);
+        // Replace all weird characters with dashes
+        $string = preg_replace('/[^\w\-~_\.]+/u', '-', $this->getTitle());
+
+        // Only allow one dash separator at a time (and make string lowercase)
+        $cleanString = mb_strtolower(preg_replace('/--+/u', '-', $string), 'UTF-8');
+
+        $urlFilePart = $cleanString . ".html";
+
+        // TODO :
+        // check if URL url already exists, and add a numeric suffix, or the like
+        try{
+            URL::getInstance()->resolve($urlFilePart);
+        } catch (UrlRewritingException $e) {
+
+        }
+        // insert the URL in the rewriting table
+        //URL::getInstance()->generateRewritenUrl($this->getRewritenUrlViewName(), $this->getId(), $locale, $this->getTitle());
     }
 
     /**
