@@ -10,6 +10,8 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ProductEvent;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Propel;
+use Thelia\Model\Map\ProductTableMap;
 
 class Product extends BaseProduct
 {
@@ -18,6 +20,8 @@ class Product extends BaseProduct
     use \Thelia\Model\Tools\PositionManagementTrait;
 
     use \Thelia\Model\Tools\UrlRewritingTrait;
+
+    protected $defaultCategory = null;
 
     /**
      * {@inheritDoc}
@@ -45,7 +49,7 @@ class Product extends BaseProduct
     }
 
     /**
-     * @return the current default category for this product
+     * @return the current default category ID for this product
      */
     public function getDefaultCategoryId()
     {
@@ -85,6 +89,42 @@ class Product extends BaseProduct
     }
 
     /**
+     * Create a new product, along with the default category ID
+     *
+     * @param int $defaultCategoryId the default category ID of this product
+     */
+    public function create($defaultCategoryId) {
+
+        $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
+
+        $con->beginTransaction();
+
+        try {
+            // Create the product
+            $this->save($con);
+
+            // Add the default category
+            $pc = new ProductCategory();
+
+            $pc
+                ->setProduct($this)
+                ->setCategoryId($defaultCategoryId)
+                ->setDefaultCategory(true)
+                ->save($con)
+            ;
+
+            // Store all the stuff !
+            $con->commit();
+        }
+        catch(PropelException $ex) {
+
+            $con->rollback();
+
+            throw $ex;
+        }
+    }
+
+    /**
      * Calculate next position relative to our default category
      */
     protected function addCriteriaToPositionQuery($query)
@@ -105,8 +145,6 @@ class Product extends BaseProduct
      */
     public function preInsert(ConnectionInterface $con = null)
     {
-        $this->setPosition($this->getNextPosition());
-
         $this->generateRewritenUrl($this->getLocale());
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEPRODUCT, new ProductEvent($this));
@@ -119,6 +157,10 @@ class Product extends BaseProduct
      */
     public function postInsert(ConnectionInterface $con = null)
     {
+        $this->setPosition($this->getNextPosition());
+
+        $this->save();
+
         $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
     }
 
