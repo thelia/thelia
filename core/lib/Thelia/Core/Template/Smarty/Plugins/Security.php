@@ -78,7 +78,17 @@ class Security extends AbstractSmartyPlugin
     {
         $cart = $this->request->getSession()->getCart();
         if($cart===null || $cart->countCartItems() == 0) {
-            throw new OrderException('Cart must not be empty', OrderException::CART_EMPTY);
+            throw new OrderException('Cart must not be empty', OrderException::CART_EMPTY, array('empty' => 1));
+        }
+
+        return "";
+    }
+
+    public function checkValidDeliveryFunction($params, &$smarty)
+    {
+        $order = $this->request->getSession()->getOrder();
+        if(null === $order || null === $order->chosenDeliveryAddress || null === $order->getDeliveryModuleId()) {
+            throw new OrderException('Delivery must be defined', OrderException::UNDEFINED_DELIVERY, array('missing' => 1));
         }
 
         return "";
@@ -94,6 +104,7 @@ class Security extends AbstractSmartyPlugin
         return array(
             new SmartyPluginDescriptor('function', 'check_auth', $this, 'checkAuthFunction'),
             new SmartyPluginDescriptor('function', 'check_cart_not_empty', $this, 'checkCartNotEmptyFunction'),
+            new SmartyPluginDescriptor('function', 'check_valid_delivery', $this, 'checkValidDeliveryFunction'),
         );
     }
 }

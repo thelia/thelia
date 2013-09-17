@@ -128,7 +128,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      */
     public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
-        // TODO: Implement generate() method.
+        throw new RouteNotFoundException();
     }
 
     /**

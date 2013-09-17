@@ -1,5 +1,11 @@
 {extends file="layout.tpl"}
 
+{block name="no-return-functions"}
+    {check_auth context="front" roles="CUSTOMER" login_tpl="login"}
+    {check_cart_not_empty}
+    {check_valid_delivery}
+{/block}
+
 {block name="breadcrumb"}
     <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
         <strong id="breadcrumb-label">You are here: </strong>
@@ -18,10 +24,10 @@
             <h1 id="main-label" class="page-header">Your Cart</h1>
 
             <div class="btn-group checkout-progress">
-                <a href="cart.php" role="button" class="btn btn-step"><span class="step-nb">1</span> <span class="step-label"> <span>Your Cart</span></a>
-                <a href="cart-step2.php" role="button" class="btn btn-step"><span class="step-nb">2</span> <span class="step-label">Billing and delivery</span></a>
-                <a href="cart-step3.php" role="button" class="btn btn-step active"><span class="step-nb">3</span> <span class="step-label">Check my order</span></a>
-                <a href="cart-step4.php" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">Secure payment</span></a>
+                <a href="{url path="/cart"}" role="button" class="btn btn-step"><span class="step-nb">1</span> <span class="step-label"> <span>Your Cart</span></a>
+                <a href="{url path="/cart/delivery"}" role="button" class="btn btn-step"><span class="step-nb">2</span> <span class="step-label">Billing and delivery</span></a>
+                <a href="#" role="button" class="btn btn-step active"><span class="step-nb">3</span> <span class="step-label">Check my order</span></a>
+                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">Secure payment</span></a>
             </div>
 
             <form id="form-cart" action="cart-step4.php" method="post" role="form">

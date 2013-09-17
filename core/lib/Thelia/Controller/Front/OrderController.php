@@ -69,9 +69,9 @@ class OrderController extends BaseFrontController
             /* check that the delivery module fetch the delivery address area */
             if(AreaDeliveryModuleQuery::create()
                 ->filterByAreaId($deliveryAddress->getCountry()->getAreaId())
-                ->filterByDeliveryModuleId()
+                ->filterByDeliveryModuleId($deliveryModuleId)
                 ->count() == 0) {
-                throw new \Exception("PUKE");
+                throw new \Exception("Delivery module cannot be use with selected delivery address");
             }
 
 
