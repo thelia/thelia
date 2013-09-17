@@ -20,52 +20,35 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Thelia\Core\Event;
 
-class ProductCreationForm extends BaseForm
+use Thelia\Model\Product;
+use Thelia\Core\Event\ActionEvent;
+
+class ProductEvent extends ActionEvent
 {
-    protected function buildForm()
+    public $product = null;
+
+    public function __construct(Product $product = null)
     {
-        $this->formBuilder
-            ->add("ref", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Product reference *",
-                "label_attr" => array(
-                    "for" => "ref"
-                )
-            ))
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Product title *",
-                "label_attr" => array(
-                    "for" => "title"
-                )
-            ))
-            ->add("default_category", "integer", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This product is online."),
-                "label_attr" => array("for" => "visible_create")
-            ))
-            ;
+        $this->product = $product;
     }
 
-    public function getName()
+    public function hasProduct()
     {
-        return "thelia_product_creation";
+        return ! is_null($this->product);
+    }
+
+    public function getProduct()
+    {
+        return $this->product;
+    }
+
+    public function setProduct(Product $product)
+    {
+        $this->product = $product;
+
+        return $this;
     }
 }

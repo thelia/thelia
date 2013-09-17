@@ -22,50 +22,43 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Thelia\Core\Translation\Translator;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class ProductCreationForm extends BaseForm
+class ProductModificationForm extends ProductCreationForm
 {
+    use StandardDescriptionFieldsTrait;
+
     protected function buildForm()
     {
+        parent::buildForm(true);
+
         $this->formBuilder
-            ->add("ref", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Product reference *",
-                "label_attr" => array(
-                    "for" => "ref"
-                )
+            ->add("id", "integer", array(
+                    "label"       => Translator::getInstance()->trans("Prodcut ID *"),
+                    "label_attr"  => array("for" => "product_id_field"),
+                    "constraints" => array(new GreaterThan(array('value' => 0)))
+
             ))
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Product title *",
-                "label_attr" => array(
-                    "for" => "title"
-                )
+            ->add("template_id", "integer", array(
+                    "label"       => Translator::getInstance()->trans("Product template"),
+                    "label_attr"  => array("for" => "product_template_field")
+
             ))
-            ->add("default_category", "integer", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
+            ->add("url", "text", array(
+                "label"       => Translator::getInstance()->trans("Rewriten URL *"),
+                "constraints" => array(new NotBlank()),
+                "label_attr" => array("for" => "rewriten_url_field")
             ))
-            ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This product is online."),
-                "label_attr" => array("for" => "visible_create")
-            ))
-            ;
+        ;
+
+        // Add standard description fields, excluding title and locale, which a re defined in parent class
+        $this->addStandardDescFields(array('title', 'locale'));
     }
 
     public function getName()
     {
-        return "thelia_product_creation";
+        return "thelia_product_modification";
     }
 }
