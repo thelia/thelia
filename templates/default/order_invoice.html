@@ -49,6 +49,10 @@
                             <span class="hidden-xs">Unit Price</span>
                             <span class="visible-xs">Price</span>
                         </th>
+                        <th class="qty">
+                            <span class="hidden-xs">Quantity</span>
+                            <span class="visible-xs">Quantity</span>
+                        </th>
                         <th class="subprice">
                             <span class="hidden-xs">Total <abbr title="Tax Inclusive">TTC</abbr></span>
                             <span class="visible-xs">Total</span>
@@ -102,6 +106,9 @@
                                 <div class="special-price"><span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></div>
                             {/if}
                         </td>
+                        <td class="qty">
+                            <span class="price">{$QUANTITY}</span>
+                        </td>
                         <td class="subprice">
                             <span class="price">{currency attr="symbol"} {$real_price * $QUANTITY}</span>
                         </td>
@@ -112,7 +119,7 @@
                     </tbody>
                     <tfoot>
                     <tr >
-                        <td rowspan="3" colspan="2" class="empty">&nbsp;</td>
+                        <td rowspan="3" colspan="3" class="empty">&nbsp;</td>
                         <th class="shipping">Shipping Tax</th>
                         <td class="shipping">
                             <div class="shipping-price">
@@ -135,7 +142,7 @@
                         <th class="total">Total <abbr title="Tax Inclusive">TTC</abbr></th>
                         <td class="total">
                             <div class="total-price">
-                                <span class="price">$200.00</span>
+                                <span class="price">{currency attr="symbol"} {cart attr="total_taxed_price"}</span>
                             </div>
                         </td>
                     </tr>
