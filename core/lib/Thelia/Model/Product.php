@@ -9,6 +9,7 @@ use Thelia\TaxEngine\Calculator;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ProductEvent;
+use Propel\Runtime\ActiveQuery\Criteria;
 
 class Product extends BaseProduct
 {
@@ -46,7 +47,7 @@ class Product extends BaseProduct
     /**
      * @return the current default category for this product
      */
-    public function getDefaultCategory()
+    public function getDefaultCategoryId()
     {
         // Find default category
         $default_category = ProductCategoryQuery::create()
@@ -54,7 +55,7 @@ class Product extends BaseProduct
             ->filterByDefaultCategory(true)
             ->findOne();
 
-        return $default_category;
+        return $default_category == null ? 0 : $default_category->getCategoryId();
     }
 
     /**
@@ -88,15 +89,15 @@ class Product extends BaseProduct
      */
     protected function addCriteriaToPositionQuery($query)
     {
-        // Retrourver les produits qui ont la même categorie par defaut
+        // Find products in the same category
         $produits = ProductCategoryQuery::create()
-            ->filterByCategory($this->getDefaultCategory())
+            ->filterByCategoryId($this->getDefaultCategoryId())
             ->filterByDefaultCategory(true)
             ->select('product_id')
             ->find();
 
         // Filtrer la requete sur ces produits
-        if ($produits != null) $query->filterById($produits);
+        if ($produits != null) $query->filterById($produits, Criteria::IN);
     }
 
     /**
