@@ -159,32 +159,20 @@ class CategoryController extends AbstractCrudController
         return $object->getId();
     }
 
+    protected function getEditionArguments()
+    {
+        return array(
+                'category_id' => $this->getRequest()->get('category_id', 0),
+                'folder_id' => $this->getRequest()->get('folder_id', 0),
+                'current_tab' => $this->getRequest()->get('current_tab', 'general')
+        );
+    }
+
     protected function renderListTemplate($currentOrder) {
         return $this->render('categories',
                 array(
                     'category_order' => $currentOrder,
                     'category_id' => $this->getRequest()->get('category_id', 0)
-                )
-         );
-    }
-
-    protected function renderEditionTemplate() {
-
-        return $this->render('category-edit',
-                array(
-                        'category_id' => $this->getRequest()->get('category_id', 0),
-                        'folder_id' => $this->getRequest()->get('folder_id', 0),
-                        'current_tab' => $this->getRequest()->get('current_tab', 'general')
-        ));
-    }
-
-    protected function redirectToEditionTemplate() {
-        $this->redirectToRoute(
-                "admin.categories.update",
-                array(
-                        'category_id' => $this->getRequest()->get('category_id', 0),
-                        'folder_id' => $this->getRequest()->get('folder_id', 0),
-                        'current_tab' => $this->getRequest()->get('current_tab', 'general')
         ));
     }
 
@@ -192,7 +180,16 @@ class CategoryController extends AbstractCrudController
         $this->redirectToRoute(
                 'admin.categories.default',
                 array('category_id' => $this->getRequest()->get('category_id', 0))
-                );
+        );
+    }
+
+    protected function renderEditionTemplate() {
+
+        return $this->render('category-edit', $this->getEditionArguments());
+    }
+
+    protected function redirectToEditionTemplate() {
+        $this->redirectToRoute("admin.categories.update", $this->getEditionArguments());
     }
 
     /**
@@ -262,6 +259,7 @@ class CategoryController extends AbstractCrudController
         if ($folders !== null) {
 
             $list = ContentQuery::create()
+                ->joinWithI18n($this->getCurrentEditionLocale())
                 ->filterByFolder($folders, Criteria::IN)
                 ->filterById(CategoryAssociatedContentQuery::create()->select('content_id')->findByCategoryId($categoryId), Criteria::NOT_IN)
                 ->find();
