@@ -88,8 +88,8 @@ class Coupon extends BaseI18nLoop
             $search->filterById($id, Criteria::IN);
         }
 
-        if ($isEnabled != BooleanOrBothType::ANY) {
-            $search->filterByIsEnabled($isEnabled ? 1 : 0);
+        if (isset($isEnabled)) {
+            $search->filterByIsEnabled($isEnabled ? true : false);
         }
 
         // Perform search
