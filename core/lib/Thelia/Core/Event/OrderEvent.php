@@ -23,17 +23,16 @@
 
 namespace Thelia\Core\Event;
 
-use Thelia\Model\Address;
-use Thelia\Model\AddressQuery;
-use Thelia\Model\Module;
 use Thelia\Model\Order;
 
 class OrderEvent extends ActionEvent
 {
     protected $order = null;
-    protected $billingAddress = null;
+    protected $invoiceAddress = null;
     protected $deliveryAddress = null;
     protected $deliveryModule = null;
+    protected $paymentModule = null;
+    protected $postage = null;
 
     /**
      * @param Order $order
@@ -54,7 +53,7 @@ class OrderEvent extends ActionEvent
     /**
      * @param $address
      */
-    public function setBillingAddress($address)
+    public function setInvoiceAddress($address)
     {
         $this->deliveryAddress = $address;
     }
@@ -76,6 +75,22 @@ class OrderEvent extends ActionEvent
     }
 
     /**
+     * @param $module
+     */
+    public function setPaymentModule($module)
+    {
+        $this->paymentModule = $module;
+    }
+
+    /**
+     * @param $postage
+     */
+    public function setPostage($postage)
+    {
+        $this->postage = $postage;
+    }
+
+    /**
      * @return null|Order
      */
     public function getOrder()
@@ -84,15 +99,15 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return array|mixed|Address
+     * @return null|int
      */
-    public function getBillingAddress()
+    public function getInvoiceAddress()
     {
-        return $this->billingAddress;
+        return $this->invoiceAddress;
     }
 
     /**
-     * @return array|mixed|Address
+     * @return null|int
      */
     public function getDeliveryAddress()
     {
@@ -100,10 +115,26 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return array|mixed|Address
+     * @return null|int
      */
     public function getDeliveryModule()
     {
         return $this->deliveryModule;
+    }
+
+    /**
+     * @return null|int
+     */
+    public function getPaymentModule()
+    {
+        return $this->paymentModule;
+    }
+
+    /**
+     * @return null|int
+     */
+    public function getPostage()
+    {
+        return $this->postage;
     }
 }

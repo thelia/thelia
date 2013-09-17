@@ -28,8 +28,10 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Exception\OrderException;
 use Thelia\Tools\Redirect;
 use Thelia\Tools\URL;
 use Thelia\Core\Security\Exception\AuthenticationException;
@@ -87,6 +89,19 @@ class ViewListener implements EventSubscriberInterface
 
             // Redirect to the login template
             Redirect::exec($this->container->get('thelia.url.manager')->viewUrl($ex->getLoginTemplate()));
+        } catch (OrderException $e) {
+            switch($e->getCode()) {
+                case OrderException::CART_EMPTY:
+                    // Redirect to the cart template
+                    Redirect::exec($this->container->get('router.chainRequest')->generate($e->cartRoute, $e->arguments, Router::ABSOLUTE_URL));
+                    break;
+                case OrderException::UNDEFINED_DELIVERY:
+                    // Redirect to the delivery choice template
+                    Redirect::exec($this->container->get('router.chainRequest')->generate($e->orderDeliveryRoute, $e->arguments, Router::ABSOLUTE_URL));
+                    break;
+            }
+
+            throw $e;
         }
     }
 

@@ -218,6 +218,9 @@ class Session extends BaseSession
         return $this;
     }
 
+    /**
+     * @return Order
+     */
     public function getOrder()
     {
         return $this->get("thelia.order");

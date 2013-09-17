@@ -28,9 +28,12 @@ use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Form\OrderDelivery;
+use Thelia\Form\OrderPayment;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
+use Thelia\Model\CountryQuery;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 
 /**
@@ -41,7 +44,6 @@ use Thelia\Model\Order;
 class OrderController extends BaseFrontController
 {
     /**
-     * set billing address
      * set delivery address
      * set delivery module
      */
@@ -59,25 +61,35 @@ class OrderController extends BaseFrontController
 
             $deliveryAddressId = $form->get("delivery-address")->getData();
             $deliveryModuleId = $form->get("delivery-module")->getData();
+            $deliveryAddress = AddressQuery::create()->findPk($deliveryAddressId);
+            $deliveryModule = ModuleQuery::create()->findPk($deliveryModuleId);
 
-            /* check that the delivery address belong to the current customer */
+            /* check that the delivery address belongs to the current customer */
             $deliveryAddress = AddressQuery::create()->findPk($deliveryAddressId);
             if($deliveryAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
-                throw new \Exception("Address does not belong to the current customer");
+                throw new \Exception("Delivery address does not belong to the current customer");
             }
 
-            /* check that the delivery module fetch the delivery address area */
+            /* check that the delivery module fetches the delivery address area */
             if(AreaDeliveryModuleQuery::create()
                 ->filterByAreaId($deliveryAddress->getCountry()->getAreaId())
-                ->filterByDeliveryModuleId()
+                ->filterByDeliveryModuleId($deliveryModuleId)
                 ->count() == 0) {
-                throw new \Exception("PUKE");
+                throw new \Exception("Delivery module cannot be use with selected delivery address");
             }
 
+            /* try to get postage amount */
+            $moduleReflection = new \ReflectionClass($deliveryModule->getFullNamespace());
+            if ($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
+                throw new \RuntimeException(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $deliveryModule->getCode()));
+            }
+            $moduleInstance = $moduleReflection->newInstance();
+            $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
 
             $orderEvent = $this->getOrderEvent();
             $orderEvent->setDeliveryAddress($deliveryAddressId);
             $orderEvent->setDeliveryModule($deliveryModuleId);
+            $orderEvent->setPostage($postage);
 
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
@@ -99,6 +111,62 @@ class OrderController extends BaseFrontController
 
             $this->getParserContext()
                 ->addForm($orderDelivery)
+                ->setGeneralError($message)
+            ;
+        }
+
+    }
+
+    /**
+     * set invoice address
+     * set payment module
+     */
+    public function pay()
+    {
+        $this->checkAuth();
+        $this->checkCartNotEmpty();
+        $this->checkValidDelivery();
+
+        $message = false;
+
+        $orderPayment = new OrderPayment($this->getRequest());
+
+        try {
+            $form = $this->validateForm($orderPayment, "post");
+
+            $deliveryAddressId = $form->get("delivery-address")->getData();
+            $deliveryModuleId = $form->get("delivery-module")->getData();
+
+            /* check that the invoice address belongs to the current customer */
+            $deliveryAddress = AddressQuery::create()->findPk($deliveryAddressId);
+            if($deliveryAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
+                throw new \Exception("Invoice address does not belong to the current customer");
+            }
+
+            $orderEvent = $this->getOrderEvent();
+            $orderEvent->setInvoiceAddress($deliveryAddressId);
+            $orderEvent->setPaymentModule($deliveryModuleId);
+
+            $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
+            $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
+
+            $this->redirectToRoute("order.invoice");
+
+        } catch (FormValidationException $e) {
+            $message = sprintf("Please check your input: %s", $e->getMessage());
+        } catch (PropelException $e) {
+            $this->getParserContext()->setGeneralError($e->getMessage());
+        } catch (\Exception $e) {
+            $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+        }
+
+        if ($message !== false) {
+            Tlog::getInstance()->error(sprintf("Error during order delivery process : %s. Exception was %s", $message, $e->getMessage()));
+
+            $orderPayment->setErrorMessage($message);
+
+            $this->getParserContext()
+                ->addForm($orderPayment)
                 ->setGeneralError($message)
             ;
         }
