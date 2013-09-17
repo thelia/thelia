@@ -20,65 +20,37 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+?>
+<?php
+$step = 2;
+include("header.php");
+global $thelia;
 
-namespace Colissimo;
+$checkPermission = new \Thelia\Install\CheckPermission(true, $thelia->getContainer()->get('thelia.translator'));
+$isValid = $checkPermission->exec();
+$validationMessage = $checkPermission->getValidationMessages();
+$_SESSION['install']['return_step'] = 'permission.php';
+$_SESSION['install']['continue'] = $isValid;
+$_SESSION['install']['current_step'] = 'permission.php';
+$_SESSION['install']['step'] = 2;
+?>
+    <div class="well">
+        <p>Checking permissions</p>
+        <ul class="list-unstyled list-group">
+            <?php foreach($validationMessage as $item => $data): ?>
+            <li class="list-group-item <?php if ($data['status']) {echo 'text-success';} else { echo 'text-danger';} ?>">
+                <?php echo $data['text']; ?>
+                <?php if (!$data['status']) { echo $data['hint']; } ?>
+            </li>
+            <?php endforeach; ?>
+        </ul>
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Model\Country;
-use Thelia\Module\BaseModule;
-use Thelia\Module\DeliveryModuleInterface;
-
-class Colissimo extends BaseModule implements DeliveryModuleInterface
-{
-    protected $request;
-    protected $dispatcher;
-
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
-    }
-
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
-    /**
-     *
-     * calculate and return delivery price
-     *
-     * @param Country $country
-     * @return mixed
-     */
-    public function calculate(Country $country)
-    {
-        // TODO: Implement calculate() method.
-        return 2;
-    }
-
-    /**
-     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
-     * Like install and destroy
-     */
-    public function install()
-    {
-        // TODO: Implement install() method.
-    }
-
-    public function destroy()
-    {
-        // TODO: Implement destroy() method.
-    }
-
-}
+    </div>
+    <div class="clearfix">
+        <?php if($isValid){ ?>
+            <a href="connection.php" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> Continue</a>
+        <?php } else { ?>
+            <a href="permission.php" class="pull-right btn btn-default btn-danger"><span class="glyphicon glyphicon-refresh"></span> refresh</a>
+        <?php } ?>
+    </div>
+<?php include("footer.php"); ?>

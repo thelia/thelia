@@ -1,3 +1,4 @@
+{block name="no-return-functions"}{/block}
 <!doctype html>
 <!--
  ______   __  __     ______     __         __     ______

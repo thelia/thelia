@@ -21,64 +21,19 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Colissimo;
+namespace Thelia\Exception;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Model\Country;
-use Thelia\Module\BaseModule;
-use Thelia\Module\DeliveryModuleInterface;
-
-class Colissimo extends BaseModule implements DeliveryModuleInterface
+class OrderException extends \RuntimeException
 {
-    protected $request;
-    protected $dispatcher;
+    const UNKNOWN_EXCEPTION = 0;
 
-    public function setRequest(Request $request)
+    const CART_EMPTY = 100;
+
+    public function __construct($message, $code = null, $previous = null)
     {
-        $this->request = $request;
+        if ($code === null) {
+            $code = self::UNKNOWN_EXCEPTION;
+        }
+        parent::__construct($message, $code, $previous);
     }
-
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
-    /**
-     *
-     * calculate and return delivery price
-     *
-     * @param Country $country
-     * @return mixed
-     */
-    public function calculate(Country $country)
-    {
-        // TODO: Implement calculate() method.
-        return 2;
-    }
-
-    /**
-     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
-     * Like install and destroy
-     */
-    public function install()
-    {
-        // TODO: Implement install() method.
-    }
-
-    public function destroy()
-    {
-        // TODO: Implement destroy() method.
-    }
-
 }

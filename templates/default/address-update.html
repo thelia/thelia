@@ -1,5 +1,9 @@
-{check_auth context="front" roles="CUSTOMER" login_tpl="login"}
 {extends file="layout.tpl"}
+
+{block name="no-return-functions"}
+    {check_auth context="front" roles="CUSTOMER" login_tpl="login"}
+{/block}
+
 {block name="breadcrumb"}
     <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
         <strong id="breadcrumb-label">{intl l="You are here"}: </strong>
