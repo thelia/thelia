@@ -63,7 +63,11 @@
                         <tr>
                             <td>{intl l='Usage left'}</td>
                             <td>
-                                {if $USAGE_LEFT}
+                                {if $USAGE_LEFT == -1}
+                                    <span class="label label-success">
+                                        {intl l='Unlimited'}
+                                    </span>
+                                {elseif $USAGE_LEFT}
                                     <span class="label label-success">
                                         {$USAGE_LEFT}
                                     </span>

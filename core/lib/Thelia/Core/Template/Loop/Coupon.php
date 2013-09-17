@@ -63,7 +63,7 @@ class Coupon extends BaseI18nLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createBooleanOrBothTypeArgument('is_enabled', 1)
+            Argument::createBooleanOrBothTypeArgument('is_enabled')
         );
     }
 
