@@ -175,13 +175,16 @@ class Product extends BaseI18nLoop
 
         if (!is_null($category) ||!is_null($categoryDefault)) {
 
-            $categories = array();
-            if (!is_null($category)) {
-                $categories = array_merge($categories, CategoryQuery::create()->filterById($category, Criteria::IN)->find());
+            $categoryIds = array();
+            if (!is_array($category)) {
+                $category = array();
             }
-            if (!is_null($categoryDefault)) {
-                $categories = array_merge($categories, CategoryQuery::create()->filterById($categoryDefault, Criteria::IN)->find());
+            if (!is_array($categoryDefault)) {
+                $categoryDefault = array();
             }
+
+            $categoryIds = array_merge($categoryIds, $category, $categoryDefault);
+            $categories =CategoryQuery::create()->filterById($categoryIds, Criteria::IN)->find();
 
             $depth = $this->getDepth();
 
@@ -549,12 +552,12 @@ class Product extends BaseI18nLoop
                     $search->addDescendingOrderByColumn('real_lowest_price');
                     break;
                 case "manual":
-                    if(null === $category || count($category) != 1)
+                    if(null === $categoryIds || count($categoryIds) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
                     $search->orderByPosition(Criteria::ASC);
                     break;
                 case "manual_reverse":
-                    if(null === $category || count($category) != 1)
+                    if(null === $categoryIds || count($categoryIds) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
                     $search->orderByPosition(Criteria::DESC);
                     break;
