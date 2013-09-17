@@ -93,7 +93,7 @@ class Database
      */
     public function createDatabase($dbName)
     {
-        $this->connection->query(
+        $this->connection->exec(
             sprintf(
                 "CREATE DATABASE IF NOT EXISTS %s CHARACTER SET utf8",
                 $dbName

@@ -26,8 +26,12 @@
     </div>
 
     {* -- Main page content section ----------------------------------------- *}
+    {if $isAlreadyInstalled}
+        <div>{intl l='Thelia is already installed'}</div>
+    {else}
+        {block name="main-content"}Put here the content of the template{/block}
+    {/if}
 
-    {block name="main-content"}Put here the content of the template{/block}
 
     {* -- Footer section ---------------------------------------------------- *}
 
@@ -38,7 +42,6 @@
             - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Édité par OpenStudio'}</a>
             - <a href="http://forum.thelia.net/" target="_blank">{intl l='Forum Thelia'}</a>
             - <a href="http://contrib.thelia.net/" target="_blank">{intl l='Contributions Thelia'}</a>
-                  <span class="pull-right">{intl l='interface par <a target="_blank" href="http://www.steaw-webdesign.com/">Steaw-Webdesign</a>'}</span>
             </p>
 
             {module_include location='in_footer'}
