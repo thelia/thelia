@@ -96,11 +96,11 @@ class CheckDatabaseConnection extends BaseInstall
     public function exec()
     {
 
-        $dsn = "mysql:host=%s";
+        $dsn = "mysql:host=%s;port=%s";
 
         try {
             $this->connection = new \PDO(
-                sprintf($dsn, $this->host),
+                sprintf($dsn, $this->host, $this->port),
                 $this->user,
                 $this->password
             );

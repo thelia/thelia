@@ -49,7 +49,7 @@ $_SESSION['install']['step'] = 3;
                 <label for="password">Password :</label>
                 <input id="password" type="password" class="form-control" name="password" placeholder="l33t 5p34k" >
             </div>
-            <div class="form-group{if $error} has-error{/if}">
+            <div class="form-group">
                 <label for="port">Port :</label>
                 <input id="port" type="text" class="form-control" name="port" value="<?php if(isset($_SESSION['install']['port'])){ echo $_SESSION['install']['port']; } else { echo '3306'; } ?>">
             </div>

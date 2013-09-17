@@ -51,7 +51,7 @@ $connection = $checkConnection->getConnection();
 $databases = $connection->query('show databases');
 ?>
     <div class="well">
-        <form action="config.php">
+        <form action="config.php" method="post">
             <fieldset>
                 <legend>Choose your database</legend>
                 <p>
@@ -107,6 +107,12 @@ $databases = $connection->query('show databases');
                 </div>
                 <?php } ?>
             </fieldset>
+            <div class="clearfix">
+                <div class="control-btn">
+                    <button type="submit" class="pull-right btn btn-default btn-primary">Continue</button>
+                </div>
+
+            </div>
         </form>
     </div>
 
