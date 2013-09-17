@@ -21,7 +21,7 @@ class Product extends BaseProduct
     /**
      * {@inheritDoc}
      */
-    protected function getRewritenUrlViewName() {
+    protected function getRewrittenUrlViewName() {
         return 'product';
     }
 
@@ -106,7 +106,7 @@ class Product extends BaseProduct
     {
         $this->setPosition($this->getNextPosition());
 
-        $this->generateRewritenUrl($this->getLocale());
+        $this->generateRewrittenUrl($this->getLocale());
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEPRODUCT, new ProductEvent($this));
 

@@ -24,7 +24,8 @@
 namespace Thelia\Model\Tools;
 
 use Thelia\Exception\UrlRewritingException;
-use Thelia\Model\Rewriting;
+use Thelia\Model\RewritingUrlQuery;
+use Thelia\Model\RewritingUrl;
 use Thelia\Tools\URL;
 /**
  * A trait for managing Rewriten URLs from model classes
@@ -34,7 +35,7 @@ trait UrlRewritingTrait {
     /**
      * @returns string the view name of the rewriten object (e.g., 'category', 'product')
      */
-    protected abstract function getRewritenUrlViewName();
+    protected abstract function getRewrittenUrlViewName();
 
     /**
      * Get the object URL for the given locale, rewriten if rewriting is enabled.
@@ -43,7 +44,7 @@ trait UrlRewritingTrait {
      */
     public function getUrl($locale)
     {
-        return URL::getInstance()->retrieve($this->getRewritenUrlViewName(), $this->getId(), $locale)->toString();
+        return URL::getInstance()->retrieve($this->getRewrittenUrlViewName(), $this->getId(), $locale)->toString();
     }
 
     /**
@@ -51,13 +52,22 @@ trait UrlRewritingTrait {
      *
      * @param string $locale a valid locale (e.g. en_US)
      */
-    public function generateRewritenUrl($locale)
+    public function generateRewrittenUrl($locale)
     {
+        if ($this->isNew()) {
+            throw new \RuntimeException(sprintf('Object %s must be save before generating url', $this->getRewrittenUrlViewName()));
+        }
         // Borrowed from http://stackoverflow.com/questions/2668854/sanitizing-strings-to-make-them-url-and-filename-safe
 
         $this->setLocale($locale);
+
+        $title = $this->getTitle();
+
+        if (null === $title) {
+            throw new \RuntimeException(sprintf('Impossible to generate url if title does not exists for the locale %s', $locale));
+        }
         // Replace all weird characters with dashes
-        $string = preg_replace('/[^\w\-~_\.]+/u', '-', $this->getTitle());
+        $string = preg_replace('/[^\w\-~_\.]+/u', '-', $title);
 
         // Only allow one dash separator at a time (and make string lowercase)
         $cleanString = mb_strtolower(preg_replace('/--+/u', '-', $string), 'UTF-8');
@@ -67,30 +77,59 @@ trait UrlRewritingTrait {
         // TODO :
         // check if URL url already exists, and add a numeric suffix, or the like
         try{
-            URL::getInstance()->resolve($urlFilePart);
+            $i=0;
+            while(URL::getInstance()->resolve($urlFilePart)) {
+                $i++;
+                $urlFilePart = sprintf("%s-%d.html",$cleanString, $i);
+            }
         } catch (UrlRewritingException $e) {
-
+            $rewritingUrl = new RewritingUrl();
+            $rewritingUrl->setUrl($urlFilePart)
+                ->setView($this->getRewrittenUrlViewName())
+                ->setViewId($this->getId())
+                ->setViewLocale($locale)
+                ->setRedirected(0)
+                ->save()
+            ;
         }
-        // insert the URL in the rewriting table
-        //URL::getInstance()->generateRewritenUrl($this->getRewritenUrlViewName(), $this->getId(), $locale, $this->getTitle());
+
+        return $urlFilePart;
+
     }
 
     /**
      * return the rewriten URL for the given locale
      *
      * @param string $locale a valid locale (e.g. en_US)
+     * @return null
      */
-    public function getRewritenUrl($locale)
+    public function getRewrittenUrl($locale)
     {
-        return "fake url - TODO";
+        $rewritingUrl = RewritingUrlQuery::create()
+            ->filterByViewLocale($locale)
+            ->filterByView($this->getRewrittenUrlViewName())
+            ->filterByViewId($this->getId())
+            ->filterByRedirected(0)
+            ->findOne()
+        ;
+
+        if($rewritingUrl) {
+            $url = $rewritingUrl->getUrl();
+        } else {
+            $url = null;
+        }
+
+        return $url;
     }
 
     /**
      * Set the rewriten URL for the given locale
      *
      * @param string $locale a valid locale (e.g. en_US)
+     * @param $url the wanted url
+     * @return $this
      */
-    public function setRewritenUrl($locale, $url)
+    public function setRewrittenUrl($locale, $url)
     {
         // TODO - code me !
 

@@ -17,7 +17,7 @@ class Content extends BaseContent
     /**
      * {@inheritDoc}
      */
-    protected function getRewritenUrlViewName() {
+    protected function getRewrittenUrlViewName() {
         return 'content';
     }
 
@@ -37,7 +37,7 @@ class Content extends BaseContent
     {
         $this->setPosition($this->getNextPosition());
 
-        $this->generateRewritenUrl($this->getLocale());
+        $this->generateRewrittenUrl($this->getLocale());
 
         return true;
     }
