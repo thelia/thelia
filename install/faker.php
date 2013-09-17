@@ -135,6 +135,8 @@ try {
     \Thelia\Model\FolderDocumentQuery::create()->find()->delete();
     \Thelia\Model\ContentDocumentQuery::create()->find()->delete();
 
+    \Thelia\Model\CouponQuery::create()->find()->delete();
+
     $stmt = $con->prepare("SET foreign_key_checks = 1");
 
     $stmt->execute();
