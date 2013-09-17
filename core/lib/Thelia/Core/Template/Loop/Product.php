@@ -89,7 +89,7 @@ class Product extends BaseI18nLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new', 'random', 'given_id'))
+                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new', 'random', 'given_id'))
                 ),
                 'alpha'
             ),
@@ -175,12 +175,16 @@ class Product extends BaseI18nLoop
 
         if (!is_null($category) ||!is_null($categoryDefault)) {
 
-            if (!is_null($category)) {
-                $categories = CategoryQuery::create()->filterById($category, Criteria::IN)->find();
+            $categoryIds = array();
+            if (!is_array($category)) {
+                $category = array();
             }
-            if (!is_null($categoryDefault)) {
-                $categories = CategoryQuery::create()->filterById($categoryDefault, Criteria::IN)->find();
+            if (!is_array($categoryDefault)) {
+                $categoryDefault = array();
             }
+
+            $categoryIds = array_merge($categoryIds, $category, $categoryDefault);
+            $categories =CategoryQuery::create()->filterById($categoryIds, Criteria::IN)->find();
 
             $depth = $this->getDepth();
 
@@ -535,6 +539,12 @@ class Product extends BaseI18nLoop
 
         foreach ($orders as $order) {
             switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
@@ -548,12 +558,12 @@ class Product extends BaseI18nLoop
                     $search->addDescendingOrderByColumn('real_lowest_price');
                     break;
                 case "manual":
-                    if(null === $category || count($category) != 1)
+                    if(null === $categoryIds || count($categoryIds) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
                     $search->orderByPosition(Criteria::ASC);
                     break;
                 case "manual_reverse":
-                    if(null === $category || count($category) != 1)
+                    if(null === $categoryIds || count($categoryIds) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
                     $search->orderByPosition(Criteria::DESC);
                     break;

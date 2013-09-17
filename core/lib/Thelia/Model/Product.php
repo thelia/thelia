@@ -7,6 +7,9 @@ use Thelia\Model\Base\Product as BaseProduct;
 use Thelia\Tools\URL;
 use Thelia\TaxEngine\Calculator;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\ProductEvent;
+use Propel\Runtime\ActiveQuery\Criteria;
 
 class Product extends BaseProduct
 {
@@ -19,7 +22,7 @@ class Product extends BaseProduct
     /**
      * {@inheritDoc}
      */
-    protected function getRewritenUrlViewName() {
+    protected function getRewrittenUrlViewName() {
         return 'product';
     }
 
@@ -42,13 +45,59 @@ class Product extends BaseProduct
     }
 
     /**
+     * @return the current default category for this product
+     */
+    public function getDefaultCategoryId()
+    {
+        // Find default category
+        $default_category = ProductCategoryQuery::create()
+            ->filterByProductId($this->getId())
+            ->filterByDefaultCategory(true)
+            ->findOne();
+
+        return $default_category == null ? 0 : $default_category->getCategoryId();
+    }
+
+    /**
+     * Set default category for this product
+     *
+     * @param integer $categoryId the new default category id
+     */
+    public function setDefaultCategory($categoryId)
+    {
+        // Unset previous category
+        ProductCategoryQuery::create()
+            ->filterByProductId($this->getId())
+            ->filterByDefaultCategory(true)
+            ->find()
+            ->setByDefault(false)
+            ->save();
+
+        // Set new default category
+        ProductCategoryQuery::create()
+            ->filterByProductId($this->getId())
+            ->filterByCategoryId($categoryId)
+            ->find()
+            ->setByDefault(true)
+            ->save();
+
+        return $this;
+    }
+
+    /**
      * Calculate next position relative to our default category
      */
-    protected function addCriteriaToPositionQuery($query) {
+    protected function addCriteriaToPositionQuery($query)
+    {
+        // Find products in the same category
+        $produits = ProductCategoryQuery::create()
+            ->filterByCategoryId($this->getDefaultCategoryId())
+            ->filterByDefaultCategory(true)
+            ->select('product_id')
+            ->find();
 
-        // TODO: Find the default category for this product,
-        // and generate the position relative to this category
-
+        // Filtrer la requete sur ces produits
+        if ($produits != null) $query->filterById($produits, Criteria::IN);
     }
 
     /**
@@ -58,8 +107,56 @@ class Product extends BaseProduct
     {
         $this->setPosition($this->getNextPosition());
 
-        $this->generateRewritenUrl($this->getLocale());
+
+
+        $this->dispatchEvent(TheliaEvents::BEFORE_CREATEPRODUCT, new ProductEvent($this));
 
         return true;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function postInsert(ConnectionInterface $con = null)
+    {
+        //$this->generateRewrittenUrl($this->getLocale());
+        $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preUpdate(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEPRODUCT, new ProductEvent($this));
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function postUpdate(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_UPDATEPRODUCT, new ProductEvent($this));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_DELETEPRODUCT, new ProductEvent($this));
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function postDelete(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
+    }
+
 }

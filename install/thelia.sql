@@ -36,7 +36,7 @@ CREATE TABLE `product`
     `ref` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER NOT NULL,
-    `template_id` INTEGER NOT NULL,
+    `template_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -343,6 +343,8 @@ CREATE TABLE `attribute_combination`
     CONSTRAINT `fk_attribute_combination_product_sale_elements_id`
         FOREIGN KEY (`product_sale_elements_id`)
         REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -893,9 +895,8 @@ CREATE TABLE `area_delivery_module`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `delivery_module_id_area_id_UNIQUE` (`area_id`, `delivery_module_id`),
     INDEX `idx_area_delivery_module_area_id` (`area_id`),
-    INDEX `idx_area_delivery_module_delivery_module_id` (`delivery_module_id`),
+    INDEX `idx_area_delivery_module_delivery_module_id_idx` (`delivery_module_id`),
     CONSTRAINT `fk_area_delivery_module_area_id`
         FOREIGN KEY (`area_id`)
         REFERENCES `area` (`id`)
@@ -2166,7 +2167,7 @@ CREATE TABLE `product_version`
     `ref` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER NOT NULL,
-    `template_id` INTEGER NOT NULL,
+    `template_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

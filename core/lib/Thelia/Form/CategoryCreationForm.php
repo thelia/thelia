@@ -53,7 +53,7 @@ class CategoryCreationForm extends BaseForm
                "label_attr" => array("for" => "locale_create")
             ))
             ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This category is online on the front office."),
+                "label" => Translator::getInstance()->trans("This category is online."),
                 "label_attr" => array("for" => "visible_create")
             ))
         ;

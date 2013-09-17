@@ -102,14 +102,16 @@ class Content extends BaseI18nLoop
 
         if (!is_null($folder) || !is_null($folderDefault)) {
 
-            if (!is_null($folder)) {
-                $folders = FolderQuery::create()->filterById($folder, Criteria::IN)->find();
+            $foldersIds = array();
+            if (!is_array($folder)) {
+                $folder = array();
+            }
+            if (!is_array($folderDefault)) {
+                $folderDefault = array();
             }
 
-            if (!is_null($folderDefault)) {
-                $folders = FolderQuery::create()->filterById($folderDefault, Criteria::IN)->find();
-            }
-
+            $foldersIds = array_merge($foldersIds, $folder, $folderDefault);
+            $folders =FolderQuery::create()->filterById($foldersIds, Criteria::IN)->find();
 
             $depth = $this->getDepth();
 
@@ -174,12 +176,12 @@ class Content extends BaseI18nLoop
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
-                    if(null === $folder || count($folder) != 1)
+                    if(null === $foldersIds || count($foldersIds) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single folder argument');
                     $search->orderByPosition(Criteria::ASC);
                     break;
                 case "manual_reverse":
-                    if(null === $folder || count($folder) != 1)
+                    if(null === $foldersIds || count($foldersIds) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single folder argument');
                     $search->orderByPosition(Criteria::DESC);
                     break;

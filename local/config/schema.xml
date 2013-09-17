@@ -28,7 +28,7 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <column name="template_id" required="true" type="INTEGER" />
+    <column name="template_id" type="INTEGER" />
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
     </foreign-key>
@@ -259,7 +259,7 @@
     <foreign-key foreignTable="attribute_av" name="fk_attribute_combination_attribute_av_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_av_id" />
     </foreign-key>
-    <foreign-key foreignTable="product_sale_elements" name="fk_attribute_combination_product_sale_elements_id">
+    <foreign-key foreignTable="product_sale_elements" name="fk_attribute_combination_product_sale_elements_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
     <index name="idx_attribute_combination_attribute_id">
@@ -692,13 +692,9 @@
     <index name="idx_area_delivery_module_area_id">
       <index-column name="area_id" />
     </index>
-    <index name="idx_area_delivery_module_delivery_module_id">
+    <index name="idx_area_delivery_module_delivery_module_id_idx">
       <index-column name="delivery_module_id" />
     </index>
-    <unique name="delivery_module_id_area_id_UNIQUE">
-      <unique-column name="area_id" />
-      <unique-column name="delivery_module_id" />
-    </unique>
     <behavior name="timestampable" />
   </table>
   <table name="group" namespace="Thelia\Model">
