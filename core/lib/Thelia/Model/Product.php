@@ -119,7 +119,6 @@ class Product extends BaseProduct
      */
     public function postInsert(ConnectionInterface $con = null)
     {
-        //$this->generateRewrittenUrl($this->getLocale());
         $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
     }
 
