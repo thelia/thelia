@@ -51,5 +51,7 @@ $response = $thelia->handle($request)->prepare($request)->send();
 
 $thelia->terminate($request, $response);
 
-echo "\n<!-- page parsed in : " . (microtime(true) - $thelia->getStartTime())." s. -->";
-echo "\n<!-- memory peak : " . memory_get_peak_usage()/1024/1024 . " MiB. -->";
+if (strstr($response->headers->get('content-type'), 'text/html') !== false) {
+    echo "\n<!-- page parsed in : " . (microtime(true) - $thelia->getStartTime())." s. -->";
+    echo "\n<!-- memory peak : " . memory_get_peak_usage()/1024/1024 . " MiB. -->";
+}

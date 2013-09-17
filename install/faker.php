@@ -314,7 +314,13 @@ try {
             for($k=0; $k<rand(0, 5); $k++) {
                 $content = new Thelia\Model\Content();
                 $content->addFolder($subfolder);
-                $content->setVisible(1);
+
+                $contentFolders = $content->getContentFolders();
+                $collection = new \Propel\Runtime\Collection\Collection();
+                $collection->prepend($contentFolders[0]->setDefaultFolder(1));
+                $content->setContentFolders($collection);
+
+                $content->setVisible(rand(1, 10)>7 ? 0 : 1);
                 $content->setPosition($k);
                 setI18n($faker, $content);
 
@@ -453,11 +459,16 @@ try {
     $con->rollBack();
 }
 
-function createProduct($faker, $category, $position, $template, &$productIdList)
+function createProduct($faker, Thelia\Model\Category $category, $position, $template, &$productIdList)
 {
     $product = new Thelia\Model\Product();
     $product->setRef($category->getId() . '_' . $position . '_' . $faker->randomNumber(8));
     $product->addCategory($category);
+    $product->setVisible(1);
+    $productCategories = $product->getProductCategories();
+    $collection = new \Propel\Runtime\Collection\Collection();
+    $collection->prepend($productCategories[0]->setDefaultCategory(1));
+    $product->setProductCategories($collection);
     $product->setVisible(1);
     $product->setPosition($position);
     $product->setTaxRuleId(1);

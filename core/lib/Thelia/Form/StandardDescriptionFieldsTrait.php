@@ -58,7 +58,8 @@ trait StandardDescriptionFieldsTrait
                     "label" => Translator::getInstance()->trans("Title"),
                     "label_attr" => array(
                         "for" => "title"
-                    )
+                    ),
+                    "label_attr" => array("for" => "title_field")
                 )
             );
 
@@ -67,7 +68,7 @@ trait StandardDescriptionFieldsTrait
                 ->add("chapo", "text", array(
                     "label" => Translator::getInstance()->trans("Summary"),
                     "label_attr" => array(
-                        "for" => "summary"
+                        "for" => "summary_field"
                     )
                 ));
 
@@ -76,7 +77,7 @@ trait StandardDescriptionFieldsTrait
                 ->add("description", "text", array(
                     "label" => Translator::getInstance()->trans("Detailed description"),
                     "label_attr" => array(
-                        "for" => "detailed_description"
+                        "for" => "detailed_description_field"
                     )
                 ));
 
@@ -85,7 +86,7 @@ trait StandardDescriptionFieldsTrait
                     ->add("postscriptum", "text", array(
                     "label" => Translator::getInstance()->trans("Conclusion"),
                     "label_attr" => array(
-                        "for" => "conclusion"
+                        "for" => "conclusion_field"
                     )
                 ));
      }

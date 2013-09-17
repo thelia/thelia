@@ -53,8 +53,12 @@ class AssociatedContent extends Content
     {
         $argumentCollection = parent::getArgDefinitions();
 
-        $argumentCollection->addArgument(Argument::createIntTypeArgument('product'))
-            ->addArgument(Argument::createIntTypeArgument('category'));
+        $argumentCollection
+            ->addArgument(Argument::createIntTypeArgument('product'))
+            ->addArgument(Argument::createIntTypeArgument('category'))
+            ->addArgument(Argument::createIntTypeArgument('exclude_product'))
+            ->addArgument(Argument::createIntTypeArgument('exclude_category'))
+            ;
 
         $argumentCollection->get('order')->default = "associated_content";
 
@@ -89,6 +93,28 @@ class AssociatedContent extends Content
             $search = CategoryAssociatedContentQuery::create();
 
             $search->filterByCategoryId($category, Criteria::EQUAL);
+        }
+
+        $exclude_product = $this->getExcludeProduct();
+
+        // If we have to filter by template, find all attributes assigned to this template, and filter by found IDs
+        if (null !== $exclude_product) {
+            // Exclure tous les attribut qui sont attachés aux templates indiqués
+            $search->filterById(
+                    ProductAssociatedContentQuery::create()->filterByProductId($exclude_product)->select('product_id')->find(),
+                    Criteria::NOT_IN
+            );
+        }
+
+        $exclude_category = $this->getExcludeCategory();
+
+        // If we have to filter by template, find all attributes assigned to this template, and filter by found IDs
+        if (null !== $exclude_category) {
+            // Exclure tous les attribut qui sont attachés aux templates indiqués
+            $search->filterById(
+                    CategoryAssociatedContentQuery::create()->filterByProductId($exclude_category)->select('category_id')->find(),
+                    Criteria::NOT_IN
+            );
         }
 
         $order = $this->getOrder();

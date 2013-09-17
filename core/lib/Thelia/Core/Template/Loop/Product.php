@@ -73,6 +73,7 @@ class Product extends BaseI18nLoop
                 )
             ),
             Argument::createIntListTypeArgument('category'),
+            Argument::createIntListTypeArgument('category_default'),
             Argument::createBooleanTypeArgument('new'),
             Argument::createBooleanTypeArgument('promo'),
             Argument::createFloatTypeArgument('min_price'),
@@ -170,9 +171,16 @@ class Product extends BaseI18nLoop
         }
 
         $category = $this->getCategory();
+        $categoryDefault = $this->getCategoryDefault();
 
-        if (!is_null($category)) {
-            $categories = CategoryQuery::create()->filterById($category, Criteria::IN)->find();
+        if (!is_null($category) ||!is_null($categoryDefault)) {
+
+            if (!is_null($category)) {
+                $categories = CategoryQuery::create()->filterById($category, Criteria::IN)->find();
+            }
+            if (!is_null($categoryDefault)) {
+                $categories = CategoryQuery::create()->filterById($categoryDefault, Criteria::IN)->find();
+            }
 
             $depth = $this->getDepth();
 
