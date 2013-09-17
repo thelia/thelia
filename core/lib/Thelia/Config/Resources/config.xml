@@ -24,6 +24,7 @@
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
         <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
+        <loop class="Thelia\Core\Template\Loop\Payment" name="payment"/>
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
         <loop class="Thelia\Core\Template\Loop\ProductSaleElements" name="product_sale_elements"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
@@ -40,6 +41,8 @@
     </loops>
 
     <forms>
+        <form name="thelia.install.step3" class="Thelia\Form\InstallStep3Form"/>
+
         <form name="thelia.customer.creation" class="Thelia\Form\CustomerCreation"/>
         <form name="thelia.customer.modification" class="Thelia\Form\CustomerModification"/>
         <form name="thelia.customer.lostpassword" class="Thelia\Form\CustomerLostPasswordForm"/>
@@ -54,9 +57,15 @@
         <form name="thelia.admin.category.modification" class="Thelia\Form\CategoryModificationForm"/>
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
+        <form name="thelia.admin.product.modification" class="Thelia\Form\ProductModificationForm"/>
+
+        <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
         <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
 
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
+
+        <form name="thelia.order.delivery" class="Thelia\Form\OrderDelivery"/>
+        <form name="thelia.order.payment" class="Thelia\Form\OrderPayment"/>
 
         <form name="thelia.admin.config.creation" class="Thelia\Form\ConfigCreationForm"/>
         <form name="thelia.admin.config.modification" class="Thelia\Form\ConfigModificationForm"/>
@@ -201,6 +210,7 @@
 
         <service id="smarty.plugin.security" class="Thelia\Core\Template\Smarty\Plugins\Security" scope="request">
             <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="request" />
             <argument type="service" id="thelia.securityContext" />
         </service>
 

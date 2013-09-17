@@ -28,6 +28,9 @@ use Symfony\Component\DependencyInjection\ContainerAware;
 
 abstract class BaseModule extends ContainerAware
 {
+    const CLASSIC_MODULE_TYPE = 1;
+    const DELIVERY_MODULE_TYPE = 2;
+    const PAYMENT_MODULE_TYPE = 3;
 
     public function __construct()
     {

@@ -47,7 +47,7 @@ class ProductCreationForm extends BaseForm
                     "for" => "title"
                 )
             ))
-            ->add("parent", "integer", array(
+            ->add("default_category", "integer", array(
                 "constraints" => array(
                     new NotBlank()
                 )
@@ -57,7 +57,11 @@ class ProductCreationForm extends BaseForm
                     new NotBlank()
                 )
             ))
-        ;
+            ->add("visible", "integer", array(
+                "label" => Translator::getInstance()->trans("This product is online."),
+                "label_attr" => array("for" => "visible_create")
+            ))
+            ;
     }
 
     public function getName()

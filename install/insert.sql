@@ -13,8 +13,11 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('imagine_graphic_driver', 'gd', 0, 0, NOW(), NOW()),
 ('default_images_quality_percent', '75', 0, 0, NOW(), NOW()),
 ('original_image_delivery_mode', 'symlink', 0, 0, NOW(), NOW()),
+('original_document_delivery_mode', 'symlink', 0, 0, NOW(), NOW()),
 ('images_library_path', 'local/media/images', 0, 0, NOW(), NOW()),
+('documents_library_path', 'local/media/documents', 0, 0, NOW(), NOW()),
 ('image_cache_dir_from_web_root', 'cache/images', 0, 0, NOW(), NOW()),
+('document_cache_dir_from_web_root', 'cache/documents', 0, 0, NOW(), NOW()),
 ('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', 0, 0, NOW(), NOW()),
 ('page_not_found_view', '404.html', 0, 0, NOW(), NOW()),
 ('use_tax_free_amounts', 0, 0, 0, NOW(), NOW()),
@@ -28,7 +31,13 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
-(1, 'DebugBar', 1, 1, 1, 'DebugBar\\DebugBar', NOW(), NOW());
+(1, 'DebugBar', 1, 1, 1, 'DebugBar\\DebugBar', NOW(), NOW()),
+(2, 'Colissimo', 2, 1, 1, 'Colissimo\\Colissimo', NOW(), NOW());
+
+INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+('2',  'en_US',  '72h delivery', NULL,  NULL,  NULL),
+('2',  'fr_FR',  'Livraison par colissimo en 72h', NULL,  NULL,  NULL);
+
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
 (1, 1, 1, NOW(), NOW()),
@@ -43,13 +52,13 @@ INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
 (3, 'fr_FR', 'Mlle', 'Madamemoiselle'),
 (3, 'en_US', 'Miss', 'Miss');
 
-INSERT INTO `currency` (`id` ,`code` ,`symbol` ,`rate`, `position` ,`by_default` ,`created_at` ,`updated_at`)
+INSERT INTO `currency` (`id`, `code`, `symbol`, `rate`, `position`, `by_default`, `created_at`, `updated_at`)
 VALUES
-(1, 'EUR', '€', '1', 1, '1', NOW() , NOW()),
+(1, 'EUR', '€', '1', 1, '1', NOW(),  NOW()),
 (2, 'USD', '$', '1.26', 2, '0', NOW(), NOW()),
 (3, 'GBP', '£', '0.89', 3, '0', NOW(), NOW());
 
-INSERT INTO `currency_i18n` (`id` ,`locale` ,`name`)
+INSERT INTO `currency_i18n` (`id`, `locale`, `name`)
 VALUES
 (1, 'fr_FR', 'Euro'),
 (1, 'en_US', 'Euro'),

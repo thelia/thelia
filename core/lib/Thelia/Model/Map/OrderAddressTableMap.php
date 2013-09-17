@@ -211,8 +211,8 @@ class OrderAddressTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('OrderRelatedByAddressInvoice', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'address_invoice', ), 'SET NULL', 'RESTRICT', 'OrdersRelatedByAddressInvoice');
-        $this->addRelation('OrderRelatedByAddressDelivery', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'address_delivery', ), 'SET NULL', 'RESTRICT', 'OrdersRelatedByAddressDelivery');
+        $this->addRelation('OrderRelatedByInvoiceOrderAddressId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'invoice_order_address_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByInvoiceOrderAddressId');
+        $this->addRelation('OrderRelatedByDeliveryOrderAddressId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'delivery_order_address_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByDeliveryOrderAddressId');
     } // buildRelations()
 
     /**
@@ -227,15 +227,6 @@ class OrderAddressTableMap extends TableMap
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
-    /**
-     * Method to invalidate the instance pool of all tables related to order_address     * by a foreign key with ON DELETE CASCADE
-     */
-    public static function clearRelatedInstancePool()
-    {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                OrderTableMap::clearInstancePool();
-            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.

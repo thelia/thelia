@@ -153,6 +153,9 @@ final class TheliaEvents
     const CATEGORY_TOGGLE_VISIBILITY = "action.toggleCategoryVisibility";
     const CATEGORY_UPDATE_POSITION   = "action.updateCategoryPosition";
 
+    const CATEGORY_ADD_CONTENT      = "action.categoryAddContent";
+    const CATEGORY_REMOVE_CONTENT   = "action.categoryRemoveContent";
+
     const BEFORE_CREATECATEGORY = "action.before_createcategory";
     const AFTER_CREATECATEGORY 	= "action.after_createcategory";
 
@@ -161,6 +164,26 @@ final class TheliaEvents
 
     const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
     const AFTER_UPDATECATEGORY 	= "action.after_updateCategory";
+
+    // -- Product management -----------------------------------------------
+
+    const PRODUCT_CREATE            = "action.createProduct";
+    const PRODUCT_UPDATE            = "action.updateProduct";
+    const PRODUCT_DELETE            = "action.deleteProduct";
+    const PRODUCT_TOGGLE_VISIBILITY = "action.toggleProductVisibility";
+    const PRODUCT_UPDATE_POSITION   = "action.updateProductPosition";
+
+    const PRODUCT_ADD_CONTENT      = "action.productAddContent";
+    const PRODUCT_REMOVE_CONTENT   = "action.productRemoveContent";
+
+    const BEFORE_CREATEPRODUCT = "action.before_createproduct";
+    const AFTER_CREATEPRODUCT  = "action.after_createproduct";
+
+    const BEFORE_DELETEPRODUCT = "action.before_deleteproduct";
+    const AFTER_DELETEPRODUCT  = "action.after_deleteproduct";
+
+    const BEFORE_UPDATEPRODUCT = "action.before_updateProduct";
+    const AFTER_UPDATEPRODUCT  = "action.after_updateProduct";
 
     /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart
@@ -190,12 +213,24 @@ final class TheliaEvents
     const CART_DELETEITEM = "action.deleteArticle";
 
     /**
+     * Order linked event
+     */
+    const ORDER_SET_BILLING_ADDRESS = "action.order.setBillingAddress";
+    const ORDER_SET_DELIVERY_ADDRESS = "action.order.setDeliveryAddress";
+    const ORDER_SET_DELIVERY_MODULE = "action.order.setDeliveryModule";
+
+    /**
      * Sent on image processing
      */
     const IMAGE_PROCESS = "action.processImage";
 
     /**
-     * Sent on cimage cache clear request
+     * Sent on document processing
+     */
+    const DOCUMENT_PROCESS = "action.processDocument";
+
+    /**
+     * Sent on image cache clear request
      */
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
 

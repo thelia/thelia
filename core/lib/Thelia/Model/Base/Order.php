@@ -23,6 +23,10 @@ use Thelia\Model\Currency as ChildCurrency;
 use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
 use Thelia\Model\Customer as ChildCustomer;
 use Thelia\Model\CustomerQuery as ChildCustomerQuery;
+use Thelia\Model\Lang as ChildLang;
+use Thelia\Model\LangQuery as ChildLangQuery;
+use Thelia\Model\Module as ChildModule;
+use Thelia\Model\ModuleQuery as ChildModuleQuery;
 use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\OrderAddress as ChildOrderAddress;
 use Thelia\Model\OrderAddressQuery as ChildOrderAddressQuery;
@@ -86,16 +90,16 @@ abstract class Order implements ActiveRecordInterface
     protected $customer_id;
 
     /**
-     * The value for the address_invoice field.
+     * The value for the invoice_order_address_id field.
      * @var        int
      */
-    protected $address_invoice;
+    protected $invoice_order_address_id;
 
     /**
-     * The value for the address_delivery field.
+     * The value for the delivery_order_address_id field.
      * @var        int
      */
-    protected $address_delivery;
+    protected $delivery_order_address_id;
 
     /**
      * The value for the invoice_date field.
@@ -116,22 +120,22 @@ abstract class Order implements ActiveRecordInterface
     protected $currency_rate;
 
     /**
-     * The value for the transaction field.
+     * The value for the transaction_ref field.
      * @var        string
      */
-    protected $transaction;
+    protected $transaction_ref;
 
     /**
-     * The value for the delivery_num field.
+     * The value for the delivery_ref field.
      * @var        string
      */
-    protected $delivery_num;
+    protected $delivery_ref;
 
     /**
-     * The value for the invoice field.
+     * The value for the invoice_ref field.
      * @var        string
      */
-    protected $invoice;
+    protected $invoice_ref;
 
     /**
      * The value for the postage field.
@@ -140,16 +144,16 @@ abstract class Order implements ActiveRecordInterface
     protected $postage;
 
     /**
-     * The value for the payment field.
-     * @var        string
+     * The value for the payment_module_id field.
+     * @var        int
      */
-    protected $payment;
+    protected $payment_module_id;
 
     /**
-     * The value for the carrier field.
-     * @var        string
+     * The value for the delivery_module_id field.
+     * @var        int
      */
-    protected $carrier;
+    protected $delivery_module_id;
 
     /**
      * The value for the status_id field.
@@ -158,10 +162,10 @@ abstract class Order implements ActiveRecordInterface
     protected $status_id;
 
     /**
-     * The value for the lang field.
-     * @var        string
+     * The value for the lang_id field.
+     * @var        int
      */
-    protected $lang;
+    protected $lang_id;
 
     /**
      * The value for the created_at field.
@@ -188,17 +192,32 @@ abstract class Order implements ActiveRecordInterface
     /**
      * @var        OrderAddress
      */
-    protected $aOrderAddressRelatedByAddressInvoice;
+    protected $aOrderAddressRelatedByInvoiceOrderAddressId;
 
     /**
      * @var        OrderAddress
      */
-    protected $aOrderAddressRelatedByAddressDelivery;
+    protected $aOrderAddressRelatedByDeliveryOrderAddressId;
 
     /**
      * @var        OrderStatus
      */
     protected $aOrderStatus;
+
+    /**
+     * @var        Module
+     */
+    protected $aModuleRelatedByPaymentModuleId;
+
+    /**
+     * @var        Module
+     */
+    protected $aModuleRelatedByDeliveryModuleId;
+
+    /**
+     * @var        Lang
+     */
+    protected $aLang;
 
     /**
      * @var        ObjectCollection|ChildOrderProduct[] Collection to store aggregation of ChildOrderProduct objects.
@@ -520,25 +539,25 @@ abstract class Order implements ActiveRecordInterface
     }
 
     /**
-     * Get the [address_invoice] column value.
+     * Get the [invoice_order_address_id] column value.
      *
      * @return   int
      */
-    public function getAddressInvoice()
+    public function getInvoiceOrderAddressId()
     {
 
-        return $this->address_invoice;
+        return $this->invoice_order_address_id;
     }
 
     /**
-     * Get the [address_delivery] column value.
+     * Get the [delivery_order_address_id] column value.
      *
      * @return   int
      */
-    public function getAddressDelivery()
+    public function getDeliveryOrderAddressId()
     {
 
-        return $this->address_delivery;
+        return $this->delivery_order_address_id;
     }
 
     /**
@@ -584,36 +603,36 @@ abstract class Order implements ActiveRecordInterface
     }
 
     /**
-     * Get the [transaction] column value.
-     *
+     * Get the [transaction_ref] column value.
+     * transaction reference - usually use to identify a transaction with banking modules
      * @return   string
      */
-    public function getTransaction()
+    public function getTransactionRef()
     {
 
-        return $this->transaction;
+        return $this->transaction_ref;
     }
 
     /**
-     * Get the [delivery_num] column value.
-     *
+     * Get the [delivery_ref] column value.
+     * delivery reference - usually use to identify a delivery progress on a distant delivery tracker website
      * @return   string
      */
-    public function getDeliveryNum()
+    public function getDeliveryRef()
     {
 
-        return $this->delivery_num;
+        return $this->delivery_ref;
     }
 
     /**
-     * Get the [invoice] column value.
-     *
+     * Get the [invoice_ref] column value.
+     * the invoice reference
      * @return   string
      */
-    public function getInvoice()
+    public function getInvoiceRef()
     {
 
-        return $this->invoice;
+        return $this->invoice_ref;
     }
 
     /**
@@ -628,25 +647,25 @@ abstract class Order implements ActiveRecordInterface
     }
 
     /**
-     * Get the [payment] column value.
+     * Get the [payment_module_id] column value.
      *
-     * @return   string
+     * @return   int
      */
-    public function getPayment()
+    public function getPaymentModuleId()
     {
 
-        return $this->payment;
+        return $this->payment_module_id;
     }
 
     /**
-     * Get the [carrier] column value.
+     * Get the [delivery_module_id] column value.
      *
-     * @return   string
+     * @return   int
      */
-    public function getCarrier()
+    public function getDeliveryModuleId()
     {
 
-        return $this->carrier;
+        return $this->delivery_module_id;
     }
 
     /**
@@ -661,14 +680,14 @@ abstract class Order implements ActiveRecordInterface
     }
 
     /**
-     * Get the [lang] column value.
+     * Get the [lang_id] column value.
      *
-     * @return   string
+     * @return   int
      */
-    public function getLang()
+    public function getLangId()
     {
 
-        return $this->lang;
+        return $this->lang_id;
     }
 
     /**
@@ -779,54 +798,54 @@ abstract class Order implements ActiveRecordInterface
     } // setCustomerId()
 
     /**
-     * Set the value of [address_invoice] column.
+     * Set the value of [invoice_order_address_id] column.
      *
      * @param      int $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
-    public function setAddressInvoice($v)
+    public function setInvoiceOrderAddressId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->address_invoice !== $v) {
-            $this->address_invoice = $v;
-            $this->modifiedColumns[] = OrderTableMap::ADDRESS_INVOICE;
+        if ($this->invoice_order_address_id !== $v) {
+            $this->invoice_order_address_id = $v;
+            $this->modifiedColumns[] = OrderTableMap::INVOICE_ORDER_ADDRESS_ID;
         }
 
-        if ($this->aOrderAddressRelatedByAddressInvoice !== null && $this->aOrderAddressRelatedByAddressInvoice->getId() !== $v) {
-            $this->aOrderAddressRelatedByAddressInvoice = null;
+        if ($this->aOrderAddressRelatedByInvoiceOrderAddressId !== null && $this->aOrderAddressRelatedByInvoiceOrderAddressId->getId() !== $v) {
+            $this->aOrderAddressRelatedByInvoiceOrderAddressId = null;
         }
 
 
         return $this;
-    } // setAddressInvoice()
+    } // setInvoiceOrderAddressId()
 
     /**
-     * Set the value of [address_delivery] column.
+     * Set the value of [delivery_order_address_id] column.
      *
      * @param      int $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
-    public function setAddressDelivery($v)
+    public function setDeliveryOrderAddressId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->address_delivery !== $v) {
-            $this->address_delivery = $v;
-            $this->modifiedColumns[] = OrderTableMap::ADDRESS_DELIVERY;
+        if ($this->delivery_order_address_id !== $v) {
+            $this->delivery_order_address_id = $v;
+            $this->modifiedColumns[] = OrderTableMap::DELIVERY_ORDER_ADDRESS_ID;
         }
 
-        if ($this->aOrderAddressRelatedByAddressDelivery !== null && $this->aOrderAddressRelatedByAddressDelivery->getId() !== $v) {
-            $this->aOrderAddressRelatedByAddressDelivery = null;
+        if ($this->aOrderAddressRelatedByDeliveryOrderAddressId !== null && $this->aOrderAddressRelatedByDeliveryOrderAddressId->getId() !== $v) {
+            $this->aOrderAddressRelatedByDeliveryOrderAddressId = null;
         }
 
 
         return $this;
-    } // setAddressDelivery()
+    } // setDeliveryOrderAddressId()
 
     /**
      * Sets the value of [invoice_date] column to a normalized version of the date/time value specified.
@@ -896,67 +915,67 @@ abstract class Order implements ActiveRecordInterface
     } // setCurrencyRate()
 
     /**
-     * Set the value of [transaction] column.
-     *
+     * Set the value of [transaction_ref] column.
+     * transaction reference - usually use to identify a transaction with banking modules
      * @param      string $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
-    public function setTransaction($v)
+    public function setTransactionRef($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->transaction !== $v) {
-            $this->transaction = $v;
-            $this->modifiedColumns[] = OrderTableMap::TRANSACTION;
+        if ($this->transaction_ref !== $v) {
+            $this->transaction_ref = $v;
+            $this->modifiedColumns[] = OrderTableMap::TRANSACTION_REF;
         }
 
 
         return $this;
-    } // setTransaction()
+    } // setTransactionRef()
 
     /**
-     * Set the value of [delivery_num] column.
-     *
+     * Set the value of [delivery_ref] column.
+     * delivery reference - usually use to identify a delivery progress on a distant delivery tracker website
      * @param      string $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
-    public function setDeliveryNum($v)
+    public function setDeliveryRef($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->delivery_num !== $v) {
-            $this->delivery_num = $v;
-            $this->modifiedColumns[] = OrderTableMap::DELIVERY_NUM;
+        if ($this->delivery_ref !== $v) {
+            $this->delivery_ref = $v;
+            $this->modifiedColumns[] = OrderTableMap::DELIVERY_REF;
         }
 
 
         return $this;
-    } // setDeliveryNum()
+    } // setDeliveryRef()
 
     /**
-     * Set the value of [invoice] column.
-     *
+     * Set the value of [invoice_ref] column.
+     * the invoice reference
      * @param      string $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
-    public function setInvoice($v)
+    public function setInvoiceRef($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->invoice !== $v) {
-            $this->invoice = $v;
-            $this->modifiedColumns[] = OrderTableMap::INVOICE;
+        if ($this->invoice_ref !== $v) {
+            $this->invoice_ref = $v;
+            $this->modifiedColumns[] = OrderTableMap::INVOICE_REF;
         }
 
 
         return $this;
-    } // setInvoice()
+    } // setInvoiceRef()
 
     /**
      * Set the value of [postage] column.
@@ -980,46 +999,54 @@ abstract class Order implements ActiveRecordInterface
     } // setPostage()
 
     /**
-     * Set the value of [payment] column.
+     * Set the value of [payment_module_id] column.
      *
-     * @param      string $v new value
+     * @param      int $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
-    public function setPayment($v)
+    public function setPaymentModuleId($v)
     {
         if ($v !== null) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->payment !== $v) {
-            $this->payment = $v;
-            $this->modifiedColumns[] = OrderTableMap::PAYMENT;
+        if ($this->payment_module_id !== $v) {
+            $this->payment_module_id = $v;
+            $this->modifiedColumns[] = OrderTableMap::PAYMENT_MODULE_ID;
+        }
+
+        if ($this->aModuleRelatedByPaymentModuleId !== null && $this->aModuleRelatedByPaymentModuleId->getId() !== $v) {
+            $this->aModuleRelatedByPaymentModuleId = null;
         }
 
 
         return $this;
-    } // setPayment()
+    } // setPaymentModuleId()
 
     /**
-     * Set the value of [carrier] column.
+     * Set the value of [delivery_module_id] column.
      *
-     * @param      string $v new value
+     * @param      int $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
-    public function setCarrier($v)
+    public function setDeliveryModuleId($v)
     {
         if ($v !== null) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->carrier !== $v) {
-            $this->carrier = $v;
-            $this->modifiedColumns[] = OrderTableMap::CARRIER;
+        if ($this->delivery_module_id !== $v) {
+            $this->delivery_module_id = $v;
+            $this->modifiedColumns[] = OrderTableMap::DELIVERY_MODULE_ID;
+        }
+
+        if ($this->aModuleRelatedByDeliveryModuleId !== null && $this->aModuleRelatedByDeliveryModuleId->getId() !== $v) {
+            $this->aModuleRelatedByDeliveryModuleId = null;
         }
 
 
         return $this;
-    } // setCarrier()
+    } // setDeliveryModuleId()
 
     /**
      * Set the value of [status_id] column.
@@ -1047,25 +1074,29 @@ abstract class Order implements ActiveRecordInterface
     } // setStatusId()
 
     /**
-     * Set the value of [lang] column.
+     * Set the value of [lang_id] column.
      *
-     * @param      string $v new value
+     * @param      int $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
-    public function setLang($v)
+    public function setLangId($v)
     {
         if ($v !== null) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->lang !== $v) {
-            $this->lang = $v;
-            $this->modifiedColumns[] = OrderTableMap::LANG;
+        if ($this->lang_id !== $v) {
+            $this->lang_id = $v;
+            $this->modifiedColumns[] = OrderTableMap::LANG_ID;
+        }
+
+        if ($this->aLang !== null && $this->aLang->getId() !== $v) {
+            $this->aLang = null;
         }
 
 
         return $this;
-    } // setLang()
+    } // setLangId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -1155,11 +1186,11 @@ abstract class Order implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : OrderTableMap::translateFieldName('CustomerId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->customer_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OrderTableMap::translateFieldName('AddressInvoice', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->address_invoice = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OrderTableMap::translateFieldName('InvoiceOrderAddressId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->invoice_order_address_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OrderTableMap::translateFieldName('AddressDelivery', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->address_delivery = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OrderTableMap::translateFieldName('DeliveryOrderAddressId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->delivery_order_address_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderTableMap::translateFieldName('InvoiceDate', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00') {
@@ -1173,29 +1204,29 @@ abstract class Order implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : OrderTableMap::translateFieldName('CurrencyRate', TableMap::TYPE_PHPNAME, $indexType)];
             $this->currency_rate = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : OrderTableMap::translateFieldName('Transaction', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->transaction = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : OrderTableMap::translateFieldName('TransactionRef', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->transaction_ref = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : OrderTableMap::translateFieldName('DeliveryNum', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->delivery_num = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : OrderTableMap::translateFieldName('DeliveryRef', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->delivery_ref = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderTableMap::translateFieldName('Invoice', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->invoice = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderTableMap::translateFieldName('InvoiceRef', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->invoice_ref = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderTableMap::translateFieldName('Postage', TableMap::TYPE_PHPNAME, $indexType)];
             $this->postage = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderTableMap::translateFieldName('Payment', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->payment = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderTableMap::translateFieldName('PaymentModuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->payment_module_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderTableMap::translateFieldName('Carrier', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->carrier = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderTableMap::translateFieldName('DeliveryModuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->delivery_module_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderTableMap::translateFieldName('StatusId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->status_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderTableMap::translateFieldName('Lang', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->lang = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderTableMap::translateFieldName('LangId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->lang_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
@@ -1241,17 +1272,26 @@ abstract class Order implements ActiveRecordInterface
         if ($this->aCustomer !== null && $this->customer_id !== $this->aCustomer->getId()) {
             $this->aCustomer = null;
         }
-        if ($this->aOrderAddressRelatedByAddressInvoice !== null && $this->address_invoice !== $this->aOrderAddressRelatedByAddressInvoice->getId()) {
-            $this->aOrderAddressRelatedByAddressInvoice = null;
+        if ($this->aOrderAddressRelatedByInvoiceOrderAddressId !== null && $this->invoice_order_address_id !== $this->aOrderAddressRelatedByInvoiceOrderAddressId->getId()) {
+            $this->aOrderAddressRelatedByInvoiceOrderAddressId = null;
         }
-        if ($this->aOrderAddressRelatedByAddressDelivery !== null && $this->address_delivery !== $this->aOrderAddressRelatedByAddressDelivery->getId()) {
-            $this->aOrderAddressRelatedByAddressDelivery = null;
+        if ($this->aOrderAddressRelatedByDeliveryOrderAddressId !== null && $this->delivery_order_address_id !== $this->aOrderAddressRelatedByDeliveryOrderAddressId->getId()) {
+            $this->aOrderAddressRelatedByDeliveryOrderAddressId = null;
         }
         if ($this->aCurrency !== null && $this->currency_id !== $this->aCurrency->getId()) {
             $this->aCurrency = null;
         }
+        if ($this->aModuleRelatedByPaymentModuleId !== null && $this->payment_module_id !== $this->aModuleRelatedByPaymentModuleId->getId()) {
+            $this->aModuleRelatedByPaymentModuleId = null;
+        }
+        if ($this->aModuleRelatedByDeliveryModuleId !== null && $this->delivery_module_id !== $this->aModuleRelatedByDeliveryModuleId->getId()) {
+            $this->aModuleRelatedByDeliveryModuleId = null;
+        }
         if ($this->aOrderStatus !== null && $this->status_id !== $this->aOrderStatus->getId()) {
             $this->aOrderStatus = null;
+        }
+        if ($this->aLang !== null && $this->lang_id !== $this->aLang->getId()) {
+            $this->aLang = null;
         }
     } // ensureConsistency
 
@@ -1294,9 +1334,12 @@ abstract class Order implements ActiveRecordInterface
 
             $this->aCurrency = null;
             $this->aCustomer = null;
-            $this->aOrderAddressRelatedByAddressInvoice = null;
-            $this->aOrderAddressRelatedByAddressDelivery = null;
+            $this->aOrderAddressRelatedByInvoiceOrderAddressId = null;
+            $this->aOrderAddressRelatedByDeliveryOrderAddressId = null;
             $this->aOrderStatus = null;
+            $this->aModuleRelatedByPaymentModuleId = null;
+            $this->aModuleRelatedByDeliveryModuleId = null;
+            $this->aLang = null;
             $this->collOrderProducts = null;
 
             $this->collCouponOrders = null;
@@ -1442,18 +1485,18 @@ abstract class Order implements ActiveRecordInterface
                 $this->setCustomer($this->aCustomer);
             }
 
-            if ($this->aOrderAddressRelatedByAddressInvoice !== null) {
-                if ($this->aOrderAddressRelatedByAddressInvoice->isModified() || $this->aOrderAddressRelatedByAddressInvoice->isNew()) {
-                    $affectedRows += $this->aOrderAddressRelatedByAddressInvoice->save($con);
+            if ($this->aOrderAddressRelatedByInvoiceOrderAddressId !== null) {
+                if ($this->aOrderAddressRelatedByInvoiceOrderAddressId->isModified() || $this->aOrderAddressRelatedByInvoiceOrderAddressId->isNew()) {
+                    $affectedRows += $this->aOrderAddressRelatedByInvoiceOrderAddressId->save($con);
                 }
-                $this->setOrderAddressRelatedByAddressInvoice($this->aOrderAddressRelatedByAddressInvoice);
+                $this->setOrderAddressRelatedByInvoiceOrderAddressId($this->aOrderAddressRelatedByInvoiceOrderAddressId);
             }
 
-            if ($this->aOrderAddressRelatedByAddressDelivery !== null) {
-                if ($this->aOrderAddressRelatedByAddressDelivery->isModified() || $this->aOrderAddressRelatedByAddressDelivery->isNew()) {
-                    $affectedRows += $this->aOrderAddressRelatedByAddressDelivery->save($con);
+            if ($this->aOrderAddressRelatedByDeliveryOrderAddressId !== null) {
+                if ($this->aOrderAddressRelatedByDeliveryOrderAddressId->isModified() || $this->aOrderAddressRelatedByDeliveryOrderAddressId->isNew()) {
+                    $affectedRows += $this->aOrderAddressRelatedByDeliveryOrderAddressId->save($con);
                 }
-                $this->setOrderAddressRelatedByAddressDelivery($this->aOrderAddressRelatedByAddressDelivery);
+                $this->setOrderAddressRelatedByDeliveryOrderAddressId($this->aOrderAddressRelatedByDeliveryOrderAddressId);
             }
 
             if ($this->aOrderStatus !== null) {
@@ -1461,6 +1504,27 @@ abstract class Order implements ActiveRecordInterface
                     $affectedRows += $this->aOrderStatus->save($con);
                 }
                 $this->setOrderStatus($this->aOrderStatus);
+            }
+
+            if ($this->aModuleRelatedByPaymentModuleId !== null) {
+                if ($this->aModuleRelatedByPaymentModuleId->isModified() || $this->aModuleRelatedByPaymentModuleId->isNew()) {
+                    $affectedRows += $this->aModuleRelatedByPaymentModuleId->save($con);
+                }
+                $this->setModuleRelatedByPaymentModuleId($this->aModuleRelatedByPaymentModuleId);
+            }
+
+            if ($this->aModuleRelatedByDeliveryModuleId !== null) {
+                if ($this->aModuleRelatedByDeliveryModuleId->isModified() || $this->aModuleRelatedByDeliveryModuleId->isNew()) {
+                    $affectedRows += $this->aModuleRelatedByDeliveryModuleId->save($con);
+                }
+                $this->setModuleRelatedByDeliveryModuleId($this->aModuleRelatedByDeliveryModuleId);
+            }
+
+            if ($this->aLang !== null) {
+                if ($this->aLang->isModified() || $this->aLang->isNew()) {
+                    $affectedRows += $this->aLang->save($con);
+                }
+                $this->setLang($this->aLang);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1543,11 +1607,11 @@ abstract class Order implements ActiveRecordInterface
         if ($this->isColumnModified(OrderTableMap::CUSTOMER_ID)) {
             $modifiedColumns[':p' . $index++]  = 'CUSTOMER_ID';
         }
-        if ($this->isColumnModified(OrderTableMap::ADDRESS_INVOICE)) {
-            $modifiedColumns[':p' . $index++]  = 'ADDRESS_INVOICE';
+        if ($this->isColumnModified(OrderTableMap::INVOICE_ORDER_ADDRESS_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'INVOICE_ORDER_ADDRESS_ID';
         }
-        if ($this->isColumnModified(OrderTableMap::ADDRESS_DELIVERY)) {
-            $modifiedColumns[':p' . $index++]  = 'ADDRESS_DELIVERY';
+        if ($this->isColumnModified(OrderTableMap::DELIVERY_ORDER_ADDRESS_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'DELIVERY_ORDER_ADDRESS_ID';
         }
         if ($this->isColumnModified(OrderTableMap::INVOICE_DATE)) {
             $modifiedColumns[':p' . $index++]  = 'INVOICE_DATE';
@@ -1558,29 +1622,29 @@ abstract class Order implements ActiveRecordInterface
         if ($this->isColumnModified(OrderTableMap::CURRENCY_RATE)) {
             $modifiedColumns[':p' . $index++]  = 'CURRENCY_RATE';
         }
-        if ($this->isColumnModified(OrderTableMap::TRANSACTION)) {
-            $modifiedColumns[':p' . $index++]  = 'TRANSACTION';
+        if ($this->isColumnModified(OrderTableMap::TRANSACTION_REF)) {
+            $modifiedColumns[':p' . $index++]  = 'TRANSACTION_REF';
         }
-        if ($this->isColumnModified(OrderTableMap::DELIVERY_NUM)) {
-            $modifiedColumns[':p' . $index++]  = 'DELIVERY_NUM';
+        if ($this->isColumnModified(OrderTableMap::DELIVERY_REF)) {
+            $modifiedColumns[':p' . $index++]  = 'DELIVERY_REF';
         }
-        if ($this->isColumnModified(OrderTableMap::INVOICE)) {
-            $modifiedColumns[':p' . $index++]  = 'INVOICE';
+        if ($this->isColumnModified(OrderTableMap::INVOICE_REF)) {
+            $modifiedColumns[':p' . $index++]  = 'INVOICE_REF';
         }
         if ($this->isColumnModified(OrderTableMap::POSTAGE)) {
             $modifiedColumns[':p' . $index++]  = 'POSTAGE';
         }
-        if ($this->isColumnModified(OrderTableMap::PAYMENT)) {
-            $modifiedColumns[':p' . $index++]  = 'PAYMENT';
+        if ($this->isColumnModified(OrderTableMap::PAYMENT_MODULE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'PAYMENT_MODULE_ID';
         }
-        if ($this->isColumnModified(OrderTableMap::CARRIER)) {
-            $modifiedColumns[':p' . $index++]  = 'CARRIER';
+        if ($this->isColumnModified(OrderTableMap::DELIVERY_MODULE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'DELIVERY_MODULE_ID';
         }
         if ($this->isColumnModified(OrderTableMap::STATUS_ID)) {
             $modifiedColumns[':p' . $index++]  = 'STATUS_ID';
         }
-        if ($this->isColumnModified(OrderTableMap::LANG)) {
-            $modifiedColumns[':p' . $index++]  = 'LANG';
+        if ($this->isColumnModified(OrderTableMap::LANG_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'LANG_ID';
         }
         if ($this->isColumnModified(OrderTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -1608,11 +1672,11 @@ abstract class Order implements ActiveRecordInterface
                     case 'CUSTOMER_ID':
                         $stmt->bindValue($identifier, $this->customer_id, PDO::PARAM_INT);
                         break;
-                    case 'ADDRESS_INVOICE':
-                        $stmt->bindValue($identifier, $this->address_invoice, PDO::PARAM_INT);
+                    case 'INVOICE_ORDER_ADDRESS_ID':
+                        $stmt->bindValue($identifier, $this->invoice_order_address_id, PDO::PARAM_INT);
                         break;
-                    case 'ADDRESS_DELIVERY':
-                        $stmt->bindValue($identifier, $this->address_delivery, PDO::PARAM_INT);
+                    case 'DELIVERY_ORDER_ADDRESS_ID':
+                        $stmt->bindValue($identifier, $this->delivery_order_address_id, PDO::PARAM_INT);
                         break;
                     case 'INVOICE_DATE':
                         $stmt->bindValue($identifier, $this->invoice_date ? $this->invoice_date->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1623,29 +1687,29 @@ abstract class Order implements ActiveRecordInterface
                     case 'CURRENCY_RATE':
                         $stmt->bindValue($identifier, $this->currency_rate, PDO::PARAM_STR);
                         break;
-                    case 'TRANSACTION':
-                        $stmt->bindValue($identifier, $this->transaction, PDO::PARAM_STR);
+                    case 'TRANSACTION_REF':
+                        $stmt->bindValue($identifier, $this->transaction_ref, PDO::PARAM_STR);
                         break;
-                    case 'DELIVERY_NUM':
-                        $stmt->bindValue($identifier, $this->delivery_num, PDO::PARAM_STR);
+                    case 'DELIVERY_REF':
+                        $stmt->bindValue($identifier, $this->delivery_ref, PDO::PARAM_STR);
                         break;
-                    case 'INVOICE':
-                        $stmt->bindValue($identifier, $this->invoice, PDO::PARAM_STR);
+                    case 'INVOICE_REF':
+                        $stmt->bindValue($identifier, $this->invoice_ref, PDO::PARAM_STR);
                         break;
                     case 'POSTAGE':
                         $stmt->bindValue($identifier, $this->postage, PDO::PARAM_STR);
                         break;
-                    case 'PAYMENT':
-                        $stmt->bindValue($identifier, $this->payment, PDO::PARAM_STR);
+                    case 'PAYMENT_MODULE_ID':
+                        $stmt->bindValue($identifier, $this->payment_module_id, PDO::PARAM_INT);
                         break;
-                    case 'CARRIER':
-                        $stmt->bindValue($identifier, $this->carrier, PDO::PARAM_STR);
+                    case 'DELIVERY_MODULE_ID':
+                        $stmt->bindValue($identifier, $this->delivery_module_id, PDO::PARAM_INT);
                         break;
                     case 'STATUS_ID':
                         $stmt->bindValue($identifier, $this->status_id, PDO::PARAM_INT);
                         break;
-                    case 'LANG':
-                        $stmt->bindValue($identifier, $this->lang, PDO::PARAM_STR);
+                    case 'LANG_ID':
+                        $stmt->bindValue($identifier, $this->lang_id, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1725,10 +1789,10 @@ abstract class Order implements ActiveRecordInterface
                 return $this->getCustomerId();
                 break;
             case 3:
-                return $this->getAddressInvoice();
+                return $this->getInvoiceOrderAddressId();
                 break;
             case 4:
-                return $this->getAddressDelivery();
+                return $this->getDeliveryOrderAddressId();
                 break;
             case 5:
                 return $this->getInvoiceDate();
@@ -1740,28 +1804,28 @@ abstract class Order implements ActiveRecordInterface
                 return $this->getCurrencyRate();
                 break;
             case 8:
-                return $this->getTransaction();
+                return $this->getTransactionRef();
                 break;
             case 9:
-                return $this->getDeliveryNum();
+                return $this->getDeliveryRef();
                 break;
             case 10:
-                return $this->getInvoice();
+                return $this->getInvoiceRef();
                 break;
             case 11:
                 return $this->getPostage();
                 break;
             case 12:
-                return $this->getPayment();
+                return $this->getPaymentModuleId();
                 break;
             case 13:
-                return $this->getCarrier();
+                return $this->getDeliveryModuleId();
                 break;
             case 14:
                 return $this->getStatusId();
                 break;
             case 15:
-                return $this->getLang();
+                return $this->getLangId();
                 break;
             case 16:
                 return $this->getCreatedAt();
@@ -1801,19 +1865,19 @@ abstract class Order implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getRef(),
             $keys[2] => $this->getCustomerId(),
-            $keys[3] => $this->getAddressInvoice(),
-            $keys[4] => $this->getAddressDelivery(),
+            $keys[3] => $this->getInvoiceOrderAddressId(),
+            $keys[4] => $this->getDeliveryOrderAddressId(),
             $keys[5] => $this->getInvoiceDate(),
             $keys[6] => $this->getCurrencyId(),
             $keys[7] => $this->getCurrencyRate(),
-            $keys[8] => $this->getTransaction(),
-            $keys[9] => $this->getDeliveryNum(),
-            $keys[10] => $this->getInvoice(),
+            $keys[8] => $this->getTransactionRef(),
+            $keys[9] => $this->getDeliveryRef(),
+            $keys[10] => $this->getInvoiceRef(),
             $keys[11] => $this->getPostage(),
-            $keys[12] => $this->getPayment(),
-            $keys[13] => $this->getCarrier(),
+            $keys[12] => $this->getPaymentModuleId(),
+            $keys[13] => $this->getDeliveryModuleId(),
             $keys[14] => $this->getStatusId(),
-            $keys[15] => $this->getLang(),
+            $keys[15] => $this->getLangId(),
             $keys[16] => $this->getCreatedAt(),
             $keys[17] => $this->getUpdatedAt(),
         );
@@ -1830,14 +1894,23 @@ abstract class Order implements ActiveRecordInterface
             if (null !== $this->aCustomer) {
                 $result['Customer'] = $this->aCustomer->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aOrderAddressRelatedByAddressInvoice) {
-                $result['OrderAddressRelatedByAddressInvoice'] = $this->aOrderAddressRelatedByAddressInvoice->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aOrderAddressRelatedByInvoiceOrderAddressId) {
+                $result['OrderAddressRelatedByInvoiceOrderAddressId'] = $this->aOrderAddressRelatedByInvoiceOrderAddressId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aOrderAddressRelatedByAddressDelivery) {
-                $result['OrderAddressRelatedByAddressDelivery'] = $this->aOrderAddressRelatedByAddressDelivery->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aOrderAddressRelatedByDeliveryOrderAddressId) {
+                $result['OrderAddressRelatedByDeliveryOrderAddressId'] = $this->aOrderAddressRelatedByDeliveryOrderAddressId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aOrderStatus) {
                 $result['OrderStatus'] = $this->aOrderStatus->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aModuleRelatedByPaymentModuleId) {
+                $result['ModuleRelatedByPaymentModuleId'] = $this->aModuleRelatedByPaymentModuleId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aModuleRelatedByDeliveryModuleId) {
+                $result['ModuleRelatedByDeliveryModuleId'] = $this->aModuleRelatedByDeliveryModuleId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aLang) {
+                $result['Lang'] = $this->aLang->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collOrderProducts) {
                 $result['OrderProducts'] = $this->collOrderProducts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1889,10 +1962,10 @@ abstract class Order implements ActiveRecordInterface
                 $this->setCustomerId($value);
                 break;
             case 3:
-                $this->setAddressInvoice($value);
+                $this->setInvoiceOrderAddressId($value);
                 break;
             case 4:
-                $this->setAddressDelivery($value);
+                $this->setDeliveryOrderAddressId($value);
                 break;
             case 5:
                 $this->setInvoiceDate($value);
@@ -1904,28 +1977,28 @@ abstract class Order implements ActiveRecordInterface
                 $this->setCurrencyRate($value);
                 break;
             case 8:
-                $this->setTransaction($value);
+                $this->setTransactionRef($value);
                 break;
             case 9:
-                $this->setDeliveryNum($value);
+                $this->setDeliveryRef($value);
                 break;
             case 10:
-                $this->setInvoice($value);
+                $this->setInvoiceRef($value);
                 break;
             case 11:
                 $this->setPostage($value);
                 break;
             case 12:
-                $this->setPayment($value);
+                $this->setPaymentModuleId($value);
                 break;
             case 13:
-                $this->setCarrier($value);
+                $this->setDeliveryModuleId($value);
                 break;
             case 14:
                 $this->setStatusId($value);
                 break;
             case 15:
-                $this->setLang($value);
+                $this->setLangId($value);
                 break;
             case 16:
                 $this->setCreatedAt($value);
@@ -1960,19 +2033,19 @@ abstract class Order implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setRef($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setCustomerId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setAddressInvoice($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setAddressDelivery($arr[$keys[4]]);
+        if (array_key_exists($keys[3], $arr)) $this->setInvoiceOrderAddressId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setDeliveryOrderAddressId($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setInvoiceDate($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setCurrencyId($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setCurrencyRate($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setTransaction($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setDeliveryNum($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setInvoice($arr[$keys[10]]);
+        if (array_key_exists($keys[8], $arr)) $this->setTransactionRef($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setDeliveryRef($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setInvoiceRef($arr[$keys[10]]);
         if (array_key_exists($keys[11], $arr)) $this->setPostage($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setPayment($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setCarrier($arr[$keys[13]]);
+        if (array_key_exists($keys[12], $arr)) $this->setPaymentModuleId($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setDeliveryModuleId($arr[$keys[13]]);
         if (array_key_exists($keys[14], $arr)) $this->setStatusId($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setLang($arr[$keys[15]]);
+        if (array_key_exists($keys[15], $arr)) $this->setLangId($arr[$keys[15]]);
         if (array_key_exists($keys[16], $arr)) $this->setCreatedAt($arr[$keys[16]]);
         if (array_key_exists($keys[17], $arr)) $this->setUpdatedAt($arr[$keys[17]]);
     }
@@ -1989,19 +2062,19 @@ abstract class Order implements ActiveRecordInterface
         if ($this->isColumnModified(OrderTableMap::ID)) $criteria->add(OrderTableMap::ID, $this->id);
         if ($this->isColumnModified(OrderTableMap::REF)) $criteria->add(OrderTableMap::REF, $this->ref);
         if ($this->isColumnModified(OrderTableMap::CUSTOMER_ID)) $criteria->add(OrderTableMap::CUSTOMER_ID, $this->customer_id);
-        if ($this->isColumnModified(OrderTableMap::ADDRESS_INVOICE)) $criteria->add(OrderTableMap::ADDRESS_INVOICE, $this->address_invoice);
-        if ($this->isColumnModified(OrderTableMap::ADDRESS_DELIVERY)) $criteria->add(OrderTableMap::ADDRESS_DELIVERY, $this->address_delivery);
+        if ($this->isColumnModified(OrderTableMap::INVOICE_ORDER_ADDRESS_ID)) $criteria->add(OrderTableMap::INVOICE_ORDER_ADDRESS_ID, $this->invoice_order_address_id);
+        if ($this->isColumnModified(OrderTableMap::DELIVERY_ORDER_ADDRESS_ID)) $criteria->add(OrderTableMap::DELIVERY_ORDER_ADDRESS_ID, $this->delivery_order_address_id);
         if ($this->isColumnModified(OrderTableMap::INVOICE_DATE)) $criteria->add(OrderTableMap::INVOICE_DATE, $this->invoice_date);
         if ($this->isColumnModified(OrderTableMap::CURRENCY_ID)) $criteria->add(OrderTableMap::CURRENCY_ID, $this->currency_id);
         if ($this->isColumnModified(OrderTableMap::CURRENCY_RATE)) $criteria->add(OrderTableMap::CURRENCY_RATE, $this->currency_rate);
-        if ($this->isColumnModified(OrderTableMap::TRANSACTION)) $criteria->add(OrderTableMap::TRANSACTION, $this->transaction);
-        if ($this->isColumnModified(OrderTableMap::DELIVERY_NUM)) $criteria->add(OrderTableMap::DELIVERY_NUM, $this->delivery_num);
-        if ($this->isColumnModified(OrderTableMap::INVOICE)) $criteria->add(OrderTableMap::INVOICE, $this->invoice);
+        if ($this->isColumnModified(OrderTableMap::TRANSACTION_REF)) $criteria->add(OrderTableMap::TRANSACTION_REF, $this->transaction_ref);
+        if ($this->isColumnModified(OrderTableMap::DELIVERY_REF)) $criteria->add(OrderTableMap::DELIVERY_REF, $this->delivery_ref);
+        if ($this->isColumnModified(OrderTableMap::INVOICE_REF)) $criteria->add(OrderTableMap::INVOICE_REF, $this->invoice_ref);
         if ($this->isColumnModified(OrderTableMap::POSTAGE)) $criteria->add(OrderTableMap::POSTAGE, $this->postage);
-        if ($this->isColumnModified(OrderTableMap::PAYMENT)) $criteria->add(OrderTableMap::PAYMENT, $this->payment);
-        if ($this->isColumnModified(OrderTableMap::CARRIER)) $criteria->add(OrderTableMap::CARRIER, $this->carrier);
+        if ($this->isColumnModified(OrderTableMap::PAYMENT_MODULE_ID)) $criteria->add(OrderTableMap::PAYMENT_MODULE_ID, $this->payment_module_id);
+        if ($this->isColumnModified(OrderTableMap::DELIVERY_MODULE_ID)) $criteria->add(OrderTableMap::DELIVERY_MODULE_ID, $this->delivery_module_id);
         if ($this->isColumnModified(OrderTableMap::STATUS_ID)) $criteria->add(OrderTableMap::STATUS_ID, $this->status_id);
-        if ($this->isColumnModified(OrderTableMap::LANG)) $criteria->add(OrderTableMap::LANG, $this->lang);
+        if ($this->isColumnModified(OrderTableMap::LANG_ID)) $criteria->add(OrderTableMap::LANG_ID, $this->lang_id);
         if ($this->isColumnModified(OrderTableMap::CREATED_AT)) $criteria->add(OrderTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(OrderTableMap::UPDATED_AT)) $criteria->add(OrderTableMap::UPDATED_AT, $this->updated_at);
 
@@ -2069,19 +2142,19 @@ abstract class Order implements ActiveRecordInterface
     {
         $copyObj->setRef($this->getRef());
         $copyObj->setCustomerId($this->getCustomerId());
-        $copyObj->setAddressInvoice($this->getAddressInvoice());
-        $copyObj->setAddressDelivery($this->getAddressDelivery());
+        $copyObj->setInvoiceOrderAddressId($this->getInvoiceOrderAddressId());
+        $copyObj->setDeliveryOrderAddressId($this->getDeliveryOrderAddressId());
         $copyObj->setInvoiceDate($this->getInvoiceDate());
         $copyObj->setCurrencyId($this->getCurrencyId());
         $copyObj->setCurrencyRate($this->getCurrencyRate());
-        $copyObj->setTransaction($this->getTransaction());
-        $copyObj->setDeliveryNum($this->getDeliveryNum());
-        $copyObj->setInvoice($this->getInvoice());
+        $copyObj->setTransactionRef($this->getTransactionRef());
+        $copyObj->setDeliveryRef($this->getDeliveryRef());
+        $copyObj->setInvoiceRef($this->getInvoiceRef());
         $copyObj->setPostage($this->getPostage());
-        $copyObj->setPayment($this->getPayment());
-        $copyObj->setCarrier($this->getCarrier());
+        $copyObj->setPaymentModuleId($this->getPaymentModuleId());
+        $copyObj->setDeliveryModuleId($this->getDeliveryModuleId());
         $copyObj->setStatusId($this->getStatusId());
-        $copyObj->setLang($this->getLang());
+        $copyObj->setLangId($this->getLangId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -2241,20 +2314,20 @@ abstract class Order implements ActiveRecordInterface
      * @return                 \Thelia\Model\Order The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setOrderAddressRelatedByAddressInvoice(ChildOrderAddress $v = null)
+    public function setOrderAddressRelatedByInvoiceOrderAddressId(ChildOrderAddress $v = null)
     {
         if ($v === null) {
-            $this->setAddressInvoice(NULL);
+            $this->setInvoiceOrderAddressId(NULL);
         } else {
-            $this->setAddressInvoice($v->getId());
+            $this->setInvoiceOrderAddressId($v->getId());
         }
 
-        $this->aOrderAddressRelatedByAddressInvoice = $v;
+        $this->aOrderAddressRelatedByInvoiceOrderAddressId = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildOrderAddress object, it will not be re-added.
         if ($v !== null) {
-            $v->addOrderRelatedByAddressInvoice($this);
+            $v->addOrderRelatedByInvoiceOrderAddressId($this);
         }
 
 
@@ -2269,20 +2342,20 @@ abstract class Order implements ActiveRecordInterface
      * @return                 ChildOrderAddress The associated ChildOrderAddress object.
      * @throws PropelException
      */
-    public function getOrderAddressRelatedByAddressInvoice(ConnectionInterface $con = null)
+    public function getOrderAddressRelatedByInvoiceOrderAddressId(ConnectionInterface $con = null)
     {
-        if ($this->aOrderAddressRelatedByAddressInvoice === null && ($this->address_invoice !== null)) {
-            $this->aOrderAddressRelatedByAddressInvoice = ChildOrderAddressQuery::create()->findPk($this->address_invoice, $con);
+        if ($this->aOrderAddressRelatedByInvoiceOrderAddressId === null && ($this->invoice_order_address_id !== null)) {
+            $this->aOrderAddressRelatedByInvoiceOrderAddressId = ChildOrderAddressQuery::create()->findPk($this->invoice_order_address_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aOrderAddressRelatedByAddressInvoice->addOrdersRelatedByAddressInvoice($this);
+                $this->aOrderAddressRelatedByInvoiceOrderAddressId->addOrdersRelatedByInvoiceOrderAddressId($this);
              */
         }
 
-        return $this->aOrderAddressRelatedByAddressInvoice;
+        return $this->aOrderAddressRelatedByInvoiceOrderAddressId;
     }
 
     /**
@@ -2292,20 +2365,20 @@ abstract class Order implements ActiveRecordInterface
      * @return                 \Thelia\Model\Order The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setOrderAddressRelatedByAddressDelivery(ChildOrderAddress $v = null)
+    public function setOrderAddressRelatedByDeliveryOrderAddressId(ChildOrderAddress $v = null)
     {
         if ($v === null) {
-            $this->setAddressDelivery(NULL);
+            $this->setDeliveryOrderAddressId(NULL);
         } else {
-            $this->setAddressDelivery($v->getId());
+            $this->setDeliveryOrderAddressId($v->getId());
         }
 
-        $this->aOrderAddressRelatedByAddressDelivery = $v;
+        $this->aOrderAddressRelatedByDeliveryOrderAddressId = $v;
 
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildOrderAddress object, it will not be re-added.
         if ($v !== null) {
-            $v->addOrderRelatedByAddressDelivery($this);
+            $v->addOrderRelatedByDeliveryOrderAddressId($this);
         }
 
 
@@ -2320,20 +2393,20 @@ abstract class Order implements ActiveRecordInterface
      * @return                 ChildOrderAddress The associated ChildOrderAddress object.
      * @throws PropelException
      */
-    public function getOrderAddressRelatedByAddressDelivery(ConnectionInterface $con = null)
+    public function getOrderAddressRelatedByDeliveryOrderAddressId(ConnectionInterface $con = null)
     {
-        if ($this->aOrderAddressRelatedByAddressDelivery === null && ($this->address_delivery !== null)) {
-            $this->aOrderAddressRelatedByAddressDelivery = ChildOrderAddressQuery::create()->findPk($this->address_delivery, $con);
+        if ($this->aOrderAddressRelatedByDeliveryOrderAddressId === null && ($this->delivery_order_address_id !== null)) {
+            $this->aOrderAddressRelatedByDeliveryOrderAddressId = ChildOrderAddressQuery::create()->findPk($this->delivery_order_address_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aOrderAddressRelatedByAddressDelivery->addOrdersRelatedByAddressDelivery($this);
+                $this->aOrderAddressRelatedByDeliveryOrderAddressId->addOrdersRelatedByDeliveryOrderAddressId($this);
              */
         }
 
-        return $this->aOrderAddressRelatedByAddressDelivery;
+        return $this->aOrderAddressRelatedByDeliveryOrderAddressId;
     }
 
     /**
@@ -2385,6 +2458,159 @@ abstract class Order implements ActiveRecordInterface
         }
 
         return $this->aOrderStatus;
+    }
+
+    /**
+     * Declares an association between this object and a ChildModule object.
+     *
+     * @param                  ChildModule $v
+     * @return                 \Thelia\Model\Order The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setModuleRelatedByPaymentModuleId(ChildModule $v = null)
+    {
+        if ($v === null) {
+            $this->setPaymentModuleId(NULL);
+        } else {
+            $this->setPaymentModuleId($v->getId());
+        }
+
+        $this->aModuleRelatedByPaymentModuleId = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildModule object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrderRelatedByPaymentModuleId($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildModule object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildModule The associated ChildModule object.
+     * @throws PropelException
+     */
+    public function getModuleRelatedByPaymentModuleId(ConnectionInterface $con = null)
+    {
+        if ($this->aModuleRelatedByPaymentModuleId === null && ($this->payment_module_id !== null)) {
+            $this->aModuleRelatedByPaymentModuleId = ChildModuleQuery::create()->findPk($this->payment_module_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aModuleRelatedByPaymentModuleId->addOrdersRelatedByPaymentModuleId($this);
+             */
+        }
+
+        return $this->aModuleRelatedByPaymentModuleId;
+    }
+
+    /**
+     * Declares an association between this object and a ChildModule object.
+     *
+     * @param                  ChildModule $v
+     * @return                 \Thelia\Model\Order The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setModuleRelatedByDeliveryModuleId(ChildModule $v = null)
+    {
+        if ($v === null) {
+            $this->setDeliveryModuleId(NULL);
+        } else {
+            $this->setDeliveryModuleId($v->getId());
+        }
+
+        $this->aModuleRelatedByDeliveryModuleId = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildModule object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrderRelatedByDeliveryModuleId($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildModule object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildModule The associated ChildModule object.
+     * @throws PropelException
+     */
+    public function getModuleRelatedByDeliveryModuleId(ConnectionInterface $con = null)
+    {
+        if ($this->aModuleRelatedByDeliveryModuleId === null && ($this->delivery_module_id !== null)) {
+            $this->aModuleRelatedByDeliveryModuleId = ChildModuleQuery::create()->findPk($this->delivery_module_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aModuleRelatedByDeliveryModuleId->addOrdersRelatedByDeliveryModuleId($this);
+             */
+        }
+
+        return $this->aModuleRelatedByDeliveryModuleId;
+    }
+
+    /**
+     * Declares an association between this object and a ChildLang object.
+     *
+     * @param                  ChildLang $v
+     * @return                 \Thelia\Model\Order The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setLang(ChildLang $v = null)
+    {
+        if ($v === null) {
+            $this->setLangId(NULL);
+        } else {
+            $this->setLangId($v->getId());
+        }
+
+        $this->aLang = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildLang object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrder($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildLang object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildLang The associated ChildLang object.
+     * @throws PropelException
+     */
+    public function getLang(ConnectionInterface $con = null)
+    {
+        if ($this->aLang === null && ($this->lang_id !== null)) {
+            $this->aLang = ChildLangQuery::create()->findPk($this->lang_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aLang->addOrders($this);
+             */
+        }
+
+        return $this->aLang;
     }
 
 
@@ -2850,19 +3076,19 @@ abstract class Order implements ActiveRecordInterface
         $this->id = null;
         $this->ref = null;
         $this->customer_id = null;
-        $this->address_invoice = null;
-        $this->address_delivery = null;
+        $this->invoice_order_address_id = null;
+        $this->delivery_order_address_id = null;
         $this->invoice_date = null;
         $this->currency_id = null;
         $this->currency_rate = null;
-        $this->transaction = null;
-        $this->delivery_num = null;
-        $this->invoice = null;
+        $this->transaction_ref = null;
+        $this->delivery_ref = null;
+        $this->invoice_ref = null;
         $this->postage = null;
-        $this->payment = null;
-        $this->carrier = null;
+        $this->payment_module_id = null;
+        $this->delivery_module_id = null;
         $this->status_id = null;
-        $this->lang = null;
+        $this->lang_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -2906,9 +3132,12 @@ abstract class Order implements ActiveRecordInterface
         $this->collCouponOrders = null;
         $this->aCurrency = null;
         $this->aCustomer = null;
-        $this->aOrderAddressRelatedByAddressInvoice = null;
-        $this->aOrderAddressRelatedByAddressDelivery = null;
+        $this->aOrderAddressRelatedByInvoiceOrderAddressId = null;
+        $this->aOrderAddressRelatedByDeliveryOrderAddressId = null;
         $this->aOrderStatus = null;
+        $this->aModuleRelatedByPaymentModuleId = null;
+        $this->aModuleRelatedByDeliveryModuleId = null;
+        $this->aLang = null;
     }
 
     /**

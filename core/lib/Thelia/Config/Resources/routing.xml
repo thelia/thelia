@@ -56,17 +56,6 @@
             <tag name="router.register" priority="0"/>
         </service>
 
-        <service id="router.install" class="%router.class%">
-            <argument type="service" id="router.xmlLoader"/>
-            <argument>install.xml</argument>
-            <argument type="collection">
-                <argument key="cache_dir">%kernel.cache_dir%</argument>
-                <argument key="debug">%kernel.debug%</argument>
-            </argument>
-            <argument type="service" id="request.context"/>
-            <tag name="router.register" priority="-1"/>
-        </service>
-
         <service id="router.front" class="%router.class%">
             <argument type="service" id="router.xmlLoader"/>
             <argument>front.xml</argument>
