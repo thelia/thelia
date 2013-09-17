@@ -632,54 +632,73 @@ DROP TABLE IF EXISTS `order`;
 CREATE TABLE `order`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `ref` VARCHAR(45),
+    `ref` VARCHAR(45) NOT NULL,
     `customer_id` INTEGER NOT NULL,
-    `address_invoice` INTEGER,
-    `address_delivery` INTEGER,
-    `invoice_date` DATE,
-    `currency_id` INTEGER,
+    `invoice_order_address_id` INTEGER NOT NULL,
+    `delivery_order_address_id` INTEGER NOT NULL,
+    `invoice_date` DATE NOT NULL,
+    `currency_id` INTEGER NOT NULL,
     `currency_rate` FLOAT NOT NULL,
-    `transaction` VARCHAR(100),
-    `delivery_num` VARCHAR(100),
-    `invoice` VARCHAR(100),
-    `postage` FLOAT,
-    `payment` VARCHAR(45) NOT NULL,
-    `carrier` VARCHAR(45) NOT NULL,
-    `status_id` INTEGER,
-    `lang` VARCHAR(10) NOT NULL,
+    `transaction_ref` VARCHAR(100) COMMENT 'transaction reference - usually use to identify a transaction with banking modules',
+    `delivery_ref` VARCHAR(100) COMMENT 'delivery reference - usually use to identify a delivery progress on a distant delivery tracker website',
+    `invoice_ref` VARCHAR(100) COMMENT 'the invoice reference',
+    `postage` FLOAT NOT NULL,
+    `payment_module_id` INTEGER NOT NULL,
+    `delivery_module_id` INTEGER NOT NULL,
+    `status_id` INTEGER NOT NULL,
+    `lang_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_order_currency_id` (`currency_id`),
     INDEX `idx_order_customer_id` (`customer_id`),
-    INDEX `idx_order_address_invoice` (`address_invoice`),
-    INDEX `idx_order_address_delivery` (`address_delivery`),
+    INDEX `idx_order_invoice_order_address_id` (`invoice_order_address_id`),
+    INDEX `idx_order_delivery_order_address_id` (`delivery_order_address_id`),
     INDEX `idx_order_status_id` (`status_id`),
+    INDEX `fk_order_payment_module_id` (`payment_module_id`),
+    INDEX `fk_order_delivery_module_id` (`delivery_module_id`),
+    INDEX `fk_order_lang_id` (`lang_id`),
     CONSTRAINT `fk_order_currency_id`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL,
+        ON DELETE RESTRICT,
     CONSTRAINT `fk_order_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_order_address_invoice`
-        FOREIGN KEY (`address_invoice`)
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_invoice_order_address_id`
+        FOREIGN KEY (`invoice_order_address_id`)
         REFERENCES `order_address` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL,
-    CONSTRAINT `fk_order_address_delivery`
-        FOREIGN KEY (`address_delivery`)
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_delivery_order_address_id`
+        FOREIGN KEY (`delivery_order_address_id`)
         REFERENCES `order_address` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL,
+        ON DELETE RESTRICT,
     CONSTRAINT `fk_order_status_id`
         FOREIGN KEY (`status_id`)
         REFERENCES `order_status` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_payment_module_id`
+        FOREIGN KEY (`payment_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_lang_id`
+        FOREIGN KEY (`lang_id`)
+        REFERENCES `lang` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

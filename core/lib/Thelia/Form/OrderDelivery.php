@@ -41,6 +41,7 @@ class OrderDelivery extends BaseForm
     {
         $this->formBuilder
             ->add("delivery-address", "integer", array(
+                "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array(
@@ -51,6 +52,7 @@ class OrderDelivery extends BaseForm
                 )
             ))
             ->add("delivery-module", "integer", array(
+                "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array(

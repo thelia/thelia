@@ -4,7 +4,10 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\Order as BaseOrder;
 
-class Order extends BaseOrder {
+class Order extends BaseOrder
+{
+    public $chosenDeliveryAddress = null;
+    public $chosenInvoiceModule = null;
 
     /**
      * calculate the total amount

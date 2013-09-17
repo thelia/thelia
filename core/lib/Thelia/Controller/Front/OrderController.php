@@ -27,8 +27,15 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Form\OrderDelivery;
+use Thelia\Log\Tlog;
 use Thelia\Model\Order;
 
+/**
+ * Class OrderController
+ * @package Thelia\Controller\Front
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ */
 class OrderController extends BaseFrontController
 {
     /**
@@ -38,19 +45,43 @@ class OrderController extends BaseFrontController
      */
     public function deliver()
     {
-        $orderEvent = $this->getOrderEvent();
-        //$orderEvent->setBillingAddress($this->getRequest()->get("billing-address"));
-        $orderEvent->setDeliveryAddress($this->getRequest()->get("delivery-address"));
-        $orderEvent->setDeliveryModule($this->getRequest()->get("delivery-module"));
+        $message = false;
+
+        $orderDelivery = new OrderDelivery($this->getRequest());
+
+        $x = $this->getRequest();
+        $y = $_POST;
 
         try {
-            //$this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_BILLING_ADDRESS, $orderEvent);
+            $form = $this->validateForm($orderDelivery, "post");
+
+            $orderEvent = $this->getOrderEvent();
+            $orderEvent->setDeliveryAddress($form->get("delivery-address")->getData());
+            $orderEvent->setDeliveryModule($form->get("delivery-module")->getData());
+
+
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
 
-            $this->redirectSuccess();
+            $this->redirectToRoute("order.billing");
+
+        } catch (FormValidationException $e) {
+            $message = sprintf("Please check your input: %s", $e->getMessage());
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
+        } catch (\Exception $e) {
+            $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+        }
+
+        if ($message !== false) {
+            Tlog::getInstance()->error(sprintf("Error during customer creation process : %s. Exception was %s", $message, $e->getMessage()));
+
+            $orderDelivery->setErrorMessage($message);
+
+            $this->getParserContext()
+                ->addForm($orderDelivery)
+                ->setGeneralError($message)
+            ;
         }
 
     }

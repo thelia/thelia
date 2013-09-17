@@ -112,13 +112,18 @@
         <default key="_view">cart</default>
     </route>
 
-    <route id="cart.billing" path="/order/billing">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">cart_billing</default>
+    <route id="order.delivery" path="/order/delivery" methods="post">
+        <default key="_controller">Thelia\Controller\Front\OrderController::deliver</default>
+        <default key="_view">cart_delivery</default>
     </route>
 
-    <route id="cart.update.quantity" path="/order/deliver">
-        <default key="_controller">Thelia\Controller\Front\OrderController::deliver</default>
+    <route id="order.delivery.process" path="/order/delivery">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">cart_delivery</default>
+    </route>
+
+    <route id="order.billing" path="/order/billing">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">cart_billing</default>
     </route>
 

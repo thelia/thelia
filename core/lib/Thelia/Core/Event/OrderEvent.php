@@ -40,31 +40,39 @@ class OrderEvent extends ActionEvent
      */
     public function __construct(Order $order)
     {
+        $this->setOrder($order);
+    }
+
+    /**
+     * @param Order $order
+     */
+    public function setOrder(Order $order)
+    {
         $this->order = $order;
     }
 
     /**
-     * @param Address $address
+     * @param $address
      */
-    public function setBillingAddress(Address $address)
+    public function setBillingAddress($address)
     {
-        $this->deliveryAddress = $address->getId();
+        $this->deliveryAddress = $address;
     }
 
     /**
-     * @param Address $address
+     * @param $address
      */
-    public function setDeliveryAddress(Address $address)
+    public function setDeliveryAddress($address)
     {
-        $this->deliveryAddress = $address->getId();
+        $this->deliveryAddress = $address;
     }
 
     /**
-     * @param Module $module
+     * @param $module
      */
-    public function setDeliveryModule(Module $module)
+    public function setDeliveryModule($module)
     {
-        $this->deliveryModule = $module->getId();
+        $this->deliveryModule = $module;
     }
 
     /**
@@ -80,7 +88,7 @@ class OrderEvent extends ActionEvent
      */
     public function getBillingAddress()
     {
-        return AddressQuery::create()->findPk($this->billingAddress);
+        return $this->billingAddress;
     }
 
     /**
@@ -88,7 +96,7 @@ class OrderEvent extends ActionEvent
      */
     public function getDeliveryAddress()
     {
-        return AddressQuery::create()->findPk($this->deliveryAddress);
+        return $this->deliveryAddress;
     }
 
     /**
@@ -96,6 +104,6 @@ class OrderEvent extends ActionEvent
      */
     public function getDeliveryModule()
     {
-        return AddressQuery::create()->findPk($this->deliveryModule);
+        return $this->deliveryModule;
     }
 }

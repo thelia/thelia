@@ -217,6 +217,7 @@ class LangTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'lang_id', ), 'RESTRICT', 'RESTRICT', 'Orders');
     } // buildRelations()
 
     /**
