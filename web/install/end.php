@@ -20,65 +20,38 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+$step=6;
+include "header.php";
 
-namespace Colissimo;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Model\Country;
-use Thelia\Module\BaseModule;
-use Thelia\Module\DeliveryModuleInterface;
-
-class Colissimo extends BaseModule implements DeliveryModuleInterface
-{
-    protected $request;
-    protected $dispatcher;
-
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
-    }
-
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
-    /**
-     *
-     * calculate and return delivery price
-     *
-     * @param Country $country
-     * @return mixed
-     */
-    public function calculate(Country $country)
-    {
-        // TODO: Implement calculate() method.
-        return 2;
-    }
-
-    /**
-     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
-     * Like install and destroy
-     */
-    public function install()
-    {
-        // TODO: Implement install() method.
-    }
-
-    public function destroy()
-    {
-        // TODO: Implement destroy() method.
-    }
-
+if($_SESSION['install']['step'] != $step && (empty($_POST['admin_login']) || empty($_POST['admin_password']) || ($_POST['admin_password'] != $_POST['admin_password_verif']))) {
+    header('location: config.php?err=1');
 }
+
+if($_SESSION['install']['step'] == 5) {
+    $admin = new \Thelia\Model\Admin();
+    $admin->setLogin($_POST['admin_login'])
+        ->setPassword($_POST['admin_password'])
+        ->setFirstname('admin')
+        ->setLastname('admin')
+        ->save();
+
+    $config = new \Thelia\Model\Config();
+    $config->setName('contact_email')
+        ->setValue($_POST['email_contact'])
+        ->save();
+    ;
+}
+
+$_SESSION['install']['step'] = $step;
+?>
+
+    <div class="well">
+        <p class="lead text-center">
+            Thank you have installed Thelia
+        </p>
+        <p class="lead text-center">
+            Don't forget to delete the web/install directory.
+        </p>
+
+    </div>
+<?php include "footer.php"; ?>
