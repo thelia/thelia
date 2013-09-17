@@ -7,7 +7,7 @@ use Thelia\Model\Base\Order as BaseOrder;
 class Order extends BaseOrder
 {
     public $chosenDeliveryAddress = null;
-    public $chosenInvoiceModule = null;
+    public $chosenInvoiceAddress = null;
 
     /**
      * calculate the total amount

@@ -122,6 +122,11 @@
         <default key="_view">order_delivery</default>
     </route>
 
+    <route id="order.invoice.process" path="/order/invoice" methods="post">
+        <default key="_controller">Thelia\Controller\Front\OrderController::pay</default>
+        <default key="_view">order_invoice</default>
+    </route>
+
     <route id="order.invoice" path="/order/invoice">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">order_invoice</default>

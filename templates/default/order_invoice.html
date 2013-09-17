@@ -25,12 +25,19 @@
 
             <div class="btn-group checkout-progress">
                 <a href="{url path="/cart"}" role="button" class="btn btn-step"><span class="step-nb">1</span> <span class="step-label"> <span>Your Cart</span></a>
-                <a href="{url path="/cart/delivery"}" role="button" class="btn btn-step"><span class="step-nb">2</span> <span class="step-label">Billing and delivery</span></a>
+                <a href="{url path="/order/delivery"}" role="button" class="btn btn-step"><span class="step-nb">2</span> <span class="step-label">Billing and delivery</span></a>
                 <a href="#" role="button" class="btn btn-step active"><span class="step-nb">3</span> <span class="step-label">Check my order</span></a>
                 <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">Secure payment</span></a>
             </div>
 
-            <form id="form-cart" action="cart-step4.php" method="post" role="form">
+            {form name="thelia.order.payment"}
+
+            <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" role="form" {form_enctype form=$form}>
+
+                {form_hidden_fields form=$form}
+
+                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
                 <table class="table table-cart">
                     <colgroup>
                         <col width="150">
@@ -123,7 +130,7 @@
                         <th class="shipping">Shipping Tax</th>
                         <td class="shipping">
                             <div class="shipping-price">
-                                <span class="price">{order attr="postage"}</span>
+                                <span class="price">{currency attr="symbol"} {order attr="postage"}</span>
                             </div>
                         </td>
                     </tr>
@@ -151,32 +158,105 @@
 
                 <div id="cart-address">
                     <div class="panel">
+                        {loop type="address" name="delivery-address" id="{order attr="delivery_address"}"}
                         <div class="panel-heading">Delivery address</div>
                         <div class="panel-body">
-                            <span class="fn">M. DUPONT Jean</span>
-                            <span class="org">Agency XY</span>
+                            <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
+                            <span class="org">{$COMPANY}</span>
                             <address class="adr">
-                                <span class="street-address">street name of my business</span><br>
-                                <span class="postal-code">75000</span>
-                                <span class="locality">City, <span class="country-name">Country</span></span>
+                                <span class="street-address">{$ADDRESS1}</span><br>
+                                {if $ADDRESS2 != ""}
+                                    <span class="street-address">{$ADDRESS2}</span><br>
+                                {/if}
+                                {if $ADDRESS3 != ""}
+                                    <span class="street-address">{$ADDRESS3}</span><br>
+                                {/if}
+                                <span class="postal-code">{$ZIPCODE}</span>
+                                <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
                             </address>
                         </div>
+                        {/loop}
                     </div>
+
+                    {form_field form=$form field='invoice-address'}
+
                     <div class="panel">
                         <div class="panel-heading">Billing address</div>
+
+                        {if $error}
+                            <span class="help-block"><span class="icon-remove"></span> {$message}</span>
+                        {/if}
+
                         <div class="panel-body">
-                            <span class="fn">M. DUPONT Jean</span>
-                            <span class="org">Agency XY</span>
-                            <address class="adr">
-                                <span class="street-address">street name of my business</span><br>
-                                <span class="postal-code">75000</span>
-                                <span class="locality">City, <span class="country-name">Country</span></span>
-                            </address>
-                            <a href="address.php" class="btn btn-change-address">Change address</a>
+
+                            <table class="col-md-12">
+
+                        {loop type="address" name="invoice-address" default="{if !$error && $value}*{else}true{/if}" id="{if !$error && $value}{$value}{else}*{/if}"}
+
+                            <tr>
+                                <td>
+                                    <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
+                                    <span class="org">{$COMPANY}</span>
+                                    <address class="adr">
+                                        <span class="street-address">{$ADDRESS1}</span><br>
+                                        {if $ADDRESS2 != ""}
+                                            <span class="street-address">{$ADDRESS2}</span><br>
+                                        {/if}
+                                        {if $ADDRESS3 != ""}
+                                            <span class="street-address">{$ADDRESS3}</span><br>
+                                        {/if}
+                                        <span class="postal-code">{$ZIPCODE}</span>
+                                        <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                    </address>
+                                </td>
+                                <td>
+                                    <input class="js-invoice-address-selector {if !$error}hidden{/if}" type="radio" name="{$name}" value="{$ID}" {if $value == $ID OR !$error}checked="checked"{/if}>
+                                </td>
+                            </tr>
+
+                            {if !$error}
+                            <tr class="js-change-invoice-address">
+                                <td colspan="2">
+                                    <a href="#" class="btn btn-change-address">Change address</a>
+                                </td>
+                            </tr>
+                            {/if}
+
+                        {/loop}
+
+                        {loop type="address" name="invoice-address" default="{if !$error && $value}*{else}false{/if}" exclude="{if !$error && $value}{$value}{else}none{/if}"}
+
+                            <tr class="js-other-invoice-address {if !$error}hidden{/if}">
+                                <td>
+                                    <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
+                                    <span class="org">{$COMPANY}</span>
+                                    <address class="adr">
+                                        <span class="street-address">{$ADDRESS1}</span><br>
+                                        {if $ADDRESS2 != ""}
+                                            <span class="street-address">{$ADDRESS2}</span><br>
+                                        {/if}
+                                        {if $ADDRESS3 != ""}
+                                            <span class="street-address">{$ADDRESS3}</span><br>
+                                        {/if}
+                                        <span class="postal-code">{$ZIPCODE}</span>
+                                        <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                    </address>
+                                </td>
+                                <td>
+                                    <input class="js-invoice-address-selector {if !$error}hidden{/if}" type="radio" name="{$name}" value="{$ID}" {if $value == $ID}checked="checked"{/if}>
+                                </td>
+                            </tr>
+
+                        {/loop}
+
+                            </table>
+
                         </div>
+
                     </div>
                 </div>
 
+                {/form_field}
 
                 <div id="payment-method" class="panel">
                     <div class="panel-heading">Choose your payment method</div>
@@ -195,9 +275,11 @@
                     </div>
                 </div>
 
-                <a href="cart-step2.php" role="button" class="btn btn-back"><span>Back</span></a>
-                <button type="submit" class="btn btn-checkout-next"><span>Next Step</span></button>
+                <a href="{url path="/order/delivery"}" role="button" class="btn btn-back"><span>Back</span></a>
+                <button type="submit" class="btn btn-checkout-next"><span>TO REMOVE</span></button>
             </form>
+
+            {/form}
 
 
         </article>
@@ -209,8 +291,16 @@
 
 {block name="javascript-initialization"}
 <script type="text/javascript">
-jQuery(function($cart) {
+jQuery(function($order) {
+    $order('.js-change-invoice-address').on('click', 'a', function(e) {
+        e.preventDefault();
 
+        $order('.js-other-invoice-address').removeClass('hidden');
+        $order('.js-invoice-address-selector').removeClass('hidden');
+
+        $order('#js-invoice-address-default-selector').unbind().remove();
+        $order('.js-change-invoice-address').unbind().remove();
+    });
 });
 </script>
 {/block}

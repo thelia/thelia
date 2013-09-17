@@ -29,7 +29,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ModuleQuery;
 
 /**
- * Class Delivery
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
@@ -92,6 +91,8 @@ class BaseSpecificModule extends BaseI18nLoop
     public function exec(&$pagination)
     {
         $search = ModuleQuery::create();
+
+        $search->filterByActivate(1);
 
         if (null !== $id = $this->getId()) {
             $search->filterById($id);
