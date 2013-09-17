@@ -21,12 +21,12 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-$step = 4;
+$step = 5;
 include("header.php");
 global $thelia;
 $err = isset($_GET['err']) && $_GET['err'];
 
-if (!$err) {
+if (!$err && $_SESSION['install']['step'] != $step) {
     $checkConnection = new \Thelia\Install\CheckDatabaseConnection($_SESSION['install']['host'], $_SESSION['install']['username'], $_SESSION['install']['password'], $_SESSION['install']['port']);
     $connection = $checkConnection->getConnection();
     $connection->exec("SET NAMES UTF8");
@@ -39,10 +39,6 @@ if (!$err) {
     if (isset($_POST['database_create']) && $_POST['database_create'] != "") {
         $_SESSION['install']['database'] = $_POST['database_create'];
         $database->createDatabase($_SESSION['install']['database']);
-    }
-
-    if (!$connection->exec(sprintf('use %s', $_SESSION['install']['database']))) {
-        header('location: bdd.php?err=1');
     }
 
     $database->insertSql($_SESSION['install']['database']);
@@ -75,6 +71,8 @@ if (!$err) {
     }
 }
 
+$_SESSION['install']['step'] = $step;
+
 ?>
 <form action="end.php" method="POST" >
     <div class="well">
@@ -98,13 +96,15 @@ if (!$err) {
             <label for="site_name">Site name :</label>
             <input id="site_name" class="form-control" type="text" name="site_name" placeholder="" value="" required>
         </div>
-        <div class="form-group">
-            <label for="site_name">Site name :</label>
-            <input id="site_name" class="form-control" type="text" name="site_name" placeholder="" value="" required>
+        <div class="clearfix">
+            <div class="control-btn">
+                <button type="submit" class="pull-right btn btn-default btn-primary">Continue</button>
+            </div>
+
         </div>
-
-
     </div>
 
 </form>
+
+<?php include('footer.php'); ?>
 

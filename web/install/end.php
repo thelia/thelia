@@ -20,22 +20,38 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+$step=6;
+include "header.php";
+
+if($_SESSION['install']['step'] != $step && (empty($_POST['admin_login']) || empty($_POST['admin_password']) || ($_POST['admin_password'] != $_POST['admin_password_verif']))) {
+    header('location: config.php?err=1');
+}
+
+if($_SESSION['install']['step'] == 5) {
+    $admin = new \Thelia\Model\Admin();
+    $admin->setLogin($_POST['admin_login'])
+        ->setPassword($_POST['admin_password'])
+        ->setFirstname('admin')
+        ->setLastname('admin')
+        ->save();
+
+    $config = new \Thelia\Model\Config();
+    $config->setName('contact_email')
+        ->setValue($_POST['email_contact'])
+        ->save();
+    ;
+}
+
+$_SESSION['install']['step'] = $step;
 ?>
-</div>
-</div>
-</div>
-</div>
-</div>
-<hr />
-<footer class="footer">
-    <div class="container">
-        <p>&copy; Thelia 2013
-            - <a href="http://www.openstudio.fr/" target="_blank">Édité par OpenStudio</a>
-            - <a href="http://forum.thelia.net/" target="_blank">Forum Thelia</a>
-            - <a href="http://contrib.thelia.net/" target="_blank">Contributions Thelia</a>
+
+    <div class="well">
+        <p class="lead text-center">
+            Thank you have installed Thelia
         </p>
+        <p class="lead text-center">
+            Don't forget to delete the web/install directory.
+        </p>
+
     </div>
-</footer>
-<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
-</body>
-</html>
+<?php include "footer.php"; ?>

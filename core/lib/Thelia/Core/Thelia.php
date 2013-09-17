@@ -69,29 +69,22 @@ class Thelia extends Kernel
 
     protected function initPropel()
     {
-        if (defined('THELIA_INSTALL_MODE') === true) {
-            $serviceContainer = Propel::getServiceContainer();
-            $serviceContainer->setAdapterClass('thelia', 'sqlite');
-            $manager = new ConnectionManagerSingle();
-            $manager->setConfiguration(array(
-                "classname" => "\Propel\Runtime\Connection\PropelPDO",
-                "dsn" => "sqlite:".THELIA_ROOT . "/install/thelia.sqlite"
-            ));
-            $serviceContainer->setConnectionManager('thelia', $manager);
-        } else {
-            $definePropel = new DefinePropel(new DatabaseConfiguration(),
-                Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
-            $serviceContainer = Propel::getServiceContainer();
-            $serviceContainer->setAdapterClass('thelia', 'mysql');
-            $manager = new ConnectionManagerSingle();
-            $manager->setConfiguration($definePropel->getConfig());
-            $serviceContainer->setConnectionManager('thelia', $manager);
-            $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
-            $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
-            if ($this->isDebug()) {
-                $serviceContainer->setLogger('defaultLogger', \Thelia\Log\Tlog::getInstance());
-                $con->useDebug(true);
-            }
+        if (file_exists(THELIA_ROOT . '/local/config/database.yml') === false) {
+            return ;
+        }
+
+        $definePropel = new DefinePropel(new DatabaseConfiguration(),
+            Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
+        $serviceContainer = Propel::getServiceContainer();
+        $serviceContainer->setAdapterClass('thelia', 'mysql');
+        $manager = new ConnectionManagerSingle();
+        $manager->setConfiguration($definePropel->getConfig());
+        $serviceContainer->setConnectionManager('thelia', $manager);
+        $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
+        $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
+        if ($this->isDebug()) {
+            $serviceContainer->setLogger('defaultLogger', \Thelia\Log\Tlog::getInstance());
+            $con->useDebug(true);
         }
 
 
