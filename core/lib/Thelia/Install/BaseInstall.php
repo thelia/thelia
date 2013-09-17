@@ -25,19 +25,33 @@ use Thelia\Install\Exception\AlreadyInstallException;
 
 /**
  * Class BaseInstall
+ *
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 abstract class BaseInstall
 {
+    /** @var bool If Installation wizard is launched by CLI */
+    protected $isConsoleMode = true;
+
     /**
-     * Verify if an installation already exists
+     * Constructor
+     *
+     * @param bool $verifyInstall Verify if an installation already exists
+     *
+     * @throws Exception\AlreadyInstallException
      */
     public function __construct($verifyInstall = true)
     {
-        /* TODO : activate this part
+
+        // Check if install wizard is launched via CLI
+        if (php_sapi_name() == 'cli') {
+            $this->isConsoleMode = true;
+        } else {
+            $this->isConsoleMode = false;
+        }
         if (file_exists(THELIA_ROOT . '/local/config/database.yml') && $verifyInstall) {
             throw new AlreadyInstallException("Thelia is already installed");
-        }*/
+        }
 
 
         $this->exec();

@@ -20,40 +20,22 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-
-namespace Thelia\Controller\Install;
-use Symfony\Component\HttpFoundation\Response;
-use Thelia\Controller\BaseController;
-
-/**
- * Class BaseInstallController
- * @package Thelia\Controller\Install
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class BaseInstallController extends BaseController
-{
-    /**
-     * @return a ParserInterface instance parser
-     */
-    protected function getParser()
-    {
-        $parser = $this->container->get("thelia.parser");
-
-        // Define the template that shoud be used
-        $parser->setTemplate("install");
-
-        return $parser;
-    }
-
-    public function render($templateName, $args = array())
-    {
-        return new Response($this->renderRaw($templateName, $args));
-    }
-
-    public function renderRaw($templateName, $args = array())
-    {
-        $data = $this->getParser()->render($templateName, $args);
-
-        return $data;
-    }
-}
+?>
+</div>
+</div>
+</div>
+</div>
+</div>
+<hr />
+<footer class="footer">
+    <div class="container">
+        <p>&copy; Thelia 2013
+            - <a href="http://www.openstudio.fr/" target="_blank">Édité par OpenStudio</a>
+            - <a href="http://forum.thelia.net/" target="_blank">Forum Thelia</a>
+            - <a href="http://contrib.thelia.net/" target="_blank">Contributions Thelia</a>
+        </p>
+    </div>
+</footer>
+<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+</body>
+</html>

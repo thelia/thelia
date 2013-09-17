@@ -40,6 +40,8 @@
     </loops>
 
     <forms>
+        <form name="thelia.install.step3" class="Thelia\Form\InstallStep3Form"/>
+
         <form name="thelia.customer.creation" class="Thelia\Form\CustomerCreation"/>
         <form name="thelia.customer.modification" class="Thelia\Form\CustomerModification"/>
         <form name="thelia.customer.lostpassword" class="Thelia\Form\CustomerLostPasswordForm"/>
@@ -52,6 +54,9 @@
 
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
         <form name="thelia.admin.category.modification" class="Thelia\Form\CategoryModificationForm"/>
+
+        <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
+        <form name="thelia.admin.product.modification" class="Thelia\Form\ProductModificationForm"/>
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
         <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
