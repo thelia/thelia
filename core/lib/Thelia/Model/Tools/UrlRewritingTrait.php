@@ -55,17 +55,13 @@ trait UrlRewritingTrait {
     public function generateRewrittenUrl($locale)
     {
         if ($this->isNew()) {
-            throw new \RuntimeException(sprintf('Object %s must be save before generating url', $this->getRewrittenUrlViewName()));
+            throw new \RuntimeException(sprintf('Object %s must be saved before generating url', $this->getRewrittenUrlViewName()));
         }
         // Borrowed from http://stackoverflow.com/questions/2668854/sanitizing-strings-to-make-them-url-and-filename-safe
 
         $this->setLocale($locale);
 
-        $title = $this->getTitle();
-
-        if (null === $title) {
-            throw new \RuntimeException(sprintf('Impossible to generate url if title does not exists for the locale %s', $locale));
-        }
+        $title = $this->getTitle() ?: $this->getRef();
         // Replace all weird characters with dashes
         $string = preg_replace('/[^\w\-~_\.]+/u', '-', $title);
 
@@ -88,7 +84,6 @@ trait UrlRewritingTrait {
                 ->setView($this->getRewrittenUrlViewName())
                 ->setViewId($this->getId())
                 ->setViewLocale($locale)
-                ->setRedirected(0)
                 ->save()
             ;
         }
