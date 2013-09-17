@@ -24,6 +24,7 @@
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
         <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
+        <loop class="Thelia\Core\Template\Loop\Payment" name="payment"/>
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
         <loop class="Thelia\Core\Template\Loop\ProductSaleElements" name="product_sale_elements"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
@@ -37,6 +38,7 @@
         <loop class="Thelia\Core\Template\Loop\Message" name="message"/>
         <loop class="Thelia\Core\Template\Loop\Delivery" name="delivery"/>
         <loop class="Thelia\Core\Template\Loop\Template" name="template"/> <!--  This is product templates ;-) -->
+        <loop class="Thelia\Core\Template\Loop\TaxRule" name="tax-rule"/>
     </loops>
 
     <forms>
@@ -64,6 +66,7 @@
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
 
         <form name="thelia.order.delivery" class="Thelia\Form\OrderDelivery"/>
+        <form name="thelia.order.payment" class="Thelia\Form\OrderPayment"/>
 
         <form name="thelia.admin.config.creation" class="Thelia\Form\ConfigCreationForm"/>
         <form name="thelia.admin.config.modification" class="Thelia\Form\ConfigModificationForm"/>

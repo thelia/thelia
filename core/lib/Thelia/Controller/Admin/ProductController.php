@@ -250,7 +250,7 @@ class ProductController extends AbstractCrudController
         // Redirect to parent product list
         $this->redirectToRoute(
                 'admin.products.default',
-                array('category_id' => $deleteEvent->getProduct()->getDefaultCategoryId())
+                array('category_id' => $this->getCategoryId())
         );
     }
 
@@ -261,7 +261,7 @@ class ProductController extends AbstractCrudController
             // Redirect to parent product list
             $this->redirectToRoute(
                     'admin.categories.default',
-                    array('category_id' => $updateEvent->getProduct()->getDefaultCategoryId())
+                    array('category_id' => $this->getCategoryId())
             );
         }
     }
@@ -271,7 +271,7 @@ class ProductController extends AbstractCrudController
         // Redirect to parent product list
         $this->redirectToRoute(
                 'admin.categories.default',
-                array('category_id' => $positionEvent->getProduct()->getDefaultCategoryId())
+                array('category_id' => $this->getCategoryId())
         );
     }
 

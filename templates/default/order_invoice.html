@@ -1,5 +1,11 @@
 {extends file="layout.tpl"}
 
+{block name="no-return-functions"}
+    {check_auth context="front" roles="CUSTOMER" login_tpl="login"}
+    {check_cart_not_empty}
+    {check_valid_delivery}
+{/block}
+
 {block name="breadcrumb"}
     <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
         <strong id="breadcrumb-label">You are here: </strong>
@@ -18,13 +24,20 @@
             <h1 id="main-label" class="page-header">Your Cart</h1>
 
             <div class="btn-group checkout-progress">
-                <a href="cart.php" role="button" class="btn btn-step"><span class="step-nb">1</span> <span class="step-label"> <span>Your Cart</span></a>
-                <a href="cart-step2.php" role="button" class="btn btn-step"><span class="step-nb">2</span> <span class="step-label">Billing and delivery</span></a>
-                <a href="cart-step3.php" role="button" class="btn btn-step active"><span class="step-nb">3</span> <span class="step-label">Check my order</span></a>
-                <a href="cart-step4.php" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">Secure payment</span></a>
+                <a href="{url path="/cart"}" role="button" class="btn btn-step"><span class="step-nb">1</span> <span class="step-label"> <span>Your Cart</span></a>
+                <a href="{url path="/order/delivery"}" role="button" class="btn btn-step"><span class="step-nb">2</span> <span class="step-label">Billing and delivery</span></a>
+                <a href="#" role="button" class="btn btn-step active"><span class="step-nb">3</span> <span class="step-label">Check my order</span></a>
+                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">Secure payment</span></a>
             </div>
 
-            <form id="form-cart" action="cart-step4.php" method="post" role="form">
+            {form name="thelia.order.payment"}
+
+            <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" role="form" {form_enctype form=$form}>
+
+                {form_hidden_fields form=$form}
+
+                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
                 <table class="table table-cart">
                     <colgroup>
                         <col width="150">
@@ -42,6 +55,10 @@
                         <th class="unitprice">
                             <span class="hidden-xs">Unit Price</span>
                             <span class="visible-xs">Price</span>
+                        </th>
+                        <th class="qty">
+                            <span class="hidden-xs">Quantity</span>
+                            <span class="visible-xs">Quantity</span>
                         </th>
                         <th class="subprice">
                             <span class="hidden-xs">Total <abbr title="Tax Inclusive">TTC</abbr></span>
@@ -96,6 +113,9 @@
                                 <div class="special-price"><span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></div>
                             {/if}
                         </td>
+                        <td class="qty">
+                            <span class="price">{$QUANTITY}</span>
+                        </td>
                         <td class="subprice">
                             <span class="price">{currency attr="symbol"} {$real_price * $QUANTITY}</span>
                         </td>
@@ -106,11 +126,11 @@
                     </tbody>
                     <tfoot>
                     <tr >
-                        <td rowspan="3" colspan="2" class="empty">&nbsp;</td>
+                        <td rowspan="3" colspan="3" class="empty">&nbsp;</td>
                         <th class="shipping">Shipping Tax</th>
                         <td class="shipping">
                             <div class="shipping-price">
-                                <span class="price">{order attr="postage"}</span>
+                                <span class="price">{currency attr="symbol"} {order attr="postage"}</span>
                             </div>
                         </td>
                     </tr>
@@ -129,7 +149,7 @@
                         <th class="total">Total <abbr title="Tax Inclusive">TTC</abbr></th>
                         <td class="total">
                             <div class="total-price">
-                                <span class="price">$200.00</span>
+                                <span class="price">{currency attr="symbol"} {{cart attr="total_taxed_price"} + {order attr="postage"}}</span>
                             </div>
                         </td>
                     </tr>
@@ -138,38 +158,115 @@
 
                 <div id="cart-address">
                     <div class="panel">
+                        {loop type="address" name="delivery-address" id="{order attr="delivery_address"}"}
                         <div class="panel-heading">Delivery address</div>
                         <div class="panel-body">
-                            <span class="fn">M. DUPONT Jean</span>
-                            <span class="org">Agency XY</span>
+                            <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
+                            <span class="org">{$COMPANY}</span>
                             <address class="adr">
-                                <span class="street-address">street name of my business</span><br>
-                                <span class="postal-code">75000</span>
-                                <span class="locality">City, <span class="country-name">Country</span></span>
+                                <span class="street-address">{$ADDRESS1}</span><br>
+                                {if $ADDRESS2 != ""}
+                                    <span class="street-address">{$ADDRESS2}</span><br>
+                                {/if}
+                                {if $ADDRESS3 != ""}
+                                    <span class="street-address">{$ADDRESS3}</span><br>
+                                {/if}
+                                <span class="postal-code">{$ZIPCODE}</span>
+                                <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
                             </address>
                         </div>
+                        {/loop}
                     </div>
+
+                    {form_field form=$form field='invoice-address'}
+
                     <div class="panel">
                         <div class="panel-heading">Billing address</div>
+
+                        {if $error}
+                            <span class="help-block"><span class="icon-remove"></span> {$message}</span>
+                        {/if}
+
                         <div class="panel-body">
-                            <span class="fn">M. DUPONT Jean</span>
-                            <span class="org">Agency XY</span>
-                            <address class="adr">
-                                <span class="street-address">street name of my business</span><br>
-                                <span class="postal-code">75000</span>
-                                <span class="locality">City, <span class="country-name">Country</span></span>
-                            </address>
-                            <a href="address.php" class="btn btn-change-address">Change address</a>
+
+                            <table class="col-md-12">
+
+                        {loop type="address" name="invoice-address" default="{if !$error && $value}*{else}true{/if}" id="{if !$error && $value}{$value}{else}*{/if}"}
+
+                            <tr>
+                                <td>
+                                    <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
+                                    <span class="org">{$COMPANY}</span>
+                                    <address class="adr">
+                                        <span class="street-address">{$ADDRESS1}</span><br>
+                                        {if $ADDRESS2 != ""}
+                                            <span class="street-address">{$ADDRESS2}</span><br>
+                                        {/if}
+                                        {if $ADDRESS3 != ""}
+                                            <span class="street-address">{$ADDRESS3}</span><br>
+                                        {/if}
+                                        <span class="postal-code">{$ZIPCODE}</span>
+                                        <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                    </address>
+                                </td>
+                                <td>
+                                    <input class="js-invoice-address-selector {if !$error}hidden{/if}" type="radio" name="{$name}" value="{$ID}" {if $value == $ID OR !$error}checked="checked"{/if}>
+                                </td>
+                            </tr>
+
+                            {if !$error}
+                            <tr class="js-change-invoice-address">
+                                <td colspan="2">
+                                    <a href="#" class="btn btn-change-address">Change address</a>
+                                </td>
+                            </tr>
+                            {/if}
+
+                        {/loop}
+
+                        {loop type="address" name="invoice-address" default="{if !$error && $value}*{else}false{/if}" exclude="{if !$error && $value}{$value}{else}none{/if}"}
+
+                            <tr class="js-other-invoice-address {if !$error}hidden{/if}">
+                                <td>
+                                    <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
+                                    <span class="org">{$COMPANY}</span>
+                                    <address class="adr">
+                                        <span class="street-address">{$ADDRESS1}</span><br>
+                                        {if $ADDRESS2 != ""}
+                                            <span class="street-address">{$ADDRESS2}</span><br>
+                                        {/if}
+                                        {if $ADDRESS3 != ""}
+                                            <span class="street-address">{$ADDRESS3}</span><br>
+                                        {/if}
+                                        <span class="postal-code">{$ZIPCODE}</span>
+                                        <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                    </address>
+                                </td>
+                                <td>
+                                    <input class="js-invoice-address-selector {if !$error}hidden{/if}" type="radio" name="{$name}" value="{$ID}" {if $value == $ID}checked="checked"{/if}>
+                                </td>
+                            </tr>
+
+                        {/loop}
+
+                            </table>
+
                         </div>
+
                     </div>
                 </div>
 
+                {/form_field}
+
+                {form_field form=$form field='payment-module'}
 
                 <div id="payment-method" class="panel">
                     <div class="panel-heading">Choose your payment method</div>
                     <div class="panel-body">
                         <ul class="list-payment">
-                            <?php foreach ($payment as $key => $value) { ?>
+
+                            {loop type="payment" name="payments" force_return="true"}
+
                             <li>
                                 <div class="radio">
                                     <label for="payment_<?php echo $key; ?>">
@@ -178,13 +275,19 @@
                                     </label>
                                 </div>
                             </li>
-                            <?php } ?>
+
+                            {/loop}
+
                     </div>
                 </div>
 
-                <a href="cart-step2.php" role="button" class="btn btn-back"><span>Back</span></a>
-                <button type="submit" class="btn btn-checkout-next"><span>Next Step</span></button>
+                {/form_field}
+
+                <a href="{url path="/order/delivery"}" role="button" class="btn btn-back"><span>Back</span></a>
+                <button type="submit" class="btn btn-checkout-next"><span>TO REMOVE</span></button>
             </form>
+
+            {/form}
 
 
         </article>
@@ -196,8 +299,16 @@
 
 {block name="javascript-initialization"}
 <script type="text/javascript">
-jQuery(function($cart) {
+jQuery(function($order) {
+    $order('.js-change-invoice-address').on('click', 'a', function(e) {
+        e.preventDefault();
 
+        $order('.js-other-invoice-address').removeClass('hidden');
+        $order('.js-invoice-address-selector').removeClass('hidden');
+
+        $order('#js-invoice-address-default-selector').unbind().remove();
+        $order('.js-change-invoice-address').unbind().remove();
+    });
 });
 </script>
 {/block}

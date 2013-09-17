@@ -31,18 +31,22 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\CountryQuery;
+use Thelia\Model\Base\CategoryQuery;
+use Thelia\Model\Base\ProductCategoryQuery;
+use Thelia\Model\Base\TaxRuleQuery;
+use Thelia\Type\TypeCollection;
+use Thelia\Type;
 
 /**
  *
- * Country loop
+ * TaxRule loop
  *
  *
- * Class Country
+ * Class TaxRule
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Country extends BaseI18nLoop
+class TaxRule extends BaseI18nLoop
 {
     public $timestampable = true;
 
@@ -53,9 +57,13 @@ class Country extends BaseI18nLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('area'),
-            Argument::createBooleanTypeArgument('with_area'),
-            Argument::createIntListTypeArgument('exclude')
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse'))
+                ),
+                'alpha'
+            )
         );
     }
 
@@ -66,10 +74,10 @@ class Country extends BaseI18nLoop
      */
     public function exec(&$pagination)
     {
-        $search = CountryQuery::create();
+        $search = TaxRuleQuery::create();
 
         /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $locale = $this->configureI18nProcessing($search, 'TITLE', 'DESCRIPTION');
 
         $id = $this->getId();
 
@@ -77,45 +85,48 @@ class Country extends BaseI18nLoop
             $search->filterById($id, Criteria::IN);
         }
 
-        $area = $this->getArea();
-
-        if (null !== $area) {
-            $search->filterByAreaId($area, Criteria::IN);
-        }
-
-        $withArea = $this->getWith_area();
-
-        if (true === $withArea) {
-            $search->filterByAreaId(null, Criteria::ISNOTNULL);
-        } elseif (false === $withArea) {
-            $search->filterByAreaId(null, Criteria::ISNULL);
-        }
-
         $exclude = $this->getExclude();
 
-        if (!is_null($exclude)) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $search->addAscendingOrderByColumn('i18n_TITLE');
+        $orders  = $this->getOrder();
+
+        foreach ($orders as $order) {
+            switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
+                case "alpha":
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
+                    break;
+            }
+        }
 
         /* perform search */
-        $countries = $this->search($search, $pagination);
+        $tax_rules = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult($countries);
+        $loopResult = new LoopResult($tax_rules);
 
-        foreach ($countries as $country) {
-            $loopResultRow = new LoopResultRow($loopResult, $country, $this->versionable, $this->timestampable, $this->countable);
-            $loopResultRow->set("ID", $country->getId())
-                ->set("IS_TRANSLATED",$country->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
-                ->set("TITLE",$country->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $country->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $country->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $country->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("ISOCODE", $country->getIsocode())
-                ->set("ISOALPHA2", $country->getIsoalpha2())
-                ->set("ISOALPHA3", $country->getIsoalpha3());
+        foreach ($tax_rules as $tax_rule) {
+
+            $loopResultRow = new LoopResultRow($loopResult, $tax_rule, $this->versionable, $this->timestampable, $this->countable);
+
+            $loopResultRow
+                ->set("ID"            , $tax_rule->getId())
+                ->set("IS_TRANSLATED" , $tax_rule->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE"        , $locale)
+                ->set("TITLE"         , $tax_rule->getVirtualColumn('i18n_TITLE'))
+                ->set("DESCRIPTION"   , $tax_rule->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("IS_DEFAULT"    , $tax_rule->getIsDefault() ? '1' : '0')
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

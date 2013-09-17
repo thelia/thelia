@@ -65,4 +65,14 @@ class BaseFrontController extends BaseController
             $this->redirectToRoute("cart.view");
         }
     }
+
+    protected function checkValidDelivery()
+    {
+        $order = $this->getSession()->getOrder();
+        if(null === $order || null === $order->chosenDeliveryAddress || null === $order->getDeliveryModuleId()) {
+            $this->redirectToRoute("order.delivery");
+        }
+
+
+    }
 }

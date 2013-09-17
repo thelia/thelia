@@ -57,7 +57,7 @@ class TaxTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class TaxTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the ID field
@@ -83,11 +83,6 @@ class TaxTableMap extends TableMap
      * the column name for the SERIALIZED_REQUIREMENTS field
      */
     const SERIALIZED_REQUIREMENTS = 'tax.SERIALIZED_REQUIREMENTS';
-
-    /**
-     * the column name for the IS_DEFAULT field
-     */
-    const IS_DEFAULT = 'tax.IS_DEFAULT';
 
     /**
      * the column name for the CREATED_AT field
@@ -120,12 +115,12 @@ class TaxTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Type', 'SerializedRequirements', 'IsDefault', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'type', 'serializedRequirements', 'isDefault', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(TaxTableMap::ID, TaxTableMap::TYPE, TaxTableMap::SERIALIZED_REQUIREMENTS, TaxTableMap::IS_DEFAULT, TaxTableMap::CREATED_AT, TaxTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'TYPE', 'SERIALIZED_REQUIREMENTS', 'IS_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'type', 'serialized_requirements', 'is_default', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'Type', 'SerializedRequirements', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'type', 'serializedRequirements', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(TaxTableMap::ID, TaxTableMap::TYPE, TaxTableMap::SERIALIZED_REQUIREMENTS, TaxTableMap::CREATED_AT, TaxTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'TYPE', 'SERIALIZED_REQUIREMENTS', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'type', 'serialized_requirements', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -135,12 +130,12 @@ class TaxTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Type' => 1, 'SerializedRequirements' => 2, 'IsDefault' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'type' => 1, 'serializedRequirements' => 2, 'isDefault' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(TaxTableMap::ID => 0, TaxTableMap::TYPE => 1, TaxTableMap::SERIALIZED_REQUIREMENTS => 2, TaxTableMap::IS_DEFAULT => 3, TaxTableMap::CREATED_AT => 4, TaxTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TYPE' => 1, 'SERIALIZED_REQUIREMENTS' => 2, 'IS_DEFAULT' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'type' => 1, 'serialized_requirements' => 2, 'is_default' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Type' => 1, 'SerializedRequirements' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'type' => 1, 'serializedRequirements' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(TaxTableMap::ID => 0, TaxTableMap::TYPE => 1, TaxTableMap::SERIALIZED_REQUIREMENTS => 2, TaxTableMap::CREATED_AT => 3, TaxTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TYPE' => 1, 'SERIALIZED_REQUIREMENTS' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'type' => 1, 'serialized_requirements' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -162,7 +157,6 @@ class TaxTableMap extends TableMap
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('TYPE', 'Type', 'VARCHAR', true, 255, null);
         $this->addColumn('SERIALIZED_REQUIREMENTS', 'SerializedRequirements', 'LONGVARCHAR', true, null, null);
-        $this->addColumn('IS_DEFAULT', 'IsDefault', 'BOOLEAN', false, 1, false);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -341,14 +335,12 @@ class TaxTableMap extends TableMap
             $criteria->addSelectColumn(TaxTableMap::ID);
             $criteria->addSelectColumn(TaxTableMap::TYPE);
             $criteria->addSelectColumn(TaxTableMap::SERIALIZED_REQUIREMENTS);
-            $criteria->addSelectColumn(TaxTableMap::IS_DEFAULT);
             $criteria->addSelectColumn(TaxTableMap::CREATED_AT);
             $criteria->addSelectColumn(TaxTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.TYPE');
             $criteria->addSelectColumn($alias . '.SERIALIZED_REQUIREMENTS');
-            $criteria->addSelectColumn($alias . '.IS_DEFAULT');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

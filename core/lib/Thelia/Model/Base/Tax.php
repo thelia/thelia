@@ -78,13 +78,6 @@ abstract class Tax implements ActiveRecordInterface
     protected $serialized_requirements;
 
     /**
-     * The value for the is_default field.
-     * Note: this column has a database default value of: false
-     * @var        boolean
-     */
-    protected $is_default;
-
-    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -143,23 +136,10 @@ abstract class Tax implements ActiveRecordInterface
     protected $taxI18nsScheduledForDeletion = null;
 
     /**
-     * Applies default values to this object.
-     * This method should be called from the object's constructor (or
-     * equivalent initialization method).
-     * @see __construct()
-     */
-    public function applyDefaultValues()
-    {
-        $this->is_default = false;
-    }
-
-    /**
      * Initializes internal state of Thelia\Model\Base\Tax object.
-     * @see applyDefaults()
      */
     public function __construct()
     {
-        $this->applyDefaultValues();
     }
 
     /**
@@ -443,17 +423,6 @@ abstract class Tax implements ActiveRecordInterface
     }
 
     /**
-     * Get the [is_default] column value.
-     *
-     * @return   boolean
-     */
-    public function getIsDefault()
-    {
-
-        return $this->is_default;
-    }
-
-    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -557,35 +526,6 @@ abstract class Tax implements ActiveRecordInterface
     } // setSerializedRequirements()
 
     /**
-     * Sets the value of the [is_default] column.
-     * Non-boolean arguments are converted using the following rules:
-     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     *
-     * @param      boolean|integer|string $v The new value
-     * @return   \Thelia\Model\Tax The current object (for fluent API support)
-     */
-    public function setIsDefault($v)
-    {
-        if ($v !== null) {
-            if (is_string($v)) {
-                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-            } else {
-                $v = (boolean) $v;
-            }
-        }
-
-        if ($this->is_default !== $v) {
-            $this->is_default = $v;
-            $this->modifiedColumns[] = TaxTableMap::IS_DEFAULT;
-        }
-
-
-        return $this;
-    } // setIsDefault()
-
-    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -637,10 +577,6 @@ abstract class Tax implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->is_default !== false) {
-                return false;
-            }
-
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -677,16 +613,13 @@ abstract class Tax implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TaxTableMap::translateFieldName('SerializedRequirements', TableMap::TYPE_PHPNAME, $indexType)];
             $this->serialized_requirements = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TaxTableMap::translateFieldName('IsDefault', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->is_default = (null !== $col) ? (boolean) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TaxTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TaxTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : TaxTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TaxTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -699,7 +632,7 @@ abstract class Tax implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = TaxTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = TaxTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Tax object", 0, $e);
@@ -966,9 +899,6 @@ abstract class Tax implements ActiveRecordInterface
         if ($this->isColumnModified(TaxTableMap::SERIALIZED_REQUIREMENTS)) {
             $modifiedColumns[':p' . $index++]  = 'SERIALIZED_REQUIREMENTS';
         }
-        if ($this->isColumnModified(TaxTableMap::IS_DEFAULT)) {
-            $modifiedColumns[':p' . $index++]  = 'IS_DEFAULT';
-        }
         if ($this->isColumnModified(TaxTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -994,9 +924,6 @@ abstract class Tax implements ActiveRecordInterface
                         break;
                     case 'SERIALIZED_REQUIREMENTS':
                         $stmt->bindValue($identifier, $this->serialized_requirements, PDO::PARAM_STR);
-                        break;
-                    case 'IS_DEFAULT':
-                        $stmt->bindValue($identifier, (int) $this->is_default, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1076,12 +1003,9 @@ abstract class Tax implements ActiveRecordInterface
                 return $this->getSerializedRequirements();
                 break;
             case 3:
-                return $this->getIsDefault();
-                break;
-            case 4:
                 return $this->getCreatedAt();
                 break;
-            case 5:
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1116,9 +1040,8 @@ abstract class Tax implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getType(),
             $keys[2] => $this->getSerializedRequirements(),
-            $keys[3] => $this->getIsDefault(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1177,12 +1100,9 @@ abstract class Tax implements ActiveRecordInterface
                 $this->setSerializedRequirements($value);
                 break;
             case 3:
-                $this->setIsDefault($value);
-                break;
-            case 4:
                 $this->setCreatedAt($value);
                 break;
-            case 5:
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1212,9 +1132,8 @@ abstract class Tax implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setType($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setSerializedRequirements($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setIsDefault($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1229,7 +1148,6 @@ abstract class Tax implements ActiveRecordInterface
         if ($this->isColumnModified(TaxTableMap::ID)) $criteria->add(TaxTableMap::ID, $this->id);
         if ($this->isColumnModified(TaxTableMap::TYPE)) $criteria->add(TaxTableMap::TYPE, $this->type);
         if ($this->isColumnModified(TaxTableMap::SERIALIZED_REQUIREMENTS)) $criteria->add(TaxTableMap::SERIALIZED_REQUIREMENTS, $this->serialized_requirements);
-        if ($this->isColumnModified(TaxTableMap::IS_DEFAULT)) $criteria->add(TaxTableMap::IS_DEFAULT, $this->is_default);
         if ($this->isColumnModified(TaxTableMap::CREATED_AT)) $criteria->add(TaxTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(TaxTableMap::UPDATED_AT)) $criteria->add(TaxTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1297,7 +1215,6 @@ abstract class Tax implements ActiveRecordInterface
     {
         $copyObj->setType($this->getType());
         $copyObj->setSerializedRequirements($this->getSerializedRequirements());
-        $copyObj->setIsDefault($this->getIsDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1871,12 +1788,10 @@ abstract class Tax implements ActiveRecordInterface
         $this->id = null;
         $this->type = null;
         $this->serialized_requirements = null;
-        $this->is_default = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
-        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

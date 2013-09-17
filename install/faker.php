@@ -281,7 +281,7 @@ try {
         $folder = new Thelia\Model\Folder();
         $folder->setParent(0);
         $folder->setVisible(1);
-        $folder->setPosition($i);
+        $folder->setPosition($i+1);
         setI18n($faker, $folder);
 
         $folder->save();
@@ -294,11 +294,11 @@ try {
         $document->setFolderId($folder->getId());
         generate_document($document, 1, 'folder', $folder->getId());
 
-        for($j=1; $j<rand(0, 5); $j++) {
+        for($j=0; $j<3; $j++) {
             $subfolder = new Thelia\Model\Folder();
             $subfolder->setParent($folder->getId());
             $subfolder->setVisible(1);
-            $subfolder->setPosition($j);
+            $subfolder->setPosition($j+1);
             setI18n($faker, $subfolder);
 
             $subfolder->save();
@@ -311,7 +311,7 @@ try {
             $document->setFolderId($folder->getId());
             generate_document($document, 1, 'folder', $subfolder->getId());
 
-            for($k=0; $k<rand(0, 5); $k++) {
+            for($k=0; $k<4; $k++) {
                 $content = new Thelia\Model\Content();
                 $content->addFolder($subfolder);
 
@@ -320,8 +320,8 @@ try {
                 $collection->prepend($contentFolders[0]->setDefaultFolder(1));
                 $content->setContentFolders($collection);
 
-                $content->setVisible(rand(1, 10)>7 ? 0 : 1);
-                $content->setPosition($k);
+                $content->setVisible(1);
+                $content->setPosition($k+1);
                 setI18n($faker, $content);
 
                 $content->save();

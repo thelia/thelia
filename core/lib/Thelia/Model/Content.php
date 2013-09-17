@@ -39,9 +39,4 @@ class Content extends BaseContent
 
         return true;
     }
-
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        //$this->generateRewrittenUrl($this->getLocale());
-    }
 }

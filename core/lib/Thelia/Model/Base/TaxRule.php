@@ -68,6 +68,13 @@ abstract class TaxRule implements ActiveRecordInterface
     protected $id;
 
     /**
+     * The value for the is_default field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $is_default;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -138,10 +145,23 @@ abstract class TaxRule implements ActiveRecordInterface
     protected $taxRuleI18nsScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->is_default = false;
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\TaxRule object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -403,6 +423,17 @@ abstract class TaxRule implements ActiveRecordInterface
     }
 
     /**
+     * Get the [is_default] column value.
+     *
+     * @return   boolean
+     */
+    public function getIsDefault()
+    {
+
+        return $this->is_default;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -464,6 +495,35 @@ abstract class TaxRule implements ActiveRecordInterface
     } // setId()
 
     /**
+     * Sets the value of the [is_default] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\TaxRule The current object (for fluent API support)
+     */
+    public function setIsDefault($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_default !== $v) {
+            $this->is_default = $v;
+            $this->modifiedColumns[] = TaxRuleTableMap::IS_DEFAULT;
+        }
+
+
+        return $this;
+    } // setIsDefault()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -515,6 +575,10 @@ abstract class TaxRule implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->is_default !== false) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -545,13 +609,16 @@ abstract class TaxRule implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : TaxRuleTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TaxRuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : TaxRuleTableMap::translateFieldName('IsDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_default = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TaxRuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : TaxRuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : TaxRuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -564,7 +631,7 @@ abstract class TaxRule implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 3; // 3 = TaxRuleTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = TaxRuleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\TaxRule object", 0, $e);
@@ -845,6 +912,9 @@ abstract class TaxRule implements ActiveRecordInterface
         if ($this->isColumnModified(TaxRuleTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
+        if ($this->isColumnModified(TaxRuleTableMap::IS_DEFAULT)) {
+            $modifiedColumns[':p' . $index++]  = 'IS_DEFAULT';
+        }
         if ($this->isColumnModified(TaxRuleTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -864,6 +934,9 @@ abstract class TaxRule implements ActiveRecordInterface
                 switch ($columnName) {
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
+                    case 'IS_DEFAULT':
+                        $stmt->bindValue($identifier, (int) $this->is_default, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -937,9 +1010,12 @@ abstract class TaxRule implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getCreatedAt();
+                return $this->getIsDefault();
                 break;
             case 2:
+                return $this->getCreatedAt();
+                break;
+            case 3:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -972,8 +1048,9 @@ abstract class TaxRule implements ActiveRecordInterface
         $keys = TaxRuleTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getCreatedAt(),
-            $keys[2] => $this->getUpdatedAt(),
+            $keys[1] => $this->getIsDefault(),
+            $keys[2] => $this->getCreatedAt(),
+            $keys[3] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1029,9 +1106,12 @@ abstract class TaxRule implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setCreatedAt($value);
+                $this->setIsDefault($value);
                 break;
             case 2:
+                $this->setCreatedAt($value);
+                break;
+            case 3:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1059,8 +1139,9 @@ abstract class TaxRule implements ActiveRecordInterface
         $keys = TaxRuleTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setCreatedAt($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setUpdatedAt($arr[$keys[2]]);
+        if (array_key_exists($keys[1], $arr)) $this->setIsDefault($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
     }
 
     /**
@@ -1073,6 +1154,7 @@ abstract class TaxRule implements ActiveRecordInterface
         $criteria = new Criteria(TaxRuleTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(TaxRuleTableMap::ID)) $criteria->add(TaxRuleTableMap::ID, $this->id);
+        if ($this->isColumnModified(TaxRuleTableMap::IS_DEFAULT)) $criteria->add(TaxRuleTableMap::IS_DEFAULT, $this->is_default);
         if ($this->isColumnModified(TaxRuleTableMap::CREATED_AT)) $criteria->add(TaxRuleTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(TaxRuleTableMap::UPDATED_AT)) $criteria->add(TaxRuleTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1138,6 +1220,7 @@ abstract class TaxRule implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setIsDefault($this->getIsDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1961,10 +2044,12 @@ abstract class TaxRule implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
+        $this->is_default = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

@@ -188,7 +188,16 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
     public function orderDataAccess($params, &$smarty)
     {
-        return $this->dataAccess("Order", $params, $this->request->getSession()->getOrder());
+        $order = $this->request->getSession()->getOrder();
+        $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
+        switch($attribute) {
+            case 'postage':
+                return $order->getPostage();
+            case 'delivery_address':
+                return $order->chosenDeliveryAddress;
+        }
+
+        throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", 'Order', $attribute));
      }
 
     /**
@@ -196,6 +205,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      *
      * @param $params
      * @param $smarty
+     *
+     * @return string
      */
     public function langDataAccess($params, $smarty)
     {
@@ -294,6 +305,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
+
         return array(
             new SmartyPluginDescriptor('function', 'admin', $this, 'adminDataAccess'),
             new SmartyPluginDescriptor('function', 'customer', $this, 'customerDataAccess'),

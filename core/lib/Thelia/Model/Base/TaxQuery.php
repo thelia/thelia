@@ -25,14 +25,12 @@ use Thelia\Model\Map\TaxTableMap;
  * @method     ChildTaxQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildTaxQuery orderByType($order = Criteria::ASC) Order by the type column
  * @method     ChildTaxQuery orderBySerializedRequirements($order = Criteria::ASC) Order by the serialized_requirements column
- * @method     ChildTaxQuery orderByIsDefault($order = Criteria::ASC) Order by the is_default column
  * @method     ChildTaxQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildTaxQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildTaxQuery groupById() Group by the id column
  * @method     ChildTaxQuery groupByType() Group by the type column
  * @method     ChildTaxQuery groupBySerializedRequirements() Group by the serialized_requirements column
- * @method     ChildTaxQuery groupByIsDefault() Group by the is_default column
  * @method     ChildTaxQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildTaxQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -54,14 +52,12 @@ use Thelia\Model\Map\TaxTableMap;
  * @method     ChildTax findOneById(int $id) Return the first ChildTax filtered by the id column
  * @method     ChildTax findOneByType(string $type) Return the first ChildTax filtered by the type column
  * @method     ChildTax findOneBySerializedRequirements(string $serialized_requirements) Return the first ChildTax filtered by the serialized_requirements column
- * @method     ChildTax findOneByIsDefault(boolean $is_default) Return the first ChildTax filtered by the is_default column
  * @method     ChildTax findOneByCreatedAt(string $created_at) Return the first ChildTax filtered by the created_at column
  * @method     ChildTax findOneByUpdatedAt(string $updated_at) Return the first ChildTax filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildTax objects filtered by the id column
  * @method     array findByType(string $type) Return ChildTax objects filtered by the type column
  * @method     array findBySerializedRequirements(string $serialized_requirements) Return ChildTax objects filtered by the serialized_requirements column
- * @method     array findByIsDefault(boolean $is_default) Return ChildTax objects filtered by the is_default column
  * @method     array findByCreatedAt(string $created_at) Return ChildTax objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildTax objects filtered by the updated_at column
  *
@@ -152,7 +148,7 @@ abstract class TaxQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, TYPE, SERIALIZED_REQUIREMENTS, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM tax WHERE ID = :p0';
+        $sql = 'SELECT ID, TYPE, SERIALIZED_REQUIREMENTS, CREATED_AT, UPDATED_AT FROM tax WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -338,33 +334,6 @@ abstract class TaxQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TaxTableMap::SERIALIZED_REQUIREMENTS, $serializedRequirements, $comparison);
-    }
-
-    /**
-     * Filter the query on the is_default column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByIsDefault(true); // WHERE is_default = true
-     * $query->filterByIsDefault('yes'); // WHERE is_default = true
-     * </code>
-     *
-     * @param     boolean|string $isDefault The value to use as filter.
-     *              Non-boolean arguments are converted using the following rules:
-     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildTaxQuery The current query, for fluid interface
-     */
-    public function filterByIsDefault($isDefault = null, $comparison = null)
-    {
-        if (is_string($isDefault)) {
-            $is_default = in_array(strtolower($isDefault), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-        }
-
-        return $this->addUsingAlias(TaxTableMap::IS_DEFAULT, $isDefault, $comparison);
     }
 
     /**

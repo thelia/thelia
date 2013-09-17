@@ -1128,18 +1128,18 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (268, 'es_ES', 'USA - Alabama', '', '', ''),
 (268, 'fr_FR', 'USA - Alabama', '', '', '');
 
-INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `is_default`, `created_at`, `updated_at`)
+INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `updated_at`)
   VALUES
-  (1, 'PricePercentTaxType', 'eyJwZXJjZW50IjoxOS42fQ==', 1, NOW(), NOW());
+  (1, 'PricePercentTaxType', 'eyJwZXJjZW50IjoxOS42fQ==', NOW(), NOW());
 
 INSERT INTO `tax_i18n` (`id`, `locale`, `title`)
   VALUES
   (1, 'fr_FR', 'TVA française à 19.6%'),
   (1, 'en_UK', 'french 19.6% tax');
 
-INSERT INTO  `tax_rule` (`id`, `created_at`, `updated_at`)
+INSERT INTO  `tax_rule` (`id`, `is_default`, `created_at`, `updated_at`)
   VALUES
-  (1, NOW(), NOW());
+  (1, 1, NOW(), NOW());
 
 INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`)
   VALUES

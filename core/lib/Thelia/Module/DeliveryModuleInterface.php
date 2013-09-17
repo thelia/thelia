@@ -34,5 +34,5 @@ interface DeliveryModuleInterface extends BaseModuleInterface
      *
      * @return mixed
      */
-    public function calculate(Country $country);
+    public function getPostage(Country $country);
 }

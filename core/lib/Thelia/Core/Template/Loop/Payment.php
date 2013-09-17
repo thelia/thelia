@@ -26,24 +26,19 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\CountryQuery;
 use Thelia\Module\BaseModule;
 
 /**
- * Class Delivery
+ * Class Payment
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Etienne Roudeix <eroudeix@gmail.com>
  */
-class Delivery extends BaseSpecificModule
+class Payment extends BaseSpecificModule
 {
 
     public function getArgDefinitions()
     {
         $collection = parent::getArgDefinitions();
-
-        $collection->addArgument(
-            Argument::createIntTypeArgument("country")
-        );
 
         return $collection;
     }
@@ -54,29 +49,19 @@ class Delivery extends BaseSpecificModule
         /* manage translations */
         $locale = $this->configureI18nProcessing($search);
 
-        $search->filterByType(BaseModule::DELIVERY_MODULE_TYPE, Criteria::EQUAL);
-
-        $countryId = $this->getCountry();
-        if(null !== $countryId) {
-            $country = CountryQuery::create()->findPk($countryId);
-            if(null === $country) {
-                throw new \InvalidArgumentException('Cannot found country id: `' . $countryId . '` in delivery loop');
-            }
-        } else {
-            $country = CountryQuery::create()->findOneByByDefault(1);
-        }
+        $search->filterByType(BaseModule::PAYMENT_MODULE_TYPE, Criteria::EQUAL);
 
         /* perform search */
-        $deliveryModules = $this->search($search, $pagination);
+        $paymentModules = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult($deliveryModules);
+        $loopResult = new LoopResult($paymentModules);
 
-        foreach ($deliveryModules as $deliveryModule) {
-            $loopResultRow = new LoopResultRow($loopResult, $deliveryModule, $this->versionable, $this->timestampable, $this->countable);
+        foreach ($paymentModules as $paymentModule) {
+            $loopResultRow = new LoopResultRow($loopResult, $paymentModule, $this->versionable, $this->timestampable, $this->countable);
 
-            $moduleReflection = new \ReflectionClass($deliveryModule->getFullNamespace());
-            if ($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
-                throw new \RuntimeException(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $deliveryModule->getCode()));
+            $moduleReflection = new \ReflectionClass($paymentModule->getFullNamespace());
+            if ($moduleReflection->isSubclassOf("Thelia\Module\PaymentModuleInterface") === false) {
+                throw new \RuntimeException(sprintf("payment module %s is not a Thelia\Module\PaymentModuleInterface", $paymentModule->getCode()));
             }
             $moduleInstance = $moduleReflection->newInstance();
 
@@ -84,12 +69,11 @@ class Delivery extends BaseSpecificModule
             $moduleInstance->setDispatcher($this->dispatcher);
 
             $loopResultRow
-                ->set('ID', $deliveryModule->getId())
-                ->set('TITLE', $deliveryModule->getVirtualColumn('i18n_TITLE'))
-                ->set('CHAPO', $deliveryModule->getVirtualColumn('i18n_CHAPO'))
-                ->set('DESCRIPTION', $deliveryModule->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set('POSTSCRIPTUM', $deliveryModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set('POSTAGE', $moduleInstance->getPostage($country))
+                ->set('ID', $paymentModule->getId())
+                ->set('TITLE', $paymentModule->getVirtualColumn('i18n_TITLE'))
+                ->set('CHAPO', $paymentModule->getVirtualColumn('i18n_CHAPO'))
+                ->set('DESCRIPTION', $paymentModule->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set('POSTSCRIPTUM', $paymentModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
             ;
 
             $loopResult->addRow($loopResultRow);

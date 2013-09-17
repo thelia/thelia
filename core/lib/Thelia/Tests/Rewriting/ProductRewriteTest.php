@@ -76,6 +76,7 @@ class ProductRewriteTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Object product must be saved before generating url
      */

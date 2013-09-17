@@ -79,7 +79,6 @@ class Category extends BaseCategory
      */
     public function postInsert(ConnectionInterface $con = null)
     {
-        //$this->generateRewrittenUrl($this->getLocale());
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECATEGORY, new CategoryEvent($this));
     }
 

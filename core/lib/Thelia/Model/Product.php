@@ -103,7 +103,7 @@ class Product extends BaseProduct
         try {
             // Create the product
             $this->save($con);
-echo "1";
+
             // Add the default category
             $pc = new ProductCategory();
 
@@ -116,19 +116,19 @@ echo "1";
 
             // Set the position
             $this->setPosition($this->getNextPosition())->save($con);
-            echo "2";
+
             // Create an empty product sale element
             $sale_elements = new ProductSaleElements();
 
             $sale_elements
                 ->setProduct($this)
-                ->setRef('')
+                ->setRef($this->getRef())
                 ->setPromo(0)
                 ->setNewness(0)
                 ->setWeight(0)
                 ->save($con)
             ;
-            echo "3";
+
             // Create an empty product price in the default currency
             $product_price = new ProductPrice();
 
@@ -136,22 +136,19 @@ echo "1";
                 ->setProductSaleElements($sale_elements)
                 ->setPromoPrice(0)
                 ->setPrice(0)
-                ->setCurrency(CurrencyQuery::create()->findByByDefault(true))
+                ->setCurrency(CurrencyQuery::create()->findOneByByDefault(true))
                 ->save($con)
             ;
-            echo "4";
+
             // Store all the stuff !
             $con->commit();
-echo "commited !!!: ".$this->getId();
-
 
             $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
         }
-        catch(PropelException $ex) {
+        catch(\Exception $ex) {
 
             $con->rollback();
-echo("error !");
-exit;
+
             throw $ex;
         }
     }
@@ -172,9 +169,7 @@ exit;
         if ($produits != null) $query->filterById($produits, Criteria::IN);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     public function preUpdate(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEPRODUCT, new ProductEvent($this));

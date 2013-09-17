@@ -41,6 +41,9 @@ use Thelia\Core\Event\ProductDeleteContentEvent;
 use Thelia\Model\ProductAssociatedContent;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductCategory;
+use Thelia\Model\TaxRule;
+use Thelia\Model\TaxRuleQuery;
+use Thelia\Model\TaxQuery;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
@@ -60,6 +63,9 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setTitle($event->getTitle())
             ->setLocale($event->getLocale())
             ->setVisible($event->getVisible())
+
+            // Set the default tax rule to this product
+            ->setTaxRule(TaxRuleQuery::create()->findOneByIsDefault(true))
 
             ->create($event->getDefaultCategory())
          ;
