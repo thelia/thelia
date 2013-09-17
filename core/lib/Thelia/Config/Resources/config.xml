@@ -54,6 +54,9 @@
         <form name="thelia.admin.category.modification" class="Thelia\Form\CategoryModificationForm"/>
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
+        <form name="thelia.admin.product.modification" class="Thelia\Form\ProductModificationForm"/>
+
+        <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
         <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
 
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
