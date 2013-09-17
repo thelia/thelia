@@ -987,10 +987,9 @@ abstract class Currency implements ActiveRecordInterface
 
             if ($this->ordersScheduledForDeletion !== null) {
                 if (!$this->ordersScheduledForDeletion->isEmpty()) {
-                    foreach ($this->ordersScheduledForDeletion as $order) {
-                        // need to save related object because we set the relation to null
-                        $order->save($con);
-                    }
+                    \Thelia\Model\OrderQuery::create()
+                        ->filterByPrimaryKeys($this->ordersScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
                     $this->ordersScheduledForDeletion = null;
                 }
             }
@@ -1758,7 +1757,7 @@ abstract class Currency implements ActiveRecordInterface
                 $this->ordersScheduledForDeletion = clone $this->collOrders;
                 $this->ordersScheduledForDeletion->clear();
             }
-            $this->ordersScheduledForDeletion[]= $order;
+            $this->ordersScheduledForDeletion[]= clone $order;
             $order->setCurrency(null);
         }
 
@@ -1807,10 +1806,10 @@ abstract class Currency implements ActiveRecordInterface
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
-    public function getOrdersJoinOrderAddressRelatedByAddressInvoice($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getOrdersJoinOrderAddressRelatedByInvoiceOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildOrderQuery::create(null, $criteria);
-        $query->joinWith('OrderAddressRelatedByAddressInvoice', $joinBehavior);
+        $query->joinWith('OrderAddressRelatedByInvoiceOrderAddressId', $joinBehavior);
 
         return $this->getOrders($query, $con);
     }
@@ -1832,10 +1831,10 @@ abstract class Currency implements ActiveRecordInterface
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
-    public function getOrdersJoinOrderAddressRelatedByAddressDelivery($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getOrdersJoinOrderAddressRelatedByDeliveryOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildOrderQuery::create(null, $criteria);
-        $query->joinWith('OrderAddressRelatedByAddressDelivery', $joinBehavior);
+        $query->joinWith('OrderAddressRelatedByDeliveryOrderAddressId', $joinBehavior);
 
         return $this->getOrders($query, $con);
     }
@@ -1861,6 +1860,81 @@ abstract class Currency implements ActiveRecordInterface
     {
         $query = ChildOrderQuery::create(null, $criteria);
         $query->joinWith('OrderStatus', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Currency is new, it will return
+     * an empty collection; or if this Currency has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Currency.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinModuleRelatedByPaymentModuleId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('ModuleRelatedByPaymentModuleId', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Currency is new, it will return
+     * an empty collection; or if this Currency has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Currency.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinModuleRelatedByDeliveryModuleId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('ModuleRelatedByDeliveryModuleId', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Currency is new, it will return
+     * an empty collection; or if this Currency has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Currency.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinLang($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Lang', $joinBehavior);
 
         return $this->getOrders($query, $con);
     }

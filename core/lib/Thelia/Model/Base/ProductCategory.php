@@ -71,6 +71,12 @@ abstract class ProductCategory implements ActiveRecordInterface
     protected $category_id;
 
     /**
+     * The value for the default_category field.
+     * @var        boolean
+     */
+    protected $default_category;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -377,6 +383,17 @@ abstract class ProductCategory implements ActiveRecordInterface
     }
 
     /**
+     * Get the [default_category] column value.
+     *
+     * @return   boolean
+     */
+    public function getDefaultCategory()
+    {
+
+        return $this->default_category;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -467,6 +484,35 @@ abstract class ProductCategory implements ActiveRecordInterface
     } // setCategoryId()
 
     /**
+     * Sets the value of the [default_category] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\ProductCategory The current object (for fluent API support)
+     */
+    public function setDefaultCategory($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->default_category !== $v) {
+            $this->default_category = $v;
+            $this->modifiedColumns[] = ProductCategoryTableMap::DEFAULT_CATEGORY;
+        }
+
+
+        return $this;
+    } // setDefaultCategory()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -551,13 +597,16 @@ abstract class ProductCategory implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductCategoryTableMap::translateFieldName('CategoryId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->category_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductCategoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductCategoryTableMap::translateFieldName('DefaultCategory', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->default_category = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductCategoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductCategoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductCategoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -570,7 +619,7 @@ abstract class ProductCategory implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = ProductCategoryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = ProductCategoryTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ProductCategory object", 0, $e);
@@ -819,6 +868,9 @@ abstract class ProductCategory implements ActiveRecordInterface
         if ($this->isColumnModified(ProductCategoryTableMap::CATEGORY_ID)) {
             $modifiedColumns[':p' . $index++]  = 'CATEGORY_ID';
         }
+        if ($this->isColumnModified(ProductCategoryTableMap::DEFAULT_CATEGORY)) {
+            $modifiedColumns[':p' . $index++]  = 'DEFAULT_CATEGORY';
+        }
         if ($this->isColumnModified(ProductCategoryTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -841,6 +893,9 @@ abstract class ProductCategory implements ActiveRecordInterface
                         break;
                     case 'CATEGORY_ID':
                         $stmt->bindValue($identifier, $this->category_id, PDO::PARAM_INT);
+                        break;
+                    case 'DEFAULT_CATEGORY':
+                        $stmt->bindValue($identifier, (int) $this->default_category, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -910,9 +965,12 @@ abstract class ProductCategory implements ActiveRecordInterface
                 return $this->getCategoryId();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getDefaultCategory();
                 break;
             case 3:
+                return $this->getCreatedAt();
+                break;
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -946,8 +1004,9 @@ abstract class ProductCategory implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getProductId(),
             $keys[1] => $this->getCategoryId(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[2] => $this->getDefaultCategory(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1003,9 +1062,12 @@ abstract class ProductCategory implements ActiveRecordInterface
                 $this->setCategoryId($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setDefaultCategory($value);
                 break;
             case 3:
+                $this->setCreatedAt($value);
+                break;
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1034,8 +1096,9 @@ abstract class ProductCategory implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setProductId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCategoryId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[2], $arr)) $this->setDefaultCategory($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1049,6 +1112,7 @@ abstract class ProductCategory implements ActiveRecordInterface
 
         if ($this->isColumnModified(ProductCategoryTableMap::PRODUCT_ID)) $criteria->add(ProductCategoryTableMap::PRODUCT_ID, $this->product_id);
         if ($this->isColumnModified(ProductCategoryTableMap::CATEGORY_ID)) $criteria->add(ProductCategoryTableMap::CATEGORY_ID, $this->category_id);
+        if ($this->isColumnModified(ProductCategoryTableMap::DEFAULT_CATEGORY)) $criteria->add(ProductCategoryTableMap::DEFAULT_CATEGORY, $this->default_category);
         if ($this->isColumnModified(ProductCategoryTableMap::CREATED_AT)) $criteria->add(ProductCategoryTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ProductCategoryTableMap::UPDATED_AT)) $criteria->add(ProductCategoryTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1123,6 +1187,7 @@ abstract class ProductCategory implements ActiveRecordInterface
     {
         $copyObj->setProductId($this->getProductId());
         $copyObj->setCategoryId($this->getCategoryId());
+        $copyObj->setDefaultCategory($this->getDefaultCategory());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1261,6 +1326,7 @@ abstract class ProductCategory implements ActiveRecordInterface
     {
         $this->product_id = null;
         $this->category_id = null;
+        $this->default_category = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
