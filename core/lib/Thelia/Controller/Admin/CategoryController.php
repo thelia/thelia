@@ -169,9 +169,14 @@ class CategoryController extends AbstractCrudController
     }
 
     protected function renderListTemplate($currentOrder) {
+
+        // Get product order
+        $product_order = $this->getListOrderFromSession('product', 'product_order', 'manual');
+
         return $this->render('categories',
                 array(
                     'category_order' => $currentOrder,
+                    'product_order' => $product_order,
                     'category_id' => $this->getRequest()->get('category_id', 0)
         ));
     }

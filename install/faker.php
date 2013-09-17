@@ -449,11 +449,14 @@ try {
         }
     }
 
-    echo "Generating coupns fixtures\n";
+    echo "Generating coupons fixtures\n";
 
     generateCouponFixtures($thelia);
 
     $con->commit();
+
+    echo "Successfully terminated.\n";
+
 } catch (Exception $e) {
     echo "error : ".$e->getMessage()."\n";
     $con->rollBack();

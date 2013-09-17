@@ -114,6 +114,50 @@
         <requirement key="_format">xml|json</requirement>
     </route>
 
+    <!--  Product Management -->
+
+    <route id="admin.products.default" path="/admin/products">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::defaultAction</default>
+    </route>
+
+    <route id="admin.products.create" path="/admin/products/create">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::createAction</default>
+    </route>
+
+    <route id="admin.products.update" path="/admin/products/update">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateAction</default>
+    </route>
+
+    <route id="admin.products.save" path="/admin/products/save">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.products.set-default" path="/admin/products/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::setToggleVisibilityAction</default>
+    </route>
+
+    <route id="admin.products.delete" path="/admin/products/delete">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::deleteAction</default>
+    </route>
+
+    <route id="admin.products.update-position" path="/admin/products/update-position">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updatePositionAction</default>
+    </route>
+
+    <route id="admin.products.related-content.add" path="/admin/products/related-content/add">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::addRelatedContentAction</default>
+    </route>
+
+    <route id="admin.products.related-content.delete" path="/admin/products/related-content/delete">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::deleteRelatedContentAction</default>
+    </route>
+
+    <route id="admin.product.available-related-content" path="/admin/product/{productId}/available-related-content/{folderId}.{_format}" methods="GET">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::getAvailableRelatedContentAction</default>
+        <requirement key="_format">xml|json</requirement>
+    </route>
+
+
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 
     <route id="admin.coupon.list" path="/admin/coupon/">
