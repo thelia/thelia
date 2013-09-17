@@ -56,6 +56,7 @@
   <table isCrossRef="true" name="product_category" namespace="Thelia\Model">
     <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="category_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="default_category" type="BOOLEAN" />
     <foreign-key foreignTable="product" name="fk_product_has_category_product1" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
@@ -67,6 +68,9 @@
     </index>
     <index name="idx_product_has_category_product1">
       <index-column name="product_id" />
+    </index>
+    <index name="idx_product_has_category_default">
+      <index-column name="default_category" />
     </index>
     <behavior name="timestampable" />
   </table>
@@ -548,13 +552,13 @@
     <unique name="ref_UNIQUE">
       <unique-column name="ref" />
     </unique>
-    <index name="fk_order_payment_module_id">
+    <index name="fk_order_payment_module_id_idx">
       <index-column name="payment_module_id" />
     </index>
-    <index name="fk_order_delivery_module_id">
+    <index name="fk_order_delivery_module_id_idx">
       <index-column name="delivery_module_id" />
     </index>
-    <index name="fk_order_lang_id">
+    <index name="fk_order_lang_id_idx">
       <index-column name="lang_id" />
     </index>
     <behavior name="timestampable" />
@@ -672,18 +676,24 @@
   <table name="area" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="name" required="true" size="100" type="VARCHAR" />
-    <column name="unit" type="FLOAT" />
+    <column name="postage" type="FLOAT" />
     <behavior name="timestampable" />
   </table>
-  <table name="delivzone" namespace="Thelia\Model">
+  <table name="area_delivery_module" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="area_id" type="INTEGER" />
-    <column name="delivery" required="true" size="45" type="VARCHAR" />
-    <foreign-key foreignTable="area" name="fk_delivzone_area_id" onDelete="SET NULL" onUpdate="RESTRICT">
+    <column name="area_id" required="true" type="INTEGER" />
+    <column name="delivery_module_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="area" name="fk_area_delivery_module_area_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="area_id" />
     </foreign-key>
-    <index name="idx_delivzone_area_id">
+    <foreign-key foreignTable="module" name="idx_area_delivery_module_delivery_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="delivery_module_id" />
+    </foreign-key>
+    <index name="idx_area_delivery_module_area_id">
       <index-column name="area_id" />
+    </index>
+    <index name="idx_area_delivery_module_delivery_module_id">
+      <index-column name="delivery_module_id" />
     </index>
     <behavior name="timestampable" />
   </table>
@@ -882,6 +892,7 @@
   <table isCrossRef="true" name="content_folder" namespace="Thelia\Model">
     <column name="content_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="folder_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="default_folder" type="BOOLEAN" />
     <foreign-key foreignTable="content" name="fk_content_folder_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="content_id" />
     </foreign-key>
@@ -893,6 +904,9 @@
     </index>
     <index name="idx_content_folder_folder_id">
       <index-column name="folder_id" />
+    </index>
+    <index name="idx_content_folder_default">
+      <index-column name="default_folder" />
     </index>
     <behavior name="timestampable" />
   </table>

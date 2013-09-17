@@ -17,17 +17,19 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Area as ChildArea;
+use Thelia\Model\AreaDeliveryModule as ChildAreaDeliveryModule;
+use Thelia\Model\AreaDeliveryModuleQuery as ChildAreaDeliveryModuleQuery;
 use Thelia\Model\AreaQuery as ChildAreaQuery;
-use Thelia\Model\Delivzone as ChildDelivzone;
-use Thelia\Model\DelivzoneQuery as ChildDelivzoneQuery;
-use Thelia\Model\Map\DelivzoneTableMap;
+use Thelia\Model\Module as ChildModule;
+use Thelia\Model\ModuleQuery as ChildModuleQuery;
+use Thelia\Model\Map\AreaDeliveryModuleTableMap;
 
-abstract class Delivzone implements ActiveRecordInterface
+abstract class AreaDeliveryModule implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\DelivzoneTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\AreaDeliveryModuleTableMap';
 
 
     /**
@@ -69,10 +71,10 @@ abstract class Delivzone implements ActiveRecordInterface
     protected $area_id;
 
     /**
-     * The value for the delivery field.
-     * @var        string
+     * The value for the delivery_module_id field.
+     * @var        int
      */
-    protected $delivery;
+    protected $delivery_module_id;
 
     /**
      * The value for the created_at field.
@@ -92,6 +94,11 @@ abstract class Delivzone implements ActiveRecordInterface
     protected $aArea;
 
     /**
+     * @var        Module
+     */
+    protected $aModule;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -100,7 +107,7 @@ abstract class Delivzone implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\Delivzone object.
+     * Initializes internal state of Thelia\Model\Base\AreaDeliveryModule object.
      */
     public function __construct()
     {
@@ -195,9 +202,9 @@ abstract class Delivzone implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Delivzone</code> instance.  If
-     * <code>obj</code> is an instance of <code>Delivzone</code>, delegates to
-     * <code>equals(Delivzone)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>AreaDeliveryModule</code> instance.  If
+     * <code>obj</code> is an instance of <code>AreaDeliveryModule</code>, delegates to
+     * <code>equals(AreaDeliveryModule)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param      obj The object to compare to.
      * @return Whether equal to the object specified.
@@ -278,7 +285,7 @@ abstract class Delivzone implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return Delivzone The current object, for fluid interface
+     * @return AreaDeliveryModule The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -310,7 +317,7 @@ abstract class Delivzone implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return Delivzone The current object, for fluid interface
+     * @return AreaDeliveryModule The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -376,14 +383,14 @@ abstract class Delivzone implements ActiveRecordInterface
     }
 
     /**
-     * Get the [delivery] column value.
+     * Get the [delivery_module_id] column value.
      *
-     * @return   string
+     * @return   int
      */
-    public function getDelivery()
+    public function getDeliveryModuleId()
     {
 
-        return $this->delivery;
+        return $this->delivery_module_id;
     }
 
     /**
@@ -430,7 +437,7 @@ abstract class Delivzone implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\Delivzone The current object (for fluent API support)
+     * @return   \Thelia\Model\AreaDeliveryModule The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -440,7 +447,7 @@ abstract class Delivzone implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = DelivzoneTableMap::ID;
+            $this->modifiedColumns[] = AreaDeliveryModuleTableMap::ID;
         }
 
 
@@ -451,7 +458,7 @@ abstract class Delivzone implements ActiveRecordInterface
      * Set the value of [area_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\Delivzone The current object (for fluent API support)
+     * @return   \Thelia\Model\AreaDeliveryModule The current object (for fluent API support)
      */
     public function setAreaId($v)
     {
@@ -461,7 +468,7 @@ abstract class Delivzone implements ActiveRecordInterface
 
         if ($this->area_id !== $v) {
             $this->area_id = $v;
-            $this->modifiedColumns[] = DelivzoneTableMap::AREA_ID;
+            $this->modifiedColumns[] = AreaDeliveryModuleTableMap::AREA_ID;
         }
 
         if ($this->aArea !== null && $this->aArea->getId() !== $v) {
@@ -473,32 +480,36 @@ abstract class Delivzone implements ActiveRecordInterface
     } // setAreaId()
 
     /**
-     * Set the value of [delivery] column.
+     * Set the value of [delivery_module_id] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Delivzone The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\AreaDeliveryModule The current object (for fluent API support)
      */
-    public function setDelivery($v)
+    public function setDeliveryModuleId($v)
     {
         if ($v !== null) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->delivery !== $v) {
-            $this->delivery = $v;
-            $this->modifiedColumns[] = DelivzoneTableMap::DELIVERY;
+        if ($this->delivery_module_id !== $v) {
+            $this->delivery_module_id = $v;
+            $this->modifiedColumns[] = AreaDeliveryModuleTableMap::DELIVERY_MODULE_ID;
+        }
+
+        if ($this->aModule !== null && $this->aModule->getId() !== $v) {
+            $this->aModule = null;
         }
 
 
         return $this;
-    } // setDelivery()
+    } // setDeliveryModuleId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Delivzone The current object (for fluent API support)
+     * @return   \Thelia\Model\AreaDeliveryModule The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -506,7 +517,7 @@ abstract class Delivzone implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = DelivzoneTableMap::CREATED_AT;
+                $this->modifiedColumns[] = AreaDeliveryModuleTableMap::CREATED_AT;
             }
         } // if either are not null
 
@@ -519,7 +530,7 @@ abstract class Delivzone implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Delivzone The current object (for fluent API support)
+     * @return   \Thelia\Model\AreaDeliveryModule The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -527,7 +538,7 @@ abstract class Delivzone implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = DelivzoneTableMap::UPDATED_AT;
+                $this->modifiedColumns[] = AreaDeliveryModuleTableMap::UPDATED_AT;
             }
         } // if either are not null
 
@@ -572,22 +583,22 @@ abstract class Delivzone implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : DelivzoneTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AreaDeliveryModuleTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : DelivzoneTableMap::translateFieldName('AreaId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AreaDeliveryModuleTableMap::translateFieldName('AreaId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->area_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : DelivzoneTableMap::translateFieldName('Delivery', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->delivery = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AreaDeliveryModuleTableMap::translateFieldName('DeliveryModuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->delivery_module_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : DelivzoneTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AreaDeliveryModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : DelivzoneTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AreaDeliveryModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -600,10 +611,10 @@ abstract class Delivzone implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = DelivzoneTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = AreaDeliveryModuleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\Delivzone object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\AreaDeliveryModule object", 0, $e);
         }
     }
 
@@ -624,6 +635,9 @@ abstract class Delivzone implements ActiveRecordInterface
     {
         if ($this->aArea !== null && $this->area_id !== $this->aArea->getId()) {
             $this->aArea = null;
+        }
+        if ($this->aModule !== null && $this->delivery_module_id !== $this->aModule->getId()) {
+            $this->aModule = null;
         }
     } // ensureConsistency
 
@@ -648,13 +662,13 @@ abstract class Delivzone implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(DelivzoneTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(AreaDeliveryModuleTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildDelivzoneQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildAreaDeliveryModuleQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -665,6 +679,7 @@ abstract class Delivzone implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aArea = null;
+            $this->aModule = null;
         } // if (deep)
     }
 
@@ -674,8 +689,8 @@ abstract class Delivzone implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Delivzone::setDeleted()
-     * @see Delivzone::isDeleted()
+     * @see AreaDeliveryModule::setDeleted()
+     * @see AreaDeliveryModule::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -684,12 +699,12 @@ abstract class Delivzone implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(DelivzoneTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AreaDeliveryModuleTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildDelivzoneQuery::create()
+            $deleteQuery = ChildAreaDeliveryModuleQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -726,7 +741,7 @@ abstract class Delivzone implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(DelivzoneTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AreaDeliveryModuleTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -736,16 +751,16 @@ abstract class Delivzone implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(DelivzoneTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(AreaDeliveryModuleTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(DelivzoneTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(AreaDeliveryModuleTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(DelivzoneTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(AreaDeliveryModuleTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -757,7 +772,7 @@ abstract class Delivzone implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                DelivzoneTableMap::addInstanceToPool($this);
+                AreaDeliveryModuleTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -799,6 +814,13 @@ abstract class Delivzone implements ActiveRecordInterface
                 $this->setArea($this->aArea);
             }
 
+            if ($this->aModule !== null) {
+                if ($this->aModule->isModified() || $this->aModule->isNew()) {
+                    $affectedRows += $this->aModule->save($con);
+                }
+                $this->setModule($this->aModule);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -830,30 +852,30 @@ abstract class Delivzone implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = DelivzoneTableMap::ID;
+        $this->modifiedColumns[] = AreaDeliveryModuleTableMap::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . DelivzoneTableMap::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . AreaDeliveryModuleTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(DelivzoneTableMap::ID)) {
+        if ($this->isColumnModified(AreaDeliveryModuleTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(DelivzoneTableMap::AREA_ID)) {
+        if ($this->isColumnModified(AreaDeliveryModuleTableMap::AREA_ID)) {
             $modifiedColumns[':p' . $index++]  = 'AREA_ID';
         }
-        if ($this->isColumnModified(DelivzoneTableMap::DELIVERY)) {
-            $modifiedColumns[':p' . $index++]  = 'DELIVERY';
+        if ($this->isColumnModified(AreaDeliveryModuleTableMap::DELIVERY_MODULE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'DELIVERY_MODULE_ID';
         }
-        if ($this->isColumnModified(DelivzoneTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(AreaDeliveryModuleTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
-        if ($this->isColumnModified(DelivzoneTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(AreaDeliveryModuleTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO delivzone (%s) VALUES (%s)',
+            'INSERT INTO area_delivery_module (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -868,8 +890,8 @@ abstract class Delivzone implements ActiveRecordInterface
                     case 'AREA_ID':
                         $stmt->bindValue($identifier, $this->area_id, PDO::PARAM_INT);
                         break;
-                    case 'DELIVERY':
-                        $stmt->bindValue($identifier, $this->delivery, PDO::PARAM_STR);
+                    case 'DELIVERY_MODULE_ID':
+                        $stmt->bindValue($identifier, $this->delivery_module_id, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -923,7 +945,7 @@ abstract class Delivzone implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = DelivzoneTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = AreaDeliveryModuleTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -946,7 +968,7 @@ abstract class Delivzone implements ActiveRecordInterface
                 return $this->getAreaId();
                 break;
             case 2:
-                return $this->getDelivery();
+                return $this->getDeliveryModuleId();
                 break;
             case 3:
                 return $this->getCreatedAt();
@@ -977,15 +999,15 @@ abstract class Delivzone implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Delivzone'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['AreaDeliveryModule'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Delivzone'][$this->getPrimaryKey()] = true;
-        $keys = DelivzoneTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['AreaDeliveryModule'][$this->getPrimaryKey()] = true;
+        $keys = AreaDeliveryModuleTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getAreaId(),
-            $keys[2] => $this->getDelivery(),
+            $keys[2] => $this->getDeliveryModuleId(),
             $keys[3] => $this->getCreatedAt(),
             $keys[4] => $this->getUpdatedAt(),
         );
@@ -998,6 +1020,9 @@ abstract class Delivzone implements ActiveRecordInterface
         if ($includeForeignObjects) {
             if (null !== $this->aArea) {
                 $result['Area'] = $this->aArea->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aModule) {
+                $result['Module'] = $this->aModule->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1017,7 +1042,7 @@ abstract class Delivzone implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = DelivzoneTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = AreaDeliveryModuleTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1040,7 +1065,7 @@ abstract class Delivzone implements ActiveRecordInterface
                 $this->setAreaId($value);
                 break;
             case 2:
-                $this->setDelivery($value);
+                $this->setDeliveryModuleId($value);
                 break;
             case 3:
                 $this->setCreatedAt($value);
@@ -1070,11 +1095,11 @@ abstract class Delivzone implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = DelivzoneTableMap::getFieldNames($keyType);
+        $keys = AreaDeliveryModuleTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setAreaId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setDelivery($arr[$keys[2]]);
+        if (array_key_exists($keys[2], $arr)) $this->setDeliveryModuleId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
@@ -1086,13 +1111,13 @@ abstract class Delivzone implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(DelivzoneTableMap::DATABASE_NAME);
+        $criteria = new Criteria(AreaDeliveryModuleTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(DelivzoneTableMap::ID)) $criteria->add(DelivzoneTableMap::ID, $this->id);
-        if ($this->isColumnModified(DelivzoneTableMap::AREA_ID)) $criteria->add(DelivzoneTableMap::AREA_ID, $this->area_id);
-        if ($this->isColumnModified(DelivzoneTableMap::DELIVERY)) $criteria->add(DelivzoneTableMap::DELIVERY, $this->delivery);
-        if ($this->isColumnModified(DelivzoneTableMap::CREATED_AT)) $criteria->add(DelivzoneTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(DelivzoneTableMap::UPDATED_AT)) $criteria->add(DelivzoneTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(AreaDeliveryModuleTableMap::ID)) $criteria->add(AreaDeliveryModuleTableMap::ID, $this->id);
+        if ($this->isColumnModified(AreaDeliveryModuleTableMap::AREA_ID)) $criteria->add(AreaDeliveryModuleTableMap::AREA_ID, $this->area_id);
+        if ($this->isColumnModified(AreaDeliveryModuleTableMap::DELIVERY_MODULE_ID)) $criteria->add(AreaDeliveryModuleTableMap::DELIVERY_MODULE_ID, $this->delivery_module_id);
+        if ($this->isColumnModified(AreaDeliveryModuleTableMap::CREATED_AT)) $criteria->add(AreaDeliveryModuleTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(AreaDeliveryModuleTableMap::UPDATED_AT)) $criteria->add(AreaDeliveryModuleTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1107,8 +1132,8 @@ abstract class Delivzone implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(DelivzoneTableMap::DATABASE_NAME);
-        $criteria->add(DelivzoneTableMap::ID, $this->id);
+        $criteria = new Criteria(AreaDeliveryModuleTableMap::DATABASE_NAME);
+        $criteria->add(AreaDeliveryModuleTableMap::ID, $this->id);
 
         return $criteria;
     }
@@ -1149,7 +1174,7 @@ abstract class Delivzone implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Delivzone (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\AreaDeliveryModule (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1157,7 +1182,7 @@ abstract class Delivzone implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setAreaId($this->getAreaId());
-        $copyObj->setDelivery($this->getDelivery());
+        $copyObj->setDeliveryModuleId($this->getDeliveryModuleId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1175,7 +1200,7 @@ abstract class Delivzone implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Delivzone Clone of current object.
+     * @return                 \Thelia\Model\AreaDeliveryModule Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1192,7 +1217,7 @@ abstract class Delivzone implements ActiveRecordInterface
      * Declares an association between this object and a ChildArea object.
      *
      * @param                  ChildArea $v
-     * @return                 \Thelia\Model\Delivzone The current object (for fluent API support)
+     * @return                 \Thelia\Model\AreaDeliveryModule The current object (for fluent API support)
      * @throws PropelException
      */
     public function setArea(ChildArea $v = null)
@@ -1208,7 +1233,7 @@ abstract class Delivzone implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildArea object, it will not be re-added.
         if ($v !== null) {
-            $v->addDelivzone($this);
+            $v->addAreaDeliveryModule($this);
         }
 
 
@@ -1232,11 +1257,62 @@ abstract class Delivzone implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aArea->addDelivzones($this);
+                $this->aArea->addAreaDeliveryModules($this);
              */
         }
 
         return $this->aArea;
+    }
+
+    /**
+     * Declares an association between this object and a ChildModule object.
+     *
+     * @param                  ChildModule $v
+     * @return                 \Thelia\Model\AreaDeliveryModule The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setModule(ChildModule $v = null)
+    {
+        if ($v === null) {
+            $this->setDeliveryModuleId(NULL);
+        } else {
+            $this->setDeliveryModuleId($v->getId());
+        }
+
+        $this->aModule = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildModule object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAreaDeliveryModule($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildModule object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildModule The associated ChildModule object.
+     * @throws PropelException
+     */
+    public function getModule(ConnectionInterface $con = null)
+    {
+        if ($this->aModule === null && ($this->delivery_module_id !== null)) {
+            $this->aModule = ChildModuleQuery::create()->findPk($this->delivery_module_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aModule->addAreaDeliveryModules($this);
+             */
+        }
+
+        return $this->aModule;
     }
 
     /**
@@ -1246,7 +1322,7 @@ abstract class Delivzone implements ActiveRecordInterface
     {
         $this->id = null;
         $this->area_id = null;
-        $this->delivery = null;
+        $this->delivery_module_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1271,6 +1347,7 @@ abstract class Delivzone implements ActiveRecordInterface
         } // if ($deep)
 
         $this->aArea = null;
+        $this->aModule = null;
     }
 
     /**
@@ -1280,7 +1357,7 @@ abstract class Delivzone implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(DelivzoneTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(AreaDeliveryModuleTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1288,11 +1365,11 @@ abstract class Delivzone implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildDelivzone The current object (for fluent API support)
+     * @return     ChildAreaDeliveryModule The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = DelivzoneTableMap::UPDATED_AT;
+        $this->modifiedColumns[] = AreaDeliveryModuleTableMap::UPDATED_AT;
 
         return $this;
     }

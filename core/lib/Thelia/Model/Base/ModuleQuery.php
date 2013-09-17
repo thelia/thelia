@@ -52,6 +52,10 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery rightJoinOrderRelatedByDeliveryModuleId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderRelatedByDeliveryModuleId relation
  * @method     ChildModuleQuery innerJoinOrderRelatedByDeliveryModuleId($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderRelatedByDeliveryModuleId relation
  *
+ * @method     ChildModuleQuery leftJoinAreaDeliveryModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the AreaDeliveryModule relation
+ * @method     ChildModuleQuery rightJoinAreaDeliveryModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AreaDeliveryModule relation
+ * @method     ChildModuleQuery innerJoinAreaDeliveryModule($relationAlias = null) Adds a INNER JOIN clause to the query using the AreaDeliveryModule relation
+ *
  * @method     ChildModuleQuery leftJoinGroupModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupModule relation
  * @method     ChildModuleQuery rightJoinGroupModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupModule relation
  * @method     ChildModuleQuery innerJoinGroupModule($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupModule relation
@@ -709,6 +713,79 @@ abstract class ModuleQuery extends ModelCriteria
         return $this
             ->joinOrderRelatedByDeliveryModuleId($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'OrderRelatedByDeliveryModuleId', '\Thelia\Model\OrderQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\AreaDeliveryModule object
+     *
+     * @param \Thelia\Model\AreaDeliveryModule|ObjectCollection $areaDeliveryModule  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildModuleQuery The current query, for fluid interface
+     */
+    public function filterByAreaDeliveryModule($areaDeliveryModule, $comparison = null)
+    {
+        if ($areaDeliveryModule instanceof \Thelia\Model\AreaDeliveryModule) {
+            return $this
+                ->addUsingAlias(ModuleTableMap::ID, $areaDeliveryModule->getDeliveryModuleId(), $comparison);
+        } elseif ($areaDeliveryModule instanceof ObjectCollection) {
+            return $this
+                ->useAreaDeliveryModuleQuery()
+                ->filterByPrimaryKeys($areaDeliveryModule->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByAreaDeliveryModule() only accepts arguments of type \Thelia\Model\AreaDeliveryModule or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the AreaDeliveryModule relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildModuleQuery The current query, for fluid interface
+     */
+    public function joinAreaDeliveryModule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('AreaDeliveryModule');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'AreaDeliveryModule');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the AreaDeliveryModule relation AreaDeliveryModule object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\AreaDeliveryModuleQuery A secondary query class using the current class as primary query
+     */
+    public function useAreaDeliveryModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinAreaDeliveryModule($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'AreaDeliveryModule', '\Thelia\Model\AreaDeliveryModuleQuery');
     }
 
     /**

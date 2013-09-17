@@ -71,8 +71,6 @@ class OrderDelivery extends BaseForm
 
         if(null === $address) {
             $context->addViolation("Address ID not found");
-        } elseif($address->getCustomerId() !== $this->request->getSession()->getCustomerUser()->getId()) {
-            $context->addViolation("Address does not belong to you");
         }
     }
 

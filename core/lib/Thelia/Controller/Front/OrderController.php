@@ -29,6 +29,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Form\OrderDelivery;
 use Thelia\Log\Tlog;
+use Thelia\Model\Base\AddressQuery;
 use Thelia\Model\Order;
 
 /**
@@ -45,6 +46,9 @@ class OrderController extends BaseFrontController
      */
     public function deliver()
     {
+        $this->checkAuth();
+        $this->checkCartNotEmpty();
+
         $message = false;
 
         $orderDelivery = new OrderDelivery($this->getRequest());
@@ -55,15 +59,27 @@ class OrderController extends BaseFrontController
         try {
             $form = $this->validateForm($orderDelivery, "post");
 
-            $orderEvent = $this->getOrderEvent();
-            $orderEvent->setDeliveryAddress($form->get("delivery-address")->getData());
-            $orderEvent->setDeliveryModule($form->get("delivery-module")->getData());
+            $deliveryAddressId = $form->get("delivery-address")->getData();
+            $deliveryModuleId = $form->get("delivery-module")->getData();
 
+            /* check that the delivery address belong to the current customer */
+            $deliveryAddress = AddressQuery::create()->findPk($deliveryAddressId);
+            if($deliveryAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
+                throw new \Exception("Address does not belong to the current customer");
+            }
+
+            /* check that the delivery module fetch the delivery address area */
+            
+
+
+            $orderEvent = $this->getOrderEvent();
+            $orderEvent->setDeliveryAddress($deliveryAddressId);
+            $orderEvent->setDeliveryModule($deliveryModuleId);
 
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
 
-            $this->redirectToRoute("order.billing");
+            $this->redirectToRoute("order.invoice");
 
         } catch (FormValidationException $e) {
             $message = sprintf("Please check your input: %s", $e->getMessage());
@@ -74,7 +90,7 @@ class OrderController extends BaseFrontController
         }
 
         if ($message !== false) {
-            Tlog::getInstance()->error(sprintf("Error during customer creation process : %s. Exception was %s", $message, $e->getMessage()));
+            Tlog::getInstance()->error(sprintf("Error during order delivery process : %s. Exception was %s", $message, $e->getMessage()));
 
             $orderDelivery->setErrorMessage($message);
 

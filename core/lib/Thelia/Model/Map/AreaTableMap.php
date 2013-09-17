@@ -80,9 +80,9 @@ class AreaTableMap extends TableMap
     const NAME = 'area.NAME';
 
     /**
-     * the column name for the UNIT field
+     * the column name for the POSTAGE field
      */
-    const UNIT = 'area.UNIT';
+    const POSTAGE = 'area.POSTAGE';
 
     /**
      * the column name for the CREATED_AT field
@@ -106,11 +106,11 @@ class AreaTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Unit', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'name', 'unit', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AreaTableMap::ID, AreaTableMap::NAME, AreaTableMap::UNIT, AreaTableMap::CREATED_AT, AreaTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'NAME', 'UNIT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'unit', 'created_at', 'updated_at', ),
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'Postage', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'name', 'postage', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AreaTableMap::ID, AreaTableMap::NAME, AreaTableMap::POSTAGE, AreaTableMap::CREATED_AT, AreaTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'NAME', 'POSTAGE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'name', 'postage', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
@@ -121,11 +121,11 @@ class AreaTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Unit' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'name' => 1, 'unit' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        self::TYPE_COLNAME       => array(AreaTableMap::ID => 0, AreaTableMap::NAME => 1, AreaTableMap::UNIT => 2, AreaTableMap::CREATED_AT => 3, AreaTableMap::UPDATED_AT => 4, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'NAME' => 1, 'UNIT' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'unit' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Postage' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'name' => 1, 'postage' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(AreaTableMap::ID => 0, AreaTableMap::NAME => 1, AreaTableMap::POSTAGE => 2, AreaTableMap::CREATED_AT => 3, AreaTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'NAME' => 1, 'POSTAGE' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'postage' => 2, 'created_at' => 3, 'updated_at' => 4, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
@@ -147,7 +147,7 @@ class AreaTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('NAME', 'Name', 'VARCHAR', true, 100, null);
-        $this->addColumn('UNIT', 'Unit', 'FLOAT', false, null, null);
+        $this->addColumn('POSTAGE', 'Postage', 'FLOAT', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -158,7 +158,7 @@ class AreaTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::ONE_TO_MANY, array('id' => 'area_id', ), 'SET NULL', 'RESTRICT', 'Countries');
-        $this->addRelation('Delivzone', '\\Thelia\\Model\\Delivzone', RelationMap::ONE_TO_MANY, array('id' => 'area_id', ), 'SET NULL', 'RESTRICT', 'Delivzones');
+        $this->addRelation('AreaDeliveryModule', '\\Thelia\\Model\\AreaDeliveryModule', RelationMap::ONE_TO_MANY, array('id' => 'area_id', ), 'CASCADE', 'RESTRICT', 'AreaDeliveryModules');
     } // buildRelations()
 
     /**
@@ -181,7 +181,7 @@ class AreaTableMap extends TableMap
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 CountryTableMap::clearInstancePool();
-                DelivzoneTableMap::clearInstancePool();
+                AreaDeliveryModuleTableMap::clearInstancePool();
             }
 
     /**
@@ -324,13 +324,13 @@ class AreaTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(AreaTableMap::ID);
             $criteria->addSelectColumn(AreaTableMap::NAME);
-            $criteria->addSelectColumn(AreaTableMap::UNIT);
+            $criteria->addSelectColumn(AreaTableMap::POSTAGE);
             $criteria->addSelectColumn(AreaTableMap::CREATED_AT);
             $criteria->addSelectColumn(AreaTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.NAME');
-            $criteria->addSelectColumn($alias . '.UNIT');
+            $criteria->addSelectColumn($alias . '.POSTAGE');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

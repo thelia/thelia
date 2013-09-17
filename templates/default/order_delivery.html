@@ -168,7 +168,7 @@ jQuery(function($cart) {
 
     $cart(".js-remove-address").click(function(e){
         e.preventDefault();
-        $cart("#address-delete-link").attr("href", $(this).attr("href"));
+        $cart("#address-delete-link").attr("href", $cart(this).attr("href"));
         $cart('#address-delete-modal').modal('show');
     })
 

@@ -186,6 +186,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         return $result;
     }
 
+    public function orderDataAccess($params, &$smarty)
+    {
+        return $this->dataAccess("Order", $params, $this->request->getSession()->getOrder());
+     }
+
     /**
      * Lang global data
      *
@@ -300,6 +305,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'country', $this, 'countryDataAccess'),
             new SmartyPluginDescriptor('function', 'lang', $this, 'langDataAccess'),
             new SmartyPluginDescriptor('function', 'cart', $this, 'cartDataAccess'),
+            new SmartyPluginDescriptor('function', 'order', $this, 'orderDataAccess'),
         );
     }
 }
