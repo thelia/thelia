@@ -102,12 +102,13 @@ class Content extends BaseI18nLoop
 
         if (!is_null($folder) || !is_null($folderDefault)) {
 
+            $folders = array();
             if (!is_null($folder)) {
-                $folders = FolderQuery::create()->filterById($folder, Criteria::IN)->find();
+                $folders = array_merge($folders, FolderQuery::create()->filterById($folder, Criteria::IN)->find());
             }
 
             if (!is_null($folderDefault)) {
-                $folders = FolderQuery::create()->filterById($folderDefault, Criteria::IN)->find();
+                $folders = array_merge(FolderQuery::create()->filterById($folderDefault, Criteria::IN)->find());
             }
 
 
