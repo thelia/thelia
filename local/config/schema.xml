@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -41,7 +41,7 @@
     <index name="idx_product_tax_rule_id">
       <index-column name="tax_rule_id" />
     </index>
-    <index name="fk_product_template1_idx">
+    <index name="fk_product_template_id">
       <index-column name="template_id" />
     </index>
     <behavior name="timestampable" />
@@ -80,6 +80,7 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <column name="by_default" type="TINYINT" />
     <foreign-key foreignTable="area" name="fk_country_area_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="area_id" />
     </foreign-key>
@@ -921,6 +922,7 @@
     <column name="promo_price" type="FLOAT" />
     <column name="price_end_of_life" type="TIMESTAMP" />
     <column defaultValue="0" name="discount" type="FLOAT" />
+    <column name="promo" type="INTEGER" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id">
       <reference foreign="id" local="cart_id" />
     </foreign-key>

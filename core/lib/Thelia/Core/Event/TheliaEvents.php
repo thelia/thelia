@@ -145,50 +145,21 @@ final class TheliaEvents
 
     // -- END ADDRESS MANAGEMENT ---------------------------------------------------------
 
-    /**
-     * Sent once the category creation form has been successfully validated, and before category insertion in the database.
-     */
-    const BEFORE_CREATECATEGORY = "action.before_createcategory";
+    // -- Categories management -----------------------------------------------
 
-    /**
-     * Create, change or delete a category
-     */
-    const CATEGORY_CREATE = "action.createCategory";
-    const CATEGORY_UPDATE = "action.updateCategory";
-    const CATEGORY_DELETE = "action.deleteCategory";
-
-    /**
-     * Toggle category visibility
-     */
+    const CATEGORY_CREATE            = "action.createCategory";
+    const CATEGORY_UPDATE            = "action.updateCategory";
+    const CATEGORY_DELETE            = "action.deleteCategory";
     const CATEGORY_TOGGLE_VISIBILITY = "action.toggleCategoryVisibility";
+    const CATEGORY_UPDATE_POSITION   = "action.updateCategoryPosition";
 
-    /**
-     * Change category position
-     */
-    const CATEGORY_CHANGE_POSITION = "action.updateCategoryPosition";
-
-    /**
-     * Sent just after a successful insert of a new category in the database.
-     */
+    const BEFORE_CREATECATEGORY = "action.before_createcategory";
     const AFTER_CREATECATEGORY 	= "action.after_createcategory";
-    /**
-     * Sent befonre deleting a category
-     */
-    const BEFORE_DELETECATEGORY = "action.before_deletecategory";
 
-    /**
-     * Sent just after a successful delete of a category from the database.
-     */
+    const BEFORE_DELETECATEGORY = "action.before_deletecategory";
     const AFTER_DELETECATEGORY 	= "action.after_deletecategory";
 
-    /**
-     * Sent just before a successful change of a category in the database.
-     */
     const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
-
-    /**
-     * Sent just after a successful change of a category in the database.
-     */
     const AFTER_UPDATECATEGORY 	= "action.after_updateCategory";
 
     /**
@@ -337,11 +308,18 @@ final class TheliaEvents
     const BEFORE_DELETECURRENCY = "action.before_deleteCurrency";
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
 
+    const CHANGE_DEFAULT_CURRENCY = 'action.changeDefaultCurrency';
     // -- Product templates management -----------------------------------------
 
     const TEMPLATE_CREATE          = "action.createTemplate";
     const TEMPLATE_UPDATE          = "action.updateTemplate";
     const TEMPLATE_DELETE          = "action.deleteTemplate";
+
+    const TEMPLATE_ADD_ATTRIBUTE    = "action.templateAddAttribute";
+    const TEMPLATE_DELETE_ATTRIBUTE = "action.templateDeleteAttribute";
+
+    const TEMPLATE_ADD_FEATURE    = "action.templateAddFeature";
+    const TEMPLATE_DELETE_FEATURE = "action.templateDeleteFeature";
 
     const BEFORE_CREATETEMPLATE = "action.before_createTemplate";
     const AFTER_CREATETEMPLATE  = "action.after_createTemplate";
@@ -371,6 +349,25 @@ final class TheliaEvents
     const BEFORE_DELETEATTRIBUTE = "action.before_deleteAttribute";
     const AFTER_DELETEATTRIBUTE  = "action.after_deleteAttribute";
 
+    // -- Features management ---------------------------------------------
+
+    const FEATURE_CREATE          = "action.createFeature";
+    const FEATURE_UPDATE          = "action.updateFeature";
+    const FEATURE_DELETE          = "action.deleteFeature";
+    const FEATURE_UPDATE_POSITION = "action.updateFeaturePosition";
+
+    const FEATURE_REMOVE_FROM_ALL_TEMPLATES = "action.addFeatureToAllTemplate";
+    const FEATURE_ADD_TO_ALL_TEMPLATES      = "action.removeFeatureFromAllTemplate";
+
+    const BEFORE_CREATEFEATURE = "action.before_createFeature";
+    const AFTER_CREATEFEATURE  = "action.after_createFeature";
+
+    const BEFORE_UPDATEFEATURE = "action.before_updateFeature";
+    const AFTER_UPDATEFEATURE  = "action.after_updateFeature";
+
+    const BEFORE_DELETEFEATURE = "action.before_deleteFeature";
+    const AFTER_DELETEFEATURE  = "action.after_deleteFeature";
+
     // -- Attributes values management ----------------------------------------
 
     const ATTRIBUTE_AV_CREATE          = "action.createAttributeAv";
@@ -386,4 +383,27 @@ final class TheliaEvents
 
     const BEFORE_DELETEATTRIBUTE_AV = "action.before_deleteAttributeAv";
     const AFTER_DELETEATTRIBUTE_AV  = "action.after_deleteAttributeAv";
+
+
+    // -- Features values management ----------------------------------------
+
+    const FEATURE_AV_CREATE          = "action.createFeatureAv";
+    const FEATURE_AV_UPDATE          = "action.updateFeatureAv";
+    const FEATURE_AV_DELETE          = "action.deleteFeatureAv";
+    const FEATURE_AV_UPDATE_POSITION = "action.updateFeatureAvPosition";
+
+    const BEFORE_CREATEFEATURE_AV = "action.before_createFeatureAv";
+    const AFTER_CREATEFEATURE_AV  = "action.after_createFeatureAv";
+
+    const BEFORE_UPDATEFEATURE_AV = "action.before_updateFeatureAv";
+    const AFTER_UPDATEFEATURE_AV  = "action.after_updateFeatureAv";
+
+    const BEFORE_DELETEFEATURE_AV = "action.before_deleteFeatureAv";
+    const AFTER_DELETEFEATURE_AV  = "action.after_deleteFeatureAv";
+
+    /**
+     * sent when system find a mailer transporter.
+     */
+    const MAILTRANSPORTER_CONFIG = 'action.mailertransporter.config';
+
 }

@@ -111,8 +111,8 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
             $this->availableOperators[self::INPUT1]
         );
         if (!$isOperator1Legit) {
-            throw new \InvalidArgumentException(
-                'Operator for price field is not legit'
+            throw new InvalidRuleOperatorException(
+                get_class(), 'price'
             );
         }
 
@@ -121,15 +121,15 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
             $this->availableOperators[self::INPUT2]
         );
         if (!$isOperator1Legit) {
-            throw new \InvalidArgumentException(
-                'Operator for currency field is not legit'
+            throw new InvalidRuleOperatorException(
+                get_class(), 'price'
             );
         }
 
         $floatType = new FloatType();
         if (!$floatType->isValid($priceValue) || $priceValue <= 0) {
-            throw new \InvalidArgumentException(
-                'Value for price field is not legit'
+            throw new InvalidRuleValueException(
+                get_class(), 'price'
             );
         }
 

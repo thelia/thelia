@@ -28,13 +28,7 @@ class CategoryCreateEvent extends CategoryEvent
     protected $title;
     protected $parent;
     protected $locale;
-
-    public function __construct($title, $parent, $locale)
-    {
-        $this->title = $title;
-        $this->parent = $parent;
-        $this->locale = $locale;
-    }
+    protected $visible;
 
     public function getTitle()
     {
@@ -68,6 +62,18 @@ class CategoryCreateEvent extends CategoryEvent
     public function setLocale($locale)
     {
         $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getVisible()
+    {
+        return $this->visible;
+    }
+
+    public function setVisible($visible)
+    {
+        $this->visible = $visible;
 
         return $this;
     }

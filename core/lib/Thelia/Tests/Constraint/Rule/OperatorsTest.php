@@ -23,7 +23,6 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Constraint\Validator\QuantityParam;
 use Thelia\Constraint\Rule\Operators;
 
 /**
@@ -48,13 +47,61 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    public function testSomething()
+//    public function testSomething()
+//    {
+//        // Stop here and mark this test as incomplete.
+//        $this->markTestIncomplete(
+//            'This test has not been implemented yet.'
+//        );
+//    }
+
+    public function testOperatorI18n()
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $stubTranslator = $this->getMockBuilder('\Symfony\Component\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubTranslator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnCallback((array($this, 'callbackI18n'))));
+
+        $actual = Operators::getI18n($stubTranslator, Operators::INFERIOR);
+        $expected = 'inferior to';
+        $this->assertEquals($expected, $actual);
+
+        $actual = Operators::getI18n($stubTranslator, Operators::INFERIOR_OR_EQUAL);
+        $expected = 'inferior or equal to';
+        $this->assertEquals($expected, $actual);
+
+        $actual = Operators::getI18n($stubTranslator, Operators::EQUAL);
+        $expected = 'equal to';
+        $this->assertEquals($expected, $actual);
+
+        $actual = Operators::getI18n($stubTranslator, Operators::SUPERIOR_OR_EQUAL);
+        $expected = 'superior or equal to';
+        $this->assertEquals($expected, $actual);
+
+        $actual = Operators::getI18n($stubTranslator, Operators::SUPERIOR);
+        $expected = 'superior to';
+        $this->assertEquals($expected, $actual);
+
+        $actual = Operators::getI18n($stubTranslator, Operators::DIFFERENT);
+        $expected = 'different from';
+        $this->assertEquals($expected, $actual);
+
+        $actual = Operators::getI18n($stubTranslator, Operators::IN);
+        $expected = 'in';
+        $this->assertEquals($expected, $actual);
+
+        $actual = Operators::getI18n($stubTranslator, Operators::OUT);
+        $expected = 'not in';
+        $this->assertEquals($expected, $actual);
+
+        $actual = Operators::getI18n($stubTranslator, 'unexpected operator');
+        $expected = 'unexpected operator';
+        $this->assertEquals($expected, $actual);
     }
+
 
 //    /**
 //     *
@@ -424,4 +471,11 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
     {
     }
 
+    function callbackI18n() {
+        $args = func_get_args();
+
+        return $args[0];
+    }
 }
+
+

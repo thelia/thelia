@@ -183,6 +183,7 @@ class URL
 
          return $this->absoluteUrl($path, $parameters);
      }
+
      /**
       * Retrieve a rewritten URL from a view, a view id and a locale
       *
@@ -260,5 +261,51 @@ class URL
          $this->resolver->load($url);
 
          return $this->resolver;
+     }
+
+     protected function sanitize($string, $force_lowercase = true, $alphabetic_only = false)
+     {
+         static $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
+                 "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
+                 "â€”", "â€“", ",", "<", ".", ">", "/", "?");
+
+         $clean = trim(str_replace($strip, "", strip_tags($string)));
+
+         $clean = preg_replace('/\s+/', "-", $clean);
+
+         $clean = ($alphabetic_only) ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean ;
+
+         return ($force_lowercase) ?
+             (function_exists('mb_strtolower')) ?
+                 mb_strtolower($clean, 'UTF-8') :
+             strtolower($clean) :
+             $clean;
+     }
+
+    /**
+      * Genenerate the file part of a rewriten URL from a given baseString, using a view, a view id and a locale
+      *
+      * @param $view
+      * @param $viewId
+      * @param $viewLocale
+      * @param $baseString the string to be converted in a valid URL
+      *
+      * @return A valid file part URL.
+      */
+     public function generateRewritenUrl($view, $viewId, $viewLocale, $baseString)
+     {
+         // Borrowed from http://stackoverflow.com/questions/2668854/sanitizing-strings-to-make-them-url-and-filename-safe
+
+         // Replace all weird characters with dashes
+         $string = preg_replace('/[^\w\-~_\.]+/u', '-', $baseString);
+
+         // Only allow one dash separator at a time (and make string lowercase)
+         $cleanString = mb_strtolower(preg_replace('/--+/u', '-', $string), 'UTF-8');
+
+         $urlFilePart = $cleanString . ".html";
+
+         // TODO :
+         // check if URL url already exists, and add a numeric suffix, or the like
+         // insert the URL in the rewriting table
      }
 }

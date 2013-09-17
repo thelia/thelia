@@ -40,7 +40,9 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
 
     protected $peakMemory = 0;
 
-    public function __construct()
+    protected $alternativeLogger;
+
+    public function __construct(LoggerInterface $alternativeLogger = null)
     {
         $serviceContainer = Propel::getServiceContainer();
         $serviceContainer->setLogger('defaultLogger', $this);
@@ -54,6 +56,8 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
             'commit',
             'rollBack',
         ));
+
+        $this->alternativeLogger = $alternativeLogger;
     }
 
     /**
@@ -118,6 +122,10 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
         list($sql, $duration_str) = $this->parseAndLogSqlQuery($message);
 
         $message = "$sql ($duration_str)";
+
+        if ($this->alternativeLogger) {
+            $this->alternativeLogger->log($level, $message);
+        }
     }
 
     /**
@@ -172,7 +180,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function emergency($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::EMERGENCY, $message, $context);
     }
 
     /**
@@ -187,7 +195,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function alert($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::ALERT, $message, $context);
     }
 
     /**
@@ -201,7 +209,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function critical($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::CRITICAL, $message, $context);
     }
 
     /**
@@ -214,7 +222,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function error($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::ERROR, $message, $context);
     }
 
     /**
@@ -229,7 +237,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function warning($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::WARNING, $message, $context);
     }
 
     /**
@@ -241,7 +249,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function notice($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::NOTICE, $message, $context);
     }
 
     /**
@@ -255,7 +263,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function info($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::INFO, $message, $context);
     }
 
     /**
@@ -267,7 +275,7 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
      */
     public function debug($message, array $context = array())
     {
-        $this->log(null, $message, $context);
+        $this->log(\Thelia\Log\Tlog::DEBUG, $message, $context);
     }
 
 

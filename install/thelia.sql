@@ -45,7 +45,7 @@ CREATE TABLE `product`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_product_tax_rule_id` (`tax_rule_id`),
-    INDEX `fk_product_template1_idx` (`template_id`),
+    INDEX `fk_product_template_id` (`template_id`),
     CONSTRAINT `fk_product_tax_rule_id`
         FOREIGN KEY (`tax_rule_id`)
         REFERENCES `tax_rule` (`id`)
@@ -96,6 +96,7 @@ CREATE TABLE `country`
     `isocode` VARCHAR(4) NOT NULL,
     `isoalpha2` VARCHAR(2),
     `isoalpha3` VARCHAR(4),
+    `by_default` TINYINT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1198,6 +1199,7 @@ CREATE TABLE `cart_item`
     `promo_price` FLOAT,
     `price_end_of_life` DATETIME,
     `discount` FLOAT DEFAULT 0,
+    `promo` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
