@@ -149,7 +149,7 @@
                         <th class="total">Total <abbr title="Tax Inclusive">TTC</abbr></th>
                         <td class="total">
                             <div class="total-price">
-                                <span class="price">{currency attr="symbol"} {cart attr="total_taxed_price"}</span>
+                                <span class="price">{currency attr="symbol"} {{cart attr="total_taxed_price"} + {order attr="postage"}}</span>
                             </div>
                         </td>
                     </tr>
