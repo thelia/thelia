@@ -20,47 +20,29 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
+namespace Thelia\Core\Event;
 
-class CategoryCreationForm extends BaseForm
+use Thelia\Model\Category;
+
+class CategoryDeleteContentEvent extends CategoryEvent
 {
-    protected function buildForm()
+    protected $content_id;
+
+    public function __construct(Category $category, $content_id)
     {
-        $this->formBuilder
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Category title *"),
-                "label_attr" => array(
-                    "for" => "title"
-                )
-            ))
-            ->add("parent", "text", array(
-                "label" => Translator::getInstance()->trans("Parent category *"),
-                "constraints" => array(
-                    new NotBlank()
-                ),
-               "label_attr" => array("for" => "parent_create")
-            ))
-            ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-               "label_attr" => array("for" => "locale_create")
-            ))
-            ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This category is online on the front office."),
-                "label_attr" => array("for" => "visible_create")
-            ))
-        ;
+        parent::__construct($category);
+
+        $this->content_id = $content_id;
     }
 
-    public function getName()
+    public function getContentId()
     {
-        return "thelia_category_creation";
+        return $this->content_id;
+    }
+
+    public function setContentId($content_id)
+    {
+        $this->content_id = $content_id;
     }
 }

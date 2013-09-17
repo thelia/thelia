@@ -153,6 +153,9 @@ final class TheliaEvents
     const CATEGORY_TOGGLE_VISIBILITY = "action.toggleCategoryVisibility";
     const CATEGORY_UPDATE_POSITION   = "action.updateCategoryPosition";
 
+    const CATEGORY_ADD_CONTENT      = "action.categoryAddContent";
+    const CATEGORY_REMOVE_CONTENT   = "action.categoryRemoveContent";
+
     const BEFORE_CREATECATEGORY = "action.before_createcategory";
     const AFTER_CREATECATEGORY 	= "action.after_createcategory";
 

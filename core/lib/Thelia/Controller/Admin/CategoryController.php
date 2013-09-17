@@ -32,6 +32,13 @@ use Thelia\Form\CategoryModificationForm;
 use Thelia\Form\CategoryCreationForm;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\CategoryToggleVisibilityEvent;
+use Thelia\Core\Event\CategoryDeleteContentEvent;
+use Thelia\Core\Event\CategoryAddContentEvent;
+use Thelia\Model\CategoryAssociatedContent;
+use Thelia\Model\FolderQuery;
+use Thelia\Model\ContentQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Model\CategoryAssociatedContentQuery;
 
 /**
  * Manages categories
@@ -162,14 +169,23 @@ class CategoryController extends AbstractCrudController
     }
 
     protected function renderEditionTemplate() {
-        return $this->render('category-edit', array('category_id' => $this->getRequest()->get('category_id', 0)));
+
+        return $this->render('category-edit',
+                array(
+                        'category_id' => $this->getRequest()->get('category_id', 0),
+                        'folder_id' => $this->getRequest()->get('folder_id', 0),
+                        'current_tab' => $this->getRequest()->get('current_tab', 'general')
+        ));
     }
 
     protected function redirectToEditionTemplate() {
         $this->redirectToRoute(
                 "admin.categories.update",
-                array('category_id' => $this->getRequest()->get('category_id', 0))
-        );
+                array(
+                        'category_id' => $this->getRequest()->get('category_id', 0),
+                        'folder_id' => $this->getRequest()->get('folder_id', 0),
+                        'current_tab' => $this->getRequest()->get('current_tab', 'general')
+        ));
     }
 
     protected function redirectToListTemplate() {
@@ -209,6 +225,18 @@ class CategoryController extends AbstractCrudController
         );
     }
 
+    protected function performAdditionalUpdateAction($updateEvent)
+    {
+        if ($this->getRequest()->get('save_mode') != 'stay') {
+
+            // Redirect to parent category list
+            $this->redirectToRoute(
+                    'admin.categories.default',
+                    array('category_id' => $updateEvent->getCategory()->getParent())
+            );
+        }
+    }
+
     protected function performAdditionalUpdatePositionAction($event)
     {
 
@@ -223,5 +251,81 @@ class CategoryController extends AbstractCrudController
         }
 
         return null;
+    }
+
+    public function getAvailableRelatedContentAction($categoryId, $folderId) {
+
+        $result = array();
+
+        $folders = FolderQuery::create()->filterById($folderId)->find();
+
+        if ($folders !== null) {
+
+            $list = ContentQuery::create()
+                ->filterByFolder($folders, Criteria::IN)
+                ->filterById(CategoryAssociatedContentQuery::create()->select('content_id')->findByCategoryId($categoryId), Criteria::NOT_IN)
+                ->find();
+                ;
+
+            if ($list !== null) {
+                foreach($list as $item) {
+                    $result[] = array('id' => $item->getId(), 'title' => $item->getTitle());
+                }
+            }
+        }
+
+        return $this->jsonResponse(json_encode($result));
+    }
+
+    public function addRelatedContentAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
+
+        $content_id = intval($this->getRequest()->get('content_id'));
+
+        if ($content_id > 0) {
+
+            $event = new CategoryAddContentEvent(
+                    $this->getExistingObject(),
+                    $content_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::CATEGORY_ADD_CONTENT, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    public function deleteRelatedContentAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
+
+        $content_id = intval($this->getRequest()->get('content_id'));
+
+        if ($content_id > 0) {
+
+            $event = new CategoryDeleteContentEvent(
+                    $this->getExistingObject(),
+                    $content_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::CATEGORY_REMOVE_CONTENT, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
     }
 }

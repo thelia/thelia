@@ -95,11 +95,24 @@
     <route id="admin.categories.update-position" path="/admin/categories/update-position">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::updatePositionAction</default>
     </route>
+
+    <route id="admin.categories.related-content.add" path="/admin/categories/related-content/add">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::addRelatedContentAction</default>
+    </route>
+
+    <route id="admin.categories.related-content.delete" path="/admin/categories/related-content/delete">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::deleteRelatedContentAction</default>
+    </route>
+
+    <route id="admin.category.available-related-content" path="/admin/category/{categoryId}/available-related-content/{folderId}.{_format}" methods="GET">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::getAvailableRelatedContentAction</default>
+        <requirement key="_format">xml|json</requirement>
+    </route>
+
     <route id="admin.category.ajax" path="/admin/catalog/category/parent/{parentId}.{_format}" methods="GET">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::getByParentIdAction</default>
         <requirement key="_format">xml|json</requirement>
     </route>
-
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 

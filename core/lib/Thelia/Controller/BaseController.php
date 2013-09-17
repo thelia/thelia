@@ -63,6 +63,14 @@ class BaseController extends ContainerAware
     }
 
     /**
+     * Return a JSON response
+     */
+    protected function jsonResponse($json_data)
+    {
+        return new Response($json_data, 200, array('content-type' => 'application/json'));
+    }
+
+    /**
      * Dispatch a Thelia event
      *
      * @param string $eventName a TheliaEvent name, as defined in TheliaEvents class
