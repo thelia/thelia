@@ -59,7 +59,7 @@ class CategoryTree extends BaseI18nLoop
     }
 
     // changement de rubrique
-    protected function buildCategoryTree($parent, $visible, $level, $max_level, array $exclude, LoopResult &$loopResult)
+    protected function buildCategoryTree($parent, $visible, $level, $max_level, $exclude, LoopResult &$loopResult)
     {
         if ($level > $max_level) return;
 
@@ -73,7 +73,7 @@ class CategoryTree extends BaseI18nLoop
 
         if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
 
-        $search->filterById($exclude, Criteria::NOT_IN);
+        if ($exclude != null) $search->filterById($exclude, Criteria::NOT_IN);
 
         $search->orderByPosition(Criteria::ASC);
 

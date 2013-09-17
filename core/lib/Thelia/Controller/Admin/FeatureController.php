@@ -37,7 +37,7 @@ use Thelia\Core\Event\FeatureAvUpdateEvent;
 use Thelia\Core\Event\FeatureEvent;
 
 /**
- * Manages features sent by mail
+ * Manages features
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */

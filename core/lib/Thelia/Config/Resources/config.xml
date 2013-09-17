@@ -51,7 +51,7 @@
         <form name="thelia.address.update" class="Thelia\Form\AddressUpdateForm" />
 
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
-        <form name="thelia.admin.category.deletion" class="Thelia\Form\CategoryModificationForm"/>
+        <form name="thelia.admin.category.modification" class="Thelia\Form\CategoryModificationForm"/>
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
         <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
@@ -267,6 +267,10 @@
         <service id="thelia.coupon.type.remove_x_percent" class="Thelia\Coupon\Type\RemoveXPercentManager">
             <argument type="service" id="thelia.adapter" />
             <tag name="thelia.coupon.addCoupon"/>
+        </service>
+
+        <service id="mailer" class="Thelia\Mailer\MailerFactory">
+            <argument type="service" id="event_dispatcher"/>
         </service>
 
 

@@ -20,44 +20,17 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
+namespace Thelia\Exception;
 
-class CategoryCreationForm extends BaseForm
+use Thelia\Log\Tlog;
+
+class DocumentException extends \RuntimeException
 {
-    protected function buildForm()
+    public function __construct($message, $code = null, $previous = null)
     {
-        $this->formBuilder
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Category title *"),
-                "label_attr" => array(
-                    "for" => "title"
-                )
-            ))
-            ->add("parent", "text", array(
-                "label" => Translator::getInstance()->trans("Parent category *"),
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This category is online on the front office.")
-            ))
-        ;
-    }
+        Tlog::getInstance()->addError($message);
 
-    public function getName()
-    {
-        return "thelia_category_creation";
+        parent::__construct($message, $code, $previous);
     }
 }

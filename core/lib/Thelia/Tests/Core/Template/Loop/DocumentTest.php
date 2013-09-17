@@ -20,44 +20,70 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
+namespace Thelia\Tests\Core\Template\Loop;
 
-class CategoryCreationForm extends BaseForm
+use Thelia\Model\DocumentQuery;
+use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
+
+use Thelia\Core\Template\Loop\Document;
+use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\CategoryDocumentQuery;
+use Thelia\Model\ContentDocumentQuery;
+use Thelia\Model\FolderDocumentQuery;
+
+/**
+ *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ */
+class DocumentTest extends BaseLoopTestor
 {
-    protected function buildForm()
+    public function getTestedClassName()
     {
-        $this->formBuilder
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Category title *"),
-                "label_attr" => array(
-                    "for" => "title"
-                )
-            ))
-            ->add("parent", "text", array(
-                "label" => Translator::getInstance()->trans("Parent category *"),
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This category is online on the front office.")
-            ))
-        ;
+        return 'Thelia\Core\Template\Loop\Document';
     }
 
-    public function getName()
+    public function getTestedInstance()
     {
-        return "thelia_category_creation";
+        return new Document($this->container);
+    }
+
+    public function getMandatoryArguments()
+    {
+        return array('source' => 'product', 'id' => 1);
+    }
+
+    public function testSearchByProductId()
+    {
+        $document = ProductDocumentQuery::create()->findOne();
+
+        $this->baseTestSearchById($document->getId());
+    }
+
+    public function testSearchByFolderId()
+    {
+        $document = FolderDocumentQuery::create()->findOne();
+
+        $this->baseTestSearchById($document->getId());
+    }
+
+    public function testSearchByContentId()
+    {
+        $document = ContentDocumentQuery::create()->findOne();
+
+        $this->baseTestSearchById($document->getId());
+    }
+
+    public function testSearchByCategoryId()
+    {
+        $document = CategoryDocumentQuery::create()->findOne();
+
+        $this->baseTestSearchById($document->getId());
+    }
+
+    public function testSearchLimit()
+    {
+        $this->baseTestSearchWithLimit(1);
     }
 }

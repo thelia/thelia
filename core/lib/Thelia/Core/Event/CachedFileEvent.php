@@ -20,44 +20,75 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
+namespace Thelia\Core\Event;
 
-class CategoryCreationForm extends BaseForm
+class CachedFileEvent extends ActionEvent
 {
-    protected function buildForm()
+    /**
+     * @var string The complete file name (with path) of the source file
+     */
+    protected $source_filepath = null;
+    /**
+     * @var string The target subdirectory in the cache
+     */
+    protected $cache_subdirectory = null;
+
+    /**
+     * @var string The absolute URL of the cached file (in the web space)
+     */
+    protected $file_url = null;
+
+    /**
+     * @var string The absolute path of the cached file
+     */
+    protected $cache_filepath = null;
+
+    public function getFileUrl()
     {
-        $this->formBuilder
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Category title *"),
-                "label_attr" => array(
-                    "for" => "title"
-                )
-            ))
-            ->add("parent", "text", array(
-                "label" => Translator::getInstance()->trans("Parent category *"),
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This category is online on the front office.")
-            ))
-        ;
+        return $this->file_url;
     }
 
-    public function getName()
+    public function setFileUrl($file_url)
     {
-        return "thelia_category_creation";
+        $this->file_url = $file_url;
+
+        return $this;
+    }
+
+    public function getCacheFilepath()
+    {
+        return $this->cache_filepath;
+    }
+
+    public function setCacheFilepath($cache_filepath)
+    {
+        $this->cache_filepath = $cache_filepath;
+
+        return $this;
+    }
+
+    public function getSourceFilepath()
+    {
+        return $this->source_filepath;
+    }
+
+    public function setSourceFilepath($source_filepath)
+    {
+        $this->source_filepath = $source_filepath;
+
+        return $this;
+    }
+
+    public function getCacheSubdirectory()
+    {
+        return $this->cache_subdirectory;
+    }
+
+    public function setCacheSubdirectory($cache_subdirectory)
+    {
+        $this->cache_subdirectory = $cache_subdirectory;
+
+        return $this;
     }
 }

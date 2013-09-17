@@ -20,44 +20,48 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
+namespace Thelia\Core\Event;
 
-class CategoryCreationForm extends BaseForm
+class DocumentEvent extends CachedFileEvent
 {
-    protected function buildForm()
+    protected $document_path;
+    protected $document_url;
+
+    /**
+     * @return the document file path
+     */
+    public function getDocumentPath()
     {
-        $this->formBuilder
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Category title *"),
-                "label_attr" => array(
-                    "for" => "title"
-                )
-            ))
-            ->add("parent", "text", array(
-                "label" => Translator::getInstance()->trans("Parent category *"),
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
-            ))
-            ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This category is online on the front office.")
-            ))
-        ;
+        return $this->document_path;
     }
 
-    public function getName()
+    /**
+     * @param string $document_path the document file path
+     */
+    public function setDocumentPath($document_path)
     {
-        return "thelia_category_creation";
+        $this->document_path = $document_path;
+
+        return $this;
     }
+
+    /**
+     * @return the document URL
+     */
+    public function getDocumentUrl()
+    {
+        return $this->document_url;
+    }
+
+    /**
+     * @param string $document_url the document URL
+     */
+    public function setDocumentUrl($document_url)
+    {
+        $this->document_url = $document_url;
+
+        return $this;
+    }
+
 }
