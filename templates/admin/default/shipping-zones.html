@@ -44,7 +44,7 @@
                                     {if ! $SECURED}
                                         <div class="btn-group">
                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-zones.change"}
-                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping-zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
                                            {/loop}                                               
                                         </div>
                                     {else}
@@ -61,7 +61,7 @@
                                     {if ! $SECURED}
                                         <div class="btn-group">
                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-zones.change"}
-                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping-zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
                                            {/loop}                                               
                                         </div>
                                     {else}
@@ -78,7 +78,7 @@
                                     {if ! $SECURED}
 	                                    <div class="btn-group">
                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-zones.change"}
-                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping-zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
                                            {/loop}                                               
 	                                    </div>
 	                                {else}
@@ -113,7 +113,7 @@
         dialog_title    = {intl l="Delete shipping zone"}
         dialog_message  = {intl l="Do you really want to delete this shipping zone ?"}
 
-        form_action         = {url path='/admin/configuration/shipping-zones/delete'}
+        form_action         = {url path='/admin/configuration/shipping_zones/delete'}
         form_content        = {$smarty.capture.delete_dialog nofilter}
     }
 {/block}

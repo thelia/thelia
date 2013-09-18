@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,30 +17,30 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
 
 /**
- * Class ShippingZoneController
+ * Class ShippingConfigurationController
  * @package Thelia\Controller\Admin
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ShippingZoneController extends BaseAdminController
+class ShippingConfigurationController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth("admin.shipping-zones.view")) return $response;
-        return $this->render("shipping-zones", array("display_shipping_zone" => 20));
+        if (null !== $response = $this->checkAuth("admin.shipping-configuration.view")) return $response;
+        return $this->render("shipping-configuration", array("display_shipping_configuration" => 20));
     }
     
-    public function updateAction($shipping_zones_id)
+    public function updateAction($shipping_configuration_id)
     {
 
-    	return $this->render("shipping-zones-edit", array(
-    		"shipping_zones_id" => $shipping_zones_id
-    	));
+        return $this->render("shipping-configuration-edit", array(
+            "shipping_configuration_id" => $shipping_configuration_id
+        ));
     }
 }
