@@ -111,19 +111,20 @@ function createProduct($faker, $categories, $template, $attribute, $feature)
                     $product->addCategory($categories[$productCategory]);
                 }
             }
-
+/*
             $productCategories = $product->getProductCategories();
             $collection = new \Propel\Runtime\Collection\Collection();
-            foreach($productCategories as $i => $productCategory) {
+            $i=0;
+            foreach($productCategories as $productCategory) {
                 if($i == 0) {
-                    $collection->append($productCategory->setDefaultCategory(1));
+                    $collection->append($productCategory->setDefaultCategory(true));
                 } else {
                     $collection->append($productCategory);
                 }
-
+                $i++;
             }
 
-            $product->setProductCategories($collection);
+            $product->setProductCategories($collection);*/
 
             $product
                 ->setLocale('en_US')
@@ -137,6 +138,13 @@ function createProduct($faker, $categories, $template, $attribute, $feature)
                     ->setDescription($data[5])
                     ->setPostscriptum($data[7])
             ->save();
+
+            $productCategories = $product->getProductCategories()->getFirst();
+            $productCategories->setDefaultCategory(true)
+                ->save();
+
+            // Set the position
+            $product->setPosition($product->getNextPosition())->save();
 
             $images = explode(';', $data[10]);
 
@@ -182,7 +190,6 @@ function createProduct($faker, $categories, $template, $attribute, $feature)
                     ->filterByTitle($pse)
                     ->findOne();
 
-                var_dump($attributeAv->getTitle());
                 $attributeCombination = new \Thelia\Model\AttributeCombination();
                 $attributeCombination
                     ->setAttributeId($attribute->getId())
