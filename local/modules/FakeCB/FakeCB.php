@@ -61,6 +61,11 @@ class FakeCB extends BaseModule implements PaymentModuleInterface
 
     public function install()
     {
+
+    }
+
+    public function afterActivation()
+    {
         /* insert the images from image folder if first module activation */
         $module = $this->getModuleModel();
         if(ModuleImageQuery::create()->filterByModule($module)->count() == 0) {

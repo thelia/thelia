@@ -38,14 +38,22 @@ abstract class BaseModule extends ContainerAware
     const DELIVERY_MODULE_TYPE = 2;
     const PAYMENT_MODULE_TYPE = 3;
 
+    const IS_ACTIVATED = 1;
+    const IS_NOT_ACTIVATED = 0;
+
     public function __construct()
     {
 
     }
 
-    protected function activate()
+    public function activate()
     {
-
+        $moduleModel = $this->getModuleModel();
+        if($moduleModel->getActivate() == self::IS_NOT_ACTIVATED) {
+            $moduleModel->setActivate(self::IS_ACTIVATED);
+            $moduleModel->save();
+            $this->afterActivation();
+        }
     }
 
     public function hasContainer()
@@ -127,7 +135,7 @@ abstract class BaseModule extends ContainerAware
     }
 
     /**
-     * @return ChildModule
+     * @return Module
      * @throws \Thelia\Exception\ModuleException
      */
     public function getModuleModel()
@@ -143,6 +151,7 @@ abstract class BaseModule extends ContainerAware
 
     abstract public function getCode();
     abstract public function install();
+    abstract public function afterActivation();
     abstract public function destroy();
 
 }

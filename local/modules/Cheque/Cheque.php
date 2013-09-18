@@ -25,6 +25,7 @@ namespace Cheque;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Model\ModuleImageQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\PaymentModuleInterface;
 
@@ -59,6 +60,11 @@ class Cheque extends BaseModule implements PaymentModuleInterface
     }
 
     public function install()
+    {
+
+    }
+
+    public function afterActivation()
     {
         /* insert the images from image folder if first module activation */
         $module = $this->getModuleModel();

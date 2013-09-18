@@ -32,6 +32,11 @@ class DebugBar extends BaseModule
      * Like install and destroy
      */
 
+    public function afterActivation()
+    {
+
+    }
+
     public function install()
     {
         // TODO: Implement install() method.
