@@ -48,7 +48,7 @@ class Image extends BaseI18nLoop
     /**
      * @var array Possible image sources
      */
-    protected $possible_sources = array('category', 'product', 'folder', 'content');
+    protected $possible_sources = array('category', 'product', 'folder', 'content', 'module');
 
     /**
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection

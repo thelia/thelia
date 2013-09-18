@@ -21,60 +21,34 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Cheque;
+namespace FakeCB\Tests;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Module\BaseModule;
-use Thelia\Module\PaymentModuleInterface;
+use FakeCB\FakeCB;
+use Thelia\Tests\Module\BaseModuleTestor;
 
-class Cheque extends BaseModule implements PaymentModuleInterface
+/**
+ *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ */
+class FakeCBTest extends BaseModuleTestor
 {
-    protected $request;
-    protected $dispatcher;
-
-    public function setRequest(Request $request)
+    public function getTestedClassName()
     {
-        $this->request = $request;
+        return 'FakeCB\FakeCB';
     }
 
-    public function getRequest()
+    public function getTestedInstance()
     {
-        return $this->request;
+        return new FakeCB();
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function testInstall()
     {
-        $this->dispatcher = $dispatcher;
-    }
+        $fakeCB = new FakeCB();
 
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
+        $fakeCB->install();
 
-    public function pay()
-    {
-        // TODO: Implement pay() method.
+        $out = true;
     }
-
-    /**
-     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
-     * Like install and destroy
-     */
-    public function install()
-    {
-        // TODO: Implement install() method.
-    }
-
-    public function destroy()
-    {
-        // TODO: Implement destroy() method.
-    }
-
-    public function getCode()
-    {
-        return 'Cheque';
-    }
-
 }

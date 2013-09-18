@@ -34,7 +34,7 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 (1, 'DebugBar', 1, 1, 1, 'DebugBar\\DebugBar', NOW(), NOW()),
 (2, 'Colissimo', 2, 1, 1, 'Colissimo\\Colissimo', NOW(), NOW()),
 (3, 'Cheque', 3, 1, 1, 'Cheque\\Cheque', NOW(), NOW()),
-(4, 'Paypal', 3, 1, 2, 'Paypal\\Paypal', NOW(), NOW());
+(4, 'FakeCB', 3, 1, 2, 'FakeCB\\FakeCB', NOW(), NOW());
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 ('2',  'en_US',  '72h delivery', NULL,  NULL,  NULL),

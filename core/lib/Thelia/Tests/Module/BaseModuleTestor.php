@@ -21,60 +21,33 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Cheque;
+namespace Thelia\Tests\Module;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Module\BaseModule;
-use Thelia\Module\PaymentModuleInterface;
 
-class Cheque extends BaseModule implements PaymentModuleInterface
+/**
+ *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ */
+abstract class BaseModuleTestor extends \PHPUnit_Framework_TestCase
 {
-    protected $request;
-    protected $dispatcher;
+    protected $instance;
 
-    public function setRequest(Request $request)
+    abstract public function getTestedClassName();
+    abstract public function getTestedInstance();
+
+    /*protected function getMethod($name)
     {
-        $this->request = $request;
-    }
+        $class = new \ReflectionClass($this->getTestedClassName());
+        $method = $class->getMethod($name);
+        $method->setAccessible(true);
 
-    public function getRequest()
+        return $method;
+    }*/
+
+    public function setUp()
     {
-        return $this->request;
+        $this->instance = $this->getTestedInstance();
     }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
-    public function pay()
-    {
-        // TODO: Implement pay() method.
-    }
-
-    /**
-     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
-     * Like install and destroy
-     */
-    public function install()
-    {
-        // TODO: Implement install() method.
-    }
-
-    public function destroy()
-    {
-        // TODO: Implement destroy() method.
-    }
-
-    public function getCode()
-    {
-        return 'Cheque';
-    }
-
 }
+

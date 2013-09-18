@@ -81,4 +81,9 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
         // TODO: Implement destroy() method.
     }
 
+    public function getCode()
+    {
+        return 'Colissimo';
+    }
+
 }

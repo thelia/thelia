@@ -41,4 +41,9 @@ class DebugBar extends BaseModule
     {
         // TODO: Implement destroy() method.
     }
+
+    public function getCode()
+    {
+        return 'DebugBar';
+    }
 }
