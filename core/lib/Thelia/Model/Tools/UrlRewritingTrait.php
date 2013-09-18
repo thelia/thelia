@@ -23,6 +23,8 @@
 
 namespace Thelia\Model\Tools;
 
+use Thelia\Core\Event\GenerateRewrittenUrlEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\RewritingUrl;
@@ -60,6 +62,16 @@ trait UrlRewritingTrait {
         // Borrowed from http://stackoverflow.com/questions/2668854/sanitizing-strings-to-make-them-url-and-filename-safe
 
         $this->setLocale($locale);
+
+        $generateEvent = new GenerateRewrittenUrlEvent($this, $locale);
+
+        $this->dispatchEvent(TheliaEvents::GENERATE_REWRITTENURL, $generateEvent);
+
+
+        if($generateEvent->isRewritten())
+        {
+            return $generateEvent->getUrl();
+        }
 
         $title = $this->getTitle();
 
