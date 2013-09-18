@@ -401,7 +401,25 @@
         <requirement key="country_id">\d+</requirement>
     </route>
 
-    <!-- end countries routes  management -->
+    <!-- end countries routes management -->
+
+    <!-- Shipping zones routes management -->
+
+    <route id="admin.configuration.shipping-zones.default" path="/admin/configuration/shipping-zones">
+        <default key="_controller">Thelia\Controller\Admin\ShippingZoneController::indexAction</default>
+    </route>
+
+    <route id="admin.configuration.shipping-zones.create" path="/admin/configuration/shipping-zones/create">
+        <default key="_controller">Thelia\Controller\Admin\ShippingZoneController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.shipping-zones.update.view" path="/admin/configuration/shipping-zones/update/{shipping_zones_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ShippingZoneController::updateAction</default>
+        <requirement key="country_id">\d+</requirement>
+    </route>
+
+    <!-- end shipping routes management -->
+
 
     <!-- feature and features value management -->
 
