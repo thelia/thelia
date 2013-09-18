@@ -21,14 +21,17 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace DebugBar\DataCollector;
+namespace TheliaDebugBar\DataCollector;
+
+use DebugBar\DataCollector\DataCollector;
+use DebugBar\DataCollector\Renderable;
 use Propel\Runtime\Propel;
 use Psr\Log\LoggerInterface;
 
 
 /**
  * Class PropelCollector
- * @package DebugBar\DataCollector
+ * @package TheliaDebugBar\DataCollector
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 class PropelCollector extends DataCollector implements Renderable, LoggerInterface

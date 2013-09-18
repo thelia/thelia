@@ -31,7 +31,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
-(1, 'DebugBar', 1, 1, 1, 'DebugBar\\DebugBar', NOW(), NOW()),
+(1, 'TheliaDebugBar', 1, 1, 1, 'TheliaDebugBar\\TheliaDebugBar', NOW(), NOW()),
 (2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', NOW(), NOW()),
 (3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', NOW(), NOW()),
 (4, 'FakeCB', 3, 0, 2, 'FakeCB\\FakeCB', NOW(), NOW());

@@ -21,7 +21,7 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace DebugBar\Smarty\Plugin;
+namespace TheliaDebugBar\Smarty\Plugin;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\an;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;

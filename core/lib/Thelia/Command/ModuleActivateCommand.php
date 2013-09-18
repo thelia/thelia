@@ -63,31 +63,28 @@ class ModuleActivateCommand extends BaseModuleGenerate
         $module = ModuleQuery::create()->findOneByCode($moduleCode);
 
         if(null === $module) {
-            $output->renderBlock(array(
-                '',
-                sprintf("module %s not found", $moduleCode),
-                ''
-            ), "bg=red;fg=white");
+            throw new \RuntimeException(sprintf("module %s not found", $moduleCode));
         }
 
         try {
+            new \TheliaDebugBar\TheliaDebugBar();
+
             $moduleReflection = new \ReflectionClass($module->getFullNamespace());
 
             $moduleInstance = $moduleReflection->newInstance();
 
             $moduleInstance->activate();
         } catch(\Exception $e) {
-            $output->renderBlock(array(
-                '',
-                sprintf("Activation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()),
-                ''
-            ), "bg=red;fg=white");
+            throw new \RuntimeException(sprintf("Activation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()));
         }
 
-        $output->renderBlock(array(
-            '',
-            sprintf("Activation succeed for module %s", $moduleCode),
-            ''
-        ), "bg=green;fg=black");
+        //impossible to change output class in CommandTester...
+        if (method_exists($output, "renderBlock")) {
+            $output->renderBlock(array(
+                '',
+                sprintf("Activation succeed for module %s", $moduleCode),
+                ''
+            ), "bg=green;fg=black");
+        }
     }
 }

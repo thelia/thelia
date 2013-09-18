@@ -21,11 +21,11 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace DebugBar;
+namespace TheliaDebugBar;
 
 use Thelia\Module\BaseModule;
 
-class DebugBar extends BaseModule
+class TheliaDebugBar extends BaseModule
 {
     /**
      * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
@@ -49,6 +49,6 @@ class DebugBar extends BaseModule
 
     public function getCode()
     {
-        return 'DebugBar';
+        return 'TheliaDebugBar';
     }
 }

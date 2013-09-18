@@ -52,7 +52,13 @@ abstract class BaseModule extends ContainerAware
         if($moduleModel->getActivate() == self::IS_NOT_ACTIVATED) {
             $moduleModel->setActivate(self::IS_ACTIVATED);
             $moduleModel->save();
-            $this->afterActivation();
+            try {
+                $this->afterActivation();
+            } catch(\Exception $e) {
+                $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
+                $moduleModel->save();
+                throw $e;
+            }
         }
     }
 
@@ -106,20 +112,20 @@ abstract class BaseModule extends ContainerAware
 
                     $increment = 0;
                     while(file_exists($imageDirectory . '/' . $imageFileName)) {
-                        $imageFileName = sprintf("module/%s-%d-%d-%s", $module->getCode(), $image->getId(), $increment, $fileName);
+                        $imageFileName = sprintf("%s-%d-%d-%s", $module->getCode(), $image->getId(), $increment, $fileName);
                         $increment++;
                     }
 
                     $imagePath = sprintf('%s/%s', $imageDirectory, $imageFileName);
 
                     if (! is_dir($imageDirectory)) {
-                        if(! mkdir($imageDirectory, 0777, true)) {
+                        if(! @mkdir($imageDirectory, 0777, true)) {
                             $con->rollBack();
                             throw new ModuleException(sprintf("Cannot create directory : %s", $imageDirectory), ModuleException::CODE_NOT_FOUND);
                         }
                     }
 
-                    if(! copy($filePath, $imagePath)) {
+                    if(! @copy($filePath, $imagePath)) {
                         $con->rollBack();
                         throw new ModuleException(sprintf("Cannot copy file : %s to : %s", $filePath, $imagePath), ModuleException::CODE_NOT_FOUND);
                     }

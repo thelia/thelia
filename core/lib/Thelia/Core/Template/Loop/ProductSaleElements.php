@@ -151,13 +151,21 @@ class ProductSaleElements extends BaseLoop
             $loopResultRow = new LoopResultRow($loopResult, $PSEValue, $this->versionable, $this->timestampable, $this->countable);
 
             $price = $PSEValue->getPrice();
-            $taxedPrice = $PSEValue->getTaxedPrice(
-                CountryQuery::create()->findOneById(64) // @TODO : make it magic
-            );
+            try {
+                $taxedPrice = $PSEValue->getTaxedPrice(
+                    CountryQuery::create()->findOneById(64) // @TODO : make it magic
+                );
+            } catch(TaxEngineException $e) {
+                $taxedPrice = null;
+            }
             $promoPrice = $PSEValue->getPromoPrice();
-            $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
-                CountryQuery::create()->findOneById(64) // @TODO : make it magic
-            );
+            try {
+                $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
+                    CountryQuery::create()->findOneById(64) // @TODO : make it magic
+                );
+            } catch(TaxEngineException $e) {
+                $taxedPromoPrice = null;
+            }
 
             $loopResultRow->set("ID", $PSEValue->getId())
                 ->set("QUANTITY", $PSEValue->getQuantity())

@@ -32,13 +32,13 @@
     <services>
         <service id="debugBar" class="DebugBar\DebugBar"/>
 
-        <service id="smarty.debugbar" class="DebugBar\Smarty\Plugin\DebugBar">
+        <service id="smarty.debugbar" class="TheliaDebugBar\Smarty\Plugin\DebugBar">
             <argument type="service" id="debugBar"/>
             <argument >%kernel.debug%</argument>
             <tag name="thelia.parser.register_plugin"/>
         </service>
 
-        <service id="debugBar.listener" class="DebugBar\Listeners\DebugBarListeners">
+        <service id="debugBar.listener" class="TheliaDebugBar\Listeners\DebugBarListeners">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>

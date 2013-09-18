@@ -32,6 +32,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Exception\TaxEngineException;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
@@ -603,9 +604,13 @@ class Product extends BaseI18nLoop
 
             $price = $product->getRealLowestPrice();
 
-            $taxedPrice = $product->getTaxedPrice(
-                CountryQuery::create()->findOneById(64) // @TODO : make it magic
-            );
+            try {
+                $taxedPrice = $product->getTaxedPrice(
+                    CountryQuery::create()->findOneById(64) // @TODO : make it magic
+                );
+            } catch(TaxEngineException $e) {
+                $taxedPrice = null;
+            }
 
             // Find previous and next product, in the default category.
             $default_category_id = $product->getDefaultCategoryId();
