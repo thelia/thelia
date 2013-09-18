@@ -31,79 +31,14 @@ use Thelia\Model\ProductQuery;
  * @package Thelia\Tests\Rewriting
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ProductRewriteTest extends \PHPUnit_Framework_TestCase
+class ProductRewriteTest extends BaseRewritingObject
 {
 
     /**
-     * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
+     * @return mixed an instance of Product, Folder, Content or Category Model
      */
-    public function testSimpleFrenchRewrittenUrl()
+    function getObject()
     {
-        $product = new Product();
-        $product->setRef(sprintf("TestRewrittenProduct%s",uniqid()))
-            ->setVisible(1)
-            ->setPosition(1)
-            ->setLocale('fr_FR')
-            ->setTitle('Mon super titre en français')
-            ->save();
-
-        $this->assertRegExp('/^mon-super-titre-en-français(-[0-9]+)?\.html$/', $product->getRewrittenUrl('fr_FR'));
-
-        $rewrittenUrl = $product->generateRewrittenUrl('fr_FR');
-        $this->assertNotNull($rewrittenUrl, "rewritten url can not be null");
-        $this->assertRegExp('/^mon-super-titre-en-français(-[0-9]+)?\.html$/', $rewrittenUrl);
-        //mon-super-titre-en-français-2.html
-
-        $product->delete();
-    }
-
-    /**
-     * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
-     */
-    public function testSimpleEnglishRewrittenUrl()
-    {
-        $product = new Product();
-        $product->setRef(sprintf("TestRewrittenProduct%s",uniqid()))
-            ->setVisible(1)
-            ->setPosition(1)
-            ->setLocale('en_US')
-            ->setTitle('My english super Title')
-            ->save();
-
-        $this->assertRegExp('/^my-english-super-title(-[0-9]+)?\.html$/', $product->getRewrittenUrl('en_US'));
-
-        $rewrittenUrl = $product->generateRewrittenUrl('en_US');
-        $this->assertNotNull($rewrittenUrl, "rewritten url can not be null");
-        $this->assertRegExp('/^my-english-super-title(-[0-9]+)?\.html$/', $rewrittenUrl);
-
-        $product->delete();
-    }
-
-    /**
-     * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Impossible to create an url if title is null
-     */
-    public function testRewrittenWithoutTitle()
-    {
-        $product = new Product();
-        $product->setRef(sprintf("TestRewrittenProduct%s",uniqid()))
-            ->setVisible(1)
-            ->setPosition(1)
-            ->setLocale('en_US')
-            ->setDescription('My english super Description')
-            ->save();
-    }
-
-    /**
-     * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Object product must be saved before generating url
-     */
-    public function testOnNotSavedProduct()
-    {
-        $product = new Product();
-
-        $product->generateRewrittenUrl('fr_FR');
+        return new Product();
     }
 }
