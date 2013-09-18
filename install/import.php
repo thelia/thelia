@@ -48,9 +48,9 @@ try {
     $stmt = $con->prepare("SET foreign_key_checks = 1");
     $stmt->execute();
 
-    
-    $categories = createCategories();
 
+    $categories = createCategories();
+    createColors();
 
     $con->commit();
 } catch (Exception $e) {
@@ -82,6 +82,36 @@ function createCategories()
     }
 
     return $categories;
+}
+
+function createColors()
+{
+    if (($handle = fopen(THELIA_ROOT . '/install/import/colors.csv', "r")) !== FALSE) {
+        $row=0;
+        $attribute = new \Thelia\Model\Attribute();
+        $attribute
+            ->setPosition(1)
+            ->setLocale('fr_FR')
+                ->setTitle('Couleur')
+            ->setLocale('en_US')
+                ->setTitle('Colors');
+
+        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
+            $row++;
+            $attributeAv = new \Thelia\Model\AttributeAv();
+            $attributeAv
+                ->setPosition($row)
+                ->setLocale('fr_FR')
+                    ->setTitle($data[0])
+                ->setLocale('en_US')
+                    ->setTitle($data[1]);
+
+            $attribute->addAttributeAv($attributeAv);
+        }
+        $attribute->save();
+        fclose($handle);
+    }
+
 }
 
 function clearTables()
