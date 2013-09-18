@@ -200,6 +200,12 @@ class Product extends BaseProduct
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        RewritingUrlQuery::create()
+            ->filterByView($this->getRewrittenUrlViewName())
+            ->filterByViewId($this->getId())
+            ->update(array(
+                "View" => ConfigQuery::read('passed_url_view', 'passed-url')
+            ));
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }
 }

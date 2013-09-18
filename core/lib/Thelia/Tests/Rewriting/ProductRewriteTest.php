@@ -33,46 +33,69 @@ use Thelia\Model\ProductQuery;
  */
 class ProductRewriteTest extends \PHPUnit_Framework_TestCase
 {
-    protected static $productId;
-
-    public static function setUpBeforeClass()
-    {
-        $product = new Product();
-        $product->setRef(sprintf("TestRewrittenProduct%s",uniqid()))
-            ->setPosition(1)
-            ->setVisible(1)
-            ->setLocale('en_US')
-                ->setTitle('My english super Title')
-            ->setLocale('fr_FR')
-                ->setTitle('Mon super titre en français')
-            ->save();
-
-        self::$productId = $product->getId();
-    }
 
     /**
      * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
      */
-    public function testFrenchRewrittenUrl()
+    public function testSimpleFrenchRewrittenUrl()
     {
-        $product = ProductQuery::create()->findPk(self::$productId);
+        $product = new Product();
+        $product->setRef(sprintf("TestRewrittenProduct%s",uniqid()))
+            ->setVisible(1)
+            ->setPosition(1)
+            ->setLocale('fr_FR')
+            ->setTitle('Mon super titre en français')
+            ->save();
+
+        $this->assertRegExp('/^mon-super-titre-en-français(-[0-9]+)?\.html$/', $product->getRewrittenUrl('fr_FR'));
 
         $rewrittenUrl = $product->generateRewrittenUrl('fr_FR');
         $this->assertNotNull($rewrittenUrl, "rewritten url can not be null");
         $this->assertRegExp('/^mon-super-titre-en-français(-[0-9]+)?\.html$/', $rewrittenUrl);
         //mon-super-titre-en-français-2.html
+
+        $product->delete();
     }
 
     /**
      * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
      */
-    public function testEnglishRewrittenUrl()
+    public function testSimpleEnglishRewrittenUrl()
     {
-        $product = ProductQuery::create()->findPk(self::$productId);
+        $product = new Product();
+        $product->setRef(sprintf("TestRewrittenProduct%s",uniqid()))
+            ->setVisible(1)
+            ->setPosition(1)
+            ->setLocale('en_US')
+            ->setTitle('My english super Title')
+            ->save();
+
+        $this->assertRegExp('/^my-english-super-title(-[0-9]+)?\.html$/', $product->getRewrittenUrl('en_US'));
 
         $rewrittenUrl = $product->generateRewrittenUrl('en_US');
         $this->assertNotNull($rewrittenUrl, "rewritten url can not be null");
         $this->assertRegExp('/^my-english-super-title(-[0-9]+)?\.html$/', $rewrittenUrl);
+
+        $product->delete();
+    }
+
+    public function testRewrittenWithoutTitle()
+    {
+        $product = new Product();
+        $product->setRef(sprintf("TestRewrittenProduct%s",uniqid()))
+            ->setVisible(1)
+            ->setPosition(1)
+            ->setLocale('en_US')
+            ->setDescription('My english super Description')
+            ->save();
+
+        $this->assertEquals(strtolower(sprintf('%s.html', $product->getRef())), $product->getRewrittenUrl('en_US'));
+
+        $rewrittenUrl = $product->generateRewrittenUrl('en_US');
+        $this->assertNotNull($rewrittenUrl, "rewritten url can not be null");
+        $this->assertEquals(strtolower(sprintf('%s-1.html', $product->getRef())), $rewrittenUrl);
+
+        $product->delete();
     }
 
     /**

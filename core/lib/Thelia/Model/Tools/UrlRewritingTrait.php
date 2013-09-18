@@ -104,7 +104,7 @@ trait UrlRewritingTrait {
             ->filterByViewLocale($locale)
             ->filterByView($this->getRewrittenUrlViewName())
             ->filterByViewId($this->getId())
-            ->filterByRedirected(0)
+            ->filterByRedirected(null)
             ->findOne()
         ;
 
