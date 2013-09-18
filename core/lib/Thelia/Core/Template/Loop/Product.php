@@ -597,14 +597,16 @@ class Product extends BaseI18nLoop
 
         $loopResult = new LoopResult($products);
 
+        $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
+
         foreach ($products as $product) {
 
             $loopResultRow = new LoopResultRow($loopResult, $product, $this->versionable, $this->timestampable, $this->countable);
 
             $price = $product->getRealLowestPrice();
 
-            $taxedPrice = $product->getTaxedPrice(
-                CountryQuery::create()->findOneById(64) // @TODO : make it magic
+            $taxedPrice = null === $price ? null : $product->getTaxedPrice(
+                $taxCountry
             );
 
             // Find previous and next product, in the default category.
