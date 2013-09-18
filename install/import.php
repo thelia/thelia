@@ -192,7 +192,6 @@ function createProduct($faker, $categories, $template, $attribute, $feature)
             }
 
             $brand = $data[11];
-            var_dump($brand);
             $featurAv = \Thelia\Model\FeatureAvI18nQuery::create()
                 ->filterByLocale('en_US')
                 ->filterByTitle($brand)
@@ -369,25 +368,6 @@ function clearTables()
         ->find();
     $product->delete();
 
-    $customer = Thelia\Model\CustomerQuery::create()
-        ->find();
-    $customer->delete();
-
-    $folder = Thelia\Model\FolderQuery::create()
-        ->find();
-    $folder->delete();
-
-    $folder = Thelia\Model\FolderI18nQuery::create()
-        ->find();
-    $folder->delete();
-
-    $content = Thelia\Model\ContentQuery::create()
-        ->find();
-    $content->delete();
-
-    $content = Thelia\Model\ContentI18nQuery::create()
-        ->find();
-    $content->delete();
 
     $accessory = Thelia\Model\AccessoryQuery::create()
         ->find();
@@ -402,14 +382,4 @@ function clearTables()
     $productPrice->delete();
 
     \Thelia\Model\ProductImageQuery::create()->find()->delete();
-    \Thelia\Model\CategoryImageQuery::create()->find()->delete();
-    \Thelia\Model\FolderImageQuery::create()->find()->delete();
-    \Thelia\Model\ContentImageQuery::create()->find()->delete();
-
-    \Thelia\Model\ProductDocumentQuery::create()->find()->delete();
-    \Thelia\Model\CategoryDocumentQuery::create()->find()->delete();
-    \Thelia\Model\FolderDocumentQuery::create()->find()->delete();
-    \Thelia\Model\ContentDocumentQuery::create()->find()->delete();
-
-    \Thelia\Model\CouponQuery::create()->find()->delete();
 }
