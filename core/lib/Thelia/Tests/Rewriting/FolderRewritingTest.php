@@ -22,16 +22,15 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Rewriting;
-use Thelia\Model\Product;
-use Thelia\Model\ProductQuery;
+use Thelia\Model\Folder;
 
 
 /**
- * Class ProductRewriteTest
+ * Class FolderRewritingTest
  * @package Thelia\Tests\Rewriting
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ProductRewriteTest extends BaseRewritingObject
+class FolderRewritingTest extends BaseRewritingObject
 {
 
     /**
@@ -39,6 +38,6 @@ class ProductRewriteTest extends BaseRewritingObject
      */
     function getObject()
     {
-        return new Product();
+        return new Folder();
     }
 }

@@ -22,23 +22,22 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Rewriting;
-use Thelia\Model\Product;
-use Thelia\Model\ProductQuery;
+use Thelia\Model\Content;
 
 
 /**
- * Class ProductRewriteTest
+ * Class ContentRewritingTest
  * @package Thelia\Tests\Rewriting
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ProductRewriteTest extends BaseRewritingObject
+class ContentRewritingTest extends BaseRewritingObject
 {
 
     /**
-     * @return mixed an instance of Product, Folder, Content or Category Model
+     * @return \Thelia\Model\Content
      */
     function getObject()
     {
-        return new Product();
+        return new Content();
     }
 }

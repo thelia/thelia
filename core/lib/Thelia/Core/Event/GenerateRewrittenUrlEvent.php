@@ -21,24 +21,40 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Tests\Rewriting;
-use Thelia\Model\Product;
-use Thelia\Model\ProductQuery;
+namespace Thelia\Core\Event;
 
 
 /**
- * Class ProductRewriteTest
- * @package Thelia\Tests\Rewriting
+ * Class GenerateRewrittenUrlEvent
+ * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ProductRewriteTest extends BaseRewritingObject
-{
+class GenerateRewrittenUrlEvent extends ActionEvent {
 
-    /**
-     * @return mixed an instance of Product, Folder, Content or Category Model
-     */
-    function getObject()
+    protected $object;
+    protected $locale;
+
+    protected $url;
+
+    public function __construct($object, $locale)
     {
-        return new Product();
+        $this->object;
+        $this->locale;
     }
+
+    public function setUrl($url)
+    {
+        $this->url = $url;
+    }
+
+    public function isRewritten()
+    {
+        return null !== $this->url;
+    }
+
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
 }

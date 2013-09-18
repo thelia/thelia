@@ -7,7 +7,7 @@
 	      <div id="wrapper" class="container">
 
 		    {module_include location='home_top'}
-			
+
 			<div class="col-md-12 general-block-decorator dashboard">
 
 				<div class="title title-without-tabs clearfix">
@@ -17,8 +17,8 @@
 						<button type="button" class="btn btn-default disabled"><span class="glyphicon glyphicon-calendar"></span></button>
 						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
 					</div>
-				</div>	
-				
+				</div>
+
 				<div class="text-center clearfix">
 					<div class="btn-group">
 						<button type="button" class="btn btn-default active" data-toggle="jqplot" data-target="turnover"><span class="glyphicon glyphicon-euro"></span> {intl l="Turnover"}</button>
@@ -26,11 +26,11 @@
 						<button type="button" class="btn btn-success" data-toggle="jqplot" data-target="orders"><span class="glyphicon glyphicon-shopping-cart"></span> {intl l="Orders"}</button>
 						<button type="button" class="btn btn-info" data-toggle="jqplot" data-target="first-orders"><span class="glyphicon glyphicon-thumbs-up"></span> {intl l="First orders"}</button>
 						<button type="button" class="btn btn-danger" data-toggle="jqplot" data-target="aborted-orders"><span class="glyphicon glyphicon-thumbs-down"></span> {intl l="Aborted orders"}</button>
-					</div>					
+					</div>
 				</div>
 
 				<hr/>
-				
+
 				<div class="jqplot-content">
 					<div id="jqplot"></div>
 
@@ -42,7 +42,7 @@
 				</div>
 
  			</div>
-	 		
+
 
 	 		<div class="row">
 	 			<div class="col-md-4">
@@ -91,10 +91,10 @@
 	                                <td>0</td>
 								</tr>
 				            </tbody>
-				        </table>                    
+				        </table>
 					</div>
 				</div>
-				
+
 				<div class="col-md-4">
 					<div class="general-block-decorator">
 						<div class="title title-without-tabs">{intl l="Sales statistics"}</div>
@@ -138,7 +138,7 @@
 	                                        <td>25.00 €</td>
 	                                    </tr>
 	                           		</tbody>
-	                        	</table>                                    
+	                        	</table>
 	                        </div>
 							<div class="tab-pane fade" id="statmois">
 	                            <table class="table table-striped">
@@ -206,7 +206,7 @@
 	                                        <td>25.00 €</td>
 	                                    </tr>
 	                           		</tbody>
-	                            </table>                           
+	                            </table>
 	                        </div>
 						</div>
 					</div>
@@ -230,7 +230,7 @@
 									<td><a href="" target="_blank">{intl l="Click here"}</a></td>
 								</tr>
 							</tbody>
-						</table>		                      
+						</table>
 					</div>
 				</div>
 
@@ -245,7 +245,7 @@
 
 	{javascripts file='assets/js/jqplot/jquery.jqplot.min.js'}
         <script src="{$asset_url}"></script>
-		
+
 		{javascripts file='assets/js/jqplot/plugins/jqplot.highlighter.min.js'}
 			<script type="text/javascript" src="{$asset_url}"></script>
 		{/javascripts}
@@ -259,19 +259,19 @@
         <script>
 
         	(function($, window, document){
-    			
-			    $(function(){			    				    	
+
+			    $(function(){
 
 			    	var $elem			= $('#jqplot');
 
-		            var url 			= '/web/test_to_remove/admin-stats.json',
+		            var url 			= "{url file='/test_to_remove/admin-stats.json'}",
 		    			series 			= [],
 		    			seriesColors 	= [],
 		    			ticks 			= [],
 		    			days 			= 0,
 		    			jqplot;
 
-		    		var options = {		    			
+		    		var options = {
 	    				animate: true,
 	    				axesDefaults: {
 	    					tickOptions: { showMark: true, showGridline: true }
@@ -288,13 +288,13 @@
 				        },
 						seriesDefaults: {
 							lineWidth: 3,
-							shadow : false,							
+							shadow : false,
 							markerOptions: { shadow : false, style: 'filledCircle', size: 12 }
 						},
-						grid: {											       
+						grid: {
 					        background: '#FFF',
 					        shadow : false,
-					        borderColor : '#FFF'			        
+					        borderColor : '#FFF'
 					    },
 					    highlighter: {
 					    	show: true,
@@ -302,7 +302,7 @@
 					        tooltipLocation: 'n',
 					        tooltipContentEditor: function(str, seriesIndex, pointIndex, plot){
 
-					        	// Return axis value : data value				            					         				            	
+					        	// Return axis value : data value
 				                return ticks[pointIndex][1] + ': ' + plot.data[seriesIndex][pointIndex][1];
 				            }
     					}
@@ -310,26 +310,26 @@
 
 					// Get datas Json
 					$.getJSON(url)
-		            .done(function(data) {		                		               		                
+		            .done(function(data) {
 
 			    		// Init series datas and colors
-						initJqplotDatas(series, seriesColors, options, data);    		
+						initJqplotDatas(series, seriesColors, options, data);
 
 						// Add days to xaxis
 						for(var i = 1; i < (days+1); i++){
 			    			ticks.push([i-1, i]);
 			    		}
-			    		
+
 			    		// Start jqplot
 			    		var elementId = $elem.attr('id');
 			    		jqplot = $.jqplot(elementId, series, options);
 
-			    		$('[data-toggle="jqplot"]').each(function(){		    			
+			    		$('[data-toggle="jqplot"]').each(function(){
 
 			    			$(this).click(function(){
 
 			    				if($('[data-toggle="jqplot-serie"].active').length > 1 || !$(this).hasClass('active')){
-				    				
+
 				    				// Active button and jqplot-serie management
 				    				$(this).toggleClass('active');
 
@@ -341,16 +341,16 @@
 				    				seriesColors = [];
 
 				    				// Init series datas and colors
-						    		initJqplotDatas(series, seriesColors, options, data);	
+						    		initJqplotDatas(series, seriesColors, options, data);
 
 				    				// Restart jqplot
 				    				jqplot.destroy();
 				    				jqplot = $.jqplot(elementId, series, options);
 			    				}
 
-			    			});			    		
-				    		
-			    		});			    			    			
+			    			});
+
+			    		});
 
 						$(window).bind('resize', function(event, ui) {
 	        				jqplot.replot( { resetAxes: true } );
@@ -359,15 +359,15 @@
 		            })
 		            .fail(function() {
 		                $elem.append('<div class="alert alert-danger">An error occurred while reading from JSON file</div>');
-		            });	
+		            });
 
 
     				function initJqplotDatas(series, seriesColors, options, json){
     					$('[data-toggle="jqplot-serie"].active').each(function(i){
-    						var position = $(this).index() - 1;      						
+    						var position = $(this).index() - 1;
 			    			series.push(json.series[position].datas);
-			    			seriesColors.push(json.series[position].color);			    			
-			    		});			    		
+			    			seriesColors.push(json.series[position].color);
+			    		});
 
     					// Number of days to display ( = datas.length in one serie)
     					days = json.series[0].datas.length;
@@ -380,7 +380,7 @@
     				}
 
 			    });
-    
+
 			}(window.jQuery, window, document));
 
         </script>
