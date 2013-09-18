@@ -111,20 +111,7 @@ function createProduct($faker, $categories, $template, $attribute, $feature)
                     $product->addCategory($categories[$productCategory]);
                 }
             }
-/*
-            $productCategories = $product->getProductCategories();
-            $collection = new \Propel\Runtime\Collection\Collection();
-            $i=0;
-            foreach($productCategories as $productCategory) {
-                if($i == 0) {
-                    $collection->append($productCategory->setDefaultCategory(true));
-                } else {
-                    $collection->append($productCategory);
-                }
-                $i++;
-            }
 
-            $product->setProductCategories($collection);*/
 
             $product
                 ->setLocale('en_US')
