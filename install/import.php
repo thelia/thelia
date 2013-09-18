@@ -51,15 +51,46 @@ try {
 
     $categories = createCategories();
     createColors();
-
+    createBrand();
     $con->commit();
 } catch (Exception $e) {
     echo "error : ".$e->getMessage()."\n";
     $con->rollBack();
 }
 
+function createBrand()
+{
+    echo "start creating brands feature\n";
+    if (($handle = fopen(THELIA_ROOT . '/install/import/brand.csv', "r")) !== FALSE) {
+        $row=0;
+        $feature = new \Thelia\Model\Feature();
+        $feature
+            ->setPosition(1)
+            ->setLocale('fr_FR')
+                ->setTitle('Marque')
+            ->setLocale('en_US')
+                ->setTitle('Brand');
+        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
+            $row++;
+            $featureAv = new \Thelia\Model\FeatureAv();
+            $featureAv
+                ->setPosition($row)
+                ->setLocale('fr_FR')
+                    ->setTitle($data[0])
+                ->setLocale('en_US')
+                    ->setTitle($data[0]);
+            $feature->addFeatureAv($featureAv);
+
+        }
+        $feature->save();
+        fclose($handle);
+    }
+    echo "brands feature created successfully\n";
+}
+
 function createCategories()
 {
+    echo "start creating categories\n";
     $categories = array();
     if (($handle = fopen(THELIA_ROOT . '/install/import/categories.csv', "r")) !== FALSE) {
         $row=0;
@@ -80,12 +111,13 @@ function createCategories()
         }
         fclose($handle);
     }
-
+    echo "categories created successfully\n";
     return $categories;
 }
 
 function createColors()
 {
+    echo "start creating colors attributes\n";
     if (($handle = fopen(THELIA_ROOT . '/install/import/colors.csv', "r")) !== FALSE) {
         $row=0;
         $attribute = new \Thelia\Model\Attribute();
@@ -111,7 +143,7 @@ function createColors()
         $attribute->save();
         fclose($handle);
     }
-
+    echo "colors attributes created with success\n";
 }
 
 function clearTables()
