@@ -1137,9 +1137,9 @@ INSERT INTO `tax_i18n` (`id`, `locale`, `title`)
   (1, 'fr_FR', 'TVA française à 19.6%'),
   (1, 'en_UK', 'french 19.6% tax');
 
-INSERT INTO  `tax_rule` (`id`, `created_at`, `updated_at`)
+INSERT INTO  `tax_rule` (`id`, `is_default`, `created_at`, `updated_at`)
   VALUES
-  (1, NOW(), NOW());
+  (1, 1, NOW(), NOW());
 
 INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`)
   VALUES
