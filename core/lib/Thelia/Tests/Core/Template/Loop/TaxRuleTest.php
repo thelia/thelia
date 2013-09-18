@@ -54,7 +54,7 @@ class TaxRuleTest extends BaseLoopTestor
     {
         $tr = TaxRuleQuery::create()->findOne();
 
-        $this->baseTestSearchById($tr->getId());
+        $this->baseTestSearchById($tr->getId(), array('force_return' => true));
     }
 
 }
