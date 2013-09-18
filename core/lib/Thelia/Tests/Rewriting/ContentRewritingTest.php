@@ -22,22 +22,22 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Rewriting;
-use Thelia\Model\Category;
+use Thelia\Model\Content;
 
 
 /**
- * Class CategoryRewritingTest
+ * Class ContentRewritingTest
  * @package Thelia\Tests\Rewriting
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CategoryRewritingTest extends BaseRewritingObject
+class ContentRewritingTest extends BaseRewritingObject
 {
 
     /**
-     * @return \Thelia\Model\Category
+     * @return \Thelia\Model\Content
      */
     function getObject()
     {
-        return new Category();
+        return new Content();
     }
 }

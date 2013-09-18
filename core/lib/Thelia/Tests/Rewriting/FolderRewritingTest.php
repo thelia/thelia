@@ -22,22 +22,22 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Rewriting;
-use Thelia\Model\Category;
+use Thelia\Model\Folder;
 
 
 /**
- * Class CategoryRewritingTest
+ * Class FolderRewritingTest
  * @package Thelia\Tests\Rewriting
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CategoryRewritingTest extends BaseRewritingObject
+class FolderRewritingTest extends BaseRewritingObject
 {
 
     /**
-     * @return \Thelia\Model\Category
+     * @return mixed an instance of Product, Folder, Content or Category Model
      */
     function getObject()
     {
-        return new Category();
+        return new Folder();
     }
 }
