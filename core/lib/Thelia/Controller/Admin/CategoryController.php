@@ -27,6 +27,7 @@ use Thelia\Core\Event\CategoryDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\CategoryUpdateEvent;
 use Thelia\Core\Event\CategoryCreateEvent;
+use Thelia\Form\CategoryPictureCreationForm;
 use Thelia\Model\CategoryQuery;
 use Thelia\Form\CategoryModificationForm;
 use Thelia\Form\CategoryCreationForm;
@@ -306,6 +307,39 @@ class CategoryController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
+    /**
+     * Add category pictures
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function addRelatedPictureAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.categories.update")) {
+            return $response;
+        }
+
+//        $content_id = intval($this->getRequest()->get('content_id'));
+//
+//        if ($content_id > 0) {
+//
+//            $event = new CategoryAddContentEvent(
+//                $this->getExistingObject(),
+//                $content_id
+//            );
+//
+//            try {
+//                $this->dispatch(TheliaEvents::CATEGORY_ADD_CONTENT, $event);
+//            }
+//            catch (\Exception $ex) {
+//                // Any error
+//                return $this->errorPage($ex);
+//            }
+//        }
+
+        $this->redirectToEditionTemplate();
+    }
+
     public function deleteRelatedContentAction() {
 
         // Check current user authorization
@@ -331,4 +365,30 @@ class CategoryController extends AbstractCrudController
 
         $this->redirectToEditionTemplate();
     }
+
+    /**
+     * @todo remove
+     * @return Symfony\Component\HttpFoundation\Response|void
+     */
+    public function updateAction()
+    {
+        var_dump('updateAction');
+        if ($this->getRequest()->isMethod('POST')) {
+            var_dump('getRequest', $this->getRequest()->files);
+            // Create the form from the request
+            $creationForm = new CategoryPictureCreationForm($this->getRequest());
+
+            // Check the form against constraints violations
+            $form = $this->validateForm($creationForm, 'POST');
+            var_dump('$form', $form);
+
+            // Get the form field values
+            $data = $form->getData();
+            var_dump('$data', $data);
+        }
+
+
+        return parent::updateAction();
+    }
+
 }

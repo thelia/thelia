@@ -246,6 +246,31 @@
 		                    </div>
 
 		                    <div class="tab-pane fade" id="images">
+                                image
+                                {form name="thelia.admin.category.picture.creation"}
+                                    <form id="related_picture_form" method="POST" {form_enctype form=$form} action="#">
+                                        {form_hidden_fields form=$form}
+
+
+                                        {form_field form=$form field='title'}
+                                            <div class="form-group {if $error}has-error{/if}">
+                                                <label for="title" class="control-label" >{intl l='Title :'}</label>
+                                                <input id="title" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='title'}">
+                                                {if $error}{$message}{/if}
+                                            </div>
+                                        {/form_field}
+
+                                        {form_field form=$form field='file'}
+                                            <div class="form-group {if $error}has-error{/if}">
+                                                <label for="file" class="control-label" >{intl l='Picture :'}</label>
+                                                <input id="file" class="form-control" type="file" name="{$name}" value="{$value}" placeholder="{intl l='file'}">
+                                                {if $error}{$message}{/if}
+                                            </div>
+                                        {/form_field}
+
+                                        <input type="submit" value="submit"/>
+                                    </form>
+                                {/form}
 		                    </div>
 
 		                    <div class="tab-pane fade" id="documents">

@@ -100,6 +100,10 @@
         <default key="_controller">Thelia\Controller\Admin\CategoryController::addRelatedContentAction</default>
     </route>
 
+    <route id="admin.categories.related-content.add" path="/admin/categories/related-picture/add">
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::addRelatedPictureAction</default>
+    </route>
+
     <route id="admin.categories.related-content.delete" path="/admin/categories/related-content/delete">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::deleteRelatedContentAction</default>
     </route>
