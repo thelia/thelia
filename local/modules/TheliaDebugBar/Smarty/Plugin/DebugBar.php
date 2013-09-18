@@ -71,7 +71,11 @@ class DebugBar extends AbstractSmartyPlugin
                     }
                 }
 
-                file_put_contents($cssFile, $assetCss->dump());
+                if(!file_exists(THELIA_WEB_DIR . "/cache")) {
+                    @mkdir(THELIA_WEB_DIR . "/cache");
+                }
+
+                @file_put_contents($cssFile, $assetCss->dump());
             }
             $render =  sprintf('<link rel="stylesheet" href="%s">', URL::getInstance()->absoluteUrl($webFile, array(), URL::PATH_TO_FILE));
         }
@@ -96,7 +100,11 @@ class DebugBar extends AbstractSmartyPlugin
                     }
                 }
 
-                file_put_contents($cacheFile, $assetJs->dump());
+                if(!file_exists(THELIA_WEB_DIR . "/cache")) {
+                    @mkdir(THELIA_WEB_DIR . "/cache");
+                }
+
+                @file_put_contents($cacheFile, $assetJs->dump());
             }
 
             $render = sprintf('<script src="%s"></script>', URL::getInstance()->absoluteUrl($webFile, array(), URL::PATH_TO_FILE));

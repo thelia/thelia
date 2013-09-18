@@ -63,6 +63,12 @@
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
         <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
 
+        <form name="thelia.admin.folder.creation" class="Thelia\Form\FolderCreationForm"/>
+        <form name="thelia.admin.folder.modification" class="Thelia\Form\FolderModificationForm"/>
+
+        <form name="thelia.admin.content.creation" class="Thelia\Form\ContentCreationForm"/>
+        <form name="thelia.admin.content.modification" class="Thelia\Form\ContentModificationForm"/>
+
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
 
         <form name="thelia.order.delivery" class="Thelia\Form\OrderDelivery"/>

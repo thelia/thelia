@@ -23,6 +23,8 @@
 
 namespace Thelia\Model\Tools;
 
+use Thelia\Core\Event\GenerateRewrittenUrlEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\RewritingUrl;
@@ -61,14 +63,28 @@ trait UrlRewritingTrait {
 
         $this->setLocale($locale);
 
-        $title = $this->getTitle() ?: $this->getRef();
+        $generateEvent = new GenerateRewrittenUrlEvent($this, $locale);
+
+        $this->dispatchEvent(TheliaEvents::GENERATE_REWRITTENURL, $generateEvent);
+
+
+        if($generateEvent->isRewritten())
+        {
+            return $generateEvent->getUrl();
+        }
+
+        $title = $this->getTitle();
+
+        if(null == $title) {
+            throw new \RuntimeException('Impossible to create an url if title is null');
+        }
         // Replace all weird characters with dashes
         $string = preg_replace('/[^\w\-~_\.]+/u', '-', $title);
 
         // Only allow one dash separator at a time (and make string lowercase)
         $cleanString = mb_strtolower(preg_replace('/--+/u', '-', $string), 'UTF-8');
 
-        $urlFilePart = $cleanString . ".html";
+        $urlFilePart = rtrim($cleanString, '.-~_') . ".html";
 
         // TODO :
         // check if URL url already exists, and add a numeric suffix, or the like
@@ -104,7 +120,7 @@ trait UrlRewritingTrait {
             ->filterByViewLocale($locale)
             ->filterByView($this->getRewrittenUrlViewName())
             ->filterByViewId($this->getId())
-            ->filterByRedirected(0)
+            ->filterByRedirected(null)
             ->findOne()
         ;
 

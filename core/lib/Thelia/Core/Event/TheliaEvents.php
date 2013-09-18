@@ -441,4 +441,9 @@ final class TheliaEvents
      */
     const MAILTRANSPORTER_CONFIG = 'action.mailertransporter.config';
 
+    /**
+     * sent when Thelia try to generate a rewriten url
+     */
+    const GENERATE_REWRITTENURL = 'action.generate_rewritenurl';
+
 }

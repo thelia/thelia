@@ -31,59 +31,14 @@ use Thelia\Model\ProductQuery;
  * @package Thelia\Tests\Rewriting
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ProductRewriteTest extends \PHPUnit_Framework_TestCase
+class ProductRewriteTest extends BaseRewritingObject
 {
-    protected static $productId;
-
-    public static function setUpBeforeClass()
-    {
-        $product = new Product();
-        $product->setRef(sprintf("TestRewrittenProduct%s",uniqid()))
-            ->setPosition(1)
-            ->setVisible(1)
-            ->setLocale('en_US')
-                ->setTitle('My english super Title')
-            ->setLocale('fr_FR')
-                ->setTitle('Mon super titre en français')
-            ->save();
-
-        self::$productId = $product->getId();
-    }
 
     /**
-     * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
+     * @return mixed an instance of Product, Folder, Content or Category Model
      */
-    public function testFrenchRewrittenUrl()
+    function getObject()
     {
-        $product = ProductQuery::create()->findPk(self::$productId);
-
-        $rewrittenUrl = $product->generateRewrittenUrl('fr_FR');
-        $this->assertNotNull($rewrittenUrl, "rewritten url can not be null");
-        $this->assertRegExp('/^mon-super-titre-en-français(-[0-9]+)?\.html$/', $rewrittenUrl);
-        //mon-super-titre-en-français-2.html
-    }
-
-    /**
-     * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
-     */
-    public function testEnglishRewrittenUrl()
-    {
-        $product = ProductQuery::create()->findPk(self::$productId);
-
-        $rewrittenUrl = $product->generateRewrittenUrl('en_US');
-        $this->assertNotNull($rewrittenUrl, "rewritten url can not be null");
-        $this->assertRegExp('/^my-english-super-title(-[0-9]+)?\.html$/', $rewrittenUrl);
-    }
-
-    /**
-     * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Object product must be saved before generating url
-     */
-    public function testOnNotSavedProduct()
-    {
-        $product = new Product();
-
-        $product->generateRewrittenUrl('fr_FR');
+        return new Product();
     }
 }

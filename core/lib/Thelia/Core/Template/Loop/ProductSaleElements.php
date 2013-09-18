@@ -31,6 +31,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
@@ -147,13 +148,15 @@ class ProductSaleElements extends BaseLoop
 
         $loopResult = new LoopResult($PSEValues);
 
+        $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
+
         foreach ($PSEValues as $PSEValue) {
             $loopResultRow = new LoopResultRow($loopResult, $PSEValue, $this->versionable, $this->timestampable, $this->countable);
 
             $price = $PSEValue->getPrice();
             try {
                 $taxedPrice = $PSEValue->getTaxedPrice(
-                    CountryQuery::create()->findOneById(64) // @TODO : make it magic
+                    $taxCountry
                 );
             } catch(TaxEngineException $e) {
                 $taxedPrice = null;
@@ -161,7 +164,7 @@ class ProductSaleElements extends BaseLoop
             $promoPrice = $PSEValue->getPromoPrice();
             try {
                 $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
-                    CountryQuery::create()->findOneById(64) // @TODO : make it magic
+                    $taxCountry
                 );
             } catch(TaxEngineException $e) {
                 $taxedPromoPrice = null;
