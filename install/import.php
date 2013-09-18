@@ -77,7 +77,7 @@ try {
         ->save();
     echo "end creating templates\n";
 
-    createProduct($categories, $template);
+    createProduct($faker, $categories, $template, $color, $brand);
 
 
 
@@ -87,7 +87,7 @@ try {
     $con->rollBack();
 }
 
-function createProduct($categories, $template)
+function createProduct($faker, $categories, $template, $attribute, $feature)
 {
     echo "start creating products\n";
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
@@ -143,7 +143,6 @@ function createProduct($categories, $template)
             foreach ($images as $image) {
                 $image = trim($image);
                 if(empty($image)) continue;
-                var_dump($image);
                 $productImage = new \Thelia\Model\ProductImage();
                 $productImage
                     ->setProduct($product)
@@ -151,35 +150,65 @@ function createProduct($categories, $template)
                     ->save();
                 $fileSystem->copy(THELIA_ROOT . 'install/import/images/'.$image, THELIA_ROOT . 'local/media/images/product/'.$image, true);
             }
+
+            $pses = explode(";", $data[12]);
+
+
+            foreach ($pses as $pse) {
+                if(empty($pse)) continue;
+                $stock = new \Thelia\Model\ProductSaleElements();
+                $stock->setProduct($product);
+                $stock->setRef($product->getId() . '_' . uniqid('', true));
+                $stock->setQuantity($faker->randomNumber(1,50));
+                if(!empty($data[9])) {
+                    $stock->setPromo(1);
+                } else {
+                    $stock->setPromo(0);
+                }
+
+                $stock->setNewness($faker->randomNumber(0,1));
+                $stock->setWeight($faker->randomFloat(2, 100,10000));
+                $stock->save();
+
+                $productPrice = new \Thelia\Model\ProductPrice();
+                $productPrice->setProductSaleElements($stock);
+                $productPrice->setCurrencyId(1);
+                $productPrice->setPrice($data[8]);
+                $productPrice->setPromoPrice($data[9]);
+                $productPrice->save();
+
+                $attributeAv = \Thelia\Model\AttributeAvI18nQuery::create()
+                    ->filterByLocale('en_US')
+                    ->filterByTitle($pse)
+                    ->findOne();
+
+                var_dump($attributeAv->getTitle());
+                $attributeCombination = new \Thelia\Model\AttributeCombination();
+                $attributeCombination
+                    ->setAttributeId($attribute->getId())
+                    ->setAttributeAvId($attributeAv->getId())
+                    ->setProductSaleElements($stock)
+                    ->save();
+            }
+
+            $brand = $data[11];
+            var_dump($brand);
+            $featurAv = \Thelia\Model\FeatureAvI18nQuery::create()
+                ->filterByLocale('en_US')
+                ->filterByTitle($brand)
+                ->findOne();
+
+            $featureProduct = new Thelia\Model\FeatureProduct();
+            $featureProduct->setProduct($product)
+                ->setFeatureId($feature->getId())
+                ->setFeatureAvId($featurAv->getId())
+                ->save()
+            ;
+
+
+
         }
     }
-
-/*    $product = new Thelia\Model\Product();
-    $product->setRef($category->getId() . '_' . $position . '_' . $faker->randomNumber(8));
-    $product->addCategory($category);
-    $product->setVisible(1);
-    $productCategories = $product->getProductCategories();
-    $collection = new \Propel\Runtime\Collection\Collection();
-    $collection->prepend($productCategories[0]->setDefaultCategory(1));
-    $product->setProductCategories($collection);
-    $product->setVisible(1);
-    $product->setPosition($position);
-    $product->setTaxRuleId(1);
-    $product->setTemplate($template);
-
-    setI18n($faker, $product);
-
-    $product->save();
-    $productId = $product->getId();
-    $productIdList[] = $productId;
-
-    $image = new \Thelia\Model\ProductImage();
-    $image->setProductId($productId);
-    generate_image($image, 1, 'product', $productId);
-
-    $document = new \Thelia\Model\ProductDocument();
-    $document->setProductId($productId);
-    generate_document($document, 1, 'product', $productId);*/
     echo "end creating products\n";
 }
 
