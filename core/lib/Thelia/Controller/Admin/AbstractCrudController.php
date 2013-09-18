@@ -224,7 +224,7 @@ abstract class AbstractCrudController extends BaseAdminController
      * @param unknown $updateEvent the update event
      * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalUpdateAction($updateeEvent)
+    protected function performAdditionalUpdateAction($updateEvent)
     {
         return null;
     }
@@ -236,6 +236,17 @@ abstract class AbstractCrudController extends BaseAdminController
      * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalDeleteAction($deleteEvent)
+    {
+        return null;
+    }
+
+    /**
+     * Put in this method post object position change processing if required.
+     *
+     * @param unknown $deleteEvent the delete event
+     * @return Response a response, or null to continue normal processing
+     */
+    protected function performAdditionalUpdatePositionAction($positionChangeEvent)
     {
         return null;
     }
@@ -309,14 +320,18 @@ abstract class AbstractCrudController extends BaseAdminController
                 $this->adminLogAppend(sprintf("%s %s (ID %s) created", ucfirst($this->objectName), $this->getObjectLabel($createdObject), $this->getObjectId($createdObject)));
             }
 
-            $this->performAdditionalCreateAction($createEvent);
+            $response = $this->performAdditionalCreateAction($createEvent);
 
-            // Substitute _ID_ in the URL with the ID of the created object
-            $successUrl = str_replace('_ID_', $this->getObjectId($createdObject), $creationForm->getSuccessUrl());
+            if ($response == null)  {
+                // Substitute _ID_ in the URL with the ID of the created object
+                $successUrl = str_replace('_ID_', $this->getObjectId($createdObject), $creationForm->getSuccessUrl());
 
-            // Redirect to the success URL
-            $this->redirect($successUrl);
-
+                // Redirect to the success URL
+                $this->redirect($successUrl);
+            }
+            else {
+                return $response;
+            }
         }
         catch (FormValidationException $ex) {
             // Form cannot be validated
@@ -396,16 +411,21 @@ abstract class AbstractCrudController extends BaseAdminController
                 $this->adminLogAppend(sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
             }
 
-            $this->performAdditionalUpdateAction($changeEvent);
+            $response = $this->performAdditionalUpdateAction($changeEvent);
 
-            // If we have to stay on the same page, do not redirect to the succesUrl,
-            // just redirect to the edit page again.
-            if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirectToEditionTemplate($this->getRequest());
+            if ($response == null) {
+                // If we have to stay on the same page, do not redirect to the succesUrl,
+                // just redirect to the edit page again.
+                if ($this->getRequest()->get('save_mode') == 'stay') {
+                    $this->redirectToEditionTemplate($this->getRequest());
+                }
+
+                // Redirect to the success URL
+                $this->redirect($changeForm->getSuccessUrl());
             }
-
-            // Redirect to the success URL
-            $this->redirect($changeForm->getSuccessUrl());
+            else {
+                return $response;
+            }
         }
         catch (FormValidationException $ex) {
             // Form cannot be validated
@@ -452,7 +472,14 @@ abstract class AbstractCrudController extends BaseAdminController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        $response = $this->performAdditionalUpdatePositionAction($event);
+
+        if ($response == null) {
+            $this->redirectToListTemplate();
+        }
+        else {
+            return $response;
+        }
     }
 
     /**
@@ -475,7 +502,7 @@ abstract class AbstractCrudController extends BaseAdminController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToRoute('admin.categories.default');
+        $this->redirectToListTemplate();
     }
 
     /**

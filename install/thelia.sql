@@ -36,7 +36,7 @@ CREATE TABLE `product`
     `ref` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER NOT NULL,
-    `template_id` INTEGER NOT NULL,
+    `template_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -66,11 +66,13 @@ CREATE TABLE `product_category`
 (
     `product_id` INTEGER NOT NULL,
     `category_id` INTEGER NOT NULL,
+    `default_category` TINYINT(1),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`product_id`,`category_id`),
     INDEX `idx_product_has_category_category1` (`category_id`),
     INDEX `idx_product_has_category_product1` (`product_id`),
+    INDEX `idx_product_has_category_default` (`default_category`),
     CONSTRAINT `fk_product_has_category_product1`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
@@ -133,6 +135,7 @@ DROP TABLE IF EXISTS `tax_rule`;
 CREATE TABLE `tax_rule`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `is_default` TINYINT(1) DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -341,6 +344,8 @@ CREATE TABLE `attribute_combination`
     CONSTRAINT `fk_attribute_combination_product_sale_elements_id`
         FOREIGN KEY (`product_sale_elements_id`)
         REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -632,54 +637,73 @@ DROP TABLE IF EXISTS `order`;
 CREATE TABLE `order`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `ref` VARCHAR(45),
+    `ref` VARCHAR(45) NOT NULL,
     `customer_id` INTEGER NOT NULL,
-    `address_invoice` INTEGER,
-    `address_delivery` INTEGER,
-    `invoice_date` DATE,
-    `currency_id` INTEGER,
+    `invoice_order_address_id` INTEGER NOT NULL,
+    `delivery_order_address_id` INTEGER NOT NULL,
+    `invoice_date` DATE NOT NULL,
+    `currency_id` INTEGER NOT NULL,
     `currency_rate` FLOAT NOT NULL,
-    `transaction` VARCHAR(100),
-    `delivery_num` VARCHAR(100),
-    `invoice` VARCHAR(100),
-    `postage` FLOAT,
-    `payment` VARCHAR(45) NOT NULL,
-    `carrier` VARCHAR(45) NOT NULL,
-    `status_id` INTEGER,
-    `lang` VARCHAR(10) NOT NULL,
+    `transaction_ref` VARCHAR(100) COMMENT 'transaction reference - usually use to identify a transaction with banking modules',
+    `delivery_ref` VARCHAR(100) COMMENT 'delivery reference - usually use to identify a delivery progress on a distant delivery tracker website',
+    `invoice_ref` VARCHAR(100) COMMENT 'the invoice reference',
+    `postage` FLOAT NOT NULL,
+    `payment_module_id` INTEGER NOT NULL,
+    `delivery_module_id` INTEGER NOT NULL,
+    `status_id` INTEGER NOT NULL,
+    `lang_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
+    UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_order_currency_id` (`currency_id`),
     INDEX `idx_order_customer_id` (`customer_id`),
-    INDEX `idx_order_address_invoice` (`address_invoice`),
-    INDEX `idx_order_address_delivery` (`address_delivery`),
+    INDEX `idx_order_invoice_order_address_id` (`invoice_order_address_id`),
+    INDEX `idx_order_delivery_order_address_id` (`delivery_order_address_id`),
     INDEX `idx_order_status_id` (`status_id`),
+    INDEX `fk_order_payment_module_id_idx` (`payment_module_id`),
+    INDEX `fk_order_delivery_module_id_idx` (`delivery_module_id`),
+    INDEX `fk_order_lang_id_idx` (`lang_id`),
     CONSTRAINT `fk_order_currency_id`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL,
+        ON DELETE RESTRICT,
     CONSTRAINT `fk_order_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_order_address_invoice`
-        FOREIGN KEY (`address_invoice`)
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_invoice_order_address_id`
+        FOREIGN KEY (`invoice_order_address_id`)
         REFERENCES `order_address` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL,
-    CONSTRAINT `fk_order_address_delivery`
-        FOREIGN KEY (`address_delivery`)
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_delivery_order_address_id`
+        FOREIGN KEY (`delivery_order_address_id`)
         REFERENCES `order_address` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL,
+        ON DELETE RESTRICT,
     CONSTRAINT `fk_order_status_id`
         FOREIGN KEY (`status_id`)
         REFERENCES `order_status` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_payment_module_id`
+        FOREIGN KEY (`payment_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_lang_id`
+        FOREIGN KEY (`lang_id`)
+        REFERENCES `lang` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -852,32 +876,38 @@ CREATE TABLE `area`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(100) NOT NULL,
-    `unit` FLOAT,
+    `postage` FLOAT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- delivzone
+-- area_delivery_module
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `delivzone`;
+DROP TABLE IF EXISTS `area_delivery_module`;
 
-CREATE TABLE `delivzone`
+CREATE TABLE `area_delivery_module`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `area_id` INTEGER,
-    `delivery` VARCHAR(45) NOT NULL,
+    `area_id` INTEGER NOT NULL,
+    `delivery_module_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_delivzone_area_id` (`area_id`),
-    CONSTRAINT `fk_delivzone_area_id`
+    INDEX `idx_area_delivery_module_area_id` (`area_id`),
+    INDEX `idx_area_delivery_module_delivery_module_id_idx` (`delivery_module_id`),
+    CONSTRAINT `fk_area_delivery_module_area_id`
         FOREIGN KEY (`area_id`)
         REFERENCES `area` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL
+        ON DELETE CASCADE,
+    CONSTRAINT `idx_area_delivery_module_delivery_module_id`
+        FOREIGN KEY (`delivery_module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1128,11 +1158,13 @@ CREATE TABLE `content_folder`
 (
     `content_id` INTEGER NOT NULL,
     `folder_id` INTEGER NOT NULL,
+    `default_folder` TINYINT(1),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`content_id`,`folder_id`),
     INDEX `idx_content_folder_content_id` (`content_id`),
     INDEX `idx_content_folder_folder_id` (`folder_id`),
+    INDEX `idx_content_folder_default` (`default_folder`),
     CONSTRAINT `fk_content_folder_content_id`
         FOREIGN KEY (`content_id`)
         REFERENCES `content` (`id`)
@@ -2136,7 +2168,7 @@ CREATE TABLE `product_version`
     `ref` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER NOT NULL,
-    `template_id` INTEGER NOT NULL,
+    `template_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

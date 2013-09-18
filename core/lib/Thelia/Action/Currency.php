@@ -71,7 +71,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     {
         $search = CurrencyQuery::create();
 
-        if (null !== $currency = CurrencyQuery::create()->findOneById($event->getCurrencyId())) {
+        if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
 
             $currency
                 ->setDispatcher($this->getDispatcher())
@@ -97,7 +97,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     {
         $search = CurrencyQuery::create();
 
-        if (null !== $currency = CurrencyQuery::create()->findOneById($event->getCurrencyId())) {
+        if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
 
             if ($currency->getByDefault() != $event->getIsDefault()) {
 
@@ -123,7 +123,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     public function delete(CurrencyDeleteEvent $event)
     {
 
-        if (null !== ($currency = CurrencyQuery::create()->findOneById($event->getCurrencyId()))) {
+        if (null !== ($currency = CurrencyQuery::create()->findPk($event->getCurrencyId()))) {
 
             $currency
                 ->setDispatcher($this->getDispatcher())

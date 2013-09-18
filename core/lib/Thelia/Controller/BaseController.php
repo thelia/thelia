@@ -31,6 +31,7 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Translation\Translator;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Template\ParserContext;
@@ -63,6 +64,14 @@ class BaseController extends ContainerAware
     }
 
     /**
+     * Return a JSON response
+     */
+    protected function jsonResponse($json_data)
+    {
+        return new Response($json_data, 200, array('content-type' => 'application/json'));
+    }
+
+    /**
      * Dispatch a Thelia event
      *
      * @param string $eventName a TheliaEvent name, as defined in TheliaEvents class
@@ -89,7 +98,7 @@ class BaseController extends ContainerAware
      *
      * return the Translator
      *
-     * @return mixed \Thelia\Core\Translation\Translator
+     * @return Translator
      */
     public function getTranslator()
     {
@@ -280,5 +289,17 @@ class BaseController extends ContainerAware
         if(false === $this->getRequest()->isXmlHttpRequest() && false === $this->isDebug()) {
             $this->accessDenied();
         }
+    }
+
+    /**
+     *
+     * return an instance of \Swift_Mailer with good Transporter configured.
+     *
+     * @return \Swift_Mailer
+     */
+    public function getMailer()
+    {
+        $mailer = $this->container->get('mailer');
+        return $mailer->getSwiftMailer();
     }
 }

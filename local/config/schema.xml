@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -28,7 +28,7 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <column name="template_id" required="true" type="INTEGER" />
+    <column name="template_id" type="INTEGER" />
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
     </foreign-key>
@@ -56,6 +56,7 @@
   <table isCrossRef="true" name="product_category" namespace="Thelia\Model">
     <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="category_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="default_category" type="BOOLEAN" />
     <foreign-key foreignTable="product" name="fk_product_has_category_product1" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
@@ -67,6 +68,9 @@
     </index>
     <index name="idx_product_has_category_product1">
       <index-column name="product_id" />
+    </index>
+    <index name="idx_product_has_category_default">
+      <index-column name="default_category" />
     </index>
     <behavior name="timestampable" />
   </table>
@@ -107,6 +111,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="LONGVARCHAR" />
+    <column defaultValue="0" name="is_default" required="true" type="BOOLEAN" />
     <behavior name="timestampable" />
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description" />
@@ -255,7 +260,7 @@
     <foreign-key foreignTable="attribute_av" name="fk_attribute_combination_attribute_av_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_av_id" />
     </foreign-key>
-    <foreign-key foreignTable="product_sale_elements" name="fk_attribute_combination_product_sale_elements_id">
+    <foreign-key foreignTable="product_sale_elements" name="fk_attribute_combination_product_sale_elements_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
     <index name="idx_attribute_combination_attribute_id">
@@ -491,35 +496,44 @@
   </table>
   <table name="order" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="ref" size="45" type="VARCHAR" />
+    <column name="ref" required="true" size="45" type="VARCHAR" />
     <column name="customer_id" required="true" type="INTEGER" />
-    <column name="address_invoice" type="INTEGER" />
-    <column name="address_delivery" type="INTEGER" />
-    <column name="invoice_date" type="DATE" />
-    <column name="currency_id" type="INTEGER" />
+    <column name="invoice_order_address_id" required="true" type="INTEGER" />
+    <column name="delivery_order_address_id" required="true" type="INTEGER" />
+    <column name="invoice_date" required="true" type="DATE" />
+    <column name="currency_id" required="true" type="INTEGER" />
     <column name="currency_rate" required="true" type="FLOAT" />
-    <column name="transaction" size="100" type="VARCHAR" />
-    <column name="delivery_num" size="100" type="VARCHAR" />
-    <column name="invoice" size="100" type="VARCHAR" />
-    <column name="postage" type="FLOAT" />
-    <column name="payment" required="true" size="45" type="VARCHAR" />
-    <column name="carrier" required="true" size="45" type="VARCHAR" />
-    <column name="status_id" type="INTEGER" />
-    <column name="lang" required="true" size="10" type="VARCHAR" />
-    <foreign-key foreignTable="currency" name="fk_order_currency_id" onDelete="SET NULL" onUpdate="RESTRICT">
+    <column description="transaction reference - usually use to identify a transaction with banking modules" name="transaction_ref" size="100" type="VARCHAR" />
+    <column description="delivery reference - usually use to identify a delivery progress on a distant delivery tracker website" name="delivery_ref" size="100" type="VARCHAR" />
+    <column description="the invoice reference" name="invoice_ref" size="100" type="VARCHAR" />
+    <column name="postage" required="true" type="FLOAT" />
+    <column name="payment_module_id" required="true" type="INTEGER" />
+    <column name="delivery_module_id" required="true" type="INTEGER" />
+    <column name="status_id" required="true" type="INTEGER" />
+    <column name="lang_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="currency" name="fk_order_currency_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
     </foreign-key>
-    <foreign-key foreignTable="customer" name="fk_order_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="customer" name="fk_order_customer_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
-    <foreign-key foreignTable="order_address" name="fk_order_address_invoice" onDelete="SET NULL" onUpdate="RESTRICT">
-      <reference foreign="id" local="address_invoice" />
+    <foreign-key foreignTable="order_address" name="fk_order_invoice_order_address_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="invoice_order_address_id" />
     </foreign-key>
-    <foreign-key foreignTable="order_address" name="fk_order_address_delivery" onDelete="SET NULL" onUpdate="RESTRICT">
-      <reference foreign="id" local="address_delivery" />
+    <foreign-key foreignTable="order_address" name="fk_order_delivery_order_address_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="delivery_order_address_id" />
     </foreign-key>
-    <foreign-key foreignTable="order_status" name="fk_order_status_id" onDelete="SET NULL" onUpdate="RESTRICT">
+    <foreign-key foreignTable="order_status" name="fk_order_status_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="status_id" />
+    </foreign-key>
+    <foreign-key foreignTable="module" name="fk_order_payment_module_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="payment_module_id" />
+    </foreign-key>
+    <foreign-key foreignTable="module" name="fk_order_delivery_module_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="delivery_module_id" />
+    </foreign-key>
+    <foreign-key foreignTable="lang" name="fk_order_lang_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="lang_id" />
     </foreign-key>
     <index name="idx_order_currency_id">
       <index-column name="currency_id" />
@@ -527,14 +541,26 @@
     <index name="idx_order_customer_id">
       <index-column name="customer_id" />
     </index>
-    <index name="idx_order_address_invoice">
-      <index-column name="address_invoice" />
+    <index name="idx_order_invoice_order_address_id">
+      <index-column name="invoice_order_address_id" />
     </index>
-    <index name="idx_order_address_delivery">
-      <index-column name="address_delivery" />
+    <index name="idx_order_delivery_order_address_id">
+      <index-column name="delivery_order_address_id" />
     </index>
     <index name="idx_order_status_id">
       <index-column name="status_id" />
+    </index>
+    <unique name="ref_UNIQUE">
+      <unique-column name="ref" />
+    </unique>
+    <index name="fk_order_payment_module_id_idx">
+      <index-column name="payment_module_id" />
+    </index>
+    <index name="fk_order_delivery_module_id_idx">
+      <index-column name="delivery_module_id" />
+    </index>
+    <index name="fk_order_lang_id_idx">
+      <index-column name="lang_id" />
     </index>
     <behavior name="timestampable" />
   </table>
@@ -651,18 +677,24 @@
   <table name="area" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="name" required="true" size="100" type="VARCHAR" />
-    <column name="unit" type="FLOAT" />
+    <column name="postage" type="FLOAT" />
     <behavior name="timestampable" />
   </table>
-  <table name="delivzone" namespace="Thelia\Model">
+  <table name="area_delivery_module" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="area_id" type="INTEGER" />
-    <column name="delivery" required="true" size="45" type="VARCHAR" />
-    <foreign-key foreignTable="area" name="fk_delivzone_area_id" onDelete="SET NULL" onUpdate="RESTRICT">
+    <column name="area_id" required="true" type="INTEGER" />
+    <column name="delivery_module_id" required="true" type="INTEGER" />
+    <foreign-key foreignTable="area" name="fk_area_delivery_module_area_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="area_id" />
     </foreign-key>
-    <index name="idx_delivzone_area_id">
+    <foreign-key foreignTable="module" name="idx_area_delivery_module_delivery_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="delivery_module_id" />
+    </foreign-key>
+    <index name="idx_area_delivery_module_area_id">
       <index-column name="area_id" />
+    </index>
+    <index name="idx_area_delivery_module_delivery_module_id_idx">
+      <index-column name="delivery_module_id" />
     </index>
     <behavior name="timestampable" />
   </table>
@@ -861,6 +893,7 @@
   <table isCrossRef="true" name="content_folder" namespace="Thelia\Model">
     <column name="content_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="folder_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="default_folder" type="BOOLEAN" />
     <foreign-key foreignTable="content" name="fk_content_folder_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="content_id" />
     </foreign-key>
@@ -872,6 +905,9 @@
     </index>
     <index name="idx_content_folder_folder_id">
       <index-column name="folder_id" />
+    </index>
+    <index name="idx_content_folder_default">
+      <index-column name="default_folder" />
     </index>
     <behavior name="timestampable" />
   </table>

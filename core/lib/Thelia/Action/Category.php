@@ -24,52 +24,92 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Category as CategoryModel;
+
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\Category as CategoryModel;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\Propel;
-use Thelia\Model\Map\CategoryTableMap;
+use Thelia\Core\Event\TheliaEvents;
 
+use Thelia\Core\Event\CategoryUpdateEvent;
 use Thelia\Core\Event\CategoryCreateEvent;
 use Thelia\Core\Event\CategoryDeleteEvent;
+use Thelia\Model\ConfigQuery;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\CategoryToggleVisibilityEvent;
-use Thelia\Core\Event\CategoryChangePositionEvent;
+use Thelia\Core\Event\CategoryAddContentEvent;
+use Thelia\Core\Event\CategoryDeleteContentEvent;
+use Thelia\Model\CategoryAssociatedContent;
+use Thelia\Model\CategoryAssociatedContentQuery;
 
 class Category extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * Create a new category entry
+     *
+     * @param CategoryCreateEvent $event
+     */
     public function create(CategoryCreateEvent $event)
     {
         $category = new CategoryModel();
 
         $category
             ->setDispatcher($this->getDispatcher())
-            ->create(
-               $event->getTitle(),
-               $event->getParent(),
-               $event->getLocale()
-         );
+
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setParent($event->getParent())
+            ->setVisible($event->getVisible())
+
+            ->save()
+        ;
 
         $event->setCategory($category);
     }
 
-    public function update(CategoryChangeEvent $event)
+    /**
+     * Change a category
+     *
+     * @param CategoryUpdateEvent $event
+     */
+    public function update(CategoryUpdateEvent $event)
     {
+        $search = CategoryQuery::create();
+
+        if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
+
+            $category
+                ->setDispatcher($this->getDispatcher())
+
+                ->setLocale($event->getLocale())
+                ->setTitle($event->getTitle())
+                ->setDescription($event->getDescription())
+                ->setChapo($event->getChapo())
+                ->setPostscriptum($event->getPostscriptum())
+
+                ->setParent($event->getParent())
+                ->setVisible($event->getVisible())
+
+                ->save();
+
+            $event->setCategory($category);
+        }
     }
 
     /**
-     * Delete a category
+     * Delete a category entry
      *
-     * @param ActionEvent $event
+     * @param CategoryDeleteEvent $event
      */
     public function delete(CategoryDeleteEvent $event)
     {
-        $category = CategoryQuery::create()->findPk($event->getCategoryId());
+        if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
 
-        if ($category !== null) {
+            $category
+                ->setDispatcher($this->getDispatcher())
+                ->delete()
+            ;
 
-            $category->setDispatcher($this->getDispatcher())->delete();
+            $event->setCategory($category);
         }
     }
 
@@ -80,178 +120,80 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function toggleVisibility(CategoryToggleVisibilityEvent $event)
     {
-        $category = CategoryQuery::create()->findPk($event->getCategoryId());
+         $category = $event->getCategory();
 
-        if ($category !== null) {
+         $category
+            ->setDispatcher($this->getDispatcher())
+            ->setVisible($category->getVisible() ? false : true)
+            ->save()
+            ;
+    }
 
-            $category
-                ->setDispatcher($this->getDispatcher())
-                ->setVisible($category->getVisible() ? false : true)
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param CategoryChangePositionEvent $event
+     */
+    public function updatePosition(UpdatePositionEvent $event)
+    {
+        if (null !== $category = CategoryQuery::create()->findPk($event->getObjectId())) {
+
+            $category->setDispatcher($this->getDispatcher());
+
+            $mode = $event->getMode();
+
+            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
+                return $category->changeAbsolutePosition($event->getPosition());
+            else if ($mode == UpdatePositionEvent::POSITION_UP)
+                return $category->movePositionUp();
+            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
+                return $category->movePositionDown();
+        }
+    }
+
+    public function addContent(CategoryAddContentEvent $event) {
+
+        if (CategoryAssociatedContentQuery::create()
+            ->filterByContentId($event->getContentId())
+             ->filterByCategory($event->getCategory())->count() <= 0) {
+
+            $content = new CategoryAssociatedContent();
+
+            $content
+                ->setCategory($event->getCategory())
+                ->setContentId($event->getContentId())
                 ->save()
             ;
-        }
+         }
     }
 
-    /**
-     * Changes category position, selecting absolute ou relative change.
-     *
-     * @param CategoryChangePositionEvent $event
-     */
-    public function changePosition(CategoryChangePositionEvent $event)
-    {
-        if ($event->getMode() == CategoryChangePositionEvent::POSITION_ABSOLUTE)
-            return $this->changeAbsolutePosition($event);
-        else
-            return $this->exchangePosition($event);
+    public function removeContent(CategoryDeleteContentEvent $event) {
+
+        $content = CategoryAssociatedContentQuery::create()
+            ->filterByContentId($event->getContentId())
+            ->filterByCategory($event->getCategory())->findOne()
+        ;
+
+        if ($content !== null) $content->delete();
     }
 
-    /**
-     * Move up or down a category
-     *
-     * @param CategoryChangePositionEvent $event
-     */
-    protected function exchangePosition(CategoryChangePositionEvent $event)
-    {
-       $category = CategoryQuery::create()->findPk($event->getCategoryId());
-
-        if ($category !== null) {
-
-            // The current position of the category
-            $my_position = $category->getPosition();
-
-            // Find category to exchange position with
-            $search = CategoryQuery::create()
-                ->filterByParent($category->getParent());
-
-            // Up or down ?
-            if ($event->getMode() == CategoryChangePositionEvent::POSITION_UP) {
-                // Find the category immediately before me
-                $search->filterByPosition(array('max' => $my_position-1))->orderByPosition(Criteria::DESC);
-            } elseif ($event->getMode() == CategoryChangePositionEvent::POSITION_DOWN) {
-                // Find the category immediately after me
-                $search->filterByPosition(array('min' => $my_position+1))->orderByPosition(Criteria::ASC);
-            } else
-
-                return;
-
-            $result = $search->findOne();
-
-            // If we found the proper category, exchange their positions
-            if ($result) {
-
-                $cnx = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
-
-                $cnx->beginTransaction();
-
-                try {
-                    $category
-                        ->setDispatcher($this->getDispatcher())
-                        ->setPosition($result->getPosition())
-                        ->save()
-                    ;
-
-                    $result->setPosition($my_position)->save();
-
-                    $cnx->commit();
-                } catch (Exception $e) {
-                    $cnx->rollback();
-                }
-            }
-        }
-    }
 
     /**
-     * Changes category position
-     *
-     * @param CategoryChangePositionEvent $event
-     */
-    protected function changeAbsolutePosition(CategoryChangePositionEvent $event)
-    {
-        $category = CategoryQuery::create()->findPk($event->getCategoryId());
-
-        if ($category !== null) {
-
-            // The required position
-            $new_position = $event->getPosition();
-
-            // The current position
-            $current_position = $category->getPosition();
-
-            if ($new_position != null && $new_position > 0 && $new_position != $current_position) {
-
-                 // Find categories to offset
-                $search = CategoryQuery::create()->filterByParent($category->getParent());
-
-                if ($new_position > $current_position) {
-                    // The new position is after the current position -> we will offset + 1 all categories located between us and the new position
-                    $search->filterByPosition(array('min' => 1+$current_position, 'max' => $new_position));
-
-                    $delta = -1;
-                } else {
-                    // The new position is brefore the current position -> we will offset - 1 all categories located between us and the new position
-                    $search->filterByPosition(array('min' => $new_position, 'max' => $current_position - 1));
-
-                    $delta = 1;
-                }
-
-                $results = $search->find();
-
-                $cnx = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
-
-                $cnx->beginTransaction();
-
-                try {
-                    foreach ($results as $result) {
-                        $result->setPosition($result->getPosition() + $delta)->save($cnx);
-                    }
-
-                    $category
-                        ->setDispatcher($this->getDispatcher())
-                        ->setPosition($new_position)
-                        ->save($cnx)
-                    ;
-
-                    $cnx->commit();
-                } catch (Exception $e) {
-                    $cnx->rollback();
-                }
-            }
-        }
-    }
-
-    /**
-     * Returns an array of event names this subscriber listens to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::CATEGORY_CREATE => array("create", 128),
-            TheliaEvents::CATEGORY_UPDATE => array("update", 128),
-            TheliaEvents::CATEGORY_DELETE => array("delete", 128),
-
+            TheliaEvents::CATEGORY_CREATE            => array("create", 128),
+            TheliaEvents::CATEGORY_UPDATE            => array("update", 128),
+            TheliaEvents::CATEGORY_DELETE            => array("delete", 128),
             TheliaEvents::CATEGORY_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
-            TheliaEvents::CATEGORY_CHANGE_POSITION   => array("changePosition", 128),
 
-            "action.updateCategoryPositionU" 	=> array("changePositionUp", 128),
-            "action.updateCategoryPositionDown" => array("changePositionDown", 128),
-            "action.updateCategoryPosition" 	=> array("changePosition", 128),
+            TheliaEvents::CATEGORY_UPDATE_POSITION   => array("updatePosition", 128),
+
+            TheliaEvents::CATEGORY_ADD_CONTENT       => array("addContent", 128),
+            TheliaEvents::CATEGORY_REMOVE_CONTENT    => array("removeContent", 128),
+
         );
     }
 }

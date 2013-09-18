@@ -23,11 +23,13 @@ use Thelia\Model\Map\ContentFolderTableMap;
  *
  * @method     ChildContentFolderQuery orderByContentId($order = Criteria::ASC) Order by the content_id column
  * @method     ChildContentFolderQuery orderByFolderId($order = Criteria::ASC) Order by the folder_id column
+ * @method     ChildContentFolderQuery orderByDefaultFolder($order = Criteria::ASC) Order by the default_folder column
  * @method     ChildContentFolderQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildContentFolderQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildContentFolderQuery groupByContentId() Group by the content_id column
  * @method     ChildContentFolderQuery groupByFolderId() Group by the folder_id column
+ * @method     ChildContentFolderQuery groupByDefaultFolder() Group by the default_folder column
  * @method     ChildContentFolderQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildContentFolderQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -48,11 +50,13 @@ use Thelia\Model\Map\ContentFolderTableMap;
  *
  * @method     ChildContentFolder findOneByContentId(int $content_id) Return the first ChildContentFolder filtered by the content_id column
  * @method     ChildContentFolder findOneByFolderId(int $folder_id) Return the first ChildContentFolder filtered by the folder_id column
+ * @method     ChildContentFolder findOneByDefaultFolder(boolean $default_folder) Return the first ChildContentFolder filtered by the default_folder column
  * @method     ChildContentFolder findOneByCreatedAt(string $created_at) Return the first ChildContentFolder filtered by the created_at column
  * @method     ChildContentFolder findOneByUpdatedAt(string $updated_at) Return the first ChildContentFolder filtered by the updated_at column
  *
  * @method     array findByContentId(int $content_id) Return ChildContentFolder objects filtered by the content_id column
  * @method     array findByFolderId(int $folder_id) Return ChildContentFolder objects filtered by the folder_id column
+ * @method     array findByDefaultFolder(boolean $default_folder) Return ChildContentFolder objects filtered by the default_folder column
  * @method     array findByCreatedAt(string $created_at) Return ChildContentFolder objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildContentFolder objects filtered by the updated_at column
  *
@@ -143,7 +147,7 @@ abstract class ContentFolderQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT CONTENT_ID, FOLDER_ID, CREATED_AT, UPDATED_AT FROM content_folder WHERE CONTENT_ID = :p0 AND FOLDER_ID = :p1';
+        $sql = 'SELECT CONTENT_ID, FOLDER_ID, DEFAULT_FOLDER, CREATED_AT, UPDATED_AT FROM content_folder WHERE CONTENT_ID = :p0 AND FOLDER_ID = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -328,6 +332,33 @@ abstract class ContentFolderQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ContentFolderTableMap::FOLDER_ID, $folderId, $comparison);
+    }
+
+    /**
+     * Filter the query on the default_folder column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDefaultFolder(true); // WHERE default_folder = true
+     * $query->filterByDefaultFolder('yes'); // WHERE default_folder = true
+     * </code>
+     *
+     * @param     boolean|string $defaultFolder The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildContentFolderQuery The current query, for fluid interface
+     */
+    public function filterByDefaultFolder($defaultFolder = null, $comparison = null)
+    {
+        if (is_string($defaultFolder)) {
+            $default_folder = in_array(strtolower($defaultFolder), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(ContentFolderTableMap::DEFAULT_FOLDER, $defaultFolder, $comparison);
     }
 
     /**

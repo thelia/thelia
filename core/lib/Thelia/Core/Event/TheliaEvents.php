@@ -145,51 +145,45 @@ final class TheliaEvents
 
     // -- END ADDRESS MANAGEMENT ---------------------------------------------------------
 
-    /**
-     * Sent once the category creation form has been successfully validated, and before category insertion in the database.
-     */
-    const BEFORE_CREATECATEGORY = "action.before_createcategory";
+    // -- Categories management -----------------------------------------------
 
-    /**
-     * Create, change or delete a category
-     */
-    const CATEGORY_CREATE = "action.createCategory";
-    const CATEGORY_UPDATE = "action.updateCategory";
-    const CATEGORY_DELETE = "action.deleteCategory";
-
-    /**
-     * Toggle category visibility
-     */
+    const CATEGORY_CREATE            = "action.createCategory";
+    const CATEGORY_UPDATE            = "action.updateCategory";
+    const CATEGORY_DELETE            = "action.deleteCategory";
     const CATEGORY_TOGGLE_VISIBILITY = "action.toggleCategoryVisibility";
+    const CATEGORY_UPDATE_POSITION   = "action.updateCategoryPosition";
 
-    /**
-     * Change category position
-     */
-    const CATEGORY_CHANGE_POSITION = "action.updateCategoryPosition";
+    const CATEGORY_ADD_CONTENT      = "action.categoryAddContent";
+    const CATEGORY_REMOVE_CONTENT   = "action.categoryRemoveContent";
 
-    /**
-     * Sent just after a successful insert of a new category in the database.
-     */
+    const BEFORE_CREATECATEGORY = "action.before_createcategory";
     const AFTER_CREATECATEGORY 	= "action.after_createcategory";
-    /**
-     * Sent befonre deleting a category
-     */
-    const BEFORE_DELETECATEGORY = "action.before_deletecategory";
 
-    /**
-     * Sent just after a successful delete of a category from the database.
-     */
+    const BEFORE_DELETECATEGORY = "action.before_deletecategory";
     const AFTER_DELETECATEGORY 	= "action.after_deletecategory";
 
-    /**
-     * Sent just before a successful change of a category in the database.
-     */
     const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
-
-    /**
-     * Sent just after a successful change of a category in the database.
-     */
     const AFTER_UPDATECATEGORY 	= "action.after_updateCategory";
+
+    // -- Product management -----------------------------------------------
+
+    const PRODUCT_CREATE            = "action.createProduct";
+    const PRODUCT_UPDATE            = "action.updateProduct";
+    const PRODUCT_DELETE            = "action.deleteProduct";
+    const PRODUCT_TOGGLE_VISIBILITY = "action.toggleProductVisibility";
+    const PRODUCT_UPDATE_POSITION   = "action.updateProductPosition";
+
+    const PRODUCT_ADD_CONTENT      = "action.productAddContent";
+    const PRODUCT_REMOVE_CONTENT   = "action.productRemoveContent";
+
+    const BEFORE_CREATEPRODUCT = "action.before_createproduct";
+    const AFTER_CREATEPRODUCT  = "action.after_createproduct";
+
+    const BEFORE_DELETEPRODUCT = "action.before_deleteproduct";
+    const AFTER_DELETEPRODUCT  = "action.after_deleteproduct";
+
+    const BEFORE_UPDATEPRODUCT = "action.before_updateProduct";
+    const AFTER_UPDATEPRODUCT  = "action.after_updateProduct";
 
     /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart
@@ -219,12 +213,24 @@ final class TheliaEvents
     const CART_DELETEITEM = "action.deleteArticle";
 
     /**
+     * Order linked event
+     */
+    const ORDER_SET_BILLING_ADDRESS = "action.order.setBillingAddress";
+    const ORDER_SET_DELIVERY_ADDRESS = "action.order.setDeliveryAddress";
+    const ORDER_SET_DELIVERY_MODULE = "action.order.setDeliveryModule";
+
+    /**
      * Sent on image processing
      */
     const IMAGE_PROCESS = "action.processImage";
 
     /**
-     * Sent on cimage cache clear request
+     * Sent on document processing
+     */
+    const DOCUMENT_PROCESS = "action.processDocument";
+
+    /**
+     * Sent on image cache clear request
      */
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
 
@@ -429,5 +435,10 @@ final class TheliaEvents
 
     const BEFORE_DELETEFEATURE_AV = "action.before_deleteFeatureAv";
     const AFTER_DELETEFEATURE_AV  = "action.after_deleteFeatureAv";
+
+    /**
+     * sent when system find a mailer transporter.
+     */
+    const MAILTRANSPORTER_CONFIG = 'action.mailertransporter.config';
 
 }

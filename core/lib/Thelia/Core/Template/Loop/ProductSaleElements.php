@@ -115,7 +115,7 @@ class ProductSaleElements extends BaseLoop
 
         $currencyId = $this->getCurrency();
         if (null !== $currencyId) {
-            $currency = CurrencyQuery::create()->findOneById($currencyId);
+            $currency = CurrencyQuery::create()->findPk($currencyId);
             if (null === $currency) {
                 throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
             }

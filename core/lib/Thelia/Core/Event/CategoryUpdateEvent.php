@@ -32,7 +32,6 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     protected $postscriptum;
 
     protected $url;
-    protected $visibility;
     protected $parent;
 
     public function __construct($category_id)
@@ -96,18 +95,6 @@ class CategoryUpdateEvent extends CategoryCreateEvent
     public function setUrl($url)
     {
         $this->url = $url;
-
-        return $this;
-    }
-
-    public function getVisibility()
-    {
-        return $this->visibility;
-    }
-
-    public function setVisibility($visibility)
-    {
-        $this->visibility = $visibility;
 
         return $this;
     }

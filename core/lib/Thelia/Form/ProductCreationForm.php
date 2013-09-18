@@ -23,16 +23,26 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
+use Thelia\Model\ProductQuery;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\ExecutionContextInterface;
 
 class ProductCreationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm($change_mode = false)
     {
+        $ref_constraints = array(new NotBlank());
+
+        if (! $change_mode) {
+            $ref_constraints[] = new Callback(array(
+                "methods" => array(array($this, "checkDuplicateRef"))
+            ));
+        }
+
         $this->formBuilder
             ->add("ref", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
+                "constraints" => $ref_constraints,
                 "label" => "Product reference *",
                 "label_attr" => array(
                     "for" => "ref"
@@ -47,7 +57,7 @@ class ProductCreationForm extends BaseForm
                     "for" => "title"
                 )
             ))
-            ->add("parent", "integer", array(
+            ->add("default_category", "integer", array(
                 "constraints" => array(
                     new NotBlank()
                 )
@@ -57,7 +67,24 @@ class ProductCreationForm extends BaseForm
                     new NotBlank()
                 )
             ))
-        ;
+            ->add("visible", "integer", array(
+                "label" => Translator::getInstance()->trans("This product is online."),
+                "label_attr" => array("for" => "visible_create")
+            ))
+            ;
+    }
+
+    public function checkDuplicateRef($value, ExecutionContextInterface $context)
+    {
+        $count = ProductQuery::create()->filterByRef($value)->count();
+
+        if ($count > 0) {
+            $context->addViolation(
+                    Translator::getInstance()->trans(
+                            "A product with reference %ref already exists. Please choose another reference.",
+                            array('%ref' => $value)
+            ));
+        }
     }
 
     public function getName()

@@ -123,8 +123,10 @@ class Image extends BaseI18nLoop
         $search = $method->invoke(null); // Static !
 
         // $query->filterByXXX(id)
-        $method = new \ReflectionMethod($queryClass, $filterMethod);
-        $method->invoke($search, $object_id);
+        if (! is_null($object_id)) {
+            $method = new \ReflectionMethod($queryClass, $filterMethod);
+            $method->invoke($search, $object_id);
+        }
 
         $orders  = $this->getOrder();
 
@@ -171,11 +173,12 @@ class Image extends BaseI18nLoop
         if (! is_null($source)) {
 
             $source_id = $this->getSourceId();
+            $id = $this->getId();
 
-            // echo "source = ".$this->getSource().", id=".$source_id." - ".$this->getArg('source_id')->getValue()."<br />";
+            //echo "source = ".$this->getSourceId()."source_id=$source_id, id=$id<br />";
 
-            if (is_null($source_id)) {
-                throw new \InvalidArgumentException("'source_id' argument cannot be null if 'source' argument is specified.");
+            if (is_null($source_id) && is_null($id)) {
+                throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
 
             $search = $this->createSearchQuery($source, $source_id);
@@ -211,6 +214,7 @@ class Image extends BaseI18nLoop
      */
     public function exec(&$pagination)
     {
+
         // Select the proper query to use, and get the object type
         $object_type = $object_id = null;
 
@@ -282,7 +286,7 @@ class Image extends BaseI18nLoop
             // Put source image file path
             $source_filepath = sprintf("%s%s/%s/%s",
                 THELIA_ROOT,
-                ConfigQuery::read('documents_library_path', 'local/media/images'),
+                ConfigQuery::read('images_library_path', 'local/media/images'),
                 $object_type,
                 $result->getFile()
              );
@@ -313,7 +317,8 @@ class Image extends BaseI18nLoop
                 ;
 
                 $loopResult->addRow($loopResultRow);
-            } catch (\Exception $ex) {
+            }
+            catch (\Exception $ex) {
                 // Ignore the result and log an error
                 Tlog::getInstance()->addError("Failed to process image in image loop: ", $this->args);
             }

@@ -73,6 +73,7 @@ class Product extends BaseI18nLoop
                 )
             ),
             Argument::createIntListTypeArgument('category'),
+            Argument::createIntListTypeArgument('category_default'),
             Argument::createBooleanTypeArgument('new'),
             Argument::createBooleanTypeArgument('promo'),
             Argument::createFloatTypeArgument('min_price'),
@@ -88,7 +89,7 @@ class Product extends BaseI18nLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new', 'random', 'given_id'))
+                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new', 'random', 'given_id'))
                 ),
                 'alpha'
             ),
@@ -170,9 +171,20 @@ class Product extends BaseI18nLoop
         }
 
         $category = $this->getCategory();
+        $categoryDefault = $this->getCategoryDefault();
 
-        if (!is_null($category)) {
-            $categories = CategoryQuery::create()->filterById($category, Criteria::IN)->find();
+        if (!is_null($category) ||!is_null($categoryDefault)) {
+
+            $categoryIds = array();
+            if (!is_array($category)) {
+                $category = array();
+            }
+            if (!is_array($categoryDefault)) {
+                $categoryDefault = array();
+            }
+
+            $categoryIds = array_merge($categoryIds, $category, $categoryDefault);
+            $categories =CategoryQuery::create()->filterById($categoryIds, Criteria::IN)->find();
 
             $depth = $this->getDepth();
 
@@ -527,6 +539,12 @@ class Product extends BaseI18nLoop
 
         foreach ($orders as $order) {
             switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
@@ -540,12 +558,12 @@ class Product extends BaseI18nLoop
                     $search->addDescendingOrderByColumn('real_lowest_price');
                     break;
                 case "manual":
-                    if(null === $category || count($category) != 1)
+                    if(null === $categoryIds || count($categoryIds) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
                     $search->orderByPosition(Criteria::ASC);
                     break;
                 case "manual_reverse":
-                    if(null === $category || count($category) != 1)
+                    if(null === $categoryIds || count($categoryIds) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
                     $search->orderByPosition(Criteria::DESC);
                     break;
@@ -579,31 +597,61 @@ class Product extends BaseI18nLoop
 
         $loopResult = new LoopResult($products);
 
+        $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
+
         foreach ($products as $product) {
+
             $loopResultRow = new LoopResultRow($loopResult, $product, $this->versionable, $this->timestampable, $this->countable);
 
             $price = $product->getRealLowestPrice();
-            $taxedPrice = $product->getTaxedPrice(
-                CountryQuery::create()->findOneById(64) // @TODO : make it magic
+
+            $taxedPrice = null === $price ? null : $product->getTaxedPrice(
+                $taxCountry
             );
 
+            // Find previous and next product, in the default category.
+            $default_category_id = $product->getDefaultCategoryId();
 
-            $loopResultRow->set("ID", $product->getId())
-                ->set("REF",$product->getRef())
-                ->set("IS_TRANSLATED",$product->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
-                ->set("TITLE",$product->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $product->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL", $product->getUrl($locale))
-                ->set("BEST_PRICE", $price)
-                ->set("BEST_PRICE_TAX", $taxedPrice - $price)
-                ->set("BEST_TAXED_PRICE", $taxedPrice)
-                ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
-                ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))
-                ->set("POSITION", $product->getPosition())
+            $previous = ProductQuery::create()
+                ->joinProductCategory()
+                ->where('ProductCategory.category_id = ?', $default_category_id)
+                ->filterByPosition($product->getPosition(), Criteria::LESS_THAN)
+                ->orderByPosition(Criteria::DESC)
+                ->findOne()
             ;
+
+            $next = ProductQuery::create()
+                ->joinProductCategory()
+                ->where('ProductCategory.category_id = ?', $default_category_id)
+                ->filterByPosition($product->getPosition(), Criteria::GREATER_THAN)
+                ->orderByPosition(Criteria::ASC)
+                ->findOne()
+            ;
+
+            $loopResultRow
+                ->set("ID"               , $product->getId())
+                ->set("REF"              , $product->getRef())
+                ->set("IS_TRANSLATED"    , $product->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE"           , $locale)
+                ->set("TITLE"            , $product->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO"            , $product->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION"      , $product->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM"     , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("URL"              , $product->getUrl($locale))
+                ->set("BEST_PRICE"       , $price)
+                ->set("BEST_PRICE_TAX"   , $taxedPrice - $price)
+                ->set("BEST_TAXED_PRICE" , $taxedPrice)
+                ->set("IS_PROMO"         , $product->getVirtualColumn('main_product_is_promo'))
+                ->set("IS_NEW"           , $product->getVirtualColumn('main_product_is_new'))
+                ->set("POSITION"         , $product->getPosition())
+                ->set("VISIBLE"          , $product->getVisible() ? "1" : "0")
+                ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
+                ->set("HAS_NEXT"         , $next != null ? 1 : 0)
+                ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
+                ->set("NEXT"             , $next != null ? $next->getId() : -1)
+                ->set("DEFAULT_CATEGORY" , $default_category_id)
+
+                ;
 
             $loopResult->addRow($loopResultRow);
         }
