@@ -58,13 +58,13 @@ class Cheque extends BaseModule implements PaymentModuleInterface
         // TODO: Implement pay() method.
     }
 
-    /**
-     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
-     * Like install and destroy
-     */
     public function install()
     {
-        // TODO: Implement install() method.
+        /* insert the images from image folder if first module activation */
+        $module = $this->getModuleModel();
+        if(ModuleImageQuery::create()->filterByModule($module)->count() == 0) {
+            $this->deployImageFolder($module, sprintf('%s/images', __DIR__));
+        }
     }
 
     public function destroy()

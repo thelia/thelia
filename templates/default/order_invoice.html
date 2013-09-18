@@ -267,14 +267,18 @@
 
                             {loop type="payment" name="payments" force_return="true"}
 
-                            <li>
-                                <div class="radio">
-                                    <label for="payment_<?php echo $key; ?>">
-                                        <input type="radio" name="payment" id="payment_<?php echo $key; ?>" value="<?php echo $value; ?>">
-                                        <img src="img/payment/<?php echo $value; ?>.png">
-                                    </label>
-                                </div>
-                            </li>
+                                {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
+
+                                    <li>
+                                        <div class="radio">
+                                            <label for="payment_{$ID}">
+                                                <input type="radio" name="payment" id="payment_{$ID}" value="test">
+                                                <img src="{$IMAGE_URL}">
+                                            </label>
+                                        </div>
+                                    </li>
+
+                                {/loop}
 
                             {/loop}
 
