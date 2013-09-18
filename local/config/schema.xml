@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -696,6 +696,10 @@
     <index name="idx_area_delivery_module_delivery_module_id_idx">
       <index-column name="delivery_module_id" />
     </index>
+    <unique name="area_id_delivery_module_id_UNIQUE">
+      <unique-column name="area_id" />
+      <unique-column name="delivery_module_id" />
+    </unique>
     <behavior name="timestampable" />
   </table>
   <table name="group" namespace="Thelia\Model">
@@ -1196,5 +1200,25 @@
       <parameter name="i18n_columns" value="name" />
     </behavior>
     <behavior name="timestampable" />
+  </table>
+  <table name="module_image" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="module_id" required="true" type="INTEGER" />
+    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="position" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="chapo" type="LONGVARCHAR" />
+    <column name="postscriptum" type="LONGVARCHAR" />
+    <foreign-key foreignTable="module" name="fk_module_image_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="module_id" />
+    </foreign-key>
+    <index name="idx_module_image_module_id">
+      <index-column name="module_id" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+    </behavior>
   </table>
 </database>

@@ -12,6 +12,7 @@
     <testsuites>
 	    <testsuite name="Thelia">
 	        <directory>core/lib/Thelia/Tests</directory>
+            <directory>local/modules/*/Tests</directory>
 	    </testsuite>
     </testsuites>
     <filter>

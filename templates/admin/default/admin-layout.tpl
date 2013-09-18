@@ -138,9 +138,9 @@
                         </li>
                         {/loop}
 
-                        {loop name="menu-auth-content" type="auth" roles="ADMIN" permissions="admin.content.view"}
-                        <li class="{if $admin_current_location == 'content'}active{/if}" id="content_menu">
-                            <a href="{url path='/admin/content'}">{intl l="Content"}</a>
+                        {loop name="menu-auth-content" type="auth" roles="ADMIN" permissions="admin.folders.view"}
+                        <li class="{if $admin_current_location == 'folder'}active{/if}" id="folders_menu">
+                            <a href="{url path='/admin/folders'}">{intl l="Folders"}</a>
                         </li>
                         {/loop}
 

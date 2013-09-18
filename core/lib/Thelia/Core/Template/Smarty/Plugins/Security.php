@@ -29,6 +29,8 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Exception\OrderException;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\ModuleQuery;
 
 class Security extends AbstractSmartyPlugin
 {
@@ -87,7 +89,12 @@ class Security extends AbstractSmartyPlugin
     public function checkValidDeliveryFunction($params, &$smarty)
     {
         $order = $this->request->getSession()->getOrder();
-        if(null === $order || null === $order->chosenDeliveryAddress || null === $order->getDeliveryModuleId()) {
+        /* Does address and module still exists ? We assume address owner can't change neither module type */
+        if($order !== null) {
+            $checkAddress = AddressQuery::create()->findPk($order->chosenDeliveryAddress);
+            $checkModule = ModuleQuery::create()->findPk($order->getDeliveryModuleId());
+        }
+        if(null === $order || null == $checkAddress || null === $checkModule) {
             throw new OrderException('Delivery must be defined', OrderException::UNDEFINED_DELIVERY, array('missing' => 1));
         }
 
