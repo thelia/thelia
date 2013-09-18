@@ -156,7 +156,20 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::getAvailableRelatedContentAction</default>
         <requirement key="_format">xml|json</requirement>
     </route>
+    
+    <!--  Folder routes management -->
+    <route id="admin.folders.default" path="/admin/folders">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::indexAction</default>
+    </route>
 
+    <route id="admin.folders.create" path="/admin/folders/create">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::createAction</default>
+    </route>
+
+    <route id="admin.folders.update" path="/admin/folders/update/{folder_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::updateAction</default>
+        <requirement key="folder_id">\d+</requirement>
+    </route>
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 
