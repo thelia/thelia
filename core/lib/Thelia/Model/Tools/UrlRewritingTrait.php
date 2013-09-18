@@ -61,7 +61,11 @@ trait UrlRewritingTrait {
 
         $this->setLocale($locale);
 
-        $title = $this->getTitle() ?: $this->getRef();
+        $title = $this->getTitle();
+
+        if(null == $title) {
+            throw new \RuntimeException('Impossible to create an url if title is null');
+        }
         // Replace all weird characters with dashes
         $string = preg_replace('/[^\w\-~_\.]+/u', '-', $title);
 
