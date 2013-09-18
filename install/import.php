@@ -34,7 +34,8 @@ $thelia = new Thelia\Core\Thelia("dev", true);
 $thelia->boot();
 
 $faker = Faker\Factory::create();
-
+// Intialize URL management
+$url = new Thelia\Tools\URL();
 $con = \Propel\Runtime\Propel::getConnection(
     Thelia\Model\Map\ProductTableMap::DATABASE_NAME
 );
@@ -45,10 +46,11 @@ try {
     $stmt->execute();
     clearTables();
     $stmt = $con->prepare("SET foreign_key_checks = 1");
-
-    createCategories();
-
     $stmt->execute();
+
+    
+    $categories = createCategories();
+
 
     $con->commit();
 } catch (Exception $e) {
@@ -58,7 +60,28 @@ try {
 
 function createCategories()
 {
+    $categories = array();
+    if (($handle = fopen(THELIA_ROOT . '/install/import/categories.csv', "r")) !== FALSE) {
+        $row=0;
+        while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
+            $row++;
+            if($row==1) continue;
+            $category = new \Thelia\Model\Category();
+            $category
+                ->setVisible(1)
+                ->setPosition($row-1)
+                ->setParent(0)
+                ->setLocale('fr_FR')
+                    ->setTitle($data[0])
+                ->setLocale('en_US')
+                    ->setTitle($data[1])
+                ->save();
+            $categories[$data[1]] = $category->getId();
+        }
+        fclose($handle);
+    }
 
+    return $categories;
 }
 
 function clearTables()
