@@ -21,15 +21,15 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Colissimo;
+namespace Cheque;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Model\Country;
 use Thelia\Module\BaseModule;
-use Thelia\Module\DeliveryModuleInterface;
+use Thelia\Module\PaymentModuleInterface;
 
-class Colissimo extends BaseModule implements DeliveryModuleInterface
+class Cheque extends BaseModule implements PaymentModuleInterface
 {
     protected $request;
     protected $dispatcher;
@@ -54,17 +54,9 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
         return $this->dispatcher;
     }
 
-    /**
-     *
-     * calculate and return delivery price
-     *
-     * @param Country $country
-     * @return mixed
-     */
-    public function getPostage(Country $country)
+    public function pay()
     {
-        // TODO: Implement getPostage() method.
-        return 2;
+        // TODO: Implement pay() method.
     }
 
     /**
