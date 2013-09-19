@@ -105,7 +105,7 @@ abstract class BaseModule extends ContainerAware
                     $image = new ModuleImage();
                     $image->setModuleId($module->getId());
                     $image->setPosition($imagePosition);
-                    $image->save();
+                    $image->save($con);
 
                     $imageDirectory = sprintf("%s/../../../../local/media/images/module", __DIR__);
                     $imageFileName = sprintf("%s-%d-%s", $module->getCode(), $image->getId(), $fileName);
@@ -131,7 +131,7 @@ abstract class BaseModule extends ContainerAware
                     }
 
                     $image->setFile($imageFileName);
-                    $image->save();
+                    $image->save($con);
 
                     $con->commit();
                     $imagePosition++;

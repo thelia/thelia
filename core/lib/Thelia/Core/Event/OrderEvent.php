@@ -33,6 +33,7 @@ class OrderEvent extends ActionEvent
     protected $deliveryModule = null;
     protected $paymentModule = null;
     protected $postage = null;
+    protected $ref = null;
 
     /**
      * @param Order $order
@@ -55,7 +56,7 @@ class OrderEvent extends ActionEvent
      */
     public function setInvoiceAddress($address)
     {
-        $this->deliveryAddress = $address;
+        $this->invoiceAddress = $address;
     }
 
     /**
@@ -88,6 +89,14 @@ class OrderEvent extends ActionEvent
     public function setPostage($postage)
     {
         $this->postage = $postage;
+    }
+
+    /**
+     * @param $ref
+     */
+    public function setRef($ref)
+    {
+        $this->ref = $ref;
     }
 
     /**
@@ -136,5 +145,13 @@ class OrderEvent extends ActionEvent
     public function getPostage()
     {
         return $this->postage;
+    }
+
+    /**
+     * @return null|int
+     */
+    public function getRef()
+    {
+        return $this->ref;
     }
 }

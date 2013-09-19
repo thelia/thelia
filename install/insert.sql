@@ -1167,3 +1167,22 @@ INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`)
 INSERT INTO  `tax_rule_country` (`tax_rule_id`, `country_id`, `tax_id`, `position`, `created_at`, `updated_at`)
   VALUES
   (1, 64, 1, 1, NOW(), NOW());
+
+INSERT INTO `order_status`(`id`, `code`, `created_at`, `updated_at`) VALUES
+(1, 'not_paid', NOW(), NOW()),
+(2, 'paid', NOW(), NOW()),
+(3, 'processing', NOW(), NOW()),
+(4, 'sent', NOW(), NOW()),
+(5, 'canceled', NOW(), NOW());
+
+INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(1, 'en_US', 'Not paid', '', '', ''),
+(1, 'fr_FR', 'Non payée', '', '', ''),
+(2, 'en_US', 'Paid', '', '', ''),
+(2, 'fr_FR', 'Payée', '', '', ''),
+(3, 'en_US', 'Processing', '', '', ''),
+(3, 'fr_FR', 'Traitement', '', '', ''),
+(4, 'en_US', 'Sent', '', '', ''),
+(4, 'fr_FR', 'Envoyée', '', '', ''),
+(5, 'en_US', 'Canceled', '', '', ''),
+(5, 'fr_FR', 'Annulée', '', '', '');

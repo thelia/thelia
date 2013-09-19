@@ -23,15 +23,16 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\CartEvent;
 use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\ProductPrice;
-use Thelia\Model\ProductPriceQuery;
-use Thelia\Model\CartItem;
-use Thelia\Model\CartItemQuery;
+use Thelia\Model\Base\AddressQuery;
+use Thelia\Model\OrderStatus;
+use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\OrderAddress;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -68,6 +69,130 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * @param \Thelia\Core\Event\OrderEvent $event
+     */
+    public function setInvoiceAddress(OrderEvent $event)
+    {
+        $order = $event->getOrder();
+
+        $order->chosenInvoiceAddress = $event->getInvoiceAddress();
+
+        $event->setOrder($order);
+    }
+
+    /**
+     * @param \Thelia\Core\Event\OrderEvent $event
+     */
+    public function setPaymentModule(OrderEvent $event)
+    {
+        $order = $event->getOrder();
+
+        $order->setPaymentModuleId($event->getPaymentModule());
+
+        $event->setOrder($order);
+    }
+
+    /**
+     * @param \Thelia\Core\Event\OrderEvent $event
+     */
+    public function create(OrderEvent $event)
+    {
+        $con = \Propel\Runtime\Propel::getConnection(
+            OrderTableMap::DATABASE_NAME
+        );
+
+        $con->beginTransaction();
+
+        $sessionOrder = $event->getOrder();
+
+        /* use a copy to avoid errored reccord in session */
+        $placedOrder = $sessionOrder->copy();
+
+        $customer = $this->getSecurityContext()->getCustomerUser();
+        $currency = $this->getSession()->getCurrency();
+        $lang = $this->getSession()->getLang();
+        $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->chosenDeliveryAddress);
+        $invoiceAddress = AddressQuery::create()->findPk($sessionOrder->chosenInvoiceAddress);
+
+        /* fulfill order */
+        $placedOrder->setCustomerId($customer->getId());
+        $placedOrder->setCurrencyId($currency->getId());
+        $placedOrder->setCurrencyRate($currency->getRate());
+        $placedOrder->setLangId($lang->getId());
+
+        /* hard save the delivery and invoice addresses */
+        $deliveryOrderAddress = new OrderAddress();
+        $deliveryOrderAddress
+            ->setCustomerTitleId($deliveryAddress->getTitleId())
+            ->setCompany($deliveryAddress->getCompany())
+            ->setFirstname($deliveryAddress->getFirstname())
+            ->setLastname($deliveryAddress->getLastname())
+            ->setAddress1($deliveryAddress->getAddress1())
+            ->setAddress2($deliveryAddress->getAddress2())
+            ->setAddress3($deliveryAddress->getAddress3())
+            ->setZipcode($deliveryAddress->getZipcode())
+            ->setCity($deliveryAddress->getCity())
+            ->setCountryId($deliveryAddress->getCountryId())
+            ->save($con)
+        ;
+
+        $invoiceOrderAddress = new OrderAddress();
+        $invoiceOrderAddress
+            ->setCustomerTitleId($invoiceAddress->getTitleId())
+            ->setCompany($invoiceAddress->getCompany())
+            ->setFirstname($invoiceAddress->getFirstname())
+            ->setLastname($invoiceAddress->getLastname())
+            ->setAddress1($invoiceAddress->getAddress1())
+            ->setAddress2($invoiceAddress->getAddress2())
+            ->setAddress3($invoiceAddress->getAddress3())
+            ->setZipcode($invoiceAddress->getZipcode())
+            ->setCity($invoiceAddress->getCity())
+            ->setCountryId($invoiceAddress->getCountryId())
+            ->save($con)
+        ;
+
+        $placedOrder->setDeliveryOrderAddressId($deliveryOrderAddress->getId());
+        $placedOrder->setInvoiceOrderAddressId($invoiceOrderAddress->getId());
+
+        $placedOrder->setStatusId(
+            OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_NOT_PAID)->getId()
+        );
+
+        $placedOrder->save($con);
+
+        /* fulfill order_products and decrease stock // @todo dispatch event */
+
+        /* discount */
+
+        /* postage */
+
+
+        $con->commit();
+
+
+        /* dispatch mail event */
+
+        /* clear session ? */
+
+        /* call pay method */
+
+        $out = true;
+    }
+
+    /**
+     * @param \Thelia\Core\Event\OrderEvent $event
+     */
+    public function setReference(OrderEvent $event)
+    {
+        $this->setRef($this->generateRef());
+    }
+
+    public function generateRef()
+    {
+        return sprintf('O', uniqid('', true), $this->getId());
+    }
+
+    /**
      * Returns an array of event names this subscriber wants to listen to.
      *
      * The array keys are event names and the value can be:
@@ -92,6 +217,40 @@ class Order extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::ORDER_SET_DELIVERY_ADDRESS => array("setDeliveryAddress", 128),
             TheliaEvents::ORDER_SET_DELIVERY_MODULE => array("setDeliveryModule", 128),
+            TheliaEvents::ORDER_SET_INVOICE_ADDRESS => array("setInvoiceAddress", 128),
+            TheliaEvents::ORDER_SET_PAYMENT_MODULE => array("setPaymentModule", 128),
+            TheliaEvents::ORDER_PAY => array("create", 128),
+            TheliaEvents::ORDER_SET_REFERENCE => array("setReference", 128),
         );
+    }
+
+    /**
+     * Return the security context
+     *
+     * @return SecurityContext
+     */
+    protected function getSecurityContext()
+    {
+        return $this->container->get('thelia.securityContext');
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Request
+     */
+    protected function getRequest()
+    {
+        return $this->container->get('request');
+    }
+
+    /**
+     * Returns the session from the current request
+     *
+     * @return \Thelia\Core\HttpFoundation\Session\Session
+     */
+    protected function getSession()
+    {
+        $request = $this->getRequest();
+
+        return $request->getSession();
     }
 }

@@ -215,9 +215,12 @@ final class TheliaEvents
     /**
      * Order linked event
      */
-    const ORDER_SET_BILLING_ADDRESS = "action.order.setBillingAddress";
     const ORDER_SET_DELIVERY_ADDRESS = "action.order.setDeliveryAddress";
     const ORDER_SET_DELIVERY_MODULE = "action.order.setDeliveryModule";
+    const ORDER_SET_INVOICE_ADDRESS = "action.order.setInvoiceAddress";
+    const ORDER_SET_PAYMENT_MODULE = "action.order.setPaymentModule";
+    const ORDER_PAY = "action.order.pay";
+    const ORDER_SET_REFERENCE = "action.order.setReference";
 
     /**
      * Sent on image processing
