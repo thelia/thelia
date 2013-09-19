@@ -19,114 +19,116 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="general-block-decorator">
-                    <table class="table table-striped table-condensed table-left-aligned">
-                        <caption class="clearfix">
-                           {intl l='Orders'}
-                           {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.orders.create"}
-                                <a class="btn btn-default btn-primary pull-right" title="{intl l='Create an order'}" href="#creation_dialog">
-                                    <span class="glyphicon glyphicon-plus-sign"></span>
-                                </a>
-                        	{/loop}
-                        </caption>
-                        <thead>
-	                        <tr>
-	                           <th>{intl l="Order n°"}</th>
-                               <th>{intl l="Date & Hour"}</th>
-                               <th>{intl l="Compagny"}</th>
-                               <th>{intl l="Name"}</th>
-                               <th>{intl l="Amount"}</th>
-                               <th>{intl l="Status"}</th>
+                	<div class="table-responsive">
+	                    <table class="table table-striped table-condensed table-left-aligned">
+	                        <caption class="clearfix">
+	                           {intl l='Orders'}
+	                           {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.orders.create"}
+	                                <a class="btn btn-default btn-primary pull-right" title="{intl l='Create an order'}" href="#creation_dialog">
+	                                    <span class="glyphicon glyphicon-plus-sign"></span>
+	                                </a>
+	                        	{/loop}
+	                        </caption>
+	                        <thead>
+		                        <tr>
+		                           <th>{intl l="Order n°"}</th>
+	                               <th>{intl l="Date & Hour"}</th>
+	                               <th>{intl l="Compagny"}</th>
+	                               <th>{intl l="Name"}</th>
+	                               <th>{intl l="Amount"}</th>
+	                               <th>{intl l="Status"}</th>
 
-                               {module_include location='orders_table_header'}
+	                               {module_include location='orders_table_header'}
 
-                               <th class="actions">{intl l="Actions"}</th>
-	                        </tr>
-                        </thead>
+	                               <th class="actions">{intl l="Actions"}</th>
+		                        </tr>
+	                        </thead>
 
-                        <tbody>
-	                            <tr>
+	                        <tbody>
+		                            <tr>
 
-	                               	<td><a href="">01230450123045</a></td>
-	                               	<td>11/09/2013 10:24:31</td>
-	                               	<td>Thelia</td>
-	                               	<td><a href="">Dupont</a></td>
-	                               	<td>251 &euro;</td>
-	                               	<td><span class="label label-success">Paid</span></td>
+		                               	<td><a href="">01230450123045</a></td>
+		                               	<td>11/09/2013 10:24:31</td>
+		                               	<td>Thelia</td>
+		                               	<td><a href="">Dupont</a></td>
+		                               	<td>251 &euro;</td>
+		                               	<td><span class="label label-success">Paid</span></td>
 
-	                                {module_include location='orders_table_row'}
+		                                {module_include location='orders_table_row'}
 
-	                                <td>
-	                                    <div class="btn-group">
+		                                <td>
+		                                    <div class="btn-group">
 
-			                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.orders.edit"}
-			                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
-			                                {/loop}
+				                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.orders.edit"}
+				                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+				                                {/loop}
 
-			                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.orders.delete"}
-			                                   <a class="btn btn-default btn-xs" title="{intl l='Delete this order'}"  href="#delete_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-			                                {/loop}
-			                            </div>
-	                                </td>
-	                            </tr>
-	                            <tr>
+				                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.orders.delete"}
+				                                   <a class="btn btn-default btn-xs" title="{intl l='Delete this order'}"  href="#delete_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+				                                {/loop}
+				                            </div>
+		                                </td>
+		                            </tr>
+		                            <tr>
 
-	                               	<td><a href="">01230450123045</a></td>
-	                               	<td>11/09/2013 10:24:31</td>
-	                               	<td>Thelia</td>
-	                               	<td><a href="">Dupont</a></td>
-	                               	<td>251 &euro;</td>
-	                               	<td><span class="label label-danger">Canceled</span></td>
+		                               	<td><a href="">01230450123045</a></td>
+		                               	<td>11/09/2013 10:24:31</td>
+		                               	<td>Thelia</td>
+		                               	<td><a href="">Dupont</a></td>
+		                               	<td>251 &euro;</td>
+		                               	<td><span class="label label-danger">Canceled</span></td>
 
-	                                {module_include location='orders_table_row'}
+		                                {module_include location='orders_table_row'}
 
-	                                <td>
-	                                    <div class="btn-group">
+		                                <td>
+		                                    <div class="btn-group">
 
-			                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.orders.edit"}
-			                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
-			                                {/loop}
+				                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.orders.edit"}
+				                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+				                                {/loop}
 
-			                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.orders.delete"}
-			                                   <a class="btn btn-default btn-xs" title="{intl l='Delete this order'}"  href="#delete_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-			                                {/loop}
-			                            </div>
-	                                </td>
-	                            </tr>
-	                            <tr>
+				                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.orders.delete"}
+				                                   <a class="btn btn-default btn-xs" title="{intl l='Delete this order'}"  href="#delete_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+				                                {/loop}
+				                            </div>
+		                                </td>
+		                            </tr>
+		                            <tr>
 
-	                               	<td><a href="">01230450123045</a></td>
-	                               	<td>11/09/2013 10:24:31</td>
-	                               	<td>Thelia</td>
-	                               	<td><a href="">Dupont</a></td>
-	                               	<td>251 &euro;</td>
-	                               	<td><span class="label label-info">Current</span></td>
+		                               	<td><a href="">01230450123045</a></td>
+		                               	<td>11/09/2013 10:24:31</td>
+		                               	<td>Thelia</td>
+		                               	<td><a href="">Dupont</a></td>
+		                               	<td>251 &euro;</td>
+		                               	<td><span class="label label-info">Current</span></td>
 
-	                                {module_include location='orders_table_row'}
+		                                {module_include location='orders_table_row'}
 
-	                                <td>
-	                                    <div class="btn-group">
+		                                <td>
+		                                    <div class="btn-group">
 
-			                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.orders.edit"}
-			                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
-			                                {/loop}
+				                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.orders.edit"}
+				                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+				                                {/loop}
 
-			                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.orders.delete"}
-			                                   <a class="btn btn-default btn-xs" title="{intl l='Delete this order'}"  href="#delete_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-			                                {/loop}
-			                            </div>
-	                                </td>
-	                            </tr>
+				                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.orders.delete"}
+				                                   <a class="btn btn-default btn-xs" title="{intl l='Delete this order'}"  href="#delete_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+				                                {/loop}
+				                            </div>
+		                                </td>
+		                            </tr>
 
-	                        <!-- <tr>
-	                           <td colspan="3">
-	                               <div class="alert alert-info">
-	                               {intl l="No mailing template has been created yet. Click the + button to create one."}
-	                               </div>
-	                           </td>
-	                        </tr> -->
+		                        <!-- <tr>
+		                           <td colspan="3">
+		                               <div class="alert alert-info">
+		                               {intl l="No mailing template has been created yet. Click the + button to create one."}
+		                               </div>
+		                           </td>
+		                        </tr> -->
 
-                        </tbody>
-                    </table>
+	                        </tbody>
+	                    </table>
+	                </div>
                 </div>
             </div>
         </div>
