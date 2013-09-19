@@ -12,7 +12,7 @@
         <ul class="breadcrumb">
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
-            <li><a href="{url path='/admin/configuration/shipping-zones'}">{intl l="Shipping zones"}</a></li>
+            <li><a href="{url path='/admin/configuration/shipping_zones'}">{intl l="Shipping zones"}</a></li>
             <li>{intl l='Editing shipping zone "%name"' name="{$TITLE}"}</li>
         </ul>
 
@@ -31,7 +31,7 @@
                                 <label class="control-label" for="">{intl l="Zones"}</label>
 
                                 <div class="input-group">                                    
-                                    <select name="" id="" class="form-control">
+                                    <select name="" id="" data-toggle="selectpicker">
                                         <option value="">1</option>
                                         <option value="">2</option>
                                         <option value="">3</option>
@@ -108,4 +108,13 @@
         form_action     = {url path=''}
         form_content    = {$smarty.capture.delete_zone_dialog nofilter}
     }  
+{/block}
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/js/main.js'}
+        <script src="{$asset_url}"></script>        
+    {/javascripts}
+    {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
+        <script src="{$asset_url}"></script>        
+    {/javascripts}
 {/block}
