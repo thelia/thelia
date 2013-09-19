@@ -188,6 +188,7 @@ class ModuleTableMap extends TableMap
         $this->addRelation('OrderRelatedByDeliveryModuleId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'delivery_module_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByDeliveryModuleId');
         $this->addRelation('AreaDeliveryModule', '\\Thelia\\Model\\AreaDeliveryModule', RelationMap::ONE_TO_MANY, array('id' => 'delivery_module_id', ), 'CASCADE', 'RESTRICT', 'AreaDeliveryModules');
         $this->addRelation('GroupModule', '\\Thelia\\Model\\GroupModule', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT', 'GroupModules');
+        $this->addRelation('ModuleImage', '\\Thelia\\Model\\ModuleImage', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT', 'ModuleImages');
         $this->addRelation('ModuleI18n', '\\Thelia\\Model\\ModuleI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ModuleI18ns');
     } // buildRelations()
 
@@ -213,6 +214,7 @@ class ModuleTableMap extends TableMap
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 AreaDeliveryModuleTableMap::clearInstancePool();
                 GroupModuleTableMap::clearInstancePool();
+                ModuleImageTableMap::clearInstancePool();
                 ModuleI18nTableMap::clearInstancePool();
             }
 

@@ -48,7 +48,7 @@ class Image extends BaseI18nLoop
     /**
      * @var array Possible image sources
      */
-    protected $possible_sources = array('category', 'product', 'folder', 'content');
+    protected $possible_sources = array('category', 'product', 'folder', 'content', 'module');
 
     /**
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
@@ -93,7 +93,8 @@ class Image extends BaseI18nLoop
                                 new EnumType($this->possible_sources)
                         )
                 ),
-                Argument::createIntTypeArgument('source_id')
+                Argument::createIntTypeArgument('source_id'),
+                Argument::createBooleanTypeArgument('force_return', true)
         );
 
         // Add possible image sources

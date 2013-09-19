@@ -896,6 +896,7 @@ CREATE TABLE `area_delivery_module`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
+    UNIQUE INDEX `area_id_delivery_module_id_UNIQUE` (`area_id`, `delivery_module_id`),
     INDEX `idx_area_delivery_module_area_id` (`area_id`),
     INDEX `idx_area_delivery_module_delivery_module_id_idx` (`delivery_module_id`),
     CONSTRAINT `fk_area_delivery_module_area_id`
@@ -1536,6 +1537,29 @@ CREATE TABLE `template`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- module_image
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_image`;
+
+CREATE TABLE `module_image`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_module_image_module_id` (`module_id`),
+    CONSTRAINT `fk_module_image_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 
@@ -2128,6 +2152,27 @@ CREATE TABLE `template_i18n`
     CONSTRAINT `template_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `template` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- module_image_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_image_i18n`;
+
+CREATE TABLE `module_image_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `module_image_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `module_image` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
