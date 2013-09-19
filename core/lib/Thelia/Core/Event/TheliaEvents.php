@@ -165,6 +165,27 @@ final class TheliaEvents
     const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
     const AFTER_UPDATECATEGORY 	= "action.after_updateCategory";
 
+    // -- folder management -----------------------------------------------
+
+    const FOLDER_CREATE            = "action.createFolder";
+    const FOLDER_UPDATE            = "action.updateFolder";
+    const FOLDER_DELETE            = "action.deleteFolder";
+    const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
+    const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
+
+//    const FOLDER_ADD_CONTENT      = "action.categoryAddContent";
+//    const FOLDER_REMOVE_CONTENT   = "action.categoryRemoveContent";
+
+    const BEFORE_CREATEFOLDER = "action.before_createFolder";
+    const AFTER_CREATEFOLDER 	= "action.after_createFolder";
+
+    const BEFORE_DELETEFOLDER = "action.before_deleteFolder";
+    const AFTER_DELETEFOLDER 	= "action.after_deleteFolder";
+
+    const BEFORE_UPDATEFOLDER = "action.before_updateFolder";
+    const AFTER_UPDATEFOLDER 	= "action.after_updateFolder";
+
+
     // -- Product management -----------------------------------------------
 
     const PRODUCT_CREATE            = "action.createProduct";
