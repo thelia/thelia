@@ -595,14 +595,20 @@
   <table name="order_product" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="order_id" required="true" type="INTEGER" />
-    <column name="product_ref" size="255" type="VARCHAR" />
+    <column name="product_ref" required="true" size="255" type="VARCHAR" />
+    <column name="product_sale_elements_ref" required="true" size="255" type="VARCHAR" />
     <column name="title" size="255" type="VARCHAR" />
-    <column name="description" type="LONGVARCHAR" />
     <column name="chapo" type="LONGVARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="postscriptum" type="LONGVARCHAR" />
     <column name="quantity" required="true" type="FLOAT" />
     <column name="price" required="true" type="FLOAT" />
+    <column name="promo_price" size="45" type="VARCHAR" />
+    <column name="was_new" required="true" type="TINYINT" />
+    <column name="was_in_promo" required="true" type="TINYINT" />
+    <column name="weight" size="45" type="VARCHAR" />
     <column name="tax" type="FLOAT" />
-    <column name="parent" type="INTEGER" />
+    <column description="not managed yet" name="parent" type="INTEGER" />
     <foreign-key foreignTable="order" name="fk_order_product_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_id" />
     </foreign-key>
@@ -626,11 +632,17 @@
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
   </table>
-  <table name="order_feature" namespace="Thelia\Model">
+  <table name="order_attribute_combination" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="order_product_id" required="true" type="INTEGER" />
-    <column name="feature_desc" size="255" type="VARCHAR" />
-    <column name="feature_av_desc" size="255" type="VARCHAR" />
+    <column name="attribute_title" required="true" size="255" type="VARCHAR" />
+    <column name="attribute_chapo" type="LONGVARCHAR" />
+    <column name="attribute_description" type="CLOB" />
+    <column name="attribute_postscriptumn" type="LONGVARCHAR" />
+    <column name="attribute_av_title" required="true" size="255" type="VARCHAR" />
+    <column name="attribute_av_chapo" type="LONGVARCHAR" />
+    <column name="attribute_av_description" type="CLOB" />
+    <column name="attribute_av_postscriptum" type="LONGVARCHAR" />
     <foreign-key foreignTable="order_product" name="fk_order_feature_order_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_product_id" />
     </foreign-key>

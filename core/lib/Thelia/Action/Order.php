@@ -30,6 +30,7 @@ use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\AddressQuery;
 use Thelia\Model\ModuleQuery;
+use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderAddress;
@@ -108,14 +109,17 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         /* use a copy to avoid errored reccord in session */
         $placedOrder = $sessionOrder->copy();
+        $placedOrder->setDispatcher($this->getDispatcher());
 
         $customer = $this->getSecurityContext()->getCustomerUser();
         $currency = $this->getSession()->getCurrency();
         $lang = $this->getSession()->getLang();
         $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->chosenDeliveryAddress);
         $invoiceAddress = AddressQuery::create()->findPk($sessionOrder->chosenInvoiceAddress);
+        $cart = $this->getSession()->getCart();
+        $cartItems = $cart->getCartItems();
 
-        $paymentModule = ModuleQuery::findPk($placedOrder->getPaymentModuleId());
+        $paymentModule = ModuleQuery::create()->findPk($placedOrder->getPaymentModuleId());
 
         /* fulfill order */
         $placedOrder->setCustomerId($customer->getId());
@@ -163,7 +167,16 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $placedOrder->save($con);
 
-        /* fulfill order_products and decrease stock // @todo dispatch event */
+        /* fulfill order_products and decrease stock // @todo + dispatch event */
+
+        foreach($cartItems as $cartItem) {
+            $orderProduct = new OrderProduct();
+            $orderProduct
+                ->setOrderId($placedOrder->getId())
+            ;
+
+            $in = true;
+        }
 
         /* discount @todo */
 
@@ -171,14 +184,15 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         /* T1style : dispatch mail event ? */
 
-        /* clear session ? */
+        /* clear session @todo : remove comment below + test */
+        //$sessionOrder = new \Thelia\Model\Order();
 
         /* call pay method */
         $paymentModuleReflection = new \ReflectionClass($paymentModule->getFullNamespace());
         $paymentModuleInstance = $paymentModuleReflection->newInstance();
 
-        $paymentModuleInstance->setRequest($this->request);
-        $paymentModuleInstance->setDispatcher($this->dispatcher);
+        $paymentModuleInstance->setRequest($this->getRequest());
+        $paymentModuleInstance->setDispatcher($this->getDispatcher());
 
         $paymentModuleInstance->pay();
     }
@@ -188,14 +202,13 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function setReference(OrderEvent $event)
     {
-        $x = true;
-
-        $this->setRef($this->generateRef());
+        $event->getOrder()->setRef($this->generateRef());
     }
 
     public function generateRef()
     {
-        return sprintf('O', uniqid('', true), $this->getId());
+        /* order addresses are unique */
+        return uniqid('ORD', true);
     }
 
     /**

@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\OrderProduct;
-use Thelia\Model\OrderProductQuery;
+use Thelia\Model\OrderAttributeCombination;
+use Thelia\Model\OrderAttributeCombinationQuery;
 
 
 /**
- * This class defines the structure of the 'order_product' table.
+ * This class defines the structure of the 'order_attribute_combination' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\OrderProductQuery;
  * (i.e. if it's a text column type).
  *
  */
-class OrderProductTableMap extends TableMap
+class OrderAttributeCombinationTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.OrderProductTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.OrderAttributeCombinationTableMap';
 
     /**
      * The default database name for this class
@@ -42,17 +42,17 @@ class OrderProductTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'order_product';
+    const TABLE_NAME = 'order_attribute_combination';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\OrderProduct';
+    const OM_CLASS = '\\Thelia\\Model\\OrderAttributeCombination';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.OrderProduct';
+    const CLASS_DEFAULT = 'Thelia.Model.OrderAttributeCombination';
 
     /**
      * The total number of columns
@@ -72,62 +72,62 @@ class OrderProductTableMap extends TableMap
     /**
      * the column name for the ID field
      */
-    const ID = 'order_product.ID';
+    const ID = 'order_attribute_combination.ID';
 
     /**
-     * the column name for the ORDER_ID field
+     * the column name for the ORDER_PRODUCT_ID field
      */
-    const ORDER_ID = 'order_product.ORDER_ID';
+    const ORDER_PRODUCT_ID = 'order_attribute_combination.ORDER_PRODUCT_ID';
 
     /**
-     * the column name for the PRODUCT_REF field
+     * the column name for the ATTRIBUTE_TITLE field
      */
-    const PRODUCT_REF = 'order_product.PRODUCT_REF';
+    const ATTRIBUTE_TITLE = 'order_attribute_combination.ATTRIBUTE_TITLE';
 
     /**
-     * the column name for the TITLE field
+     * the column name for the ATTRIBUTE_CHAPO field
      */
-    const TITLE = 'order_product.TITLE';
+    const ATTRIBUTE_CHAPO = 'order_attribute_combination.ATTRIBUTE_CHAPO';
 
     /**
-     * the column name for the DESCRIPTION field
+     * the column name for the ATTRIBUTE_DESCRIPTION field
      */
-    const DESCRIPTION = 'order_product.DESCRIPTION';
+    const ATTRIBUTE_DESCRIPTION = 'order_attribute_combination.ATTRIBUTE_DESCRIPTION';
 
     /**
-     * the column name for the CHAPO field
+     * the column name for the ATTRIBUTE_POSTSCRIPTUMN field
      */
-    const CHAPO = 'order_product.CHAPO';
+    const ATTRIBUTE_POSTSCRIPTUMN = 'order_attribute_combination.ATTRIBUTE_POSTSCRIPTUMN';
 
     /**
-     * the column name for the QUANTITY field
+     * the column name for the ATTRIBUTE_AV_TITLE field
      */
-    const QUANTITY = 'order_product.QUANTITY';
+    const ATTRIBUTE_AV_TITLE = 'order_attribute_combination.ATTRIBUTE_AV_TITLE';
 
     /**
-     * the column name for the PRICE field
+     * the column name for the ATTRIBUTE_AV_CHAPO field
      */
-    const PRICE = 'order_product.PRICE';
+    const ATTRIBUTE_AV_CHAPO = 'order_attribute_combination.ATTRIBUTE_AV_CHAPO';
 
     /**
-     * the column name for the TAX field
+     * the column name for the ATTRIBUTE_AV_DESCRIPTION field
      */
-    const TAX = 'order_product.TAX';
+    const ATTRIBUTE_AV_DESCRIPTION = 'order_attribute_combination.ATTRIBUTE_AV_DESCRIPTION';
 
     /**
-     * the column name for the PARENT field
+     * the column name for the ATTRIBUTE_AV_POSTSCRIPTUM field
      */
-    const PARENT = 'order_product.PARENT';
+    const ATTRIBUTE_AV_POSTSCRIPTUM = 'order_attribute_combination.ATTRIBUTE_AV_POSTSCRIPTUM';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'order_product.CREATED_AT';
+    const CREATED_AT = 'order_attribute_combination.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'order_product.UPDATED_AT';
+    const UPDATED_AT = 'order_attribute_combination.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -141,11 +141,11 @@ class OrderProductTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'OrderId', 'ProductRef', 'Title', 'Description', 'Chapo', 'Quantity', 'Price', 'Tax', 'Parent', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'orderId', 'productRef', 'title', 'description', 'chapo', 'quantity', 'price', 'tax', 'parent', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(OrderProductTableMap::ID, OrderProductTableMap::ORDER_ID, OrderProductTableMap::PRODUCT_REF, OrderProductTableMap::TITLE, OrderProductTableMap::DESCRIPTION, OrderProductTableMap::CHAPO, OrderProductTableMap::QUANTITY, OrderProductTableMap::PRICE, OrderProductTableMap::TAX, OrderProductTableMap::PARENT, OrderProductTableMap::CREATED_AT, OrderProductTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_ID', 'PRODUCT_REF', 'TITLE', 'DESCRIPTION', 'CHAPO', 'QUANTITY', 'PRICE', 'TAX', 'PARENT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'order_id', 'product_ref', 'title', 'description', 'chapo', 'quantity', 'price', 'tax', 'parent', 'created_at', 'updated_at', ),
+        self::TYPE_PHPNAME       => array('Id', 'OrderProductId', 'AttributeTitle', 'AttributeChapo', 'AttributeDescription', 'AttributePostscriptumn', 'AttributeAvTitle', 'AttributeAvChapo', 'AttributeAvDescription', 'AttributeAvPostscriptum', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'orderProductId', 'attributeTitle', 'attributeChapo', 'attributeDescription', 'attributePostscriptumn', 'attributeAvTitle', 'attributeAvChapo', 'attributeAvDescription', 'attributeAvPostscriptum', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(OrderAttributeCombinationTableMap::ID, OrderAttributeCombinationTableMap::ORDER_PRODUCT_ID, OrderAttributeCombinationTableMap::ATTRIBUTE_TITLE, OrderAttributeCombinationTableMap::ATTRIBUTE_CHAPO, OrderAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION, OrderAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUMN, OrderAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE, OrderAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO, OrderAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION, OrderAttributeCombinationTableMap::ATTRIBUTE_AV_POSTSCRIPTUM, OrderAttributeCombinationTableMap::CREATED_AT, OrderAttributeCombinationTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_PRODUCT_ID', 'ATTRIBUTE_TITLE', 'ATTRIBUTE_CHAPO', 'ATTRIBUTE_DESCRIPTION', 'ATTRIBUTE_POSTSCRIPTUMN', 'ATTRIBUTE_AV_TITLE', 'ATTRIBUTE_AV_CHAPO', 'ATTRIBUTE_AV_DESCRIPTION', 'ATTRIBUTE_AV_POSTSCRIPTUM', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'order_product_id', 'attribute_title', 'attribute_chapo', 'attribute_description', 'attribute_postscriptumn', 'attribute_av_title', 'attribute_av_chapo', 'attribute_av_description', 'attribute_av_postscriptum', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
     );
 
@@ -156,11 +156,11 @@ class OrderProductTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderId' => 1, 'ProductRef' => 2, 'Title' => 3, 'Description' => 4, 'Chapo' => 5, 'Quantity' => 6, 'Price' => 7, 'Tax' => 8, 'Parent' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderId' => 1, 'productRef' => 2, 'title' => 3, 'description' => 4, 'chapo' => 5, 'quantity' => 6, 'price' => 7, 'tax' => 8, 'parent' => 9, 'createdAt' => 10, 'updatedAt' => 11, ),
-        self::TYPE_COLNAME       => array(OrderProductTableMap::ID => 0, OrderProductTableMap::ORDER_ID => 1, OrderProductTableMap::PRODUCT_REF => 2, OrderProductTableMap::TITLE => 3, OrderProductTableMap::DESCRIPTION => 4, OrderProductTableMap::CHAPO => 5, OrderProductTableMap::QUANTITY => 6, OrderProductTableMap::PRICE => 7, OrderProductTableMap::TAX => 8, OrderProductTableMap::PARENT => 9, OrderProductTableMap::CREATED_AT => 10, OrderProductTableMap::UPDATED_AT => 11, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_ID' => 1, 'PRODUCT_REF' => 2, 'TITLE' => 3, 'DESCRIPTION' => 4, 'CHAPO' => 5, 'QUANTITY' => 6, 'PRICE' => 7, 'TAX' => 8, 'PARENT' => 9, 'CREATED_AT' => 10, 'UPDATED_AT' => 11, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'order_id' => 1, 'product_ref' => 2, 'title' => 3, 'description' => 4, 'chapo' => 5, 'quantity' => 6, 'price' => 7, 'tax' => 8, 'parent' => 9, 'created_at' => 10, 'updated_at' => 11, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderProductId' => 1, 'AttributeTitle' => 2, 'AttributeChapo' => 3, 'AttributeDescription' => 4, 'AttributePostscriptumn' => 5, 'AttributeAvTitle' => 6, 'AttributeAvChapo' => 7, 'AttributeAvDescription' => 8, 'AttributeAvPostscriptum' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderProductId' => 1, 'attributeTitle' => 2, 'attributeChapo' => 3, 'attributeDescription' => 4, 'attributePostscriptumn' => 5, 'attributeAvTitle' => 6, 'attributeAvChapo' => 7, 'attributeAvDescription' => 8, 'attributeAvPostscriptum' => 9, 'createdAt' => 10, 'updatedAt' => 11, ),
+        self::TYPE_COLNAME       => array(OrderAttributeCombinationTableMap::ID => 0, OrderAttributeCombinationTableMap::ORDER_PRODUCT_ID => 1, OrderAttributeCombinationTableMap::ATTRIBUTE_TITLE => 2, OrderAttributeCombinationTableMap::ATTRIBUTE_CHAPO => 3, OrderAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION => 4, OrderAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUMN => 5, OrderAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE => 6, OrderAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO => 7, OrderAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION => 8, OrderAttributeCombinationTableMap::ATTRIBUTE_AV_POSTSCRIPTUM => 9, OrderAttributeCombinationTableMap::CREATED_AT => 10, OrderAttributeCombinationTableMap::UPDATED_AT => 11, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_PRODUCT_ID' => 1, 'ATTRIBUTE_TITLE' => 2, 'ATTRIBUTE_CHAPO' => 3, 'ATTRIBUTE_DESCRIPTION' => 4, 'ATTRIBUTE_POSTSCRIPTUMN' => 5, 'ATTRIBUTE_AV_TITLE' => 6, 'ATTRIBUTE_AV_CHAPO' => 7, 'ATTRIBUTE_AV_DESCRIPTION' => 8, 'ATTRIBUTE_AV_POSTSCRIPTUM' => 9, 'CREATED_AT' => 10, 'UPDATED_AT' => 11, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'order_product_id' => 1, 'attribute_title' => 2, 'attribute_chapo' => 3, 'attribute_description' => 4, 'attribute_postscriptumn' => 5, 'attribute_av_title' => 6, 'attribute_av_chapo' => 7, 'attribute_av_description' => 8, 'attribute_av_postscriptum' => 9, 'created_at' => 10, 'updated_at' => 11, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
     );
 
@@ -174,22 +174,22 @@ class OrderProductTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('order_product');
-        $this->setPhpName('OrderProduct');
-        $this->setClassName('\\Thelia\\Model\\OrderProduct');
+        $this->setName('order_attribute_combination');
+        $this->setPhpName('OrderAttributeCombination');
+        $this->setClassName('\\Thelia\\Model\\OrderAttributeCombination');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('ORDER_ID', 'OrderId', 'INTEGER', 'order', 'ID', true, null, null);
-        $this->addColumn('PRODUCT_REF', 'ProductRef', 'VARCHAR', false, 255, null);
-        $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
-        $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('CHAPO', 'Chapo', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('QUANTITY', 'Quantity', 'FLOAT', true, null, null);
-        $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, null);
-        $this->addColumn('TAX', 'Tax', 'FLOAT', false, null, null);
-        $this->addColumn('PARENT', 'Parent', 'INTEGER', false, null, null);
+        $this->addForeignKey('ORDER_PRODUCT_ID', 'OrderProductId', 'INTEGER', 'order_product', 'ID', true, null, null);
+        $this->addColumn('ATTRIBUTE_TITLE', 'AttributeTitle', 'VARCHAR', true, 255, null);
+        $this->addColumn('ATTRIBUTE_CHAPO', 'AttributeChapo', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('ATTRIBUTE_DESCRIPTION', 'AttributeDescription', 'CLOB', false, null, null);
+        $this->addColumn('ATTRIBUTE_POSTSCRIPTUMN', 'AttributePostscriptumn', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('ATTRIBUTE_AV_TITLE', 'AttributeAvTitle', 'VARCHAR', true, 255, null);
+        $this->addColumn('ATTRIBUTE_AV_CHAPO', 'AttributeAvChapo', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('ATTRIBUTE_AV_DESCRIPTION', 'AttributeAvDescription', 'CLOB', false, null, null);
+        $this->addColumn('ATTRIBUTE_AV_POSTSCRIPTUM', 'AttributeAvPostscriptum', 'LONGVARCHAR', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -199,8 +199,7 @@ class OrderProductTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('order_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('OrderFeature', '\\Thelia\\Model\\OrderFeature', RelationMap::ONE_TO_MANY, array('id' => 'order_product_id', ), 'CASCADE', 'RESTRICT', 'OrderFeatures');
+        $this->addRelation('OrderProduct', '\\Thelia\\Model\\OrderProduct', RelationMap::MANY_TO_ONE, array('order_product_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
 
     /**
@@ -215,15 +214,6 @@ class OrderProductTableMap extends TableMap
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
-    /**
-     * Method to invalidate the instance pool of all tables related to order_product     * by a foreign key with ON DELETE CASCADE
-     */
-    public static function clearRelatedInstancePool()
-    {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                OrderFeatureTableMap::clearInstancePool();
-            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -281,7 +271,7 @@ class OrderProductTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? OrderProductTableMap::CLASS_DEFAULT : OrderProductTableMap::OM_CLASS;
+        return $withPrefix ? OrderAttributeCombinationTableMap::CLASS_DEFAULT : OrderAttributeCombinationTableMap::OM_CLASS;
     }
 
     /**
@@ -295,21 +285,21 @@ class OrderProductTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (OrderProduct object, last column rank)
+     * @return array (OrderAttributeCombination object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = OrderProductTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = OrderProductTableMap::getInstanceFromPool($key))) {
+        $key = OrderAttributeCombinationTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = OrderAttributeCombinationTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + OrderProductTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + OrderAttributeCombinationTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = OrderProductTableMap::OM_CLASS;
+            $cls = OrderAttributeCombinationTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            OrderProductTableMap::addInstanceToPool($obj, $key);
+            OrderAttributeCombinationTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -332,8 +322,8 @@ class OrderProductTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = OrderProductTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = OrderProductTableMap::getInstanceFromPool($key))) {
+            $key = OrderAttributeCombinationTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = OrderAttributeCombinationTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -342,7 +332,7 @@ class OrderProductTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                OrderProductTableMap::addInstanceToPool($obj, $key);
+                OrderAttributeCombinationTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -363,29 +353,29 @@ class OrderProductTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(OrderProductTableMap::ID);
-            $criteria->addSelectColumn(OrderProductTableMap::ORDER_ID);
-            $criteria->addSelectColumn(OrderProductTableMap::PRODUCT_REF);
-            $criteria->addSelectColumn(OrderProductTableMap::TITLE);
-            $criteria->addSelectColumn(OrderProductTableMap::DESCRIPTION);
-            $criteria->addSelectColumn(OrderProductTableMap::CHAPO);
-            $criteria->addSelectColumn(OrderProductTableMap::QUANTITY);
-            $criteria->addSelectColumn(OrderProductTableMap::PRICE);
-            $criteria->addSelectColumn(OrderProductTableMap::TAX);
-            $criteria->addSelectColumn(OrderProductTableMap::PARENT);
-            $criteria->addSelectColumn(OrderProductTableMap::CREATED_AT);
-            $criteria->addSelectColumn(OrderProductTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(OrderAttributeCombinationTableMap::ID);
+            $criteria->addSelectColumn(OrderAttributeCombinationTableMap::ORDER_PRODUCT_ID);
+            $criteria->addSelectColumn(OrderAttributeCombinationTableMap::ATTRIBUTE_TITLE);
+            $criteria->addSelectColumn(OrderAttributeCombinationTableMap::ATTRIBUTE_CHAPO);
+            $criteria->addSelectColumn(OrderAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION);
+            $criteria->addSelectColumn(OrderAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUMN);
+            $criteria->addSelectColumn(OrderAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE);
+            $criteria->addSelectColumn(OrderAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO);
+            $criteria->addSelectColumn(OrderAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION);
+            $criteria->addSelectColumn(OrderAttributeCombinationTableMap::ATTRIBUTE_AV_POSTSCRIPTUM);
+            $criteria->addSelectColumn(OrderAttributeCombinationTableMap::CREATED_AT);
+            $criteria->addSelectColumn(OrderAttributeCombinationTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.ORDER_ID');
-            $criteria->addSelectColumn($alias . '.PRODUCT_REF');
-            $criteria->addSelectColumn($alias . '.TITLE');
-            $criteria->addSelectColumn($alias . '.DESCRIPTION');
-            $criteria->addSelectColumn($alias . '.CHAPO');
-            $criteria->addSelectColumn($alias . '.QUANTITY');
-            $criteria->addSelectColumn($alias . '.PRICE');
-            $criteria->addSelectColumn($alias . '.TAX');
-            $criteria->addSelectColumn($alias . '.PARENT');
+            $criteria->addSelectColumn($alias . '.ORDER_PRODUCT_ID');
+            $criteria->addSelectColumn($alias . '.ATTRIBUTE_TITLE');
+            $criteria->addSelectColumn($alias . '.ATTRIBUTE_CHAPO');
+            $criteria->addSelectColumn($alias . '.ATTRIBUTE_DESCRIPTION');
+            $criteria->addSelectColumn($alias . '.ATTRIBUTE_POSTSCRIPTUMN');
+            $criteria->addSelectColumn($alias . '.ATTRIBUTE_AV_TITLE');
+            $criteria->addSelectColumn($alias . '.ATTRIBUTE_AV_CHAPO');
+            $criteria->addSelectColumn($alias . '.ATTRIBUTE_AV_DESCRIPTION');
+            $criteria->addSelectColumn($alias . '.ATTRIBUTE_AV_POSTSCRIPTUM');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -400,7 +390,7 @@ class OrderProductTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(OrderProductTableMap::DATABASE_NAME)->getTable(OrderProductTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(OrderAttributeCombinationTableMap::DATABASE_NAME)->getTable(OrderAttributeCombinationTableMap::TABLE_NAME);
     }
 
     /**
@@ -408,16 +398,16 @@ class OrderProductTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(OrderProductTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(OrderProductTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new OrderProductTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(OrderAttributeCombinationTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(OrderAttributeCombinationTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new OrderAttributeCombinationTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a OrderProduct or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a OrderAttributeCombination or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or OrderProduct object or primary key or array of primary keys
+     * @param mixed               $values Criteria or OrderAttributeCombination object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -428,25 +418,25 @@ class OrderProductTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(OrderProductTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(OrderAttributeCombinationTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\OrderProduct) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\OrderAttributeCombination) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(OrderProductTableMap::DATABASE_NAME);
-            $criteria->add(OrderProductTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(OrderAttributeCombinationTableMap::DATABASE_NAME);
+            $criteria->add(OrderAttributeCombinationTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = OrderProductQuery::create()->mergeWith($criteria);
+        $query = OrderAttributeCombinationQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { OrderProductTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { OrderAttributeCombinationTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { OrderProductTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { OrderAttributeCombinationTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -454,20 +444,20 @@ class OrderProductTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the order_product table.
+     * Deletes all rows from the order_attribute_combination table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return OrderProductQuery::create()->doDeleteAll($con);
+        return OrderAttributeCombinationQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a OrderProduct or Criteria object.
+     * Performs an INSERT on the database, given a OrderAttributeCombination or Criteria object.
      *
-     * @param mixed               $criteria Criteria or OrderProduct object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or OrderAttributeCombination object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -476,22 +466,22 @@ class OrderProductTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(OrderProductTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(OrderAttributeCombinationTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from OrderProduct object
+            $criteria = $criteria->buildCriteria(); // build Criteria from OrderAttributeCombination object
         }
 
-        if ($criteria->containsKey(OrderProductTableMap::ID) && $criteria->keyContainsValue(OrderProductTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.OrderProductTableMap::ID.')');
+        if ($criteria->containsKey(OrderAttributeCombinationTableMap::ID) && $criteria->keyContainsValue(OrderAttributeCombinationTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.OrderAttributeCombinationTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = OrderProductQuery::create()->mergeWith($criteria);
+        $query = OrderAttributeCombinationQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -507,7 +497,7 @@ class OrderProductTableMap extends TableMap
         return $pk;
     }
 
-} // OrderProductTableMap
+} // OrderAttributeCombinationTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-OrderProductTableMap::buildTableMap();
+OrderAttributeCombinationTableMap::buildTableMap();
