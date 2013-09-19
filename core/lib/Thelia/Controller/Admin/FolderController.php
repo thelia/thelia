@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\TheliaEvents;
 
 /**
  * Class FolderController
@@ -30,18 +31,25 @@ namespace Thelia\Controller\Admin;
  */
 class FolderController extends AbstractCrudController
 {
-    public function indexAction()
-    {
-        if (null !== $response = $this->checkAuth("admin.folder.view")) return $response;
-        return $this->render("folders", array("display_folder" => 20));
-    }
-    
-    public function updateAction($folder_id)
-    {
 
-    	return $this->render("folder-edit", array(
-    		"folder_id" => $folder_id
-    	));
+    public function __construct()
+    {
+        parent::__construct(
+            'folder',
+            'manual',
+            'folder_order',
+
+            'admin.folder.default',
+            'admin.folder.create',
+            'admin.folder.update',
+            'admin.folder.delete',
+
+            TheliaEvents::FOLDER_CREATE,
+            TheliaEvents::FOLDER_UPDATE,
+            TheliaEvents::FOLDER_DELETE,
+            TheliaEvents::FOLDER_TOGGLE_VISIBILITY,
+            TheliaEvents::FOLDER_UPDATE_POSITION
+        );
     }
 
     /**
@@ -151,17 +159,34 @@ class FolderController extends AbstractCrudController
      *
      * @param unknown $currentOrder, if any, null otherwise.
      */
-    protected function renderListTemplate($currentOrder)
-    {
-        // TODO: Implement renderListTemplate() method.
+    protected function renderListTemplate($currentOrder) {
+
+        // Get product order
+        $product_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
+
+        return $this->render('folders',
+            array(
+                'folder_order' => $currentOrder,
+                'content_order' => $product_order,
+                'folder_id' => $this->getRequest()->get('folder_id', 0)
+            ));
     }
+
 
     /**
      * Render the edition template
      */
-    protected function renderEditionTemplate()
+    protected function renderEditionTemplate() {
+
+        return $this->render('folder-edit', $this->getEditionArguments());
+    }
+
+    protected function getEditionArguments()
     {
-        // TODO: Implement renderEditionTemplate() method.
+        return array(
+            'folder_id' => $this->getRequest()->get('folder_id', 0),
+            'current_tab' => $this->getRequest()->get('current_tab', 'general')
+        );
     }
 
     /**

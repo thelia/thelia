@@ -45,7 +45,7 @@
                                     current_order=$folder_order
                                     order='id'
                                     reverse_order='id_reverse'
-                                    path={url path='/admin/folders' id_folder=$folder_id}
+                                    path={url path='/admin/folders' folder_id=$folder_id}
                                     request_parameter_name='folder_order'
                                     label="{intl l='ID'}"
                                  }
@@ -58,7 +58,7 @@
                                     current_order=$folder_order
                                     order='alpha'
                                     reverse_order='alpha_reverse'
-                                    path={url path='/admin/folders' id_folder=$folder_id}
+                                    path={url path='/admin/folders' folder_id=$folder_id}
                                     request_parameter_name='folder_order'
                                     label="{intl l='Folder title'}"
                                  }
@@ -71,7 +71,7 @@
                                     current_order=$folder_order
                                     order='visible'
                                     reverse_order='visible_reverse'
-                                    path={url path='/admin/folders' id_folder=$folder_id}
+                                    path={url path='/admin/folders' folder_id=$folder_id}
                                     request_parameter_name='folder_order'
                                     label="{intl l='Online'}"
                                  }
@@ -82,7 +82,7 @@
                                     current_order=$folder_order
                                     order='manual'
                                     reverse_order='manual_reverse'
-                                    path={url path='/admin/folders' id_folder=$folder_id}
+                                    path={url path='/admin/folders' folder_id=$folder_id}
                                     request_parameter_name='folder_order'
                                     label="{intl l='Position'}"
                                  }
@@ -99,12 +99,12 @@
 
                              <td>
                              {loop type="image" name="folder_image" source="folder" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-                               <a href="{url path='admin/folder' folder_id=$ID}" title="{intl l='Browse this folder'}"><img class="img-thumbnail" src="{$IMAGE_URL}" alt="{$TITLE}" /></a>
+                               <a href="{url path='admin/folders' folder_id=$ID}" title="{intl l='Browse this folder'}"><img class="img-thumbnail" src="{$IMAGE_URL}" alt="{$TITLE}" /></a>
                              {/loop}
                              </td>
 
                              <td class="object-title">
-                                  <a href="{url path='admin/folder' folder_id=$ID}" title="{intl l='Browse this folder'}">
+                                  <a href="{url path='admin/folders' folder_id=$ID}" title="{intl l='Browse this folder'}">
                                     {$TITLE}
                                   </a>
                              </td>
@@ -138,7 +138,7 @@
 
                              <td class="actions">
                                  <div class="btn-group">
-                                     <a class="btn btn-default btn-xs" title="{intl l='Browse this folder'}" href="{url path='admin/folder' folder_id=$ID}"><i class="glyphicon glyphicon-folder-open"></i></a>
+                                     <a class="btn btn-default btn-xs" title="{intl l='Browse this folder'}" href="{url path='admin/folders' folder_id=$ID}"><i class="glyphicon glyphicon-folder-open"></i></a>
 
                                      {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.folders.edit"}
                                         <a class="btn btn-default btn-xs" title="{intl l='Edit this folder'}" href="{url path='/admin/folders/update' folder_id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
