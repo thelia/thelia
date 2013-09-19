@@ -266,14 +266,14 @@
 
                              <td>
                              {loop type="image" name="cat_image" source="product" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-                               <a href="{url path='admin/product/edit' id=$ID}" title="{intl l='Edit this product'}">
+                               <a href="{url path='/admin/products/update' product_id=$ID}" title="{intl l='Edit this product'}">
                                  <img src="{$IMAGE_URL}" alt="{$TITLE}" />
                                </a>
                              {/loop}
 
-                             <td class="object-title"><a href="{url path="/admin/product/update/$ID"}" title="{intl l='Edit this product'}">{$REF}</a></td>
+                             <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID}" title="{intl l='Edit this product'}">{$REF}</a></td>
 
-                             <td class="object-title"><a href="{url path="/admin/product/update/$ID"}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
+                             <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
 
                              {module_include location='product_list_row'}
 
@@ -305,7 +305,7 @@
                              <td>
                                  <div class="btn-group">
                                  {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.product.edit"}
-                                    <a class="btn btn-default btn-xs" title="{intl l='Edit this product'}" href="{url path="admin/product/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                    <a class="btn btn-default btn-xs" title="{intl l='Edit this product'}" href="{url path='/admin/products/update' product_id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
                                 {/loop}
 
                                  {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.product.delete"}
