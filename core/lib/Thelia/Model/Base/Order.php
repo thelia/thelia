@@ -1653,18 +1653,8 @@ abstract class Order implements ActiveRecordInterface
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
-        $db = Propel::getServiceContainer()->getAdapter(OrderTableMap::DATABASE_NAME);
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(OrderTableMap::DATABASE_NAME);
-
-        $tableName = OrderTableMap::TABLE_NAME;
-
-        if ($db->useQuoteIdentifier()) {
-            $tableName = $db->quoteIdentifierTable($tableName);
-        }
-
         $sql = sprintf(
-            'INSERT INTO %s (%s) VALUES (%s)',
-            $tableName,
+            'INSERT INTO order (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
