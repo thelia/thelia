@@ -206,7 +206,8 @@ class Category extends BaseI18nLoop
                 ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("PARENT", $category->getParent())
                 ->set("URL", $category->getUrl($locale))
-                ->set("PRODUCT_COUNT", $category->countChild())
+                ->set("PRODUCT_COUNT", $category->countAllProducts())
+                ->set("CHILD_COUNT", $category->getCount())
                 ->set("VISIBLE", $category->getVisible() ? "1" : "0")
                 ->set("POSITION", $category->getPosition())
 

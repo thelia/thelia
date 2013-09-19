@@ -77,16 +77,16 @@
                                     {if $IS_PROMO }
                                         {loop name="productSaleElements_promo" type="product_sale_elements" product=$ID limit="1" order="min_price"}
                                          {assign var="default_product_sale_elements" value=$ID}
-                                        <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$TAXED_PROMO_PRICE}"} {currency attr="symbol"}</span></span>
-                                        <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                                        <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number=$TAXED_PROMO_PRICE} {currency attr="symbol"}</span></span>
+                                        <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number=$TAXED_PRICE} {currency attr="symbol"}</span></span>
                                         {/loop}
                                     {else}
-                                        <span class="regular-price"><span itemprop="price" class="price">{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                                        <span class="regular-price"><span itemprop="price" class="price">{format_number number=$BEST_TAXED_PRICE} {currency attr="symbol"}</span></span>
                                     {/if}
 
                                 </div>
                                 <div class="product-btn">
-                                    <a class="btn btn-cart" href="#">Add to cart</a>
+                                    <button class="btn btn-cart">Add to cart</button>
                                 </div>
                             </div>
                         </article><!-- /product -->
@@ -101,9 +101,14 @@
         <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
 
             <section id="categories" class="block block-nav" role="navigation" aria-labelledby="categories-label">
-                <div class="block-heading"><h3 class="block-title" id="categories-label">Categories</h3></div>
+                <div class="block-heading"><h3 class="block-title" id="categories-label">{intl l="Categories"}</h3></div>
                 <div class="block-content">
                     <nav class="nav-categories">
+                        {loop name="cat-parent" type="category-tree" category="0"}
+                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" >{$LEVEL} {$ID} {$PARENT} {$TITLE}</option>
+                        {/loop}
+
+
                         <ul id="category" class="accordion">
                             <li>
                                 <a class="accordion-toggle" data-toggle="collapse" data-parent="#category" href="#collapse1">Category 1 <span class="amount">(3)</span></a>
