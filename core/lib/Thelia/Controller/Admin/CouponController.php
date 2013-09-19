@@ -201,7 +201,7 @@ class CouponController extends BaseAdminController
         $lang = $this->getSession()->getLang();
         $eventToDispatch = TheliaEvents::COUPON_UPDATE;
 
-        // Create
+        // Update
         if ($this->getRequest()->isMethod('POST')) {
             $this->validateCreateOrUpdateForm(
                 $i18n,
@@ -210,7 +210,7 @@ class CouponController extends BaseAdminController
                 'updated',
                 'update'
             );
-        } else { // Update
+        } else { // Display
 
             // Prepare the data that will hydrate the form
             /** @var ConstraintFactory $constraintFactory */
@@ -495,11 +495,12 @@ class CouponController extends BaseAdminController
 
             // Get the form field values
             $data = $form->getData();
+
             $couponEvent = new CouponCreateOrUpdateEvent(
                 $data['code'],
                 $data['title'],
                 $data['amount'],
-                $data['effect'],
+                $data['type'],
                 $data['shortDescription'],
                 $data['description'],
                 $data['isEnabled'],

@@ -90,7 +90,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param string               $code                       Coupon Code
      * @param string               $title                      Coupon title
      * @param float                $amount                     Amount removed from the Total Checkout
-     * @param string               $effect                     Coupon effect
+     * @param string               $type                       Coupon type
      * @param string               $shortDescription           Coupon short description
      * @param string               $description                Coupon description
      * @param boolean              $isEnabled                  Enable/Disable
@@ -106,7 +106,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         $code,
         $title,
         $amount,
-        $effect,
+        $type,
         $shortDescription,
         $description,
         $isEnabled,
@@ -130,7 +130,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         $this->rules = $rules;
         $this->shortDescription = $shortDescription;
         $this->title = $title;
-        $this->effect = $effect;
+        $this->type = $type;
         $this->locale = $locale;
     }
 
@@ -264,13 +264,13 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Get Coupon effect
+     * Get Coupon type (effect)
      *
      * @return string
      */
-    public function getEffect()
+    public function getType()
     {
-        return $this->effect;
+        return $this->type;
     }
 
     /**

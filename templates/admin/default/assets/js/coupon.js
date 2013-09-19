@@ -138,17 +138,24 @@ $(function($){
 
     // Set max usage to unlimited or not
     couponManager.onUsageUnlimitedChange = function() {
-        if (!$('#max-usage').parent().hasClass('has-error')) {
-            $('#max-usage').hide().attr('value', '-1');
+        var isUnlimited = $('#is-unlimited');
+        if ($('#max-usage').val() == -1) {
+            isUnlimited.prop('checked', true);
+            $('#max-usage').hide();
             $('#max-usage-label').hide();
+        } else {
+            $isUnlimited.prop('checked', false);
+            $('#max-usage').show();
+            $('#max-usage-label').show();
         }
-        $('#is-unlimited').change(function(){
+
+        isUnlimited.change(function(){
             var $this = $(this);
             if ($this.is(':checked')) {
-                $('#max-usage').hide().attr('value', '-1');
+                $('#max-usage').hide().val('-1');
                 $('#max-usage-label').hide();
             } else {
-                $('#max-usage').show().val('').attr('value', '');
+                $('#max-usage').show().val('');
                 $('#max-usage-label').show();
             }
         });
