@@ -160,6 +160,7 @@ class Category extends BaseAction implements EventSubscriberInterface
             $content = new CategoryAssociatedContent();
 
             $content
+                ->setDispatcher($this->getDispatcher())
                 ->setCategory($event->getCategory())
                 ->setContentId($event->getContentId())
                 ->save()
@@ -174,7 +175,11 @@ class Category extends BaseAction implements EventSubscriberInterface
             ->filterByCategory($event->getCategory())->findOne()
         ;
 
-        if ($content !== null) $content->delete();
+        if ($content !== null) {
+            $content
+                ->setDispatcher($this->getDispatcher())
+                ->delete();
+        }
     }
 
 

@@ -44,6 +44,10 @@ use Thelia\Model\ProductCategory;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Model\TaxQuery;
+use Thelia\Model\AccessoryQuery;
+use Thelia\Model\Accessory;
+use Thelia\Core\Event\ProductAddAccessoryEvent;
+use Thelia\Core\Event\ProductDeleteAccessoryEvent;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
@@ -167,6 +171,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $content = new ProductAssociatedContent();
 
             $content
+                ->setDispatcher($this->getDispatcher())
                 ->setProduct($event->getProduct())
                 ->setContentId($event->getContentId())
                 ->save()
@@ -181,9 +186,66 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->filterByProduct($event->getProduct())->findOne()
         ;
 
-        if ($content !== null) $content->delete();
+        if ($content !== null)
+            $content
+                ->setDispatcher($this->getDispatcher())
+                ->delete()
+            ;
     }
 
+    public function addAccessory(ProductAddAccessoryEvent $event) {
+
+        if (AccessoryQuery::create()
+            ->filterByAccessory($event->getAccessoryId())
+            ->filterByProductId($event->getProduct()->getId())->count() <= 0) {
+
+            $accessory = new Accessory();
+
+            $accessory
+                ->setDispatcher($this->getDispatcher())
+                ->setProductId($event->getProduct()->getId())
+                ->setAccessory($event->getAccessoryId())
+            ->save()
+            ;
+        }
+    }
+
+    public function removeAccessory(ProductDeleteAccessoryEvent $event) {
+
+        $accessory = AccessoryQuery::create()
+            ->filterByAccessory($event->getAccessoryId())
+            ->filterByProductId($event->getProduct()->getId())->findOne()
+        ;
+
+        if ($accessory !== null)
+            $accessory
+                ->setDispatcher($this->getDispatcher())
+                ->delete()
+            ;
+    }
+
+
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param ProductChangePositionEvent $event
+     */
+    public function updateAccessoryPosition(UpdatePositionEvent $event)
+    {
+        if (null !== $accessory = AccessoryQuery::create()->findPk($event->getObjectId())) {
+
+            $accessory->setDispatcher($this->getDispatcher());
+
+            $mode = $event->getMode();
+
+            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
+                return $accessory->changeAbsolutePosition($event->getPosition());
+            else if ($mode == UpdatePositionEvent::POSITION_UP)
+                return $accessory->movePositionUp();
+            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
+                return $accessory->movePositionDown();
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -198,9 +260,12 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             TheliaEvents::PRODUCT_UPDATE_POSITION   => array("updatePosition", 128),
 
-            TheliaEvents::PRODUCT_ADD_CONTENT       => array("addContent", 128),
-            TheliaEvents::PRODUCT_REMOVE_CONTENT    => array("removeContent", 128),
+            TheliaEvents::PRODUCT_ADD_CONTENT               => array("addContent", 128),
+            TheliaEvents::PRODUCT_REMOVE_CONTENT            => array("removeContent", 128),
+            TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => array("updateAccessoryPosition", 128),
 
+            TheliaEvents::PRODUCT_ADD_ACCESSORY     => array("addAccessory", 128),
+            TheliaEvents::PRODUCT_REMOVE_ACCESSORY  => array("removeAccessory", 128),
         );
     }
 }

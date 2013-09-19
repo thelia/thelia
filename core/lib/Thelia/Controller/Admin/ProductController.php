@@ -39,6 +39,10 @@ use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\ProductAssociatedContentQuery;
+use Thelia\Model\AccessoryQuery;
+use Thelia\Model\CategoryQuery;
+use Thelia\Core\Event\ProductAddAccessoryEvent;
+use Thelia\Core\Event\ProductDeleteAccessoryEvent;
 
 /**
  * Manages products
@@ -175,10 +179,11 @@ class ProductController extends AbstractCrudController
     protected function getEditionArguments()
     {
         return array(
-                'category_id' => $this->getCategoryId(),
-                'product_id'  => $this->getRequest()->get('product_id', 0),
-                'folder_id'   => $this->getRequest()->get('folder_id', 0),
-                'current_tab' => $this->getRequest()->get('current_tab', 'general')
+                'category_id'          => $this->getCategoryId(),
+                'product_id'           => $this->getRequest()->get('product_id', 0),
+                'folder_id'            => $this->getRequest()->get('folder_id', 0),
+                'accessory_category_id'=> $this->getRequest()->get('accessory_category_id', 0),
+                'current_tab'          => $this->getRequest()->get('current_tab', 'general')
         );
     }
 
@@ -275,6 +280,8 @@ class ProductController extends AbstractCrudController
         );
     }
 
+    // -- Related content management -------------------------------------------
+
     public function getAvailableRelatedContentAction($productId, $folderId)
     {
         $result = array();
@@ -353,4 +360,118 @@ class ProductController extends AbstractCrudController
 
         $this->redirectToEditionTemplate();
     }
+
+
+    // -- Accessories management ----------------------------------------------
+
+    public function getAvailableAccessoriesAction($productId, $categoryId)
+    {
+        $result = array();
+
+        $categories = CategoryQuery::create()->filterById($categoryId)->find();
+
+        if ($categories !== null) {
+
+            $list = ProductQuery::create()
+            ->joinWithI18n($this->getCurrentEditionLocale())
+            ->filterByCategory($categories, Criteria::IN)
+            ->filterById(AccessoryQuery::create()->select('accessory')->findByProductId($productId), Criteria::NOT_IN)
+            ->find();
+            ;
+
+            if ($list !== null) {
+                foreach($list as $item) {
+                    $result[] = array('id' => $item->getId(), 'title' => $item->getTitle());
+                }
+            }
+        }
+
+        return $this->jsonResponse(json_encode($result));
+    }
+
+    public function addAccessoryAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $accessory_id = intval($this->getRequest()->get('accessory_id'));
+
+        if ($accessory_id > 0) {
+
+            $event = new ProductAddAccessoryEvent(
+                    $this->getExistingObject(),
+                    $accessory_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::PRODUCT_ADD_ACCESSORY, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    public function deleteAccessoryAction()
+    {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $accessory_id = intval($this->getRequest()->get('accessory_id'));
+
+        if ($accessory_id > 0) {
+
+            $event = new ProductDeleteAccessoryEvent(
+                    $this->getExistingObject(),
+                    $accessory_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::PRODUCT_REMOVE_ACCESSORY, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    /**
+     * Update accessory position (only for objects whichsupport that)
+     */
+    public function updateAccessoryPositionAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth('admin.products.update')) return $response;
+
+        try {
+            $mode = $this->getRequest()->get('mode', null);
+
+            if ($mode == 'up')
+                $mode = UpdatePositionEvent::POSITION_UP;
+            else if ($mode == 'down')
+                $mode = UpdatePositionEvent::POSITION_DOWN;
+            else
+                $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
+
+            $position = $this->getRequest()->get('position', null);
+
+            $event = new UpdatePositionEvent($mode, $position);
+
+            $this->dispatch(TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION, $event);
+        }
+        catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
 }
