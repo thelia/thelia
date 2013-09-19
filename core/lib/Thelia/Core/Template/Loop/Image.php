@@ -93,7 +93,8 @@ class Image extends BaseI18nLoop
                                 new EnumType($this->possible_sources)
                         )
                 ),
-                Argument::createIntTypeArgument('source_id')
+                Argument::createIntTypeArgument('source_id'),
+                Argument::createBooleanTypeArgument('force_return', true)
         );
 
         // Add possible image sources
