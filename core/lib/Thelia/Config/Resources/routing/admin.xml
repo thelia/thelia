@@ -487,6 +487,15 @@
 
     <!-- end feature and feature routes  management -->
 
+    <!-- Modules rule management -->
+
+    <route id="admin.module" path="/admin/modules">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::indexAction</default>
+    </route>
+
+    <!-- end Modules rule management -->
+
+
 	<!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">
