@@ -68,14 +68,11 @@ class ModuleActivateCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testModuleActivateCommandUnknownModule()
     {
-        $module = ModuleQuery::create()->findOne();
         $testedModule = ModuleQuery::create()->findOneByCode('Letshopethismoduledoesnotexists');
 
-        if(null !== $module && null == $testedModule) {
+        if(null == $testedModule) {
             $application = new Application($this->getKernel());
 
-            $module->setActivate(BaseModule::IS_NOT_ACTIVATED);
-            $module->save();
 
             $moduleActivate = new ModuleActivateCommand();
             $moduleActivate->setContainer($this->getContainer());
