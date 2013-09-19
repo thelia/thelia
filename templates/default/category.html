@@ -31,8 +31,17 @@
                         <li class="item">
                         <article itemscope itemtype="http://schema.org/Product">
                             <!-- Use the meta tag to specify content that is not visible on the page in any way -->
-                            <meta itemprop="brand" content="Diesel">
-                            <meta itemprop="productID" content="isbn:925872">
+                            {$product_id=$ID}
+                            {loop name="brand.feature" type="feature" product=$ID title="brand"}
+                                {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+                                            <meta itemprop="brand" content="{$TITLE}">
+                                {/loop}
+                            {/loop}
+                            {loop name="brand.feature" type="feature" product=$ID title="isbn"}
+                                {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+                                    <meta itemprop="productID" content="isbn:{$TITLE}">
+                                {/loop}
+                            {/loop}
 
                             <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
                                 {loop name="product_thumbnail" type="image" product=$ID width="218" height="146" resize_mode="borders" limit="1"}
@@ -54,9 +63,9 @@
 
                             <div class="product-price">
                                 <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                                    <meta itemprop="category" content="Category1">
+                                    <meta itemprop="category" content="{category attr="title"}">
                                     <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
-                                    <meta itemprop="priceCurrency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                    <meta itemprop="priceCurrency" content="{currency attr="symbol"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
                                     <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
                                     <!-- List of availibility :
                                         out_of_stock : http://schema.org/OutOfStock

@@ -26,11 +26,11 @@
                     <meta itemprop="brand" content="{$TITLE}">
                 {/loop}
             {/loop}
-
-            <!--
-                activate this meta tag if you have isbn feature for exemple
-                <meta itemprop="productID" content="isbn:925872">
-            -->
+            {loop name="brand.feature" type="feature" product=$ID title="isbn"}
+                {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+                    <meta itemprop="productID" content="isbn:{$TITLE}">
+                {/loop}
+            {/loop}
 
             <section id="product-gallery">
                 <figure class="product-image">
