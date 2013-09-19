@@ -60,6 +60,10 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery rightJoinGroupModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupModule relation
  * @method     ChildModuleQuery innerJoinGroupModule($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupModule relation
  *
+ * @method     ChildModuleQuery leftJoinModuleImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the ModuleImage relation
+ * @method     ChildModuleQuery rightJoinModuleImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ModuleImage relation
+ * @method     ChildModuleQuery innerJoinModuleImage($relationAlias = null) Adds a INNER JOIN clause to the query using the ModuleImage relation
+ *
  * @method     ChildModuleQuery leftJoinModuleI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ModuleI18n relation
  * @method     ChildModuleQuery rightJoinModuleI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ModuleI18n relation
  * @method     ChildModuleQuery innerJoinModuleI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ModuleI18n relation
@@ -859,6 +863,79 @@ abstract class ModuleQuery extends ModelCriteria
         return $this
             ->joinGroupModule($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'GroupModule', '\Thelia\Model\GroupModuleQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\ModuleImage object
+     *
+     * @param \Thelia\Model\ModuleImage|ObjectCollection $moduleImage  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildModuleQuery The current query, for fluid interface
+     */
+    public function filterByModuleImage($moduleImage, $comparison = null)
+    {
+        if ($moduleImage instanceof \Thelia\Model\ModuleImage) {
+            return $this
+                ->addUsingAlias(ModuleTableMap::ID, $moduleImage->getModuleId(), $comparison);
+        } elseif ($moduleImage instanceof ObjectCollection) {
+            return $this
+                ->useModuleImageQuery()
+                ->filterByPrimaryKeys($moduleImage->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByModuleImage() only accepts arguments of type \Thelia\Model\ModuleImage or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ModuleImage relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildModuleQuery The current query, for fluid interface
+     */
+    public function joinModuleImage($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ModuleImage');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ModuleImage');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ModuleImage relation ModuleImage object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ModuleImageQuery A secondary query class using the current class as primary query
+     */
+    public function useModuleImageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinModuleImage($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ModuleImage', '\Thelia\Model\ModuleImageQuery');
     }
 
     /**

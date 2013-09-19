@@ -23,7 +23,7 @@
 
             <section id="product-gallery">
                 <figure class="product-image">
-                    {loop type="image" name="image.main" product="{$ID}" width="560" height="445" resize_mode="crop" limit="1" force_result="1"}
+                    {loop type="image" name="image.main" product="{$ID}" width="560" height="445" resize_mode="borders" limit="1" force_result="1"}
                         <img src="{$IMAGE_URL}" alt="{$TITLE}" class="img-responsive" itemprop="image" data-toggle="magnify">
                     {/loop}
                 </figure>
@@ -32,10 +32,10 @@
                     <div class="carousel-inner">
                         <div class="item active">
                             <ul>
-                                {loop name="image.carousel" type="image" product="{$ID}"  width="560" height="445" resize_mode="crop" limit="5" force_result="1"}
+                                {loop name="image.carousel" type="image" product="{$ID}"  width="560" height="445" resize_mode="borders" limit="5" force_result="1"}
                                 <li>
                                     <a href="{$IMAGE_URL}" class="thumbnail {if $LOOP_COUNT == 1}active{/if}">
-                                        {loop type="image" name="image.thumbs" id="{$ID}" product="$OBJECT_ID" width="118" height="85" resize_mode="crop" force_result="1"}
+                                        {loop type="image" name="image.thumbs" id="{$ID}" product="$OBJECT_ID" width="118" height="85" resize_mode="borders" force_result="1"}
                                             <img src="{$IMAGE_URL}" alt="{$TITLE}">
                                         {/loop}
                                     </a>
