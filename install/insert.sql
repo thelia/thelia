@@ -27,7 +27,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('thelia_admin_remember_me_cookie_expiration', 2592000, 0, 0, NOW(), NOW()),
 ('thelia_customer_remember_me_cookie_name', 'tcrmcn', 0, 0, NOW(), NOW()),
 ('thelia_customer_remember_me_cookie_expiration', 31536000, 0, 0, NOW(), NOW()),
-('session_config.handlers', 'Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler', 0, 0, NOW(), NOW())
+('session_config.handlers', 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\NativeFileSessionHandler', 0, 0, NOW(), NOW())
 ;
 
 
