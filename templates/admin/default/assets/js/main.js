@@ -47,6 +47,11 @@
             $('[rel="tooltip"]').tooltip();
         }
 
+        // -- Bootstrap select --
+        if($('[data-toggle="selectpicker"]').length){            
+            $('[data-toggle="selectpicker"]').selectpicker();
+        }
+
         // -- Confirm Box --
         if($('[data-toggle="confirm"]').length){
             $('[data-toggle="confirm"]').click(function(e){		
