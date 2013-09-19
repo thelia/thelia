@@ -29,6 +29,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\AddressQuery;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderAddress;
@@ -114,6 +115,8 @@ class Order extends BaseAction implements EventSubscriberInterface
         $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->chosenDeliveryAddress);
         $invoiceAddress = AddressQuery::create()->findPk($sessionOrder->chosenInvoiceAddress);
 
+        $paymentModule = ModuleQuery::findPk($placedOrder->getPaymentModuleId());
+
         /* fulfill order */
         $placedOrder->setCustomerId($customer->getId());
         $placedOrder->setCurrencyId($currency->getId());
@@ -162,21 +165,22 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         /* fulfill order_products and decrease stock // @todo dispatch event */
 
-        /* discount */
-
-        /* postage */
-
+        /* discount @todo */
 
         $con->commit();
 
-
-        /* dispatch mail event */
+        /* T1style : dispatch mail event ? */
 
         /* clear session ? */
 
         /* call pay method */
+        $paymentModuleReflection = new \ReflectionClass($paymentModule->getFullNamespace());
+        $paymentModuleInstance = $paymentModuleReflection->newInstance();
 
-        $out = true;
+        $paymentModuleInstance->setRequest($this->request);
+        $paymentModuleInstance->setDispatcher($this->dispatcher);
+
+        $paymentModuleInstance->pay();
     }
 
     /**
@@ -184,6 +188,8 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function setReference(OrderEvent $event)
     {
+        $x = true;
+
         $this->setRef($this->generateRef());
     }
 

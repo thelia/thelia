@@ -17,10 +17,12 @@ class Order extends BaseOrder
     /**
      * {@inheritDoc}
      */
-    /*public function postInsert(ConnectionInterface $con = null)
+    public function preInsert(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::ORDER_SET_REFERENCE, new OrderEvent($this));
-    }*/
+
+        return true;
+    }
 
     /**
      * calculate the total amount

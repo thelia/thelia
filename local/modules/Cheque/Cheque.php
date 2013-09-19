@@ -56,7 +56,7 @@ class Cheque extends BaseModule implements PaymentModuleInterface
 
     public function pay()
     {
-        // TODO: Implement pay() method.
+        // no special process, waiting for the cheque.
     }
 
     public function install()
