@@ -21,76 +21,78 @@
             <div class="col-md-12">
                 <form action="{url path='/admin/configuration/messages/update-values'}" method="post">
 	                <div class="general-block-decorator">
-	                    <table class="table table-striped table-condensed table-left-aligned">
-	                        <caption>
-	                           {intl l='Thelia mailing templates'}
-	                           {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.messages.create"}
-                                <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new mailing template'}" href="#creation_dialog" data-toggle="modal">
-                                    <span class="glyphicon glyphicon-plus-sign"></span>
-                                </a>
-                            {/loop}
+                        <div class="table-responsive">
+    	                    <table class="table table-striped table-condensed table-left-aligned">
+    	                        <caption>
+    	                           {intl l='Thelia mailing templates'}
+    	                           {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.messages.create"}
+                                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new mailing template'}" href="#creation_dialog" data-toggle="modal">
+                                        <span class="glyphicon glyphicon-plus-sign"></span>
+                                    </a>
+                                {/loop}
 
-	                        </caption>
-                            <thead>
-    	                        <tr>
-    	                           <th>{intl l="Purpose"}</th>
-                                   <th>{intl l="Name"}</th>
+    	                        </caption>
+                                <thead>
+        	                        <tr>
+        	                           <th>{intl l="Purpose"}</th>
+                                       <th>{intl l="Name"}</th>
 
-                                   {module_include location='messages_table_header'}
+                                       {module_include location='messages_table_header'}
 
-                                   <th>&nbsp;</th>
-    	                        </tr>
-                            </thead>
+                                       <th>&nbsp;</th>
+        	                        </tr>
+                                </thead>
 
-                            <tbody>
-    	                        {loop name="mailing-templates" type="message" secured="*" backend_context="1" lang="$lang_id"}
-    	                            <tr>
+                                <tbody>
+        	                        {loop name="mailing-templates" type="message" secured="*" backend_context="1" lang="$lang_id"}
+        	                            <tr>
 
-    	                               <td>{$TITLE}</td>
+        	                               <td>{$TITLE}</td>
 
-                                       <td>
-                                       {if ! $SECURED}
-                                           {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.messages.change"}
-                                               <a title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}">{$NAME}</a>
-                                           {/loop}
-                                           {elseloop rel="can_change"}
+                                           <td>
+                                           {if ! $SECURED}
+                                               {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.messages.change"}
+                                                   <a title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}">{$NAME}</a>
+                                               {/loop}
+                                               {elseloop rel="can_change"}
+                                                   {$NAME}
+                                               {/elseloop}
+                                           {else}
                                                {$NAME}
-                                           {/elseloop}
-                                       {else}
-                                           {$NAME}
-                                       {/if}
-                                       </td>
+                                           {/if}
+                                           </td>
 
-    	                                {module_include location='messages_table_row'}
+        	                                {module_include location='messages_table_row'}
 
-    	                                <td class="actions">
-    	                                    {if ! $SECURED}
-    		                                    <div class="btn-group">
-                                                   {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.messages.change"}
-                                                       <a class="btn btn-default btn-xs message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
-                                                   {/loop}
+        	                                <td class="actions">
+        	                                    {if ! $SECURED}
+        		                                    <div class="btn-group">
+                                                       {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.messages.change"}
+                                                           <a class="btn btn-default btn-xs message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                       {/loop}
 
-                                                   {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.messages.delete"}
-                                                       <a class="btn btn-default btn-xs message-delete" title="{intl l='Delete this mailing template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
-                                                   {/loop}
-    		                                    </div>
-    		                                {else}
-    		                                    <i title="{intl l='This mailing template could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
-    	                                    {/if}
-    	                                </td>
-    	                            </tr>
-    	                        {/loop}
-    	                        {elseloop rel="mailing-templates"}
-    	                        <tr>
-    	                           <td colspan="3">
-    	                               <div class="alert alert-info">
-    	                               {intl l="No mailing template has been created yet. Click the + button to create one."}
-    	                               </div>
-    	                           </td>
-    	                        </tr>
-    	                        {/elseloop}
-                            </tbody>
-	                    </table>
+                                                       {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.messages.delete"}
+                                                           <a class="btn btn-default btn-xs message-delete" title="{intl l='Delete this mailing template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                       {/loop}
+        		                                    </div>
+        		                                {else}
+        		                                    <i title="{intl l='This mailing template could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
+        	                                    {/if}
+        	                                </td>
+        	                            </tr>
+        	                        {/loop}
+        	                        {elseloop rel="mailing-templates"}
+        	                        <tr>
+        	                           <td colspan="3">
+        	                               <div class="alert alert-info">
+        	                               {intl l="No mailing template has been created yet. Click the + button to create one."}
+        	                               </div>
+        	                           </td>
+        	                        </tr>
+        	                        {/elseloop}
+                                </tbody>
+    	                    </table>
+                        </div>
 	                </div>
                 </form>
             </div>

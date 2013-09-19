@@ -194,54 +194,56 @@
 
 									    </form>
 									</div>
+									
+									<div class="table-responsive">
+										<table class="table table-striped table-condensed table-left-aligned">
+										    <thead>
+										        <tr>
+										            <th>{intl l='ID'}</th>
 
-									<table class="table table-striped table-condensed table-left-aligned">
-									    <thead>
-									        <tr>
-									            <th>{intl l='ID'}</th>
+										            <th>{intl l='Attribute title'}</th>
 
-									            <th>{intl l='Attribute title'}</th>
+										            {module_include location='category_contents_table_header'}
 
-									            {module_include location='category_contents_table_header'}
+										            <th class="actions">{intl l="Actions"}</th>
+										        </tr>
+										    </thead>
 
-									            <th class="actions">{intl l="Actions"}</th>
-									        </tr>
-									    </thead>
+										    <tbody>
+										        {loop name="assigned_contents" type="associated_content" category="$category_id" backend_context="1" lang="$edit_language_id"}
+										        <tr>
+										            <td>{$ID}</td>
 
-									    <tbody>
-									        {loop name="assigned_contents" type="associated_content" category="$category_id" backend_context="1" lang="$edit_language_id"}
-									        <tr>
-									            <td>{$ID}</td>
+										            <td>
+										                {$TITLE}
+										            </td>
 
-									            <td>
-									                {$TITLE}
-									            </td>
+										            {module_include location='category_contents_table_row'}
 
-									            {module_include location='category_contents_table_row'}
+										            <td class="actions">
+										                <div class="btn-group">
+										                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.category.content.delete"}
+										                       <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$ID}" data-toggle="modal">
+										                        <span class="glyphicon glyphicon-trash"></span>
+										                       </a>
+										                    {/loop}
+										                </div>
+										            </td>
+										        </tr>
+										         {/loop}
 
-									            <td class="actions">
-									                <div class="btn-group">
-									                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.category.content.delete"}
-									                       <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$ID}" data-toggle="modal">
-									                        <span class="glyphicon glyphicon-trash"></span>
-									                       </a>
-									                    {/loop}
-									                </div>
-									            </td>
-									        </tr>
-									         {/loop}
-
-									         {elseloop rel="assigned_contents"}
-									             <tr>
-									                 <td colspan="3">
-									                     <div class="alert alert-info">
-									                         {intl l="This category contains no contents"}
-									                     </div>
-									                 </td>
-									             </tr>
-									         {/elseloop}
-									    </tbody>
-									</table>
+										         {elseloop rel="assigned_contents"}
+										             <tr>
+										                 <td colspan="3">
+										                     <div class="alert alert-info">
+										                         {intl l="This category contains no contents"}
+										                     </div>
+										                 </td>
+										             </tr>
+										         {/elseloop}
+										    </tbody>
+										</table>
+									</div>
 			                    </div>
 		                    </div>
 

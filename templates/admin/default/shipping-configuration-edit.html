@@ -48,56 +48,58 @@
                         </div>
 
                         <div class="col-md-8">
-                            <table class="table table-striped table-condensed">
-                                <thead>
-                                    <tr>
-                                        <th>{intl l="Country"}</th>
-                                        <th>{intl l="Actions"}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Wallis-et-Futuna</td>
-                                        <td>
-                                            <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
-                                                <span class="glyphicon glyphicon-trash"></span>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Polynésie française</td>
-                                        <td>
-                                            <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
-                                                <span class="glyphicon glyphicon-trash"></span>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>USA - Alabama</td>
-                                        <td>
-                                            <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_zone_dialog" data-id="{$ID}" data-toggle="modal">
-                                                <span class="glyphicon glyphicon-trash"></span>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr class="active">
-                                        <td colspan="2">
-                                            <form method="POST" action="">
-                                                <label for="" class="control-label">{intl l="Freight"}</label>
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" name="" id="" placeholder="Freight value">
-                                                    <span class="input-group-addon">&euro;</span>
-                                                    <span class="input-group-btn">
-                                                        <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span></button>
-                                                    </span>
-                                                </div>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>{intl l="Country"}</th>
+                                            <th>{intl l="Actions"}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Wallis-et-Futuna</td>
+                                            <td>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Polynésie française</td>
+                                            <td>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>USA - Alabama</td>
+                                            <td>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_zone_dialog" data-id="{$ID}" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="active">
+                                            <td colspan="2">
+                                                <form method="POST" action="">
+                                                    <label for="" class="control-label">{intl l="Freight"}</label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" name="" id="" placeholder="Freight value">
+                                                        <span class="input-group-addon">&euro;</span>
+                                                        <span class="input-group-btn">
+                                                            <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span></button>
+                                                        </span>
+                                                    </div>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
                         </div>
                     </div>
                     
