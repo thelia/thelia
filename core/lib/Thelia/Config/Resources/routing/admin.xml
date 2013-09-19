@@ -144,6 +144,8 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updatePositionAction</default>
     </route>
 
+    <!-- Related content -->
+
     <route id="admin.products.related-content.add" path="/admin/products/related-content/add">
         <default key="_controller">Thelia\Controller\Admin\ProductController::addRelatedContentAction</default>
     </route>
@@ -156,7 +158,23 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::getAvailableRelatedContentAction</default>
         <requirement key="_format">xml|json</requirement>
     </route>
-    
+
+    <!-- Product accessories -->
+
+    <route id="admin.products.accessories.add" path="/admin/products/accessory/add">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::addAccessoryAction</default>
+    </route>
+
+    <route id="admin.products.accessories.delete" path="/admin/products/accessory/delete">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::deleteAccessoryAction</default>
+    </route>
+
+    <route id="admin.product.accessories-content" path="/admin/product/{productId}/available-accessories/{categoryId}.{_format}" methods="GET">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::getAvailableAccessoriesAction</default>
+        <requirement key="_format">xml|json</requirement>
+    </route>
+
+
     <!--  Folder routes management -->
     <route id="admin.folders.default" path="/admin/folders">
         <default key="_controller">Thelia\Controller\Admin\FolderController::indexAction</default>
