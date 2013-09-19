@@ -80,10 +80,17 @@ class OrderPayment extends BaseForm
             ->filterByType(BaseModule::PAYMENT_MODULE_TYPE)
             ->filterByActivate(1)
             ->filterById($value)
-            ->find();
+            ->findOne();
 
         if(null === $module) {
             $context->addViolation("Payment module ID not found");
+        }
+
+        $moduleReflection = new \ReflectionClass($module->getFullNamespace());
+        if ($moduleReflection->isSubclassOf("Thelia\Module\PaymentModuleInterface") === false) {
+            $context->addViolation(
+                sprintf("delivery module %s is not a Thelia\Module\PaymentModuleInterface", $module->getCode())
+            );
         }
     }
 

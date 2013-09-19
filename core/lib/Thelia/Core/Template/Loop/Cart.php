@@ -110,4 +110,13 @@ class Cart extends BaseLoop
         return $result;
     }
 
+    /**
+     * Return the event dispatcher,
+     *
+     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
+    }
 }

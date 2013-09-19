@@ -227,6 +227,7 @@
             <argument type="service" id="request" />
             <argument type="service" id="thelia.securityContext" />
             <argument type="service" id="thelia.parser.context"/>
+            <argument type="service" id="event_dispatcher"/>
         </service>
 
         <service id="smarty.plugin.adminUtilities" class="Thelia\Core\Template\Smarty\Plugins\AdminUtilities" scope="request">

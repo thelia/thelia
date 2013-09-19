@@ -72,7 +72,13 @@ class BaseFrontController extends BaseController
         if(null === $order || null === $order->chosenDeliveryAddress || null === $order->getDeliveryModuleId()) {
             $this->redirectToRoute("order.delivery");
         }
+    }
 
-
+    protected function checkValidInvoice()
+    {
+        $order = $this->getSession()->getOrder();
+        if(null === $order || null === $order->chosenInvoiceAddress || null === $order->getPaymentModuleId()) {
+            $this->redirectToRoute("order.invoice");
+        }
     }
 }
