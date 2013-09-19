@@ -17,3 +17,173 @@
         </ul>
     </nav><!-- /.nav-breadcrumb -->
 {/block}
+
+{block name="main-content"}
+    <div class="main layout-col-2-left">
+
+        <article class="col-main {$smarty.get.mode|default:"grid"}" role="main">
+            {include file="includes/category-toolbar.html" toolbar="top"}
+            <div id="category-products">
+                <div class="products-content">
+                    <ul class="product-col-4">
+                        {loop type="product" name="product_list" category={category attr="id"}}
+
+                        <li class="item">
+                        <article itemscope itemtype="http://schema.org/Product">
+                            <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+                            <meta itemprop="brand" content="Diesel">
+                            <meta itemprop="productID" content="isbn:925872">
+
+                            <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
+                                {loop name="product_thumbnail" type="image" product=$ID width="218" height="146" resize_mode="borders" limit="1"}
+                                    <img itemprop="image" src="{$IMAGE_URL}" alt="Product #{$LOOP_COUNT}">
+                                {/loop}
+                                {elseloop rel="product_thumbnail"}
+                                    {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{$LOOP_COUNT}">{/images}
+                                {/elseloop}
+                                <span class="mask"></span>
+                            </a>
+
+                            <div class="product-info">
+                                <h3 class="name"><a href="{$URL}"><span itemprop="name">{$TITLE}</span></a></h3>
+
+                                <div class="description" itemprop="description">
+                                    <p>{$DESCRIPTION}</p>
+                                </div>
+                            </div>
+
+                            <div class="product-price">
+                                <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                    <meta itemprop="category" content="Category1">
+                                    <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
+                                    <meta itemprop="priceCurrency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                                    <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
+                                    <!-- List of availibility :
+                                        out_of_stock : http://schema.org/OutOfStock
+                                        in_stock : http://schema.org/InStock
+                                        instore_only : http://schema.org/InStoreOnly
+                                        preorder : http://schema.org/PreOrder
+                                        online_only : http://schema.org/OnlineOnly
+                                    -->
+                                    {if $IS_PROMO }
+                                        {loop name="productSaleElements_promo" type="product_sale_elements" product=$ID limit="1" order="min_price"}
+                                         {assign var="default_product_sale_elements" value=$ID}
+                                        <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$TAXED_PROMO_PRICE}"} {currency attr="symbol"}</span></span>
+                                        <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                                        {/loop}
+                                    {else}
+                                        <span class="regular-price"><span itemprop="price" class="price">{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                                    {/if}
+
+                                </div>
+                                <div class="product-btn">
+                                    <a class="btn btn-cart" href="#">Add to cart</a>
+                                </div>
+                            </div>
+                        </article><!-- /product -->
+                        </li>
+                        {/loop}
+                    </ul>
+                </div>
+            </div><!-- /#category-products -->
+            {include file="includes/category-toolbar.html" toolbar="bottom"}
+        </article>
+
+        <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
+
+            <section id="categories" class="block block-nav" role="navigation" aria-labelledby="categories-label">
+                <div class="block-heading"><h3 class="block-title" id="categories-label">Categories</h3></div>
+                <div class="block-content">
+                    <nav class="nav-categories">
+                        <ul id="category" class="accordion">
+                            <li>
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#category" href="#collapse1">Category 1 <span class="amount">(3)</span></a>
+                                <ul id="collapse1" class="in">
+                                    <li>
+                                        <a href="#collapse11" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#collapse1">Category 1.1 <span class="amount">(3)</span></a>
+                                        <ul id="collapse11" class="collapse">
+                                            <li><a href="#">Category 1.1.1 <span class="amount">(0)</span></a></li>
+                                            <li>
+                                                <a href="#collapse112" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#collapse11">Category 1.1.2 <span class="amount">(2)</span></a>
+                                                <ul id="collapse112" class="collapse">
+                                                    <li><a href="#">Category 1.1.2.1 <span class="amount">(0)</span></a></li>
+                                                    <li><a href="#">Category 1.1.2.2 <span class="amount">(0)</span></a></li>
+                                                </ul>
+
+                                            </li>
+                                            <li><a href="#">Category 1.1.3 <span class="amount">(0)</span></a></li>
+                                        </ul>
+
+                                    </li>
+                                    <li><a href="#">Category 1.2 <span class="amount">(0)</span></a></li>
+                                    <li><a href="#">Category 1.3 <span class="amount">(0)</span></a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#">Category 2 <span class="amount">(0)</span></a></li>
+                            <li><a href="#">Category 3 <span class="amount">(0)</span></a></li>
+                            <li><a href="#">Category 4 <span class="amount">(0)</span></a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </section>
+
+            <section id="filters">
+                <h3>Find <span>a product</span></h3>
+                <form id="form-filters" action="" method="get" role="form">
+                    <div class="filter filter-type">
+                        <fieldset>
+                            <legend class="filter-heading">Type</legend>
+                            <div class="filter-content">
+                                <?php for ($count = 1; $count <= $type; $count++) { ?>
+                                <div class="checkbox">
+                                    <label for="type<?php echo $count; ?>">
+                                        <input type="checkbox" name="type<?php echo $count; ?>" id="type<?php echo $count; ?>"<?php if(isset($_GET['type'. $count])) { echo ' checked'; }?> value="<?php echo $count; ?>"> Type <?php echo $count; ?>
+                                    </label>
+                                </div>
+                                <?php } ?>
+                            </div>
+                        </fieldset>
+                    </div><!-- /Filter Type -->
+
+                    <div class="filter filter-price">
+                        <fieldset>
+                            <legend class="filter-heading">Price</legend>
+                            <div class="filter-content">
+                                <?php foreach ($price as $key => $value) { ?>
+                                <div class="checkbox">
+                                    <label for="price<?php echo $key; ?>">
+                                        <input type="checkbox" name="price<?php echo $key; ?>" id="price<?php echo $key; ?>"<?php if(isset($_GET['price'. $key])) { echo ' checked'; }?> value="<?php echo $value; ?>"> <?php echo $value; ?>
+                                    </label>
+                                </div>
+                                <?php } ?>
+                            </div>
+                        </fieldset>
+                    </div><!-- /Filter Price -->
+
+                    <div class="filter filter-size">
+                        <fieldset>
+                            <legend class="filter-heading">Size</legend>
+                            <div class="filter-content">
+                                <?php foreach ($size as $key => $value) { ?>
+                                <div class="checkbox">
+                                    <label for="size<?php echo $key; ?>">
+                                        <input type="checkbox" name="size<?php echo $key; ?>" id="size<?php echo $key; ?>"<?php if(isset($_GET['size'. $key])) { echo ' checked'; }?> value="<?php echo $key; ?>"> <?php echo $value; ?>
+                                    </label>
+                                </div>
+                                <?php } ?>
+                            </div>
+                        </fieldset>
+                    </div><!-- /Filter Size -->
+
+                    <div class="group-btn">
+                        <button type="submit" class="btn btn-filter">Submit</button>
+                    </div>
+                </form>
+            </section><!-- /.filters -->
+
+        </aside>
+
+    </div>
+
+    </div><!-- /.container -->
+{/block}

@@ -1,0 +1,52 @@
+<div class="toolbar toolbar-{$toolbar}" role="toolbar">
+    <div class="sorter-container">
+        <span class="amount">9 Item(s)</span>
+
+            <span class="limiter">
+                <label for="limit-top">Show</label>
+                <select id="limit-top" name="limit">
+                    <option value="?limit=4">4</option>
+                    <option value="?limit=8" selected>8</option>
+                    <option value="?limit=12">12</option>
+                    <option value="?limit=50">50</option>
+                    <option value="?limit=all">All</option>
+                </select>
+                <span class="per-page"> per page</span>
+            </span><!-- /.limiter -->
+
+            <span class="sort-by">
+                <label for="sortby-top">Sort By</label>
+                <select id="sortby-top" name="sortby" onchange="">
+                    <option value="?order=position">Position</option>
+                    <option value="?order=name" selected>Name</option>
+                    <option value="?order=price">Price</option>
+                    <option value="?order=rating">Rating</option>
+                </select>
+
+                <a class="sort-order" href="?dir=desc" title="Set Descending Direction"><i class="icon-long-arrow-up"></i></a>
+
+            </span><!-- /.sort-by -->
+
+            <span class="view-mode">
+                <span class="view-mode-label">View as:</span>
+                <span class="view-mode-btn">
+                    <a href="?mode=grid" data-toggle="view" role="button" class="btn btn-grid"><i class="icon-grid"></i></a>
+                    <a href="?mode=list" data-toggle="view" role="button" class="btn btn-list "><i class="icon-list"></i></a>
+                </span>
+            </span><!-- /.view-mode -->
+
+    </div><!-- /.sorter -->
+
+    <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}">
+        <strong id="pagination-label-{$toolbar}" class="pagination-label">Pagination</strong>
+        <ul class="pagination">
+            <li><a href="?page=<?php echo $page-1; ?>" class="prev"><i class="icon-prev"></i></a></li>
+            <li class="active"><a href="?page=1" tabindex="-1"'; >1</a></li>
+            <li><a href="?page=2">2</a></li>
+            <li><a href="?page=3">3</a></li>
+            <li><a href="?page=4">4</a></li>
+            <li><a href="?page=5">5</a></li>
+            <li><a href="?page=<?php echo $page+1; ?>" class="next"><i class="icon-next"></i></a></li>
+        </ul>
+    </div>
+</div><!-- /.toolbar toolbar-<?php echo $toolbar; ?> -->

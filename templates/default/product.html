@@ -58,10 +58,10 @@
                         <div class="item">
                             <ul>
 
-                                {loop name="image.carouselsup" type="image" product="{$ID}"  width="560" height="445" resize_mode="crop" offset="5"}
+                                {loop name="image.carouselsup" type="image" product="{$ID}"  width="560" height="445" resize_mode="borders" offset="5"}
                                     <li>
                                         <a href="{$IMAGE_URL}" class="thumbnail">
-                                            {loop type="image" name="image.thumbssup" id="{$ID}" product="$OBJECT_ID" width="118" height="85" resize_mode="crop"}
+                                            {loop type="image" name="image.thumbssup" id="{$ID}" product="$OBJECT_ID" width="118" height="85" resize_mode="borders"}
                                                 <img src="{$IMAGE_URL}" alt="{$TITLE}">
                                             {/loop}
                                         </a>
@@ -111,7 +111,7 @@
                             <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                         {/loop}
                         {else}
-                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                            <span class="regular-price"><span itemprop="price" class="price">{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                         {/if}
                     </div>
                 </div>
