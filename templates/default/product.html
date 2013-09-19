@@ -93,7 +93,9 @@
                     <div class="availability"><span class="availibity-label">{intl l="Availability"}: </span><span itemprop="availability" href="http://schema.org/InStock" class="in-stock">In stock</span></div>
 
                     <div class="price-container">
-                        <meta itemprop="category" content="Category1">
+                        {loop type="category" name="category_tag" id=$DEFAULT_CATEGORY}
+                            <meta itemprop="category" content="{$TITLE}">
+                        {/loop}
                         <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
                         <meta itemprop="priceCurrency" content="{currency attr="symbol"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
                         <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
