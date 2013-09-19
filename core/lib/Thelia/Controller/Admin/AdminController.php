@@ -33,4 +33,9 @@ class AdminController extends BaseAdminController
     {
         return $this->render("home");
     }
+
+    public function updateAction()
+    {
+    	return $this->render("profile-edit");
+    }
 }

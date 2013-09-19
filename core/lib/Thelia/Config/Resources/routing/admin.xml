@@ -24,6 +24,12 @@
         <default key="_controller">Thelia\Controller\Admin\SessionController::checkLoginAction</default>
     </route>
 
+    <!-- Route to edit admin profile -->
+    <route id="admin.profile.update.view" path="/admin/profile/update" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\AdminController::updateAction</default>
+    </route>
+
+
 
 	<!-- Route to the catalog controller -->
 
