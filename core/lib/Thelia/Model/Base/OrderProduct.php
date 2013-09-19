@@ -18,8 +18,8 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Order as ChildOrder;
-use Thelia\Model\OrderFeature as ChildOrderFeature;
-use Thelia\Model\OrderFeatureQuery as ChildOrderFeatureQuery;
+use Thelia\Model\OrderAttributeCombination as ChildOrderAttributeCombination;
+use Thelia\Model\OrderAttributeCombinationQuery as ChildOrderAttributeCombinationQuery;
 use Thelia\Model\OrderProduct as ChildOrderProduct;
 use Thelia\Model\OrderProductQuery as ChildOrderProductQuery;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
@@ -78,10 +78,22 @@ abstract class OrderProduct implements ActiveRecordInterface
     protected $product_ref;
 
     /**
+     * The value for the product_sale_elements_ref field.
+     * @var        string
+     */
+    protected $product_sale_elements_ref;
+
+    /**
      * The value for the title field.
      * @var        string
      */
     protected $title;
+
+    /**
+     * The value for the chapo field.
+     * @var        string
+     */
+    protected $chapo;
 
     /**
      * The value for the description field.
@@ -90,10 +102,10 @@ abstract class OrderProduct implements ActiveRecordInterface
     protected $description;
 
     /**
-     * The value for the chapo field.
+     * The value for the postscriptum field.
      * @var        string
      */
-    protected $chapo;
+    protected $postscriptum;
 
     /**
      * The value for the quantity field.
@@ -106,6 +118,30 @@ abstract class OrderProduct implements ActiveRecordInterface
      * @var        double
      */
     protected $price;
+
+    /**
+     * The value for the promo_price field.
+     * @var        string
+     */
+    protected $promo_price;
+
+    /**
+     * The value for the was_new field.
+     * @var        int
+     */
+    protected $was_new;
+
+    /**
+     * The value for the was_in_promo field.
+     * @var        int
+     */
+    protected $was_in_promo;
+
+    /**
+     * The value for the weight field.
+     * @var        string
+     */
+    protected $weight;
 
     /**
      * The value for the tax field.
@@ -137,10 +173,10 @@ abstract class OrderProduct implements ActiveRecordInterface
     protected $aOrder;
 
     /**
-     * @var        ObjectCollection|ChildOrderFeature[] Collection to store aggregation of ChildOrderFeature objects.
+     * @var        ObjectCollection|ChildOrderAttributeCombination[] Collection to store aggregation of ChildOrderAttributeCombination objects.
      */
-    protected $collOrderFeatures;
-    protected $collOrderFeaturesPartial;
+    protected $collOrderAttributeCombinations;
+    protected $collOrderAttributeCombinationsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -154,7 +190,7 @@ abstract class OrderProduct implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $orderFeaturesScheduledForDeletion = null;
+    protected $orderAttributeCombinationsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Thelia\Model\Base\OrderProduct object.
@@ -444,6 +480,17 @@ abstract class OrderProduct implements ActiveRecordInterface
     }
 
     /**
+     * Get the [product_sale_elements_ref] column value.
+     *
+     * @return   string
+     */
+    public function getProductSaleElementsRef()
+    {
+
+        return $this->product_sale_elements_ref;
+    }
+
+    /**
      * Get the [title] column value.
      *
      * @return   string
@@ -452,6 +499,17 @@ abstract class OrderProduct implements ActiveRecordInterface
     {
 
         return $this->title;
+    }
+
+    /**
+     * Get the [chapo] column value.
+     *
+     * @return   string
+     */
+    public function getChapo()
+    {
+
+        return $this->chapo;
     }
 
     /**
@@ -466,14 +524,14 @@ abstract class OrderProduct implements ActiveRecordInterface
     }
 
     /**
-     * Get the [chapo] column value.
+     * Get the [postscriptum] column value.
      *
      * @return   string
      */
-    public function getChapo()
+    public function getPostscriptum()
     {
 
-        return $this->chapo;
+        return $this->postscriptum;
     }
 
     /**
@@ -499,6 +557,50 @@ abstract class OrderProduct implements ActiveRecordInterface
     }
 
     /**
+     * Get the [promo_price] column value.
+     *
+     * @return   string
+     */
+    public function getPromoPrice()
+    {
+
+        return $this->promo_price;
+    }
+
+    /**
+     * Get the [was_new] column value.
+     *
+     * @return   int
+     */
+    public function getWasNew()
+    {
+
+        return $this->was_new;
+    }
+
+    /**
+     * Get the [was_in_promo] column value.
+     *
+     * @return   int
+     */
+    public function getWasInPromo()
+    {
+
+        return $this->was_in_promo;
+    }
+
+    /**
+     * Get the [weight] column value.
+     *
+     * @return   string
+     */
+    public function getWeight()
+    {
+
+        return $this->weight;
+    }
+
+    /**
      * Get the [tax] column value.
      *
      * @return   double
@@ -511,7 +613,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
     /**
      * Get the [parent] column value.
-     *
+     * not managed yet
      * @return   int
      */
     public function getParent()
@@ -628,6 +730,27 @@ abstract class OrderProduct implements ActiveRecordInterface
     } // setProductRef()
 
     /**
+     * Set the value of [product_sale_elements_ref] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
+     */
+    public function setProductSaleElementsRef($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->product_sale_elements_ref !== $v) {
+            $this->product_sale_elements_ref = $v;
+            $this->modifiedColumns[] = OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF;
+        }
+
+
+        return $this;
+    } // setProductSaleElementsRef()
+
+    /**
      * Set the value of [title] column.
      *
      * @param      string $v new value
@@ -647,6 +770,27 @@ abstract class OrderProduct implements ActiveRecordInterface
 
         return $this;
     } // setTitle()
+
+    /**
+     * Set the value of [chapo] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
+     */
+    public function setChapo($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->chapo !== $v) {
+            $this->chapo = $v;
+            $this->modifiedColumns[] = OrderProductTableMap::CHAPO;
+        }
+
+
+        return $this;
+    } // setChapo()
 
     /**
      * Set the value of [description] column.
@@ -670,25 +814,25 @@ abstract class OrderProduct implements ActiveRecordInterface
     } // setDescription()
 
     /**
-     * Set the value of [chapo] column.
+     * Set the value of [postscriptum] column.
      *
      * @param      string $v new value
      * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
-    public function setChapo($v)
+    public function setPostscriptum($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->chapo !== $v) {
-            $this->chapo = $v;
-            $this->modifiedColumns[] = OrderProductTableMap::CHAPO;
+        if ($this->postscriptum !== $v) {
+            $this->postscriptum = $v;
+            $this->modifiedColumns[] = OrderProductTableMap::POSTSCRIPTUM;
         }
 
 
         return $this;
-    } // setChapo()
+    } // setPostscriptum()
 
     /**
      * Set the value of [quantity] column.
@@ -733,6 +877,90 @@ abstract class OrderProduct implements ActiveRecordInterface
     } // setPrice()
 
     /**
+     * Set the value of [promo_price] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
+     */
+    public function setPromoPrice($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->promo_price !== $v) {
+            $this->promo_price = $v;
+            $this->modifiedColumns[] = OrderProductTableMap::PROMO_PRICE;
+        }
+
+
+        return $this;
+    } // setPromoPrice()
+
+    /**
+     * Set the value of [was_new] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
+     */
+    public function setWasNew($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->was_new !== $v) {
+            $this->was_new = $v;
+            $this->modifiedColumns[] = OrderProductTableMap::WAS_NEW;
+        }
+
+
+        return $this;
+    } // setWasNew()
+
+    /**
+     * Set the value of [was_in_promo] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
+     */
+    public function setWasInPromo($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->was_in_promo !== $v) {
+            $this->was_in_promo = $v;
+            $this->modifiedColumns[] = OrderProductTableMap::WAS_IN_PROMO;
+        }
+
+
+        return $this;
+    } // setWasInPromo()
+
+    /**
+     * Set the value of [weight] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
+     */
+    public function setWeight($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->weight !== $v) {
+            $this->weight = $v;
+            $this->modifiedColumns[] = OrderProductTableMap::WEIGHT;
+        }
+
+
+        return $this;
+    } // setWeight()
+
+    /**
      * Set the value of [tax] column.
      *
      * @param      double $v new value
@@ -755,7 +983,7 @@ abstract class OrderProduct implements ActiveRecordInterface
 
     /**
      * Set the value of [parent] column.
-     *
+     * not managed yet
      * @param      int $v new value
      * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
@@ -862,34 +1090,52 @@ abstract class OrderProduct implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : OrderProductTableMap::translateFieldName('ProductRef', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_ref = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OrderProductTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->title = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OrderProductTableMap::translateFieldName('ProductSaleElementsRef', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->product_sale_elements_ref = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OrderProductTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->description = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OrderProductTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->title = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderProductTableMap::translateFieldName('Chapo', TableMap::TYPE_PHPNAME, $indexType)];
             $this->chapo = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OrderProductTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OrderProductTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->description = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : OrderProductTableMap::translateFieldName('Postscriptum', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->postscriptum = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : OrderProductTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
             $this->quantity = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : OrderProductTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : OrderProductTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
             $this->price = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : OrderProductTableMap::translateFieldName('Tax', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderProductTableMap::translateFieldName('PromoPrice', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->promo_price = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderProductTableMap::translateFieldName('WasNew', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->was_new = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderProductTableMap::translateFieldName('WasInPromo', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->was_in_promo = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderProductTableMap::translateFieldName('Weight', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->weight = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderProductTableMap::translateFieldName('Tax', TableMap::TYPE_PHPNAME, $indexType)];
             $this->tax = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : OrderProductTableMap::translateFieldName('Parent', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderProductTableMap::translateFieldName('Parent', TableMap::TYPE_PHPNAME, $indexType)];
             $this->parent = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderProductTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderProductTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderProductTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderProductTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -902,7 +1148,7 @@ abstract class OrderProduct implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 12; // 12 = OrderProductTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 18; // 18 = OrderProductTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\OrderProduct object", 0, $e);
@@ -967,7 +1213,7 @@ abstract class OrderProduct implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aOrder = null;
-            $this->collOrderFeatures = null;
+            $this->collOrderAttributeCombinations = null;
 
         } // if (deep)
     }
@@ -1114,17 +1360,17 @@ abstract class OrderProduct implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->orderFeaturesScheduledForDeletion !== null) {
-                if (!$this->orderFeaturesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\OrderFeatureQuery::create()
-                        ->filterByPrimaryKeys($this->orderFeaturesScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->orderAttributeCombinationsScheduledForDeletion !== null) {
+                if (!$this->orderAttributeCombinationsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\OrderAttributeCombinationQuery::create()
+                        ->filterByPrimaryKeys($this->orderAttributeCombinationsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->orderFeaturesScheduledForDeletion = null;
+                    $this->orderAttributeCombinationsScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collOrderFeatures !== null) {
-            foreach ($this->collOrderFeatures as $referrerFK) {
+                if ($this->collOrderAttributeCombinations !== null) {
+            foreach ($this->collOrderAttributeCombinations as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1166,20 +1412,38 @@ abstract class OrderProduct implements ActiveRecordInterface
         if ($this->isColumnModified(OrderProductTableMap::PRODUCT_REF)) {
             $modifiedColumns[':p' . $index++]  = 'PRODUCT_REF';
         }
+        if ($this->isColumnModified(OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF)) {
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_SALE_ELEMENTS_REF';
+        }
         if ($this->isColumnModified(OrderProductTableMap::TITLE)) {
             $modifiedColumns[':p' . $index++]  = 'TITLE';
+        }
+        if ($this->isColumnModified(OrderProductTableMap::CHAPO)) {
+            $modifiedColumns[':p' . $index++]  = 'CHAPO';
         }
         if ($this->isColumnModified(OrderProductTableMap::DESCRIPTION)) {
             $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
         }
-        if ($this->isColumnModified(OrderProductTableMap::CHAPO)) {
-            $modifiedColumns[':p' . $index++]  = 'CHAPO';
+        if ($this->isColumnModified(OrderProductTableMap::POSTSCRIPTUM)) {
+            $modifiedColumns[':p' . $index++]  = 'POSTSCRIPTUM';
         }
         if ($this->isColumnModified(OrderProductTableMap::QUANTITY)) {
             $modifiedColumns[':p' . $index++]  = 'QUANTITY';
         }
         if ($this->isColumnModified(OrderProductTableMap::PRICE)) {
             $modifiedColumns[':p' . $index++]  = 'PRICE';
+        }
+        if ($this->isColumnModified(OrderProductTableMap::PROMO_PRICE)) {
+            $modifiedColumns[':p' . $index++]  = 'PROMO_PRICE';
+        }
+        if ($this->isColumnModified(OrderProductTableMap::WAS_NEW)) {
+            $modifiedColumns[':p' . $index++]  = 'WAS_NEW';
+        }
+        if ($this->isColumnModified(OrderProductTableMap::WAS_IN_PROMO)) {
+            $modifiedColumns[':p' . $index++]  = 'WAS_IN_PROMO';
+        }
+        if ($this->isColumnModified(OrderProductTableMap::WEIGHT)) {
+            $modifiedColumns[':p' . $index++]  = 'WEIGHT';
         }
         if ($this->isColumnModified(OrderProductTableMap::TAX)) {
             $modifiedColumns[':p' . $index++]  = 'TAX';
@@ -1213,20 +1477,38 @@ abstract class OrderProduct implements ActiveRecordInterface
                     case 'PRODUCT_REF':
                         $stmt->bindValue($identifier, $this->product_ref, PDO::PARAM_STR);
                         break;
+                    case 'PRODUCT_SALE_ELEMENTS_REF':
+                        $stmt->bindValue($identifier, $this->product_sale_elements_ref, PDO::PARAM_STR);
+                        break;
                     case 'TITLE':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
+                        break;
+                    case 'CHAPO':
+                        $stmt->bindValue($identifier, $this->chapo, PDO::PARAM_STR);
                         break;
                     case 'DESCRIPTION':
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
-                    case 'CHAPO':
-                        $stmt->bindValue($identifier, $this->chapo, PDO::PARAM_STR);
+                    case 'POSTSCRIPTUM':
+                        $stmt->bindValue($identifier, $this->postscriptum, PDO::PARAM_STR);
                         break;
                     case 'QUANTITY':
                         $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_STR);
                         break;
                     case 'PRICE':
                         $stmt->bindValue($identifier, $this->price, PDO::PARAM_STR);
+                        break;
+                    case 'PROMO_PRICE':
+                        $stmt->bindValue($identifier, $this->promo_price, PDO::PARAM_STR);
+                        break;
+                    case 'WAS_NEW':
+                        $stmt->bindValue($identifier, $this->was_new, PDO::PARAM_INT);
+                        break;
+                    case 'WAS_IN_PROMO':
+                        $stmt->bindValue($identifier, $this->was_in_promo, PDO::PARAM_INT);
+                        break;
+                    case 'WEIGHT':
+                        $stmt->bindValue($identifier, $this->weight, PDO::PARAM_STR);
                         break;
                     case 'TAX':
                         $stmt->bindValue($identifier, $this->tax, PDO::PARAM_STR);
@@ -1312,30 +1594,48 @@ abstract class OrderProduct implements ActiveRecordInterface
                 return $this->getProductRef();
                 break;
             case 3:
-                return $this->getTitle();
+                return $this->getProductSaleElementsRef();
                 break;
             case 4:
-                return $this->getDescription();
+                return $this->getTitle();
                 break;
             case 5:
                 return $this->getChapo();
                 break;
             case 6:
-                return $this->getQuantity();
+                return $this->getDescription();
                 break;
             case 7:
-                return $this->getPrice();
+                return $this->getPostscriptum();
                 break;
             case 8:
-                return $this->getTax();
+                return $this->getQuantity();
                 break;
             case 9:
-                return $this->getParent();
+                return $this->getPrice();
                 break;
             case 10:
-                return $this->getCreatedAt();
+                return $this->getPromoPrice();
                 break;
             case 11:
+                return $this->getWasNew();
+                break;
+            case 12:
+                return $this->getWasInPromo();
+                break;
+            case 13:
+                return $this->getWeight();
+                break;
+            case 14:
+                return $this->getTax();
+                break;
+            case 15:
+                return $this->getParent();
+                break;
+            case 16:
+                return $this->getCreatedAt();
+                break;
+            case 17:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1370,15 +1670,21 @@ abstract class OrderProduct implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getOrderId(),
             $keys[2] => $this->getProductRef(),
-            $keys[3] => $this->getTitle(),
-            $keys[4] => $this->getDescription(),
+            $keys[3] => $this->getProductSaleElementsRef(),
+            $keys[4] => $this->getTitle(),
             $keys[5] => $this->getChapo(),
-            $keys[6] => $this->getQuantity(),
-            $keys[7] => $this->getPrice(),
-            $keys[8] => $this->getTax(),
-            $keys[9] => $this->getParent(),
-            $keys[10] => $this->getCreatedAt(),
-            $keys[11] => $this->getUpdatedAt(),
+            $keys[6] => $this->getDescription(),
+            $keys[7] => $this->getPostscriptum(),
+            $keys[8] => $this->getQuantity(),
+            $keys[9] => $this->getPrice(),
+            $keys[10] => $this->getPromoPrice(),
+            $keys[11] => $this->getWasNew(),
+            $keys[12] => $this->getWasInPromo(),
+            $keys[13] => $this->getWeight(),
+            $keys[14] => $this->getTax(),
+            $keys[15] => $this->getParent(),
+            $keys[16] => $this->getCreatedAt(),
+            $keys[17] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1390,8 +1696,8 @@ abstract class OrderProduct implements ActiveRecordInterface
             if (null !== $this->aOrder) {
                 $result['Order'] = $this->aOrder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collOrderFeatures) {
-                $result['OrderFeatures'] = $this->collOrderFeatures->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collOrderAttributeCombinations) {
+                $result['OrderAttributeCombinations'] = $this->collOrderAttributeCombinations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1437,30 +1743,48 @@ abstract class OrderProduct implements ActiveRecordInterface
                 $this->setProductRef($value);
                 break;
             case 3:
-                $this->setTitle($value);
+                $this->setProductSaleElementsRef($value);
                 break;
             case 4:
-                $this->setDescription($value);
+                $this->setTitle($value);
                 break;
             case 5:
                 $this->setChapo($value);
                 break;
             case 6:
-                $this->setQuantity($value);
+                $this->setDescription($value);
                 break;
             case 7:
-                $this->setPrice($value);
+                $this->setPostscriptum($value);
                 break;
             case 8:
-                $this->setTax($value);
+                $this->setQuantity($value);
                 break;
             case 9:
-                $this->setParent($value);
+                $this->setPrice($value);
                 break;
             case 10:
-                $this->setCreatedAt($value);
+                $this->setPromoPrice($value);
                 break;
             case 11:
+                $this->setWasNew($value);
+                break;
+            case 12:
+                $this->setWasInPromo($value);
+                break;
+            case 13:
+                $this->setWeight($value);
+                break;
+            case 14:
+                $this->setTax($value);
+                break;
+            case 15:
+                $this->setParent($value);
+                break;
+            case 16:
+                $this->setCreatedAt($value);
+                break;
+            case 17:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1490,15 +1814,21 @@ abstract class OrderProduct implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setOrderId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setProductRef($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setTitle($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setDescription($arr[$keys[4]]);
+        if (array_key_exists($keys[3], $arr)) $this->setProductSaleElementsRef($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setTitle($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setChapo($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setQuantity($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setPrice($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setTax($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setParent($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
+        if (array_key_exists($keys[6], $arr)) $this->setDescription($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setPostscriptum($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setQuantity($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setPrice($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setPromoPrice($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setWasNew($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setWasInPromo($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setWeight($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setTax($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setParent($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setCreatedAt($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setUpdatedAt($arr[$keys[17]]);
     }
 
     /**
@@ -1513,11 +1843,17 @@ abstract class OrderProduct implements ActiveRecordInterface
         if ($this->isColumnModified(OrderProductTableMap::ID)) $criteria->add(OrderProductTableMap::ID, $this->id);
         if ($this->isColumnModified(OrderProductTableMap::ORDER_ID)) $criteria->add(OrderProductTableMap::ORDER_ID, $this->order_id);
         if ($this->isColumnModified(OrderProductTableMap::PRODUCT_REF)) $criteria->add(OrderProductTableMap::PRODUCT_REF, $this->product_ref);
+        if ($this->isColumnModified(OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF)) $criteria->add(OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF, $this->product_sale_elements_ref);
         if ($this->isColumnModified(OrderProductTableMap::TITLE)) $criteria->add(OrderProductTableMap::TITLE, $this->title);
-        if ($this->isColumnModified(OrderProductTableMap::DESCRIPTION)) $criteria->add(OrderProductTableMap::DESCRIPTION, $this->description);
         if ($this->isColumnModified(OrderProductTableMap::CHAPO)) $criteria->add(OrderProductTableMap::CHAPO, $this->chapo);
+        if ($this->isColumnModified(OrderProductTableMap::DESCRIPTION)) $criteria->add(OrderProductTableMap::DESCRIPTION, $this->description);
+        if ($this->isColumnModified(OrderProductTableMap::POSTSCRIPTUM)) $criteria->add(OrderProductTableMap::POSTSCRIPTUM, $this->postscriptum);
         if ($this->isColumnModified(OrderProductTableMap::QUANTITY)) $criteria->add(OrderProductTableMap::QUANTITY, $this->quantity);
         if ($this->isColumnModified(OrderProductTableMap::PRICE)) $criteria->add(OrderProductTableMap::PRICE, $this->price);
+        if ($this->isColumnModified(OrderProductTableMap::PROMO_PRICE)) $criteria->add(OrderProductTableMap::PROMO_PRICE, $this->promo_price);
+        if ($this->isColumnModified(OrderProductTableMap::WAS_NEW)) $criteria->add(OrderProductTableMap::WAS_NEW, $this->was_new);
+        if ($this->isColumnModified(OrderProductTableMap::WAS_IN_PROMO)) $criteria->add(OrderProductTableMap::WAS_IN_PROMO, $this->was_in_promo);
+        if ($this->isColumnModified(OrderProductTableMap::WEIGHT)) $criteria->add(OrderProductTableMap::WEIGHT, $this->weight);
         if ($this->isColumnModified(OrderProductTableMap::TAX)) $criteria->add(OrderProductTableMap::TAX, $this->tax);
         if ($this->isColumnModified(OrderProductTableMap::PARENT)) $criteria->add(OrderProductTableMap::PARENT, $this->parent);
         if ($this->isColumnModified(OrderProductTableMap::CREATED_AT)) $criteria->add(OrderProductTableMap::CREATED_AT, $this->created_at);
@@ -1587,11 +1923,17 @@ abstract class OrderProduct implements ActiveRecordInterface
     {
         $copyObj->setOrderId($this->getOrderId());
         $copyObj->setProductRef($this->getProductRef());
+        $copyObj->setProductSaleElementsRef($this->getProductSaleElementsRef());
         $copyObj->setTitle($this->getTitle());
-        $copyObj->setDescription($this->getDescription());
         $copyObj->setChapo($this->getChapo());
+        $copyObj->setDescription($this->getDescription());
+        $copyObj->setPostscriptum($this->getPostscriptum());
         $copyObj->setQuantity($this->getQuantity());
         $copyObj->setPrice($this->getPrice());
+        $copyObj->setPromoPrice($this->getPromoPrice());
+        $copyObj->setWasNew($this->getWasNew());
+        $copyObj->setWasInPromo($this->getWasInPromo());
+        $copyObj->setWeight($this->getWeight());
         $copyObj->setTax($this->getTax());
         $copyObj->setParent($this->getParent());
         $copyObj->setCreatedAt($this->getCreatedAt());
@@ -1602,9 +1944,9 @@ abstract class OrderProduct implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getOrderFeatures() as $relObj) {
+            foreach ($this->getOrderAttributeCombinations() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addOrderFeature($relObj->copy($deepCopy));
+                    $copyObj->addOrderAttributeCombination($relObj->copy($deepCopy));
                 }
             }
 
@@ -1700,37 +2042,37 @@ abstract class OrderProduct implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('OrderFeature' == $relationName) {
-            return $this->initOrderFeatures();
+        if ('OrderAttributeCombination' == $relationName) {
+            return $this->initOrderAttributeCombinations();
         }
     }
 
     /**
-     * Clears out the collOrderFeatures collection
+     * Clears out the collOrderAttributeCombinations collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addOrderFeatures()
+     * @see        addOrderAttributeCombinations()
      */
-    public function clearOrderFeatures()
+    public function clearOrderAttributeCombinations()
     {
-        $this->collOrderFeatures = null; // important to set this to NULL since that means it is uninitialized
+        $this->collOrderAttributeCombinations = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collOrderFeatures collection loaded partially.
+     * Reset is the collOrderAttributeCombinations collection loaded partially.
      */
-    public function resetPartialOrderFeatures($v = true)
+    public function resetPartialOrderAttributeCombinations($v = true)
     {
-        $this->collOrderFeaturesPartial = $v;
+        $this->collOrderAttributeCombinationsPartial = $v;
     }
 
     /**
-     * Initializes the collOrderFeatures collection.
+     * Initializes the collOrderAttributeCombinations collection.
      *
-     * By default this just sets the collOrderFeatures collection to an empty array (like clearcollOrderFeatures());
+     * By default this just sets the collOrderAttributeCombinations collection to an empty array (like clearcollOrderAttributeCombinations());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1739,17 +2081,17 @@ abstract class OrderProduct implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initOrderFeatures($overrideExisting = true)
+    public function initOrderAttributeCombinations($overrideExisting = true)
     {
-        if (null !== $this->collOrderFeatures && !$overrideExisting) {
+        if (null !== $this->collOrderAttributeCombinations && !$overrideExisting) {
             return;
         }
-        $this->collOrderFeatures = new ObjectCollection();
-        $this->collOrderFeatures->setModel('\Thelia\Model\OrderFeature');
+        $this->collOrderAttributeCombinations = new ObjectCollection();
+        $this->collOrderAttributeCombinations->setModel('\Thelia\Model\OrderAttributeCombination');
     }
 
     /**
-     * Gets an array of ChildOrderFeature objects which contain a foreign key that references this object.
+     * Gets an array of ChildOrderAttributeCombination objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1759,109 +2101,109 @@ abstract class OrderProduct implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildOrderFeature[] List of ChildOrderFeature objects
+     * @return Collection|ChildOrderAttributeCombination[] List of ChildOrderAttributeCombination objects
      * @throws PropelException
      */
-    public function getOrderFeatures($criteria = null, ConnectionInterface $con = null)
+    public function getOrderAttributeCombinations($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collOrderFeaturesPartial && !$this->isNew();
-        if (null === $this->collOrderFeatures || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collOrderFeatures) {
+        $partial = $this->collOrderAttributeCombinationsPartial && !$this->isNew();
+        if (null === $this->collOrderAttributeCombinations || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrderAttributeCombinations) {
                 // return empty collection
-                $this->initOrderFeatures();
+                $this->initOrderAttributeCombinations();
             } else {
-                $collOrderFeatures = ChildOrderFeatureQuery::create(null, $criteria)
+                $collOrderAttributeCombinations = ChildOrderAttributeCombinationQuery::create(null, $criteria)
                     ->filterByOrderProduct($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collOrderFeaturesPartial && count($collOrderFeatures)) {
-                        $this->initOrderFeatures(false);
+                    if (false !== $this->collOrderAttributeCombinationsPartial && count($collOrderAttributeCombinations)) {
+                        $this->initOrderAttributeCombinations(false);
 
-                        foreach ($collOrderFeatures as $obj) {
-                            if (false == $this->collOrderFeatures->contains($obj)) {
-                                $this->collOrderFeatures->append($obj);
+                        foreach ($collOrderAttributeCombinations as $obj) {
+                            if (false == $this->collOrderAttributeCombinations->contains($obj)) {
+                                $this->collOrderAttributeCombinations->append($obj);
                             }
                         }
 
-                        $this->collOrderFeaturesPartial = true;
+                        $this->collOrderAttributeCombinationsPartial = true;
                     }
 
-                    $collOrderFeatures->getInternalIterator()->rewind();
+                    $collOrderAttributeCombinations->getInternalIterator()->rewind();
 
-                    return $collOrderFeatures;
+                    return $collOrderAttributeCombinations;
                 }
 
-                if ($partial && $this->collOrderFeatures) {
-                    foreach ($this->collOrderFeatures as $obj) {
+                if ($partial && $this->collOrderAttributeCombinations) {
+                    foreach ($this->collOrderAttributeCombinations as $obj) {
                         if ($obj->isNew()) {
-                            $collOrderFeatures[] = $obj;
+                            $collOrderAttributeCombinations[] = $obj;
                         }
                     }
                 }
 
-                $this->collOrderFeatures = $collOrderFeatures;
-                $this->collOrderFeaturesPartial = false;
+                $this->collOrderAttributeCombinations = $collOrderAttributeCombinations;
+                $this->collOrderAttributeCombinationsPartial = false;
             }
         }
 
-        return $this->collOrderFeatures;
+        return $this->collOrderAttributeCombinations;
     }
 
     /**
-     * Sets a collection of OrderFeature objects related by a one-to-many relationship
+     * Sets a collection of OrderAttributeCombination objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $orderFeatures A Propel collection.
+     * @param      Collection $orderAttributeCombinations A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildOrderProduct The current object (for fluent API support)
      */
-    public function setOrderFeatures(Collection $orderFeatures, ConnectionInterface $con = null)
+    public function setOrderAttributeCombinations(Collection $orderAttributeCombinations, ConnectionInterface $con = null)
     {
-        $orderFeaturesToDelete = $this->getOrderFeatures(new Criteria(), $con)->diff($orderFeatures);
+        $orderAttributeCombinationsToDelete = $this->getOrderAttributeCombinations(new Criteria(), $con)->diff($orderAttributeCombinations);
 
 
-        $this->orderFeaturesScheduledForDeletion = $orderFeaturesToDelete;
+        $this->orderAttributeCombinationsScheduledForDeletion = $orderAttributeCombinationsToDelete;
 
-        foreach ($orderFeaturesToDelete as $orderFeatureRemoved) {
-            $orderFeatureRemoved->setOrderProduct(null);
+        foreach ($orderAttributeCombinationsToDelete as $orderAttributeCombinationRemoved) {
+            $orderAttributeCombinationRemoved->setOrderProduct(null);
         }
 
-        $this->collOrderFeatures = null;
-        foreach ($orderFeatures as $orderFeature) {
-            $this->addOrderFeature($orderFeature);
+        $this->collOrderAttributeCombinations = null;
+        foreach ($orderAttributeCombinations as $orderAttributeCombination) {
+            $this->addOrderAttributeCombination($orderAttributeCombination);
         }
 
-        $this->collOrderFeatures = $orderFeatures;
-        $this->collOrderFeaturesPartial = false;
+        $this->collOrderAttributeCombinations = $orderAttributeCombinations;
+        $this->collOrderAttributeCombinationsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related OrderFeature objects.
+     * Returns the number of related OrderAttributeCombination objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related OrderFeature objects.
+     * @return int             Count of related OrderAttributeCombination objects.
      * @throws PropelException
      */
-    public function countOrderFeatures(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countOrderAttributeCombinations(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collOrderFeaturesPartial && !$this->isNew();
-        if (null === $this->collOrderFeatures || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collOrderFeatures) {
+        $partial = $this->collOrderAttributeCombinationsPartial && !$this->isNew();
+        if (null === $this->collOrderAttributeCombinations || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrderAttributeCombinations) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getOrderFeatures());
+                return count($this->getOrderAttributeCombinations());
             }
 
-            $query = ChildOrderFeatureQuery::create(null, $criteria);
+            $query = ChildOrderAttributeCombinationQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1871,53 +2213,53 @@ abstract class OrderProduct implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collOrderFeatures);
+        return count($this->collOrderAttributeCombinations);
     }
 
     /**
-     * Method called to associate a ChildOrderFeature object to this object
-     * through the ChildOrderFeature foreign key attribute.
+     * Method called to associate a ChildOrderAttributeCombination object to this object
+     * through the ChildOrderAttributeCombination foreign key attribute.
      *
-     * @param    ChildOrderFeature $l ChildOrderFeature
+     * @param    ChildOrderAttributeCombination $l ChildOrderAttributeCombination
      * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
-    public function addOrderFeature(ChildOrderFeature $l)
+    public function addOrderAttributeCombination(ChildOrderAttributeCombination $l)
     {
-        if ($this->collOrderFeatures === null) {
-            $this->initOrderFeatures();
-            $this->collOrderFeaturesPartial = true;
+        if ($this->collOrderAttributeCombinations === null) {
+            $this->initOrderAttributeCombinations();
+            $this->collOrderAttributeCombinationsPartial = true;
         }
 
-        if (!in_array($l, $this->collOrderFeatures->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddOrderFeature($l);
+        if (!in_array($l, $this->collOrderAttributeCombinations->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddOrderAttributeCombination($l);
         }
 
         return $this;
     }
 
     /**
-     * @param OrderFeature $orderFeature The orderFeature object to add.
+     * @param OrderAttributeCombination $orderAttributeCombination The orderAttributeCombination object to add.
      */
-    protected function doAddOrderFeature($orderFeature)
+    protected function doAddOrderAttributeCombination($orderAttributeCombination)
     {
-        $this->collOrderFeatures[]= $orderFeature;
-        $orderFeature->setOrderProduct($this);
+        $this->collOrderAttributeCombinations[]= $orderAttributeCombination;
+        $orderAttributeCombination->setOrderProduct($this);
     }
 
     /**
-     * @param  OrderFeature $orderFeature The orderFeature object to remove.
+     * @param  OrderAttributeCombination $orderAttributeCombination The orderAttributeCombination object to remove.
      * @return ChildOrderProduct The current object (for fluent API support)
      */
-    public function removeOrderFeature($orderFeature)
+    public function removeOrderAttributeCombination($orderAttributeCombination)
     {
-        if ($this->getOrderFeatures()->contains($orderFeature)) {
-            $this->collOrderFeatures->remove($this->collOrderFeatures->search($orderFeature));
-            if (null === $this->orderFeaturesScheduledForDeletion) {
-                $this->orderFeaturesScheduledForDeletion = clone $this->collOrderFeatures;
-                $this->orderFeaturesScheduledForDeletion->clear();
+        if ($this->getOrderAttributeCombinations()->contains($orderAttributeCombination)) {
+            $this->collOrderAttributeCombinations->remove($this->collOrderAttributeCombinations->search($orderAttributeCombination));
+            if (null === $this->orderAttributeCombinationsScheduledForDeletion) {
+                $this->orderAttributeCombinationsScheduledForDeletion = clone $this->collOrderAttributeCombinations;
+                $this->orderAttributeCombinationsScheduledForDeletion->clear();
             }
-            $this->orderFeaturesScheduledForDeletion[]= clone $orderFeature;
-            $orderFeature->setOrderProduct(null);
+            $this->orderAttributeCombinationsScheduledForDeletion[]= clone $orderAttributeCombination;
+            $orderAttributeCombination->setOrderProduct(null);
         }
 
         return $this;
@@ -1931,11 +2273,17 @@ abstract class OrderProduct implements ActiveRecordInterface
         $this->id = null;
         $this->order_id = null;
         $this->product_ref = null;
+        $this->product_sale_elements_ref = null;
         $this->title = null;
-        $this->description = null;
         $this->chapo = null;
+        $this->description = null;
+        $this->postscriptum = null;
         $this->quantity = null;
         $this->price = null;
+        $this->promo_price = null;
+        $this->was_new = null;
+        $this->was_in_promo = null;
+        $this->weight = null;
         $this->tax = null;
         $this->parent = null;
         $this->created_at = null;
@@ -1959,17 +2307,17 @@ abstract class OrderProduct implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collOrderFeatures) {
-                foreach ($this->collOrderFeatures as $o) {
+            if ($this->collOrderAttributeCombinations) {
+                foreach ($this->collOrderAttributeCombinations as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
-        if ($this->collOrderFeatures instanceof Collection) {
-            $this->collOrderFeatures->clearIterator();
+        if ($this->collOrderAttributeCombinations instanceof Collection) {
+            $this->collOrderAttributeCombinations->clearIterator();
         }
-        $this->collOrderFeatures = null;
+        $this->collOrderAttributeCombinations = null;
         $this->aOrder = null;
     }
 

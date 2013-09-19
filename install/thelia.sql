@@ -760,14 +760,20 @@ CREATE TABLE `order_product`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `order_id` INTEGER NOT NULL,
-    `product_ref` VARCHAR(255),
+    `product_ref` VARCHAR(255) NOT NULL,
+    `product_sale_elements_ref` VARCHAR(255) NOT NULL,
     `title` VARCHAR(255),
-    `description` TEXT,
     `chapo` TEXT,
+    `description` LONGTEXT,
+    `postscriptum` TEXT,
     `quantity` FLOAT NOT NULL,
     `price` FLOAT NOT NULL,
+    `promo_price` VARCHAR(45),
+    `was_new` TINYINT NOT NULL,
+    `was_in_promo` TINYINT NOT NULL,
+    `weight` VARCHAR(45),
     `tax` FLOAT,
-    `parent` INTEGER,
+    `parent` INTEGER COMMENT 'not managed yet',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -796,17 +802,23 @@ CREATE TABLE `order_status`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- order_feature
+-- order_attribute_combination
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `order_feature`;
+DROP TABLE IF EXISTS `order_attribute_combination`;
 
-CREATE TABLE `order_feature`
+CREATE TABLE `order_attribute_combination`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `order_product_id` INTEGER NOT NULL,
-    `feature_desc` VARCHAR(255),
-    `feature_av_desc` VARCHAR(255),
+    `attribute_title` VARCHAR(255) NOT NULL,
+    `attribute_chapo` TEXT,
+    `attribute_description` LONGTEXT,
+    `attribute_postscriptumn` TEXT,
+    `attribute_av_title` VARCHAR(255) NOT NULL,
+    `attribute_av_chapo` TEXT,
+    `attribute_av_description` LONGTEXT,
+    `attribute_av_postscriptum` TEXT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
