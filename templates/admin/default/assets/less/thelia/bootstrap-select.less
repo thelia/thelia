@@ -58,10 +58,7 @@
 
 .bootstrap-select > .btn {
     width: 100%;
-}
-
-.error .bootstrap-select .btn {
-    border: 1px solid #b94a48;
+    .form-control-focus();
 }
 
 
@@ -79,6 +76,7 @@
     left: 12px;
     right: 25px;
     text-align: left;
+    color: @input-color;
 }
 
 .bootstrap-select.btn-group .btn .caret {
@@ -130,6 +128,14 @@
 
 .bootstrap-select.btn-group .div-contain {
     overflow: hidden;
+}
+
+.bootstrap-select.btn-group .dropdown-menu li a{
+    color: @input-color;
+
+    &:hover{
+        color: #FFF;
+    }
 }
 
 .bootstrap-select.btn-group .dropdown-menu li {
