@@ -30,6 +30,7 @@ class OrderException extends \RuntimeException
      */
     public $cartRoute = "cart.view";
     public $orderDeliveryRoute = "order.delivery";
+    public $cartItem = null;
 
     public $arguments = array();
 
@@ -38,6 +39,8 @@ class OrderException extends \RuntimeException
     const CART_EMPTY = 100;
 
     const UNDEFINED_DELIVERY = 200;
+
+    const NOT_ENOUGH_STOCK = 300;
 
     public function __construct($message, $code = null, $arguments = array(), $previous = null)
     {

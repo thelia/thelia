@@ -23,12 +23,23 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Base\AddressQuery;
+use Thelia\Exception\OrderException;
+use Thelia\Model\AttributeAvI18n;
+use Thelia\Model\AttributeAvI18nQuery;
+use Thelia\Model\AttributeI18n;
+use Thelia\Model\AttributeI18nQuery;
+use Thelia\Model\AttributeQuery;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\OrderAttributeCombination;
+use Thelia\Model\ProductI18nQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderStatus;
@@ -36,6 +47,7 @@ use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\ProductI18n;
 
 /**
  *
@@ -167,15 +179,68 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $placedOrder->save($con);
 
-        /* fulfill order_products and decrease stock // @todo + dispatch event */
+        /* fulfill order_products and decrease stock */
 
         foreach($cartItems as $cartItem) {
+            $product = $cartItem->getProduct();
+
+            /* get customer translation */
+            $productI18n = $this->getI18n(ProductI18nQuery::create(), new ProductI18n(), $product->getId());
+
+            $pse = $cartItem->getProductSaleElements();
+
+            /* check still in stock */
+            if($cartItem->getQuantity() > $pse->getQuantity()) {
+                $e = new OrderException("Not enough stock", OrderException::NOT_ENOUGH_STOCK);
+                $e->cartItem = $cartItem;
+                throw $e;
+            }
+
+            /* decrease stock */
+            $pse->setQuantity(
+                $pse->getQuantity() - $cartItem->getQuantity()
+            );
+            $pse->save();
+
             $orderProduct = new OrderProduct();
             $orderProduct
                 ->setOrderId($placedOrder->getId())
+                ->setProductRef($product->getRef())
+                ->setProductSaleElementsRef($pse->getRef())
+                ->setTitle($productI18n->getTitle())
+                ->setChapo($productI18n->getChapo())
+                ->setDescription($productI18n->getDescription())
+                ->setPostscriptum($productI18n->getPostscriptum())
+                ->setQuantity($cartItem->getQuantity())
+                ->setPrice($cartItem->getPrice())
+                ->setPromoPrice($cartItem->getPromoPrice())
+                ->setWasNew($pse->getNewness())
+                ->setWasInPromo($cartItem->getPromo())
+                ->setWeight($pse->getWeight())
             ;
+            $orderProduct->setDispatcher($this->getDispatcher());
+            $orderProduct->save();
 
-            $in = true;
+            /* fulfill order_attribute_combination and decrease stock */
+            foreach($pse->getAttributeCombinations() as $attributeCombination) {
+                $attribute = $this->getI18n(AttributeI18nQuery::create(), new AttributeI18n(), $attributeCombination->getAttributeId());
+                $attributeAv = $this->getI18n(AttributeAvI18nQuery::create(), new AttributeAvI18n(), $attributeCombination->getAttributeAvId());
+
+                $orderAttributeCombination = new OrderAttributeCombination();
+                $orderAttributeCombination
+                    ->setOrderProductId($orderProduct->getId())
+                    ->setAttributeTitle($attribute->getTitle())
+                    ->setAttributeChapo($attribute->getChapo())
+                    ->setAttributeDescription($attribute->getDescription())
+                    ->setAttributePostscriptumn($attribute->getPostscriptum())
+                    ->setAttributeAvTitle($attributeAv->getTitle())
+                    ->setAttributeAvChapo($attributeAv->getChapo())
+                    ->setAttributeAvDescription($attributeAv->getDescription())
+                    ->setAttributeAvPostscriptum($attributeAv->getPostscriptum())
+                ;
+
+                $orderAttributeCombination->save();
+            }
         }
 
         /* discount @todo */
@@ -239,7 +304,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_SET_INVOICE_ADDRESS => array("setInvoiceAddress", 128),
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => array("setPaymentModule", 128),
             TheliaEvents::ORDER_PAY => array("create", 128),
-            TheliaEvents::ORDER_SET_REFERENCE => array("setReference", 128),
+            TheliaEvents::ORDER_BEFORE_CREATE => array("setReference", 128),
         );
     }
 
@@ -271,5 +336,43 @@ class Order extends BaseAction implements EventSubscriberInterface
         $request = $this->getRequest();
 
         return $request->getSession();
+    }
+
+    /**
+     * @param ModelCriteria         $query
+     * @param ActiveRecordInterface $object
+     * @param                       $id
+     * @param array                 $needed = array('Title')
+     *
+     * @return ProductI18n
+     */
+    protected function getI18n(ModelCriteria $query, ActiveRecordInterface $object, $id, $needed = array('Title'))
+    {
+        $i18n = $query
+            ->filterById($id)
+            ->filterByLocale(
+                $this->getSession()->getLang()->getLocale()
+            )->findOne();
+        /* or default translation */
+        if(null === $i18n) {
+            $i18n = $query
+                ->filterById($id)
+                ->filterByLocale(
+                    Lang::getDefaultLanguage()->getLocale()
+                )->findOne();
+        }
+        if(null === $i18n) { // @todo something else ?
+            $i18n = $object;
+            foreach($needed as $need) {
+                $method = sprintf('get%s', $need);
+                if(method_exists($i18n, $method)) {
+                    $i18n->$method('DEFAULT ' . strtoupper($need));
+                } else {
+                    // @todo throw sg ?
+                }
+            }
+        }
+
+        return $i18n;
     }
 }

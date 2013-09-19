@@ -78,11 +78,8 @@ class OrderController extends BaseFrontController
                 throw new \Exception("Delivery module cannot be use with selected delivery address");
             }
 
-            /* try to get postage amount */
+            /* get postage amount */
             $moduleReflection = new \ReflectionClass($deliveryModule->getFullNamespace());
-            if ($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
-                throw new \RuntimeException(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $deliveryModule->getCode()));
-            }
             $moduleInstance = $moduleReflection->newInstance();
             $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
 
