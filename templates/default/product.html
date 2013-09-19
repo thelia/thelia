@@ -18,8 +18,16 @@
         <article id="product" class="col-main" role="main" itemscope itemtype="http://schema.org/Product">
 
             <!-- Use the meta tag to specify content that is not visible on the page in any way -->
-            <meta itemprop="brand" content="Diesel">
-            <meta itemprop="productID" content="isbn:925872">
+            {loop name="brand.feature" type="feature" product="{$ID}" title="brand"}
+                {loop name="brand.value" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
+                    <meta itemprop="brand" content="{$TITLE}">
+                {/loop}
+            {/loop}
+
+            <!--
+                activate this meta tag if you have isbn feature for exemple
+                <meta itemprop="productID" content="isbn:925872">
+            -->
 
             <section id="product-gallery">
                 <figure class="product-image">
@@ -84,7 +92,7 @@
                     <div class="price-container">
                         <meta itemprop="category" content="Category1">
                         <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
-                        <meta itemprop="priceCurrency" content="USD"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+                        <meta itemprop="priceCurrency" content="{currency attr="symbol"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
                         <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
                         <!-- List of availibility :
                             out_of_stock : http://schema.org/OutOfStock
@@ -100,7 +108,7 @@
                             <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                         {/loop}
                         {else}
-                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                         {/if}
                     </div>
                 </div>
