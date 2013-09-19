@@ -247,10 +247,15 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $con->commit();
 
-        /* T1style : dispatch mail event ? */
+        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
 
-        /* clear session @todo : remove comment below + test */
-        //$sessionOrder = new \Thelia\Model\Order();
+        /* clear session */
+        $sessionOrder = new \Thelia\Model\Order();
+        $event->setOrder($sessionOrder);
+        $this->getSession()->setOrder($sessionOrder);
+
+        /* empty cart */
+        $this->getSession()->getCart()->clear();
 
         /* call pay method */
         $paymentModuleReflection = new \ReflectionClass($paymentModule->getFullNamespace());
@@ -259,7 +264,15 @@ class Order extends BaseAction implements EventSubscriberInterface
         $paymentModuleInstance->setRequest($this->getRequest());
         $paymentModuleInstance->setDispatcher($this->getDispatcher());
 
-        $paymentModuleInstance->pay();
+        $paymentModuleInstance->pay($placedOrder);
+    }
+
+    /**
+     * @param \Thelia\Core\Event\OrderEvent $event
+     */
+    public function sendOrderEmail(OrderEvent $event)
+    {
+        /* @todo */
     }
 
     /**
@@ -305,6 +318,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => array("setPaymentModule", 128),
             TheliaEvents::ORDER_PAY => array("create", 128),
             TheliaEvents::ORDER_BEFORE_CREATE => array("setReference", 128),
+            TheliaEvents::ORDER_BEFORE_PAYMENT => array("sendOrderEmail", 128),
         );
     }
 
