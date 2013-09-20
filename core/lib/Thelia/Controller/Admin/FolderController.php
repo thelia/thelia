@@ -27,6 +27,7 @@ use Thelia\Core\Event\FolderDeleteEvent;
 use Thelia\Core\Event\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Form\FolderCreationForm;
 use Thelia\Form\FolderModificationForm;
 use Thelia\Model\FolderQuery;
@@ -149,11 +150,25 @@ class FolderController extends AbstractCrudController
     }
 
     /**
-     *
+     * @return FolderToggleVisibilityEvent|void
      */
     protected function createToggleVisibilityEvent()
     {
         return new FolderToggleVisibilityEvent($this->getExistingObject());
+    }
+
+    /**
+     * @param $positionChangeMode
+     * @param $positionValue
+     * @return UpdatePositionEvent|void
+     */
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue) {
+
+        return new UpdatePositionEvent(
+            $this->getRequest()->get('folder_id', null),
+            $positionChangeMode,
+            $positionValue
+        );
     }
 
     /**
@@ -270,6 +285,26 @@ class FolderController extends AbstractCrudController
             'admin.folders.default',
             array('folder_id' => $deleteEvent->getFolder()->getParent())
         );
+    }
+
+    /**
+     * @param $event \Thelia\Core\Event\UpdatePositionEvent
+     * @return null|Response
+     */
+    protected function performAdditionalUpdatePositionAction($event)
+    {
+
+        $folder = FolderQuery::create()->findPk($event->getObjectId());
+
+        if ($folder != null) {
+            // Redirect to parent category list
+            $this->redirectToRoute(
+                'admin.folders.default',
+                array('folder_id' => $folder->getParent())
+            );
+        }
+
+        return null;
     }
 
     /**

@@ -28,6 +28,7 @@ use Thelia\Core\Event\FolderDeleteEvent;
 use Thelia\Core\Event\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Folder as FolderModel;
 
@@ -98,6 +99,26 @@ class Folder extends BaseAction implements EventSubscriberInterface {
             ->setVisible(!$folder->getVisible())
             ->save();
 
+    }
+
+    public function updatePosition(UpdatePositionEvent $event)
+    {
+        if(null !== $folder = FolderQuery::create()->findPk($event->getObjectId())) {
+            $folder->setDispatcher($this->getDispatcher());
+
+            switch($event->getMode())
+            {
+                case UpdatePositionEvent::POSITION_ABSOLUTE:
+                    $folder->changeAbsolutePosition($event->getPosition());
+                    break;
+                case UpdatePositionEvent::POSITION_DOWN:
+                    $folder->movePositionDown();
+                    break;
+                case UpdatePositionEvent::POSITION_UP:
+                    $folder->movePositionUp();
+                    break;
+            }
+        }
     }
 
     /**

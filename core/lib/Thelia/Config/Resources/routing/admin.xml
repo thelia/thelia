@@ -216,6 +216,10 @@
         <default key="_controller">Thelia\Controller\Admin\FolderController::deleteAction</default>
     </route>
 
+    <route id="admin.folders.update-position" path="/admin/folders/update-position">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::updatePositionAction</default>
+    </route>
+
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 
     <route id="admin.coupon.list" path="/admin/coupon/">
