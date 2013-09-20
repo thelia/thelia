@@ -43,35 +43,29 @@ class ProductCreationForm extends BaseForm
         $this->formBuilder
             ->add("ref", "text", array(
                 "constraints" => $ref_constraints,
-                "label" => "Product reference *",
-                "label_attr" => array(
-                    "for" => "ref"
-                )
+                "label"       => "Product reference *",
+                "label_attr"  => array("for" => "ref")
             ))
             ->add("title", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
                 "label" => "Product title *",
-                "label_attr" => array(
-                    "for" => "title"
-                )
+                "label_attr" => array("for" => "title")
             ))
             ->add("default_category", "integer", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
+                "constraints" => array(new NotBlank()),
+                "label"       => Translator::getInstance()->trans("Default product category."),
+                "label_attr"  => array("for" => "default_category_field")
             ))
             ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
+                "constraints" => array(new NotBlank())
             ))
             ->add("visible", "integer", array(
-                "label" => Translator::getInstance()->trans("This product is online."),
-                "label_attr" => array("for" => "visible_create")
+                "label"      => Translator::getInstance()->trans("This product is online."),
+                "label_attr" => array("for" => "visible_field")
             ))
-            ;
+        ;
     }
 
     public function checkDuplicateRef($value, ExecutionContextInterface $context)

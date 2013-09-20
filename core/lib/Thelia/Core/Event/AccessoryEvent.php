@@ -21,21 +21,34 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
+namespace Thelia\Core\Event;
 
-use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\Security\Exception\TokenAuthenticationException;
+use Thelia\Model\Accessory;
+use Thelia\Core\Event\ActionEvent;
 
-class AdminController extends BaseAdminController
+class AccessoryEvent extends ActionEvent
 {
-    public function indexAction()
+    public $accessory = null;
+
+    public function __construct(Accessory $accessory = null)
     {
-        return $this->render("home");
+        $this->accessory = $accessory;
     }
 
-    public function updateAction()
+    public function hasAccessory()
     {
-    	return $this->render("profile-edit");
+        return ! is_null($this->accessory);
+    }
+
+    public function getAccessory()
+    {
+        return $this->accessory;
+    }
+
+    public function setAccessory(Accessory $accessory)
+    {
+        $this->accessory = $accessory;
+
+        return $this;
     }
 }

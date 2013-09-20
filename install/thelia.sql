@@ -641,7 +641,7 @@ CREATE TABLE `order`
     `customer_id` INTEGER NOT NULL,
     `invoice_order_address_id` INTEGER NOT NULL,
     `delivery_order_address_id` INTEGER NOT NULL,
-    `invoice_date` DATE NOT NULL,
+    `invoice_date` DATE,
     `currency_id` INTEGER NOT NULL,
     `currency_rate` FLOAT NOT NULL,
     `transaction_ref` VARCHAR(100) COMMENT 'transaction reference - usually use to identify a transaction with banking modules',
@@ -788,10 +788,11 @@ DROP TABLE IF EXISTS `order_status`;
 CREATE TABLE `order_status`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `code` VARCHAR(45),
+    `code` VARCHAR(45) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `code_UNIQUE` (`code`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

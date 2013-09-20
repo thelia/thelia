@@ -165,6 +165,17 @@ final class TheliaEvents
     const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
     const AFTER_UPDATECATEGORY 	= "action.after_updateCategory";
 
+    // -- Categories Associated Content ----------------------------------------
+
+    const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT   = "action.before_createCategoryAssociatedContent";
+    const AFTER_CREATECATEGORY_ASSOCIATED_CONTENT 	= "action.after_createCategoryAssociatedContent";
+
+    const BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT   = "action.before_deleteCategoryAssociatedContenty";
+    const AFTER_DELETECATEGORY_ASSOCIATED_CONTENT 	= "action.after_deleteproduct_accessory";
+
+    const BEFORE_UPDATECATEGORY_ASSOCIATED_CONTENT   = "action.before_updateCategoryAssociatedContent";
+    const AFTER_UPDATECATEGORY_ASSOCIATED_CONTENT 	= "action.after_updateCategoryAssociatedContent";
+
     // -- Product management -----------------------------------------------
 
     const PRODUCT_CREATE            = "action.createProduct";
@@ -176,6 +187,10 @@ final class TheliaEvents
     const PRODUCT_ADD_CONTENT      = "action.productAddContent";
     const PRODUCT_REMOVE_CONTENT   = "action.productRemoveContent";
 
+    const PRODUCT_ADD_ACCESSORY             = "action.productAddAccessory";
+    const PRODUCT_REMOVE_ACCESSORY          = "action.productRemoveAccessory";
+    const PRODUCT_UPDATE_ACCESSORY_POSITION = "action.updateProductPosition";
+
     const BEFORE_CREATEPRODUCT = "action.before_createproduct";
     const AFTER_CREATEPRODUCT  = "action.after_createproduct";
 
@@ -184,6 +199,28 @@ final class TheliaEvents
 
     const BEFORE_UPDATEPRODUCT = "action.before_updateProduct";
     const AFTER_UPDATEPRODUCT  = "action.after_updateProduct";
+
+    // -- Product Accessories --------------------------------------------------
+
+    const BEFORE_CREATEACCESSORY = "action.before_createAccessory";
+    const AFTER_CREATEACCESSORY  = "action.after_createAccessory";
+
+    const BEFORE_DELETEACCESSORY = "action.before_deleteAccessory";
+    const AFTER_DELETEACCESSORY  = "action.after_deleteAccessory";
+
+    const BEFORE_UPDATEACCESSORY = "action.before_updateAccessory";
+    const AFTER_UPDATEACCESSORY  = "action.after_updateAccessory";
+
+    // -- Product Associated Content --------------------------------------------------
+
+    const BEFORE_CREATEPRODUCT_ASSOCIATED_CONTENT   = "action.before_createProductAssociatedContent";
+    const AFTER_CREATEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_createProductAssociatedContent";
+
+    const BEFORE_DELETEPRODUCT_ASSOCIATED_CONTENT   = "action.before_deleteProductAssociatedContenty";
+    const AFTER_DELETEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_deleteproduct_accessory";
+
+    const BEFORE_UPDATEPRODUCT_ASSOCIATED_CONTENT   = "action.before_updateProductAssociatedContent";
+    const AFTER_UPDATEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_updateProductAssociatedContent";
 
     /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart
@@ -215,9 +252,12 @@ final class TheliaEvents
     /**
      * Order linked event
      */
-    const ORDER_SET_BILLING_ADDRESS = "action.order.setBillingAddress";
     const ORDER_SET_DELIVERY_ADDRESS = "action.order.setDeliveryAddress";
     const ORDER_SET_DELIVERY_MODULE = "action.order.setDeliveryModule";
+    const ORDER_SET_INVOICE_ADDRESS = "action.order.setInvoiceAddress";
+    const ORDER_SET_PAYMENT_MODULE = "action.order.setPaymentModule";
+    const ORDER_PAY = "action.order.pay";
+    const ORDER_SET_REFERENCE = "action.order.setReference";
 
     /**
      * Sent on image processing

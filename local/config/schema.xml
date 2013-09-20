@@ -500,7 +500,7 @@
     <column name="customer_id" required="true" type="INTEGER" />
     <column name="invoice_order_address_id" required="true" type="INTEGER" />
     <column name="delivery_order_address_id" required="true" type="INTEGER" />
-    <column name="invoice_date" required="true" type="DATE" />
+    <column name="invoice_date" type="DATE" />
     <column name="currency_id" required="true" type="INTEGER" />
     <column name="currency_rate" required="true" type="FLOAT" />
     <column description="transaction reference - usually use to identify a transaction with banking modules" name="transaction_ref" size="100" type="VARCHAR" />
@@ -613,11 +613,14 @@
   </table>
   <table name="order_status" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="code" size="45" type="VARCHAR" />
+    <column name="code" required="true" size="45" type="VARCHAR" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <unique name="code_UNIQUE">
+      <unique-column name="code" />
+    </unique>
     <behavior name="timestampable" />
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />

@@ -21,21 +21,28 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
+namespace Thelia\Core\Event;
 
-use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\Security\Exception\TokenAuthenticationException;
+use Thelia\Model\Product;
 
-class AdminController extends BaseAdminController
+class ProductDeleteAccessoryEvent extends ProductEvent
 {
-    public function indexAction()
+    protected $accessory_id;
+
+    public function __construct(Product $product, $accessory_id)
     {
-        return $this->render("home");
+        parent::__construct($product);
+
+        $this->accessory_id = $accessory_id;
     }
 
-    public function updateAction()
+    public function getAccessoryId()
     {
-    	return $this->render("profile-edit");
+        return $this->accessory_id;
+    }
+
+    public function setAccessoryId($accessory_id)
+    {
+        $this->accessory_id = $accessory_id;
     }
 }

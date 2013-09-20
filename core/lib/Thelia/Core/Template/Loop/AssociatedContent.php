@@ -97,9 +97,9 @@ class AssociatedContent extends Content
 
         $exclude_product = $this->getExcludeProduct();
 
-        // If we have to filter by template, find all attributes assigned to this template, and filter by found IDs
+        // If we have to filter by product, find all products assigned to this product, and filter by found IDs
         if (null !== $exclude_product) {
-            // Exclure tous les attribut qui sont attachés aux templates indiqués
+            // Exclude all contents related to the given product
             $search->filterById(
                     ProductAssociatedContentQuery::create()->filterByProductId($exclude_product)->select('product_id')->find(),
                     Criteria::NOT_IN
@@ -108,7 +108,7 @@ class AssociatedContent extends Content
 
         $exclude_category = $this->getExcludeCategory();
 
-        // If we have to filter by template, find all attributes assigned to this template, and filter by found IDs
+        // If we have to filter by category, find all contents assigned to this category, and filter by found IDs
         if (null !== $exclude_category) {
             // Exclure tous les attribut qui sont attachés aux templates indiqués
             $search->filterById(

@@ -21,21 +21,34 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
+namespace Thelia\Core\Event;
 
-use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\Security\Exception\TokenAuthenticationException;
+use Thelia\Model\ProductAssociatedContent;
+use Thelia\Core\Event\ActionEvent;
 
-class AdminController extends BaseAdminController
+class ProductAssociatedContentEvent extends ActionEvent
 {
-    public function indexAction()
+    public $content = null;
+
+    public function __construct(ProductAssociatedContent $content = null)
     {
-        return $this->render("home");
+        $this->content = $content;
     }
 
-    public function updateAction()
+    public function hasProductAssociatedContent()
     {
-    	return $this->render("profile-edit");
+        return ! is_null($this->content);
+    }
+
+    public function getProductAssociatedContent()
+    {
+        return $this->content;
+    }
+
+    public function setProductAssociatedContent(ProductAssociatedContent $content)
+    {
+        $this->content = $content;
+
+        return $this;
     }
 }

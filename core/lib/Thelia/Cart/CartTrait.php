@@ -139,4 +139,6 @@ trait CartTrait
         return $id;
 
     }
+
+    abstract public function getDispatcher();
 }

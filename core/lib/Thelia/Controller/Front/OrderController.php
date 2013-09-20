@@ -121,7 +121,7 @@ class OrderController extends BaseFrontController
      * set invoice address
      * set payment module
      */
-    public function pay()
+    public function invoice()
     {
         $this->checkAuth();
         $this->checkCartNotEmpty();
@@ -134,23 +134,23 @@ class OrderController extends BaseFrontController
         try {
             $form = $this->validateForm($orderPayment, "post");
 
-            $deliveryAddressId = $form->get("delivery-address")->getData();
-            $deliveryModuleId = $form->get("delivery-module")->getData();
+            $invoiceAddressId = $form->get("invoice-address")->getData();
+            $paymentModuleId = $form->get("payment-module")->getData();
 
             /* check that the invoice address belongs to the current customer */
-            $deliveryAddress = AddressQuery::create()->findPk($deliveryAddressId);
-            if($deliveryAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
+            $invoiceAddress = AddressQuery::create()->findPk($invoiceAddressId);
+            if($invoiceAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
                 throw new \Exception("Invoice address does not belong to the current customer");
             }
 
             $orderEvent = $this->getOrderEvent();
-            $orderEvent->setInvoiceAddress($deliveryAddressId);
-            $orderEvent->setPaymentModule($deliveryModuleId);
+            $orderEvent->setInvoiceAddress($invoiceAddressId);
+            $orderEvent->setPaymentModule($paymentModuleId);
 
-            $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
-            $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
+            $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_INVOICE_ADDRESS, $orderEvent);
+            $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_PAYMENT_MODULE, $orderEvent);
 
-            $this->redirectToRoute("order.invoice");
+            $this->redirectToRoute("order.payment.process");
 
         } catch (FormValidationException $e) {
             $message = sprintf("Please check your input: %s", $e->getMessage());
@@ -161,7 +161,7 @@ class OrderController extends BaseFrontController
         }
 
         if ($message !== false) {
-            Tlog::getInstance()->error(sprintf("Error during order delivery process : %s. Exception was %s", $message, $e->getMessage()));
+            Tlog::getInstance()->error(sprintf("Error during order payment process : %s. Exception was %s", $message, $e->getMessage()));
 
             $orderPayment->setErrorMessage($message);
 
@@ -171,6 +171,25 @@ class OrderController extends BaseFrontController
             ;
         }
 
+    }
+
+    public function pay()
+    {
+        /* check customer */
+        $this->checkAuth();
+
+        /* check cart count */
+        $this->checkCartNotEmpty();
+
+        /* check delivery address and module */
+        $this->checkValidDelivery();
+
+        /* check invoice address and payment module */
+        $this->checkValidInvoice();
+
+        $orderEvent = $this->getOrderEvent();
+
+        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_PAY, $orderEvent);
     }
 
     protected function getOrderEvent()
