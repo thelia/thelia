@@ -87,6 +87,32 @@ class Product extends BaseProduct
         return $this;
     }
 
+    public function updateDefaultCategory($defaultCategoryId) {
+
+        // Update the default category
+        $productCategory = ProductCategoryQuery::create()
+            ->filterByProductId($this->getId())
+            ->filterByDefaultCategory(true)
+            ->findOne()
+        ;
+
+        if ($productCategory == null || $productCategory->getCategoryId() != $defaultCategoryId) {
+
+            // Delete the old default category
+            if ($productCategory !== null) $productCategory->delete();
+
+            // Add the new default category
+            $productCategory = new ProductCategory();
+
+            $productCategory
+                ->setProduct($this)
+                ->setCategoryId($defaultCategoryId)
+                ->setDefaultCategory(true)
+                ->save($con)
+            ;
+        }
+    }
+
     /**
      * Create a new product, along with the default category ID
      *
@@ -105,14 +131,7 @@ class Product extends BaseProduct
             $this->save($con);
 
             // Add the default category
-            $pc = new ProductCategory();
-
-            $pc
-                ->setProduct($this)
-                ->setCategoryId($defaultCategoryId)
-                ->setDefaultCategory(true)
-                ->save($con)
-            ;
+            $this->updateDefaultCategory($defaultCategoryId);
 
             // Set the position
             $this->setPosition($this->getNextPosition())->save($con);

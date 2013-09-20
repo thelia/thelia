@@ -70,6 +70,9 @@ class UrlGenerator extends AbstractSmartyPlugin
                 $mode
         );
 
+        // FIXME: potentially dangerous ?
+        $url = str_replace('&', '&amp;', $url);
+
         if ($target != null) $url .= '#'.$target;
 
         return $url;

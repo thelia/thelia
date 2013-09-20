@@ -53,6 +53,7 @@ use Thelia\Model\FeatureProduct;
 use Thelia\Model\FeatureQuery;
 use Thelia\Core\Event\FeatureProductDeleteEvent;
 use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\ProductCategoryQuery;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
@@ -101,11 +102,16 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setDescription($event->getDescription())
                 ->setChapo($event->getChapo())
                 ->setPostscriptum($event->getPostscriptum())
-
-                ->setParent($event->getParent())
                 ->setVisible($event->getVisible())
 
-                ->save();
+                ->save()
+            ;
+
+            // Update the rewriten URL, if required
+            $product->setRewrittenUrl($event->getLocale(), $event->getUrl());
+
+            // Update default category (ifd required)
+            $product->updateDefaultCategory($event->getDefaultCategory());
 
             $event->setProduct($product);
         }
@@ -293,6 +299,7 @@ echo " Create !";
         else {
             $featureProduct->setFeatureAvId($event->getFeatureValue());
         }
+echo "value=".$event->getFeatureValue();
 
         $featureProduct->save();
 
@@ -311,7 +318,7 @@ echo " Create !";
 
             ->delete();
         ;
-echo "<br/>Delete p=".$event->getProductId()." f=".$event->getFeatureId();
+echo "<br/>Delete p=".$event->getProductId().", f=".$event->getFeatureId();
 
         $event->setFeatureProduct($featureProduct);
     }

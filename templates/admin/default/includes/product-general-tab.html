@@ -12,6 +12,10 @@
 
         {form_hidden_fields form=$form}
 
+        {form_field form=$form field='id'}
+            <input type="hidden" name="{$name}" value="{$value}" />
+        {/form_field}
+
         {form_field form=$form field='success_url'}
             <input type="hidden" name="{$name}" value="{url path='/admin/product' product_id={$product_d}}" />
         {/form_field}
@@ -23,11 +27,16 @@
         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
         <div class="form-group">
-            <label for="product_ref" class="control-label">
+            <label class="control-label">
                 {intl l='Product reference'} :
             </label>
 
             <div class="well well-sm">{$REF}</div>
+
+	        {form_field form=$form field='ref'}
+	            <input type="hidden" name="{$name}" value="{$value}" />
+	        {/form_field}
+
         </div>
 
         {include file="includes/standard-description-form-fields.html"}
@@ -56,7 +65,7 @@
                               <option value="0">{intl l="Top level"}</option>
 
                               {loop name="cat-parent" type="category-tree" category="0" visible="*" product="0"}
-                                   <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY == $ID}selected="selected"{/if} {if $product_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
+                                   <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY == $ID}selected="selected"{/if}>{$TITLE}</option>
                               {/loop}
 
                         </select>
@@ -84,7 +93,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="control-group">
-                    <lablel>&nbsp;</lablel>
+                    <label>&nbsp;</label>
                     <div class="controls">
                         <p>{intl l='Product created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
                     </div>

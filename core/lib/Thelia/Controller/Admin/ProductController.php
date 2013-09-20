@@ -114,7 +114,7 @@ class ProductController extends AbstractCrudController
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
             ->setUrl($formData['url'])
-            ->setParent($formData['parent'])
+            ->setDefaultCategory($formData['default_category'])
         ;
 
         return $changeEvent;
@@ -144,6 +144,7 @@ class ProductController extends AbstractCrudController
         // Prepare the data that will hydrate the form
         $data = array(
             'id'               => $object->getId(),
+            'ref'              => $object->getRef(),
             'locale'           => $object->getLocale(),
             'title'            => $object->getTitle(),
             'chapo'            => $object->getChapo(),
@@ -500,7 +501,7 @@ class ProductController extends AbstractCrudController
 
                 // Update all features values
                 $featureValues = $this->getRequest()->get('feature_value', array());
-print_r($featureValues);
+echo "<br />list: "; print_r($featureValues);
                 foreach($featureValues as $featureId => $featureValueList) {
 
                     // Delete all values for this feature.
@@ -520,7 +521,7 @@ print_r($featureValues);
 
                 // Update then features text values
                 $featureTextValues = $this->getRequest()->get('feature_text_value', array());
-print_r($featureTextValues);
+echo "<br />free text"; print_r($featureTextValues);
                 foreach($featureTextValues as $featureId => $featureValue) {
 
                     // considere empty text as empty feature value (e.g., we will delete it)
@@ -537,7 +538,7 @@ print_r($featureTextValues);
                 foreach($allFeatures as $feature) {
                     if (! in_array($feature->getId(), $updatedFeatures)) {
                         $event = new FeatureProductDeleteEvent($productId, $feature->getId());
-echo "delete $productId, ".$feature->getId()." - ";
+echo "<br />delete $productId, ".$feature->getId()." - ";
                         $this->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $event);
                     }
                 }

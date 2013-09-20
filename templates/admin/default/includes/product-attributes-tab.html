@@ -28,7 +28,7 @@
                         {/loop}
                     </select>
 
-                    <span class="input-group-btn" id="content_add_button">
+                    <span class="input-group-btn" id="apply_template_button">
                        <button class="btn btn-default btn-primary action-btn" type="button">{intl l="Apply this template"}</button>
                     </span>
                 </div>
@@ -37,7 +37,7 @@
 
 		{ifloop rel="product_template"}
 
-	        {* -- Begin attributes management ----------------------------------- *}
+	        {* -- Begin attributes management ------------------------------- *}
 
 	        <div class="row">
 		        {loop name="product_template" type="template" id={$TEMPLATE|default:0}}{/loop}
@@ -45,14 +45,13 @@
 		        <div class="col-md-12">
 		            <div class="form-group">
 	                    <p class="title title-without-tabs">{intl l='Product Attributes'}</p>
-	                    <p>{intl l='You can attach here some content to this product'}</p>
 		            </div>
 		        </div>
 	        </div>
 
-		   {* -- End attributes management -------------------------------------- *}
+		   {* -- End attributes management ---------------------------------- *}
 
-		   {* -- Begin features management -------------------------------------- *}
+           {* -- Begin features management ---------------------------------- *}
 
 	        <div class="row">
 		        <div class="col-md-12">
@@ -139,9 +138,9 @@
 		            </div>
 		        </div>
 
-		        {* -- End features management --------- *}
-		    {/ifloop}
-	    </div>
+                {* -- End features management ------------------------------- *}
+	       </div>
+        {/ifloop}
 
 	    {elseloop rel="product_template"}
 	    <div class="row">
