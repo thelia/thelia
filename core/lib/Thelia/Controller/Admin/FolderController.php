@@ -23,6 +23,8 @@
 
 namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Form\FolderModificationForm;
+use Thelia\Model\FolderQuery;
 
 /**
  * Class FolderController
@@ -71,11 +73,25 @@ class FolderController extends AbstractCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template
      *
-     * @param unknown $object
+     * @param \Thelia\Model\Folder $object
      */
-    protected function hydrateObjectForm($object)
-    {
-        // TODO: Implement hydrateObjectForm() method.
+    protected function hydrateObjectForm($object) {
+
+        // Prepare the data that will hydrate the form
+        $data = array(
+            'id'           => $object->getId(),
+            'locale'       => $object->getLocale(),
+            'title'        => $object->getTitle(),
+            'chapo'        => $object->getChapo(),
+            'description'  => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum(),
+            'visible'      => $object->getVisible(),
+            'url'          => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
+            'parent'       => $object->getParent()
+        );
+
+        // Setup the object form
+        return new FolderModificationForm($this->getRequest(), "form", $data);
     }
 
     /**
@@ -129,9 +145,10 @@ class FolderController extends AbstractCrudController
     /**
      * Load an existing object from the database
      */
-    protected function getExistingObject()
-    {
-        // TODO: Implement getExistingObject() method.
+    protected function getExistingObject() {
+        return FolderQuery::create()
+            ->joinWithI18n($this->getCurrentEditionLocale())
+            ->findOneById($this->getRequest()->get('folder_id', 0));
     }
 
     /**
