@@ -314,10 +314,10 @@ URL: http://www.thelia.net
                                     </address>
                                 </li>
                                 <li class="contact-phone">
-                                    <span class="tel" itemprop="telephone">+33 09 08 07 06 05</span>
+                                    <span class="tel" itemprop="telephone">+33 04 44 05 31 00</span>
                                 </li>
                                 <li class="contact-email">
-                                    <a href="mailto:demo@thelia.net" class="email" itemprop="email">demo@thelia.net</a>
+                                    <a href="mailto:demo@thelia.net" class="email" itemprop="email">info@thelia.net</a>
                                 </li>
                             </ul>
                         </div>

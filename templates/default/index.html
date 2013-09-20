@@ -34,8 +34,17 @@
                 <li class="item">
                     <article itemscope itemtype="http://schema.org/Product">
                         <!-- Use the meta tag to specify content that is not visible on the page in any way -->
-                        <meta itemprop="brand" content="Diesel">
-                        <meta itemprop="productID" content="isbn:925872">
+                        {$product_id=$ID}
+                        {loop name="brand.feature" type="feature" product="{$ID}" title="brand"}
+                            {loop name="brand.value" type="feature_value" feature="{$ID}" product="$product_id"}
+                                <meta itemprop="brand" content="{$TITLE}">
+                            {/loop}
+                        {/loop}
+                        {loop name="brand.feature" type="feature" product=$ID title="isbn"}
+                            {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+                                <meta itemprop="productID" content="isbn:{$TITLE}">
+                            {/loop}
+                        {/loop}
 
                         <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
                             {ifloop rel="image_product_new" }
@@ -57,7 +66,9 @@
 
                             <div class="product-price">
                                 <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                                    <meta itemprop="category" content="Category1">
+                                    {loop type="category" name="category_tag" id=$DEFAULT_CATEGORY}
+                                        <meta itemprop="category" content="{$TITLE}">
+                                    {/loop}
                                     <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
                                     <meta itemprop="priceCurrency" content="{currency attr="code"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
                                     <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
@@ -69,8 +80,7 @@
                                             preorder : http://schema.org/PreOrder
                                             online_only : http://schema.org/OnlineOnly
                                     -->
-                                    <span class="regular-price"><span itemprop="price" class="price">{currency attr="symbol"} {format_number number="{$BEST_TAXED_PRICE}"}
-</span></span>
+                                    <span class="regular-price"><span itemprop="price" class="price">{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                                 </div>
                             </div>
                         </a>
@@ -90,51 +100,7 @@
         <div class="products-content">
             <ul class="products-grid product-col-5 hover-effect">
                 {loop name="product_promo" type="product" limit="5" promo="yes"}
-                <li class="item">
-                    <article itemscope itemtype="http://schema.org/Product">
-                        <!-- Use the meta tag to specify content that is not visible on the page in any way -->
-                        <meta itemprop="brand" content="Diesel">
-                        <meta itemprop="productID" content="isbn:925872">
-
-                        <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
-                            {ifloop rel="image_product_promo" }
-                            <img itemprop="image"
-                                    {loop name="image_product_promo" type="image" limit="1" product="{$ID}" width="218" height="146" resize_mode="borders"}
-                                        src="{$IMAGE_URL}"
-                                    {/loop}
-                                 alt="Product #{$LOOP_COUNT}" >
-                            {/ifloop}
-                            {elseloop rel="image_product_promo"}
-                                {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="Promotion #{$LOOP_COUNT}">{/images}
-                            {/elseloop}
-                            <span class="mask"></span>
-                        </a>
-
-                        <div class="product-info">
-                            <h3 class="name"><a href="{$URL}"><span itemprop="name">{$CHAPO}</span></a></h3>
-                        </div>
-
-                        <div class="product-price">
-                            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                                <meta itemprop="category" content="Category1">
-                                <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
-                                <meta itemprop="priceCurrency" content="{currency attr="code"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
-                                <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
-                                <!-- List of availibility :
-                                    out_of_stock : http://schema.org/OutOfStock
-                                    in_stock : http://schema.org/InStock
-                                    instore_only : http://schema.org/InStoreOnly
-                                    preorder : http://schema.org/PreOrder
-                                    online_only : http://schema.org/OnlineOnly
-                                -->
-                                {loop name="productSaleElements_promo" type="product_sale_elements" product="{$ID}" limit="1"}
-                                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$TAXED_PROMO_PRICE}"} {currency attr="symbol"}</span></span>
-                                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
-                                {/loop}
-                            </div>
-                        </div>
-                    </article><!-- /product -->
-                </li>
+                    {include file="includes/single-product.html" product_id=$ID hasBtn=false hasDescription=false width="218" height="146"}
                 {/loop}
 
             </ul>
