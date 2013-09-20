@@ -102,6 +102,8 @@
         <form name="thelia.admin.country.creation" class="Thelia\Form\CountryCreationForm"/>
         <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
 
+        <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
+
     </forms>
 
 
