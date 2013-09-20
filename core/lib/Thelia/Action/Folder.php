@@ -23,6 +23,7 @@
 
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\FolderDeleteEvent;
 use Thelia\Core\Event\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\FolderQuery;
@@ -52,6 +53,16 @@ class Folder extends BaseAction implements EventSubscriberInterface {
                 ->setPostscriptum($event->getPostscriptum())
                 ->save();
             ;
+
+            $event->setFolder($folder);
+        }
+    }
+
+    public function delete(FolderDeleteEvent $event)
+    {
+        if (null !== $folder = FolderQuery::create()->findPk($event->getFolderId())) {
+            $folder->setDispatcher($this->getDispatcher())
+                ->delete();
 
             $event->setFolder($folder);
         }
