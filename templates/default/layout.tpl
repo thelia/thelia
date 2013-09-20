@@ -61,8 +61,8 @@ URL: http://www.thelia.net
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="Main Navigation">
                 <ul class="nav navbar-nav navbar-categories">
-{*                    <li class="active"><a href="{url path="/"}" class="home" tabindex="-1">Home</a></li>
-                    <li class="dropdown">
+                    <li class="active"><a href="{url path="/"}" class="home" tabindex="-1">Home</a></li>
+{*                    <li class="dropdown">
                         <a href="" data-toggle="dropdown" class="dropdown-toggle">Pages</a>
                         <ul class="dropdown-menu list-subnav" role="menu">
                             <li class="active"><a href="index.html" tabindex="-1">Index</a></li>
