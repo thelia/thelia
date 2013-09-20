@@ -77,7 +77,7 @@ class FakeCB extends BaseModule implements PaymentModuleInterface
             $module,
             array(
                 "en_US" => "Credit Card",
-                "fr_FR" => "Credit Card",
+                "fr_FR" => "Carte de crédit",
             )
         );
     }
