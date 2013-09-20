@@ -25,6 +25,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\FolderCreateEvent;
 use Thelia\Core\Event\FolderDeleteEvent;
+use Thelia\Core\Event\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\FolderQuery;
@@ -86,6 +87,17 @@ class Folder extends BaseAction implements EventSubscriberInterface {
             ->save();
 
         $event->setFolder($folder);
+    }
+
+    public function toggleVisibility(FolderToggleVisibilityEvent $event)
+    {
+        $folder = $event->getFolder();
+
+        $folder
+            ->setDispatcher($this->getDispatcher())
+            ->setVisible(!$folder->getVisible())
+            ->save();
+
     }
 
     /**

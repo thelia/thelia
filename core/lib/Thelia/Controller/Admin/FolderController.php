@@ -24,6 +24,7 @@
 namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\FolderCreateEvent;
 use Thelia\Core\Event\FolderDeleteEvent;
+use Thelia\Core\Event\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\FolderCreationForm;
@@ -145,6 +146,14 @@ class FolderController extends AbstractCrudController
     protected function getDeleteEvent()
     {
         return new FolderDeleteEvent($this->getRequest()->get('folder_id'), 0);
+    }
+
+    /**
+     *
+     */
+    protected function createToggleVisibilityEvent()
+    {
+        return new FolderToggleVisibilityEvent($this->getExistingObject());
     }
 
     /**

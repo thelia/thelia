@@ -204,11 +204,15 @@
         <default key="_controller">Thelia\Controller\Admin\FolderController::updateAction</default>
     </route>
 
-    <route id="admin.categories.save" path="/admin/folders/save">
+    <route id="admin.folders.toggle-online" path="/admin/folders/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::setToggleVisibilityAction</default>
+    </route>
+
+    <route id="admin.folders.save" path="/admin/folders/save">
         <default key="_controller">Thelia\Controller\Admin\FolderController::processUpdateAction</default>
     </route>
 
-    <route id="admin.categories.delete" path="/admin/folders/delete">
+    <route id="admin.folders.delete" path="/admin/folders/delete">
         <default key="_controller">Thelia\Controller\Admin\FolderController::deleteAction</default>
     </route>
 
