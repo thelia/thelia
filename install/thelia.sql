@@ -51,7 +51,7 @@ CREATE TABLE `product`
         REFERENCES `tax_rule` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL,
-    CONSTRAINT `fk_product_template1`
+    CONSTRAINT `fk_product_template`
         FOREIGN KEY (`template_id`)
         REFERENCES `template` (`id`)
 ) ENGINE=InnoDB;
@@ -226,7 +226,7 @@ CREATE TABLE `feature_product`
     `product_id` INTEGER NOT NULL,
     `feature_id` INTEGER NOT NULL,
     `feature_av_id` INTEGER,
-    `by_default` VARCHAR(255),
+    `free_text_value` TEXT,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -325,6 +325,7 @@ CREATE TABLE `attribute_combination`
     `attribute_id` INTEGER NOT NULL,
     `attribute_av_id` INTEGER NOT NULL,
     `product_sale_elements_id` INTEGER NOT NULL,
+    `is_default` TINYINT(1) DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`attribute_id`,`attribute_av_id`,`product_sale_elements_id`),
@@ -358,7 +359,7 @@ CREATE TABLE `product_sale_elements`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
-    `ref` VARCHAR(45) NOT NULL,
+    `ref` VARCHAR(255) NOT NULL,
     `quantity` FLOAT NOT NULL,
     `promo` TINYINT DEFAULT 0,
     `newness` TINYINT DEFAULT 0,
@@ -760,14 +761,21 @@ CREATE TABLE `order_product`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `order_id` INTEGER NOT NULL,
-    `product_ref` VARCHAR(255),
+    `product_ref` VARCHAR(255) NOT NULL,
+    `product_sale_elements_ref` VARCHAR(255) NOT NULL,
     `title` VARCHAR(255),
-    `description` TEXT,
     `chapo` TEXT,
+    `description` LONGTEXT,
+    `postscriptum` TEXT,
     `quantity` FLOAT NOT NULL,
     `price` FLOAT NOT NULL,
-    `tax` FLOAT,
-    `parent` INTEGER,
+    `promo_price` VARCHAR(45),
+    `was_new` TINYINT NOT NULL,
+    `was_in_promo` TINYINT NOT NULL,
+    `weight` VARCHAR(45),
+    `tax_rule_title` VARCHAR(255),
+    `tax_rule_description` LONGTEXT,
+    `parent` INTEGER COMMENT 'not managed yet',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -796,22 +804,28 @@ CREATE TABLE `order_status`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- order_feature
+-- order_product_attribute_combination
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `order_feature`;
+DROP TABLE IF EXISTS `order_product_attribute_combination`;
 
-CREATE TABLE `order_feature`
+CREATE TABLE `order_product_attribute_combination`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `order_product_id` INTEGER NOT NULL,
-    `feature_desc` VARCHAR(255),
-    `feature_av_desc` VARCHAR(255),
+    `attribute_title` VARCHAR(255) NOT NULL,
+    `attribute_chapo` TEXT,
+    `attribute_description` LONGTEXT,
+    `attribute_postscriptumn` TEXT,
+    `attribute_av_title` VARCHAR(255) NOT NULL,
+    `attribute_av_chapo` TEXT,
+    `attribute_av_description` LONGTEXT,
+    `attribute_av_postscriptum` TEXT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_order_feature_order_product_id` (`order_product_id`),
-    CONSTRAINT `fk_order_feature_order_product_id`
+    INDEX `idx_order_product_attribute_combination_order_product_id` (`order_product_id`),
+    CONSTRAINT `fk_order_product_attribute_combination_order_product_id`
         FOREIGN KEY (`order_product_id`)
         REFERENCES `order_product` (`id`)
         ON UPDATE RESTRICT
@@ -1561,6 +1575,30 @@ CREATE TABLE `module_image`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- order_product_tax
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_product_tax`;
+
+CREATE TABLE `order_product_tax`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_product_id` INTEGER NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `description` LONGTEXT,
+    `amount` FLOAT NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_ order_product_tax_order_product_id` (`order_product_id`),
+    CONSTRAINT `fk_ order_product_tax_order_product_id0`
+        FOREIGN KEY (`order_product_id`)
+        REFERENCES `order_product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 
@@ -1634,7 +1672,7 @@ CREATE TABLE `tax_i18n`
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255),
-    `description` TEXT,
+    `description` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `tax_i18n_FK_1`
         FOREIGN KEY (`id`)
@@ -1653,7 +1691,7 @@ CREATE TABLE `tax_rule_i18n`
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255),
-    `description` TEXT,
+    `description` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `tax_rule_i18n_FK_1`
         FOREIGN KEY (`id`)

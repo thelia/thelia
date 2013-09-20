@@ -57,7 +57,7 @@ class AttributeCombinationTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class AttributeCombinationTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the ATTRIBUTE_ID field
@@ -83,6 +83,11 @@ class AttributeCombinationTableMap extends TableMap
      * the column name for the PRODUCT_SALE_ELEMENTS_ID field
      */
     const PRODUCT_SALE_ELEMENTS_ID = 'attribute_combination.PRODUCT_SALE_ELEMENTS_ID';
+
+    /**
+     * the column name for the IS_DEFAULT field
+     */
+    const IS_DEFAULT = 'attribute_combination.IS_DEFAULT';
 
     /**
      * the column name for the CREATED_AT field
@@ -106,12 +111,12 @@ class AttributeCombinationTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('AttributeId', 'AttributeAvId', 'ProductSaleElementsId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('attributeId', 'attributeAvId', 'productSaleElementsId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AttributeCombinationTableMap::ATTRIBUTE_ID, AttributeCombinationTableMap::ATTRIBUTE_AV_ID, AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, AttributeCombinationTableMap::CREATED_AT, AttributeCombinationTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ATTRIBUTE_ID', 'ATTRIBUTE_AV_ID', 'PRODUCT_SALE_ELEMENTS_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('attribute_id', 'attribute_av_id', 'product_sale_elements_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('AttributeId', 'AttributeAvId', 'ProductSaleElementsId', 'IsDefault', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('attributeId', 'attributeAvId', 'productSaleElementsId', 'isDefault', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AttributeCombinationTableMap::ATTRIBUTE_ID, AttributeCombinationTableMap::ATTRIBUTE_AV_ID, AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, AttributeCombinationTableMap::IS_DEFAULT, AttributeCombinationTableMap::CREATED_AT, AttributeCombinationTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ATTRIBUTE_ID', 'ATTRIBUTE_AV_ID', 'PRODUCT_SALE_ELEMENTS_ID', 'IS_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('attribute_id', 'attribute_av_id', 'product_sale_elements_id', 'is_default', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -121,12 +126,12 @@ class AttributeCombinationTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('AttributeId' => 0, 'AttributeAvId' => 1, 'ProductSaleElementsId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        self::TYPE_STUDLYPHPNAME => array('attributeId' => 0, 'attributeAvId' => 1, 'productSaleElementsId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        self::TYPE_COLNAME       => array(AttributeCombinationTableMap::ATTRIBUTE_ID => 0, AttributeCombinationTableMap::ATTRIBUTE_AV_ID => 1, AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID => 2, AttributeCombinationTableMap::CREATED_AT => 3, AttributeCombinationTableMap::UPDATED_AT => 4, ),
-        self::TYPE_RAW_COLNAME   => array('ATTRIBUTE_ID' => 0, 'ATTRIBUTE_AV_ID' => 1, 'PRODUCT_SALE_ELEMENTS_ID' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        self::TYPE_FIELDNAME     => array('attribute_id' => 0, 'attribute_av_id' => 1, 'product_sale_elements_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('AttributeId' => 0, 'AttributeAvId' => 1, 'ProductSaleElementsId' => 2, 'IsDefault' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('attributeId' => 0, 'attributeAvId' => 1, 'productSaleElementsId' => 2, 'isDefault' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(AttributeCombinationTableMap::ATTRIBUTE_ID => 0, AttributeCombinationTableMap::ATTRIBUTE_AV_ID => 1, AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID => 2, AttributeCombinationTableMap::IS_DEFAULT => 3, AttributeCombinationTableMap::CREATED_AT => 4, AttributeCombinationTableMap::UPDATED_AT => 5, ),
+        self::TYPE_RAW_COLNAME   => array('ATTRIBUTE_ID' => 0, 'ATTRIBUTE_AV_ID' => 1, 'PRODUCT_SALE_ELEMENTS_ID' => 2, 'IS_DEFAULT' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        self::TYPE_FIELDNAME     => array('attribute_id' => 0, 'attribute_av_id' => 1, 'product_sale_elements_id' => 2, 'is_default' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -148,6 +153,7 @@ class AttributeCombinationTableMap extends TableMap
         $this->addForeignPrimaryKey('ATTRIBUTE_ID', 'AttributeId', 'INTEGER' , 'attribute', 'ID', true, null, null);
         $this->addForeignPrimaryKey('ATTRIBUTE_AV_ID', 'AttributeAvId', 'INTEGER' , 'attribute_av', 'ID', true, null, null);
         $this->addForeignPrimaryKey('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER' , 'product_sale_elements', 'ID', true, null, null);
+        $this->addColumn('IS_DEFAULT', 'IsDefault', 'BOOLEAN', false, 1, false);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -365,12 +371,14 @@ class AttributeCombinationTableMap extends TableMap
             $criteria->addSelectColumn(AttributeCombinationTableMap::ATTRIBUTE_ID);
             $criteria->addSelectColumn(AttributeCombinationTableMap::ATTRIBUTE_AV_ID);
             $criteria->addSelectColumn(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID);
+            $criteria->addSelectColumn(AttributeCombinationTableMap::IS_DEFAULT);
             $criteria->addSelectColumn(AttributeCombinationTableMap::CREATED_AT);
             $criteria->addSelectColumn(AttributeCombinationTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_ID');
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_AV_ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_SALE_ELEMENTS_ID');
+            $criteria->addSelectColumn($alias . '.IS_DEFAULT');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

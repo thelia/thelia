@@ -6,7 +6,7 @@
 
 	    <div class="input-group">
 	        <select required="required" name="feature_id" id="feature_id" class="form-control">
-		        <option value="">Select an feature...</option>
+		        <option value="">{intl l='Select an feature...'}</option>
 		        {loop name="free_features" type="feature" exclude_template="$template_id" backend_context="1" lang="$edit_language_id"}
 		            <option value="{$ID}">{$TITLE}</option>
 		        {/loop}

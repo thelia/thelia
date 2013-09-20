@@ -170,8 +170,8 @@ final class TheliaEvents
     const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT   = "action.before_createCategoryAssociatedContent";
     const AFTER_CREATECATEGORY_ASSOCIATED_CONTENT 	= "action.after_createCategoryAssociatedContent";
 
-    const BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT   = "action.before_deleteCategoryAssociatedContenty";
-    const AFTER_DELETECATEGORY_ASSOCIATED_CONTENT 	= "action.after_deleteproduct_accessory";
+    const BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT   = "action.before_deleteCategoryAssociatedContent";
+    const AFTER_DELETECATEGORY_ASSOCIATED_CONTENT 	= "action.after_deleteCategoryAssociatedContent";
 
     const BEFORE_UPDATECATEGORY_ASSOCIATED_CONTENT   = "action.before_updateCategoryAssociatedContent";
     const AFTER_UPDATECATEGORY_ASSOCIATED_CONTENT 	= "action.after_updateCategoryAssociatedContent";
@@ -190,6 +190,9 @@ final class TheliaEvents
     const PRODUCT_ADD_ACCESSORY             = "action.productAddAccessory";
     const PRODUCT_REMOVE_ACCESSORY          = "action.productRemoveAccessory";
     const PRODUCT_UPDATE_ACCESSORY_POSITION = "action.updateProductPosition";
+
+    const PRODUCT_FEATURE_UPDATE_VALUE = "action.after_updateProductFeatureValue";
+    const PRODUCT_FEATURE_DELETE_VALUE = "action.after_deleteProductFeatureValue";
 
     const BEFORE_CREATEPRODUCT = "action.before_createproduct";
     const AFTER_CREATEPRODUCT  = "action.after_createproduct";
@@ -211,16 +214,27 @@ final class TheliaEvents
     const BEFORE_UPDATEACCESSORY = "action.before_updateAccessory";
     const AFTER_UPDATEACCESSORY  = "action.after_updateAccessory";
 
-    // -- Product Associated Content --------------------------------------------------
+    // -- Product Associated Content -------------------------------------------
 
     const BEFORE_CREATEPRODUCT_ASSOCIATED_CONTENT   = "action.before_createProductAssociatedContent";
     const AFTER_CREATEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_createProductAssociatedContent";
 
-    const BEFORE_DELETEPRODUCT_ASSOCIATED_CONTENT   = "action.before_deleteProductAssociatedContenty";
-    const AFTER_DELETEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_deleteproduct_accessory";
+    const BEFORE_DELETEPRODUCT_ASSOCIATED_CONTENT   = "action.before_deleteProductAssociatedContent";
+    const AFTER_DELETEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_deleteProductAssociatedContent";
 
     const BEFORE_UPDATEPRODUCT_ASSOCIATED_CONTENT   = "action.before_updateProductAssociatedContent";
     const AFTER_UPDATEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_updateProductAssociatedContent";
+
+    // -- Feature product ------------------------------------------------------
+
+    const BEFORE_CREATEFEATURE_PRODUCT = "action.before_createFeatureProduct";
+    const AFTER_CREATEFEATURE_PRODUCT  = "action.after_createFeatureProduct";
+
+    const BEFORE_DELETEFEATURE_PRODUCT = "action.before_deleteFeatureProduct";
+    const AFTER_DELETEFEATURE_PRODUCT  = "action.after_deleteFeatureProduct";
+
+    const BEFORE_UPDATEFEATURE_PRODUCT = "action.before_updateFeatureProduct";
+    const AFTER_UPDATEFEATURE_PRODUCT  = "action.after_updateFeatureProduct";
 
     /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart

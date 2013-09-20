@@ -48,6 +48,11 @@ use Thelia\Model\AccessoryQuery;
 use Thelia\Model\Accessory;
 use Thelia\Core\Event\ProductAddAccessoryEvent;
 use Thelia\Core\Event\ProductDeleteAccessoryEvent;
+use Thelia\Core\Event\FeatureProductUpdateEvent;
+use Thelia\Model\FeatureProduct;
+use Thelia\Model\FeatureQuery;
+use Thelia\Core\Event\FeatureProductDeleteEvent;
+use Thelia\Model\FeatureProductQuery;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
@@ -247,6 +252,70 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function updateFeatureProductValue(FeatureProductUpdateEvent $event) {
+
+        // If the feature is not free text, it may have one ore more values.
+        // If the value exists, we do not change it
+        // If the value does not exists, we create it.
+        //
+        // If the feature is free text, it has only a single value.
+        // Etiher create or update it.
+
+        $featureProductQuery = FeatureProductQuery::create()
+            ->filterByFeatureId($event->getFeatureId())
+            ->filterByProductId($event->getProductId())
+        ;
+
+        if ($event->getIsTextValue() !== true) {
+            $featureProductQuery->filterByFeatureAvId($event->getFeatureValue());
+        }
+
+        $featureProduct = $featureProductQuery->findOne();
+echo "<br /> create or update: f=".$event->getFeatureId().", p=".$event->getProductId();
+
+        if ($featureProduct == null) {
+echo " Create !";
+            $featureProduct = new FeatureProduct();
+
+            $featureProduct
+                ->setDispatcher($this->getDispatcher())
+
+                ->setProductId($event->getProductId())
+                ->setFeatureId($event->getFeatureId())
+
+            ;
+        }
+        else echo " Update !";
+
+        if ($event->getIsTextValue() == true) {
+            $featureProduct->setFreeTextValue($event->getFeatureValue());
+        }
+        else {
+            $featureProduct->setFeatureAvId($event->getFeatureValue());
+        }
+
+        $featureProduct->save();
+
+        $event->setFeatureProduct($featureProduct);
+    }
+
+    public function deleteFeatureProductValue(FeatureProductDeleteEvent $event) {
+
+        $featureProduct = new FeatureProduct();
+
+        $featureProduct
+            ->setDispatcher($this->getDispatcher())
+
+            ->setProductId($event->getProductId())
+            ->setFeatureId($event->getFeatureId())
+
+            ->delete();
+        ;
+echo "<br/>Delete p=".$event->getProductId()." f=".$event->getFeatureId();
+
+        $event->setFeatureProduct($featureProduct);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -266,6 +335,9 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             TheliaEvents::PRODUCT_ADD_ACCESSORY     => array("addAccessory", 128),
             TheliaEvents::PRODUCT_REMOVE_ACCESSORY  => array("removeAccessory", 128),
+
+            TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE => array("updateFeatureProductValue", 128),
+            TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE => array("deleteFeatureProductValue", 128),
         );
     }
 }

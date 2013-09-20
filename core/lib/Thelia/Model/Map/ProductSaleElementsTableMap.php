@@ -167,7 +167,7 @@ class ProductSaleElementsTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', true, 45, null);
+        $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
         $this->addColumn('QUANTITY', 'Quantity', 'FLOAT', true, null, null);
         $this->addColumn('PROMO', 'Promo', 'TINYINT', false, null, 0);
         $this->addColumn('NEWNESS', 'Newness', 'TINYINT', false, null, 0);

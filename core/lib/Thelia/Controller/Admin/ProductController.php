@@ -43,6 +43,10 @@ use Thelia\Model\AccessoryQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Core\Event\ProductAddAccessoryEvent;
 use Thelia\Core\Event\ProductDeleteAccessoryEvent;
+use Thelia\Core\Event\FeatureProductUpdateEvent;
+use Thelia\Model\FeatureQuery;
+use Thelia\Core\Event\FeatureProductDeleteEvent;
+use Thelia\Model\FeatureTemplateQuery;
 
 /**
  * Manages products
@@ -443,7 +447,7 @@ class ProductController extends AbstractCrudController
     }
 
     /**
-     * Update accessory position (only for objects whichsupport that)
+     * Update accessory position
      */
     public function updateAccessoryPositionAction()
     {
@@ -474,4 +478,72 @@ class ProductController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
+    /**
+     * Update product attributes and features
+     */
+    public function updateAttributesAndFeaturesAction($productId) {
+
+        // et all features for the product's template
+        $product = ProductQuery::create()->findPk($productId);
+
+        if ($product != null) {
+
+            $featureTemplate = FeatureTemplateQuery::create()->filterByTemplateId($product->getTemplateId())->find();
+
+            if ($featureTemplate !== null) {
+                // Get all features for the template attached to this product
+                $allFeatures = FeatureQuery::create()
+                    ->filterByFeatureTemplate($featureTemplate)
+                    ->find();
+
+                $updatedFeatures = array();
+
+                // Update all features values
+                $featureValues = $this->getRequest()->get('feature_value', array());
+print_r($featureValues);
+                foreach($featureValues as $featureId => $featureValueList) {
+
+                    // Delete all values for this feature.
+                    $event = new FeatureProductDeleteEvent($productId, $featureId);
+
+                    $this->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $event);
+
+                    // Add all selected values
+                    foreach($featureValueList as $featureValue) {
+                        $event = new FeatureProductUpdateEvent($productId, $featureId, $featureValue);
+
+                        $this->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $event);
+                    }
+
+                    $updatedFeatures[] = $featureId;
+                }
+
+                // Update then features text values
+                $featureTextValues = $this->getRequest()->get('feature_text_value', array());
+print_r($featureTextValues);
+                foreach($featureTextValues as $featureId => $featureValue) {
+
+                    // considere empty text as empty feature value (e.g., we will delete it)
+                    if (empty($featureValue)) continue;
+
+                    $event = new FeatureProductUpdateEvent($productId, $featureId, $featureValue, true);
+
+                    $this->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $event);
+
+                    $updatedFeatures[] = $featureId;
+                }
+
+                // Delete features which don't have any values
+                foreach($allFeatures as $feature) {
+                    if (! in_array($feature->getId(), $updatedFeatures)) {
+                        $event = new FeatureProductDeleteEvent($productId, $feature->getId());
+echo "delete $productId, ".$feature->getId()." - ";
+                        $this->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $event);
+                    }
+                }
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
 }

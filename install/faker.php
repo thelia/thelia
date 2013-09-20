@@ -442,7 +442,7 @@ try {
                     $featureAvId[array_rand($featureAvId, 1)]
                 );
             } else { //no av
-                $featureProduct->setByDefault($faker->text(10));
+                $featureProduct->setFreeTextValue($faker->text(10));
             }
 
             $featureProduct->save();

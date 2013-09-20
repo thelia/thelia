@@ -59,7 +59,7 @@ class FeatureValue extends BaseI18nLoop
             Argument::createIntTypeArgument('product', null, true),
             Argument::createIntListTypeArgument('feature_availability'),
             Argument::createBooleanTypeArgument('exclude_feature_availability', 0),
-            Argument::createBooleanTypeArgument('exclude_personal_values', 0),
+            Argument::createBooleanTypeArgument('exclude_free_text', 0),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -79,14 +79,14 @@ class FeatureValue extends BaseI18nLoop
     {
         $search = FeatureProductQuery::create();
 
-        /* manage featureAv translations */
-        $locale = $this->configureI18nProcessing(
-            $search,
-            array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
-            FeatureAvTableMap::TABLE_NAME,
-            'FEATURE_AV_ID',
-            true
-        );
+             // manage featureAv translations
+            $locale = $this->configureI18nProcessing(
+                $search,
+                array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+                FeatureAvTableMap::TABLE_NAME,
+                'FEATURE_AV_ID',
+                true
+            );
 
         $feature = $this->getFeature();
 
@@ -103,13 +103,9 @@ class FeatureValue extends BaseI18nLoop
         }
 
         $excludeFeatureAvailability = $this->getExclude_feature_availability();
-        if ($excludeFeatureAvailability == true) {
-            $search->filterByFeatureAvId(null, Criteria::NULL);
-        }
 
-        $excludeDefaultValues = $this->getExclude_personal_values();
-        if ($excludeDefaultValues == true) {
-            $search->filterByByDefault(null, Criteria::NULL);
+        if ($excludeFeatureAvailability == true) {
+            $search->filterByFeatureAvId(null, Criteria::ISNULL);
         }
 
         $orders  = $this->getOrder();
@@ -137,16 +133,24 @@ class FeatureValue extends BaseI18nLoop
 
         foreach ($featureValues as $featureValue) {
             $loopResultRow = new LoopResultRow($loopResult, $featureValue, $this->versionable, $this->timestampable, $this->countable);
-            $loopResultRow->set("ID", $featureValue->getId());
 
             $loopResultRow
-                ->set("LOCALE",$locale)
-                ->set("PERSONAL_VALUE", $featureValue->getByDefault())
-                ->set("TITLE",$featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
-                ->set("CHAPO", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
-                ->set("DESCRIPTION", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $featureValue->getPosition());
+                ->set("ID"               , $featureValue->getId())
+                ->set("PRODUCT"          , $featureValue->getProductId())
+                ->set("FEATURE_AV_ID"    , $featureValue->getFeatureAvId())
+                ->set("FREE_TEXT_VALUE"  , $featureValue->getFreeTextValue())
+
+                ->set("IS_FREE_TEXT"     , is_null($featureValue->getFeatureAvId()) ? 1 : 0)
+                ->set("IS_FEATURE_AV"    , is_null($featureValue->getFeatureAvId()) ? 0 : 1)
+
+                ->set("LOCALE"           , $locale)
+                ->set("TITLE"            , $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
+                ->set("CHAPO"            , $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                ->set("DESCRIPTION"      , $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM"     , $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
+
+                ->set("POSITION"         , $featureValue->getPosition())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }
