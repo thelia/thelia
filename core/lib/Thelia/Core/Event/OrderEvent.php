@@ -28,6 +28,7 @@ use Thelia\Model\Order;
 class OrderEvent extends ActionEvent
 {
     protected $order = null;
+    protected $placedOrder = null;
     protected $invoiceAddress = null;
     protected $deliveryAddress = null;
     protected $deliveryModule = null;
@@ -49,6 +50,14 @@ class OrderEvent extends ActionEvent
     public function setOrder(Order $order)
     {
         $this->order = $order;
+    }
+
+    /**
+     * @param Order $order
+     */
+    public function setPlacedOrder(Order $order)
+    {
+        $this->placedOrder = $order;
     }
 
     /**
@@ -105,6 +114,14 @@ class OrderEvent extends ActionEvent
     public function getOrder()
     {
         return $this->order;
+    }
+
+    /**
+     * @return null|Order
+     */
+    public function getPlacedOrder()
+    {
+        return $this->placedOrder;
     }
 
     /**

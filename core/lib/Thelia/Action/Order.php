@@ -24,20 +24,14 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\OrderException;
-use Thelia\Model\AttributeAvI18n;
-use Thelia\Model\AttributeAvI18nQuery;
-use Thelia\Model\AttributeI18n;
-use Thelia\Model\AttributeI18nQuery;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\OrderProductAttributeCombination;
-use Thelia\Model\ProductI18nQuery;
-use Thelia\Model\Lang;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderStatus;
@@ -45,7 +39,7 @@ use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\ProductI18n;
+use Thelia\Tools\I18n;
 
 /**
  *
@@ -125,6 +119,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $currency = $this->getSession()->getCurrency();
         $lang = $this->getSession()->getLang();
         $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->chosenDeliveryAddress);
+        $taxCountry = $deliveryAddress->getCountry();
         $invoiceAddress = AddressQuery::create()->findPk($sessionOrder->chosenInvoiceAddress);
         $cart = $this->getSession()->getCart();
         $cartItems = $cart->getCartItems();
@@ -182,23 +177,30 @@ class Order extends BaseAction implements EventSubscriberInterface
         foreach($cartItems as $cartItem) {
             $product = $cartItem->getProduct();
 
-            /* get customer translation */
-            $productI18n = $this->getI18n(ProductI18nQuery::create(), new ProductI18n(), $product->getId());
+            /* get translation */
+            $productI18n = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'Product', $product->getId());
 
             $pse = $cartItem->getProductSaleElements();
 
             /* check still in stock */
             if($cartItem->getQuantity() > $pse->getQuantity()) {
-                $e = new OrderException("Not enough stock", OrderException::NOT_ENOUGH_STOCK);
-                $e->cartItem = $cartItem;
-                throw $e;
+                throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
             }
 
             /* decrease stock */
             $pse->setQuantity(
                 $pse->getQuantity() - $cartItem->getQuantity()
             );
-            $pse->save();
+            $pse->save($con);
+
+            /* get tax */
+            $taxRuleI18n = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'TaxRule', $product->getTaxRuleId());
+
+            $taxDetail = $product->getTaxRule()->getTaxDetail(
+                $taxCountry,
+                $cartItem->getPromo() == 1 ? $cartItem->getPromoPrice() : $cartItem->getPrice(),
+                $this->getSession()->getLang()->getLocale()
+            );
 
             $orderProduct = new OrderProduct();
             $orderProduct
@@ -215,14 +217,22 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->setWasNew($pse->getNewness())
                 ->setWasInPromo($cartItem->getPromo())
                 ->setWeight($pse->getWeight())
+                ->setTaxRuleTitle($taxRuleI18n->getTitle())
+                ->setTaxRuleDescription($taxRuleI18n->getDescription())
             ;
             $orderProduct->setDispatcher($this->getDispatcher());
-            $orderProduct->save();
+            $orderProduct->save($con);
+
+            /* fulfill order_product_tax */
+            foreach($taxDetail as $tax) {
+                $tax->setOrderProductId($orderProduct->getId());
+                $tax->save($con);
+            }
 
             /* fulfill order_attribute_combination and decrease stock */
             foreach($pse->getAttributeCombinations() as $attributeCombination) {
-                $attribute = $this->getI18n(AttributeI18nQuery::create(), new AttributeI18n(), $attributeCombination->getAttributeId());
-                $attributeAv = $this->getI18n(AttributeAvI18nQuery::create(), new AttributeAvI18n(), $attributeCombination->getAttributeAvId());
+                $attribute = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'Attribute', $attributeCombination->getAttributeId());
+                $attributeAv = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'AttributeAv', $attributeCombination->getAttributeAvId());
 
                 $orderAttributeCombination = new OrderProductAttributeCombination();
                 $orderAttributeCombination
@@ -237,7 +247,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                     ->setAttributeAvPostscriptum($attributeAv->getPostscriptum())
                 ;
 
-                $orderAttributeCombination->save();
+                $orderAttributeCombination->save($con);
             }
         }
 
@@ -248,12 +258,13 @@ class Order extends BaseAction implements EventSubscriberInterface
         $this->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
 
         /* clear session */
+        /* but memorize placed order */
         $sessionOrder = new \Thelia\Model\Order();
         $event->setOrder($sessionOrder);
+        $event->setPlacedOrder($placedOrder);
         $this->getSession()->setOrder($sessionOrder);
 
-        /* empty cart */
-        $this->getSession()->getCart()->clear();
+        /* empty cart @todo */
 
         /* call pay method */
         $paymentModuleReflection = new \ReflectionClass($paymentModule->getFullNamespace());
@@ -348,43 +359,5 @@ class Order extends BaseAction implements EventSubscriberInterface
         $request = $this->getRequest();
 
         return $request->getSession();
-    }
-
-    /**
-     * @param ModelCriteria         $query
-     * @param ActiveRecordInterface $object
-     * @param                       $id
-     * @param array                 $needed = array('Title')
-     *
-     * @return ProductI18n
-     */
-    protected function getI18n(ModelCriteria $query, ActiveRecordInterface $object, $id, $needed = array('Title'))
-    {
-        $i18n = $query
-            ->filterById($id)
-            ->filterByLocale(
-                $this->getSession()->getLang()->getLocale()
-            )->findOne();
-        /* or default translation */
-        if(null === $i18n) {
-            $i18n = $query
-                ->filterById($id)
-                ->filterByLocale(
-                    Lang::getDefaultLanguage()->getLocale()
-                )->findOne();
-        }
-        if(null === $i18n) { // @todo something else ?
-            $i18n = $object;
-            foreach($needed as $need) {
-                $method = sprintf('get%s', $need);
-                if(method_exists($i18n, $method)) {
-                    $i18n->$method('DEFAULT ' . strtoupper($need));
-                } else {
-                    // @todo throw sg ?
-                }
-            }
-        }
-
-        return $i18n;
     }
 }

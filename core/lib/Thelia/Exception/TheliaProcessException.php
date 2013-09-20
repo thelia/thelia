@@ -21,75 +21,34 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace FakeCB;
+namespace Thelia\Exception;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Model\Base\ModuleImageQuery;
-use Thelia\Module\BaseModule;
-use Thelia\Module\PaymentModuleInterface;
-
-class FakeCB extends BaseModule implements PaymentModuleInterface
+/**
+ * these exception are non fatal exception, due to thelia process exception
+ * or customer random navigation
+ *
+ * they redirect the customer who trig them to a specific error page // @todo
+ *
+ * Class TheliaProcessException
+ * @package Thelia\Exception
+ */
+class TheliaProcessException extends \RuntimeException
 {
-    protected $request;
-    protected $dispatcher;
+    public $data = null;
 
-    public function setRequest(Request $request)
+    const UNKNOWN_EXCEPTION = 0;
+
+    const CART_ITEM_NOT_ENOUGH_STOCK = 100;
+    const NO_PLACED_ORDER = 101;
+    const PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER = 102;
+
+    public function __construct($message, $code = null, $data = null, $previous = null)
     {
-        $this->request = $request;
-    }
+        $this->data = $data;
 
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
-    public function pay()
-    {
-        // TODO: Implement pay() method.
-    }
-
-    public function install()
-    {
-
-    }
-
-    public function afterActivation()
-    {
-        /* insert the images from image folder if first module activation */
-        $module = $this->getModuleModel();
-        if(ModuleImageQuery::create()->filterByModule($module)->count() == 0) {
-            $this->deployImageFolder($module, sprintf('%s/images', __DIR__));
+        if ($code === null) {
+            $code = self::UNKNOWN_EXCEPTION;
         }
-
-        /* set module title */
-        $this->setTitle(
-            $module,
-            array(
-                "en_US" => "Credit Card",
-                "fr_FR" => "Credit Card",
-            )
-        );
+        parent::__construct($message, $code, $previous);
     }
-
-    public function destroy()
-    {
-        // TODO: Implement destroy() method.
-    }
-
-    public function getCode()
-    {
-        return 'FakeCB';
-    }
-
 }

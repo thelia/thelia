@@ -1153,7 +1153,7 @@ INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `upda
 INSERT INTO `tax_i18n` (`id`, `locale`, `title`)
   VALUES
   (1, 'fr_FR', 'TVA française à 19.6%'),
-  (1, 'en_UK', 'french 19.6% tax');
+  (1, 'en_US', 'french 19.6% tax');
 
 INSERT INTO  `tax_rule` (`id`, `is_default`, `created_at`, `updated_at`)
   VALUES
@@ -1162,7 +1162,7 @@ INSERT INTO  `tax_rule` (`id`, `is_default`, `created_at`, `updated_at`)
 INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`)
   VALUES
   (1, 'fr_FR', 'TVA française à 19.6%'),
-  (1, 'en_UK', 'french 19.6% tax');
+  (1, 'en_US', 'french 19.6% tax');
 
 INSERT INTO  `tax_rule_country` (`tax_rule_id`, `country_id`, `tax_id`, `position`, `created_at`, `updated_at`)
   VALUES

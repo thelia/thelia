@@ -25,7 +25,9 @@
 namespace Thelia\Module;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\Map\ModuleImageTableMap;
+use Thelia\Model\ModuleI18n;
 use Thelia\Tools\Image;
 use Thelia\Exception\ModuleException;
 use Thelia\Model\Module;
@@ -74,6 +76,27 @@ abstract class BaseModule extends ContainerAware
         }
 
         return $this->container;
+    }
+
+    public function setTitle(Module $module, $titles)
+    {
+        if(is_array($titles)) {
+            foreach($titles as $locale => $title) {
+                $moduleI18n = ModuleI18nQuery::create()->filterById($module->getId())->filterByLocale($locale)->findOne();
+                if(null === $moduleI18n) {
+                    $moduleI18n = new ModuleI18n();
+                    $moduleI18n
+                        ->setId($module->getId())
+                        ->setLocale($locale)
+                        ->setTitle($title)
+                    ;
+                    $moduleI18n->save();
+                } else {
+                    $moduleI18n->setTitle($title);
+                    $moduleI18n->save();
+                }
+            }
+        }
     }
 
     public function deployImageFolder(Module $module, $folderPath)

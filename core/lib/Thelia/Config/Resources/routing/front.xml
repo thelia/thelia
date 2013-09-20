@@ -137,7 +137,11 @@
 
     <route id="order.payment.process" path="/order/pay">
         <default key="_controller">Thelia\Controller\Front\OrderController::pay</default>
-        <default key="_view">order_payment</default>
+    </route>
+
+    <route id="order.placed" path="/order/placed/{order_id}">
+        <default key="_controller">Thelia\Controller\Front\OrderController::orderPlaced</default>
+        <default key="_view">order_placed</default>
     </route>
     <!-- end order management process -->
 

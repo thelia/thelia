@@ -2,11 +2,15 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Order as BaseOrder;
+use Thelia\Model\Base\OrderProductTaxQuery;
+use Thelia\Model\Map\OrderProductTaxTableMap;
+use Thelia\Model\OrderProductQuery;
 use Thelia\Model\Map\OrderTableMap;
 use \PDO;
 
@@ -38,13 +42,27 @@ class Order extends BaseOrder
     /**
      * calculate the total amount
      *
-     * @TODO create body method
+     * @param int $tax
      *
-     * @return int
+     * @return int|string|Base\double
      */
-    public function getTotalAmount()
+    public function getTotalAmount(&$tax = 0)
     {
-        return 2;
+        $amount = 0;
+        $tax = 0;
+
+        /* browse all products */
+        $orderProductIds = array();
+        foreach($this->getOrderProducts() as $orderProduct) {
+            $taxAmount = OrderProductTaxQuery::create()
+                ->withColumn('SUM(' . OrderProductTaxTableMap::AMOUNT . ')', 'total_tax')
+                ->filterByOrderProductId($orderProduct->getId(), Criteria::EQUAL)
+                ->findOne();
+            $amount += ($orderProduct->getWasInPromo() == 1 ? $orderProduct->getPromoPrice() : $orderProduct->getPrice()) * $orderProduct->getQuantity();
+            $tax += round($taxAmount->getVirtualColumn('total_tax'), 2) * $orderProduct->getQuantity();
+        }
+
+        return $amount + $tax + $this->getPostage(); // @todo : manage discount
     }
 
     /**
