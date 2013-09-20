@@ -22,9 +22,11 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\FolderCreateEvent;
 use Thelia\Core\Event\FolderDeleteEvent;
 use Thelia\Core\Event\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Form\FolderCreationForm;
 use Thelia\Form\FolderModificationForm;
 use Thelia\Model\FolderQuery;
 
@@ -61,7 +63,7 @@ class FolderController extends AbstractCrudController
      */
     protected function getCreationForm()
     {
-        // TODO: Implement getCreationForm() method.
+        return new FolderCreationForm($this->getRequest());
     }
 
     /**
@@ -103,7 +105,15 @@ class FolderController extends AbstractCrudController
      */
     protected function getCreationEvent($formData)
     {
-        // TODO: Implement getCreationEvent() method.
+        $creationEvent = new FolderCreateEvent();
+
+        $creationEvent
+            ->setLocale($formData['locale'])
+            ->setTitle($formData['title'])
+            ->setVisible($formData['visible'])
+            ->setParent($formData['parent']);
+
+        return $creationEvent;
     }
 
     /**

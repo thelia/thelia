@@ -23,10 +23,12 @@
 
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\FolderCreateEvent;
 use Thelia\Core\Event\FolderDeleteEvent;
 use Thelia\Core\Event\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\Folder as FolderModel;
 
 
 /**
@@ -66,6 +68,24 @@ class Folder extends BaseAction implements EventSubscriberInterface {
 
             $event->setFolder($folder);
         }
+    }
+
+    /**
+     * @param FolderCreateEvent $event
+     */
+    public function create(FolderCreateEvent $event)
+    {
+        $folder = new FolderModel();
+        $folder->setDispatcher($this->getDispatcher());
+
+        $folder
+            ->setParent($event->getParent())
+            ->setVisible($event->getVisible())
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->save();
+
+        $event->setFolder($folder);
     }
 
     /**
