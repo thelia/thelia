@@ -25,7 +25,6 @@ namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\OrderEvent;
@@ -35,9 +34,8 @@ use Thelia\Model\AttributeAvI18n;
 use Thelia\Model\AttributeAvI18nQuery;
 use Thelia\Model\AttributeI18n;
 use Thelia\Model\AttributeI18nQuery;
-use Thelia\Model\AttributeQuery;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\OrderAttributeCombination;
+use Thelia\Model\OrderProductAttributeCombination;
 use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\ModuleQuery;
@@ -226,7 +224,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $attribute = $this->getI18n(AttributeI18nQuery::create(), new AttributeI18n(), $attributeCombination->getAttributeId());
                 $attributeAv = $this->getI18n(AttributeAvI18nQuery::create(), new AttributeAvI18n(), $attributeCombination->getAttributeAvId());
 
-                $orderAttributeCombination = new OrderAttributeCombination();
+                $orderAttributeCombination = new OrderProductAttributeCombination();
                 $orderAttributeCombination
                     ->setOrderProductId($orderProduct->getId())
                     ->setAttributeTitle($attribute->getTitle())
