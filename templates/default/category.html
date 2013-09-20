@@ -20,13 +20,13 @@
 
 {block name="main-content"}
     <div class="main layout-col-2-left">
-
+        {$limit={$smarty.get.limit|default:8}}
         <article class="col-main {$smarty.get.mode|default:"grid"}" role="main">
-            {include file="includes/category-toolbar.html" toolbar="top"}
+            {include file="includes/category-toolbar.html" toolbar="top" limit=$limit}
             <div id="category-products">
                 <div class="products-content">
                     <ul class="product-col-4">
-                        {loop type="product" name="product_list" category={category attr="id"}}
+                        {loop type="product" name="product_list" category={category attr="id"} limit=$limit}
 
                         <li class="item">
                             {include file="includes/single-product.html" product_id=$ID}
