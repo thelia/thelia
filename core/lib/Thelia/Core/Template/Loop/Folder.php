@@ -162,7 +162,8 @@ class Folder extends BaseI18nLoop
                 ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("PARENT", $folder->getParent())
                 ->set("URL", $folder->getUrl($locale))
-                ->set("CONTENT_COUNT", $folder->countChild())
+                ->set("CHILD_COUNT", $folder->countChild())
+                ->set("CONTENT_COUNT", $folder->countAllContents())
                 ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
                 ->set("POSITION", $folder->getPosition())
             ;
