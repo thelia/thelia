@@ -143,7 +143,7 @@ class FolderController extends AbstractCrudController
      */
     protected function eventContainsObject($event)
     {
-        // TODO: Implement eventContainsObject() method.
+        return $event->hasFolder();
     }
 
     /**
@@ -170,9 +170,8 @@ class FolderController extends AbstractCrudController
      *
      * @param unknown $object
      */
-    protected function getObjectLabel($object)
-    {
-        // TODO: Implement getObjectLabel() method.
+    protected function getObjectLabel($object) {
+        return $object->getTitle();
     }
 
     /**
@@ -182,7 +181,7 @@ class FolderController extends AbstractCrudController
      */
     protected function getObjectId($object)
     {
-        // TODO: Implement getObjectId() method.
+        return $object->getId();
     }
 
     /**
@@ -221,11 +220,36 @@ class FolderController extends AbstractCrudController
     }
 
     /**
+     * @param \Thelia\Core\Event\FolderUpdateEvent $updateEvent
+     * @return Response|void
+     */
+    protected function performAdditionalUpdateAction($updateEvent)
+    {
+        if ($this->getRequest()->get('save_mode') != 'stay') {
+
+            // Redirect to parent category list
+            $this->redirectToRoute(
+                'admin.folders.default',
+                array('folder_id' => $updateEvent->getFolder()->getParent())
+            );
+        }
+    }
+
+    protected function performAdditionalDeleteAction($deleteEvent)
+    {
+        // Redirect to parent category list
+        $this->redirectToRoute(
+            'admin.folders.default',
+            array('folder_id' => $deleteEvent->getFolder()->getParent())
+        );
+    }
+
+    /**
      * Redirect to the edition template
      */
     protected function redirectToEditionTemplate()
     {
-        // TODO: Implement redirectToEditionTemplate() method.
+        $this->redirectToRoute("admin.folders.update", $this->getEditionArguments());
     }
 
     /**
@@ -233,6 +257,9 @@ class FolderController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        // TODO: Implement redirectToListTemplate() method.
+        $this->redirectToRoute(
+            'admin.folders.default',
+            array('folder_id' => $this->getRequest()->get('folder_id', 0))
+        );
     }
 }
