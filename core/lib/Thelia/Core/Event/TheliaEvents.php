@@ -257,7 +257,12 @@ final class TheliaEvents
     const ORDER_SET_INVOICE_ADDRESS = "action.order.setInvoiceAddress";
     const ORDER_SET_PAYMENT_MODULE = "action.order.setPaymentModule";
     const ORDER_PAY = "action.order.pay";
-    const ORDER_SET_REFERENCE = "action.order.setReference";
+    const ORDER_BEFORE_CREATE = "action.order.beforeCreate";
+    const ORDER_AFTER_CREATE = "action.order.afterCreate";
+    const ORDER_BEFORE_PAYMENT = "action.order.beforePayment";
+
+    const ORDER_PRODUCT_BEFORE_CREATE = "action.orderProduct.beforeCreate";
+    const ORDER_PRODUCT_AFTER_CREATE = "action.orderProduct.afterCreate";
 
     /**
      * Sent on image processing
