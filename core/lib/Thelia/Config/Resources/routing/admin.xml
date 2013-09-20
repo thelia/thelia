@@ -204,6 +204,10 @@
         <default key="_controller">Thelia\Controller\Admin\FolderController::updateAction</default>
     </route>
 
+    <route id="admin.categories.save" path="/admin/folders/save">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::processUpdateAction</default>
+    </route>
+
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 
     <route id="admin.coupon.list" path="/admin/coupon/">

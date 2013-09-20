@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\FolderModificationForm;
 use Thelia\Model\FolderQuery;
@@ -67,7 +68,7 @@ class FolderController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        // TODO: Implement getUpdateForm() method.
+        return new FolderModificationForm($this->getRequest());
     }
 
     /**
@@ -111,7 +112,20 @@ class FolderController extends AbstractCrudController
      */
     protected function getUpdateEvent($formData)
     {
-        // TODO: Implement getUpdateEvent() method.
+        $updateEvent = new FolderUpdateEvent($formData['id']);
+
+        $updateEvent
+            ->setLocale($formData['locale'])
+            ->setTitle($formData['title'])
+            ->setChapo($formData['chapo'])
+            ->setDescription($formData['description'])
+            ->setPostscriptum($formData['postscriptum'])
+            ->setVisible($formData['visible'])
+            ->setUrl($formData['url'])
+            ->setParent($formData['parent'])
+        ;
+
+        return $updateEvent;
     }
 
     /**
