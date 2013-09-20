@@ -58,6 +58,34 @@ class ProfileModificationForm extends BaseForm
                     "for" => "lastname"
                 )
             ))
+            ->add("default_language", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Default language"),
+                "label_attr" => array(
+                    "for" => "default_language"
+                )
+            ))
+            ->add("editing_language_default", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Editing language default"),
+                "label_attr" => array(
+                    "for" => "editing_language_default"
+                )
+            ))
+            ->add("old_password", "password", array(
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4)))
+                ),
+                "label" => Translator::getInstance()->trans("Old password"),
+                "label_attr" => array(
+                    "for" => "old_password"
+                )
+            ))
             ->add("password", "password", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),

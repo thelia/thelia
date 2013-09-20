@@ -47,19 +47,54 @@
                                         </div>
                                     {/form_field}
 
-                                    {form_field form=$form field='password'}
+                                    {form_field form=$form field='default_language'}
                                         <div class="form-group {if $error}has-error{/if}">
                                             <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$LASTNAME}" title="{intl l="{$label}"}" placeholder="{intl l='Password'}">
-                                        </div>
-                                    {/form_field}
 
-                                    {form_field form=$form field='password_confirm'}
-                                        <div class="form-group {if $error}has-error{/if}">
-                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$LASTNAME}" title="{intl l="{$label}"}" placeholder="{intl l='Password confirmation'}">
+                                            <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
+                                                {loop type="lang" name="default_language" backend_context="1"}
+                                                    <option value="{$ID}" {if $ID == $TITLE}selected{/if}>{$TITLE}</option>
+                                                {/loop}
+                                            </select>
                                         </div>
                                     {/form_field}
+                                    
+                                    {form_field form=$form field='editing_language_default'}
+                                        <div class="form-group {if $error}has-error{/if}">
+                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+
+                                            <select name="{$name}" id="{$label_attr.for}"  data-toggle="selectpicker">
+                                                {loop type="lang" name="editing_language_default" backend_context="1"}
+                                                    <option value="{$ID}" {if $ID == $TITLE}selected{/if}>{$TITLE}</option>
+                                                {/loop}
+                                            </select>
+                                        </div>
+                                    {/form_field}
+                                    
+                                    <div class="well">
+                                        <div class="title title-without-tabs">{intl l="Change password"}</div>
+
+                                        {form_field form=$form field='old_password'}
+                                            <div class="form-group {if $error}has-error{/if}">
+                                                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Old password'}">
+                                            </div>
+                                        {/form_field}
+
+                                        {form_field form=$form field='password'}
+                                            <div class="form-group {if $error}has-error{/if}">
+                                                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Password'}">
+                                            </div>
+                                        {/form_field}
+
+                                        {form_field form=$form field='password_confirm'}
+                                            <div class="form-group {if $error}has-error{/if}">
+                                                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Password confirmation'}">
+                                            </div>
+                                        {/form_field}
+                                    </div>
                                     
                                     <div class="text-right">
                                         <button type="submit" class="btn btn-default btn-primary" title="{intl l='Edit profile'}">
@@ -77,4 +112,15 @@
 
         </div>
     </div>
+{/block}
+
+{block name="javascript-initialization"}
+
+    {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/main.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
 {/block}
