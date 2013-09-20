@@ -22,52 +22,43 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
-use Thelia\Model\Folder;
 
 
 /**
- * Class FolderEvent
+ * Class FolderDeleteEvent
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderEvent extends ActionEvent {
+class FolderDeleteEvent extends FolderEvent{
 
     /**
-     * @var \Thelia\Model\Folder
+     * @var int folder id
      */
-    protected $folder;
+    protected $folder_id;
 
-    function __construct(Folder $folder = null)
+    /**
+     * @param int $folder_id
+     */
+    function __construct($folder_id)
     {
-        $this->folder = $folder;
+        $this->folder_id = $folder_id;
     }
 
     /**
-     * @param \Thelia\Model\Folder $folder
+     * @param int $folder_id
      */
-    public function setFolder(Folder $folder)
+    public function setFolderId($folder_id)
     {
-        $this->folder = $folder;
-
-        return $this;
+        $this->folder_id = $folder_id;
     }
 
     /**
-     * @return \Thelia\Model\Folder
+     * @return int
      */
-    public function getFolder()
+    public function getFolderId()
     {
-        return $this->folder;
+        return $this->folder_id;
     }
 
-    /**
-     * test if a folder object exists
-     *
-     * @return bool
-     */
-    public function hasFolder()
-    {
-        return null !== $this->folder;
-    }
 
 }

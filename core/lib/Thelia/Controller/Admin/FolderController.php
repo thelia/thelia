@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\FolderDeleteEvent;
 use Thelia\Core\Event\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\FolderModificationForm;
@@ -133,7 +134,7 @@ class FolderController extends AbstractCrudController
      */
     protected function getDeleteEvent()
     {
-        // TODO: Implement getDeleteEvent() method.
+        return new FolderDeleteEvent($this->getRequest()->get('folder_id'), 0);
     }
 
     /**
@@ -149,11 +150,13 @@ class FolderController extends AbstractCrudController
     /**
      * Get the created object from an event.
      *
-     * @param unknown $createEvent
+     * @param $event \Thelia\Core\Event\FolderEvent $event
+     *
+     * @return null|\Thelia\Model\Folder
      */
     protected function getObjectFromEvent($event)
     {
-        // TODO: Implement getObjectFromEvent() method.
+        return $event->hasFolder() ? $event->getFolder() : null;
     }
 
     /**
@@ -235,6 +238,12 @@ class FolderController extends AbstractCrudController
         }
     }
 
+    /**
+     * Put in this method post object delete processing if required.
+     *
+     * @param \Thelia\Core\Event\FolderDeleteEvent $deleteEvent the delete event
+     * @return Response a response, or null to continue normal processing
+     */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
         // Redirect to parent category list
