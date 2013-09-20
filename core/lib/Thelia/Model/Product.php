@@ -108,7 +108,7 @@ class Product extends BaseProduct
                 ->setProduct($this)
                 ->setCategoryId($defaultCategoryId)
                 ->setDefaultCategory(true)
-                ->save($con)
+                ->save()
             ;
         }
     }

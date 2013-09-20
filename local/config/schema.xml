@@ -55,7 +55,7 @@
   </table>
   <table isCrossRef="true" name="product_category" namespace="Thelia\Model">
     <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="category_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="category_id" primaryKey="true" type="INTEGER" />
     <column name="default_category" type="BOOLEAN" />
     <foreign-key foreignTable="product" name="fk_product_has_category_product1" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
@@ -254,7 +254,6 @@
     <column name="attribute_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="attribute_av_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
-    <column defaultValue="0" name="is_default" type="BOOLEAN" />
     <foreign-key foreignTable="attribute" name="fk_attribute_combination_attribute_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_id" />
     </foreign-key>
@@ -282,7 +281,8 @@
     <column name="quantity" required="true" type="FLOAT" />
     <column defaultValue="0" name="promo" type="TINYINT" />
     <column defaultValue="0" name="newness" type="TINYINT" />
-    <column name="weight" type="FLOAT" />
+    <column defaultValue="0" name="weight" type="FLOAT" />
+    <column defaultValue="0" name="is_default" type="BOOLEAN" />
     <foreign-key foreignTable="product" name="fk_product_sale_element_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>

@@ -79,13 +79,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
     protected $product_sale_elements_id;
 
     /**
-     * The value for the is_default field.
-     * Note: this column has a database default value of: false
-     * @var        boolean
-     */
-    protected $is_default;
-
-    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -121,23 +114,10 @@ abstract class AttributeCombination implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Applies default values to this object.
-     * This method should be called from the object's constructor (or
-     * equivalent initialization method).
-     * @see __construct()
-     */
-    public function applyDefaultValues()
-    {
-        $this->is_default = false;
-    }
-
-    /**
      * Initializes internal state of Thelia\Model\Base\AttributeCombination object.
-     * @see applyDefaults()
      */
     public function __construct()
     {
-        $this->applyDefaultValues();
     }
 
     /**
@@ -421,17 +401,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
     }
 
     /**
-     * Get the [is_default] column value.
-     *
-     * @return   boolean
-     */
-    public function getIsDefault()
-    {
-
-        return $this->is_default;
-    }
-
-    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -547,35 +516,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
     } // setProductSaleElementsId()
 
     /**
-     * Sets the value of the [is_default] column.
-     * Non-boolean arguments are converted using the following rules:
-     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     *
-     * @param      boolean|integer|string $v The new value
-     * @return   \Thelia\Model\AttributeCombination The current object (for fluent API support)
-     */
-    public function setIsDefault($v)
-    {
-        if ($v !== null) {
-            if (is_string($v)) {
-                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-            } else {
-                $v = (boolean) $v;
-            }
-        }
-
-        if ($this->is_default !== $v) {
-            $this->is_default = $v;
-            $this->modifiedColumns[] = AttributeCombinationTableMap::IS_DEFAULT;
-        }
-
-
-        return $this;
-    } // setIsDefault()
-
-    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -627,10 +567,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->is_default !== false) {
-                return false;
-            }
-
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -667,16 +603,13 @@ abstract class AttributeCombination implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AttributeCombinationTableMap::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_sale_elements_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AttributeCombinationTableMap::translateFieldName('IsDefault', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->is_default = (null !== $col) ? (boolean) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AttributeCombinationTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AttributeCombinationTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AttributeCombinationTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AttributeCombinationTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -689,7 +622,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = AttributeCombinationTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = AttributeCombinationTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\AttributeCombination object", 0, $e);
@@ -952,9 +885,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
         if ($this->isColumnModified(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID)) {
             $modifiedColumns[':p' . $index++]  = 'PRODUCT_SALE_ELEMENTS_ID';
         }
-        if ($this->isColumnModified(AttributeCombinationTableMap::IS_DEFAULT)) {
-            $modifiedColumns[':p' . $index++]  = 'IS_DEFAULT';
-        }
         if ($this->isColumnModified(AttributeCombinationTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -980,9 +910,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
                         break;
                     case 'PRODUCT_SALE_ELEMENTS_ID':
                         $stmt->bindValue($identifier, $this->product_sale_elements_id, PDO::PARAM_INT);
-                        break;
-                    case 'IS_DEFAULT':
-                        $stmt->bindValue($identifier, (int) $this->is_default, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1055,12 +982,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
                 return $this->getProductSaleElementsId();
                 break;
             case 3:
-                return $this->getIsDefault();
-                break;
-            case 4:
                 return $this->getCreatedAt();
                 break;
-            case 5:
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1095,9 +1019,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
             $keys[0] => $this->getAttributeId(),
             $keys[1] => $this->getAttributeAvId(),
             $keys[2] => $this->getProductSaleElementsId(),
-            $keys[3] => $this->getIsDefault(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1159,12 +1082,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
                 $this->setProductSaleElementsId($value);
                 break;
             case 3:
-                $this->setIsDefault($value);
-                break;
-            case 4:
                 $this->setCreatedAt($value);
                 break;
-            case 5:
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1194,9 +1114,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setAttributeId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setAttributeAvId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setProductSaleElementsId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setIsDefault($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1211,7 +1130,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
         if ($this->isColumnModified(AttributeCombinationTableMap::ATTRIBUTE_ID)) $criteria->add(AttributeCombinationTableMap::ATTRIBUTE_ID, $this->attribute_id);
         if ($this->isColumnModified(AttributeCombinationTableMap::ATTRIBUTE_AV_ID)) $criteria->add(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $this->attribute_av_id);
         if ($this->isColumnModified(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID)) $criteria->add(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
-        if ($this->isColumnModified(AttributeCombinationTableMap::IS_DEFAULT)) $criteria->add(AttributeCombinationTableMap::IS_DEFAULT, $this->is_default);
         if ($this->isColumnModified(AttributeCombinationTableMap::CREATED_AT)) $criteria->add(AttributeCombinationTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(AttributeCombinationTableMap::UPDATED_AT)) $criteria->add(AttributeCombinationTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1290,7 +1208,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
         $copyObj->setAttributeId($this->getAttributeId());
         $copyObj->setAttributeAvId($this->getAttributeAvId());
         $copyObj->setProductSaleElementsId($this->getProductSaleElementsId());
-        $copyObj->setIsDefault($this->getIsDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1481,12 +1398,10 @@ abstract class AttributeCombination implements ActiveRecordInterface
         $this->attribute_id = null;
         $this->attribute_av_id = null;
         $this->product_sale_elements_id = null;
-        $this->is_default = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
-        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

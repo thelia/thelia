@@ -54,6 +54,10 @@ use Thelia\Model\FeatureQuery;
 use Thelia\Core\Event\FeatureProductDeleteEvent;
 use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\ProductCategoryQuery;
+use Thelia\Core\Event\ProductSetTemplateEvent;
+use Thelia\Model\AttributeCombinationQuery;
+use Thelia\Core\Template\Loop\ProductSaleElements;
+use Thelia\Model\ProductSaleElementsQuery;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
@@ -235,6 +239,24 @@ class Product extends BaseAction implements EventSubscriberInterface
             ;
     }
 
+    public function setProductTemplate(ProductSetTemplateEvent $event) {
+
+        $product = $event->getProduct();
+
+        // Delete all product feature relations
+        FeatureProductQuery::create()->filterByProduct($product)->delete();
+
+        // Delete all product attributes sale elements
+        ProductSaleElementsQuery::create()->filterByProduct($product)->delete();
+
+        // Update the product template
+        $template_id = $event->getTemplateId();
+
+        // Set it to null if it's zero.
+        if ($template_id <= 0) $template_id = NULL;
+
+        $product->setTemplateId($template_id)->save();
+    }
 
     /**
      * Changes position, selecting absolute ou relative change.
@@ -308,19 +330,13 @@ echo "value=".$event->getFeatureValue();
 
     public function deleteFeatureProductValue(FeatureProductDeleteEvent $event) {
 
-        $featureProduct = new FeatureProduct();
-
-        $featureProduct
-            ->setDispatcher($this->getDispatcher())
-
-            ->setProductId($event->getProductId())
-            ->setFeatureId($event->getFeatureId())
-
-            ->delete();
+        $featureProduct = FeatureProductQuery::create()
+            ->filterByProductId($event->getProductId())
+            ->filterByFeatureId($event->getFeatureId())
+            ->delete()
         ;
-echo "<br/>Delete p=".$event->getProductId().", f=".$event->getFeatureId();
 
-        $event->setFeatureProduct($featureProduct);
+        echo "<br/>Delete p=".$event->getProductId().", f=".$event->getFeatureId();
     }
 
     /**
@@ -343,8 +359,11 @@ echo "<br/>Delete p=".$event->getProductId().", f=".$event->getFeatureId();
             TheliaEvents::PRODUCT_ADD_ACCESSORY     => array("addAccessory", 128),
             TheliaEvents::PRODUCT_REMOVE_ACCESSORY  => array("removeAccessory", 128),
 
+            TheliaEvents::PRODUCT_SET_TEMPLATE => array("setProductTemplate", 128),
+
             TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE => array("updateFeatureProductValue", 128),
             TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE => array("deleteFeatureProductValue", 128),
+
         );
     }
 }

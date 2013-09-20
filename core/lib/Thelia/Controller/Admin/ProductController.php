@@ -47,6 +47,7 @@ use Thelia\Core\Event\FeatureProductUpdateEvent;
 use Thelia\Model\FeatureQuery;
 use Thelia\Core\Event\FeatureProductDeleteEvent;
 use Thelia\Model\FeatureTemplateQuery;
+use Thelia\Core\Event\ProductSetTemplateEvent;
 
 /**
  * Manages products
@@ -479,12 +480,36 @@ class ProductController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
+
+    /**
+     * Change product template for a given product.
+     *
+     * @param unknown $productId
+     */
+    public function setProductTemplateAction($productId) {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth('admin.products.update')) return $response;
+
+        $product = ProductQuery::create()->findPk($productId);
+
+        if ($product != null) {
+
+            $template_id = intval($this->getRequest()->get('template_id', 0));
+
+            $this->dispatch(
+                    TheliaEvents::PRODUCT_SET_TEMPLATE,
+                    new ProductSetTemplateEvent($product, $template_id)
+            );
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
     /**
      * Update product attributes and features
      */
     public function updateAttributesAndFeaturesAction($productId) {
 
-        // et all features for the product's template
         $product = ProductQuery::create()->findPk($productId);
 
         if ($product != null) {
@@ -492,6 +517,7 @@ class ProductController extends AbstractCrudController
             $featureTemplate = FeatureTemplateQuery::create()->filterByTemplateId($product->getTemplateId())->find();
 
             if ($featureTemplate !== null) {
+
                 // Get all features for the template attached to this product
                 $allFeatures = FeatureQuery::create()
                     ->filterByFeatureTemplate($featureTemplate)
@@ -499,17 +525,17 @@ class ProductController extends AbstractCrudController
 
                 $updatedFeatures = array();
 
-                // Update all features values
+                // Update all features values, starting with feature av. values
                 $featureValues = $this->getRequest()->get('feature_value', array());
-echo "<br />list: "; print_r($featureValues);
+
                 foreach($featureValues as $featureId => $featureValueList) {
 
-                    // Delete all values for this feature.
+                    // Delete all features av. for this feature.
                     $event = new FeatureProductDeleteEvent($productId, $featureId);
 
                     $this->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $event);
 
-                    // Add all selected values
+                    // Add then all selected values
                     foreach($featureValueList as $featureValue) {
                         $event = new FeatureProductUpdateEvent($productId, $featureId, $featureValue);
 
@@ -521,7 +547,7 @@ echo "<br />list: "; print_r($featureValues);
 
                 // Update then features text values
                 $featureTextValues = $this->getRequest()->get('feature_text_value', array());
-echo "<br />free text"; print_r($featureTextValues);
+
                 foreach($featureTextValues as $featureId => $featureValue) {
 
                     // considere empty text as empty feature value (e.g., we will delete it)
@@ -536,16 +562,23 @@ echo "<br />free text"; print_r($featureTextValues);
 
                 // Delete features which don't have any values
                 foreach($allFeatures as $feature) {
+
                     if (! in_array($feature->getId(), $updatedFeatures)) {
                         $event = new FeatureProductDeleteEvent($productId, $feature->getId());
-echo "<br />delete $productId, ".$feature->getId()." - ";
+
                         $this->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $event);
                     }
                 }
             }
-exit;
         }
 
-        $this->redirectToEditionTemplate();
+        // If we have to stay on the same page, do not redirect to the succesUrl,
+        // just redirect to the edit page again.
+        if ($this->getRequest()->get('save_mode') == 'stay') {
+            $this->redirectToEditionTemplate($this->getRequest());
+        }
+
+        // Redirect to the category/product list
+        $this->redirectToListTemplate();
     }
 }

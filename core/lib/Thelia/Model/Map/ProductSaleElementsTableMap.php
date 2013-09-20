@@ -57,7 +57,7 @@ class ProductSaleElementsTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 10;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class ProductSaleElementsTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 10;
 
     /**
      * the column name for the ID field
@@ -105,6 +105,11 @@ class ProductSaleElementsTableMap extends TableMap
     const WEIGHT = 'product_sale_elements.WEIGHT';
 
     /**
+     * the column name for the IS_DEFAULT field
+     */
+    const IS_DEFAULT = 'product_sale_elements.IS_DEFAULT';
+
+    /**
      * the column name for the CREATED_AT field
      */
     const CREATED_AT = 'product_sale_elements.CREATED_AT';
@@ -126,12 +131,12 @@ class ProductSaleElementsTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ProductId', 'Ref', 'Quantity', 'Promo', 'Newness', 'Weight', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'productId', 'ref', 'quantity', 'promo', 'newness', 'weight', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProductSaleElementsTableMap::ID, ProductSaleElementsTableMap::PRODUCT_ID, ProductSaleElementsTableMap::REF, ProductSaleElementsTableMap::QUANTITY, ProductSaleElementsTableMap::PROMO, ProductSaleElementsTableMap::NEWNESS, ProductSaleElementsTableMap::WEIGHT, ProductSaleElementsTableMap::CREATED_AT, ProductSaleElementsTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_ID', 'REF', 'QUANTITY', 'PROMO', 'NEWNESS', 'WEIGHT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'product_id', 'ref', 'quantity', 'promo', 'newness', 'weight', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id', 'ProductId', 'Ref', 'Quantity', 'Promo', 'Newness', 'Weight', 'IsDefault', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'productId', 'ref', 'quantity', 'promo', 'newness', 'weight', 'isDefault', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ProductSaleElementsTableMap::ID, ProductSaleElementsTableMap::PRODUCT_ID, ProductSaleElementsTableMap::REF, ProductSaleElementsTableMap::QUANTITY, ProductSaleElementsTableMap::PROMO, ProductSaleElementsTableMap::NEWNESS, ProductSaleElementsTableMap::WEIGHT, ProductSaleElementsTableMap::IS_DEFAULT, ProductSaleElementsTableMap::CREATED_AT, ProductSaleElementsTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_ID', 'REF', 'QUANTITY', 'PROMO', 'NEWNESS', 'WEIGHT', 'IS_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'product_id', 'ref', 'quantity', 'promo', 'newness', 'weight', 'is_default', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -141,12 +146,12 @@ class ProductSaleElementsTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductId' => 1, 'Ref' => 2, 'Quantity' => 3, 'Promo' => 4, 'Newness' => 5, 'Weight' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productId' => 1, 'ref' => 2, 'quantity' => 3, 'promo' => 4, 'newness' => 5, 'weight' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
-        self::TYPE_COLNAME       => array(ProductSaleElementsTableMap::ID => 0, ProductSaleElementsTableMap::PRODUCT_ID => 1, ProductSaleElementsTableMap::REF => 2, ProductSaleElementsTableMap::QUANTITY => 3, ProductSaleElementsTableMap::PROMO => 4, ProductSaleElementsTableMap::NEWNESS => 5, ProductSaleElementsTableMap::WEIGHT => 6, ProductSaleElementsTableMap::CREATED_AT => 7, ProductSaleElementsTableMap::UPDATED_AT => 8, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_ID' => 1, 'REF' => 2, 'QUANTITY' => 3, 'PROMO' => 4, 'NEWNESS' => 5, 'WEIGHT' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'product_id' => 1, 'ref' => 2, 'quantity' => 3, 'promo' => 4, 'newness' => 5, 'weight' => 6, 'created_at' => 7, 'updated_at' => 8, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductId' => 1, 'Ref' => 2, 'Quantity' => 3, 'Promo' => 4, 'Newness' => 5, 'Weight' => 6, 'IsDefault' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productId' => 1, 'ref' => 2, 'quantity' => 3, 'promo' => 4, 'newness' => 5, 'weight' => 6, 'isDefault' => 7, 'createdAt' => 8, 'updatedAt' => 9, ),
+        self::TYPE_COLNAME       => array(ProductSaleElementsTableMap::ID => 0, ProductSaleElementsTableMap::PRODUCT_ID => 1, ProductSaleElementsTableMap::REF => 2, ProductSaleElementsTableMap::QUANTITY => 3, ProductSaleElementsTableMap::PROMO => 4, ProductSaleElementsTableMap::NEWNESS => 5, ProductSaleElementsTableMap::WEIGHT => 6, ProductSaleElementsTableMap::IS_DEFAULT => 7, ProductSaleElementsTableMap::CREATED_AT => 8, ProductSaleElementsTableMap::UPDATED_AT => 9, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_ID' => 1, 'REF' => 2, 'QUANTITY' => 3, 'PROMO' => 4, 'NEWNESS' => 5, 'WEIGHT' => 6, 'IS_DEFAULT' => 7, 'CREATED_AT' => 8, 'UPDATED_AT' => 9, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'product_id' => 1, 'ref' => 2, 'quantity' => 3, 'promo' => 4, 'newness' => 5, 'weight' => 6, 'is_default' => 7, 'created_at' => 8, 'updated_at' => 9, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -171,7 +176,8 @@ class ProductSaleElementsTableMap extends TableMap
         $this->addColumn('QUANTITY', 'Quantity', 'FLOAT', true, null, null);
         $this->addColumn('PROMO', 'Promo', 'TINYINT', false, null, 0);
         $this->addColumn('NEWNESS', 'Newness', 'TINYINT', false, null, 0);
-        $this->addColumn('WEIGHT', 'Weight', 'FLOAT', false, null, null);
+        $this->addColumn('WEIGHT', 'Weight', 'FLOAT', false, null, 0);
+        $this->addColumn('IS_DEFAULT', 'IsDefault', 'BOOLEAN', false, 1, false);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -355,6 +361,7 @@ class ProductSaleElementsTableMap extends TableMap
             $criteria->addSelectColumn(ProductSaleElementsTableMap::PROMO);
             $criteria->addSelectColumn(ProductSaleElementsTableMap::NEWNESS);
             $criteria->addSelectColumn(ProductSaleElementsTableMap::WEIGHT);
+            $criteria->addSelectColumn(ProductSaleElementsTableMap::IS_DEFAULT);
             $criteria->addSelectColumn(ProductSaleElementsTableMap::CREATED_AT);
             $criteria->addSelectColumn(ProductSaleElementsTableMap::UPDATED_AT);
         } else {
@@ -365,6 +372,7 @@ class ProductSaleElementsTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.PROMO');
             $criteria->addSelectColumn($alias . '.NEWNESS');
             $criteria->addSelectColumn($alias . '.WEIGHT');
+            $criteria->addSelectColumn($alias . '.IS_DEFAULT');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

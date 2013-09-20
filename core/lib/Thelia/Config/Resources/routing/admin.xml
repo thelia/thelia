@@ -185,6 +185,9 @@
     </route>
 
     <!--Features and attributes -->
+    <route id="admin.products.set-product-template" path="/admin/product/{productId}/set-product-template">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::setProductTemplateAction</default>
+    </route>
 
     <route id="admin.products.update-attributes-and-features" path="/admin/product/{productId}/update-attributes-and-features">
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateAttributesAndFeaturesAction</default>

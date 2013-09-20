@@ -24,14 +24,12 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
  * @method     ChildAttributeCombinationQuery orderByAttributeId($order = Criteria::ASC) Order by the attribute_id column
  * @method     ChildAttributeCombinationQuery orderByAttributeAvId($order = Criteria::ASC) Order by the attribute_av_id column
  * @method     ChildAttributeCombinationQuery orderByProductSaleElementsId($order = Criteria::ASC) Order by the product_sale_elements_id column
- * @method     ChildAttributeCombinationQuery orderByIsDefault($order = Criteria::ASC) Order by the is_default column
  * @method     ChildAttributeCombinationQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAttributeCombinationQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildAttributeCombinationQuery groupByAttributeId() Group by the attribute_id column
  * @method     ChildAttributeCombinationQuery groupByAttributeAvId() Group by the attribute_av_id column
  * @method     ChildAttributeCombinationQuery groupByProductSaleElementsId() Group by the product_sale_elements_id column
- * @method     ChildAttributeCombinationQuery groupByIsDefault() Group by the is_default column
  * @method     ChildAttributeCombinationQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAttributeCombinationQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -57,14 +55,12 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
  * @method     ChildAttributeCombination findOneByAttributeId(int $attribute_id) Return the first ChildAttributeCombination filtered by the attribute_id column
  * @method     ChildAttributeCombination findOneByAttributeAvId(int $attribute_av_id) Return the first ChildAttributeCombination filtered by the attribute_av_id column
  * @method     ChildAttributeCombination findOneByProductSaleElementsId(int $product_sale_elements_id) Return the first ChildAttributeCombination filtered by the product_sale_elements_id column
- * @method     ChildAttributeCombination findOneByIsDefault(boolean $is_default) Return the first ChildAttributeCombination filtered by the is_default column
  * @method     ChildAttributeCombination findOneByCreatedAt(string $created_at) Return the first ChildAttributeCombination filtered by the created_at column
  * @method     ChildAttributeCombination findOneByUpdatedAt(string $updated_at) Return the first ChildAttributeCombination filtered by the updated_at column
  *
  * @method     array findByAttributeId(int $attribute_id) Return ChildAttributeCombination objects filtered by the attribute_id column
  * @method     array findByAttributeAvId(int $attribute_av_id) Return ChildAttributeCombination objects filtered by the attribute_av_id column
  * @method     array findByProductSaleElementsId(int $product_sale_elements_id) Return ChildAttributeCombination objects filtered by the product_sale_elements_id column
- * @method     array findByIsDefault(boolean $is_default) Return ChildAttributeCombination objects filtered by the is_default column
  * @method     array findByCreatedAt(string $created_at) Return ChildAttributeCombination objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildAttributeCombination objects filtered by the updated_at column
  *
@@ -155,7 +151,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ATTRIBUTE_ID, ATTRIBUTE_AV_ID, PRODUCT_SALE_ELEMENTS_ID, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM attribute_combination WHERE ATTRIBUTE_ID = :p0 AND ATTRIBUTE_AV_ID = :p1 AND PRODUCT_SALE_ELEMENTS_ID = :p2';
+        $sql = 'SELECT ATTRIBUTE_ID, ATTRIBUTE_AV_ID, PRODUCT_SALE_ELEMENTS_ID, CREATED_AT, UPDATED_AT FROM attribute_combination WHERE ATTRIBUTE_ID = :p0 AND ATTRIBUTE_AV_ID = :p1 AND PRODUCT_SALE_ELEMENTS_ID = :p2';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -387,33 +383,6 @@ abstract class AttributeCombinationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId, $comparison);
-    }
-
-    /**
-     * Filter the query on the is_default column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByIsDefault(true); // WHERE is_default = true
-     * $query->filterByIsDefault('yes'); // WHERE is_default = true
-     * </code>
-     *
-     * @param     boolean|string $isDefault The value to use as filter.
-     *              Non-boolean arguments are converted using the following rules:
-     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
-     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
-     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildAttributeCombinationQuery The current query, for fluid interface
-     */
-    public function filterByIsDefault($isDefault = null, $comparison = null)
-    {
-        if (is_string($isDefault)) {
-            $is_default = in_array(strtolower($isDefault), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
-        }
-
-        return $this->addUsingAlias(AttributeCombinationTableMap::IS_DEFAULT, $isDefault, $comparison);
     }
 
     /**

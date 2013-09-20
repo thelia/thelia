@@ -17,7 +17,7 @@
         {/form_field}
 
         {form_field form=$form field='success_url'}
-            <input type="hidden" name="{$name}" value="{url path='/admin/product' product_id={$product_d}}" />
+            <input type="hidden" name="{$name}" value="{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}" />
         {/form_field}
 
         {form_field form=$form field='locale'}

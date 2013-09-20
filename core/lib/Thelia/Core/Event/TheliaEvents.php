@@ -187,6 +187,8 @@ final class TheliaEvents
     const PRODUCT_ADD_CONTENT      = "action.productAddContent";
     const PRODUCT_REMOVE_CONTENT   = "action.productRemoveContent";
 
+    const PRODUCT_SET_TEMPLATE     = "action.productSetTemplate";
+
     const PRODUCT_ADD_ACCESSORY             = "action.productAddAccessory";
     const PRODUCT_REMOVE_ACCESSORY          = "action.productRemoveAccessory";
     const PRODUCT_UPDATE_ACCESSORY_POSITION = "action.updateProductPosition";
