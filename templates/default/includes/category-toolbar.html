@@ -1,30 +1,30 @@
 <div class="toolbar toolbar-{$toolbar}" role="toolbar">
+    {if $toolbar == "top" }
     <div class="sorter-container">
         <span class="amount">9 Item(s)</span>
 
             <span class="limiter">
                 <label for="limit-top">Show</label>
                 <select id="limit-top" name="limit">
-                    <option value="{url path="{navigate to="current"}" limit="4"}" {if $limit==4}selected{/if}>4</option>
-                    <option value="{url path="{navigate to="current"}" limit="8"}" {if $limit==8}selected{/if}>8</option>
-                    <option value="{url path="{navigate to="current"}" limit="12"}" {if $limit==12}selected{/if}>12</option>
-                    <option value="{url path="{navigate to="current"}" limit="50"}"{if $limit==50}selected{/if}>50</option>
-                    <option value="{url path="{navigate to="current"}" limit="9999999999"}" {if $limit==9999999999}selected{/if}>All</option>
+                    <option value="{url path="{category attr="url"}" limit="4"}" {if $limit==4}selected{/if}>4</option>
+                    <option value="{url path="{category attr="url"}" limit="8"}" {if $limit==8}selected{/if}>8</option>
+                    <option value="{url path="{category attr="url"}" limit="12"}" {if $limit==12}selected{/if}>12</option>
+                    <option value="{url path="{category attr="url"}" limit="50"}"{if $limit==50}selected{/if}>50</option>
+                    <option value="{url path="{category attr="url"}" limit="9999999999"}" {if $limit==9999999999}selected{/if}>All</option>
                 </select>
                 <span class="per-page"> per page</span>
             </span><!-- /.limiter -->
 
             <span class="sort-by">
-                <label for="sortby-top">Sort By</label>
-                <select id="sortby-top" name="sortby" onchange="">
-                    <option value="?order=position">Position</option>
-                    <option value="?order=name" selected>Name</option>
-                    <option value="?order=price">Price</option>
-                    <option value="?order=rating">Rating</option>
+                <label for="sortby-top">{intl l="Sort By"}</label>
+                <select id="sortby-top" name="sortby">
+                    {*<option value="{url path="{category attr="url"}" order="manual"}">{intl l="Position"}</option>*}
+                    <option value="{url path="{category attr="url"}" limit=$limit order="alpha"}" {if $order=="alpha"}selected{/if}>{intl l="Name ascending"}</option>
+                    <option value="{url path="{category attr="url"}" limit=$limit order="alpha_reverse"}" {if $order=="alpha_reverse"}selected{/if}>{intl l="Name descending"}</option>
+                    <option value="{url path="{category attr="url"}" limit=$limit order="min_price"}" {if $order=="min_price"}selected{/if}>{intl l="Price ascending"}</option>
+                    <option value="{url path="{category attr="url"}" limit=$limit order="max_price"}" {if $order=="max_price"}selected{/if}>{intl l="Price descending"}</option>
+                    {*<option value="{url path="{category attr="url"}" order="rating"}">{intl l="Rating"}</option>*}
                 </select>
-
-                <a class="sort-order" href="?dir=desc" title="Set Descending Direction"><i class="icon-long-arrow-up"></i></a>
-
             </span><!-- /.sort-by -->
 
             <span class="view-mode">
@@ -36,17 +36,32 @@
             </span><!-- /.view-mode -->
 
     </div><!-- /.sorter -->
-
-    <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}">
-        <strong id="pagination-label-{$toolbar}" class="pagination-label">{intl l="Pagination"}</strong>
+    {else}
+    <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}}">
+        <strong id="pagination-label-{$toolbar}}" class="pagination-label">{intl l="Pagination"}</strong>
         <ul class="pagination">
-            <li><a href="?page=<?php echo $page-1; ?>" class="prev"><i class="icon-prev"></i></a></li>
-            <li class="active"><a href="?page=1" tabindex="-1"'; >1</a></li>
-            <li><a href="?page=2">2</a></li>
-            <li><a href="?page=3">3</a></li>
-            <li><a href="?page=4">4</a></li>
-            <li><a href="?page=5">5</a></li>
-            <li><a href="?page=<?php echo $page+1; ?>" class="next"><i class="icon-next"></i></a></li>
+
+            {if $product_page > 1}
+                <li><a href="{url path={navigate to="current"} page={$product_page-1} }" class="prev"><i class="icon-prev"></i></a></li>
+            {else}
+                <li><a href="#" class="prev"><i class="icon-prev"></i></a></li>
+            {/if}
+            {pageloop rel="product_list"}
+            {if $PAGE != $CURRENT}
+                <li><a href="{url path={navigate to="current"} page=$PAGE }"> {$PAGE} </a></li>
+            {else}
+                <li class="active"><a href="#" tabindex="-1">{$PAGE}</a></li>
+            {/if}
+            {if $PAGE == $LAST}
+                {if $CURRENT < $LAST}
+                    <li><a href="{url path={navigate to="current"} page={$CURRENT+1} }" class="next"><i class="icon-next"></i></a></li>
+                {else}
+                    <li><a href="#" class="next"><i class="icon-next"></i></a></li>
+                {/if}
+
+            {/if}
+            {/pageloop}
         </ul>
     </div>
+    {/if}
 </div><!-- /.toolbar toolbar-<?php echo $toolbar; ?> -->

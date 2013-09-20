@@ -130,6 +130,10 @@
             window.location = $(this).val()
         });
 
+        $('#sortby-top').change(function(e){
+            window.location = $(this).val()
+        });
+
     });
 
 })(jQuery);

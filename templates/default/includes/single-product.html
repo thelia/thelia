@@ -1,3 +1,4 @@
+<li class="item">
 <article itemscope itemtype="http://schema.org/Product">
     <!-- Use the meta tag to specify content that is not visible on the page in any way -->
     {loop name="brand.feature" type="feature" product=$ID title="brand"}
@@ -12,21 +13,22 @@
     {/loop}
 
     <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
-        {loop name="product_thumbnail" type="image" product=$ID width="218" height="146" resize_mode="borders" limit="1"}
+        {loop name="product_thumbnail" type="image" product=$ID width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
             <img itemprop="image" src="{$IMAGE_URL}" alt="Product #{$LOOP_COUNT}">
         {/loop}
         {elseloop rel="product_thumbnail"}
-            {images file='../assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{$LOOP_COUNT}">{/images}
+            {images file="../assets/img/{$width}x{$height}.png"}<img itemprop="image" src="{$asset_url}" alt="Product #{$LOOP_COUNT}">{/images}
         {/elseloop}
         <span class="mask"></span>
     </a>
 
     <div class="product-info">
         <h3 class="name"><a href="{$URL}"><span itemprop="name">{$TITLE}</span></a></h3>
-
+        {if $hasDescription}
         <div class="description" itemprop="description">
             <p>{$DESCRIPTION}</p>
         </div>
+        {/if}
     </div>
 
     <div class="product-price">
@@ -53,8 +55,11 @@
             {/if}
 
         </div>
+        {if $hasBtn}
         <div class="product-btn">
             <button class="btn btn-cart">Add to cart</button>
         </div>
+        {/if}
     </div>
 </article><!-- /product -->
+</li>
