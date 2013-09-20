@@ -18,7 +18,7 @@
         <loop class="Thelia\Core\Template\Loop\Currency" name="currency"/>
         <loop class="Thelia\Core\Template\Loop\Customer" name="customer"/>
         <loop class="Thelia\Core\Template\Loop\Feature" name="feature"/>
-        <loop class="Thelia\Core\Template\Loop\FeatureAvailability" name="feature_availability"/>
+        <loop class="Thelia\Core\Template\Loop\FeatureAvailability" name="feature-availability"/>
         <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature_value"/>
         <loop class="Thelia\Core\Template\Loop\Folder" name="folder"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
