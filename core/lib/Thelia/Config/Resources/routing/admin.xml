@@ -529,6 +529,13 @@
 
     <!-- end Modules rule management -->
 
+    <!-- mailing system management -->
+
+    <route id="admin.configuration.mailing-system.default" path="/admin/configuration/mailing_system">
+        <default key="_controller">Thelia\Controller\Admin\MailingSystemController::defaultAction</default>
+    </route>
+
+    <!-- end mailing system management -->
 
 	<!-- The default route, to display a template -->
 

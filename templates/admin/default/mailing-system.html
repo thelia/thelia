@@ -1,0 +1,102 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Thelia Mailing System'}{/block}
+
+{block name="check-permissions"}admin.configuration.mailing-system.view{/block}
+
+{block name="main-content"}
+<div class="mailing-system">
+
+    <div id="wrapper" class="container">
+
+        <ul class="breadcrumb">
+            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+            <li><a href="{url path='/admin/configuration/mailing_system'}">{intl l="Mailing system"}</a></li>
+        </ul>
+
+        {module_include location='mailing_system_top'}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="general-block-decorator">
+                    
+                    <div class="title title-without-tabs">{intl l="Configuration variables"}</div>
+
+                    <form action="" method="">
+                        
+                        <div class="form-group">
+                            <label for="" class="label-control">{intl l="SMTP Server"}</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="" placeholder="{intl l="SMTP Server"}">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default btn-primary"><span class="glyphicon glyphicon-remove"></span></button>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="" class="label-control">{intl l="Port"}</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="" placeholder="{intl l="port"}">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default btn-primary"><span class="glyphicon glyphicon-remove"></span></button>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="" class="label-control">{intl l="Username"}</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="" placeholder="{intl l="username"}">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default btn-primary"><span class="glyphicon glyphicon-remove"></span></button>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="" class="label-control">{intl l="Password"}</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="" placeholder="{intl l="password"}">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default btn-primary"><span class="glyphicon glyphicon-remove"></span></button>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="" class="label-control">{intl l="Protocol"}</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="" placeholder="{intl l="protocol"}">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default btn-primary"><span class="glyphicon glyphicon-remove"></span></button>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="" class="label-control">{intl l="Active ?"}</label>
+
+                            <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                <input type="checkbox" name="" id="" checked>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        {module_include location='mailing_system_bottom'}
+
+    </div>
+</div>
+{/block}
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+{/block}
