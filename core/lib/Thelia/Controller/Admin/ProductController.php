@@ -542,6 +542,7 @@ echo "delete $productId, ".$feature->getId()." - ";
                     }
                 }
             }
+exit;
         }
 
         $this->redirectToEditionTemplate();

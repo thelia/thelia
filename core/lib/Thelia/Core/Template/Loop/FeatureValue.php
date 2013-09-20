@@ -79,14 +79,14 @@ class FeatureValue extends BaseI18nLoop
     {
         $search = FeatureProductQuery::create();
 
-             // manage featureAv translations
-            $locale = $this->configureI18nProcessing(
-                $search,
-                array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
-                FeatureAvTableMap::TABLE_NAME,
-                'FEATURE_AV_ID',
-                true
-            );
+         // manage featureAv translations
+        $locale = $this->configureI18nProcessing(
+            $search,
+            array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+            FeatureAvTableMap::TABLE_NAME,
+            'FEATURE_AV_ID',
+            true
+        );
 
         $feature = $this->getFeature();
 
@@ -132,6 +132,7 @@ class FeatureValue extends BaseI18nLoop
         $loopResult = new LoopResult($featureValues);
 
         foreach ($featureValues as $featureValue) {
+
             $loopResultRow = new LoopResultRow($loopResult, $featureValue, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow

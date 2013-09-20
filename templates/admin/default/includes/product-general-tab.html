@@ -1,0 +1,97 @@
+<div class="form-container">
+
+    {form name="thelia.admin.product.modification"}
+    <form method="POST" action="{url path='/admin/products/save'}" {form_enctype form=$form} class="clearfix">
+
+        {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/products' product_id=$product_id}"}
+
+        {* Be sure to get the product ID, even if the form could not be validated *}
+        <input type="hidden" name="product_id" value="{$product_id}" />
+
+        <input type="hidden" name="current_tab" value="general" />
+
+        {form_hidden_fields form=$form}
+
+        {form_field form=$form field='success_url'}
+            <input type="hidden" name="{$name}" value="{url path='/admin/product' product_id={$product_d}}" />
+        {/form_field}
+
+        {form_field form=$form field='locale'}
+            <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+        {/form_field}
+
+        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+        <div class="form-group">
+            <label for="product_ref" class="control-label">
+                {intl l='Product reference'} :
+            </label>
+
+            <div class="well well-sm">{$REF}</div>
+        </div>
+
+        {include file="includes/standard-description-form-fields.html"}
+
+        {form_field form=$form field='url'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">
+                    {intl l="{$label}"} :
+                </label>
+
+                <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Rewritten URL'}" placeholder="{intl l='Rewriten URL'}" class="form-control">
+             </div>
+        {/form_field}
+
+        <div class="row">
+            <div class="col-md-6">
+
+                {form_field form=$form field='default_category'}
+                    <div class="form-group {if $error}has-error{/if}">
+
+                        <label for="{$label_attr.for}" class="control-label">
+                            {intl l="{$label}"} :
+                        </label>
+
+                        <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
+                              <option value="0">{intl l="Top level"}</option>
+
+                              {loop name="cat-parent" type="category-tree" category="0" visible="*" product="0"}
+                                   <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY == $ID}selected="selected"{/if} {if $product_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
+                              {/loop}
+
+                        </select>
+                        <span class="help-block">{intl l='You can attach this product to more categories in the details tab.'}</span>
+                     </div>
+                {/form_field}
+
+            </div>
+
+            <div class="col-md-6">
+                {form_field form=$form field='visible'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+                                {$label}
+                            </label>
+                        </div>
+                    </div>
+                {/form_field}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="control-group">
+                    <lablel>&nbsp;</lablel>
+                    <div class="controls">
+                        <p>{intl l='Product created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
+                    </div>
+                 </div>
+            </div>
+        </div>
+
+    </form>
+    {/form}
+</div>
