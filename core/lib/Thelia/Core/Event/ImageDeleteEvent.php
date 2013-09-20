@@ -20,44 +20,63 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Model\AdminLog;
+namespace Thelia\Core\Event;
 
-class BaseAction
+use Thelia\Model\CategoryImage;
+use Thelia\Model\ContentImage;
+use Thelia\Model\FolderImage;
+use Thelia\Model\ProductImage;
+
+/**
+ * Created by JetBrains PhpStorm.
+ * Date: 9/18/13
+ * Time: 3:56 PM
+ *
+ * Occurring when a Image is about to be deleted
+ *
+ * @package Image
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ *
+ */
+class ImageDeleteEvent extends ActionEvent
 {
-    /**
-     * @var The container
-     */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
+    /** @var CategoryImage|ProductImage|ContentImage|FolderImage Image about to be deleted */
+    protected $imageToDelete = null;
 
     /**
-     * Return the event dispatcher,
+     * Constructor
      *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
      */
-    public function getDispatcher()
+    public function __construct($imageToDelete)
     {
-        return $this->container->get('event_dispatcher');
+        $this->imageToDelete = $imageToDelete;
     }
 
     /**
-     * Helper to append a message to the admin log.
+     * Set Image about to be deleted
      *
-     * @param string $message
+     * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
+     *
+     * @return $this
      */
-    public function adminLogAppend($message)
+    public function setImageToDelete($imageToDelete)
     {
-        AdminLog::append(
-            $message,
-            $this->container->get('request'),
-            $this->container->get('thelia.securityContext')->getAdminUser()
-        );
+        $this->imageToDelete = $imageToDelete;
+
+        return $this;
     }
+
+    /**
+     * Get Image about to be deleted
+     *
+     * @return CategoryImage|ProductImage|ContentImage|FolderImage
+     */
+    public function getImageToDelete()
+    {
+        return $this->imageToDelete;
+    }
+
+
 }

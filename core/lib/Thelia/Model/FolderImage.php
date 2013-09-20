@@ -25,4 +25,14 @@ class FolderImage extends BaseFolderImage
 
         return true;
     }
+
+    /**
+     * Get Image parent id
+     *
+     * @return int parent id
+     */
+    public function getParentId()
+    {
+        return $this->getFolderId();
+    }
 }

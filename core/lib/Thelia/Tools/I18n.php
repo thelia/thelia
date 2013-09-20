@@ -54,4 +54,5 @@ class I18n
 
         return \DateTime::createFromFormat($currentDateFormat, $date);
     }
+
 }

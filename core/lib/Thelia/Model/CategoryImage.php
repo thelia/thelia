@@ -2,6 +2,8 @@
 
 namespace Thelia\Model;
 
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Model\Base\CategoryImage as BaseCategoryImage;
 use Propel\Runtime\Connection\ConnectionInterface;
 
@@ -28,6 +30,7 @@ class CategoryImage extends BaseCategoryImage
 
     /**
      * Get picture absolute path
+     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
      *
      * @return null|string
      */
@@ -35,11 +38,12 @@ class CategoryImage extends BaseCategoryImage
     {
         return null === $this->file
             ? null
-            : $this->getUploadRootDir().'/'.$this->file;
+            : $this->getUploadDir().'/'.$this->file;
     }
 
     /**
      * Get picture web path
+     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
      *
      * @return null|string
      */
@@ -50,23 +54,25 @@ class CategoryImage extends BaseCategoryImage
             : $this->getUploadDir().'/'.$this->file;
     }
 
-    /**
-     * The absolute directory path where uploaded
-     * documents should be saved
-     * @return string
-     */
-    protected function getUploadRootDir()
-    {
-        return __DIR__.'/../../../../../'.$this->getUploadDir();
-    }
 
     /**
      * Get rid of the __DIR__ so it doesn't screw up
      * when displaying uploaded doc/image in the view.
      * @return string
      */
-    protected function getUploadDir()
+    public function getUploadDir()
     {
-        return 'local/media/images/category';
+        return THELIA_LOCAL_DIR . 'media/images/category';
     }
+
+    /**
+     * Get Image parent id
+     *
+     * @return int parent id
+     */
+    public function getParentId()
+    {
+        return $this->getCategoryId();
+    }
+
 }

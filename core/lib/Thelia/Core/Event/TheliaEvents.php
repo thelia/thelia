@@ -235,6 +235,16 @@ final class TheliaEvents
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
 
     /**
+     * Save given images
+     */
+    const IMAGE_SAVE = "action.saveImages";
+
+    /**
+     * Delete given image
+     */
+    const IMAGE_DELETE = "action.deleteImage";
+
+    /**
      * Sent when creating a Coupon
      */
     const COUPON_CREATE = "action.create_coupon";

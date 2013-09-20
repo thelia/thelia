@@ -23,10 +23,19 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Thelia\Core\Event\ImageCreateOrUpdateEvent;
+use Thelia\Core\Event\ImageDeleteEvent;
 use Thelia\Core\Event\ImageEvent;
+use Thelia\Model\CategoryImage;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\ContentImage;
+use Thelia\Model\FolderImage;
+use Thelia\Model\ProductImage;
+use Thelia\Tools\FileManager;
 use Thelia\Tools\URL;
 
 use Imagine\Image\ImagineInterface;
@@ -39,10 +48,10 @@ use Thelia\Core\Event\TheliaEvents;
 
 /**
  *
- * Image management actions. This class handles image processing an caching.
+ * Image management actions. This class handles image processing and caching.
  *
- * Basically, images are stored outside the web space (by default in local/media/images),
- * and cached in the web space (by default in web/local/images).
+ * Basically, images are stored outside of the web space (by default in local/media/images),
+ * and cached inside the web space (by default in web/local/images).
  *
  * In the images caches directory, a subdirectory for images categories (eg. product, category, folder, etc.) is
  * automatically created, and the cached image is created here. Plugin may use their own subdirectory as required.
@@ -77,6 +86,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     const EXACT_RATIO_WITH_BORDERS = 1;
     const EXACT_RATIO_WITH_CROP = 2;
     const KEEP_IMAGE_RATIO = 3;
+
+
 
     /**
      * @return string root of the image cache directory in web space
@@ -241,6 +252,107 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     }
 
     /**
+     * Take care of saving images in the database and file storage
+     *
+     * @param ImageCreateOrUpdateEvent $event Image event
+     *
+     * @throws \Thelia\Exception\ImageException
+     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function saveImages(ImageCreateOrUpdateEvent $event)
+    {
+        $fileManager = new FileManager($this->container);
+
+        $this->adminLogAppend(
+            $this->container->get('thelia.translator')->trans(
+                'Saving images for parent id %parentId% (%parentType%)',
+                array(
+                    '%parentId%' => $event->getParentId(),
+                    '%parentType%' => $event->getImageType()
+                ),
+                'image'
+            )
+        );
+
+        $newUploadedFiles = array();
+        $uploadedFiles = $event->getUploadedFiles();
+
+        foreach ($event->getModelImages() as $i => $modelImage) {
+            // Save image to database in order to get image id
+            $fileManager->saveImage($event, $modelImage);
+
+            if (isset($uploadedFiles) && isset($uploadedFiles[$i])) {
+                /** @var UploadedFile $uploadedFile */
+                $uploadedFile = $uploadedFiles[$i]['file'];
+
+                // Copy uploaded file into the storage directory
+                $newUploadedFiles = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $modelImage, $uploadedFile, $newUploadedFiles);
+            } else {
+                throw new ImageException(
+                    sprintf(
+                        'File with name %s not found on the server',
+                        $modelImage->getFile()
+                    )
+                );
+            }
+            $event->setUploadedFiles($newUploadedFiles);
+        }
+    }
+
+    /**
+     * Take care of deleting image in the database and file storage
+     *
+     * @param ImageCreateOrUpdateEvent $event Image event
+     *
+     * @throws \Thelia\Exception\ImageException
+     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function deleteImage(ImageDeleteEvent $event)
+    {
+        $fileManager = new FileManager($this->container);
+
+        try {
+            $fileManager->deleteImage($event->getImageToDelete());
+
+            $this->adminLogAppend(
+                $this->container->get('thelia.translator')->trans(
+                    'Deleting image for %id% with parent id %parentId%',
+                    array(
+                        '%id%' => $event->getImageToDelete()->getId(),
+                        '%parentId%' => $event->getImageToDelete()->getParentId(),
+                    ),
+                    'image'
+                )
+            );
+        } catch(\Exception $e) {
+            $this->adminLogAppend(
+                $this->container->get('thelia.translator')->trans(
+                    'Fail to delete image for %id% with parent id %parentId% (Exception : %e%)',
+                    array(
+                        '%id%' => $event->getImageToDelete()->getId(),
+                        '%parentId%' => $event->getImageToDelete()->getParentId(),
+                        '%e%' => $e->getMessage()
+                    ),
+                    'image'
+                )
+            );
+        }
+    }
+
+    /**
+     * The absolute directory path where uploaded
+     * documents should be saved
+     *
+     * @param $modelImage Image model
+     *
+     * @return string
+     */
+    public function getUploadRootDir($modelImage)
+    {
+        return __DIR__.'/../../../../' . $modelImage->getUploadDir();
+    }
+
+    /**
      * Process image resizing, with borders or cropping. If $dest_width and $dest_height
      * are both null, no resize is performed.
      *
@@ -362,6 +474,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         return array(
             TheliaEvents::IMAGE_PROCESS => array("processImage", 128),
             TheliaEvents::IMAGE_CLEAR_CACHE => array("clearCache", 128),
+            TheliaEvents::IMAGE_SAVE => array("saveImages", 128),
+            TheliaEvents::IMAGE_DELETE => array("deleteImage", 128),
         );
     }
 }

@@ -20,44 +20,63 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Action;
+namespace Thelia\Form\Type;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Model\AdminLog;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Image;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
-class BaseAction
+/**
+ * Created by JetBrains PhpStorm.
+ * Date: 9/18/13
+ * Time: 3:56 PM
+ *
+ * Form allowing to process a picture
+ *
+ * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
+ *
+ * @package Image
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ *
+ */
+abstract class ImageType extends AbstractType
 {
     /**
-     * @var The container
-     */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * Return the event dispatcher,
+     * Build a Picture form
      *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     * @param FormBuilderInterface $builder Form builder
+     * @param array                $options Form options
      */
-    public function getDispatcher()
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        return $this->container->get('event_dispatcher');
-    }
-
-    /**
-     * Helper to append a message to the admin log.
-     *
-     * @param string $message
-     */
-    public function adminLogAppend($message)
-    {
-        AdminLog::append(
-            $message,
-            $this->container->get('request'),
-            $this->container->get('thelia.securityContext')->getAdminUser()
+//        $builder->add('position');
+        $builder->add(
+            'title',
+            'text',
+            array(
+                'constraints' => new NotBlank()
+            )
         );
+        $builder->add(
+            'file',
+            'file',
+            array(
+                'constraints' => array(
+                    new NotBlank(),
+                    new Image(
+                        array(
+                            'minWidth' => 200,
+//                            'maxWidth' => 400,
+                            'minHeight' => 200,
+//                            'maxHeight' => 400,
+                        )
+                    )
+                )
+            )
+        );
+//        $builder->add('description');
+//        $builder->add('chapo');
+//        $builder->add('postscriptum');
     }
 }

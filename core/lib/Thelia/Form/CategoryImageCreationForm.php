@@ -20,44 +20,52 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Action;
+namespace Thelia\Form;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Model\AdminLog;
+use Thelia\Core\Translation\Translator;
+use Thelia\Form\Type\ImageCategoryType;
 
-class BaseAction
+/**
+ * Created by JetBrains PhpStorm.
+ * Date: 9/18/13
+ * Time: 3:56 PM
+ *
+ * Form allowing to process an image collection
+ *
+ * @package Image
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ *
+ */
+class CategoryImageCreationForm extends BaseForm
 {
     /**
-     * @var The container
+     * Allow to build a form
      */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
+    protected function buildForm()
     {
-        $this->container = $container;
+        $this->formBuilder
+            ->add('pictures',
+                'collection',
+                array(
+                    'type'   => new ImageCategoryType(),
+                    'options'  => array(
+                        'required'  => false
+                    ),
+                    'allow_add' => true,
+                    'allow_delete' => true,
+                    'by_reference' => false,
+                )
+            )
+            ->add('formSuccessUrl');
     }
 
     /**
-     * Return the event dispatcher,
+     * Get form name
      *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     * @return string
      */
-    public function getDispatcher()
+    public function getName()
     {
-        return $this->container->get('event_dispatcher');
-    }
-
-    /**
-     * Helper to append a message to the admin log.
-     *
-     * @param string $message
-     */
-    public function adminLogAppend($message)
-    {
-        AdminLog::append(
-            $message,
-            $this->container->get('request'),
-            $this->container->get('thelia.securityContext')->getAdminUser()
-        );
+        return 'thelia_category_image_creation';
     }
 }

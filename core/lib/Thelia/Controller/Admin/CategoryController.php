@@ -23,11 +23,13 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\CategoryDeleteEvent;
+use Thelia\Core\Event\ImageCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\CategoryUpdateEvent;
 use Thelia\Core\Event\CategoryCreateEvent;
-use Thelia\Form\CategoryPictureCreationForm;
+use Thelia\Log\Tlog;
 use Thelia\Model\CategoryQuery;
 use Thelia\Form\CategoryModificationForm;
 use Thelia\Form\CategoryCreationForm;
@@ -35,7 +37,6 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\CategoryDeleteContentEvent;
 use Thelia\Core\Event\CategoryAddContentEvent;
-use Thelia\Model\CategoryAssociatedContent;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -364,31 +365,6 @@ class CategoryController extends AbstractCrudController
         }
 
         $this->redirectToEditionTemplate();
-    }
-
-    /**
-     * @todo remove
-     * @return Symfony\Component\HttpFoundation\Response|void
-     */
-    public function updateAction()
-    {
-        var_dump('updateAction');
-        if ($this->getRequest()->isMethod('POST')) {
-            var_dump('getRequest', $this->getRequest()->files);
-            // Create the form from the request
-            $creationForm = new CategoryPictureCreationForm($this->getRequest());
-
-            // Check the form against constraints violations
-            $form = $this->validateForm($creationForm, 'POST');
-            var_dump('$form', $form);
-
-            // Get the form field values
-            $data = $form->getData();
-            var_dump('$data', $data);
-        }
-
-
-        return parent::updateAction();
     }
 
 }

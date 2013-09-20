@@ -31,6 +31,19 @@
         <default key="_controller">Thelia\Controller\Admin\CategoryController::defaultAction</default>
     </route>
 
+    <!-- Route to the file controller -->
+
+    <route id="admin.image.save" path="/admin/image/type/{parentType}/{parentId}/save">
+        <default key="_controller">Thelia\Controller\Admin\FileController::saveImagesAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="parentId">\d+</requirement>
+    </route>
+    <route id="admin.image.delete" path="/admin/image/type/{parentType}/delete/{imageId}">
+        <default key="_controller">Thelia\Controller\Admin\FileController::deleteImagesAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="parentId">\d+</requirement>
+    </route>
+
     <!-- Customer rule management -->
 
     <route id="admin.customers" path="/admin/customers">

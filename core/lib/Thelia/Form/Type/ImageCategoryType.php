@@ -20,44 +20,60 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Action;
+namespace Thelia\Form\Type;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Model\AdminLog;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Thelia\Form\Type\ImageType;
 
-class BaseAction
+/**
+ * Created by JetBrains PhpStorm.
+ * Date: 9/18/13
+ * Time: 3:56 PM
+ *
+ * Form allowing to process a category picture
+ *
+ * @package Image
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ *
+ */
+class ImageCategoryType extends ImageType
 {
     /**
-     * @var The container
+     * Build a Picture form
+     *
+     * @param FormBuilderInterface $builder Form builder
+     * @param array                $options Form options
      */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->container = $container;
+        $builder->add('category_id', 'integer');
+
+        parent::buildForm($builder, $options);
     }
 
     /**
-     * Return the event dispatcher,
+     * Set default options
+     * Map the form to the given Model
      *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     * @param OptionsResolverInterface $resolver Option resolver
      */
-    public function getDispatcher()
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        return $this->container->get('event_dispatcher');
-    }
-
-    /**
-     * Helper to append a message to the admin log.
-     *
-     * @param string $message
-     */
-    public function adminLogAppend($message)
-    {
-        AdminLog::append(
-            $message,
-            $this->container->get('request'),
-            $this->container->get('thelia.securityContext')->getAdminUser()
+        $resolver->setDefaults(
+            array(
+                'data_class' => 'Thelia\Model\CategoryImage'
+            )
         );
+    }
+
+    /**
+     * Get form name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'thelia_category_picture_creation_type';
     }
 }

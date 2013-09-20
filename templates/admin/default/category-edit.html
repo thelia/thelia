@@ -246,31 +246,7 @@
 		                    </div>
 
 		                    <div class="tab-pane fade" id="images">
-                                image
-                                {form name="thelia.admin.category.picture.creation"}
-                                    <form id="related_picture_form" method="POST" {form_enctype form=$form} action="#">
-                                        {form_hidden_fields form=$form}
-
-
-                                        {form_field form=$form field='title'}
-                                            <div class="form-group {if $error}has-error{/if}">
-                                                <label for="title" class="control-label" >{intl l='Title :'}</label>
-                                                <input id="title" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='title'}">
-                                                {if $error}{$message}{/if}
-                                            </div>
-                                        {/form_field}
-
-                                        {form_field form=$form field='file'}
-                                            <div class="form-group {if $error}has-error{/if}">
-                                                <label for="file" class="control-label" >{intl l='Picture :'}</label>
-                                                <input id="file" class="form-control" type="file" name="{$name}" value="{$value}" placeholder="{intl l='file'}">
-                                                {if $error}{$message}{/if}
-                                            </div>
-                                        {/form_field}
-
-                                        <input type="submit" value="submit"/>
-                                    </form>
-                                {/form}
+                                {include file='includes/image-upload-form.html' formName="thelia.admin.category.image.creation" formSuccessUrl={url path="/admin/categories/update?category_id=$category_id"} imageType='category' parentId=$category_id}
 		                    </div>
 
 		                    <div class="tab-pane fade" id="documents">
@@ -311,6 +287,9 @@
 {/block}
 
 {block name="javascript-initialization"}
+{javascripts file='assets/js/image-upload.js'}
+    <script src="{$asset_url}"></script>
+{/javascripts}
 <script>
 
 $(function() {

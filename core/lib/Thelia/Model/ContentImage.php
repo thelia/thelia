@@ -25,4 +25,14 @@ class ContentImage extends BaseContentImage
 
         return true;
     }
+
+    /**
+     * Get Image parent id
+     *
+     * @return int parent id
+     */
+    public function getParentId()
+    {
+        return $this->getContentId();
+    }
 }
