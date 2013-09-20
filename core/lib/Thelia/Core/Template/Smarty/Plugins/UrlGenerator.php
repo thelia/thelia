@@ -186,7 +186,8 @@ class UrlGenerator extends AbstractSmartyPlugin
 
     protected function getCurrentUrl()
     {
-        return URL::getInstance()->retrieveCurrent($this->request)->toString();
+        //return URL::getInstance()->retrieveCurrent($this->request)->toString();
+        return $this->request->getUri();
     }
 
     protected function getReturnToUrl()

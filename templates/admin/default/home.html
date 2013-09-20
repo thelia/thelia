@@ -21,8 +21,8 @@
 
 				<div class="text-center clearfix">
 					<div class="btn-group">
-						<button type="button" class="btn btn-default active" data-toggle="jqplot" data-target="turnover"><span class="glyphicon glyphicon-euro"></span> {intl l="Turnover"}</button>
-						<button type="button" class="btn btn-primary" data-toggle="jqplot" data-target="registration"><span class="glyphicon glyphicon-user"></span> {intl l="Registrations"}</button>
+						<button type="button" class="btn btn-default active" data-toggle="jqplot" data-target="sales"><span class="glyphicon glyphicon-euro"></span> {intl l="Sales"}</button>
+						<button type="button" class="btn btn-primary" data-toggle="jqplot" data-target="registration"><span class="glyphicon glyphicon-user"></span> {intl l="New customers"}</button>
 						<button type="button" class="btn btn-success" data-toggle="jqplot" data-target="orders"><span class="glyphicon glyphicon-shopping-cart"></span> {intl l="Orders"}</button>
 						<button type="button" class="btn btn-info" data-toggle="jqplot" data-target="first-orders"><span class="glyphicon glyphicon-thumbs-up"></span> {intl l="First orders"}</button>
 						<button type="button" class="btn btn-danger" data-toggle="jqplot" data-target="aborted-orders"><span class="glyphicon glyphicon-thumbs-down"></span> {intl l="Aborted orders"}</button>
@@ -34,7 +34,7 @@
 				<div class="jqplot-content">
 					<div id="jqplot"></div>
 
-					<div id="turnover" data-toggle="jqplot-serie" class="active"></div>
+					<div id="sales" data-toggle="jqplot-serie" class="active"></div>
 					<div id="registration" data-toggle="jqplot-serie"></div>
 					<div id="orders" data-toggle="jqplot-serie"></div>
 					<div id="first-orders" data-toggle="jqplot-serie"></div>
@@ -47,7 +47,7 @@
 	 		<div class="row">
 	 			<div class="col-md-4">
 					<div class="general-block-decorator">
-						<div class="title title-without-tabs">{intl l="Informations site"}</div>
+						<div class="title title-without-tabs">{intl l="Shop Informations"}</div>
 						<div class="table-responsive">
 							<table class="table table-striped">
 								<tbody>
@@ -56,7 +56,7 @@
 		                                <td>1</td>
 									</tr>
 									<tr>
-										<th>{intl l="Sections"}</th>
+										<th>{intl l="Categories"}</th>
 		                                <td>8</td>
 									</tr>
 									<tr>
@@ -64,11 +64,11 @@
 		                                <td>43</td>
 									</tr>
 									<tr>
-										<th>{intl l="Products online"}</th>
+										<th>{intl l="Online products"}</th>
 		                                <td>43</td>
 									</tr>
 									<tr>
-										<th>{intl l="Products offline"}</th>
+										<th>{intl l="Offline products"}</th>
 		                                <td>0</td>
 									</tr>
 									<tr>
@@ -76,11 +76,11 @@
 		                                <td>1</td>
 									</tr>
 									<tr>
-										<th>{intl l="Orders pending"}</th>
+										<th>{intl l="Pending orders"}</th>
 		                                <td>1</td>
 									</tr>
 									<tr>
-										<th>{intl l="Orders treatment"}</th>
+										<th>{intl l="In process orderst"}</th>
 		                                <td>0</td>
 									</tr>
 									<tr>
@@ -112,32 +112,32 @@
 								<div class="table-responsive">
 									<table class="table table-striped">
 		                                <tbody>
-		                                	<tr>
-		                                        <th>{intl l="C. A. TTC"}</th>
-		                                        <td>2000.00 €</td>
-		                                    </tr>
+                                            <tr>
+                                                <th>{intl l="Overall sales"}</th>
+                                                <td>2500.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Sales excluding shipping"}</th>
+                                                <td>2000.00 €</td>
+                                            </tr>
 		                                    <tr>
-		                                        <th>{intl l="C. A. TTC hors frais de port"}</th>
-		                                        <td>2500.00 €</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="C. A. TTC précédent"}</th>
+		                                        <th>{intl l="Yesterday sales"}</th>
 		                                        <td>1700.00 €</td>
 		                                    </tr>
 		                                    <tr>
-		                                        <th>{intl l="Commandes en instance"}</th>
+		                                        <th>{intl l="Waiting orders"}</th>
 		                                        <td>4</td>
 		                                    </tr>
 		                                    <tr>
-		                                        <th>{intl l="Commandes en traitement"}</th>
+		                                        <th>{intl l="In process orders"}</th>
 		                                        <td>52</td>
 		                                    </tr>
 		                                    <tr>
-		                                        <th>{intl l="Commandes annulées"}</th>
+		                                        <th>{intl l="Canceled orders"}</th>
 		                                        <td>3</td>
 		                                    </tr>
 		                                    <tr>
-		                                        <th>{intl l="Panier moyen TTC"}</th>
+		                                        <th>{intl l="Average cart"}</th>
 		                                        <td>25.00 €</td>
 		                                    </tr>
 		                           		</tbody>
@@ -148,34 +148,34 @@
 								<div class="table-responsive">
 		                            <table class="table table-striped">
 		                                <tbody>
-		                                	<tr>
-		                                        <th>{intl l="C. A. TTC"}</th>
-		                                        <td>2000.00 €</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="C. A. TTC hors frais de port"}</th>
-		                                        <td>2500.00 €</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="C. A. TTC précédent"}</th>
-		                                        <td>1700.00 €</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="Commandes en instance"}</th>
-		                                        <td>4</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="Commandes en traitement"}</th>
-		                                        <td>52</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="Commandes annulées"}</th>
-		                                        <td>3</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="Panier moyen TTC"}</th>
-		                                        <td>25.00 €</td>
-		                                    </tr>
+                                            <tr>
+                                                <th>{intl l="Overall sales"}</th>
+                                                <td>2500.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Sales excluding shipping"}</th>
+                                                <td>2000.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Previous month sales"}</th>
+                                                <td>1700.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Waiting orders"}</th>
+                                                <td>4</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="In process orders"}</th>
+                                                <td>52</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Canceled orders"}</th>
+                                                <td>3</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Average cart"}</th>
+                                                <td>25.00 €</td>
+                                            </tr>
 		                           		</tbody>
 		                        	</table>
 		                        </div>
@@ -184,34 +184,34 @@
 								<div class="table-responsive">
 		                            <table class="table table-striped">
 		                                <tbody>
-		                                	<tr>
-		                                        <th>{intl l="C. A. TTC"}</th>
-		                                        <td>2000.00 €</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="C. A. TTC hors frais de port"}</th>
-		                                        <td>2500.00 €</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="C. A. TTC précédent"}</th>
-		                                        <td>1700.00 €</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="Commandes en instance"}</th>
-		                                        <td>4</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="Commandes en traitement"}</th>
-		                                        <td>52</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="Commandes annulées"}</th>
-		                                        <td>3</td>
-		                                    </tr>
-		                                    <tr>
-		                                        <th>{intl l="Panier moyen TTC"}</th>
-		                                        <td>25.00 €</td>
-		                                    </tr>
+                                            <tr>
+                                                <th>{intl l="Overall sales"}</th>
+                                                <td>2500.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Sales excluding shipping"}</th>
+                                                <td>2000.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Previous year sales"}</th>
+                                                <td>1700.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Waiting orders"}</th>
+                                                <td>4</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="In process orders"}</th>
+                                                <td>52</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Canceled orders"}</th>
+                                                <td>3</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Average cart"}</th>
+                                                <td>25.00 €</td>
+                                            </tr>
 		                           		</tbody>
 		                            </table>
 		                        </div>
