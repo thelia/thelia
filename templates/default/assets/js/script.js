@@ -126,31 +126,14 @@
             }).filter(':has(:checked)').addClass('active');
         });
 
+        $('#limit-top').change(function(e){
+            window.location = $(this).val()
+        });
 
-        // Styliser le message Confirm par Bootstrap sur un formulaire
-        /*
-         $('body').on('click', '[data-confirm]', function(){
-         var $this = $(this);
-         bootbox.confirm($(this).attr('data-confirm'),
-         function(result){
-         if(result) {
-         // Si lien
-         if($this.attr('href')){
-         window.location.href = $this.attr('href');
-         }else{
-         // Si on doit soumettre un formulaire
-         var $form = $this.closest("form");
-         if($form.size() > 0){
-         $form.submit();
-         }
-         }
-         }
-         }
-         );
+        $('#sortby-top').change(function(e){
+            window.location = $(this).val()
+        });
 
-         return false;
-         });
-         */
     });
 
 })(jQuery);

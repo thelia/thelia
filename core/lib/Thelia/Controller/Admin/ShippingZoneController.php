@@ -24,7 +24,7 @@
 namespace Thelia\Controller\Admin;
 
 /**
- * Class FolderController
+ * Class ShippingZoneController
  * @package Thelia\Controller\Admin
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */

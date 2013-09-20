@@ -18,9 +18,10 @@
         <loop class="Thelia\Core\Template\Loop\Currency" name="currency"/>
         <loop class="Thelia\Core\Template\Loop\Customer" name="customer"/>
         <loop class="Thelia\Core\Template\Loop\Feature" name="feature"/>
-        <loop class="Thelia\Core\Template\Loop\FeatureAvailability" name="feature_availability"/>
+        <loop class="Thelia\Core\Template\Loop\FeatureAvailability" name="feature-availability"/>
         <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature_value"/>
         <loop class="Thelia\Core\Template\Loop\Folder" name="folder"/>
+        <loop class="Thelia\Core\Template\Loop\Module" name="module"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
         <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
@@ -31,6 +32,7 @@
         <loop class="Thelia\Core\Template\Loop\Title" name="title"/>
         <loop class="Thelia\Core\Template\Loop\Lang" name="lang"/>
         <loop class="Thelia\Core\Template\Loop\CategoryTree" name="category-tree"/>
+        <loop class="Thelia\Core\Template\Loop\FolderTree" name="folder-tree"/>
         <loop class="Thelia\Core\Template\Loop\Cart" name="cart"/>
         <loop class="Thelia\Core\Template\Loop\Image" name="image"/>
         <loop class="Thelia\Core\Template\Loop\Config" name="config"/>
@@ -100,6 +102,8 @@
 
         <form name="thelia.admin.country.creation" class="Thelia\Form\CountryCreationForm"/>
         <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
+
+        <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
 
     </forms>
 
@@ -227,6 +231,7 @@
             <argument type="service" id="request" />
             <argument type="service" id="thelia.securityContext" />
             <argument type="service" id="thelia.parser.context"/>
+            <argument type="service" id="event_dispatcher"/>
         </service>
 
         <service id="smarty.plugin.adminUtilities" class="Thelia\Core\Template\Smarty\Plugins\AdminUtilities" scope="request">

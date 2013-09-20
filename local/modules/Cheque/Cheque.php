@@ -56,7 +56,7 @@ class Cheque extends BaseModule implements PaymentModuleInterface
 
     public function pay()
     {
-        // TODO: Implement pay() method.
+        // no special process, waiting for the cheque.
     }
 
     public function install()
@@ -71,6 +71,15 @@ class Cheque extends BaseModule implements PaymentModuleInterface
         if(ModuleImageQuery::create()->filterByModule($module)->count() == 0) {
             $this->deployImageFolder($module, sprintf('%s/images', __DIR__));
         }
+
+        /* set module title */
+        $this->setTitle(
+            $module,
+            array(
+                "en_US" => "Cheque",
+                "fr_FR" => "Cheque",
+            )
+        );
     }
 
     public function destroy()

@@ -23,16 +23,23 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\CartEvent;
 use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\ProductPrice;
-use Thelia\Model\ProductPriceQuery;
-use Thelia\Model\CartItem;
-use Thelia\Model\CartItemQuery;
+use Thelia\Exception\OrderException;
+use Thelia\Exception\TheliaProcessException;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\OrderProductAttributeCombination;
+use Thelia\Model\ModuleQuery;
+use Thelia\Model\OrderProduct;
+use Thelia\Model\OrderStatus;
+use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\OrderAddress;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Tools\I18n;
 
 /**
  *
@@ -68,6 +75,230 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * @param \Thelia\Core\Event\OrderEvent $event
+     */
+    public function setInvoiceAddress(OrderEvent $event)
+    {
+        $order = $event->getOrder();
+
+        $order->chosenInvoiceAddress = $event->getInvoiceAddress();
+
+        $event->setOrder($order);
+    }
+
+    /**
+     * @param \Thelia\Core\Event\OrderEvent $event
+     */
+    public function setPaymentModule(OrderEvent $event)
+    {
+        $order = $event->getOrder();
+
+        $order->setPaymentModuleId($event->getPaymentModule());
+
+        $event->setOrder($order);
+    }
+
+    /**
+     * @param \Thelia\Core\Event\OrderEvent $event
+     */
+    public function create(OrderEvent $event)
+    {
+        $con = \Propel\Runtime\Propel::getConnection(
+            OrderTableMap::DATABASE_NAME
+        );
+
+        $con->beginTransaction();
+
+        $sessionOrder = $event->getOrder();
+
+        /* use a copy to avoid errored reccord in session */
+        $placedOrder = $sessionOrder->copy();
+        $placedOrder->setDispatcher($this->getDispatcher());
+
+        $customer = $this->getSecurityContext()->getCustomerUser();
+        $currency = $this->getSession()->getCurrency();
+        $lang = $this->getSession()->getLang();
+        $deliveryAddress = AddressQuery::create()->findPk($sessionOrder->chosenDeliveryAddress);
+        $taxCountry = $deliveryAddress->getCountry();
+        $invoiceAddress = AddressQuery::create()->findPk($sessionOrder->chosenInvoiceAddress);
+        $cart = $this->getSession()->getCart();
+        $cartItems = $cart->getCartItems();
+
+        $paymentModule = ModuleQuery::create()->findPk($placedOrder->getPaymentModuleId());
+
+        /* fulfill order */
+        $placedOrder->setCustomerId($customer->getId());
+        $placedOrder->setCurrencyId($currency->getId());
+        $placedOrder->setCurrencyRate($currency->getRate());
+        $placedOrder->setLangId($lang->getId());
+
+        /* hard save the delivery and invoice addresses */
+        $deliveryOrderAddress = new OrderAddress();
+        $deliveryOrderAddress
+            ->setCustomerTitleId($deliveryAddress->getTitleId())
+            ->setCompany($deliveryAddress->getCompany())
+            ->setFirstname($deliveryAddress->getFirstname())
+            ->setLastname($deliveryAddress->getLastname())
+            ->setAddress1($deliveryAddress->getAddress1())
+            ->setAddress2($deliveryAddress->getAddress2())
+            ->setAddress3($deliveryAddress->getAddress3())
+            ->setZipcode($deliveryAddress->getZipcode())
+            ->setCity($deliveryAddress->getCity())
+            ->setCountryId($deliveryAddress->getCountryId())
+            ->save($con)
+        ;
+
+        $invoiceOrderAddress = new OrderAddress();
+        $invoiceOrderAddress
+            ->setCustomerTitleId($invoiceAddress->getTitleId())
+            ->setCompany($invoiceAddress->getCompany())
+            ->setFirstname($invoiceAddress->getFirstname())
+            ->setLastname($invoiceAddress->getLastname())
+            ->setAddress1($invoiceAddress->getAddress1())
+            ->setAddress2($invoiceAddress->getAddress2())
+            ->setAddress3($invoiceAddress->getAddress3())
+            ->setZipcode($invoiceAddress->getZipcode())
+            ->setCity($invoiceAddress->getCity())
+            ->setCountryId($invoiceAddress->getCountryId())
+            ->save($con)
+        ;
+
+        $placedOrder->setDeliveryOrderAddressId($deliveryOrderAddress->getId());
+        $placedOrder->setInvoiceOrderAddressId($invoiceOrderAddress->getId());
+
+        $placedOrder->setStatusId(
+            OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_NOT_PAID)->getId()
+        );
+
+        $placedOrder->save($con);
+
+        /* fulfill order_products and decrease stock */
+
+        foreach($cartItems as $cartItem) {
+            $product = $cartItem->getProduct();
+
+            /* get translation */
+            $productI18n = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'Product', $product->getId());
+
+            $pse = $cartItem->getProductSaleElements();
+
+            /* check still in stock */
+            if($cartItem->getQuantity() > $pse->getQuantity()) {
+                throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
+            }
+
+            /* decrease stock */
+            $pse->setQuantity(
+                $pse->getQuantity() - $cartItem->getQuantity()
+            );
+            $pse->save($con);
+
+            /* get tax */
+            $taxRuleI18n = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'TaxRule', $product->getTaxRuleId());
+
+            $taxDetail = $product->getTaxRule()->getTaxDetail(
+                $taxCountry,
+                $cartItem->getPromo() == 1 ? $cartItem->getPromoPrice() : $cartItem->getPrice(),
+                $this->getSession()->getLang()->getLocale()
+            );
+
+            $orderProduct = new OrderProduct();
+            $orderProduct
+                ->setOrderId($placedOrder->getId())
+                ->setProductRef($product->getRef())
+                ->setProductSaleElementsRef($pse->getRef())
+                ->setTitle($productI18n->getTitle())
+                ->setChapo($productI18n->getChapo())
+                ->setDescription($productI18n->getDescription())
+                ->setPostscriptum($productI18n->getPostscriptum())
+                ->setQuantity($cartItem->getQuantity())
+                ->setPrice($cartItem->getPrice())
+                ->setPromoPrice($cartItem->getPromoPrice())
+                ->setWasNew($pse->getNewness())
+                ->setWasInPromo($cartItem->getPromo())
+                ->setWeight($pse->getWeight())
+                ->setTaxRuleTitle($taxRuleI18n->getTitle())
+                ->setTaxRuleDescription($taxRuleI18n->getDescription())
+            ;
+            $orderProduct->setDispatcher($this->getDispatcher());
+            $orderProduct->save($con);
+
+            /* fulfill order_product_tax */
+            foreach($taxDetail as $tax) {
+                $tax->setOrderProductId($orderProduct->getId());
+                $tax->save($con);
+            }
+
+            /* fulfill order_attribute_combination and decrease stock */
+            foreach($pse->getAttributeCombinations() as $attributeCombination) {
+                $attribute = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'Attribute', $attributeCombination->getAttributeId());
+                $attributeAv = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'AttributeAv', $attributeCombination->getAttributeAvId());
+
+                $orderAttributeCombination = new OrderProductAttributeCombination();
+                $orderAttributeCombination
+                    ->setOrderProductId($orderProduct->getId())
+                    ->setAttributeTitle($attribute->getTitle())
+                    ->setAttributeChapo($attribute->getChapo())
+                    ->setAttributeDescription($attribute->getDescription())
+                    ->setAttributePostscriptumn($attribute->getPostscriptum())
+                    ->setAttributeAvTitle($attributeAv->getTitle())
+                    ->setAttributeAvChapo($attributeAv->getChapo())
+                    ->setAttributeAvDescription($attributeAv->getDescription())
+                    ->setAttributeAvPostscriptum($attributeAv->getPostscriptum())
+                ;
+
+                $orderAttributeCombination->save($con);
+            }
+        }
+
+        /* discount @todo */
+
+        $con->commit();
+
+        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
+
+        /* clear session */
+        /* but memorize placed order */
+        $sessionOrder = new \Thelia\Model\Order();
+        $event->setOrder($sessionOrder);
+        $event->setPlacedOrder($placedOrder);
+        $this->getSession()->setOrder($sessionOrder);
+
+        /* empty cart @todo */
+
+        /* call pay method */
+        $paymentModuleReflection = new \ReflectionClass($paymentModule->getFullNamespace());
+        $paymentModuleInstance = $paymentModuleReflection->newInstance();
+
+        $paymentModuleInstance->setRequest($this->getRequest());
+        $paymentModuleInstance->setDispatcher($this->getDispatcher());
+
+        $paymentModuleInstance->pay($placedOrder);
+    }
+
+    /**
+     * @param \Thelia\Core\Event\OrderEvent $event
+     */
+    public function sendOrderEmail(OrderEvent $event)
+    {
+        /* @todo */
+    }
+
+    /**
+     * @param \Thelia\Core\Event\OrderEvent $event
+     */
+    public function setReference(OrderEvent $event)
+    {
+        $event->getOrder()->setRef($this->generateRef());
+    }
+
+    public function generateRef()
+    {
+        /* order addresses are unique */
+        return uniqid('ORD', true);
+    }
+
+    /**
      * Returns an array of event names this subscriber wants to listen to.
      *
      * The array keys are event names and the value can be:
@@ -92,6 +323,41 @@ class Order extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::ORDER_SET_DELIVERY_ADDRESS => array("setDeliveryAddress", 128),
             TheliaEvents::ORDER_SET_DELIVERY_MODULE => array("setDeliveryModule", 128),
+            TheliaEvents::ORDER_SET_INVOICE_ADDRESS => array("setInvoiceAddress", 128),
+            TheliaEvents::ORDER_SET_PAYMENT_MODULE => array("setPaymentModule", 128),
+            TheliaEvents::ORDER_PAY => array("create", 128),
+            TheliaEvents::ORDER_BEFORE_CREATE => array("setReference", 128),
+            TheliaEvents::ORDER_BEFORE_PAYMENT => array("sendOrderEmail", 128),
         );
+    }
+
+    /**
+     * Return the security context
+     *
+     * @return SecurityContext
+     */
+    protected function getSecurityContext()
+    {
+        return $this->container->get('thelia.securityContext');
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Request
+     */
+    protected function getRequest()
+    {
+        return $this->container->get('request');
+    }
+
+    /**
+     * Returns the session from the current request
+     *
+     * @return \Thelia\Core\HttpFoundation\Session\Session
+     */
+    protected function getSession()
+    {
+        $request = $this->getRequest();
+
+        return $request->getSession();
     }
 }

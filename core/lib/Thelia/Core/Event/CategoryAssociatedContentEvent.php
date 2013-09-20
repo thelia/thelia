@@ -21,35 +21,34 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Front;
-use Thelia\Model\ModuleQuery;
-use Thelia\Tools\URL;
+namespace Thelia\Core\Event;
 
-/**
- * Class DeliveryController
- * @package Thelia\Controller\Front
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class DeliveryController extends BaseFrontController
+use Thelia\Model\CategoryAssociatedContent;
+use Thelia\Core\Event\ActionEvent;
+
+class CategoryAssociatedContentEvent extends ActionEvent
 {
-    public function select($delivery_id)
+    public $content = null;
+
+    public function __construct(CategoryAssociatedContent $content = null)
     {
-        if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirect(URL::getInstance()->getIndexPage());
-        }
+        $this->content = $content;
+    }
 
-        $request = $this->getRequest();
+    public function hasCategoryAssociatedContent()
+    {
+        return ! is_null($this->content);
+    }
 
-        $deliveryModule = ModuleQuery::create()
-            ->filterById($delivery_id)
-            ->filterByActivate(1)
-            ->findOne()
-        ;
+    public function getCategoryAssociatedContent()
+    {
+        return $this->content;
+    }
 
-        if ($deliveryModule) {
-            $request->getSession()->setDelivery($delivery_id);
-        } else {
-            $this->pageNotFound();
-        }
+    public function setCategoryAssociatedContent(CategoryAssociatedContent $content)
+    {
+        $this->content = $content;
+
+        return $this;
     }
 }

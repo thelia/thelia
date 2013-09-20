@@ -86,7 +86,7 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         $taxRuleQuery = $this->getMock('\Thelia\Model\TaxRuleQuery', array('getTaxCalculatorCollection'));
         $taxRuleQuery->expects($this->once())
             ->method('getTaxCalculatorCollection')
-            ->with($productQuery, $countryQuery)
+            ->with($productQuery->getTaxRule(), $countryQuery)
             ->will($this->returnValue('foo'));
 
         $rewritingUrlQuery = $this->getProperty('taxRuleQuery');

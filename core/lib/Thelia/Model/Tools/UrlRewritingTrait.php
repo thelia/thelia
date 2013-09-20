@@ -44,8 +44,11 @@ trait UrlRewritingTrait {
      *
      * @param string $locale a valid locale (e.g. en_US)
      */
-    public function getUrl($locale)
+    public function getUrl($locale = null)
     {
+        if(null === $locale) {
+            $locale = $this->getLocale();
+        }
         return URL::getInstance()->retrieve($this->getRewrittenUrlViewName(), $this->getId(), $locale)->toString();
     }
 

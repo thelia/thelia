@@ -31,10 +31,12 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Base\CategoryQuery;
-use Thelia\Model\Base\ProductCategoryQuery;
-use Thelia\Model\Base\FeatureQuery;
+use Thelia\Model\CategoryQuery;
+use Thelia\Model\FeatureI18nQuery;
+use Thelia\Model\ProductCategoryQuery;
+use Thelia\Model\FeatureQuery;
 use Thelia\Model\Map\ProductCategoryTableMap;
+use Thelia\Model\ProductQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
@@ -71,7 +73,8 @@ class Feature extends BaseI18nLoop
                     new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
-            )
+            ),
+            Argument::createAnyTypeArgument('title')
         );
     }
 
@@ -132,6 +135,23 @@ class Feature extends BaseI18nLoop
                     FeatureTemplateQuery::create()->filterByTemplateId($exclude_template)->select('feature_id')->find(),
                     Criteria::NOT_IN
             );
+        }
+
+        $title = $this->getTitle();
+
+        if (null !== $title) {
+            //find all feture that match exactly this title and find with all locales.
+            $features = FeatureI18nQuery::create()
+                ->filterByTitle($title, Criteria::LIKE)
+                ->select('id')
+                ->find();
+
+            if($features) {
+                $search->filterById(
+                    $features,
+                    Criteria::IN
+                );
+            }
         }
 
         $orders  = $this->getOrder();

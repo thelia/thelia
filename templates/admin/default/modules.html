@@ -1,0 +1,276 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Modules'}{/block}
+
+{block name="check-permissions"}admin.modules.view{/block}
+
+{block name="main-content"}
+<div class="modules">
+
+    <div id="wrapper" class="container">
+        
+        <div class="clearfix">
+            <ul class="breadcrumb pull-left">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="{url path='/admin/modules'}">{intl l="Modules"}</a></li>
+            </ul>
+            {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.modules.install"}
+                <a class="btn btn-default btn-primary pull-right" title="{intl l='Install a new module'}" href="#install_dialog" data-toggle="modal">
+                    <span class="glyphicon glyphicon-import"></span> {intl l="Install a new module"}
+                </a>
+            {/loop}
+        </div>
+
+        {module_include location='modules_top'}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <caption class="clearfix">
+                               {intl l='Transport modules'}
+                            </caption>
+                            <thead>
+                                <tr>
+                                   <th>{intl l="Name"}</th>
+                                   <th>{intl l="Description"}</th>
+                                   <th>{intl l="Enable/Disable"}</th>
+
+                                   {module_include location='modules_table_header'}
+
+                                   <th class="actions">{intl l="Actions"}</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td><a href="">Tinymce</a></td>                                    
+                                    <td>Eos minima maiores doloribus mollitia perspiciatis esse iusto odit error delectus aliquid! Eius, pariatur accusantium odit quidem laboriosam.</td>                                    
+                                    <td>
+                                        <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                                            <input type="checkbox" checked>
+                                        </div>
+                                    </td>
+
+                                    {module_include location='modules_table_row'}
+
+                                    <td>
+                                        <div class="btn-group">
+                                            
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.modules.documentation"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"><span class="glyphicon glyphicon-book"></span></a>
+                                            {/loop}
+
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.modules.edit"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                            {/loop}                                                                                                                
+
+                                            {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.modules.delete"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Delete this module'}"  href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                            {/loop}
+                                        </div>
+                                    </td>
+                                </tr>                                
+                                <tr>
+                                    <td><a href="">So colissimo</a></td>                                    
+                                    <td>Eos minima maiores doloribus mollitia perspiciatis esse iusto odit error delectus aliquid</td>                                    
+                                    <td>
+                                        <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                                            <input type="checkbox">
+                                        </div>
+                                    </td>
+
+                                    {module_include location='modules_table_row'}
+
+                                    <td>
+                                        <div class="btn-group">
+                                            
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.modules.documentation"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"><span class="glyphicon glyphicon-book"></span></a>
+                                            {/loop}
+
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.modules.edit"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                            {/loop}                                                                                                                
+
+                                            {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.modules.delete"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Delete this module'}"  href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                            {/loop}
+                                        </div>
+                                    </td>
+                                </tr>                                
+                                <tr>
+                                    <td><a href="">Title meta</a></td>                                    
+                                    <td>Eos minima maiores doloribus mollitia perspiciatis esse iusto odit error delectus aliquid</td>                                    
+                                    <td>
+                                        <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                                            <input type="checkbox">
+                                        </div>
+                                    </td>
+
+                                    {module_include location='modules_table_row'}
+
+                                    <td>
+                                        <div class="btn-group">
+                                            
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.modules.documentation"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"><span class="glyphicon glyphicon-book"></span></a>
+                                            {/loop}
+
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.modules.edit"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                            {/loop}                                                                                                                
+
+                                            {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.modules.delete"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Delete this module'}"  href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                            {/loop}
+                                        </div>
+                                    </td>
+                                </tr>                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>                
+
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <caption class="clearfix">
+                               {intl l='Delivery modules'}
+                            </caption>
+                            <thead>
+                                <tr>
+                                   <th>{intl l="Name"}</th>
+                                   <th>{intl l="Description"}</th>
+                                   <th>{intl l="Enable/Disable"}</th>
+
+                                   {module_include location='modules_table_header'}
+
+                                   <th class="actions">{intl l="Actions"}</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <td><a href="">Tinymce</a></td>                                    
+                                    <td>Eos minima maiores doloribus mollitia perspiciatis esse iusto odit error delectus aliquid! Eius, pariatur accusantium odit quidem laboriosam.</td>                                    
+                                    <td>
+                                        <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                                            <input type="checkbox" checked>
+                                        </div>
+                                    </td>
+
+                                    {module_include location='modules_table_row'}
+
+                                    <td>
+                                        <div class="btn-group">
+                                            
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.modules.documentation"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"><span class="glyphicon glyphicon-book"></span></a>
+                                            {/loop}
+
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.modules.edit"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                            {/loop}                                                                                                                
+
+                                            {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.modules.delete"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Delete this module'}"  href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                            {/loop}
+                                        </div>
+                                    </td>
+                                </tr>                                
+                                <tr>
+                                    <td><a href="">So colissimo</a></td>                                    
+                                    <td>Eos minima maiores doloribus mollitia perspiciatis esse iusto odit error delectus aliquid</td>                                    
+                                    <td>
+                                        <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                                            <input type="checkbox">
+                                        </div>
+                                    </td>
+
+                                    {module_include location='modules_table_row'}
+
+                                    <td>
+                                        <div class="btn-group">
+                                            
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.modules.documentation"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"><span class="glyphicon glyphicon-book"></span></a>
+                                            {/loop}
+
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.modules.edit"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                            {/loop}                                                                                                                
+
+                                            {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.modules.delete"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Delete this module'}"  href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                            {/loop}
+                                        </div>
+                                    </td>
+                                </tr>                                
+                                <tr>
+                                    <td><a href="">Title meta</a></td>                                    
+                                    <td>Eos minima maiores doloribus mollitia perspiciatis esse iusto odit error delectus aliquid</td>                                    
+                                    <td>
+                                        <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                                            <input type="checkbox">
+                                        </div>
+                                    </td>
+
+                                    {module_include location='modules_table_row'}
+
+                                    <td>
+                                        <div class="btn-group">
+                                            
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.modules.documentation"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"><span class="glyphicon glyphicon-book"></span></a>
+                                            {/loop}
+
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.modules.edit"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                            {/loop}                                                                                                                
+
+                                            {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.modules.delete"}
+                                               <a class="btn btn-default btn-xs" title="{intl l='Delete this module'}"  href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                            {/loop}
+                                        </div>
+                                    </td>
+                                </tr>                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {module_include location='modules_bottom'}
+
+    </div>
+</div>
+
+{* Delete module confirmation dialog *}
+
+{capture "delete_module_dialog"}
+    <input type="hidden" name="current_module_id" value="{$current_module_id}" />
+    <input type="hidden" name="module_id" id="delete_module_id" value"" />
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "delete_module_dialog"
+    dialog_title    = {intl l="Delete a module"}
+    dialog_message  = {intl l="Do you really want to delete this module ?"}
+
+    form_action         = {url path='/admin/modules/delete'}
+    form_content        = {$smarty.capture.delete_module_dialog nofilter}
+}
+
+{/block}
+
+{block name="javascript-initialization"}
+
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+{/block}

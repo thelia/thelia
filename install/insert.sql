@@ -27,7 +27,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('thelia_admin_remember_me_cookie_expiration', 2592000, 0, 0, NOW(), NOW()),
 ('thelia_customer_remember_me_cookie_name', 'tcrmcn', 0, 0, NOW(), NOW()),
 ('thelia_customer_remember_me_cookie_expiration', 31536000, 0, 0, NOW(), NOW()),
-('session_config.handlers', 'Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler', 0, 0, NOW(), NOW())
+('session_config.handlers', 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\NativeFileSessionHandler', 0, 0, NOW(), NOW())
 ;
 
 
@@ -1153,7 +1153,7 @@ INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `upda
 INSERT INTO `tax_i18n` (`id`, `locale`, `title`)
   VALUES
   (1, 'fr_FR', 'TVA française à 19.6%'),
-  (1, 'en_UK', 'french 19.6% tax');
+  (1, 'en_US', 'french 19.6% tax');
 
 INSERT INTO  `tax_rule` (`id`, `is_default`, `created_at`, `updated_at`)
   VALUES
@@ -1162,8 +1162,27 @@ INSERT INTO  `tax_rule` (`id`, `is_default`, `created_at`, `updated_at`)
 INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`)
   VALUES
   (1, 'fr_FR', 'TVA française à 19.6%'),
-  (1, 'en_UK', 'french 19.6% tax');
+  (1, 'en_US', 'french 19.6% tax');
 
 INSERT INTO  `tax_rule_country` (`tax_rule_id`, `country_id`, `tax_id`, `position`, `created_at`, `updated_at`)
   VALUES
   (1, 64, 1, 1, NOW(), NOW());
+
+INSERT INTO `order_status`(`id`, `code`, `created_at`, `updated_at`) VALUES
+(1, 'not_paid', NOW(), NOW()),
+(2, 'paid', NOW(), NOW()),
+(3, 'processing', NOW(), NOW()),
+(4, 'sent', NOW(), NOW()),
+(5, 'canceled', NOW(), NOW());
+
+INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(1, 'en_US', 'Not paid', '', '', ''),
+(1, 'fr_FR', 'Non payée', '', '', ''),
+(2, 'en_US', 'Paid', '', '', ''),
+(2, 'fr_FR', 'Payée', '', '', ''),
+(3, 'en_US', 'Processing', '', '', ''),
+(3, 'fr_FR', 'Traitement', '', '', ''),
+(4, 'en_US', 'Sent', '', '', ''),
+(4, 'fr_FR', 'Envoyée', '', '', ''),
+(5, 'en_US', 'Canceled', '', '', ''),
+(5, 'fr_FR', 'Annulée', '', '', '');

@@ -44,8 +44,8 @@ class Folder extends BaseFolder
 
         foreach($children as $child)
         {
-            $contentsCount += ProductQuery::create()
-                ->filterByCategory($child)
+            $contentsCount += ContentQuery::create()
+                ->filterByFolder($child)
                 ->count();
         }
 
