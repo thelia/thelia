@@ -184,6 +184,12 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateAccessoryPositionAction</default>
     </route>
 
+    <!--Features and attributes -->
+
+    <route id="admin.products.update-attributes-and-features" path="/admin/product/{productId}/update-attributes-and-features">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateAttributesAndFeaturesAction</default>
+    </route>
+
 
     <!--  Folder routes management -->
     <route id="admin.folders.default" path="/admin/folders">
