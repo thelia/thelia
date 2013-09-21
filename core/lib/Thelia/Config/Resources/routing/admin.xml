@@ -200,8 +200,9 @@
         <default key="_controller">Thelia\Controller\Admin\FolderController::createAction</default>
     </route>
 
-    <route id="admin.folders.update" path="/admin/folders/update" methods="get">
+    <route id="admin.folders.update" path="/admin/folders/update/{folder_id}">
         <default key="_controller">Thelia\Controller\Admin\FolderController::updateAction</default>
+        <requirement key="folder_id">\d+</requirement>
     </route>
 
     <route id="admin.folders.toggle-online" path="/admin/folders/toggle-online">

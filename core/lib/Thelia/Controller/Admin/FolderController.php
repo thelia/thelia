@@ -312,7 +312,7 @@ class FolderController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute("admin.folders.update", $this->getEditionArguments());
+        $this->redirect($this->getRoute('admin.folders.update', $this->getEditionArguments()));
     }
 
     /**
