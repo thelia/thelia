@@ -17,7 +17,7 @@ class Content extends BaseContent
     /**
      * {@inheritDoc}
      */
-    protected function getRewritenUrlViewName() {
+    protected function getRewrittenUrlViewName() {
         return 'content';
     }
 
@@ -36,8 +36,6 @@ class Content extends BaseContent
     public function preInsert(ConnectionInterface $con = null)
     {
         $this->setPosition($this->getNextPosition());
-
-        $this->generateRewritenUrl($this->getLocale());
 
         return true;
     }

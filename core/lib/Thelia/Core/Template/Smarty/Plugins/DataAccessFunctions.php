@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Security\SecurityContext;
@@ -53,12 +54,14 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     private $securityContext;
     protected $parserContext;
     protected $request;
+    protected $dispatcher;
 
-    public function __construct(Request $request, SecurityContext $securityContext, ParserContext $parserContext)
+    public function __construct(Request $request, SecurityContext $securityContext, ParserContext $parserContext, ContainerAwareEventDispatcher $dispatcher)
     {
         $this->securityContext = $securityContext;
         $this->parserContext = $parserContext;
         $this->request = $request;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -188,7 +191,22 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
     public function orderDataAccess($params, &$smarty)
     {
-        return $this->dataAccess("Order", $params, $this->request->getSession()->getOrder());
+        $order = $this->request->getSession()->getOrder();
+        $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
+        switch($attribute) {
+            case 'postage':
+                return $order->getPostage();
+            case 'delivery_address':
+                return $order->chosenDeliveryAddress;
+            case 'invoice_address':
+                return $order->chosenInvoiceAddress;
+            case 'delivery_module':
+                return $order->getDeliveryModuleId();
+            case 'payment_module':
+                return $order->getPaymentModuleId();
+        }
+
+        throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", 'Order', $attribute));
      }
 
     /**
@@ -196,6 +214,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      *
      * @param $params
      * @param $smarty
+     *
+     * @return string
      */
     public function langDataAccess($params, $smarty)
     {
@@ -294,6 +314,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
+
         return array(
             new SmartyPluginDescriptor('function', 'admin', $this, 'adminDataAccess'),
             new SmartyPluginDescriptor('function', 'customer', $this, 'customerDataAccess'),
@@ -307,5 +328,15 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'cart', $this, 'cartDataAccess'),
             new SmartyPluginDescriptor('function', 'order', $this, 'orderDataAccess'),
         );
+    }
+
+    /**
+     * Return the event dispatcher,
+     *
+     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
     }
 }

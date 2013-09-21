@@ -35,10 +35,10 @@ Installation
 ------------
 
 ``` bash
-$ git clone --recursive https://github.com/thelia/thelia.git
+$ git clone https://github.com/thelia/thelia.git
 $ cd thelia
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar install --optimize-autoloader
+$ php composer.phar install --prefer-dist --optimize-autoloader
 ```
 
 Finish the installation using cli tools :

@@ -93,8 +93,10 @@ class Accessory extends Product
         $accessories = $this->search($search);
 
         $accessoryIdList = array(0);
+        $accessoryPosition = array();
         foreach ($accessories as $accessory) {
             array_push($accessoryIdList, $accessory->getAccessory());
+            $accessoryPosition[$accessory->getAccessory()] = $accessory->getPosition();
         }
 
         $receivedIdList = $this->getId();
@@ -106,7 +108,15 @@ class Accessory extends Product
             $this->args->get('id')->setValue( implode(',', array_intersect($receivedIdList, $accessoryIdList)) );
         }
 
-        return parent::exec($pagination);
+        $loopResult = parent::exec($pagination);
+
+        foreach($loopResult as $loopResultRow) {
+            $loopResultRow
+                ->set("POSITION"         , $accessoryPosition[$loopResultRow->get('ID')])
+            ;
+        }
+
+        return $loopResult;
     }
 
 }

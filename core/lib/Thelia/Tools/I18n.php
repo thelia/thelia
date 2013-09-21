@@ -23,6 +23,8 @@
 
 namespace Thelia\Tools;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Model\Lang;
 
 /**
@@ -55,4 +57,38 @@ class I18n
         return \DateTime::createFromFormat($currentDateFormat, $date);
     }
 
+    public static function forceI18nRetrieving($askedLocale, $modelName, $id, $needed = array('Title'))
+    {
+        $i18nQueryClass = sprintf("\\Thelia\\Model\\%sI18nQuery", $modelName);
+        $i18nClass = sprintf("\\Thelia\\Model\\%sI18n", $modelName);
+
+        /* get customer language translation */
+        $i18n = $i18nQueryClass::create()
+            ->filterById($id)
+            ->filterByLocale(
+                $askedLocale
+            )->findOne();
+        /* or default translation */
+        if(null === $i18n) {
+            $i18n = $i18nQueryClass::create()
+                ->filterById($id)
+                ->filterByLocale(
+                    Lang::getDefaultLanguage()->getLocale()
+                )->findOne();
+        }
+        if(null === $i18n) { // @todo something else ?
+            $i18n = new $i18nClass();;
+            $i18n->setId($id);
+            foreach($needed as $need) {
+                $method = sprintf('set%s', $need);
+                if(method_exists($i18n, $method)) {
+                    $i18n->$method('DEFAULT ' . strtoupper($need));
+                } else {
+                    // @todo throw sg ?
+                }
+            }
+        }
+
+        return $i18n;
+    }
 }

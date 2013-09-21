@@ -28,7 +28,7 @@ class Category extends BaseCategory
     /**
      * {@inheritDoc}
      */
-    protected function getRewritenUrlViewName() {
+    protected function getRewrittenUrlViewName() {
         return 'category';
     }
 
@@ -68,8 +68,6 @@ class Category extends BaseCategory
     public function preInsert(ConnectionInterface $con = null)
     {
         $this->setPosition($this->getNextPosition());
-
-        $this->generateRewritenUrl($this->getLocale());
 
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECATEGORY, new CategoryEvent($this));
 

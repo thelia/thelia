@@ -40,24 +40,23 @@
 	                <div class="col-md-12">
 
 						<ul class="nav nav-tabs" id="tabbed-menu">
-		                    <li class="active"><a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
-
-		                    <li><a href="#details" data-toggle="tab">{intl l="Details"}</a></li>
-		                    <li><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
-		                    <li><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
-		                    <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
+                            <li {if $current_tab == 'general'}class="active"{/if}><a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
+                            <li {if $current_tab == 'details'}class="active"{/if}><a href="#details" data-toggle="tab">{intl l="Details"}</a></li>
+                            <li {if $current_tab == 'images'}class="active"{/if}><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
+                            <li {if $current_tab == 'documents'}class="active"{/if}><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
+                            <li {if $current_tab == 'modules'}class="active"{/if}><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
 		 				</ul>
 
 		                <div class="tab-content">
 
-		                    <div class="tab-pane fade active in" id="general">
+		                    <div class="tab-pane fade {if $current_tab == 'general'}active in{/if}" id="general">
 
 			                    <div class="form-container">
 
 				                    {form name="thelia.admin.category.modification"}
 				                    <form method="POST" action="{url path='/admin/categories/save'}" {form_enctype form=$form} class="clearfix">
 
-	                                    {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/categories' category_id=$category_id}"}
+	                                    {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/categories' category_id=$PARENT}"}
 
 			                            {* Be sure to get the category ID, even if the form could not be validated *}
 			                            <input type="hidden" name="category_id" value="{$category_id}" />
@@ -141,7 +140,7 @@
 			                    </div>
 		                    </div>
 
-		                    <div class="tab-pane fade" id="details">
+		                    <div class="tab-pane fade {if $current_tab == 'details'}active in{/if}" id="details">
 		                        <div class="form-container">
 									<div class="form-group">
 									    <form action="{url path='/admin/categories/related-content/add'}" id="related_content_form">
@@ -149,8 +148,11 @@
 									        {include
 									            file="includes/inner-form-toolbar.html"
 									            hide_submit_buttons=true
-									            close_url="{url path='/admin/categories' category_id=$category_id}"
+									            close_url="{url path='/admin/categories' category_id=$PARENT}"
 									        }
+
+                                            <p class="title title-without-tabs">{intl l='Related content'}</p>
+                                            <p>{intl l='You can attach here some content to this product'}</p>
 
 									        <input type="hidden" name="category_id" value="{$category_id}" />
 									        <input type="hidden" name="current_tab" value="details" />
@@ -162,8 +164,8 @@
 									                <div class="form-group">
 									                    <select name="folder_id" id="folder_id" class="form-control">
 									                        <option value="">Select a folder...</option>
-									                        {loop name="folders" type="folder" backend_context="1" lang="$edit_language_id"}
-									                            <option value="{$ID}">{$TITLE}</option>
+									                        {loop name="folders" type="folder-tree" folder="0" backend_context="1" lang="$edit_language_id"}
+									                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
 									                        {/loop}
 									                    </select>
 									                </div>
@@ -183,6 +185,12 @@
 
 									                    <span class="help-block">{intl l='Select a content and click (+) to add it to this category'}</span>
 									                </div>
+
+									                <div id="content_selector_empty" class="hide">
+									                   <div class="alert alert-info">
+									                       {intl l="No available content in this folder"}
+									                   </div>
+									                </div>
 									            </div>
 
 									        </div>
@@ -195,64 +203,66 @@
 									    </form>
 									</div>
 
-									<table class="table table-striped table-condensed table-left-aligned">
-									    <thead>
-									        <tr>
-									            <th>{intl l='ID'}</th>
+                                    <div class="table-responsive">
+										<table class="table table-striped table-condensed table-left-aligned">
+										    <thead>
+										        <tr>
+										            <th>{intl l='ID'}</th>
 
-									            <th>{intl l='Attribute title'}</th>
+										            <th>{intl l='Content title'}</th>
 
-									            {module_include location='category_contents_table_header'}
+										            {module_include location='category_contents_table_header'}
 
-									            <th class="actions">{intl l="Actions"}</th>
-									        </tr>
-									    </thead>
+										            <th class="actions">{intl l="Actions"}</th>
+										        </tr>
+										    </thead>
 
-									    <tbody>
-									        {loop name="assigned_contents" type="associated_content" category="$category_id" backend_context="1" lang="$edit_language_id"}
-									        <tr>
-									            <td>{$ID}</td>
+										    <tbody>
+										        {loop name="assigned_contents" type="associated_content" category="$category_id" backend_context="1" lang="$edit_language_id"}
+										        <tr>
+										            <td>{$ID}</td>
 
-									            <td>
-									                {$TITLE}
-									            </td>
+										            <td>
+										                {$TITLE}
+										            </td>
 
-									            {module_include location='category_contents_table_row'}
+										            {module_include location='category_contents_table_row'}
 
-									            <td class="actions">
-									                <div class="btn-group">
-									                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.category.content.delete"}
-									                       <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$ID}" data-toggle="modal">
-									                        <span class="glyphicon glyphicon-trash"></span>
-									                       </a>
-									                    {/loop}
-									                </div>
-									            </td>
-									        </tr>
-									         {/loop}
+										            <td class="actions">
+										                <div class="btn-group">
+										                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.category.content.delete"}
+										                       <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$ID}" data-toggle="modal">
+										                        <span class="glyphicon glyphicon-trash"></span>
+										                       </a>
+										                    {/loop}
+										                </div>
+										            </td>
+										        </tr>
+										         {/loop}
 
-									         {elseloop rel="assigned_contents"}
-									             <tr>
-									                 <td colspan="3">
-									                     <div class="alert alert-info">
-									                         {intl l="This category contains no contents"}
-									                     </div>
-									                 </td>
-									             </tr>
-									         {/elseloop}
-									    </tbody>
-									</table>
+										         {elseloop rel="assigned_contents"}
+										             <tr>
+										                 <td colspan="3">
+										                     <div class="alert alert-info">
+										                         {intl l="This category contains no contents"}
+										                     </div>
+										                 </td>
+										             </tr>
+										         {/elseloop}
+										    </tbody>
+										</table>
+									</div>
 			                    </div>
 		                    </div>
 
-		                    <div class="tab-pane fade" id="images">
+		                    <div class="tab-pane fade {if $current_tab == 'images'}active in{/if}" id="images">
                                 {include file='includes/image-upload-form.html' formName="thelia.admin.category.image.creation" formSuccessUrl={url path="/admin/categories/update?category_id=$category_id"} imageType='category' parentId=$category_id}
+                            </div>
+
+		                    <div class="tab-pane fade {if $current_tab == 'documents'}active in{/if}" id="documents">
 		                    </div>
 
-		                    <div class="tab-pane fade" id="documents">
-		                    </div>
-
-		                    <div class="tab-pane fade" id="modules">
+		                    <div class="tab-pane fade {if $current_tab == 'modules'}active in{/if}" id="modules">
 		                    </div>
 		                 </div>
                     </div>
@@ -290,7 +300,25 @@
 {javascripts file='assets/js/image-upload.js'}
     <script src="{$asset_url}"></script>
 {/javascripts}
+
+<script src="{url file='/tinymce/tinymce.min.js'}"></script>
 <script>
+	tinymce.init({
+		selector: ".wysiwyg",
+		theme: "modern",
+		menubar : false,
+		language: "",
+		plugins: [
+		     "advlist autolink link image lists charmap print preview hr anchor pagebreak",
+		     "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
+		     "table contextmenu directionality emoticons paste textcolor filemanager"
+		],
+		toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | styleselect | filemanager | link unlink anchor | image media | forecolor backcolor  | print preview code ",
+		image_advtab: true ,
+		external_filemanager_path:"{url file='/tinymce/plugins/filemanager/'}'",
+		filemanager_title:"{intl l='Files manager'}" ,
+		external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
+	 });
 
 $(function() {
 
@@ -300,12 +328,6 @@ $(function() {
     	ev.preventDefault();
     });
 
-    // Show proper tab, if defined
-    {if ! empty($current_tab)}
-    $('#tabbed-menu a[href="#{$current_tab}"]').tab('show')
-    {/if}
-
-
     // Set proper content ID in delete content from
     $('a.delete-content').click(function(ev) {
         $('#content_delete_id').val($(this).data('id'));
@@ -314,28 +336,41 @@ $(function() {
 
     // Load content on folder selection
     $('#folder_id').change(function(event) {
-        $.ajax({
-             url      : '{url path="/admin/category/$category_id/available-related-content/"}' + $(this).val() + '.xml',
-             type     : 'get',
-             dataType : 'json',
-             success  : function(json) {
-                 $('#content_id :not(:first-child)').remove();
 
-                 var have_content = false;
+    	var val = $(this).val();
 
-                 $.each(json, function(idx, value) {
-                     $('#content_id').append($('<option>').text(value.title).attr('value', value.id));
+        if (val != "") {
+	        $.ajax({
+	             url      : '{url path="/admin/category/$category_id/available-related-content/"}' + val + '.xml',
+	             type     : 'get',
+	             dataType : 'json',
+	             success  : function(json) {
+	                 $('#content_id :not(:first-child)').remove();
 
-                     have_content = true; // Lame...
-                 });
+	                 var have_content = false;
 
-                 if (have_content)
-                     $('#content_selector').removeClass('hide');
-                 else
-                     $('#content_selector').addClass('hide');
+	                 $.each(json, function(idx, value) {
+	                     $('#content_id').append($('<option>').text(value.title).attr('value', value.id));
 
-             }
-        });
+	                     have_content = true; // Lame...
+	                 });
+
+	                 if (have_content) {
+	                	 $('#content_selector_empty').addClass('hide');
+	                     $('#content_selector').removeClass('hide');
+	                 }
+	                 else {
+	                	 $('#content_selector_empty').removeClass('hide');
+	                     $('#content_selector').addClass('hide');
+	                 }
+
+	             }
+	        });
+        }
+        else {
+            $('#content_selector_empty').addClass('hide');
+        	$('#content_selector').addClass('hide');
+        }
     });
 
     // Initialize folder (id={$folder_id}) select value

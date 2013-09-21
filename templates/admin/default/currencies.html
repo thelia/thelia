@@ -23,166 +23,166 @@
                     <form action="{url path='/admin/configuration/currencies/update-rates'}" method="post">
 
                         <div class="general-block-decorator">
-
-                            <table class="table table-striped table-condensed">
-                               <caption class="clearfix">
-                                    {intl l='Currencies'}
-                                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.currencies.create"}
-                                        <span class="pull-right">
-                                            <button class="btn btn-default btn-info" title="{intl l='Update rates'}">{intl l='Update rates'} <span class="glyphicon glyphicon-globe"></span></button>
-                                            <a class="btn btn-default btn-primary" title="{intl l='Add a new currency'}" href="#creation_dialog" data-toggle="modal">
-                                                <span class="glyphicon glyphicon-plus-sign"></span>
-                                            </a>
-                                        </span>
-                                    {/loop}
-                                </caption>
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            {admin_sortable_header
-                                            current_order=$order
-                                            order='id'
-                                            reverse_order='id_reverse'
-                                            path='/admin/configuration/currencies'
-                                            label="{intl l='ID'}"
-                                            }
-                                        </th>
-
-                                        <th>
-                                            {admin_sortable_header
-                                            current_order=$order
-                                            order='name'
-                                            reverse_order='name_reverse'
-                                            path='/admin/configuration/currencies'
-                                            label="{intl l='Name'}"
-                                            }
-                                        </th>
-
-                                        <th class="text-center">
-                                            {admin_sortable_header
-                                            current_order=$order
-                                            order='code'
-                                            reverse_order='code_reverse'
-                                            path='/admin/configuration/currencies'
-                                            label="{intl l="ISO 4217 Code"}"
-                                            }
-                                            <a title="{intl l='More information about ISO 4217'}" href="http://fr.wikipedia.org/wiki/ISO_4217" target="_blank"><i class="glyphicon glyphicon-question-sign"></i></a>
-                                        </th>
-
-                                        <th class="text-center">
-                                            {admin_sortable_header
-                                            current_order=$order
-                                            order='symbol'
-                                            reverse_order='symbol_reverse'
-                                            path='/admin/configuration/currencies'
-                                            label="{intl l="Symbol"}"
-                                            }
-                                        </th>
-
-                                        <th class="text-right">
-                                            {admin_sortable_header
-                                            current_order=$order
-                                            order='rate'
-                                            reverse_order='rate_reverse'
-                                            path='/admin/configuration/currencies'
-                                            label="{intl l="Rate in &euro;"}"
-                                            }
-                                        </th>
-
-                                        <th class="text-center">
-                                            {admin_sortable_header
-                                            current_order=$order
-                                            order='manual'
-                                            reverse_order='manual_reverse'
-                                            path='/admin/configuration/currencies'
-                                            label="{intl l="Position"}"
-                                            }
-                                        </th>
-
-                                        <th class="text-center">
-                                            {admin_sortable_header
-                                            current_order=$order
-                                            order='is_default'
-                                            reverse_order='is_default_reverse'
-                                            path='/admin/configuration/currencies'
-                                            label="{intl l="Default"}"
-                                            }
-                                        </th>
-
-                                        {module_include location='currencies_table_header'}
-
-                                        <th class="actions">{intl l='Actions'}</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    {loop name="currencies" type="currency" backend_context="1" lang=$lang_id order=$order}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-condensed">
+                                   <caption class="clearfix">
+                                        {intl l='Currencies'}
+                                        {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.currencies.create"}
+                                            <span class="pull-right">
+                                                <button class="btn btn-default btn-info" title="{intl l='Update rates'}">{intl l='Update rates'} <span class="glyphicon glyphicon-globe"></span></button>
+                                                <a class="btn btn-default btn-primary" title="{intl l='Add a new currency'}" href="#creation_dialog" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-plus-sign"></span>
+                                                </a>
+                                            </span>
+                                        {/loop}
+                                    </caption>
+                                    <thead>
                                         <tr>
-                                            <td>{$ID}</td>
-
-                                            <td>
-                                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.currencies.change"}
-                                                    <a title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id=$ID}">{$NAME}</a>
-                                                {/loop}
-                                                {elseloop rel="can_change"}
-                                                    {$NAME}
-                                                {/elseloop}
-                                            </td>
-
-                                            <td class="text-center">{$ISOCODE}</td>
-
-                                            <td class="text-center">{$SYMBOL}</td>
-
-                                            <td class="text-right">{format_number number="$RATE" decimals="4"}</td>
-
-                                            <td class="text-center">
-                                                {admin_position_block
-                                                permission="admin.currencies.edit"
-                                                path="/admin/configuration/currencies/update-position"
-                                                url_parameter="currency_id"
-                                                in_place_edit_class="currencyPositionChange"
-                                                position="$POSITION"
-                                                id="$ID"
+                                            <th>
+                                                {admin_sortable_header
+                                                current_order=$order
+                                                order='id'
+                                                reverse_order='id_reverse'
+                                                path='/admin/configuration/currencies'
+                                                label="{intl l='ID'}"
                                                 }
-                                            </td>
+                                            </th>
 
-                                            <td class="text-center">
-                                                <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
-                                                    <input class="change-default" type="radio" name="is_default" value="{$ID}" {if $IS_DEFAULT}checked="checked"{/if}/>
-                                                </div>
-                                            </td>
+                                            <th>
+                                                {admin_sortable_header
+                                                current_order=$order
+                                                order='name'
+                                                reverse_order='name_reverse'
+                                                path='/admin/configuration/currencies'
+                                                label="{intl l='Name'}"
+                                                }
+                                            </th>
 
-                                            {module_include location='currencies_table_row'}
+                                            <th class="text-center">
+                                                {admin_sortable_header
+                                                current_order=$order
+                                                order='code'
+                                                reverse_order='code_reverse'
+                                                path='/admin/configuration/currencies'
+                                                label="{intl l="ISO 4217 Code"}"
+                                                }
+                                                <a title="{intl l='More information about ISO 4217'}" href="http://fr.wikipedia.org/wiki/ISO_4217" target="_blank"><i class="glyphicon glyphicon-question-sign"></i></a>
+                                            </th>
 
-                                            <td class="actions">
-                                                <div class="btn-group">
+                                            <th class="text-center">
+                                                {admin_sortable_header
+                                                current_order=$order
+                                                order='symbol'
+                                                reverse_order='symbol_reverse'
+                                                path='/admin/configuration/currencies'
+                                                label="{intl l="Symbol"}"
+                                                }
+                                            </th>
+
+                                            <th class="text-right">
+                                                {admin_sortable_header
+                                                current_order=$order
+                                                order='rate'
+                                                reverse_order='rate_reverse'
+                                                path='/admin/configuration/currencies'
+                                                label="{intl l="Rate in &euro;"}"
+                                                }
+                                            </th>
+
+                                            <th class="text-center">
+                                                {admin_sortable_header
+                                                current_order=$order
+                                                order='manual'
+                                                reverse_order='manual_reverse'
+                                                path='/admin/configuration/currencies'
+                                                label="{intl l="Position"}"
+                                                }
+                                            </th>
+
+                                            <th class="text-center">
+                                                {admin_sortable_header
+                                                current_order=$order
+                                                order='is_default'
+                                                reverse_order='is_default_reverse'
+                                                path='/admin/configuration/currencies'
+                                                label="{intl l="Default"}"
+                                                }
+                                            </th>
+
+                                            {module_include location='currencies_table_header'}
+
+                                            <th class="actions">{intl l='Actions'}</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {loop name="currencies" type="currency" backend_context="1" lang=$lang_id order=$order}
+                                            <tr>
+                                                <td>{$ID}</td>
+
+                                                <td>
                                                     {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.currencies.change"}
-                                                        <a class="btn btn-default btn-xs currency-change" title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id="$ID"}">
-                                                            <span class="glyphicon glyphicon-edit"></span>
-                                                        </a>
+                                                        <a title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id=$ID}">{$NAME}</a>
                                                     {/loop}
+                                                    {elseloop rel="can_change"}
+                                                        {$NAME}
+                                                    {/elseloop}
+                                                </td>
 
-                                                    {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.currencies.delete"}
-                                                        <a class="btn btn-default btn-xs currency-delete" title="{intl l='Delete this currency'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
-                                                            <span class="glyphicon glyphicon-trash"></span>
-                                                        </a>
-                                                    {/loop}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {/loop}
-                                    {elseloop rel="currencies"}
-                                        <tr>
-                                            <td colspan="8">
-                                                <div class="alert alert-info">
-                                                    {intl l="No currency has been created yet. Click the + button to create one."}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {/elseloop}
-                                </tbody>
-                            </table>
+                                                <td class="text-center">{$ISOCODE}</td>
 
+                                                <td class="text-center">{$SYMBOL}</td>
+
+                                                <td class="text-right">{format_number number="$RATE" decimals="4"}</td>
+
+                                                <td class="text-center">
+                                                    {admin_position_block
+                                                    permission="admin.currencies.edit"
+                                                    path="/admin/configuration/currencies/update-position"
+                                                    url_parameter="currency_id"
+                                                    in_place_edit_class="currencyPositionChange"
+                                                    position="$POSITION"
+                                                    id="$ID"
+                                                    }
+                                                </td>
+
+                                                <td class="text-center">
+                                                    <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                        <input class="change-default" type="radio" name="is_default" value="{$ID}" {if $IS_DEFAULT}checked="checked"{/if}/>
+                                                    </div>
+                                                </td>
+
+                                                {module_include location='currencies_table_row'}
+
+                                                <td class="actions">
+                                                    <div class="btn-group">
+                                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.currencies.change"}
+                                                            <a class="btn btn-default btn-xs currency-change" title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id="$ID"}">
+                                                                <span class="glyphicon glyphicon-edit"></span>
+                                                            </a>
+                                                        {/loop}
+
+                                                        {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.currencies.delete"}
+                                                            <a class="btn btn-default btn-xs currency-delete" title="{intl l='Delete this currency'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
+                                                                <span class="glyphicon glyphicon-trash"></span>
+                                                            </a>
+                                                        {/loop}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {/loop}
+                                        {elseloop rel="currencies"}
+                                            <tr>
+                                                <td colspan="8">
+                                                    <div class="alert alert-info">
+                                                        {intl l="No currency has been created yet. Click the + button to create one."}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {/elseloop}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                     </form>

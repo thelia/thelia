@@ -36,7 +36,7 @@ CREATE TABLE `product`
     `ref` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER NOT NULL,
-    `template_id` INTEGER NOT NULL,
+    `template_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -135,6 +135,7 @@ DROP TABLE IF EXISTS `tax_rule`;
 CREATE TABLE `tax_rule`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `is_default` TINYINT(1) DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -640,7 +641,7 @@ CREATE TABLE `order`
     `customer_id` INTEGER NOT NULL,
     `invoice_order_address_id` INTEGER NOT NULL,
     `delivery_order_address_id` INTEGER NOT NULL,
-    `invoice_date` DATE NOT NULL,
+    `invoice_date` DATE,
     `currency_id` INTEGER NOT NULL,
     `currency_rate` FLOAT NOT NULL,
     `transaction_ref` VARCHAR(100) COMMENT 'transaction reference - usually use to identify a transaction with banking modules',
@@ -759,14 +760,21 @@ CREATE TABLE `order_product`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `order_id` INTEGER NOT NULL,
-    `product_ref` VARCHAR(255),
+    `product_ref` VARCHAR(255) NOT NULL,
+    `product_sale_elements_ref` VARCHAR(255) NOT NULL,
     `title` VARCHAR(255),
-    `description` TEXT,
     `chapo` TEXT,
+    `description` LONGTEXT,
+    `postscriptum` TEXT,
     `quantity` FLOAT NOT NULL,
     `price` FLOAT NOT NULL,
-    `tax` FLOAT,
-    `parent` INTEGER,
+    `promo_price` VARCHAR(45),
+    `was_new` TINYINT NOT NULL,
+    `was_in_promo` TINYINT NOT NULL,
+    `weight` VARCHAR(45),
+    `tax_rule_title` VARCHAR(255),
+    `tax_rule_description` LONGTEXT,
+    `parent` INTEGER COMMENT 'not managed yet',
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -787,29 +795,36 @@ DROP TABLE IF EXISTS `order_status`;
 CREATE TABLE `order_status`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `code` VARCHAR(45),
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- order_feature
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `order_feature`;
-
-CREATE TABLE `order_feature`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `order_product_id` INTEGER NOT NULL,
-    `feature_desc` VARCHAR(255),
-    `feature_av_desc` VARCHAR(255),
+    `code` VARCHAR(45) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_order_feature_order_product_id` (`order_product_id`),
-    CONSTRAINT `fk_order_feature_order_product_id`
+    UNIQUE INDEX `code_UNIQUE` (`code`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- order_product_attribute_combination
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_product_attribute_combination`;
+
+CREATE TABLE `order_product_attribute_combination`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_product_id` INTEGER NOT NULL,
+    `attribute_title` VARCHAR(255) NOT NULL,
+    `attribute_chapo` TEXT,
+    `attribute_description` LONGTEXT,
+    `attribute_postscriptumn` TEXT,
+    `attribute_av_title` VARCHAR(255) NOT NULL,
+    `attribute_av_chapo` TEXT,
+    `attribute_av_description` LONGTEXT,
+    `attribute_av_postscriptum` TEXT,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_order_product_attribute_combination_order_product_id` (`order_product_id`),
+    CONSTRAINT `fk_order_product_attribute_combination_order_product_id`
         FOREIGN KEY (`order_product_id`)
         REFERENCES `order_product` (`id`)
         ON UPDATE RESTRICT
@@ -895,6 +910,7 @@ CREATE TABLE `area_delivery_module`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
+    UNIQUE INDEX `area_id_delivery_module_id_UNIQUE` (`area_id`, `delivery_module_id`),
     INDEX `idx_area_delivery_module_area_id` (`area_id`),
     INDEX `idx_area_delivery_module_delivery_module_id_idx` (`delivery_module_id`),
     CONSTRAINT `fk_area_delivery_module_area_id`
@@ -1535,6 +1551,53 @@ CREATE TABLE `template`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- module_image
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_image`;
+
+CREATE TABLE `module_image`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_module_image_module_id` (`module_id`),
+    CONSTRAINT `fk_module_image_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- order_product_tax
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `order_product_tax`;
+
+CREATE TABLE `order_product_tax`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `order_product_id` INTEGER NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `description` LONGTEXT,
+    `amount` FLOAT NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_ order_product_tax_order_product_id` (`order_product_id`),
+    CONSTRAINT `fk_ order_product_tax_order_product_id0`
+        FOREIGN KEY (`order_product_id`)
+        REFERENCES `order_product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 
@@ -1608,7 +1671,7 @@ CREATE TABLE `tax_i18n`
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255),
-    `description` TEXT,
+    `description` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `tax_i18n_FK_1`
         FOREIGN KEY (`id`)
@@ -1627,7 +1690,7 @@ CREATE TABLE `tax_rule_i18n`
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255),
-    `description` TEXT,
+    `description` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `tax_rule_i18n_FK_1`
         FOREIGN KEY (`id`)
@@ -2131,6 +2194,27 @@ CREATE TABLE `template_i18n`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- module_image_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_image_i18n`;
+
+CREATE TABLE `module_image_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `module_image_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `module_image` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- category_version
 -- ---------------------------------------------------------------------
 
@@ -2167,7 +2251,7 @@ CREATE TABLE `product_version`
     `ref` VARCHAR(255) NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER NOT NULL,
-    `template_id` INTEGER NOT NULL,
+    `template_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

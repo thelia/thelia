@@ -23,17 +23,18 @@
 
 namespace Thelia\Core\Event;
 
-use Thelia\Model\Address;
-use Thelia\Model\AddressQuery;
-use Thelia\Model\Module;
 use Thelia\Model\Order;
 
 class OrderEvent extends ActionEvent
 {
     protected $order = null;
-    protected $billingAddress = null;
+    protected $placedOrder = null;
+    protected $invoiceAddress = null;
     protected $deliveryAddress = null;
     protected $deliveryModule = null;
+    protected $paymentModule = null;
+    protected $postage = null;
+    protected $ref = null;
 
     /**
      * @param Order $order
@@ -52,11 +53,19 @@ class OrderEvent extends ActionEvent
     }
 
     /**
+     * @param Order $order
+     */
+    public function setPlacedOrder(Order $order)
+    {
+        $this->placedOrder = $order;
+    }
+
+    /**
      * @param $address
      */
-    public function setBillingAddress($address)
+    public function setInvoiceAddress($address)
     {
-        $this->deliveryAddress = $address;
+        $this->invoiceAddress = $address;
     }
 
     /**
@@ -76,6 +85,30 @@ class OrderEvent extends ActionEvent
     }
 
     /**
+     * @param $module
+     */
+    public function setPaymentModule($module)
+    {
+        $this->paymentModule = $module;
+    }
+
+    /**
+     * @param $postage
+     */
+    public function setPostage($postage)
+    {
+        $this->postage = $postage;
+    }
+
+    /**
+     * @param $ref
+     */
+    public function setRef($ref)
+    {
+        $this->ref = $ref;
+    }
+
+    /**
      * @return null|Order
      */
     public function getOrder()
@@ -84,15 +117,23 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return array|mixed|Address
+     * @return null|Order
      */
-    public function getBillingAddress()
+    public function getPlacedOrder()
     {
-        return $this->billingAddress;
+        return $this->placedOrder;
     }
 
     /**
-     * @return array|mixed|Address
+     * @return null|int
+     */
+    public function getInvoiceAddress()
+    {
+        return $this->invoiceAddress;
+    }
+
+    /**
+     * @return null|int
      */
     public function getDeliveryAddress()
     {
@@ -100,10 +141,34 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return array|mixed|Address
+     * @return null|int
      */
     public function getDeliveryModule()
     {
         return $this->deliveryModule;
+    }
+
+    /**
+     * @return null|int
+     */
+    public function getPaymentModule()
+    {
+        return $this->paymentModule;
+    }
+
+    /**
+     * @return null|int
+     */
+    public function getPostage()
+    {
+        return $this->postage;
+    }
+
+    /**
+     * @return null|int
+     */
+    public function getRef()
+    {
+        return $this->ref;
     }
 }

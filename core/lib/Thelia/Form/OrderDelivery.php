@@ -80,10 +80,17 @@ class OrderDelivery extends BaseForm
             ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
             ->filterByActivate(1)
             ->filterById($value)
-            ->find();
+            ->findOne();
 
         if(null === $module) {
             $context->addViolation("Delivery module ID not found");
+        }
+
+        $moduleReflection = new \ReflectionClass($module->getFullNamespace());
+        if ($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
+            $context->addViolation(
+                sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $module->getCode())
+            );
         }
     }
 

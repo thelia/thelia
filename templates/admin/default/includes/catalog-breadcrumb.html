@@ -2,11 +2,11 @@
 
 <ul class="breadcrumb">
 	<li><a href="{url path='admin/home'}">Home</a></li>
-	<li><a href="{url path='admin/catalog'}">Catalog</a>
+	<li><a href="{url path='admin/catalog'}">Catalog</a></li>
 
-	{ifloop rel="category_path"}</li>
+	{ifloop rel="category_path"}
 		{loop name="category_path" type="category-path" visible="*" category=$category_id}
-			{if $ID == $category_id}
+			{if $ID == $category_id && $editing_product == false}
 				<li class="active">
 				   {if $editing_category == true}
                        {intl l='Editing %cat' cat="{$TITLE}"}
@@ -20,7 +20,9 @@
 	   {/loop}
 	{/ifloop}
 
-	{elseloop rel="category_path"}
-	    </li>
-	{/elseloop}
+	{if $editing_product == true}
+        {loop name="product_path" type="product" visible="*" id=$product_id}
+            <li>{intl l="Editing %title" title="$TITLE"}</li>
+        {/loop}
+	{/if}
 </ul>
