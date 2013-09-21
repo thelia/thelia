@@ -6,6 +6,7 @@ use Propel\Runtime\Propel;
 use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Content as BaseContent;
+use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Tools\URL;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -45,6 +46,15 @@ class Content extends BaseContent
         return $default_folder == null ? 0 : $default_folder->getFolderId();
     }
 
+    public function setDefaultFolder($folderId)
+    {
+/*        ContentFolderQuery::create()
+            ->filterByContentId($this->getId)
+            ->update(array("DefaultFolder" => 0));*/
+
+        return $this;
+    }
+
     public function create($defaultFolderId)
     {
         $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
@@ -65,6 +75,8 @@ class Content extends BaseContent
             $this->setPosition($this->getNextPosition())->save($con);
 
             $con->commit();
+
+            $this->dispatchEvent(TheliaEvents::AFTER_CREATECONTENT,new ContentEvent($this));
         } catch(\Exception $ex) {
 
             $con->rollback();
@@ -73,23 +85,6 @@ class Content extends BaseContent
         }
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
-    public function preInsert(ConnectionInterface $con = null)
-    {
-        $this->setPosition($this->getNextPosition());
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECONTENT, new ContentEvent($this));
-
-        return true;
-    }
-
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATECONTENT, new ContentEvent($this));
-    }
 
     public function preUpdate(ConnectionInterface $con = null)
     {
