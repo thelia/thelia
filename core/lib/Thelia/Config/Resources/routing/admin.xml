@@ -353,6 +353,10 @@
         <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteFeatureAction</default>
     </route>
 
+    <route id="admin.configuration.templates.attributes.update-feature-position" path="/admin/template/update-feature-position">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::updateFeaturePositionAction</default>
+    </route>
+
     <route id="admin.configuration.templates.attributes.list" path="/admin/configuration/templates/attributes/list">
         <default key="_controller">Thelia\Controller\Admin\TemplateController::getAjaxAttributesAction</default>
     </route>
@@ -363,6 +367,10 @@
 
     <route id="admin.configuration.templates.attributes.delete" path="/admin/configuration/templates/attributes/delete">
         <default key="_controller">Thelia\Controller\Admin\TemplateController::deleteAttributeAction</default>
+    </route>
+
+    <route id="admin.configuration.templates.attributes.update-attribute-position" path="/admin/template/update-attribute-position">
+        <default key="_controller">Thelia\Controller\Admin\TemplateController::updateAttributePositionAction</default>
     </route>
 
 

@@ -135,6 +135,47 @@ class Template extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param CategoryChangePositionEvent $event
+     */
+    public function updateAttributePosition(UpdatePositionEvent $event)
+    {
+        $attributeTemplate = AttributeTemplateQuery::create()->findPk($event->getObjectId());
+
+        $this->updatePosition($attributeTemplate, $event);
+    }
+
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param CategoryChangePositionEvent $event
+     */
+    public function updateFeaturePosition(UpdatePositionEvent $event)
+    {
+        $featureTemplate = FeatureTemplateQuery::create()->findPk($event->getObjectId());
+
+        $this->updatePosition($featureTemplate, $event);
+    }
+
+    protected function updatePosition($object, UpdatePositionEvent $event)
+    {
+        if (null !== $object) {
+
+            $object->setDispatcher($this->getDispatcher());
+
+            $mode = $event->getMode();
+
+            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
+                $object->changeAbsolutePosition($event->getPosition());
+            else if ($mode == UpdatePositionEvent::POSITION_UP)
+                $object->movePositionUp();
+            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
+                $object->movePositionDown();
+        }
+    }
+
     public function deleteAttribute(TemplateDeleteAttributeEvent $event) {
 
         $attribute_template = AttributeTemplateQuery::create()
@@ -184,6 +225,9 @@ class Template extends BaseAction implements EventSubscriberInterface
 
             TheliaEvents::TEMPLATE_ADD_FEATURE    => array("addFeature", 128),
             TheliaEvents::TEMPLATE_DELETE_FEATURE => array("deleteFeature", 128),
+
+            TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION => array('updateAttributePosition', 128),
+            TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION   => array('updateFeaturePosition', 128),
 
         );
     }

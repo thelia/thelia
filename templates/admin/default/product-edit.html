@@ -221,7 +221,7 @@ $(function() {
         placement   : 'left',
         success     : function(response, newValue) {
             // The URL template
-            var url = "{url path='admin/product/update-accessory-position/' accessory_id='__ID__' product_id=$product_id position='__POS__'}";
+            var url = "{url noamp='1' path='admin/product/update-accessory-position/' accessory_id='__ID__' product_id=$product_id position='__POS__'}";
 
             // Perform subtitutions
             url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);

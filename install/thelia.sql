@@ -186,7 +186,7 @@ CREATE TABLE `feature`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `visible` INTEGER DEFAULT 0,
-    `position` INTEGER NOT NULL,
+    `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -262,6 +262,7 @@ CREATE TABLE `feature_template`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `feature_id` INTEGER NOT NULL,
     `template_id` INTEGER NOT NULL,
+    `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -387,6 +388,8 @@ CREATE TABLE `attribute_template`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `attribute_id` INTEGER NOT NULL,
     `template_id` INTEGER NOT NULL,
+    `position` INTEGER,
+    `attribute_templatecol` VARCHAR(45),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),

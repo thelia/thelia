@@ -145,11 +145,11 @@
   <table name="feature" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="0" name="visible" type="INTEGER" />
-    <column name="position" required="true" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <column name="position" type="INTEGER" />
     <behavior name="timestampable" />
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
@@ -205,6 +205,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="feature_id" required="true" type="INTEGER" />
     <column name="template_id" required="true" type="INTEGER" />
+    <column name="position" type="INTEGER" />
     <foreign-key foreignTable="feature" name="fk_feature_template_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="feature_id" />
     </foreign-key>
@@ -221,11 +222,11 @@
   </table>
   <table name="attribute" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <column name="position" type="INTEGER" />
     <behavior name="timestampable" />
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
@@ -298,6 +299,8 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="attribute_id" required="true" type="INTEGER" />
     <column name="template_id" required="true" type="INTEGER" />
+    <column name="position" type="INTEGER" />
+    <column name="attribute_templatecol" size="45" type="VARCHAR" />
     <foreign-key foreignTable="attribute" name="fk_attribute_template_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_id" />
     </foreign-key>

@@ -89,6 +89,9 @@ class Product extends BaseProduct
 
     public function updateDefaultCategory($defaultCategoryId) {
 
+        // Allow uncategorized products (NULL instead of 0, to bypass delete cascade constraint)
+        if ($defaultCategoryId <= 0) $defaultCategoryId = NULL;
+
         // Update the default category
         $productCategory = ProductCategoryQuery::create()
             ->filterByProductId($this->getId())

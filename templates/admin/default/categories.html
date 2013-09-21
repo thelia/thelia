@@ -604,7 +604,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url path='/admin/categories/update-position' category_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp='1' path='/admin/categories/update-position' category_id='__ID__' position='__POS__'}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id'))
@@ -623,7 +623,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url path='/admin/products/update-position' product_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp='1' path='/admin/products/update-position' product_id='__ID__' position='__POS__'}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id'))

@@ -39,6 +39,8 @@ use Thelia\Core\Event\TemplateDeleteAttributeEvent;
 use Thelia\Core\Event\TemplateAddAttributeEvent;
 use Thelia\Core\Event\TemplateAddFeatureEvent;
 use Thelia\Core\Event\TemplateDeleteFeatureEvent;
+use Thelia\Model\FeatureTemplateQuery;
+use Thelia\Model\AttributeTemplateQuery;
 
 /**
  * Manages product templates
@@ -255,6 +257,21 @@ class TemplateController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
+    public function updateAttributePositionAction() {
+
+        // Find attribute_template
+        $attributeTemplate = AttributeTemplateQuery::create()
+            ->filterByTemplateId($this->getRequest()->get('template_id', null))
+            ->filterByAttributeId($this->getRequest()->get('attribute_id', null))
+            ->findOne()
+        ;
+
+        return $this->updatePosition(
+                $attributeTemplate,
+                TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION
+        );
+    }
+
     public function addFeatureAction() {
 
         // Check current user authorization
@@ -299,4 +316,50 @@ class TemplateController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
+    public function updateFeaturePositionAction() {
+
+        // Find feature_template
+        $featureTemplate = FeatureTemplateQuery::create()
+            ->filterByTemplateId($this->getRequest()->get('template_id', null))
+            ->filterByFeatureId($this->getRequest()->get('feature_id', null))
+            ->findOne()
+        ;
+
+        return $this->updatePosition(
+                $featureTemplate,
+                TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION
+        );
+    }
+
+    protected function updatePosition($object, $eventName) {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+
+        if ($object != null) {
+
+            try {
+                $mode = $this->getRequest()->get('mode', null);
+
+                if ($mode == 'up')
+                    $mode = UpdatePositionEvent::POSITION_UP;
+                else if ($mode == 'down')
+                    $mode = UpdatePositionEvent::POSITION_DOWN;
+                else
+                    $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
+
+                $position = $this->getRequest()->get('position', null);
+
+                $event = new UpdatePositionEvent($object->getId(), $mode, $position);
+
+                $this->dispatch($eventName, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
 }

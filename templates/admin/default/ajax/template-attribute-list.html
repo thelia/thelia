@@ -33,6 +33,8 @@
 
             <th>{intl l='Attribute title'}</th>
 
+            <th class="text-center">{intl l='Position'}</th>
+
             {module_include location='template_attributes_table_header'}
 
             <th class="actions">{intl l="Actions"}</th>
@@ -44,8 +46,17 @@
         <tr>
             <td>{$ID}</td>
 
-            <td>
-                {$TITLE}
+            <td>{$TITLE}</td>
+
+            <td class="text-center">
+            {admin_position_block
+                permission="admin.templates.edit"
+                path={url path="admin/template/update-attribute-position" template_id=$template_id}
+                url_parameter="attribute_id"
+                in_place_edit_class="attributePositionChange"
+                position=$POSITION
+                id=$ID
+             }
             </td>
 
             {module_include location='template_attributes_table_row'}
@@ -64,7 +75,7 @@
 
          {elseloop rel="assigned_attributes"}
              <tr>
-                 <td colspan="3">
+                 <td colspan="4">
                      <div class="alert alert-info">
                          {intl l="This template contains no attributes"}
                      </div>
@@ -93,11 +104,33 @@
 }
 
 <script>
+
     $(function() {
 
         // Set proper attribute ID in delete attribute from
         $('a.delete-attribute').click(function(ev) {
             $('#attribute_delete_id').val($(this).data('id'));
         });
+
+        {* Inline editing of object position using bootstrap-editable *}
+
+        $('.attributePositionChange').editable({
+            type        : 'text',
+            title       : '{intl l="Enter new category position"}',
+            mode        : 'popup',
+            inputclass  : 'input-mini',
+            placement   : 'left',
+            success     : function(response, newValue) {
+                // The URL template
+                var url = "{url noamp='1' path="admin/template/update-attribute-position" template_id=$template_id attribute_id='__ID__' position='__POS__'}";
+
+                // Perform subtitutions
+                url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);
+
+                // Reload the page
+                location.href = url;
+            }
+        });
+
     });
 </script>

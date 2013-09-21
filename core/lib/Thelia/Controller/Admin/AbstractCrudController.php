@@ -58,6 +58,7 @@ abstract class AbstractCrudController extends BaseAdminController
      * @param string $objectName the lower case object name. Example. "message"
      *
      * @param string $defaultListOrder the default object list order, or null if list is not sortable. Example: manual
+     * @param string $orderRequestParameterName Name of the request parameter that set the list order (null if list is not sortable)
      *
      * @param string $viewPermissionIdentifier the 'view' permission identifier. Example: "admin.configuration.message.view"
      * @param string $createPermissionIdentifier the 'create' permission identifier. Example: "admin.configuration.message.create"

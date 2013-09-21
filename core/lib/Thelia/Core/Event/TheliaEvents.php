@@ -400,6 +400,7 @@ final class TheliaEvents
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
 
     const CHANGE_DEFAULT_CURRENCY = 'action.changeDefaultCurrency';
+
     // -- Product templates management -----------------------------------------
 
     const TEMPLATE_CREATE          = "action.createTemplate";
@@ -411,6 +412,9 @@ final class TheliaEvents
 
     const TEMPLATE_ADD_FEATURE    = "action.templateAddFeature";
     const TEMPLATE_DELETE_FEATURE = "action.templateDeleteFeature";
+
+    const TEMPLATE_CHANGE_FEATURE_POSITION   = "action.templateChangeAttributePosition";
+    const TEMPLATE_CHANGE_ATTRIBUTE_POSITION = "action.templateChangeFeaturePosition";
 
     const BEFORE_CREATETEMPLATE = "action.before_createTemplate";
     const AFTER_CREATETEMPLATE  = "action.after_createTemplate";

@@ -106,10 +106,14 @@
 
 {block name="javascript-initialization"}
 
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
     <script>
         $(function() {
-        	$('#feature_list_management').load("{url path='/admin/configuration/templates/features/list' template_id=$template_id}");
-            $('#attribute_list_management').load("{url path='/admin/configuration/templates/attributes/list'  template_id=$template_id}");
+        	$('#feature_list_management').load("{url noamp='1' path='/admin/configuration/templates/features/list' template_id=$template_id}");
+            $('#attribute_list_management').load("{url noamp='1' path='/admin/configuration/templates/attributes/list'  template_id=$template_id}");
        });
     </script>
 {/block}

@@ -179,6 +179,7 @@ trait PositionManagementTrait {
 
             try {
                 foreach ($results as $result) {
+
                     $result->setDispatcher($this->getDispatcher())->setPosition($result->getPosition() + $delta)->save($cnx);
                 }
 

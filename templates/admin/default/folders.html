@@ -7,8 +7,8 @@
 {block name="main-content"}
 <div class="folders">
 
-    <div id="wrapper" class="container">        
-        
+    <div id="wrapper" class="container">
+
         {* include file="includes/folder-breadcrumb.html" *}
 
         {module_include location='folders_top'}
@@ -213,7 +213,7 @@
                                     label="{intl l='ID'}"
                                  }
 
-                                 <th>&nbsp;</th>                                 
+                                 <th>&nbsp;</th>
 
                                  <th class="object-title">
                                  {admin_sortable_header
@@ -416,7 +416,7 @@
 
         {form_field form=$form field='default_folder'}
            <input type="hidden" name="{$name}" value="{$folder_id}" />
-        {/form_field}        
+        {/form_field}
 
         {form_field form=$form field='title'}
             <div class="form-group {if $error}has-error{/if}">
@@ -580,7 +580,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url path='/admin/folders/update-position' folder_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp='1' path='/admin/folders/update-position' folder_id='__ID__' position='__POS__'}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id'))
@@ -599,7 +599,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url path='/admin/contents/update-position' content_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp='1' path='/admin/contents/update-position' content_id='__ID__' position='__POS__'}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id'))
