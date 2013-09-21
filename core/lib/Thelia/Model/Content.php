@@ -2,9 +2,11 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\Propel;
 use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Content as BaseContent;
+use Thelia\Model\Map\ContentTableMap;
 use Thelia\Tools\URL;
 use Propel\Runtime\Connection\ConnectionInterface;
 
@@ -41,6 +43,34 @@ class Content extends BaseContent
             ->findOne();
 
         return $default_folder == null ? 0 : $default_folder->getFolderId();
+    }
+
+    public function create($defaultFolderId)
+    {
+        $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
+
+        $con->beginTransaction();
+
+        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECONTENT, new ContentEvent($this));
+
+        try {
+            $this->save($con);
+
+            $cf = new ContentFolder();
+            $cf->setContentId($this->getId())
+                ->setFolderId($defaultFolderId)
+                ->setDefaultFolder(1)
+                ->save($con);
+
+            $this->setPosition($this->getNextPosition())->save($con);
+
+            $con->commit();
+        } catch(\Exception $ex) {
+
+            $con->rollback();
+
+            throw $ex;
+        }
     }
 
 

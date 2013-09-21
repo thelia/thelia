@@ -47,8 +47,7 @@ class Content extends BaseAction implements EventSubscriberInterface
             ->setVisible($event->getVisible())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
-            ->addFolder(FolderQuery::create()->findPk($event->getDefaultFolder()))
-            ->save()
+            ->create($event->getDefaultFolder())
         ;
 
         $event->setContent($content);
