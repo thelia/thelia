@@ -23,9 +23,12 @@
 
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\Content as ContentModel;
+use Thelia\Model\FolderQuery;
 
 
 /**
@@ -36,6 +39,26 @@ use Thelia\Model\ContentQuery;
 class Content extends BaseAction implements EventSubscriberInterface
 {
 
+    public function create(ContentCreateEvent $event)
+    {
+        $content = new ContentModel();
+
+        $content
+            ->setVisible($event->getVisible())
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->addFolder(FolderQuery::create()->findPk($event->getDefaultFolder()))
+            ->save()
+        ;
+
+        $event->setContent($content);
+    }
+
+    /**
+     * process update content
+     *
+     * @param ContentUpdateEvent $event
+     */
     public function update(ContentUpdateEvent $event)
     {
         if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {

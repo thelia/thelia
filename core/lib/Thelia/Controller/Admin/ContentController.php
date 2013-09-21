@@ -108,10 +108,12 @@ class ContentController extends AbstractCrudController
 
         $contentCreateEvent
             ->setLocale($formData['locale'])
-            ->setDefaultFolder($formData['default_controller'])
+            ->setDefaultFolder($formData['default_folder'])
             ->setTitle($formData['title'])
             ->setVisible($formData['visible'])
         ;
+
+        return $contentCreateEvent;
     }
 
     /**

@@ -34,8 +34,13 @@ class Content extends BaseContent
 
     public function getDefaultFolderId()
     {
-        //@TODO update contentFolder Table, adding by_default column and change this code for returnin good value
-        return $this->getFolders()->getFirst()->getId();
+        // Find default folder
+        $default_folder = ContentFolderQuery::create()
+            ->filterByContentId($this->getId())
+            ->filterByDefaultFolder(true)
+            ->findOne();
+
+        return $default_folder == null ? 0 : $default_folder->getFolderId();
     }
 
 

@@ -412,11 +412,11 @@
         {form_hidden_fields form=$form}
 
         {* Be sure to get the folder_id, even if the form could not be validated *}
-        <input type="hidden" name="folder_id" value="{$parent}" />
+        <input type="hidden" name="parent" value="{$parent}" />
 
         {form_field form=$form field='success_url'}
            {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-           <input type="hidden" name="{$name}" value="{url path='/admin/contents/update' content_id='_ID_'}" />
+           <input type="hidden" name="{$name}" value="{url path='/admin/content/update/_ID_' }" />
         {/form_field}
 
         {form_field form=$form field='default_folder'}
@@ -468,7 +468,7 @@
 
         dialog_ok_label     = {intl l="Create this content"}
 
-        form_action        = {url path='/admin/contents/create'}
+        form_action        = {url path='/admin/content/create'}
         form_enctype       = {form_enctype form=$form}
         form_error_message = $form_error_message
     }

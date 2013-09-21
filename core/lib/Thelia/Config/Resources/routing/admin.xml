@@ -222,6 +222,10 @@
     </route>
 
     <!-- content routes management -->
+    <route id="admin.folders.create" path="/admin/content/create">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::createAction</default>
+    </route>
+
     <route id="admin.content.update" path="admin/content/update/{content_id}">
         <default key="_controller">Thelia\Controller\Admin\ContentController::updateAction</default>
         <requirement key="content_id">\d+</requirement>
