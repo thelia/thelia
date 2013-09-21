@@ -221,6 +221,12 @@
         <default key="_controller">Thelia\Controller\Admin\FolderController::updatePositionAction</default>
     </route>
 
+    <!-- content routes management -->
+    <route id="admin.content.update" path="admin/content/update/{content_id}">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::updateAction</default>
+        <requirement key="content_id">\d+</requirement>
+    </route>
+
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 
     <route id="admin.coupon.list" path="/admin/coupon/">

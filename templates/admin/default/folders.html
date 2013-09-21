@@ -214,7 +214,7 @@
                                     current_order=$content_order
                                     order='id'
                                     reverse_order='id_reverse'
-                                    path={url path='/admin/folders' id_folder=$folder_id target='contents'}
+                                    path={url path='/admin/folders' parent=$parent target='contents'}
                                     label="{intl l='ID'}"
                                  }
 
@@ -225,7 +225,7 @@
                                     current_order=$content_order
                                     order='alpha'
                                     reverse_order='alpha_reverse'
-                                    path={url path='/admin/folders' id_folder=$folder_id target='contents'}
+                                    path={url path='/admin/folders' parent=$parent target='contents'}
                                     label="{intl l='Content title'}"
                                  }
 
@@ -236,7 +236,7 @@
                                     current_order=$content_order
                                     order='visible'
                                     reverse_order='visible_reverse'
-                                    path={url path='/admin/folders' id_folder=$folder_id target='contents'}
+                                    path={url path='/admin/folders' parent=$parent target='contents'}
                                     label="{intl l='Online'}"
                                  }
                                  </th>
@@ -246,7 +246,7 @@
                                     current_order=$content_order
                                     order='manual'
                                     reverse_order='manual_reverse'
-                                    path={url path='/admin/folders' id_folder=$folder_id target='contents'}
+                                    path={url path='/admin/folders' parent=$parent target='contents'}
                                     label="{intl l='Position'}"
                                  }
                                  </th>
@@ -262,7 +262,7 @@
 
                              <td>
                              {loop type="image" name="folder_image" source="content" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-                               <a href="{url path='admin/content/edit' id=$ID}" title="{intl l='Edit this content'}">
+                               <a href="{url path="admin/content/update/$ID"}" title="{intl l='Edit this content'}">
                                  <img src="{$IMAGE_URL}" alt="{$TITLE}" />
                                </a>
                              {/loop}
