@@ -268,4 +268,20 @@ class ContentController extends AbstractCrudController
             array('parent' => $this->getFolderId())
         );
     }
+
+    /**
+     * @param \Thelia\Core\Event\Content\ContentUpdateEvent $updateEvent
+     * @return Response|void
+     */
+    protected function performAdditionalUpdateAction($updateEvent)
+    {
+        if ($this->getRequest()->get('save_mode') != 'stay') {
+
+            // Redirect to parent category list
+            $this->redirectToRoute(
+                'admin.folders.default',
+                array('parent' => $this->getFolderId())
+            );
+        }
+    }
 }

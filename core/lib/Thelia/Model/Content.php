@@ -34,7 +34,8 @@ class Content extends BaseContent
 
     public function getDefaultFolderId()
     {
-        //@TODO update contentFolder Table, adding by_default column
+        //@TODO update contentFolder Table, adding by_default column and change this code for returnin good value
+        return $this->getFolders()->getFirst()->getId();
     }
 
 

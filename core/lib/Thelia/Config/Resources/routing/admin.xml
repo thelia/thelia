@@ -227,6 +227,11 @@
         <requirement key="content_id">\d+</requirement>
     </route>
 
+    <route id="admin.content.save" path="/admin/content/save">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::processUpdateAction</default>
+    </route>
+
+
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 
     <route id="admin.coupon.list" path="/admin/coupon/">

@@ -40,9 +40,11 @@ class ContentCreationForm extends BaseForm
                 )
             ))
             ->add("default_folder", "integer", array(
+                "label" => Translator::getInstance()->trans("Default folder *"),
                 "constraints" => array(
                     new NotBlank()
-                )
+                ),
+                "label_attr" => array("for" => "default_folder")
             ))
             ->add("locale", "text", array(
                 "constraints" => array(

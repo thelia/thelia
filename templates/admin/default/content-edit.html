@@ -88,9 +88,9 @@
                             </div>
                         {/form_field}
 
-                       {* <div class="row">
+                       <div class="row">
                             <div class="col-md-6">
-                                {form_field form=$form field='parent'}
+                                {form_field form=$form field='default_folder'}
                                     <div class="form-group {if $error}has-error{/if}">
 
                                         <label for="{$label_attr.for}" class="control-label">
@@ -101,9 +101,9 @@
                                             <option value="0">{intl l="Top level"}</option>
 
                                             {$myparent=$PARENT}
-                                            *}{* loop name="fold-parent" type="folder-tree" visible="*" folder="0"}
+                                            {* loop name="fold-parent" type="folder-tree" visible="*" folder="0"}
                                                  <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $folder_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
-                                            {/loop *}{*
+                                            {/loop *}
 
                                         </select>
                                     </div>
@@ -123,7 +123,7 @@
                                     </div>
                                 {/form_field}
                             </div>
-                        </div>*}
+                        </div>
 
                         <div class="row">
                             <div class="col-md-12">
