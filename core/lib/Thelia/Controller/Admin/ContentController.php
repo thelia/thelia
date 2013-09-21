@@ -22,6 +22,9 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Form\ContentCreationForm;
+use Thelia\Form\ContentModificationForm;
 
 
 /**
@@ -29,14 +32,35 @@ namespace Thelia\Controller\Admin;
  * @package Thelia\Controller\Admin
  * @author manuel raynaud <mraynaud@openstudio.fr>
  */
-class ContentController extends AbstractCrudController {
+class ContentController extends AbstractCrudController
+{
+
+    public function __construct()
+    {
+        parent::__construct(
+            'content',
+            'manual',
+            'content_order',
+
+            'admin.content.default',
+            'admin.content.create',
+            'admin.content.update',
+            'admin.content.delete',
+
+            TheliaEvents::CONTENT_CREATE,
+            TheliaEvents::CONTENT_UPDATE,
+            TheliaEvents::CONTENT_DELETE,
+            TheliaEvents::CONTENT_TOGGLE_VISIBILITY,
+            TheliaEvents::CONTENT_UPDATE_POSITION
+        );
+    }
 
     /**
      * Return the creation form for this object
      */
     protected function getCreationForm()
     {
-        // TODO: Implement getCreationForm() method.
+        return new ContentCreationForm($this->getRequest());
     }
 
     /**
@@ -44,17 +68,31 @@ class ContentController extends AbstractCrudController {
      */
     protected function getUpdateForm()
     {
-        // TODO: Implement getUpdateForm() method.
+        return new ContentModificationForm($this->getRequest());
     }
 
     /**
      * Hydrate the update form for this object, before passing it to the update template
      *
-     * @param unknown $object
+     * @param \Thelia\Form\ContentModificationForm $object
      */
     protected function hydrateObjectForm($object)
     {
-        // TODO: Implement hydrateObjectForm() method.
+        // Prepare the data that will hydrate the form
+        $data = array(
+            'id'           => $object->getId(),
+            'locale'       => $object->getLocale(),
+            'title'        => $object->getTitle(),
+            'chapo'        => $object->getChapo(),
+            'description'  => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum(),
+            'visible'      => $object->getVisible(),
+            'url'          => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
+            'parent'       => $object->getParent()
+        );
+
+        // Setup the object form
+        return new ContentModificationForm($this->getRequest(), "form", $data);
     }
 
     /**

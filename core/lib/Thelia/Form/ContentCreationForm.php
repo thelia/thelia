@@ -27,7 +27,7 @@ use Thelia\Core\Translation\Translator;
 
 class ContentCreationForm extends BaseForm
 {
-    protected function buildForm($change_mode = false)
+    protected function buildForm()
     {
         $this->formBuilder
             ->add("title", "text", array(
