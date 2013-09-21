@@ -1,0 +1,344 @@
+{extends file="admin-layout.tpl"}
+
+{block name="check-permissions"}admin.content.view{/block}
+
+{block name="page-title"}{intl l='Edit content'}{/block}
+
+{block name="main-content"}
+    <div class="folder edit-folder">
+    <div id="wrapper" class="container">
+
+    {* include file="includes/folder-breadcrumb.html" editing_category="true" *}
+
+    <div class="row">
+    {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id"}
+        <div class="col-md-12 general-block-decorator">
+        <div class="row">
+            <div class="col-md-7 title">
+                {intl l='Edit content %title' title=$TITLE}
+            </div>
+
+            <div class="col-md-5 actions">
+
+                {if $HAS_PREVIOUS != 0}
+                    <a href="{url path="/admin/content/update/$PREVIOUS"}" class="btn btn-default" title="{intl l='Edit previous content'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                {else}
+                    <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                {/if}
+
+                <a  href="{$URL}" target="_blank" class="btn btn-default" title="{intl l='Preview folder page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
+
+                {if $HAS_NEXT != 0}
+                    <a href="{url path="/admin/content/update/$NEXT"}" class="btn btn-default" title="{intl l='Edit next content'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                {else}
+                    <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                {/if}
+            </div>
+        </div>
+
+        <div class="row">
+        <div class="col-md-12">
+
+        <ul class="nav nav-tabs" id="tabbed-menu">
+            <li class="active"><a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
+
+            <li><a href="#details" data-toggle="tab">{intl l="Details"}</a></li>
+            <li><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
+            <li><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
+            <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
+        </ul>
+
+        <div class="tab-content">
+
+        <div class="tab-pane fade active in" id="general">
+
+            <div class="form-container">
+
+                {form name="thelia.admin.content.modification"}
+                    <form method="POST" action="{url path='/admin/content/save'}" {form_enctype form=$form} class="clearfix">
+
+                        {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/folders' parent=0}"}
+
+                        {* Be sure to get the folder ID, even if the form could not be validated *}
+                        <input type="hidden" name="content_id" value="{$content_id}" />
+
+                        <input type="hidden" name="current_tab" value="general" />
+
+                        {form_hidden_fields form=$form}
+
+                        {form_field form=$form field='success_url'}
+                            <input type="hidden" name="{$name}" value="{url path="/admin/content/update{$ID}"}" />
+                        {/form_field}
+
+                        {form_field form=$form field='locale'}
+                            <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+                        {/form_field}
+
+                        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                        {include file="includes/standard-description-form-fields.html"}
+
+                        {form_field form=$form field='url'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="{$label_attr.for}" class="control-label">
+                                    {intl l="{$label}"} :
+                                </label>
+
+                                <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Rewritten URL'}" placeholder="{intl l='Rewriten URL'}" class="form-control">
+                            </div>
+                        {/form_field}
+
+                       {* <div class="row">
+                            <div class="col-md-6">
+                                {form_field form=$form field='parent'}
+                                    <div class="form-group {if $error}has-error{/if}">
+
+                                        <label for="{$label_attr.for}" class="control-label">
+                                            {intl l="{$label}"} :
+                                        </label>
+
+                                        <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
+                                            <option value="0">{intl l="Top level"}</option>
+
+                                            {$myparent=$PARENT}
+                                            *}{* loop name="fold-parent" type="folder-tree" visible="*" folder="0"}
+                                                 <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $folder_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
+                                            {/loop *}{*
+
+                                        </select>
+                                    </div>
+                                {/form_field}
+                            </div>
+
+                            <div class="col-md-6">
+                                {form_field form=$form field='visible'}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+                                                {$label}
+                                            </label>
+                                        </div>
+                                    </div>
+                                {/form_field}
+                            </div>
+                        </div>*}
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="control-group">
+                                    <lablel>&nbsp;</lablel>
+                                    <div class="controls">
+                                        <p>{intl l='Colder created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                {/form}
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="details">
+            <div class="form-container">
+                <div class="form-group">
+                    <form action="{url path='/admin/folders/related-content/add'}" id="related_content_form">
+
+                        {include
+                        file="includes/inner-form-toolbar.html"
+                        hide_submit_buttons=true
+                        close_url="{url path='/admin/folders' folder_id=$folder_id}"
+                        }
+
+                        <input type="hidden" name="folder_id" value="{$folder_id}" />
+                        <input type="hidden" name="current_tab" value="details" />
+
+                        {ifloop rel="folders"}
+                            <div class="row">
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <select name="folder_id" id="folder_id" class="form-control">
+                                            <option value="">Select a folder...</option>
+                                            {loop name="folders" type="folder" backend_context="1" lang="$edit_language_id"}
+                                                <option value="{$ID}">{$TITLE}</option>
+                                            {/loop}
+                                        </select>
+                                    </div>
+                                    <span class="help-block">{intl l='Select a folder to get its content'}</span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div id="content_selector" class="hide">
+                                        <div class="input-group">
+                                            <select required="required" name="content_id" id="content_id" class="form-control">
+                                                <option value="">Select a folder content...</option>
+                                            </select>
+									                        <span class="input-group-btn" id="content_add_button">
+									                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+									                        </span>
+                                        </div>
+
+                                        <span class="help-block">{intl l='Select a content and click (+) to add it to this category'}</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        {/ifloop}
+
+                        {elseloop rel="folders"}
+                            <div class="alert alert-info">{intl l="No folders found"}</div>
+                        {/elseloop}
+
+                    </form>
+                </div>
+
+                <table class="table table-striped table-condensed table-left-aligned">
+                    <thead>
+                    <tr>
+                        <th>{intl l='ID'}</th>
+
+                        <th>{intl l='Attribute title'}</th>
+
+                        {module_include location='folder_contents_table_header'}
+
+                        <th class="actions">{intl l="Actions"}</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {*loop name="assigned_contents" type="associated_content" folder="$folder_id" backend_context="1" lang="$edit_language_id"}
+                    <tr>
+                        <td>{$ID}</td>
+
+                        <td>
+                            {$TITLE}
+                        </td>
+
+                        {module_include location='folder_contents_table_row'}
+
+                        <td class="actions">
+                            <div class="btn-group">
+                                {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.folder.content.delete"}
+                                   <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$ID}" data-toggle="modal">
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                   </a>
+                                {/loop}
+                            </div>
+                        </td>
+                    </tr>
+                     {/loop}
+
+                     {elseloop rel="assigned_contents"}
+                         <tr>
+                             <td colspan="3">
+                                 <div class="alert alert-info">
+                                     {intl l="This folder contains no contents"}
+                                 </div>
+                             </td>
+                         </tr>
+                     {/elseloop*}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="images">
+        </div>
+
+        <div class="tab-pane fade" id="documents">
+        </div>
+
+        <div class="tab-pane fade" id="modules">
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+    {/loop}
+    </div>
+    </div>
+    </div>
+
+
+{* Delete related content confirmation dialog *}
+
+    {capture "delete_content_dialog"}
+        <!-- <input type="hidden" name="category_id" value="{$category_id}" /> -->
+        <input type="hidden" name="content_id" id="content_delete_id" value="" />
+        <input type="hidden" name="folder_id" id="folder_delete_id" value="" />
+
+        <input type="hidden" name="current_tab" value="details" />
+    {/capture}
+
+    {include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "delete_content_dialog"
+    dialog_title    = {intl l="Remove related content"}
+    dialog_message  = {intl l="Do you really want to remove this related content ?"}
+
+form_action     = {url path='/admin/folders/related-content/delete'}
+form_content    = {$smarty.capture.delete_content_dialog nofilter}
+}
+{/block}
+
+{block name="javascript-initialization"}
+    <script>
+
+        $(function() {
+
+            $('.use_default_rewriten_url').click(function(ev) {
+                alert("Not functionnal");
+
+                ev.preventDefault();
+            });
+
+            // Show proper tab, if defined
+            {if ! empty($current_tab)}
+            $('#tabbed-menu a[href="#{$current_tab}"]').tab('show')
+            {/if}
+
+
+            // Set proper content ID in delete content from
+            $('a.delete-content').click(function(ev) {
+                $('#content_delete_id').val($(this).data('id'));
+                $('#folder_delete_id').val($('#folder_id').val());
+            });
+
+            // Load content on folder selection
+            $('#folder_id').change(function(event) {
+                $.ajax({
+                    url      : '{url path="/admin/folder/$folder_id/available-related-content/"}' + $(this).val() + '.xml',
+                    type     : 'get',
+                    dataType : 'json',
+                    success  : function(json) {
+                        $('#content_id :not(:first-child)').remove();
+
+                        var have_content = false;
+
+                        $.each(json, function(idx, value) {
+                            $('#content_id').append($('<option>').text(value.title).attr('value', value.id));
+
+                            have_content = true; // Lame...
+                        });
+
+                        if (have_content)
+                            $('#content_selector').removeClass('hide');
+                        else
+                            $('#content_selector').addClass('hide');
+
+                    }
+                });
+            });
+
+            // Initialize folder (id={$folder_id}) select value
+            {if $folder_id != 0}
+            $('#folder_id').val("{$folder_id}").change();
+            {/if}
+
+        });
+    </script>
+{/block}

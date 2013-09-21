@@ -174,7 +174,7 @@ class FolderController extends AbstractCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param unknown $event
+     * @param \Thelia\Core\Event\FolderEvent $event
      */
     protected function eventContainsObject($event)
     {
@@ -228,13 +228,13 @@ class FolderController extends AbstractCrudController
      */
     protected function renderListTemplate($currentOrder) {
 
-        // Get product order
-        $product_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
+        // Get content order
+        $content_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
 
         return $this->render('folders',
             array(
                 'folder_order' => $currentOrder,
-                'content_order' => $product_order,
+                'content_order' => $content_order,
                 'parent' => $this->getRequest()->get('parent', 0)
             ));
     }

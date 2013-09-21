@@ -32,7 +32,7 @@ namespace Thelia\Core\Event\Content;
 class ContentCreateEvent extends ContentEvent
 {
     protected $title;
-    protected $parent;
+    protected $default_folder;
     protected $locale;
     protected $visible;
 
@@ -57,13 +57,13 @@ class ContentCreateEvent extends ContentEvent
     }
 
     /**
-     * @param mixed $parent
+     * @param mixed $default_folder
      *
      * @return $this
      */
-    public function setParent($parent)
+    public function setDefaultFolder($default_folder)
     {
-        $this->parent = $parent;
+        $this->default_folder = $default_folder;
 
         return $this;
     }
@@ -71,10 +71,13 @@ class ContentCreateEvent extends ContentEvent
     /**
      * @return mixed
      */
-    public function getParent()
+    public function getDefaultFolder()
     {
-        return $this->parent;
+        return $this->default_folder;
     }
+
+
+
 
     /**
      * @param mixed $visible

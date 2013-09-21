@@ -22,9 +22,12 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\Content\ContentCreateEvent;
+use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\ContentCreationForm;
 use Thelia\Form\ContentModificationForm;
+use Thelia\Model\ContentQuery;
 
 
 /**
@@ -88,7 +91,6 @@ class ContentController extends AbstractCrudController
             'postscriptum' => $object->getPostscriptum(),
             'visible'      => $object->getVisible(),
             'url'          => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
-            'parent'       => $object->getParent()
         );
 
         // Setup the object form
@@ -102,7 +104,14 @@ class ContentController extends AbstractCrudController
      */
     protected function getCreationEvent($formData)
     {
-        // TODO: Implement getCreationEvent() method.
+        $contentCreateEvent = new ContentCreateEvent();
+
+        $contentCreateEvent
+            ->setLocale($formData['locale'])
+            ->setDefaultFolder($formData['default_controller'])
+            ->setTitle($formData['title'])
+            ->setVisible($formData['visible'])
+        ;
     }
 
     /**
@@ -112,7 +121,19 @@ class ContentController extends AbstractCrudController
      */
     protected function getUpdateEvent($formData)
     {
-        // TODO: Implement getUpdateEvent() method.
+        $contentUpdateEvent = new ContentUpdateEvent($formData['id']);
+
+        $contentUpdateEvent
+            ->setLocale($formData['locale'])
+            ->setTitle($formData['title'])
+            ->setChapo($formData['chapo'])
+            ->setDescription($formData['description'])
+            ->setPostscriptum($formData['postscriptum'])
+            ->setVisible($formData['visible'])
+            ->setUrl($formData['url'])
+            ->setDefaultFolder($formData['default_folder']);
+
+        return $contentUpdateEvent;
     }
 
     /**
@@ -126,49 +147,75 @@ class ContentController extends AbstractCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param unknown $event
+     * @param \Thelia\Core\Event\Content\ContentEvent $event
      */
     protected function eventContainsObject($event)
     {
-        // TODO: Implement eventContainsObject() method.
+        return $event->hasContent();
     }
 
     /**
      * Get the created object from an event.
      *
-     * @param unknown $createEvent
+     * @param $event \Thelia\Core\Event\Content\ContentEvent
+     *
+     * @return null|\Thelia\Model\Content
      */
     protected function getObjectFromEvent($event)
     {
-        // TODO: Implement getObjectFromEvent() method.
+        return $event->getContent();
     }
 
     /**
      * Load an existing object from the database
+     *
+     * @return \Thelia\Model\Content
      */
     protected function getExistingObject()
     {
-        // TODO: Implement getExistingObject() method.
+        return ContentQuery::create()
+            ->joinWithI18n($this->getCurrentEditionLocale())
+            ->findOneById($this->getRequest()->get('content_id', 0));
     }
 
     /**
      * Returns the object label form the object event (name, title, etc.)
      *
-     * @param unknown $object
+     * @param $object \Thelia\Model\Content
+     *
+     * @return string content title
+     *
      */
     protected function getObjectLabel($object)
     {
-        // TODO: Implement getObjectLabel() method.
+        return $object->getTitle();
     }
 
     /**
      * Returns the object ID from the object
      *
-     * @param unknown $object
+     * @param $object \Thelia\Model\Content
+     *
+     * @return int content id
      */
     protected function getObjectId($object)
     {
-        // TODO: Implement getObjectId() method.
+        return $object->getId();
+    }
+
+    protected function getFolderId()
+    {
+        $folderId = $this->getRequest()->get('folder_id', null);
+
+        if(null === $folderId) {
+            $content = $this->getExistingObject();
+
+            if($content) {
+                $folderId = $content->getDefaultFolderId();
+            }
+        }
+
+        return $folderId ?: 0;
     }
 
     /**
@@ -178,7 +225,21 @@ class ContentController extends AbstractCrudController
      */
     protected function renderListTemplate($currentOrder)
     {
-        // TODO: Implement renderListTemplate() method.
+        $this->getListOrderFromSession('content', 'content_order', 'manual');
+
+        return $this->render('folders',
+            array(
+                'content_order' => $currentOrder,
+                'parent' => $this->getFolderId()
+            ));
+    }
+
+    protected function getEditionArguments()
+    {
+        return array(
+            'content_id' => $this->getRequest()->get('content_id', 0),
+            'current_tab' => $this->getRequest()->get('current_tab', 'general')
+        );
     }
 
     /**
@@ -186,7 +247,7 @@ class ContentController extends AbstractCrudController
      */
     protected function renderEditionTemplate()
     {
-        // TODO: Implement renderEditionTemplate() method.
+        return $this->render('content-edit', $this->getEditionArguments());
     }
 
     /**
@@ -194,7 +255,7 @@ class ContentController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        // TODO: Implement redirectToEditionTemplate() method.
+        $this->redirect($this->getRoute('admin.content.update', $this->getEditionArguments()));
     }
 
     /**
@@ -202,6 +263,9 @@ class ContentController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        // TODO: Implement redirectToListTemplate() method.
+        $this->redirectToRoute(
+            'admin.content.default',
+            array('parent' => $this->getFolderId())
+        );
     }
 }

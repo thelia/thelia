@@ -30,6 +30,12 @@ class Content extends BaseContent
         // and generate the position relative to this folder
     }
 
+    public function getDefaultFolderId()
+    {
+        //@TODO update contentFolder Table, adding by_default column
+    }
+
+
     /**
      * {@inheritDoc}
      */
