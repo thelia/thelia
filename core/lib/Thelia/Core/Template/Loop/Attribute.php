@@ -112,12 +112,18 @@ class Attribute extends BaseI18nLoop
         $use_attribute_pos = true;
 
         if (null !== $product) {
-            // Find the template assigned to the product.
-            $productObj = ProductQuery::create()->findPk($product);
+            // Find all template assigned to the products.
+            $products = ProductQuery::create()->findById($product);
 
             // Ignore if the product cannot be found.
-            if ($productObj !== null)
-                $template = $productObj->getTemplate();
+            if ($products !== null) {
+
+                // Create template array
+                if ($template == null) $template = array();
+
+                foreach($products as $product)
+                    $template[] = $product->getTemplateId();
+            }
         }
 
         if (null !== $template) {
@@ -145,9 +151,6 @@ class Attribute extends BaseI18nLoop
         }
 
         $orders  = $this->getOrder();
-
-        if ($template == null && ($order == "manual" || $order == "manual_reverse"))
-            throw new \InvalidException(Translator::getInstance()->trans("Can't use manual or manual_reverse order  without a 'template' or 'produst' parameter"));
 
         foreach ($orders as $order) {
             switch ($order) {

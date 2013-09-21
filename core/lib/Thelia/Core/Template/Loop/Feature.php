@@ -115,12 +115,18 @@ class Feature extends BaseI18nLoop
         $use_feature_pos = true;
 
         if (null !== $product) {
-            // Find the template assigned to the product.
-            $productObj = ProductQuery::create()->findPk($product);
+            // Find all template assigned to the products.
+            $products = ProductQuery::create()->findById($product);
 
             // Ignore if the product cannot be found.
-            if ($productObj !== null)
-                $template = $productObj->getTemplate();
+            if ($products !== null) {
+
+                // Create template array
+                if ($template == null) $template = array();
+
+                foreach($products as $product)
+                    $template[] = $product->getTemplateId();
+            }
         }
 
         if (null !== $template) {
