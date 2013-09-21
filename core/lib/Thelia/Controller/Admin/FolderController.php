@@ -235,7 +235,7 @@ class FolderController extends AbstractCrudController
             array(
                 'folder_order' => $currentOrder,
                 'content_order' => $product_order,
-                'folder_id' => $this->getRequest()->get('folder_id', 0)
+                'parent' => $this->getRequest()->get('parent', 0)
             ));
     }
 
@@ -267,7 +267,7 @@ class FolderController extends AbstractCrudController
             // Redirect to parent category list
             $this->redirectToRoute(
                 'admin.folders.default',
-                array('folder_id' => $updateEvent->getFolder()->getParent())
+                array('parent' => $updateEvent->getFolder()->getParent())
             );
         }
     }
@@ -283,7 +283,7 @@ class FolderController extends AbstractCrudController
         // Redirect to parent category list
         $this->redirectToRoute(
             'admin.folders.default',
-            array('folder_id' => $deleteEvent->getFolder()->getParent())
+            array('parent' => $deleteEvent->getFolder()->getParent())
         );
     }
 
@@ -300,7 +300,7 @@ class FolderController extends AbstractCrudController
             // Redirect to parent category list
             $this->redirectToRoute(
                 'admin.folders.default',
-                array('folder_id' => $folder->getParent())
+                array('parent' => $folder->getParent())
             );
         }
 
@@ -322,7 +322,7 @@ class FolderController extends AbstractCrudController
     {
         $this->redirectToRoute(
             'admin.folders.default',
-            array('folder_id' => $this->getRequest()->get('folder_id', 0))
+            array('parent' => $this->getRequest()->get('parent', 0))
         );
     }
 }
