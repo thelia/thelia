@@ -77,6 +77,61 @@ class ProductController extends AbstractCrudController
         );
     }
 
+    /**
+     * General ajax tab loading
+     */
+    public function loadGeneralAjaxTabAction() {
+
+        // Load the object
+        $object = $this->getExistingObject();
+
+        if ($object != null) {
+
+            // Hydrate the form abd pass it to the parser
+            $changeForm = $this->hydrateObjectForm($object);
+
+            // Pass it to the parser
+            $this->getParserContext()->addForm($changeForm);
+
+            return $this->render(
+                    'ajax/product-general-tab',
+                    array(
+                        'product_id' => $this->getRequest()->get('product_id', 0),
+                    )
+            );
+        }
+
+        $this->redirectToListTemplate();
+    }
+
+    /**
+     * Attributes ajax tab loading
+     */
+    public function loadAttributesAjaxTabAction() {
+
+        return $this->render(
+                'ajax/product-attributes-tab',
+                array(
+                    'product_id' => $this->getRequest()->get('product_id', 0),
+                )
+        );
+    }
+
+    /**
+     * Related information ajax tab loading
+     */
+    public function loadRelatedAjaxTabAction() {
+
+        return $this->render(
+                'ajax/product-related-tab',
+                array(
+                        'product_id'           => $this->getRequest()->get('product_id', 0),
+                        'folder_id'            => $this->getRequest()->get('folder_id', 0),
+                        'accessory_category_id'=> $this->getRequest()->get('accessory_category_id', 0)
+                )
+        );
+    }
+
     protected function getCreationForm()
     {
         return new ProductCreationForm($this->getRequest());
@@ -468,7 +523,7 @@ class ProductController extends AbstractCrudController
 
             $position = $this->getRequest()->get('position', null);
 
-            $event = new UpdatePositionEvent($mode, $position);
+            $event = new UpdatePositionEvent($this->getRequest()->get('accessory_id', null), $mode, $position);
 
             $this->dispatch(TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION, $event);
         }

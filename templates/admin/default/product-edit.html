@@ -6,6 +6,7 @@
 
 {block name="main-content"}
 <div class="catalog edit-product">
+
 	<div id="wrapper" class="container">
 
         {include file="includes/catalog-breadcrumb.html" editing_category="false" editing_product="true"}
@@ -40,41 +41,56 @@
 	                <div class="col-md-12">
 
 						<ul class="nav nav-tabs" id="tabbed-menu">
-		                    <li {if $current_tab == 'general'}class="active"{/if}><a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
-                            <li {if $current_tab == 'attributes'}class="active"{/if}><a href="#attributes" data-toggle="tab">{intl l="Attributes &amp; Features"}</a></li>
-                            <li {if $current_tab == 'content'}class="active"{/if}><a href="#content" data-toggle="tab">{intl l="Content &amp; accessories"}</a></li>
-		                    <li {if $current_tab == 'images'}class="active"{/if}><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
-		                    <li {if $current_tab == 'documents'}class="active"{/if}><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
-		                    <li {if $current_tab == 'modules'}class="active"{/if}><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
+		                    <li>
+		                          <a href="#general"
+		                             data-href="{url path='/admin/products/general/tab' product_id=$product_id}"
+		                             data-toggle="tab">{intl l="General description"}</a>
+		                    </li>
+
+                            <li>
+                                <a href="#price" data-toggle="tab">{intl l="Price"}</a>
+                            </li>
+
+                            <li><a href="#attributes"
+                                   data-href="{url path='/admin/products/attributes/tab' product_id=$product_id}"
+                                   data-toggle="tab">{intl l="Attributes &amp; Features"}</a>
+                            </li>
+
+                            <li>
+                                <a href="#related"
+                                   data-href="{url path='/admin/products/related/tab' folder_id=$folder_id accessory_category_id=$accessory_category_id product_id=$product_id}"
+                                   data-toggle="tab">{intl l="Associations"}</a>
+                            </li>
+
+		                    <li><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
+		                    <li><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
+		                    <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
 		 				</ul>
 
 		                <div class="tab-content">
 
-		                    <div class="tab-pane fade {if $current_tab == 'general'}active in{/if}" id="general">
-
-                                {include file="includes/product-general-tab.html"}
-
+		                    <div class="tab-pane fade" id="general">
+                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
 		                    </div>
 
-                            <div class="tab-pane fade {if $current_tab == 'attributes'}active in{/if}" id="attributes">
-
-                                {include file="includes/product-attributes-tab.html"}
-
+                            <div class="tab-pane fade" id="attributes">
+                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
                             </div>
 
-		                    <div class="tab-pane fade {if $current_tab == 'content'}active in{/if}" id="content">
-
-		                      {include file="includes/product-content-tab.html"}
-
+		                    <div class="tab-pane fade" id="related">
+		                        <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
 		                    </div>
 
-		                    <div class="tab-pane fade {if $current_tab == 'images'}active in{/if}" id="images">
+		                    <div class="tab-pane fade" id="images">
+		                        <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
 		                    </div>
 
-		                    <div class="tab-pane fade {if $current_tab == 'documents'}active in{/if}" id="documents">
+		                    <div class="tab-pane fade" id="documents">
+                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
 		                    </div>
 
-		                    <div class="tab-pane fade {if $current_tab == 'modules'}active in{/if}" id="modules">
+		                    <div class="tab-pane fade" id="modules">
+                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
 		                    </div>
 		                 </div>
                     </div>
@@ -116,137 +132,14 @@
 <script>
 $(function() {
 
-    $('.use_default_rewriten_url').click(function(ev) {
-    	alert("Not functionnal");
-
-    	ev.preventDefault();
+    // Atomatic ajax tab load, if data-href is defined.
+    $('.nav-tabs a[data-href]').on('shown.bs.tab', function(ev) {
+        var zis = $(this);
+        $(zis.attr('href')).load(zis.data('href'));
     });
 
-    // Set proper content ID in delete content from
-    $('a.delete-content').click(function(ev) {
-        $('#content_delete_id').val($(this).data('id'));
-        $('#folder_delete_id').val($('#folder_id').val());
-    });
-
-    // Set proper content ID in accessory delete from
-    $('a.delete-accessory').click(function(ev) {
-        $('#accessory_delete_id').val($(this).data('id'));
-        $('#accessory_category_delete_id').val($('#accessory_category_id').val());
-    });
-
-
-    // Load content on folder selection
-    $('#folder_id').change(function(event) {
-    	var val = $(this).val();
-
-    	if (val != "") {
-	        $.ajax({
-	             url      : '{url path="/admin/product/$product_id/available-related-content/"}' + $(this).val() + '.xml',
-	             type     : 'get',
-	             dataType : 'json',
-	             success  : function(json) {
-	                 $('#content_id :not(:first-child)').remove();
-
-	                 var have_content = false;
-
-	                 $.each(json, function(idx, value) {
-	                     $('#content_id').append($('<option>').text(value.title).attr('value', value.id));
-
-	                     have_content = true; // Lame...
-	                 });
-
-                     if (have_content) {
-                         $('#content_selector_empty').addClass('hide');
-                         $('#content_selector').removeClass('hide');
-                     }
-                     else {
-                         $('#content_selector_empty').removeClass('hide');
-                         $('#content_selector').addClass('hide');
-                     }
-
-                 }
-            });
-        }
-        else {
-            $('#content_selector_empty').addClass('hide');
-            $('#content_selector').addClass('hide');
-        }
-    });
-
-    // Load content on folder selection
-    $('#accessory_category_id').change(function(event) {
-        var val = $(this).val();
-
-        if (val != "") {
-            $.ajax({
-                 url      : '{url path="/admin/product/$product_id/available-accessories/"}' + $(this).val() + '.xml',
-                 type     : 'get',
-                 dataType : 'json',
-                 success  : function(json) {
-                     $('#accessory_id :not(:first-child)').remove();
-
-                     var have_content = false;
-
-                     $.each(json, function(idx, value) {
-                         $('#accessory_id').append($('<option>').text(value.title).attr('value', value.id));
-
-                         have_content = true; // Lame...
-                     });
-
-                     if (have_content) {
-                         $('#accessory_selector_empty').addClass('hide');
-                         $('#accessory_selector').removeClass('hide');
-                     }
-                     else {
-                         $('#accessory_selector_empty').removeClass('hide');
-                         $('#accessory_selector').addClass('hide');
-                     }
-
-                 }
-            });
-        }
-        else {
-            $('#accessory_selector_empty').addClass('hide');
-            $('#accessory_selector').addClass('hide');
-        }
-    });
-
-    {* Inline editing of accessory position using bootstrap-editable *}
-
-    $('.accessoryPositionChange').editable({
-        type        : 'text',
-        title       : '{intl l="Enter new accessory position"}',
-        mode        : 'popup',
-        inputclass  : 'input-mini',
-        placement   : 'left',
-        success     : function(response, newValue) {
-            // The URL template
-            var url = "{url noamp='1' path='admin/product/update-accessory-position/' accessory_id='__ID__' product_id=$product_id position='__POS__'}";
-
-            // Perform subtitutions
-            url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);
-
-            // Reload the page
-            location.href = url;
-        }
-    });
-
-    // Initialize folder (id={$folder_id}) select value
-    {if $folder_id != 0}
-        $('#folder_id').val("{$folder_id}").change();
-    {/if}
-
-    // Initialize folder (id={$folder_id}) select value
-    {if $accessory_category_id != 0}
-        $('#accessory_category_id').val("{$accessory_category_id}").change();
-    {/if}
-
-    // Unselect all options in attribute + feature tab
-    $('.clear_feature_value').click(function(event){
-    	$('#feature_value_' + $(this).data('id') + ' option').prop('selected', false);
-
-    	event.preventDefault();
-    });
+    // Load active tab
+    $('.nav-tabs a[href="#{$current_tab}"]').trigger("click");
 });
 </script>
 {/block}

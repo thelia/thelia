@@ -256,7 +256,7 @@
                                  }
                                  </th>
 
-                                 <th>&nbsp;</th>
+                                 <th class="actions">{intl l="Actions"}</th>
                              </tr>
                          </thead>
 
@@ -303,7 +303,7 @@
                               }
                              </td>
 
-                             <td>
+                             <td class="actions">
                                  <div class="btn-group">
                                  {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.product.edit"}
                                     <a class="btn btn-default btn-xs" title="{intl l='Edit this product'}" href="{url path='/admin/products/update' product_id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>

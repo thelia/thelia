@@ -1,9 +1,16 @@
+{loop name="product_edit" type="product" visible="*" id=$product_id backend_context="1" lang=$edit_language_id}
 <div class="form-container">
 
     {form name="thelia.admin.product.modification"}
     <form method="POST" action="{url path='/admin/products/save'}" {form_enctype form=$form} class="clearfix">
 
-        {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/products' product_id=$product_id}"}
+        {include
+            file = "includes/inner-form-toolbar.html"
+            hide_submit_buttons = false
+
+            page_url  = "{url path='/admin/products/update' product_id=$ID}"
+            close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
+        }
 
         {* Be sure to get the product ID, even if the form could not be validated *}
         <input type="hidden" name="product_id" value="{$product_id}" />
@@ -104,3 +111,4 @@
     </form>
     {/form}
 </div>
+{/loop}

@@ -1,7 +1,9 @@
+{loop name="product_edit" type="product" visible="*" id=$product_id backend_context="1" lang=$edit_language_id}
 <div class="form-container">
 
     <div class="row">
         <div class="col-md-12">
+            <p></p> {* <---- FIXME Lame ! *}
 		    <form method="POST" class="clearfix" action="{url path="/admin/product/$ID/set-product-template"}" id="product_template_form">
 
                 <input type="hidden" name="product_id" value="{$product_id}" />
@@ -54,11 +56,12 @@
 			    <input type="hidden" name="current_tab" value="attributes" />
 
 			    {include
-			        file="includes/inner-form-toolbar.html"
-			        hide_submit_buttons=false
-			        close_url="{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
-			    }
+			        file = "includes/inner-form-toolbar.html"
+			        hide_submit_buttons = false
 
+			        page_url  = "{url path='/admin/products/update' product_id=$ID}"
+			        close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
+			    }
 
 			    {* -- Begin attributes management ------------------------------- *}
 
@@ -181,7 +184,7 @@
 	{elseloop rel="product_template"}
 	<div class="row">
 		<div class="col-md-12">
-		    <p></p> {* bouuuuuh ! *}
+		    <p></p> {* <---- FIXME Lame ! *}
 			<div class="alert alert-info">
 			     {intl l="This product is not attached to any product template. If you want to use features or attributes on this product, please select the proper template. You can define product templates in the Configuration section."}
 			</div>
@@ -189,3 +192,16 @@
 	</div>
 	{/elseloop}
 </div>
+{/loop}
+
+<script>
+$(function() {
+
+    // Unselect all options in attribute + feature tab
+    $('.clear_feature_value').click(function(event){
+        $('#feature_value_' + $(this).data('id') + ' option').prop('selected', false);
+
+        event.preventDefault();
+    });
+});
+</script>

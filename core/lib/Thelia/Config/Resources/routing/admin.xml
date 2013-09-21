@@ -150,22 +150,32 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updatePositionAction</default>
     </route>
 
-    <!-- Related content -->
 
-    <route id="admin.products.related-content.add" path="/admin/products/related-content/add">
+    <route id="admin.products.general.tab" path="/admin/products/general/tab">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::loadGeneralAjaxTabAction</default>
+    </route>
+
+    <!-- Product Related content and accessories -->
+
+    <route id="admin.products.related.tab" path="/admin/products/related/tab">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::loadRelatedAjaxTabAction</default>
+    </route>
+
+    <!--  content -->
+    <route id="admin.products.related-content.add" path="/admin/products/content/add">
         <default key="_controller">Thelia\Controller\Admin\ProductController::addRelatedContentAction</default>
     </route>
 
-    <route id="admin.products.related-content.delete" path="/admin/products/related-content/delete">
+    <route id="admin.products.related-content.delete" path="/admin/products/content/delete">
         <default key="_controller">Thelia\Controller\Admin\ProductController::deleteRelatedContentAction</default>
     </route>
 
-    <route id="admin.product.available-related-content" path="/admin/product/{productId}/available-related-content/{folderId}.{_format}" methods="GET">
+    <route id="admin.product.available-related-content" path="/admin/product/{productId}/available-content/{folderId}.{_format}" methods="GET">
         <default key="_controller">Thelia\Controller\Admin\ProductController::getAvailableRelatedContentAction</default>
         <requirement key="_format">xml|json</requirement>
     </route>
 
-    <!-- Product accessories -->
+    <!-- accessories -->
 
     <route id="admin.products.accessories.add" path="/admin/products/accessory/add">
         <default key="_controller">Thelia\Controller\Admin\ProductController::addAccessoryAction</default>
@@ -180,11 +190,16 @@
         <requirement key="_format">xml|json</requirement>
     </route>
 
-    <route id="admin.products.update-accessory-position" path="/admin/products/update-accessory-position">
+    <route id="admin.product.update-accessory-position" path="/admin/product/update-accessory-position">
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateAccessoryPositionAction</default>
     </route>
 
-    <!--Features and attributes -->
+    <!--Product Features and attributes -->
+
+    <route id="admin.products.attributes.tab" path="/admin/products/attributes/tab">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::loadAttributesAjaxTabAction</default>
+    </route>
+
     <route id="admin.products.set-product-template" path="/admin/product/{productId}/set-product-template">
         <default key="_controller">Thelia\Controller\Admin\ProductController::setProductTemplateAction</default>
     </route>
@@ -195,6 +210,7 @@
 
 
     <!--  Folder routes management -->
+
     <route id="admin.folders.default" path="/admin/folders">
         <default key="_controller">Thelia\Controller\Admin\FolderController::indexAction</default>
     </route>
