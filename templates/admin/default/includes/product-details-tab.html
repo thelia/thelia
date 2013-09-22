@@ -6,6 +6,7 @@
 	    {include
 	        file = "includes/inner-form-toolbar.html"
             hide_submit_buttons = false
+            show_currencies = true
 
 	        page_url  = "{url path='/admin/products/update' product_id=$ID}"
 	        close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
@@ -36,24 +37,7 @@
             {/form_field}
         {/loop}
 
-
-        <div class="row">
-            <div class="col-md-12">
-	            <ul class="nav nav-pills">
-	                <li class="disabled"><a href="#">{intl l='Edit prices in:'}</a></li>
-
-	                {loop name="currency_list" type="currency"}
-	                <li {if $ID == $edit_currency_id}class="active"{/if}>
-	                    <a href="{url noamp=1 path='/admin/products/update' edit_currency_id=$ID product_id=$product_id current_tab='details'}" title="{intl l='Edit prices in %curr' curr=$NAME}">
-	                        {$SYMBOL}
-	                    </a>
-	                </li>
-	                {/loop}
-	            </ul>
-            </div>
-        </div>
-
-	        <div class="row">
+	    <div class="row">
 
 	        {* -- Pricing ------------------------------------------------------- *}
 
