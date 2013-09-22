@@ -43,12 +43,12 @@
 						<ul class="nav nav-tabs" id="tabbed-menu">
 		                    <li>
 		                          <a href="#general"
-		                             data-href="{url path='/admin/products/general/tab' product_id=$product_id}"
-		                             data-toggle="tab">{intl l="General description"}</a>
+		                             {* data-href="{url path='/admin/products/general/tab' product_id=$product_id}" *}
+		                             data-toggle="tab">{intl l="General"}</a>
 		                    </li>
 
                             <li>
-                                <a href="#price" data-toggle="tab">{intl l="Price"}</a>
+                                <a href="#price" data-toggle="tab">{intl l="Prices"}</a>
                             </li>
 
                             <li><a href="#attributes"
@@ -70,7 +70,7 @@
 		                <div class="tab-content">
 
 		                    <div class="tab-pane fade" id="general">
-                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                {include file="includes/product-general-tab.html"}
 		                    </div>
 
                             <div class="tab-pane fade" id="attributes">

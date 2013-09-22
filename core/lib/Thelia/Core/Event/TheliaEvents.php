@@ -184,17 +184,21 @@ final class TheliaEvents
     const PRODUCT_TOGGLE_VISIBILITY = "action.toggleProductVisibility";
     const PRODUCT_UPDATE_POSITION   = "action.updateProductPosition";
 
-    const PRODUCT_ADD_CONTENT      = "action.productAddContent";
-    const PRODUCT_REMOVE_CONTENT   = "action.productRemoveContent";
+    const PRODUCT_ADD_CONTENT             = "action.productAddContent";
+    const PRODUCT_REMOVE_CONTENT          = "action.productRemoveContent";
+    const PRODUCT_UPDATE_CONTENT_POSITION = "action.updateProductContentPosition";
 
     const PRODUCT_SET_TEMPLATE     = "action.productSetTemplate";
 
-    const PRODUCT_ADD_ACCESSORY             = "action.productAddAccessory";
-    const PRODUCT_REMOVE_ACCESSORY          = "action.productRemoveAccessory";
-    const PRODUCT_UPDATE_ACCESSORY_POSITION = "action.updateProductPosition";
+    const PRODUCT_ADD_ACCESSORY             = "action.productAddProductAccessory";
+    const PRODUCT_REMOVE_ACCESSORY          = "action.productRemoveProductAccessory";
+    const PRODUCT_UPDATE_ACCESSORY_POSITION = "action.updateProductAccessoryPosition";
 
-    const PRODUCT_FEATURE_UPDATE_VALUE = "action.after_updateProductFeatureValue";
-    const PRODUCT_FEATURE_DELETE_VALUE = "action.after_deleteProductFeatureValue";
+    const PRODUCT_FEATURE_UPDATE_VALUE = "action.updateProductFeatureValue";
+    const PRODUCT_FEATURE_DELETE_VALUE = "action.deleteProductFeatureValue";
+
+    const PRODUCT_ADD_CATEGORY    = "action.addProductCategory";
+    const PRODUCT_REMOVE_CATEGORY = "action.deleteProductCategory";
 
     const BEFORE_CREATEPRODUCT = "action.before_createproduct";
     const AFTER_CREATEPRODUCT  = "action.after_createproduct";

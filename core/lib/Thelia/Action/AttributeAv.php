@@ -112,19 +112,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getObjectId())) {
-
-            $attribute->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $attribute->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $attribute->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $attribute->movePositionDown();
-        }
+        return $this->genericUpdatePosition(AttributeAvQuery::create(), $event);
     }
 
 

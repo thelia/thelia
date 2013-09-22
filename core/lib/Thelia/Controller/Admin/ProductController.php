@@ -48,6 +48,9 @@ use Thelia\Model\FeatureQuery;
 use Thelia\Core\Event\FeatureProductDeleteEvent;
 use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Core\Event\ProductSetTemplateEvent;
+use Thelia\Model\Base\ProductSaleElementsQuery;
+use Thelia\Core\Event\ProductAddCategoryEvent;
+use Thelia\Core\Event\ProductDeleteCategoryEvent;
 
 /**
  * Manages products
@@ -78,33 +81,6 @@ class ProductController extends AbstractCrudController
     }
 
     /**
-     * General ajax tab loading
-     */
-    public function loadGeneralAjaxTabAction() {
-
-        // Load the object
-        $object = $this->getExistingObject();
-
-        if ($object != null) {
-
-            // Hydrate the form abd pass it to the parser
-            $changeForm = $this->hydrateObjectForm($object);
-
-            // Pass it to the parser
-            $this->getParserContext()->addForm($changeForm);
-
-            return $this->render(
-                    'ajax/product-general-tab',
-                    array(
-                        'product_id' => $this->getRequest()->get('product_id', 0),
-                    )
-            );
-        }
-
-        $this->redirectToListTemplate();
-    }
-
-    /**
      * Attributes ajax tab loading
      */
     public function loadAttributesAjaxTabAction() {
@@ -125,9 +101,10 @@ class ProductController extends AbstractCrudController
         return $this->render(
                 'ajax/product-related-tab',
                 array(
-                        'product_id'           => $this->getRequest()->get('product_id', 0),
-                        'folder_id'            => $this->getRequest()->get('folder_id', 0),
-                        'accessory_category_id'=> $this->getRequest()->get('accessory_category_id', 0)
+                        'product_id'             => $this->getRequest()->get('product_id', 0),
+                        'folder_id'              => $this->getRequest()->get('folder_id', 0),
+                        'accessory_category_id'  => $this->getRequest()->get('accessory_category_id', 0)
+
                 )
         );
     }
@@ -152,6 +129,10 @@ class ProductController extends AbstractCrudController
             ->setLocale($formData['locale'])
             ->setDefaultCategory($formData['default_category'])
             ->setVisible($formData['visible'])
+            ->setBasePrice($formData['price'])
+            ->setBaseWeight($formData['weight'])
+            ->setCurrencyId($formData['currency'])
+            ->setTaxRuleId($formData['tax_rule'])
         ;
 
         return $createEvent;
@@ -171,6 +152,10 @@ class ProductController extends AbstractCrudController
             ->setVisible($formData['visible'])
             ->setUrl($formData['url'])
             ->setDefaultCategory($formData['default_category'])
+            ->setBasePrice($formData['price'])
+            ->setBaseWeight($formData['weight'])
+            ->setCurrencyId($formData['currency'])
+            ->setTaxRuleId($formData['tax_rule'])
         ;
 
         return $changeEvent;
@@ -197,6 +182,11 @@ class ProductController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
+        // Get the default produc sales element
+        $salesElement = ProductSaleElementsQuery::create()->filterByProduct($object)->filterByIsDefault(true)->findOne();
+
+//        $prices = $salesElement->getProductPrices();
+
         // Prepare the data that will hydrate the form
         $data = array(
             'id'               => $object->getId(),
@@ -209,6 +199,8 @@ class ProductController extends AbstractCrudController
             'visible'          => $object->getVisible(),
             'url'              => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
             'default_category' => $object->getDefaultCategoryId()
+
+            // A terminer pour les prix
         );
 
         // Setup the object form
@@ -240,10 +232,10 @@ class ProductController extends AbstractCrudController
     protected function getEditionArguments()
     {
         return array(
-                'category_id'          => $this->getCategoryId(),
-                'product_id'           => $this->getRequest()->get('product_id', 0),
-                'folder_id'            => $this->getRequest()->get('folder_id', 0),
-                'accessory_category_id'=> $this->getRequest()->get('accessory_category_id', 0),
+                'category_id'           => $this->getCategoryId(),
+                'product_id'            => $this->getRequest()->get('product_id', 0),
+                'folder_id'             => $this->getRequest()->get('folder_id', 0),
+                'accessory_category_id' => $this->getRequest()->get('accessory_category_id', 0),
                 'current_tab'          => $this->getRequest()->get('current_tab', 'general')
         );
     }
@@ -478,7 +470,6 @@ class ProductController extends AbstractCrudController
 
     public function deleteAccessoryAction()
     {
-
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
 
@@ -508,33 +499,26 @@ class ProductController extends AbstractCrudController
      */
     public function updateAccessoryPositionAction()
     {
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth('admin.products.update')) return $response;
+        $accessory = AccessoryQuery::create()->findPk($this->getRequest()->get('accessory_id', null));
 
-        try {
-            $mode = $this->getRequest()->get('mode', null);
-
-            if ($mode == 'up')
-                $mode = UpdatePositionEvent::POSITION_UP;
-            else if ($mode == 'down')
-                $mode = UpdatePositionEvent::POSITION_DOWN;
-            else
-                $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
-
-            $position = $this->getRequest()->get('position', null);
-
-            $event = new UpdatePositionEvent($this->getRequest()->get('accessory_id', null), $mode, $position);
-
-            $this->dispatch(TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION, $event);
-        }
-        catch (\Exception $ex) {
-            // Any error
-            return $this->errorPage($ex);
-        }
-
-        $this->redirectToEditionTemplate();
+        return $this->genericUpdatePositionAction(
+                $accessory,
+                TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION
+        );
     }
 
+    /**
+     * Update related content position
+     */
+    public function updateContentPositionAction()
+    {
+        $content = ProductAssociatedContentQuery::create()->findPk($this->getRequest()->get('content_id', null));
+
+        return $this->genericUpdatePositionAction(
+                $content,
+                TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION
+        );
+    }
 
     /**
      * Change product template for a given product.
@@ -635,5 +619,57 @@ class ProductController extends AbstractCrudController
 
         // Redirect to the category/product list
         $this->redirectToListTemplate();
+    }
+
+    public function addAdditionalCategoryAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $category_id = intval($this->getRequest()->get('additional_category_id'));
+
+        if ($category_id > 0) {
+
+            $event = new ProductAddCategoryEvent(
+                    $this->getExistingObject(),
+                    $category_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::PRODUCT_ADD_CATEGORY, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    public function deleteAdditionalCategoryAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $category_id = intval($this->getRequest()->get('additional_category_id'));
+
+        if ($category_id > 0) {
+
+            $event = new ProductDeleteCategoryEvent(
+                    $this->getExistingObject(),
+                    $category_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::PRODUCT_REMOVE_CATEGORY, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
     }
 }

@@ -446,6 +446,8 @@ abstract class AbstractCrudController extends BaseAdminController
 
     /**
      * Update object position (only for objects whichsupport that)
+     *
+     * FIXME: integrate with genericUpdatePositionAction
      */
     public function updatePositionAction()
     {
@@ -481,6 +483,38 @@ abstract class AbstractCrudController extends BaseAdminController
         else {
             return $response;
         }
+    }
+
+    protected function genericUpdatePositionAction($object, $eventName, $doFinalRedirect = true) {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+
+        if ($object != null) {
+
+            try {
+                $mode = $this->getRequest()->get('mode', null);
+
+                if ($mode == 'up')
+                    $mode = UpdatePositionEvent::POSITION_UP;
+                else if ($mode == 'down')
+                    $mode = UpdatePositionEvent::POSITION_DOWN;
+                else
+                    $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
+
+                $position = $this->getRequest()->get('position', null);
+
+                $event = new UpdatePositionEvent($object->getId(), $mode, $position);
+
+                $this->dispatch($eventName, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        if ($doFinalRedirect) $this->redirectToEditionTemplate();
     }
 
     /**

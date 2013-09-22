@@ -58,6 +58,9 @@ use Thelia\Core\Event\ProductSetTemplateEvent;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Core\Template\Loop\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
+use Propel\Runtime\ActiveQuery\PropelQuery;
+use Thelia\Core\Event\ProductDeleteCategoryEvent;
+use Thelia\Core\Event\ProductAddCategoryEvent;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
@@ -81,7 +84,15 @@ class Product extends BaseAction implements EventSubscriberInterface
             // Set the default tax rule to this product
             ->setTaxRule(TaxRuleQuery::create()->findOneByIsDefault(true))
 
-            ->create($event->getDefaultCategory())
+            //public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight) {
+
+            ->create(
+                    $event->getDefaultCategory(),
+                    $event->getBasePrice(),
+                    $event->getCurrencyId(),
+                    $event->getTaxRuleId(),
+                    $event->getBaseWeight()
+            );
          ;
 
         $event->setProduct($product);
@@ -94,8 +105,6 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function update(ProductUpdateEvent $event)
     {
-        $search = ProductQuery::create();
-
         if (null !== $product = ProductQuery::create()->findPk($event->getProductId())) {
 
             $product
@@ -162,19 +171,7 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if (null !== $product = ProductQuery::create()->findPk($event->getObjectId())) {
-
-            $product->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $product->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $product->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $product->movePositionDown();
-        }
+        return $this->genericUpdatePosition(ProductQuery::create(), $event);
     }
 
     public function addContent(ProductAddContentEvent $event) {
@@ -206,6 +203,34 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setDispatcher($this->getDispatcher())
                 ->delete()
             ;
+    }
+
+    public function addCategory(ProductAddCategoryEvent $event) {
+
+        if (ProductCategoryQuery::create()
+            ->filterByProduct($event->getProduct())
+            ->filterByCategoryId($event->getCategoryId())
+            ->count() <= 0) {
+
+            $productCategory = new ProductCategory();
+
+            $productCategory
+                ->setProduct($event->getProduct())
+                ->setCategoryId($event->getCategoryId())
+                ->setDefaultCategory(false)
+                ->save()
+            ;
+        }
+    }
+
+    public function removeCategory(ProductDeleteCategoryEvent $event) {
+
+        $productCategory = ProductCategoryQuery::create()
+            ->filterByProduct($event->getProduct())
+            ->filterByCategoryId($event->getCategoryId())
+            ->findOne();
+
+        if ($productCategory != null) $productCategory->delete();
     }
 
     public function addAccessory(ProductAddAccessoryEvent $event) {
@@ -259,25 +284,23 @@ class Product extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Changes position, selecting absolute ou relative change.
+     * Changes accessry position, selecting absolute ou relative change.
      *
      * @param ProductChangePositionEvent $event
      */
     public function updateAccessoryPosition(UpdatePositionEvent $event)
     {
-        if (null !== $accessory = AccessoryQuery::create()->findPk($event->getObjectId())) {
+        return $this->genericUpdatePosition(AccessoryQuery::create(), $event);
+    }
 
-            $accessory->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $accessory->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $accessory->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $accessory->movePositionDown();
-        }
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param ProductChangePositionEvent $event
+     */
+    public function updateContentPosition(UpdatePositionEvent $event)
+    {
+        return $this->genericUpdatePosition(ProductAssociatedContentQuery::create(), $event);
     }
 
     public function updateFeatureProductValue(FeatureProductUpdateEvent $event) {
@@ -299,10 +322,8 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
 
         $featureProduct = $featureProductQuery->findOne();
-echo "<br /> create or update: f=".$event->getFeatureId().", p=".$event->getProductId();
 
         if ($featureProduct == null) {
-echo " Create !";
             $featureProduct = new FeatureProduct();
 
             $featureProduct
@@ -313,7 +334,6 @@ echo " Create !";
 
             ;
         }
-        else echo " Update !";
 
         if ($event->getIsTextValue() == true) {
             $featureProduct->setFreeTextValue($event->getFeatureValue());
@@ -321,7 +341,6 @@ echo " Create !";
         else {
             $featureProduct->setFeatureAvId($event->getFeatureValue());
         }
-echo "value=".$event->getFeatureValue();
 
         $featureProduct->save();
 
@@ -335,8 +354,6 @@ echo "value=".$event->getFeatureValue();
             ->filterByFeatureId($event->getFeatureId())
             ->delete()
         ;
-
-        echo "<br/>Delete p=".$event->getProductId().", f=".$event->getFeatureId();
     }
 
     /**
@@ -355,9 +372,13 @@ echo "value=".$event->getFeatureValue();
             TheliaEvents::PRODUCT_ADD_CONTENT               => array("addContent", 128),
             TheliaEvents::PRODUCT_REMOVE_CONTENT            => array("removeContent", 128),
             TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => array("updateAccessoryPosition", 128),
+            TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION   => array("updateContentPosition", 128),
 
             TheliaEvents::PRODUCT_ADD_ACCESSORY     => array("addAccessory", 128),
             TheliaEvents::PRODUCT_REMOVE_ACCESSORY  => array("removeAccessory", 128),
+
+            TheliaEvents::PRODUCT_ADD_CATEGORY    => array("addCategory", 128),
+            TheliaEvents::PRODUCT_REMOVE_CATEGORY => array("removeCategory", 128),
 
             TheliaEvents::PRODUCT_SET_TEMPLATE => array("setProductTemplate", 128),
 

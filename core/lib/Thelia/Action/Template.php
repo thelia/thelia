@@ -142,9 +142,7 @@ class Template extends BaseAction implements EventSubscriberInterface
      */
     public function updateAttributePosition(UpdatePositionEvent $event)
     {
-        $attributeTemplate = AttributeTemplateQuery::create()->findPk($event->getObjectId());
-
-        $this->updatePosition($attributeTemplate, $event);
+        return $this->genericUpdatePosition(AttributeTemplateQuery::create(), $event);
     }
 
     /**
@@ -154,26 +152,7 @@ class Template extends BaseAction implements EventSubscriberInterface
      */
     public function updateFeaturePosition(UpdatePositionEvent $event)
     {
-        $featureTemplate = FeatureTemplateQuery::create()->findPk($event->getObjectId());
-
-        $this->updatePosition($featureTemplate, $event);
-    }
-
-    protected function updatePosition($object, UpdatePositionEvent $event)
-    {
-        if (null !== $object) {
-
-            $object->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                $object->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                $object->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                $object->movePositionDown();
-        }
+        return $this->genericUpdatePosition(FeatureTemplateQuery::create(), $event);
     }
 
     public function deleteAttribute(TemplateDeleteAttributeEvent $event) {

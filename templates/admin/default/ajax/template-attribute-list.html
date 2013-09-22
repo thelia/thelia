@@ -1,6 +1,6 @@
 <div class="form-group">
     {ifloop rel="free_attributes"}
-    <form action="{url path='/admin/configuration/templates/attributes/add'}">
+    <form method="POST" action="{url path='/admin/configuration/templates/attributes/add'}">
 
         <input type="hidden" name="template_id" value="{$template_id}" />
 

@@ -266,7 +266,7 @@ class TemplateController extends AbstractCrudController
             ->findOne()
         ;
 
-        return $this->updatePosition(
+        return $this->genericUpdatePositionAction(
                 $attributeTemplate,
                 TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION
         );
@@ -325,41 +325,9 @@ class TemplateController extends AbstractCrudController
             ->findOne()
         ;
 
-        return $this->updatePosition(
+        return $this->genericUpdatePositionAction(
                 $featureTemplate,
                 TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION
         );
-    }
-
-    protected function updatePosition($object, $eventName) {
-
-        // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
-
-        if ($object != null) {
-
-            try {
-                $mode = $this->getRequest()->get('mode', null);
-
-                if ($mode == 'up')
-                    $mode = UpdatePositionEvent::POSITION_UP;
-                else if ($mode == 'down')
-                    $mode = UpdatePositionEvent::POSITION_DOWN;
-                else
-                    $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
-
-                $position = $this->getRequest()->get('position', null);
-
-                $event = new UpdatePositionEvent($object->getId(), $mode, $position);
-
-                $this->dispatch($eventName, $event);
-            }
-            catch (\Exception $ex) {
-                // Any error
-                return $this->errorPage($ex);
-            }
-        }
-
-        $this->redirectToEditionTemplate();
     }
 }

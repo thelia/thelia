@@ -20,56 +20,31 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Propel\Runtime\ActiveQuery\PropelQuery;
-use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Core\Event\UpdatePositionEvent;
+namespace Thelia\Core\Event;
+use Thelia\Model\Product;
 
-class BaseAction
+class ProductDeleteCategoryEvent extends ProductEvent
 {
-    /**
-     * @var The container
-     */
-    protected $container;
+    protected $category_id;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Product $product, $category_id)
     {
-        $this->container = $container;
+        parent::__construct($product);
+
+        $this->category_id = $category_id;
     }
 
-    /**
-     * Return the event dispatcher,
-     *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    public function getDispatcher()
+    public function getCategoryId()
     {
-        return $this->container->get('event_dispatcher');
+        return $this->category_id;
     }
 
-
-    /**
-     * Changes object position, selecting absolute ou relative change.
-     *
-     * @param $query the query to retrieve the object to move
-     * @param UpdatePositionEvent $event
-     */
-    protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event)
+    public function setCategoryId($category_id)
     {
-        if (null !== $object = $query->findPk($event->getObjectId())) {
+        $this->category_id = $category_id;
 
-            $object->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $object->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $object->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $object->movePositionDown();
-        }
+        return $this;
     }
+
 }

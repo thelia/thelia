@@ -31,7 +31,7 @@
 			                    </select>
 
 			                    <span class="input-group-btn" id="apply_template_button">
-			                       <button class="btn btn-default btn-primary action-btn" type="submit">{intl l="Apply this template"}</button>
+			                       <button class="btn btn-default btn-primary action-btn" type="submit">{intl l="Apply"}</button>
 			                    </span>
 			                </div>
 		                </div>
@@ -43,9 +43,6 @@
 
     {* Check if a product template is defined *}
 
-    {loop name="product_template" type="template" id={$TEMPLATE|default:0}}{/loop}
-
-    {ifloop rel="product_template"}
     <div class="row">
         <div class="col-md-12">
 			<p class="title title-without-tabs">{intl l='Product Attributes and Features'}</p>
@@ -70,10 +67,18 @@
 				       <div class="form-group">
 				           <p class="title title-without-tabs">{intl l='Product Attributes'}</p>
 
-                            <p>{intl
-                                  l="You can change attributes and their positions in <a href=\"%tpl_mgmt_url\" target=\"tpl_window\">the template configuration page</a>."
+                            <p>
+                            {if $TEMPLATE}
+                                {intl
+                                  l="You can change template attributes and their positions in <a href=\"%tpl_mgmt_url\" target=\"tpl_window\">the template configuration page</a>."
                                   tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id=$TEMPLATE}
-                               }
+                                }
+                            {else}
+                                {intl
+                                    l="You can change attributes and their positions in <a href=\"%tpl_mgmt_url\" target=\"tpl_window\">the attributes configuration page</a>."
+                                    tpl_mgmt_url={url path='/admin/configuration/attributes'}
+                                }
+                            {/if}
                             </p>
 
 				           <div class="alert alert-danger">Please code me baby, oh yeah ! Code me NOW !</div>
@@ -88,10 +93,18 @@
 			            <div class="form-group">
 			                <p class="title title-without-tabs">{intl l='Product Features'}</p>
 
-                            <p>{intl
-                                  l="You can change feature products and their positions in <a href=\"%tpl_mgmt_url\" target=\"tpl_window\">the template configuration page</a>."
-                                  tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id=$TEMPLATE}
-                               }
+                            <p>
+                            {if $TEMPLATE}
+                                {intl
+                                    l="You can change templates features and their positions in <a href=\"%tpl_mgmt_url\" target=\"tpl_window\">the template configuration page</a>."
+                                    tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id=$TEMPLATE}
+                                }
+                            {else}
+                                {intl
+                                    l="You can change feature and their positions in <a href=\"%tpl_mgmt_url\" target=\"tpl_window\">the features configuration page</a>."
+                                    tpl_mgmt_url={url path='/admin/configuration/features'}
+                                }
+                            {/if}
                             </p>
 
 			                <div class="table-responsive">
@@ -139,7 +152,7 @@
 							                         </div>
 
 												     <span class="help-block text-right">
-												         {intl l='Use ctrl+clic to select more than one value. You can also <a href="#" class="clear_feature_value" data-id="%id">clear selected values</a>.' id=$ID}
+												         {intl l='Use Ctrl+click to select more than one value. You can also <a href="#" class="clear_feature_value" data-id="%id">clear selected values</a>.' id=$ID}
 												     </span>
 						                         {/ifloop}
 
@@ -179,18 +192,7 @@
 			</form>
 		</div>
 	</div>
-	{/ifloop}
 
-	{elseloop rel="product_template"}
-	<div class="row">
-		<div class="col-md-12">
-		    <p></p> {* <---- FIXME Lame ! *}
-			<div class="alert alert-info">
-			     {intl l="This product is not attached to any product template. If you want to use features or attributes on this product, please select the proper template. You can define product templates in the Configuration section."}
-			</div>
-		</div>
-	</div>
-	{/elseloop}
 </div>
 {/loop}
 

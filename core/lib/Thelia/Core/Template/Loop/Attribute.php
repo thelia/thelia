@@ -121,12 +121,15 @@ class Attribute extends BaseI18nLoop
                 // Create template array
                 if ($template == null) $template = array();
 
-                foreach($products as $product)
-                    $template[] = $product->getTemplateId();
+                foreach($products as $product) {
+                    $tpl_id = $product->getTemplateId();
+
+                    if (! is_null($tpl_id)) $template[] = $tpl_id;
+                }
             }
         }
 
-        if (null !== $template) {
+        if (! empty($template)) {
 
             // Join with feature_template table to get position
             $search

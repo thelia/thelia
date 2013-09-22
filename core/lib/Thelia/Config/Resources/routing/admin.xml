@@ -155,13 +155,24 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::loadGeneralAjaxTabAction</default>
     </route>
 
-    <!-- Product Related content and accessories -->
+    <!-- Product associations, categories,  content and accessories -->
 
     <route id="admin.products.related.tab" path="/admin/products/related/tab">
         <default key="_controller">Thelia\Controller\Admin\ProductController::loadRelatedAjaxTabAction</default>
     </route>
 
+    <!-- categories -->
+
+    <route id="admin.products.additional-category.add" path="/admin/products/category/add">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::addAdditionalCategoryAction</default>
+    </route>
+
+    <route id="admin.products.additional-category.delete" path="/admin/products/category/delete">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::deleteAdditionalCategoryAction</default>
+    </route>
+
     <!--  content -->
+
     <route id="admin.products.related-content.add" path="/admin/products/content/add">
         <default key="_controller">Thelia\Controller\Admin\ProductController::addRelatedContentAction</default>
     </route>
@@ -173,6 +184,10 @@
     <route id="admin.product.available-related-content" path="/admin/product/{productId}/available-content/{folderId}.{_format}" methods="GET">
         <default key="_controller">Thelia\Controller\Admin\ProductController::getAvailableRelatedContentAction</default>
         <requirement key="_format">xml|json</requirement>
+    </route>
+
+    <route id="admin.product.update-content-position" path="/admin/product/update-content-position">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateContentPositionAction</default>
     </route>
 
     <!-- accessories -->
