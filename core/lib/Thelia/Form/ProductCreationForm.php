@@ -63,27 +63,32 @@ class ProductCreationForm extends BaseForm
                 "label"      => Translator::getInstance()->trans("This product is online"),
                 "label_attr" => array("for" => "visible_field")
             ))
-            ->add("price", "number", array(
-                "constraints" => array(new NotBlank()),
-                "label"      => Translator::getInstance()->trans("Product base price excluding taxes *"),
-                "label_attr" => array("for" => "price_field")
-            ))
-            ->add("currency", "integer", array(
-                "constraints" => array(new NotBlank()),
-                "label"      => Translator::getInstance()->trans("Price currency *"),
-                "label_attr" => array("for" => "currency_field")
-            ))
-            ->add("tax_rule", "integer", array(
-                "constraints" => array(new NotBlank()),
-                "label"      => Translator::getInstance()->trans("Tax rule for this product *"),
-                "label_attr" => array("for" => "tax_rule_field")
-            ))
-            ->add("weight", "number", array(
-                "constraints" => array(new NotBlank()),
-                "label"      => Translator::getInstance()->trans("Weight *"),
-                "label_attr" => array("for" => "weight_field")
-            ))
             ;
+
+       if (! $change_mode) {
+           $this->formBuilder
+                ->add("price", "number", array(
+                    "constraints" => array(new NotBlank()),
+                    "label"      => Translator::getInstance()->trans("Product base price excluding taxes *"),
+                    "label_attr" => array("for" => "price_field")
+                ))
+                ->add("currency", "integer", array(
+                    "constraints" => array(new NotBlank()),
+                    "label"      => Translator::getInstance()->trans("Price currency *"),
+                    "label_attr" => array("for" => "currency_field")
+                ))
+                ->add("tax_rule", "integer", array(
+                    "constraints" => array(new NotBlank()),
+                    "label"      => Translator::getInstance()->trans("Tax rule for this product *"),
+                    "label_attr" => array("for" => "tax_rule_field")
+                ))
+                ->add("weight", "number", array(
+                    "constraints" => array(new NotBlank()),
+                    "label"      => Translator::getInstance()->trans("Weight *"),
+                    "label_attr" => array("for" => "weight_field")
+                ))
+            ;
+        }
     }
 
     public function checkDuplicateRef($value, ExecutionContextInterface $context)

@@ -48,7 +48,7 @@
 		                    </li>
 
                             <li>
-                                <a href="#price" data-toggle="tab">{intl l="Prices"}</a>
+                                <a href="#details" data-toggle="tab">{intl l="Details"}</a>
                             </li>
 
                             <li><a href="#attributes"
@@ -72,6 +72,10 @@
 		                    <div class="tab-pane fade" id="general">
                                 {include file="includes/product-general-tab.html"}
 		                    </div>
+
+                            <div class="tab-pane fade" id="details">
+                                {include file="includes/product-details-tab.html"}
+                            </div>
 
                             <div class="tab-pane fade" id="attributes">
                                 <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>

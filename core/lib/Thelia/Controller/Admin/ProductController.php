@@ -152,11 +152,7 @@ class ProductController extends AbstractCrudController
             ->setVisible($formData['visible'])
             ->setUrl($formData['url'])
             ->setDefaultCategory($formData['default_category'])
-            ->setBasePrice($formData['price'])
-            ->setBaseWeight($formData['weight'])
-            ->setCurrencyId($formData['currency'])
-            ->setTaxRuleId($formData['tax_rule'])
-        ;
+         ;
 
         return $changeEvent;
     }

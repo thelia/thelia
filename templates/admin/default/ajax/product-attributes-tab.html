@@ -81,7 +81,40 @@
                             {/if}
                             </p>
 
-				           <div class="alert alert-danger">Please code me baby, oh yeah ! Code me NOW !</div>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-condensed table-left-aligned">
+                                    <thead>
+                                        <tr>
+                                            <th>{intl l='ID'}</th>
+                                            <th>{intl l='Attribute Name'}</th>
+
+                                            {module_include location='product_attributes_table_header'}
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {loop name="product-attributes" type="attribute" order="manual" product=$product_id backend_context="1" lang="$edit_language_id"}
+                                        <tr>
+                                            <td>{$ID}</td>
+
+                                            <td>{$TITLE}</td>
+
+                                            {module_include location='product_features_table_row'}
+                                        </tr>
+                                         {/loop}
+
+                                         {elseloop rel="product-attributes"}
+                                             <tr>
+                                                 <td colspan="2">
+                                                     <div class="alert alert-info">
+                                                         {intl l="This product template does not contains any features"}
+                                                     </div>
+                                                 </td>
+                                             </tr>
+                                         {/elseloop}
+                                    </tbody>
+                                </table>
+                            </div>
 				         </div>
 				     </div>
 			    </div>
@@ -111,7 +144,8 @@
 					            <table class="table table-striped table-condensed table-left-aligned">
 					                <thead>
 					                    <tr>
-					                        <th>{intl l='Feature Name'}</th>
+                                            <th>{intl l='ID'}</th>
+                                            <th>{intl l='Feature Name'}</th>
 					                        <th>{intl l='Feature value for this product'}</th>
 
 					                        {module_include location='product_features_table_header'}
@@ -122,6 +156,8 @@
 									<tbody>
 									    {loop name="product-features" type="feature" order="manual" product=$product_id backend_context="1" lang="$edit_language_id"}
 									    <tr>
+                                            <td>{$ID}</td>
+
 									        <td>{$TITLE}</td>
 
 						                    <td>
@@ -176,7 +212,7 @@
 
 									     {elseloop rel="product-features"}
 									         <tr>
-									             <td colspan="2">
+									             <td colspan="3">
 									                 <div class="alert alert-info">
 									                     {intl l="This product template does not contains any features"}
 									                 </div>
