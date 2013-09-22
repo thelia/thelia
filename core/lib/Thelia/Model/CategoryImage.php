@@ -29,40 +29,17 @@ class CategoryImage extends BaseCategoryImage
     }
 
     /**
-     * Get picture absolute path
-     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
+     * Set Image parent id
      *
-     * @return null|string
-     */
-    public function getAbsolutePath()
-    {
-        return null === $this->file
-            ? null
-            : $this->getUploadDir().'/'.$this->file;
-    }
-
-    /**
-     * Get picture web path
-     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
+     * @param int $parentId parent id
      *
-     * @return null|string
+     * @return $this
      */
-    public function getWebPath()
+    public function setParentId($parentId)
     {
-        return null === $this->file
-            ? null
-            : $this->getUploadDir().'/'.$this->file;
-    }
+        $this->setCategoryId($parentId);
 
-
-    /**
-     * Get rid of the __DIR__ so it doesn't screw up
-     * when displaying uploaded doc/image in the view.
-     * @return string
-     */
-    public function getUploadDir()
-    {
-        return THELIA_LOCAL_DIR . 'media/images/category';
+        return $this;
     }
 
     /**

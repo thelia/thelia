@@ -27,6 +27,20 @@ class FolderImage extends BaseFolderImage
     }
 
     /**
+     * Set Image parent id
+     *
+     * @param int $parentId parent id
+     *
+     * @return $this
+     */
+    public function setParentId($parentId)
+    {
+        $this->setFolderId($parentId);
+
+        return $this;
+    }
+
+    /**
      * Get Image parent id
      *
      * @return int parent id

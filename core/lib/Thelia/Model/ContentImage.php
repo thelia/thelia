@@ -27,6 +27,20 @@ class ContentImage extends BaseContentImage
     }
 
     /**
+     * Set Image parent id
+     *
+     * @param int $parentId parent id
+     *
+     * @return $this
+     */
+    public function setParentId($parentId)
+    {
+        $this->setContentId($parentId);
+
+        return $this;
+    }
+
+    /**
      * Get Image parent id
      *
      * @return int parent id

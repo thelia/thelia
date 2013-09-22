@@ -22,8 +22,9 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
+
 use Thelia\Core\Translation\Translator;
-use Thelia\Form\Type\ImageCategoryType;
+use Thelia\Form\Image\ImageModification;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -36,36 +37,17 @@ use Thelia\Form\Type\ImageCategoryType;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CategoryImageCreationForm extends BaseForm
+class FolderImageModification extends ImageModification
 {
-    /**
-     * Allow to build a form
-     */
-    protected function buildForm()
-    {
-        $this->formBuilder
-            ->add('pictures',
-                'collection',
-                array(
-                    'type'   => new ImageCategoryType(),
-                    'options'  => array(
-                        'required'  => false
-                    ),
-                    'allow_add' => true,
-                    'allow_delete' => true,
-                    'by_reference' => false,
-                )
-            )
-            ->add('formSuccessUrl');
-    }
 
     /**
      * Get form name
+     * This name must be unique
      *
      * @return string
      */
     public function getName()
     {
-        return 'thelia_category_image_creation';
+        return 'thelia_folder_image_modification';
     }
 }

@@ -305,6 +305,11 @@ final class TheliaEvents
     const IMAGE_SAVE = "action.saveImages";
 
     /**
+     * Save given images
+     */
+    const IMAGE_UPDATE = "action.updateImages";
+
+    /**
      * Delete given image
      */
     const IMAGE_DELETE = "action.deleteImage";

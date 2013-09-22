@@ -39,10 +39,23 @@
 
     <!-- Route to the file controller -->
 
-    <route id="admin.image.save" path="/admin/image/type/{parentType}/{parentId}/save">
-        <default key="_controller">Thelia\Controller\Admin\FileController::saveImagesAction</default>
+    <route id="admin.image.save-ajax" path="/admin/image/type/{parentType}/{parentId}/save-ajax">
+        <default key="_controller">Thelia\Controller\Admin\FileController::saveImageAjaxAction</default>
         <requirement key="parentType">.*</requirement>
         <requirement key="parentId">\d+</requirement>
+    </route>
+    <route id="admin.image.list-ajax" path="/admin/image/type/{parentType}/{parentId}/list-ajax">
+        <default key="_controller">Thelia\Controller\Admin\FileController::getImageListAjaxAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="parentId">\d+</requirement>
+    </route>
+    <route id="admin.image.update.view" path="/admin/image/type/{parentType}/{imageId}/update" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\FileController::viewImageAction</default>
+        <requirement key="customer_id">\d+</requirement>
+    </route>
+    <route id="admin.image.update.process" path="/admin/image/type/{parentType}/{imageId}/update" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\FileController::updateImageAction</default>
+        <requirement key="customer_id">\d+</requirement>
     </route>
     <route id="admin.image.delete" path="/admin/image/type/{parentType}/delete/{imageId}">
         <default key="_controller">Thelia\Controller\Admin\FileController::deleteImagesAction</default>

@@ -1,28 +1,37 @@
-// Manage picture upload
 $(function($){
-
+    // Manage picture upload
     var pictureUploadManager = {};
 
-    // Set selected image as preview
-    pictureUploadManager.onChangePreviewPicture = function() {
-        $('#images input:file').on('change', function () {
-            var $this = $(this);
-            if ($this.prop("files") && $this.prop("files")[0]) {
-                var reader = new FileReader();
-
-                reader.onload = function (e) {
-                    $this.parent()
-                        .find('img.preview')
-                        .attr('src', e.target.result)
-                        .width(150)
-                        .height(200);
-                }
-
-                reader.readAsDataURL($this.prop("files")[0]);
-            }
-        });
+    var imageDropzone = new Dropzone("#images-dropzone");
+    Dropzone.options.imageDropzone = {
+        uploadMultiple: false
     };
-    pictureUploadManager.onChangePreviewPicture();
+    imageDropzone.on("success", function(file) {
+        $(".image-manager .dz-file-preview").remove();
+        imageDropzone.removeFile(file);
+        pictureUploadManager.updateImageListAjax();
+    });
+
+    // Update picture list via AJAX call
+    pictureUploadManager.updateImageListAjax = function() {
+        var $imageListArea = $(".image-manager .existing-image");
+        $imageListArea.html('<div class="loading" ></div>');
+        $.ajax({
+            type: "POST",
+            url: imageListUrl,
+            statusCode: {
+                404: function() {
+                    $imageListArea.html(
+                        imageListErrorMessage
+                    );
+                }
+            }
+        }).done(function(data) {
+                $imageListArea.html(
+                    data
+                );
+            });
+    };
 
     // Remove image on click
     pictureUploadManager.onClickDeleteImage = function() {
@@ -52,16 +61,4 @@ $(function($){
         });
     };
     pictureUploadManager.onClickDeleteImage();
-
-    // Remove image on click
-    pictureUploadManager.clonePictureInputs = function() {
-        var $inputs = $(".image-manager .picture-input");
-        if ($inputs.size == 1) {
-            console.log('1');
-            $(".image-manager .picture-input").last().show();
-        } else {
-            console.log('+d1');
-            $(".image-manager .picture-input").last().clone().appendTo(".image-manager .pictures-input");
-        }
-    }
 });

@@ -22,13 +22,14 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 9/18/13
  * Time: 3:56 PM
  *
- * Occurring when a Image list is saved
+ * Occurring when an Image is saved
  *
  * @package Image
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
@@ -36,16 +37,15 @@ namespace Thelia\Core\Event;
  */
 class ImageCreateOrUpdateEvent extends ActionEvent
 {
-    CONST TYPE_PRODUCT  = 'product';
-    CONST TYPE_CATEGORY = 'category';
-    CONST TYPE_CONTENT  = 'content';
-    CONST TYPE_FOLDER   = 'folder';
 
-    /** @var array Images model to save */
-    protected $modelImages = array();
+    /** @var \Thelia\Model\CategoryImage|\Thelia\Model\ProductImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage model to save */
+    protected $modelImage = array();
 
-    /** @var array Images file to save */
-    protected $uploadedFiles = array();
+    /** @var \Thelia\Model\CategoryImage|\Thelia\Model\ProductImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage model to save */
+    protected $oldModelImage = array();
+
+    /** @var UploadedFile Image file to save */
+    protected $uploadedFile = null;
 
     /** @var int Image parent id */
     protected $parentId = null;
@@ -53,85 +53,56 @@ class ImageCreateOrUpdateEvent extends ActionEvent
     /** @var string Image type */
     protected $imageType = null;
 
-    /** @var array Available image parent type */
-    protected static $availableType = array(
-        self::TYPE_PRODUCT,
-        self::TYPE_CATEGORY,
-        self::TYPE_CONTENT,
-        self::TYPE_FOLDER,
-    );
+    /** @var string Parent name */
+    protected $parentName = null;
 
     /**
      * Constructor
      *
-     * @param string $pictureType Picture type
-     *                            ex : ImageCreateOrUpdateEvent::TYPE_CATEGORY
+     * @param string $imageType   Image type
+     *                            ex : FileManager::TYPE_CATEGORY
      * @param int    $parentId    Image parent id
      */
-    public function __construct($pictureType, $parentId)
+    public function __construct($imageType, $parentId)
     {
-        $this->imageType = $pictureType;
+        $this->imageType = $imageType;
         $this->parentId  = $parentId;
     }
 
     /**
-     * Set Images to save
+     * Set Image to save
      *
-     * @param array $images Thelia\Model\CategoryImage Array
+     * @param $image \Thelia\Model\CategoryImage|\Thelia\Model\ProductImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage
      *
      * @return $this
      */
-    public function setModelImages($images)
+    public function setModelImage($image)
     {
-        $this->modelImages = $images;
+        $this->modelImage = $image;
 
         return $this;
     }
 
     /**
-     * Get Images being saved
+     * Get Image being saved
      *
-     * @return array Array of Thelia\Model\CategoryImage
+     * @return \Thelia\Model\CategoryImage|\Thelia\Model\ProductImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage
      */
-    public function getModelImages()
+    public function getModelImage()
     {
-        return $this->modelImages;
-    }
-
-    /**
-     * Set Images to save
-     *
-     * @param array $images Thelia\Model\CategoryImage Array
-     *
-     * @return $this
-     */
-    public function setUploadedFiles($images)
-    {
-        $this->uploadedFiles = $images;
-
-        return $this;
-    }
-
-    /**
-     * Get Images being saved
-     *
-     * @return array Array of Thelia\Model\CategoryImage
-     */
-    public function getUploadedFiles()
-    {
-        return $this->uploadedFiles;
+        return $this->modelImage;
     }
 
     /**
      * Set picture type
      *
-     * @param string $pictureType Picture type
+     * @param string $imageType Image type
      *
      * @return $this
      */
-    public function setImageType($pictureType)
+    public function setImageType($imageType)
     {
-        $this->imageType = $pictureType;
+        $this->imageType = $imageType;
 
         return $this;
     }
@@ -144,16 +115,6 @@ class ImageCreateOrUpdateEvent extends ActionEvent
     public function getImageType()
     {
         return $this->imageType;
-    }
-
-    /**
-     * Get all image parent type available
-     *
-     * @return array
-     */
-    public static function getAvailableType()
-    {
-        return self::$availableType;
     }
 
     /**
@@ -178,6 +139,74 @@ class ImageCreateOrUpdateEvent extends ActionEvent
     public function getParentId()
     {
         return $this->parentId;
+    }
+
+    /**
+     * Set uploaded file
+     *
+     * @param UploadedFile $uploadedFile File being uploaded
+     *
+     * @return $this
+     */
+    public function setUploadedFile($uploadedFile)
+    {
+        $this->uploadedFile = $uploadedFile;
+
+        return $this;
+    }
+
+    /**
+     * Get uploaded file
+     *
+     * @return UploadedFile
+     */
+    public function getUploadedFile()
+    {
+        return $this->uploadedFile;
+    }
+
+    /**
+     * Set parent name
+     *
+     * @param string $parentName Parent name
+     *
+     * @return $this
+     */
+    public function setParentName($parentName)
+    {
+        $this->parentName = $parentName;
+
+        return $this;
+    }
+
+    /**
+     * Get parent name
+     *
+     * @return string
+     */
+    public function getParentName()
+    {
+        return $this->parentName;
+    }
+
+    /**
+     * Set old model value
+     *
+     * @param \Thelia\Model\CategoryImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage|\Thelia\Model\ProductImage $oldModelImage
+     */
+    public function setOldModelImage($oldModelImage)
+    {
+        $this->oldModelImage = $oldModelImage;
+    }
+
+    /**
+     * Get old model value
+     *
+     * @return \Thelia\Model\CategoryImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage|\Thelia\Model\ProductImage
+     */
+    public function getOldModelImage()
+    {
+        return $this->oldModelImage;
     }
 
 

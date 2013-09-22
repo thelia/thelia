@@ -23,53 +23,115 @@
 
 namespace Thelia\Core\Event;
 
-use Thelia\Model\CategoryImage;
-use Thelia\Model\ContentImage;
-use Thelia\Model\FolderImage;
-use Thelia\Model\ProductImage;
-
 /**
  * Created by JetBrains PhpStorm.
  * Date: 9/18/13
  * Time: 3:56 PM
  *
- * Occurring when a Image is about to be deleted
+ * Occurring when a Image list is saved
  *
  * @package Image
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class ImageDeleteEvent extends ActionEvent
+class ImagesCreateOrUpdateEvent extends ActionEvent
 {
+    CONST TYPE_PRODUCT  = 'product';
+    CONST TYPE_CATEGORY = 'category';
+    CONST TYPE_CONTENT  = 'content';
+    CONST TYPE_FOLDER   = 'folder';
+
+    /** @var array Images model to save */
+    protected $modelImages = array();
+
+    /** @var array Images file to save */
+    protected $uploadedFiles = array();
+
+    /** @var int Image parent id */
+    protected $parentId = null;
+
     /** @var string Image type */
     protected $imageType = null;
 
-    /** @var CategoryImage|ProductImage|ContentImage|FolderImage Image about to be deleted */
-    protected $imageToDelete = null;
+    /** @var array Available image parent type */
+    protected static $availableType = array(
+        self::TYPE_PRODUCT,
+        self::TYPE_CATEGORY,
+        self::TYPE_CONTENT,
+        self::TYPE_FOLDER,
+    );
 
     /**
      * Constructor
      *
-     * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
-     * @param string                                              $imageType   Image type
-     *                                                                         ex : FileManager::TYPE_CATEGORY
+     * @param string $pictureType Picture type
+     *                            ex : ImageCreateOrUpdateEvent::TYPE_CATEGORY
+     * @param int    $parentId    Image parent id
      */
-    public function __construct($imageToDelete, $imageType)
+    public function __construct($pictureType, $parentId)
     {
-        $this->imageToDelete = $imageToDelete;
-        $this->imageType = $imageType;
+        $this->imageType = $pictureType;
+        $this->parentId  = $parentId;
+    }
+
+    /**
+     * Set Images to save
+     *
+     * @param array $images Thelia\Model\CategoryImage Array
+     *
+     * @return $this
+     */
+    public function setModelImages($images)
+    {
+        $this->modelImages = $images;
+
+        return $this;
+    }
+
+    /**
+     * Get Images being saved
+     *
+     * @return array Array of Thelia\Model\CategoryImage
+     */
+    public function getModelImages()
+    {
+        return $this->modelImages;
+    }
+
+    /**
+     * Set Images to save
+     *
+     * @param array $images Thelia\Model\CategoryImage Array
+     *
+     * @return $this
+     */
+    public function setUploadedFiles($images)
+    {
+        $this->uploadedFiles = $images;
+
+        return $this;
+    }
+
+    /**
+     * Get Images being saved
+     *
+     * @return array Array of Thelia\Model\CategoryImage
+     */
+    public function getUploadedFiles()
+    {
+        return $this->uploadedFiles;
     }
 
     /**
      * Set picture type
      *
-     * @param string $imageType Image type
+     * @param string $pictureType Picture type
      *
      * @return $this
      */
-    public function setImageType($imageType)
+    public function setImageType($pictureType)
     {
-        $this->imageType = $imageType;
+        $this->imageType = $pictureType;
 
         return $this;
     }
@@ -85,27 +147,37 @@ class ImageDeleteEvent extends ActionEvent
     }
 
     /**
-     * Set Image about to be deleted
+     * Get all image parent type available
      *
-     * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
+     * @return array
+     */
+    public static function getAvailableType()
+    {
+        return self::$availableType;
+    }
+
+    /**
+     * Set Image parent id
+     *
+     * @param int $parentId Image parent id
      *
      * @return $this
      */
-    public function setImageToDelete($imageToDelete)
+    public function setParentId($parentId)
     {
-        $this->imageToDelete = $imageToDelete;
+        $this->parentId = $parentId;
 
         return $this;
     }
 
     /**
-     * Get Image about to be deleted
+     * Get Image parent id
      *
-     * @return CategoryImage|ProductImage|ContentImage|FolderImage
+     * @return int
      */
-    public function getImageToDelete()
+    public function getParentId()
     {
-        return $this->imageToDelete;
+        return $this->parentId;
     }
 
 

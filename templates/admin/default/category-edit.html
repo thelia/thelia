@@ -256,7 +256,7 @@
 		                    </div>
 
 		                    <div class="tab-pane fade {if $current_tab == 'images'}active in{/if}" id="images">
-                                {include file='includes/image-upload-form.html' formName="thelia.admin.category.image.creation" formSuccessUrl={url path="/admin/categories/update?category_id=$category_id"} imageType='category' parentId=$category_id}
+                                {include file='includes/image-upload-form.html' imageType='category' parentId=$category_id}
                             </div>
 
 		                    <div class="tab-pane fade {if $current_tab == 'documents'}active in{/if}" id="documents">
@@ -297,9 +297,14 @@
 {/block}
 
 {block name="javascript-initialization"}
-{javascripts file='assets/js/image-upload.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
+    {javascripts file='assets/js/dropzone.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/image-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+
 
 <script src="{url file='/tinymce/tinymce.min.js'}"></script>
 <script>

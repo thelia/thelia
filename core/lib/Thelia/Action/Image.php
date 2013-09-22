@@ -28,6 +28,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\ImageCreateOrUpdateEvent;
+use Thelia\Core\Event\ImagesCreateOrUpdateEvent;
 use Thelia\Core\Event\ImageDeleteEvent;
 use Thelia\Core\Event\ImageEvent;
 use Thelia\Model\CategoryImage;
@@ -252,21 +253,20 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     }
 
     /**
-     * Take care of saving images in the database and file storage
+     * Take care of saving image in the database and file storage
      *
      * @param ImageCreateOrUpdateEvent $event Image event
      *
      * @throws \Thelia\Exception\ImageException
      * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
      */
-    public function saveImages(ImageCreateOrUpdateEvent $event)
+    public function saveImage(ImageCreateOrUpdateEvent $event)
     {
-        $fileManager = new FileManager($this->container);
-
         $this->adminLogAppend(
             $this->container->get('thelia.translator')->trans(
-                'Saving images for parent id %parentId% (%parentType%)',
+                'Saving images for %parentName% parent id %parentId% (%parentType%)',
                 array(
+                    '%parentName%' => $event->getParentName(),
                     '%parentId%' => $event->getParentId(),
                     '%parentType%' => $event->getImageType()
                 ),
@@ -274,37 +274,75 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             )
         );
 
-        $newUploadedFiles = array();
-        $uploadedFiles = $event->getUploadedFiles();
+        $fileManager = new FileManager($this->container);
+        $model = $event->getModelImage();
 
-        foreach ($event->getModelImages() as $i => $modelImage) {
-            // Save image to database in order to get image id
-            $fileManager->saveImage($event, $modelImage);
+        $nbModifiedLines = $model->save();
+        $event->setModelImage($model);
 
-            if (isset($uploadedFiles) && isset($uploadedFiles[$i])) {
-                /** @var UploadedFile $uploadedFile */
-                $uploadedFile = $uploadedFiles[$i]['file'];
-
-                // Copy uploaded file into the storage directory
-                $newUploadedFiles = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $modelImage, $uploadedFile, $newUploadedFiles);
-            } else {
-                throw new ImageException(
-                    sprintf(
-                        'File with name %s not found on the server',
-                        $modelImage->getFile()
-                    )
-                );
-            }
-            $event->setUploadedFiles($newUploadedFiles);
+        if (!$nbModifiedLines) {
+            throw new ImageException(
+                sprintf(
+                    'Image "%s" with parent id %s (%s) failed to be saved',
+                    $event->getParentName(),
+                    $event->getParentId(),
+                    $event->getImageType()
+                )
+            );
         }
+
+        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile());
+        $event->setUploadedFile($newUploadedFile);
+    }
+
+    /**
+     * Take care of updating image in the database and file storage
+     *
+     * @param ImageCreateOrUpdateEvent $event Image event
+     *
+     * @throws \Thelia\Exception\ImageException
+     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function updateImage(ImageCreateOrUpdateEvent $event)
+    {
+        $this->adminLogAppend(
+            $this->container->get('thelia.translator')->trans(
+                'Updating images for %parentName% parent id %parentId% (%parentType%)',
+                array(
+                    '%parentName%' => $event->getParentName(),
+                    '%parentId%' => $event->getParentId(),
+                    '%parentType%' => $event->getImageType()
+                ),
+                'image'
+            )
+        );
+
+        $fileManager = new FileManager($this->container);
+        // Copy and save file
+        if ($event->getUploadedFile()) {
+            // Remove old picture file from file storage
+            $url = $fileManager->getUploadDir($event->getImageType()) . '/' . $event->getOldModelImage()->getFile();
+            unlink(str_replace('..', '', $url));
+
+            $newUploadedFile = $fileManager->copyUploadedFile(
+                $event->getModelImage()->getParentId(),
+                $event->getImageType(),
+                $event->getModelImage(), $event->getUploadedFile());
+            $event->setUploadedFile($newUploadedFile);
+        }
+
+        // Update image modifications
+        $event->getModelImage()->save();
+        $event->setModelImage($event->getModelImage());
+
     }
 
     /**
      * Take care of deleting image in the database and file storage
      *
-     * @param ImageCreateOrUpdateEvent $event Image event
+     * @param ImageDeleteEvent $event Image event
      *
-     * @throws \Thelia\Exception\ImageException
+     * @throws \Exception
      * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
      */
     public function deleteImage(ImageDeleteEvent $event)
@@ -312,7 +350,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $fileManager = new FileManager($this->container);
 
         try {
-            $fileManager->deleteImage($event->getImageToDelete());
+            $fileManager->deleteImage($event->getImageToDelete(), $event->getImageType());
 
             $this->adminLogAppend(
                 $this->container->get('thelia.translator')->trans(
@@ -336,20 +374,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     'image'
                 )
             );
+            throw $e;
         }
-    }
-
-    /**
-     * The absolute directory path where uploaded
-     * documents should be saved
-     *
-     * @param $modelImage Image model
-     *
-     * @return string
-     */
-    public function getUploadRootDir($modelImage)
-    {
-        return __DIR__.'/../../../../' . $modelImage->getUploadDir();
     }
 
     /**
@@ -474,8 +500,9 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         return array(
             TheliaEvents::IMAGE_PROCESS => array("processImage", 128),
             TheliaEvents::IMAGE_CLEAR_CACHE => array("clearCache", 128),
-            TheliaEvents::IMAGE_SAVE => array("saveImages", 128),
             TheliaEvents::IMAGE_DELETE => array("deleteImage", 128),
+            TheliaEvents::IMAGE_SAVE => array("saveImage", 128),
+            TheliaEvents::IMAGE_UPDATE => array("updateImage", 128),
         );
     }
 }

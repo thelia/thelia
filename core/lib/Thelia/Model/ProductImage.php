@@ -27,6 +27,20 @@ class ProductImage extends BaseProductImage
     }
 
     /**
+     * Set Image parent id
+     *
+     * @param int $parentId parent id
+     *
+     * @return $this
+     */
+    public function setParentId($parentId)
+    {
+        $this->setProductId($parentId);
+
+        return $this;
+    }
+
+    /**
      * Get Image parent id
      *
      * @return int parent id

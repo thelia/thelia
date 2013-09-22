@@ -20,60 +20,34 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form\Type;
+namespace Thelia\Form;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Thelia\Form\Type\ImageType;
+
+use Thelia\Core\Translation\Translator;
+use Thelia\Form\Image\ImageModification;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 9/18/13
  * Time: 3:56 PM
  *
- * Form allowing to process a category picture
+ * Form allowing to process an image collection
  *
  * @package Image
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class ImageCategoryType extends ImageType
+class ProductImageModification extends ImageModification
 {
-    /**
-     * Build a Picture form
-     *
-     * @param FormBuilderInterface $builder Form builder
-     * @param array                $options Form options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder->add('category_id', 'integer');
-
-        parent::buildForm($builder, $options);
-    }
-
-    /**
-     * Set default options
-     * Map the form to the given Model
-     *
-     * @param OptionsResolverInterface $resolver Option resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(
-            array(
-                'data_class' => 'Thelia\Model\CategoryImage'
-            )
-        );
-    }
 
     /**
      * Get form name
+     * This name must be unique
      *
      * @return string
      */
     public function getName()
     {
-        return 'thelia_category_picture_creation_type';
+        return 'thelia_product_image_modification';
     }
 }

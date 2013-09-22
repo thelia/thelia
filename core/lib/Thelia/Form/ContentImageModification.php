@@ -20,93 +20,34 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Form;
 
-namespace Thelia\Core\Event;
 
-use Thelia\Model\CategoryImage;
-use Thelia\Model\ContentImage;
-use Thelia\Model\FolderImage;
-use Thelia\Model\ProductImage;
+use Thelia\Core\Translation\Translator;
+use Thelia\Form\Image\ImageModification;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 9/18/13
  * Time: 3:56 PM
  *
- * Occurring when a Image is about to be deleted
+ * Form allowing to process an image collection
  *
  * @package Image
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class ImageDeleteEvent extends ActionEvent
+class ContentImageModification extends ImageModification
 {
-    /** @var string Image type */
-    protected $imageType = null;
-
-    /** @var CategoryImage|ProductImage|ContentImage|FolderImage Image about to be deleted */
-    protected $imageToDelete = null;
 
     /**
-     * Constructor
-     *
-     * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
-     * @param string                                              $imageType   Image type
-     *                                                                         ex : FileManager::TYPE_CATEGORY
-     */
-    public function __construct($imageToDelete, $imageType)
-    {
-        $this->imageToDelete = $imageToDelete;
-        $this->imageType = $imageType;
-    }
-
-    /**
-     * Set picture type
-     *
-     * @param string $imageType Image type
-     *
-     * @return $this
-     */
-    public function setImageType($imageType)
-    {
-        $this->imageType = $imageType;
-
-        return $this;
-    }
-
-    /**
-     * Get picture type
+     * Get form name
+     * This name must be unique
      *
      * @return string
      */
-    public function getImageType()
+    public function getName()
     {
-        return $this->imageType;
+        return 'thelia_content_image_modification';
     }
-
-    /**
-     * Set Image about to be deleted
-     *
-     * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
-     *
-     * @return $this
-     */
-    public function setImageToDelete($imageToDelete)
-    {
-        $this->imageToDelete = $imageToDelete;
-
-        return $this;
-    }
-
-    /**
-     * Get Image about to be deleted
-     *
-     * @return CategoryImage|ProductImage|ContentImage|FolderImage
-     */
-    public function getImageToDelete()
-    {
-        return $this->imageToDelete;
-    }
-
-
 }

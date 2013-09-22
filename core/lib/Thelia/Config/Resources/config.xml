@@ -58,7 +58,7 @@
 
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
         <form name="thelia.admin.category.modification" class="Thelia\Form\CategoryModificationForm"/>
-        <form name="thelia.admin.category.image.creation" class="Thelia\Form\CategoryImageCreationForm"/>
+        <form name="thelia.admin.category.image.modification" class="Thelia\Form\CategoryImageModification"/>
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
         <form name="thelia.admin.product.modification" class="Thelia\Form\ProductModificationForm"/>

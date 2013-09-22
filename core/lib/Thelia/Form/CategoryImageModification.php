@@ -20,63 +20,34 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form\Type;
+namespace Thelia\Form;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\Image;
-use Symfony\Component\Validator\Constraints\NotBlank;
+
+use Thelia\Core\Translation\Translator;
+use Thelia\Form\Image\ImageModification;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 9/18/13
  * Time: 3:56 PM
  *
- * Form allowing to process a picture
- *
- * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
+ * Form allowing to process an image collection
  *
  * @package Image
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-abstract class ImageType extends AbstractType
+class CategoryImageModification extends ImageModification
 {
+
     /**
-     * Build a Picture form
+     * Get form name
+     * This name must be unique
      *
-     * @param FormBuilderInterface $builder Form builder
-     * @param array                $options Form options
+     * @return string
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function getName()
     {
-//        $builder->add('position');
-        $builder->add(
-            'title',
-            'text',
-            array(
-                'constraints' => new NotBlank()
-            )
-        );
-        $builder->add(
-            'file',
-            'file',
-            array(
-                'constraints' => array(
-                    new NotBlank(),
-                    new Image(
-                        array(
-                            'minWidth' => 200,
-//                            'maxWidth' => 400,
-                            'minHeight' => 200,
-//                            'maxHeight' => 400,
-                        )
-                    )
-                )
-            )
-        );
-//        $builder->add('description');
-//        $builder->add('chapo');
-//        $builder->add('postscriptum');
+        return 'thelia_category_image_modification';
     }
 }
