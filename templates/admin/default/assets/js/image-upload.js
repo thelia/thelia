@@ -3,12 +3,34 @@ $(function($){
     $.imageUploadManager = {};
 
     Dropzone.autoDiscover = false;
+
+    
+
     // Remove image on click
     $.imageUploadManager.initImageDropZone = function() {
         var imageDropzone = new Dropzone("#images-dropzone", {
             dictDefaultMessage : $('.btn-browse').html(),
             uploadMultiple: false,
             maxFilesize: 8
+        });    
+
+        var totalFiles      = 0,
+            completedFiles  = 0;
+
+        imageDropzone.on("addedfile", function(file){
+            totalFiles += 1;
+
+            if(totalFiles == 1){
+                $('.dz-message').hide();
+            }
+        });
+
+        imageDropzone.on("complete", function(file){
+            completedFiles += 1;
+            console.log(completedFiles + '===' + totalFiles);
+            if (completedFiles === totalFiles){
+                $('.dz-message').slideDown();
+            }
         });
 
         imageDropzone.on("success", function(file) {
@@ -17,6 +39,9 @@ $(function($){
             $.imageUploadManager.updateImageListAjax();
             $.imageUploadManager.onClickDeleteImage();
         });
+        
+              
+
     };
 
     // Update picture list via AJAX call
