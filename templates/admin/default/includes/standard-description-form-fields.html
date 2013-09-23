@@ -1,4 +1,6 @@
-{* The standard description fields, used by many Thelia objects *}
+{*
+The standard description fields, used by many Thelia objects
+*}
 
 {form_field form=$form field='title'}
 <div class="form-group {if $error}has-error{/if}">
@@ -22,7 +24,7 @@
 <div class="form-group {if $error}has-error{/if}">
     <label for="{$label_attr.for}" class="control-label">
         {intl l="{$label}"} :
-        <span class="label-help-block">{intl l="The détailed description."}</span>
+        <span class="label-help-block">{intl l="The detailed description."}</span>
     </label>
 
     <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{$value}</textarea>

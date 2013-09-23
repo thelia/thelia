@@ -135,6 +135,26 @@ class Template extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param CategoryChangePositionEvent $event
+     */
+    public function updateAttributePosition(UpdatePositionEvent $event)
+    {
+        return $this->genericUpdatePosition(AttributeTemplateQuery::create(), $event);
+    }
+
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param CategoryChangePositionEvent $event
+     */
+    public function updateFeaturePosition(UpdatePositionEvent $event)
+    {
+        return $this->genericUpdatePosition(FeatureTemplateQuery::create(), $event);
+    }
+
     public function deleteAttribute(TemplateDeleteAttributeEvent $event) {
 
         $attribute_template = AttributeTemplateQuery::create()
@@ -184,6 +204,9 @@ class Template extends BaseAction implements EventSubscriberInterface
 
             TheliaEvents::TEMPLATE_ADD_FEATURE    => array("addFeature", 128),
             TheliaEvents::TEMPLATE_DELETE_FEATURE => array("deleteFeature", 128),
+
+            TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION => array('updateAttributePosition', 128),
+            TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION   => array('updateFeaturePosition', 128),
 
         );
     }

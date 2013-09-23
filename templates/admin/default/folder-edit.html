@@ -161,7 +161,7 @@
 									            <div class="col-md-6">
 									                <div class="form-group">
 									                    <select name="folder_id" id="folder_id" class="form-control">
-									                        <option value="">Select a folder...</option>
+									                        <option value="">{intl l='Select a folder...'}</option>
 									                        {loop name="folders" type="folder" backend_context="1" lang="$edit_language_id"}
 									                            <option value="{$ID}">{$TITLE}</option>
 									                        {/loop}
@@ -174,7 +174,7 @@
 									                <div id="content_selector" class="hide">
 									                    <div class="input-group">
 									                        <select required="required" name="content_id" id="content_id" class="form-control">
-									                            <option value="">Select a folder content...</option>
+									                            <option value="">{intl l='Select a folder content...'}</option>
 									                        </select>
 									                        <span class="input-group-btn" id="content_add_button">
 									                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>

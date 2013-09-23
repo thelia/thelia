@@ -135,8 +135,17 @@ class AssociatedContent extends Content
         $associatedContents = $this->search($search);
 
         $associatedContentIdList = array(0);
+
+        $contentIdList = array(0);
+        $contentPosition = $contentId = array();
+
         foreach ($associatedContents as $associatedContent) {
-            array_push($associatedContentIdList, $associatedContent->getContentId());
+
+            $associatedContentId = $associatedContent->getContentId();
+
+            array_push($associatedContentIdList, $associatedContentId);
+            $contentPosition[$associatedContentId] = $associatedContent->getPosition();
+            $contentId[$associatedContentId] = $associatedContent->getId();
         }
 
         $receivedIdList = $this->getId();
@@ -148,7 +157,18 @@ class AssociatedContent extends Content
             $this->args->get('id')->setValue( implode(',', array_intersect($receivedIdList, $associatedContentIdList)) );
         }
 
-        return parent::exec($pagination);
-    }
+        $loopResult = parent::exec($pagination);
 
+        foreach($loopResult as $loopResultRow) {
+
+            $relatedContentId = $loopResultRow->get('ID');
+
+            $loopResultRow
+            ->set("ID"      , $contentId[$relatedContentId])
+            ->set("POSITION", $contentPosition[$relatedContentId])
+            ;
+        }
+
+        return $loopResult;
+    }
 }

@@ -25,7 +25,7 @@ use Thelia\Model\Map\FeatureProductTableMap;
  * @method     ChildFeatureProductQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
  * @method     ChildFeatureProductQuery orderByFeatureId($order = Criteria::ASC) Order by the feature_id column
  * @method     ChildFeatureProductQuery orderByFeatureAvId($order = Criteria::ASC) Order by the feature_av_id column
- * @method     ChildFeatureProductQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
+ * @method     ChildFeatureProductQuery orderByFreeTextValue($order = Criteria::ASC) Order by the free_text_value column
  * @method     ChildFeatureProductQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildFeatureProductQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildFeatureProductQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -34,7 +34,7 @@ use Thelia\Model\Map\FeatureProductTableMap;
  * @method     ChildFeatureProductQuery groupByProductId() Group by the product_id column
  * @method     ChildFeatureProductQuery groupByFeatureId() Group by the feature_id column
  * @method     ChildFeatureProductQuery groupByFeatureAvId() Group by the feature_av_id column
- * @method     ChildFeatureProductQuery groupByByDefault() Group by the by_default column
+ * @method     ChildFeatureProductQuery groupByFreeTextValue() Group by the free_text_value column
  * @method     ChildFeatureProductQuery groupByPosition() Group by the position column
  * @method     ChildFeatureProductQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildFeatureProductQuery groupByUpdatedAt() Group by the updated_at column
@@ -62,7 +62,7 @@ use Thelia\Model\Map\FeatureProductTableMap;
  * @method     ChildFeatureProduct findOneByProductId(int $product_id) Return the first ChildFeatureProduct filtered by the product_id column
  * @method     ChildFeatureProduct findOneByFeatureId(int $feature_id) Return the first ChildFeatureProduct filtered by the feature_id column
  * @method     ChildFeatureProduct findOneByFeatureAvId(int $feature_av_id) Return the first ChildFeatureProduct filtered by the feature_av_id column
- * @method     ChildFeatureProduct findOneByByDefault(string $by_default) Return the first ChildFeatureProduct filtered by the by_default column
+ * @method     ChildFeatureProduct findOneByFreeTextValue(string $free_text_value) Return the first ChildFeatureProduct filtered by the free_text_value column
  * @method     ChildFeatureProduct findOneByPosition(int $position) Return the first ChildFeatureProduct filtered by the position column
  * @method     ChildFeatureProduct findOneByCreatedAt(string $created_at) Return the first ChildFeatureProduct filtered by the created_at column
  * @method     ChildFeatureProduct findOneByUpdatedAt(string $updated_at) Return the first ChildFeatureProduct filtered by the updated_at column
@@ -71,7 +71,7 @@ use Thelia\Model\Map\FeatureProductTableMap;
  * @method     array findByProductId(int $product_id) Return ChildFeatureProduct objects filtered by the product_id column
  * @method     array findByFeatureId(int $feature_id) Return ChildFeatureProduct objects filtered by the feature_id column
  * @method     array findByFeatureAvId(int $feature_av_id) Return ChildFeatureProduct objects filtered by the feature_av_id column
- * @method     array findByByDefault(string $by_default) Return ChildFeatureProduct objects filtered by the by_default column
+ * @method     array findByFreeTextValue(string $free_text_value) Return ChildFeatureProduct objects filtered by the free_text_value column
  * @method     array findByPosition(int $position) Return ChildFeatureProduct objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildFeatureProduct objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildFeatureProduct objects filtered by the updated_at column
@@ -163,7 +163,7 @@ abstract class FeatureProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PRODUCT_ID, FEATURE_ID, FEATURE_AV_ID, BY_DEFAULT, POSITION, CREATED_AT, UPDATED_AT FROM feature_product WHERE ID = :p0';
+        $sql = 'SELECT ID, PRODUCT_ID, FEATURE_ID, FEATURE_AV_ID, FREE_TEXT_VALUE, POSITION, CREATED_AT, UPDATED_AT FROM feature_product WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -423,32 +423,32 @@ abstract class FeatureProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the by_default column
+     * Filter the query on the free_text_value column
      *
      * Example usage:
      * <code>
-     * $query->filterByByDefault('fooValue');   // WHERE by_default = 'fooValue'
-     * $query->filterByByDefault('%fooValue%'); // WHERE by_default LIKE '%fooValue%'
+     * $query->filterByFreeTextValue('fooValue');   // WHERE free_text_value = 'fooValue'
+     * $query->filterByFreeTextValue('%fooValue%'); // WHERE free_text_value LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $byDefault The value to use as filter.
+     * @param     string $freeTextValue The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureProductQuery The current query, for fluid interface
      */
-    public function filterByByDefault($byDefault = null, $comparison = null)
+    public function filterByFreeTextValue($freeTextValue = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($byDefault)) {
+            if (is_array($freeTextValue)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $byDefault)) {
-                $byDefault = str_replace('*', '%', $byDefault);
+            } elseif (preg_match('/[\%\*]/', $freeTextValue)) {
+                $freeTextValue = str_replace('*', '%', $freeTextValue);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(FeatureProductTableMap::BY_DEFAULT, $byDefault, $comparison);
+        return $this->addUsingAlias(FeatureProductTableMap::FREE_TEXT_VALUE, $freeTextValue, $comparison);
     }
 
     /**

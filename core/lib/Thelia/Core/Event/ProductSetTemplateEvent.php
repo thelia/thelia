@@ -20,71 +20,32 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Model\AdminLog;
-use Propel\Runtime\ActiveQuery\PropelQuery;
-use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Core\Event\UpdatePositionEvent;
+namespace Thelia\Core\Event;
+use Thelia\Model\Product;
+use Thelia\Core\Event\ActionEvent;
 
-class BaseAction
+class ProductSetTemplateEvent extends ProductEvent
 {
-    /**
-     * @var The container
-     */
-    protected $container;
+    public $template_id = null;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(Product $product = null, $template_id)
     {
-        $this->container = $container;
+        parent::__construct($product);
+
+        $this->template_id = $template_id;
     }
 
-    /**
-     * Return the event dispatcher,
-     *
-     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    public function getDispatcher()
+    public function getTemplateId()
     {
-        return $this->container->get('event_dispatcher');
+        return $this->template_id;
     }
 
-
-    /**
-     * Changes object position, selecting absolute ou relative change.
-     *
-     * @param $query the query to retrieve the object to move
-     * @param UpdatePositionEvent $event
-     */
-    protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event)
+    public function setTemplateId($template_id)
     {
-        if (null !== $object = $query->findPk($event->getObjectId())) {
+        $this->template_id = $template_id;
 
-            $object->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $object->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $object->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $object->movePositionDown();
-        }
+        return $this;
     }
 
-    /**
-     * Helper to append a message to the admin log.
-     *
-     * @param string $message
-     */
-    public function adminLogAppend($message)
-    {
-        AdminLog::append(
-            $message,
-            $this->container->get('request'),
-            $this->container->get('thelia.securityContext')->getAdminUser()
-        );
-    }
 }

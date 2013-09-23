@@ -404,6 +404,7 @@ try {
             $stock->setPromo($faker->randomNumber(0,1));
             $stock->setNewness($faker->randomNumber(0,1));
             $stock->setWeight($faker->randomFloat(2, 100,10000));
+            $stock->setIsDefault($i == 0);
             $stock->save();
 
             $productPrice = new \Thelia\Model\ProductPrice();
@@ -442,7 +443,7 @@ try {
                     $featureAvId[array_rand($featureAvId, 1)]
                 );
             } else { //no av
-                $featureProduct->setByDefault($faker->text(10));
+                $featureProduct->setFreeTextValue($faker->text(10));
             }
 
             $featureProduct->save();
