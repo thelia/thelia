@@ -33,16 +33,15 @@ use Thelia\Form\BaseForm;
  * Date: 9/18/13
  * Time: 3:56 PM
  *
- * Form allowing to process an image
- * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
+ * Form allowing to process a file
+ * @todo refactor make all document using propel inheritance and factorise image behaviour into one single clean action
  *
- * @package Image
+ * @package File
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-abstract class ImageModification extends BaseForm
+abstract class DocumentModification extends BaseForm
 {
-
     /**
      *
      * in this function you add all the fields you need for your Form.
@@ -69,14 +68,7 @@ abstract class ImageModification extends BaseForm
             'file',
             'file',
             array(
-                'constraints' => array(
-                    new Image(
-                        array(
-                            'minWidth' => 200,
-                            'minHeight' => 200
-                        )
-                    )
-                ),
+                'constraints' => array(),
                 'label' => Translator::getInstance()->trans('File'),
                 'label_attr' => array(
                     'for' => 'file'
