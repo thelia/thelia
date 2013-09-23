@@ -14,115 +14,117 @@
         {* -- Begin related content management ------------------------------ *}
 
 	    <div class="col-md-6">
-	        <div class="form-group">
-	            <form method="POST" action="{url path='/admin/products/content/add'}" id="related_content_form">
+	       <div class="well well-sm">
+		        <div class="form-group">
+		            <form method="POST" action="{url path='/admin/products/content/add'}" id="related_content_form">
 
-	                <p class="title title-without-tabs">{intl l='Related content'}</p>
-	                <p>{intl l='You can attach here some content to this product'}</p>
+		                <p class="title title-without-tabs">{intl l='Related content'}</p>
+		                <p>{intl l='You can attach here some content to this product'}</p>
 
-	                <input type="hidden" name="product_id" value="{$product_id}" />
-	                <input type="hidden" name="current_tab" value="related" />
+		                <input type="hidden" name="product_id" value="{$product_id}" />
+		                <input type="hidden" name="current_tab" value="related" />
 
-	                {ifloop rel="folders"}
-	                <div class="form-group">
-	                    <select name="folder_id" id="folder_id" class="form-control">
-	                        <option value="">{intl l='Select a folder...'}</option>
-	                        {loop name="folders" type="folder-tree" folder="0" backend_context="1" lang="$edit_language_id"}
-	                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
-	                        {/loop}
-	                    </select>
+		                {ifloop rel="folders"}
+		                <div class="form-group">
+		                    <select name="folder_id" id="folder_id" class="form-control">
+		                        <option value="">{intl l='Select a folder...'}</option>
+		                        {loop name="folders" type="folder-tree" folder="0" backend_context="1" lang="$edit_language_id"}
+		                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
+		                        {/loop}
+		                    </select>
 
-	                    <span class="help-block">{intl l='Select a folder to get its content'}</span>
-	                </div>
+		                    <span class="help-block">{intl l='Select a folder to get its content'}</span>
+		                </div>
 
-	                <div id="content_selector" class="hide">
-	                    <div class="input-group">
-	                        <select required="required" name="content_id" id="content_id" class="form-control">
-	                            <option value="">{intl l='Select a folder content...'}</option>
-	                        </select>
-	                        <span class="input-group-btn" id="content_add_button">
-	                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
-	                        </span>
-	                    </div>
+		                <div id="content_selector" class="hide">
+		                    <div class="input-group">
+		                        <select required="required" name="content_id" id="content_id" class="form-control">
+		                            <option value="">{intl l='Select a folder content...'}</option>
+		                        </select>
+		                        <span class="input-group-btn" id="content_add_button">
+		                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+		                        </span>
+		                    </div>
 
-	                    <span class="help-block">{intl l='Select a content and click (+) to add it to this product'}</span>
-	                </div>
+		                    <span class="help-block">{intl l='Select a content and click (+) to add it to this product'}</span>
+		                </div>
 
-	                <div id="content_selector_empty" class="hide">
-	                   <div class="alert alert-info">
-	                       {intl l="No available content in this folder"}
-	                   </div>
-	                </div>
-	                {/ifloop}
+		                <div id="content_selector_empty" class="hide">
+		                   <div class="alert alert-info">
+		                       {intl l="No available content in this folder"}
+		                   </div>
+		                </div>
+		                {/ifloop}
 
-	                {elseloop rel="folders"}
-	                    <div class="alert alert-info">{intl l="No folders found"}</div>
-	                {/elseloop}
+		                {elseloop rel="folders"}
+		                    <div class="alert alert-info">{intl l="No folders found"}</div>
+		                {/elseloop}
 
-	            </form>
-	        </div>
+		            </form>
+		        </div>
 
-	        <div class="table-responsive">
-	            <table class="table table-striped table-condensed table-left-aligned">
-	                <thead>
-	                    <tr>
-	                        <th>{intl l='ID'}</th>
+		        <div class="table-responsive">
+		            <table class="table table-striped table-condensed table-left-aligned">
+		                <thead>
+		                    <tr>
+		                        <th>{intl l='ID'}</th>
 
-	                        <th>{intl l='Content title'}</th>
+		                        <th>{intl l='Content title'}</th>
 
-	                        <th class="text-center">{intl l='Position'}</th>
+		                        <th class="text-center">{intl l='Position'}</th>
 
-	                        {module_include location='product_contents_table_header'}
+		                        {module_include location='product_contents_table_header'}
 
-	                        <th class="actions">{intl l="Actions"}</th>
-	                    </tr>
-	                </thead>
+		                        <th class="actions">{intl l="Actions"}</th>
+		                    </tr>
+		                </thead>
 
-	                <tbody>
-	                    {loop name="assigned_contents" type="associated_content" product="$product_id" backend_context="1" lang="$edit_language_id"}
-	                    <tr>
-	                        <td>{$ID}</td>
+		                <tbody>
+		                    {loop name="assigned_contents" type="associated_content" product="$product_id" backend_context="1" lang="$edit_language_id"}
+		                    <tr>
+		                        <td>{$ID}</td>
 
-	                        <td>
-	                            {$TITLE}
-	                        </td>
+		                        <td>
+		                            {$TITLE}
+		                        </td>
 
-	                         <td class="text-center">
-	                         {admin_position_block
-	                             permission="admin.products.edit"
-	                             path={url path='/admin/product/update-content-position' product_id=$product_id current_tab="related"}
-	                             url_parameter="content_id"
-	                             in_place_edit_class="contentPositionChange"
-	                             position=$POSITION
-	                             id=$ID
-	                          }
-	                         </td>
+		                         <td class="text-center">
+		                         {admin_position_block
+		                             permission="admin.products.edit"
+		                             path={url path='/admin/product/update-content-position' product_id=$product_id current_tab="related"}
+		                             url_parameter="content_id"
+		                             in_place_edit_class="contentPositionChange"
+		                             position=$POSITION
+		                             id=$ID
+		                          }
+		                         </td>
 
-	                        {module_include location='product_contents_table_row'}
+		                        {module_include location='product_contents_table_row'}
 
-	                        <td class="actions">
-	                            <div class="btn-group">
-	                                {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.product.content.delete"}
-	                                   <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$ID}" data-toggle="modal">
-	                                    <span class="glyphicon glyphicon-trash"></span>
-	                                   </a>
-	                                {/loop}
-	                            </div>
-	                        </td>
-	                    </tr>
-	                     {/loop}
+		                        <td class="actions">
+		                            <div class="btn-group">
+		                                {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.product.content.delete"}
+		                                   <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$ID}" data-toggle="modal">
+		                                    <span class="glyphicon glyphicon-trash"></span>
+		                                   </a>
+		                                {/loop}
+		                            </div>
+		                        </td>
+		                    </tr>
+		                     {/loop}
 
-	                     {elseloop rel="assigned_contents"}
-	                         <tr>
-	                             <td colspan="4">
-	                                 <div class="alert alert-info">
-	                                     {intl l="This product contains no contents"}
-	                                 </div>
-	                             </td>
-	                         </tr>
-	                     {/elseloop}
-	                </tbody>
-	            </table>
+		                     {elseloop rel="assigned_contents"}
+		                         <tr>
+		                             <td colspan="4">
+		                                 <div class="alert alert-info">
+		                                     {intl l="This product contains no contents"}
+		                                 </div>
+		                             </td>
+		                         </tr>
+		                     {/elseloop}
+		                </tbody>
+		            </table>
+		        </div>
 	        </div>
 	    </div>
 
@@ -131,117 +133,119 @@
 	    {* -- Begin accessories management ---------------------------------- *}
 
 	    <div class="col-md-6">
-	        <div class="form-group">
-	            <form method="POST" action="{url path='/admin/products/accessory/add'}" id="accessory_form">
+	        <div class=" well well-sm">
+		        <div class="form-group">
+		            <form method="POST" action="{url path='/admin/products/accessory/add'}" id="accessory_form">
 
-	                <p class="title title-without-tabs">{intl l='Product accessories'}</p>
-	                <p>{intl l='Define here this product\'s accessories'}</p>
+		                <p class="title title-without-tabs">{intl l='Product accessories'}</p>
+		                <p>{intl l='Define here this product\'s accessories'}</p>
 
-	                <input type="hidden" name="product_id" value="{$product_id}" />
-	                <input type="hidden" name="current_tab" value="related" />
+		                <input type="hidden" name="product_id" value="{$product_id}" />
+		                <input type="hidden" name="current_tab" value="related" />
 
-	                {ifloop rel="categories"}
-	                <div class="form-group">
-	                    <select name="accessory_category_id" id="accessory_category_id" class="form-control">
-	                        <option value="">{intl l='Select a category...'}</option>
-	                        {loop name="categories" type="category-tree" category="0" backend_context="1" lang="$edit_language_id"}
-	                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
-	                        {/loop}
-	                    </select>
+		                {ifloop rel="categories"}
+		                <div class="form-group">
+		                    <select name="accessory_category_id" id="accessory_category_id" class="form-control">
+		                        <option value="">{intl l='Select a category...'}</option>
+		                        {loop name="categories" type="category-tree" category="0" backend_context="1" lang="$edit_language_id"}
+		                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
+		                        {/loop}
+		                    </select>
 
-	                    <span class="help-block">{intl l='Select a category to get its products'}</span>
-	                </div>
+		                    <span class="help-block">{intl l='Select a category to get its products'}</span>
+		                </div>
 
-	                <div id="accessory_selector" class="hide">
-	                    <div class="input-group">
-	                        <select required="required" name="accessory_id" id="accessory_id" class="form-control">
-	                            <option value="">{intl l='Select a product...'}</option>
-	                        </select>
-	                        <span class="input-group-btn" id="accessory_add_button">
-	                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
-	                        </span>
-	                    </div>
+		                <div id="accessory_selector" class="hide">
+		                    <div class="input-group">
+		                        <select required="required" name="accessory_id" id="accessory_id" class="form-control">
+		                            <option value="">{intl l='Select a product...'}</option>
+		                        </select>
+		                        <span class="input-group-btn" id="accessory_add_button">
+		                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+		                        </span>
+		                    </div>
 
-	                    <span class="help-block">{intl l='Select a product and click (+) to add it as an accessory'}</span>
-	                </div>
+		                    <span class="help-block">{intl l='Select a product and click (+) to add it as an accessory'}</span>
+		                </div>
 
-	                <div id="accessory_selector_empty" class="hide">
-	                   <div class="alert alert-info">
-	                       {intl l="No available product in this category"}
-	                   </div>
-	                </div>
+		                <div id="accessory_selector_empty" class="hide">
+		                   <div class="alert alert-info">
+		                       {intl l="No available product in this category"}
+		                   </div>
+		                </div>
 
-	                {/ifloop}
+		                {/ifloop}
 
-	                {elseloop rel="categories"}
-	                    <div class="alert alert-info">{intl l="No categories found"}</div>
-	                {/elseloop}
+		                {elseloop rel="categories"}
+		                    <div class="alert alert-info">{intl l="No categories found"}</div>
+		                {/elseloop}
 
-	            </form>
-	        </div>
+		            </form>
+		        </div>
 
-	        <div class="table-responsive">
-	            <table class="table table-striped table-condensed table-left-aligned">
-	                <thead>
-	                    <tr>
-	                        <th>{intl l='ID'}</th>
+		        <div class="table-responsive">
+		            <table class="table table-striped table-condensed table-left-aligned">
+		                <thead>
+		                    <tr>
+		                        <th>{intl l='ID'}</th>
 
-	                        <th>{intl l='Accessory title'}</th>
+		                        <th>{intl l='Accessory title'}</th>
 
-	                        <th class="text-center">{intl l='Position'}</th>
+		                        <th class="text-center">{intl l='Position'}</th>
 
-	                        {module_include location='product_accessories_table_header'}
+		                        {module_include location='product_accessories_table_header'}
 
-	                        <th class="actions">{intl l="Actions"}</th>
-	                    </tr>
-	                </thead>
+		                        <th class="actions">{intl l="Actions"}</th>
+		                    </tr>
+		                </thead>
 
-	                <tbody>
-	                    {loop name="assigned_accessories" order="accessory" type="accessory" product="$product_id" backend_context="1" lang="$edit_language_id"}
-	                    <tr>
-	                        <td>{$ID}</td>
+		                <tbody>
+		                    {loop name="assigned_accessories" order="accessory" type="accessory" product="$product_id" backend_context="1" lang="$edit_language_id"}
+		                    <tr>
+		                        <td>{$ID}</td>
 
-	                        <td>
-	                            {$TITLE}
-	                        </td>
+		                        <td>
+		                            {$TITLE}
+		                        </td>
 
-	                         <td class="text-center">
-	                         {admin_position_block
-	                             permission="admin.products.edit"
-	                             path={url path='/admin/product/update-accessory-position' product_id=$product_id current_tab="related"}
-	                             url_parameter="accessory_id"
-	                             in_place_edit_class="accessoryPositionChange"
-	                             position=$POSITION
-	                             id=$ID
-	                          }
-	                         </td>
+		                         <td class="text-center">
+		                         {admin_position_block
+		                             permission="admin.products.edit"
+		                             path={url path='/admin/product/update-accessory-position' product_id=$product_id current_tab="related"}
+		                             url_parameter="accessory_id"
+		                             in_place_edit_class="accessoryPositionChange"
+		                             position=$POSITION
+		                             id=$ID
+		                          }
+		                         </td>
 
-	                        {module_include location='product_accessories_table_row'}
+		                        {module_include location='product_accessories_table_row'}
 
-	                        <td class="actions">
-	                            <div class="btn-group">
-	                                {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.product.accessory.delete"}
-	                                   <a class="btn btn-default btn-xs delete-accessory" title="{intl l='Delete this accessory'}" href="#delete_accessory_dialog" data-id="{$ID}" data-toggle="modal">
-	                                    <span class="glyphicon glyphicon-trash"></span>
-	                                   </a>
-	                                {/loop}
-	                            </div>
-	                        </td>
-	                    </tr>
-	                     {/loop}
+		                        <td class="actions">
+		                            <div class="btn-group">
+		                                {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.product.accessory.delete"}
+		                                   <a class="btn btn-default btn-xs delete-accessory" title="{intl l='Delete this accessory'}" href="#delete_accessory_dialog" data-id="{$ID}" data-toggle="modal">
+		                                    <span class="glyphicon glyphicon-trash"></span>
+		                                   </a>
+		                                {/loop}
+		                            </div>
+		                        </td>
+		                    </tr>
+		                     {/loop}
 
-	                     {elseloop rel="assigned_accessories"}
-	                         <tr>
-	                             <td colspan="4">
-	                                 <div class="alert alert-info">
-	                                     {intl l="This product contains no accessories"}
-	                                 </div>
-	                             </td>
-	                         </tr>
-	                     {/elseloop}
-	                </tbody>
-	            </table>
-	        </div>
+		                     {elseloop rel="assigned_accessories"}
+		                         <tr>
+		                             <td colspan="4">
+		                                 <div class="alert alert-info">
+		                                     {intl l="This product contains no accessories"}
+		                                 </div>
+		                             </td>
+		                         </tr>
+		                     {/elseloop}
+		                </tbody>
+		            </table>
+		        </div>
+		    </div>
 	    </div>
 
         {* -- End accessories management ------------------------------------ *}
@@ -253,99 +257,101 @@
         {* -- Begin categories management ----------------------------------- *}
 
         <div class="col-md-6">
-            <div class="form-group">
-                <form method="POST" action="{url path='/admin/products/category/add'}" id="related_content_form">
+            <div class="well well-sm">
+	            <div class="form-group">
+	                <form method="POST" action="{url path='/admin/products/category/add'}" id="related_content_form">
 
-                    <p class="title title-without-tabs">{intl l='Additional categories'}</p>
-                    <p>{intl l='A product could be attached to more than one category. Select here the additional categories for this product.'}
-                    {loop name="default_category" type="category" id=$DEFAULT_CATEGORY}
-                        {intl l='You can change the default category (%title) in the "General" tab.' title=$TITLE}
-                    {/loop}
+	                    <p class="title title-without-tabs">{intl l='Additional categories'}</p>
+	                    <p>{intl l='A product could be attached to more than one category. Select here the additional categories for this product.'}
+	                    {loop name="default_category" type="category" id=$DEFAULT_CATEGORY}
+	                        {intl l='You can change the default category (%title) in the "General" tab.' title=$TITLE}
+	                    {/loop}
 
-                    {$exclude_from_tree = "-1"}
-                    {loop name="additional_categories" type="category" product=$product_id exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id"}
-                        {$exclude_from_tree = "$exclude_from_tree,$ID"}
-                    {/loop}
+	                    {$exclude_from_tree = "-1"}
+	                    {loop name="additional_categories" type="category" product=$product_id exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id"}
+	                        {$exclude_from_tree = "$exclude_from_tree,$ID"}
+	                    {/loop}
 
-                    <input type="hidden" name="product_id" value="{$product_id}" />
-                    <input type="hidden" name="current_tab" value="related" />
+	                    <input type="hidden" name="product_id" value="{$product_id}" />
+	                    <input type="hidden" name="current_tab" value="related" />
 
-                    {ifloop rel="categories"}
-                    <div class="input-group">
+	                    {ifloop rel="categories"}
+	                    <div class="input-group">
 
-                        <select name="additional_category_id" id="accessory_category_id" class="form-control">
-                            <option value="">{intl l='Select a category...'}</option>
-                            {loop name="categories" type="category-tree" category="0" exclude=$exclude_from_tree backend_context="1" lang="$edit_language_id"}
-                                <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY==$ID}disabled="disabled"{/if}>
-                                    {$TITLE} {if $DEFAULT_CATEGORY==$ID}{intl l=' (default)'}{/if}
-                                </option>
-                            {/loop}
-                        </select>
+	                        <select name="additional_category_id" id="accessory_category_id" class="form-control">
+	                            <option value="">{intl l='Select a category...'}</option>
+	                            {loop name="categories" type="category-tree" category="0" exclude=$exclude_from_tree backend_context="1" lang="$edit_language_id"}
+	                                <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY==$ID}disabled="disabled"{/if}>
+	                                    {$TITLE} {if $DEFAULT_CATEGORY==$ID}{intl l=' (default)'}{/if}
+	                                </option>
+	                            {/loop}
+	                        </select>
 
-                        <span class="input-group-btn" id="content_add_button">
-                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
-                        </span>
+	                        <span class="input-group-btn" id="content_add_button">
+	                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
+	                        </span>
 
-                    </div>
-                    <span class="help-block">{intl l='Select a category and click (+) to add it to the additional category list'}</span>
-                    {/ifloop}
+	                    </div>
+	                    <span class="help-block">{intl l='Select a category and click (+) to add it to the additional category list'}</span>
+	                    {/ifloop}
 
-                    {elseloop rel="categories"}
-                        <div class="alert alert-info">{intl l="No categories found"}</div>
-                    {/elseloop}
+	                    {elseloop rel="categories"}
+	                        <div class="alert alert-info">{intl l="No categories found"}</div>
+	                    {/elseloop}
 
-                </form>
-            </div>
+	                </form>
+	            </div>
 
-            <div class="table-responsive">
-                <table class="table table-striped table-condensed table-left-aligned">
-                    <thead>
-                        <tr>
-                            <th>{intl l='ID'}</th>
+	            <div class="table-responsive">
+	                <table class="table table-striped table-condensed table-left-aligned">
+	                    <thead>
+	                        <tr>
+	                            <th>{intl l='ID'}</th>
 
-                            <th>{intl l='Category title'}</th>
+	                            <th>{intl l='Category title'}</th>
 
-                            {module_include location='product_categories_table_header'}
+	                            {module_include location='product_categories_table_header'}
 
-                            <th class="actions">{intl l="Actions"}</th>
-                        </tr>
-                    </thead>
+	                            <th class="actions">{intl l="Actions"}</th>
+	                        </tr>
+	                    </thead>
 
-                    <tbody>
-                        {loop name="additional_categories" type="category" product=$product_id exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id"}
-                        <tr>
-                            <td>{$ID}</td>
+	                    <tbody>
+	                        {loop name="additional_categories" type="category" product=$product_id exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id"}
+	                        <tr>
+	                            <td>{$ID}</td>
 
-                            <td>
-                                {$TITLE}
-                            </td>
+	                            <td>
+	                                {$TITLE}
+	                            </td>
 
-                            {module_include location='product_categories_table_row'}
+	                            {module_include location='product_categories_table_row'}
 
-                            <td class="actions">
-                                <div class="btn-group">
-                                    {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.product.category.delete"}
-                                       <a class="btn btn-default btn-xs delete-category" title="{intl l='Remove the product from this category'}" href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-trash"></span>
-                                       </a>
-                                    {/loop}
-                                </div>
-                            </td>
-                        </tr>
-                        {/loop}
+	                            <td class="actions">
+	                                <div class="btn-group">
+	                                    {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.product.category.delete"}
+	                                       <a class="btn btn-default btn-xs delete-category" title="{intl l='Remove the product from this category'}" href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal">
+	                                        <span class="glyphicon glyphicon-trash"></span>
+	                                       </a>
+	                                    {/loop}
+	                                </div>
+	                            </td>
+	                        </tr>
+	                        {/loop}
 
-                        {elseloop rel="additional_categories"}
-                            <tr>
-                                <td colspan="3">
-                                    <div class="alert alert-info">
-                                        {intl l="This product doesn't belong to any additional category."}
-                                    </div>
-                                </td>
-                            </tr>
-                        {/elseloop}
-                    </tbody>
-                </table>
-            </div>
+	                        {elseloop rel="additional_categories"}
+	                            <tr>
+	                                <td colspan="3">
+	                                    <div class="alert alert-info">
+	                                        {intl l="This product doesn't belong to any additional category."}
+	                                    </div>
+	                                </td>
+	                            </tr>
+	                        {/elseloop}
+	                    </tbody>
+	                </table>
+	            </div>
+	        </div>
         </div>
         {* -- End categories management ------------------------------------- *}
     </div>
@@ -473,7 +479,7 @@ $(function() {
         }
     });
 
-    // Load content on folder selection
+    // Load accessory on category selection
     $('#accessory_category_id').change(function(event) {
         var val = $(this).val();
 

@@ -51,6 +51,8 @@ use Thelia\Core\Event\ProductSetTemplateEvent;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Core\Event\ProductAddCategoryEvent;
 use Thelia\Core\Event\ProductDeleteCategoryEvent;
+use Thelia\Model\AttributeQuery;
+use Thelia\Model\AttributeAvQuery;
 
 /**
  * Manages products
@@ -667,5 +669,73 @@ class ProductController extends AbstractCrudController
         }
 
         $this->redirectToEditionTemplate();
+    }
+
+    // -- Product combination management ---------------------------------------
+
+    public function getAttributeValuesAction($productId, $attributeId) {
+
+        $result = array();
+
+        // Get attribute for this product
+        $attribute = AttributeQuery::create()->findPk($attributeId);
+
+        if ($attribute !== null) {
+
+            $values = AttributeAvQuery::create()
+                ->joinWithI18n($this->getCurrentEditionLocale())
+                ->filterByAttribute($attribute)
+                ->find();
+            ;
+
+            if ($values !== null) {
+                foreach($values as $value) {
+                    $result[] = array('id' => $value->getId(), 'title' => $value->getTitle());
+                }
+            }
+        }
+
+        return $this->jsonResponse(json_encode($result));
+    }
+
+    public function addAttributeValueToCombinationAction($productId, $attributeAvId, $combination) {
+        $result = array();
+
+        // Get attribute for this product
+        $attributeAv = AttributeAvQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($attributeAvId);
+
+        if ($attributeAv !== null) {
+
+            $addIt = true;
+
+            // Check if this attribute is not already present
+            $combinationArray = explode(',', $combination);
+
+            foreach ($combinationArray as $id) {
+
+                $attrAv = AttributeAvQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($id);
+
+                if ($attrAv !== null) {
+
+                    if ($attrAv->getAttributeId() == $attributeAv->getAttributeId()) {
+
+                        $attribute = AttributeQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($attributeAv->getAttributeId());
+
+                        $result['error'] = $this->getTranslator()->trans(
+                                'A value for attribute "%name" is already present in the combination',
+                                array('%name' => $attribute->getTitle())
+                        );
+
+                        $addIt = false;
+                    }
+
+                    $result[] = array('id' => $attrAv->getId(), 'title' => $attrAv->getTitle());
+                }
+            }
+
+            if ($addIt) $result[] = array('id' => $attributeAv->getId(), 'title' => $attributeAv->getTitle());
+        }
+
+        return $this->jsonResponse(json_encode($result));
     }
 }

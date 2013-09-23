@@ -223,6 +223,19 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateAttributesAndFeaturesAction</default>
     </route>
 
+    <!-- Combinations -->
+
+    <route id="admin.product.attribute-values" path="/admin/product/{productId}/attribute-values/{attributeId}.{_format}" methods="GET">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::getAttributeValuesAction</default>
+        <requirement key="_format">xml|json</requirement>
+    </route>
+
+
+    <route id="admin.product.add-attribute-value-to-combination" path="/admin/product/{productId}/add-attribute-value-to-combination/{attributeAvId}/{combination}.{_format}" methods="GET">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::addAttributeValueToCombinationAction</default>
+        <requirement key="_format">xml|json</requirement>
+    </route>
+
 
     <!--  Folder routes management -->
 

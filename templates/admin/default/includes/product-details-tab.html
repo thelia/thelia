@@ -42,125 +42,132 @@
 	        {* -- Pricing ------------------------------------------------------- *}
 
 	        <div class="col-md-4">
+                <div class="well well-sm">
+		            <p class="title title-without-tabs">{intl l='Pricing'}</p>
 
-	            <p class="title title-without-tabs">{intl l='Pricing'}</p>
+		               <p></p> <!-- LAME !!! FIXME -->
 
-	               <p></p> <!-- LAME !!! FIXME -->
+		              {form_field form=$form field='price'}
+		                  <div class="form-group {if $error}has-error{/if}">
+		                      <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
-	              {form_field form=$form field='price'}
-	                  <div class="form-group {if $error}has-error{/if}">
-	                      <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+		                         <div class="input-group">
+		                             <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
+		                             <span class="input-group-addon">{$currency_symbol}</span>
+		                         </div>
+		                  </div>
+		              {/form_field}
 
-	                         <div class="input-group">
-	                             <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
-	                             <span class="input-group-addon">{$currency_symbol}</span>
-	                         </div>
-	                  </div>
-	              {/form_field}
+		              {form_field form=$form field='tax_rule'}
+		                  <div class="form-group {if $error}has-error{/if}">
+		                      <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+		                      <div class="form-group">
+		                          <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
+		                              <option value="">{intl l="Select a tax tule"}</option>
+		                              {loop name="tax" type="tax-rule" backend_context="1"}
+		                                  <option value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}>{$TITLE}</option>
+		                              {/loop}
+		                          </select>
+		                      </div>
 
-	              {form_field form=$form field='tax_rule'}
-	                  <div class="form-group {if $error}has-error{/if}">
-	                      <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-	                      <div class="form-group">
-	                          <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-	                              <option value="">{intl l="Select a tax tule"}</option>
-	                              {loop name="tax" type="tax-rule" backend_context="1"}
-	                                  <option value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}>{$TITLE}</option>
-	                              {/loop}
-	                          </select>
-	                      </div>
+		                  </div>
+		              {/form_field}
 
-	                  </div>
-	              {/form_field}
+		              {form_field form=$form field='price_with_tax'}
+		                  <div class="form-group {if $error}has-error{/if}">
+		                      <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+		                      <div class="input-group">
+		                          <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
+		                          <span class="input-group-addon">{$currency_symbol}</span>
+		                      </div>
+		                  </div>
+		              {/form_field}
 
-	              {form_field form=$form field='price_with_tax'}
-	                  <div class="form-group {if $error}has-error{/if}">
-	                      <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-	                      <div class="input-group">
-	                          <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
-	                          <span class="input-group-addon">{$currency_symbol}</span>
-	                      </div>
-	                  </div>
-	              {/form_field}
-
-	              {module_include location='product_details_pricing_form'}
+		              {module_include location='product_details_pricing_form'}
+		          </div>
 	        </div>
 
 
 	        {* -- Promotion ------------------------------------------------- *}
 
 	        <div class="col-md-4">
+                <div class="well well-sm">
+		            <p class="title title-without-tabs">{intl l='Promotion'}</p>
 
-	            <p class="title title-without-tabs">{intl l='Promotion'}</p>
+		            {form_field form=$form field='sale_price'}
+		                <div class="form-group {if $error}has-error{/if}">
+		                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
-	            {form_field form=$form field='sale_price'}
-	                <div class="form-group {if $error}has-error{/if}">
-	                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+		                    <div class="input-group">
+		                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
+		                        <span class="input-group-addon">{$currency_symbol}</span>
+		                    </div>
+		               </div>
+		            {/form_field}
 
-	                    <div class="input-group">
-	                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
-	                        <span class="input-group-addon">{$currency_symbol}</span>
-	                    </div>
-	               </div>
-	            {/form_field}
+					{form_field form=$form field='onsale'}
+					<div class="form-group {if $error}has-error{/if}">
+					    <div class="checkbox">
+					        <label>
+					            <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+					            {$label}
+					        </label>
+					    </div>
+					</div>
+					{/form_field}
 
-				{form_field form=$form field='onsale'}
-				<div class="form-group {if $error}has-error{/if}">
-				    <div class="checkbox">
-				        <label>
-				            <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
-				            {$label}
-				        </label>
-				    </div>
-				</div>
-				{/form_field}
+		            {form_field form=$form field='isnew'}
+		            <div class="form-group {if $error}has-error{/if}">
+		                <div class="checkbox">
+		                    <label>
+		                        <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+		                        {$label}
+		                    </label>
+		                </div>
+		            </div>
+		            {/form_field}
 
-	            {form_field form=$form field='isnew'}
-	            <div class="form-group {if $error}has-error{/if}">
-	                <div class="checkbox">
-	                    <label>
-	                        <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
-	                        {$label}
-	                    </label>
-	                </div>
-	            </div>
-	            {/form_field}
-
-	            {module_include location='product_details_promotion_form'}
+		            {module_include location='product_details_promotion_form'}
+		        </div>
 	         </div>
 
 
 	         {* -- Shipping -------------------------------------------------- *}
 
 	         <div class="col-md-4">
-	             <p class="title title-without-tabs">{intl l='Shipping'}</p>
+	             <div class="well well-sm">
+		             <p class="title title-without-tabs">{intl l='Shipping'}</p>
 
-	             {form_field form=$form field='weight'}
-	                <div class="form-group {if $error}has-error{/if}">
-	                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+		             {form_field form=$form field='weight'}
+		                <div class="form-group {if $error}has-error{/if}">
+		                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
-	                    <div class="input-group">
-	                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product weight'}">
-	                        <span class="input-group-addon">{intl l="Kg"}</span>
+		                    <div class="input-group">
+		                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product weight'}">
+		                        <span class="input-group-addon">{intl l="Kg"}</span>
+		                    </div>
+		                </div>
+		             {/form_field}
+
+	                {module_include location='product_details_shipping_form'}
+
+	                 <p class="title title-without-tabs">{intl l='Quantity'}</p>
+
+	                 {form_field form=$form field='quantity'}
+	                    <div class="form-group {if $error}has-error{/if}">
+	                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+
+	                        <div class="form-group">
+	                            <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Current quantity'}">
+	                        </div>
 	                    </div>
-	                </div>
-	             {/form_field}
+	                 {/form_field}
 
-                 <p class="title title-without-tabs">{intl l='Quantity'}</p>
-
-                 {form_field form=$form field='quantity'}
-                    <div class="form-group {if $error}has-error{/if}">
-                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-
-                        <div class="form-group">
-                            <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Current quantity'}">
-                        </div>
-                    </div>
-                 {/form_field}
-
-	             {module_include location='product_details_shipping_form'}
-	        </div>
+		             {module_include location='product_details_quantity_form'}
+		        </div>
+		    </div>
         </div>
+    </form>
     {/form}
 
 
@@ -171,11 +178,76 @@
 
             <p class="title title-without-tabs">{intl l='Attribute Combinations'}</p>
 
-            <div class="alert alert-info">
-                {intl l="This product has no attribute combination"}
-            </div>
+            {module_include location='product_before_combinations'}
 
-        </div> {* com *}
-    </div> {* row *}
+            {ifloop rel="product-attributes"}
+            <form method="POST" action="{url path='/admin/products/combinations/save'}" {form_enctype form=$form} class="clearfix">
+                <div class="well well-sm">
+                   <p class="title title-without-tabs">{intl l='Create a new combination'}</p>
 
+				   <div class="form-group">
+				       <label class="control-label">{intl l="Attribute"} : </label>
+				       <select required="required" name="attribute_id" id="attribute_id" class="form-control">
+					       <option value="">{intl l='Select an attribute...'}</option>
+					       {loop name="product-attributes" type="attribute" product=$product_id backend_context="1" lang=$edit_language_id}
+					           <option value="{$ID}">{$TITLE}</option>
+					       {/loop}
+					   </select>
+					   <span class="help-block">{intl l='Select an attribute and click (+) to view available values'}</span>
+					</div>
+
+
+					<div id="attribute_value_selector" class="hide">
+					    <div class="input-group">
+					        {* <label class="control-label">{intl l="Attribute values"} : </label> *}
+
+					        <select required="required" name="attribute_value_id" id="attribute_value_id" class="form-control">
+					            <option value="">{intl l='Select an attribute value...'}</option>
+					        </select>
+
+					        <span class="input-group-btn" id="add_attr_value_button">
+					           <button class="btn btn-default btn-primary action-btn add-value-to-combination" type="button"><span class="glyphicon glyphicon-plus-sign"></span></button>
+					        </span>
+					    </div>
+
+					    <span class="help-block">{intl l='Select a value click (+) to add it to the combination'}</span>
+					</div>
+
+                    <div id="attribute_value_selector_empty" class="hide">
+                        <div class="alert alert-info">
+                           {intl l="No available value for this attribute"}
+                       </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="alert alert-danger hide" id="combination_attributes_error"></div>
+
+                        <select multiple="multiple" size="5" name="combination_attributes" id="combination_attributes" class="form-control">
+                        </select>
+
+                        <div class="help-block">
+                            {intl l='To remove a value from the combination, select it and click "remove"'}
+
+		                    <div class="pull-right">
+		                        <button class="btn btn-info btn-xs remove-value-from-combination" type="button">
+		                            {intl l="Remove selected value"} <span class="glyphicon glyphicon-minus-sign"></span>
+		                        </button>
+		                    </div>
+                        </div>
+                    </div>
+
+                </div>
+	        </form>
+            {/ifloop}
+
+                {elseloop rel="product-attributes"}
+		            <div class="alert alert-info">
+		                {intl l="No attributes are attached to this product."}
+		            </div>
+                {/elseloop}
+
+ 	            {module_include location='product_after_combinations'}
+
+	    </div> {* com *}
+	</div> {* row *}
 </div>
