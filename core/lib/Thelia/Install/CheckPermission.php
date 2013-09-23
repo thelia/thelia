@@ -44,12 +44,14 @@ class CheckPermission extends BaseInstall
     const DIR_CONF =            'local/config';
     const DIR_LOG  =            'log';
     const DIR_CACHE =           'cache';
+    const DIR_WEB =             'web';
 
     /** @var array Directory needed to be writable */
     protected $directoriesToBeWritable = array(
         self::DIR_CONF,
         self::DIR_LOG,
         self::DIR_CACHE,
+        self::DIR_WEB,
     );
 
     /** @var array Minimum server configuration necessary */

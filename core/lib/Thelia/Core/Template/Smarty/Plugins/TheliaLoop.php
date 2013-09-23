@@ -132,6 +132,8 @@ class TheliaLoop extends AbstractSmartyPlugin
 
             $loopResults = $loop->exec(self::$pagination[$name]);
 
+            $loopResults->rewind();
+
             $this->loopstack[$name] = $loopResults;
 
             // Pas de résultat ? la boucle est terminée, ne pas évaluer le contenu.

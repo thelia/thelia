@@ -27,6 +27,7 @@ use Thelia\Model\ProductQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 use Thelia\Core\Template\Loop\Product;
+use Propel\Runtime\ActiveQuery\Criteria;
 
 /**
  *
@@ -52,7 +53,7 @@ class ProductTest extends BaseLoopTestor
 
     public function testSearchById()
     {
-        $product = ProductQuery::create()->findOne();
+        $product = ProductQuery::create()->orderById(Criteria::ASC)->findOne();
 
         $this->baseTestSearchById($product->getId());
     }

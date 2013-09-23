@@ -32,6 +32,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Exception\TaxEngineException;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
@@ -597,31 +598,65 @@ class Product extends BaseI18nLoop
 
         $loopResult = new LoopResult($products);
 
+        $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
+
         foreach ($products as $product) {
+
             $loopResultRow = new LoopResultRow($loopResult, $product, $this->versionable, $this->timestampable, $this->countable);
 
             $price = $product->getRealLowestPrice();
-            $taxedPrice = $product->getTaxedPrice(
-                CountryQuery::create()->findOneById(64) // @TODO : make it magic
-            );
 
+            try {
+                $taxedPrice = $product->getTaxedPrice(
+                    $taxCountry
+                );
+            } catch(TaxEngineException $e) {
+                $taxedPrice = null;
+            }
 
-            $loopResultRow->set("ID", $product->getId())
-                ->set("REF",$product->getRef())
-                ->set("IS_TRANSLATED",$product->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
-                ->set("TITLE",$product->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $product->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL", $product->getUrl($locale))
-                ->set("BEST_PRICE", $price)
-                ->set("BEST_PRICE_TAX", $taxedPrice - $price)
-                ->set("BEST_TAXED_PRICE", $taxedPrice)
-                ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
-                ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))
-                ->set("POSITION", $product->getPosition())
+            // Find previous and next product, in the default category.
+            $default_category_id = $product->getDefaultCategoryId();
+
+            $previous = ProductQuery::create()
+                ->joinProductCategory()
+                ->where('ProductCategory.category_id = ?', $default_category_id)
+                ->filterByPosition($product->getPosition(), Criteria::LESS_THAN)
+                ->orderByPosition(Criteria::DESC)
+                ->findOne()
             ;
+
+            $next = ProductQuery::create()
+                ->joinProductCategory()
+                ->where('ProductCategory.category_id = ?', $default_category_id)
+                ->filterByPosition($product->getPosition(), Criteria::GREATER_THAN)
+                ->orderByPosition(Criteria::ASC)
+                ->findOne()
+            ;
+
+            $loopResultRow
+                ->set("ID"               , $product->getId())
+                ->set("REF"              , $product->getRef())
+                ->set("IS_TRANSLATED"    , $product->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE"           , $locale)
+                ->set("TITLE"            , $product->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO"            , $product->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION"      , $product->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM"     , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("URL"              , $product->getUrl($locale))
+                ->set("BEST_PRICE"       , $price)
+                ->set("BEST_PRICE_TAX"   , $taxedPrice - $price)
+                ->set("BEST_TAXED_PRICE" , $taxedPrice)
+                ->set("IS_PROMO"         , $product->getVirtualColumn('main_product_is_promo'))
+                ->set("IS_NEW"           , $product->getVirtualColumn('main_product_is_new'))
+                ->set("POSITION"         , $product->getPosition())
+                ->set("VISIBLE"          , $product->getVisible() ? "1" : "0")
+                ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
+                ->set("HAS_NEXT"         , $next != null ? 1 : 0)
+                ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
+                ->set("NEXT"             , $next != null ? $next->getId() : -1)
+                ->set("DEFAULT_CATEGORY" , $default_category_id)
+
+                ;
 
             $loopResult->addRow($loopResultRow);
         }

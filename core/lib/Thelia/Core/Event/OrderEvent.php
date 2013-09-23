@@ -28,11 +28,13 @@ use Thelia\Model\Order;
 class OrderEvent extends ActionEvent
 {
     protected $order = null;
+    protected $placedOrder = null;
     protected $invoiceAddress = null;
     protected $deliveryAddress = null;
     protected $deliveryModule = null;
     protected $paymentModule = null;
     protected $postage = null;
+    protected $ref = null;
 
     /**
      * @param Order $order
@@ -51,11 +53,19 @@ class OrderEvent extends ActionEvent
     }
 
     /**
+     * @param Order $order
+     */
+    public function setPlacedOrder(Order $order)
+    {
+        $this->placedOrder = $order;
+    }
+
+    /**
      * @param $address
      */
     public function setInvoiceAddress($address)
     {
-        $this->deliveryAddress = $address;
+        $this->invoiceAddress = $address;
     }
 
     /**
@@ -91,11 +101,27 @@ class OrderEvent extends ActionEvent
     }
 
     /**
+     * @param $ref
+     */
+    public function setRef($ref)
+    {
+        $this->ref = $ref;
+    }
+
+    /**
      * @return null|Order
      */
     public function getOrder()
     {
         return $this->order;
+    }
+
+    /**
+     * @return null|Order
+     */
+    public function getPlacedOrder()
+    {
+        return $this->placedOrder;
     }
 
     /**
@@ -136,5 +162,13 @@ class OrderEvent extends ActionEvent
     public function getPostage()
     {
         return $this->postage;
+    }
+
+    /**
+     * @return null|int
+     */
+    public function getRef()
+    {
+        return $this->ref;
     }
 }

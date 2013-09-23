@@ -56,8 +56,14 @@ class ConfigQuery extends BaseConfigQuery {
 
     public static function getPageNotFoundView()
     {
-        return self::read("page_not_found_view", '404.html');
+        return self::read("page_not_found_view", '404');
     }
+
+    public static function getPassedUrlView()
+    {
+        return self::read('passed_url_view', 'passed-url');
+    }
+
 
     public static function getActiveTemplate()
     {

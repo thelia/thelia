@@ -15,6 +15,7 @@ use Thelia\Model\Base\OrderProductQuery as BaseOrderProductQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class OrderProductQuery extends BaseOrderProductQuery {
+class OrderProductQuery extends BaseOrderProductQuery
+{
 
 } // OrderProductQuery

@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Security\SecurityContext;
@@ -53,12 +54,16 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     private $securityContext;
     protected $parserContext;
     protected $request;
+    protected $dispatcher;
 
-    public function __construct(Request $request, SecurityContext $securityContext, ParserContext $parserContext)
+    private static $dataAccessCache = array();
+
+    public function __construct(Request $request, SecurityContext $securityContext, ParserContext $parserContext, ContainerAwareEventDispatcher $dispatcher)
     {
         $this->securityContext = $securityContext;
         $this->parserContext = $parserContext;
         $this->request = $request;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -157,7 +162,12 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
     public function countryDataAccess($params, $smarty)
     {
-        $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
+        if(array_key_exists('defaultCountry', self::$dataAccessCache)) {
+            $defaultCountry = self::$dataAccessCache['defaultCountry'];
+        } else {
+            $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
+            self::$dataAccessCache['defaultCountry'] = $defaultCountry;
+        }
 
         switch($params["attr"]) {
             case "default":
@@ -167,6 +177,13 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
     public function cartDataAccess($params, $smarty)
     {
+        if(array_key_exists('currentCountry', self::$dataAccessCache)) {
+            $currentCountry = self::$dataAccessCache['currentCountry'];
+        } else {
+            $currentCountry = CountryQuery::create()->findOneById(64); // @TODO : make it magic
+            self::$dataAccessCache['currentCountry'] = $currentCountry;
+        }
+
         $cart = $this->getCart($this->request);
         $result = "";
         switch($params["attr"]) {
@@ -177,9 +194,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 $result = $cart->getTotalAmount();
                 break;
             case "total_taxed_price":
-                $result = $cart->getTaxedAmount(
-                    CountryQuery::create()->findOneById(64) // @TODO : make it magic
-                );
+                $result = $cart->getTaxedAmount($currentCountry);
                 break;
         }
 
@@ -195,6 +210,12 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 return $order->getPostage();
             case 'delivery_address':
                 return $order->chosenDeliveryAddress;
+            case 'invoice_address':
+                return $order->chosenInvoiceAddress;
+            case 'delivery_module':
+                return $order->getDeliveryModuleId();
+            case 'payment_module':
+                return $order->getPaymentModuleId();
         }
 
         throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", 'Order', $attribute));
@@ -225,23 +246,29 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      */
     protected function dataAccessWithI18n($objectLabel, $params, ModelCriteria $search, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID')
     {
-        $lang = $this->getNormalizedParam($params, array('lang'));
-        if ($lang === null) {
-            $lang = $this->request->getSession()->getLang()->getId();
+        if(array_key_exists('data_' . $objectLabel, self::$dataAccessCache)) {
+            $data = self::$dataAccessCache['data_' . $objectLabel];
+        } else {
+            $lang = $this->getNormalizedParam($params, array('lang'));
+            if ($lang === null) {
+                $lang = $this->request->getSession()->getLang()->getId();
+            }
+
+            ModelCriteriaTools::getI18n(
+                false,
+                $lang,
+                $search,
+                $this->request->getSession()->getLang()->getLocale(),
+                $columns,
+                $foreignTable,
+                $foreignKey,
+                true
+            );
+
+            $data = $search->findOne();
+
+            self::$dataAccessCache['data_' . $objectLabel] = $data;
         }
-
-        ModelCriteriaTools::getI18n(
-            false,
-            $lang,
-            $search,
-            $this->request->getSession()->getLang()->getLocale(),
-            $columns,
-            $foreignTable,
-            $foreignKey,
-            true
-        );
-
-        $data = $search->findOne();
 
         $noGetterData = array();
         foreach ($columns as $column) {
@@ -319,5 +346,15 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'cart', $this, 'cartDataAccess'),
             new SmartyPluginDescriptor('function', 'order', $this, 'orderDataAccess'),
         );
+    }
+
+    /**
+     * Return the event dispatcher,
+     *
+     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
     }
 }

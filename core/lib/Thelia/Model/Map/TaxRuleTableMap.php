@@ -57,7 +57,7 @@ class TaxRuleTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -67,12 +67,17 @@ class TaxRuleTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
      * the column name for the ID field
      */
     const ID = 'tax_rule.ID';
+
+    /**
+     * the column name for the IS_DEFAULT field
+     */
+    const IS_DEFAULT = 'tax_rule.IS_DEFAULT';
 
     /**
      * the column name for the CREATED_AT field
@@ -105,12 +110,12 @@ class TaxRuleTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(TaxRuleTableMap::ID, TaxRuleTableMap::CREATED_AT, TaxRuleTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id', 'IsDefault', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'isDefault', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(TaxRuleTableMap::ID, TaxRuleTableMap::IS_DEFAULT, TaxRuleTableMap::CREATED_AT, TaxRuleTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'IS_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'is_default', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -120,12 +125,12 @@ class TaxRuleTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, ),
-        self::TYPE_COLNAME       => array(TaxRuleTableMap::ID => 0, TaxRuleTableMap::CREATED_AT => 1, TaxRuleTableMap::UPDATED_AT => 2, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CREATED_AT' => 1, 'UPDATED_AT' => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'created_at' => 1, 'updated_at' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'IsDefault' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'isDefault' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        self::TYPE_COLNAME       => array(TaxRuleTableMap::ID => 0, TaxRuleTableMap::IS_DEFAULT => 1, TaxRuleTableMap::CREATED_AT => 2, TaxRuleTableMap::UPDATED_AT => 3, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'IS_DEFAULT' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'is_default' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -145,6 +150,7 @@ class TaxRuleTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('IS_DEFAULT', 'IsDefault', 'BOOLEAN', true, 1, false);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -323,10 +329,12 @@ class TaxRuleTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(TaxRuleTableMap::ID);
+            $criteria->addSelectColumn(TaxRuleTableMap::IS_DEFAULT);
             $criteria->addSelectColumn(TaxRuleTableMap::CREATED_AT);
             $criteria->addSelectColumn(TaxRuleTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
+            $criteria->addSelectColumn($alias . '.IS_DEFAULT');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

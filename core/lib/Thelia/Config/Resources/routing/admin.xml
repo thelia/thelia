@@ -24,6 +24,12 @@
         <default key="_controller">Thelia\Controller\Admin\SessionController::checkLoginAction</default>
     </route>
 
+    <!-- Route to edit admin profile -->
+    <route id="admin.profile.update.view" path="/admin/profile/update" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\AdminController::updateAction</default>
+    </route>
+
+
 
 	<!-- Route to the catalog controller -->
 
@@ -144,6 +150,8 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updatePositionAction</default>
     </route>
 
+    <!-- Related content -->
+
     <route id="admin.products.related-content.add" path="/admin/products/related-content/add">
         <default key="_controller">Thelia\Controller\Admin\ProductController::addRelatedContentAction</default>
     </route>
@@ -155,6 +163,76 @@
     <route id="admin.product.available-related-content" path="/admin/product/{productId}/available-related-content/{folderId}.{_format}" methods="GET">
         <default key="_controller">Thelia\Controller\Admin\ProductController::getAvailableRelatedContentAction</default>
         <requirement key="_format">xml|json</requirement>
+    </route>
+
+    <!-- Product accessories -->
+
+    <route id="admin.products.accessories.add" path="/admin/products/accessory/add">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::addAccessoryAction</default>
+    </route>
+
+    <route id="admin.products.accessories.delete" path="/admin/products/accessory/delete">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::deleteAccessoryAction</default>
+    </route>
+
+    <route id="admin.product.accessories-content" path="/admin/product/{productId}/available-accessories/{categoryId}.{_format}" methods="GET">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::getAvailableAccessoriesAction</default>
+        <requirement key="_format">xml|json</requirement>
+    </route>
+
+    <route id="admin.products.update-accessory-position" path="/admin/products/update-accessory-position">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateAccessoryPositionAction</default>
+    </route>
+
+    <!--Features and attributes -->
+
+    <route id="admin.products.update-attributes-and-features" path="/admin/product/{productId}/update-attributes-and-features">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateAttributesAndFeaturesAction</default>
+    </route>
+
+
+    <!--  Folder routes management -->
+    <route id="admin.folders.default" path="/admin/folders">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::defaultAction</default>
+    </route>
+
+    <route id="admin.folders.create" path="/admin/folders/create">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::createAction</default>
+    </route>
+
+    <route id="admin.folders.update" path="/admin/folders/update/{folder_id}">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::updateAction</default>
+        <requirement key="folder_id">\d+</requirement>
+    </route>
+
+    <route id="admin.folders.toggle-online" path="/admin/folders/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::setToggleVisibilityAction</default>
+    </route>
+
+    <route id="admin.folders.save" path="/admin/folders/save">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.folders.delete" path="/admin/folders/delete">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::deleteAction</default>
+    </route>
+
+    <route id="admin.folders.update-position" path="/admin/folders/update-position">
+        <default key="_controller">Thelia\Controller\Admin\FolderController::updatePositionAction</default>
+    </route>
+
+    <!-- content routes management -->
+    <route id="admin.folders.create" path="/admin/content/create">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::createAction</default>
+    </route>
+
+    <route id="admin.content.update" path="admin/content/update/{content_id}">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::updateAction</default>
+        <requirement key="content_id">\d+</requirement>
+    </route>
+
+    <route id="admin.content.save" path="/admin/content/save">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::processUpdateAction</default>
     </route>
 
 
@@ -393,7 +471,34 @@
         <requirement key="country_id">\d+</requirement>
     </route>
 
-    <!-- end countries routes  management -->
+    <!-- end countries routes management -->
+
+    <!-- Shipping zones routes management -->
+
+    <route id="admin.configuration.shipping-zones.default" path="/admin/configuration/shipping_zones">
+        <default key="_controller">Thelia\Controller\Admin\ShippingZoneController::indexAction</default>
+    </route>
+
+    <route id="admin.configuration.shipping-zones.update.view" path="/admin/configuration/shipping_zones/update/{shipping_zones_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ShippingZoneController::updateAction</default>
+        <requirement key="shipping_zones_id">\d+</requirement>
+    </route>
+
+    <!-- end shipping routes management -->
+
+    <!-- Shipping zones routes management -->
+
+    <route id="admin.configuration.shipping-configuration.default" path="/admin/configuration/shipping_configuration">
+        <default key="_controller">Thelia\Controller\Admin\ShippingConfigurationController::indexAction</default>
+    </route>
+
+    <route id="admin.configuration.shipping-configuration.update.view" path="/admin/configuration/shipping_configuration/update/{shipping_configuration_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ShippingConfigurationController::updateAction</default>
+        <requirement key="shipping_configuration_id">\d+</requirement>
+    </route>
+
+    <!-- end shipping routes management -->
+
 
     <!-- feature and features value management -->
 
@@ -451,6 +556,15 @@
     </route>
 
     <!-- end feature and feature routes  management -->
+
+    <!-- Modules rule management -->
+
+    <route id="admin.module" path="/admin/modules">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::indexAction</default>
+    </route>
+
+    <!-- end Modules rule management -->
+
 
 	<!-- The default route, to display a template -->
 

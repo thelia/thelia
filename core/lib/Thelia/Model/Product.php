@@ -10,6 +10,8 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ProductEvent;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Propel;
+use Thelia\Model\Map\ProductTableMap;
 
 class Product extends BaseProduct
 {
@@ -41,11 +43,12 @@ class Product extends BaseProduct
     public function getTaxedPrice(Country $country)
     {
         $taxCalculator = new Calculator();
-        return round($taxCalculator->load($this, $country)->getTaxedPrice($this->getRealLowestPrice()), 2);
+
+        return $taxCalculator->load($this, $country)->getTaxedPrice($this->getRealLowestPrice());
     }
 
     /**
-     * @return the current default category for this product
+     * @return the current default category ID for this product
      */
     public function getDefaultCategoryId()
     {
@@ -85,6 +88,72 @@ class Product extends BaseProduct
     }
 
     /**
+     * Create a new product, along with the default category ID
+     *
+     * @param int $defaultCategoryId the default category ID of this product
+     */
+    public function create($defaultCategoryId) {
+
+        $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
+
+        $con->beginTransaction();
+
+        $this->dispatchEvent(TheliaEvents::BEFORE_CREATEPRODUCT, new ProductEvent($this));
+
+        try {
+            // Create the product
+            $this->save($con);
+
+            // Add the default category
+            $pc = new ProductCategory();
+
+            $pc
+                ->setProduct($this)
+                ->setCategoryId($defaultCategoryId)
+                ->setDefaultCategory(true)
+                ->save($con)
+            ;
+
+            // Set the position
+            $this->setPosition($this->getNextPosition())->save($con);
+
+            // Create an empty product sale element
+            $sale_elements = new ProductSaleElements();
+
+            $sale_elements
+                ->setProduct($this)
+                ->setRef($this->getRef())
+                ->setPromo(0)
+                ->setNewness(0)
+                ->setWeight(0)
+                ->save($con)
+            ;
+
+            // Create an empty product price in the default currency
+            $product_price = new ProductPrice();
+
+            $product_price
+                ->setProductSaleElements($sale_elements)
+                ->setPromoPrice(0)
+                ->setPrice(0)
+                ->setCurrency(CurrencyQuery::create()->findOneByByDefault(true))
+                ->save($con)
+            ;
+
+            // Store all the stuff !
+            $con->commit();
+
+            $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
+        }
+        catch(\Exception $ex) {
+
+            $con->rollback();
+
+            throw $ex;
+        }
+    }
+
+    /**
      * Calculate next position relative to our default category
      */
     protected function addCriteriaToPositionQuery($query)
@@ -100,31 +169,7 @@ class Product extends BaseProduct
         if ($produits != null) $query->filterById($produits, Criteria::IN);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function preInsert(ConnectionInterface $con = null)
-    {
-        $this->setPosition($this->getNextPosition());
 
-
-
-        $this->dispatchEvent(TheliaEvents::BEFORE_CREATEPRODUCT, new ProductEvent($this));
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function postInsert(ConnectionInterface $con = null)
-    {
-        $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function preUpdate(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEPRODUCT, new ProductEvent($this));
@@ -155,7 +200,12 @@ class Product extends BaseProduct
      */
     public function postDelete(ConnectionInterface $con = null)
     {
+        RewritingUrlQuery::create()
+            ->filterByView($this->getRewrittenUrlViewName())
+            ->filterByViewId($this->getId())
+            ->update(array(
+                "View" => ConfigQuery::getPassedUrlView()
+            ));
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }
-
 }
