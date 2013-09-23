@@ -160,6 +160,24 @@ try {
         "test@thelia.net",
         "azerty"
     );
+    for ($j = 0; $j <= 3; $j++) {
+        $address = new Thelia\Model\Address();
+        $address->setLabel($faker->text(20))
+            ->setTitleId(rand(1,3))
+            ->setFirstname($faker->firstname)
+            ->setLastname($faker->lastname)
+            ->setAddress1($faker->streetAddress)
+            ->setAddress2($faker->streetAddress)
+            ->setAddress3($faker->streetAddress)
+            ->setCellphone($faker->phoneNumber)
+            ->setPhone($faker->phoneNumber)
+            ->setZipcode($faker->postcode)
+            ->setCity($faker->city)
+            ->setCountryId(64)
+            ->setCustomer($customer)
+            ->save()
+        ;
+    }
 
     for($i = 0; $i < 50; $i++) {
         $customer = new Thelia\Model\Customer();

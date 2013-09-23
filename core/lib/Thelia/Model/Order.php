@@ -26,6 +26,8 @@ class Order extends BaseOrder
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        $this->setRef($this->generateRef());
+
         $this->dispatchEvent(TheliaEvents::ORDER_BEFORE_CREATE, new OrderEvent($this));
 
         return true;
@@ -37,6 +39,12 @@ class Order extends BaseOrder
     public function postInsert(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::ORDER_AFTER_CREATE, new OrderEvent($this));
+    }
+
+    public function generateRef()
+    {
+        /* order addresses are unique */
+        return uniqid('ORD', true);
     }
 
     /**

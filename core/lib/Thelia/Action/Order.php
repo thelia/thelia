@@ -144,6 +144,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             ->setAddress3($deliveryAddress->getAddress3())
             ->setZipcode($deliveryAddress->getZipcode())
             ->setCity($deliveryAddress->getCity())
+            ->setPhone($deliveryAddress->getPhone())
             ->setCountryId($deliveryAddress->getCountryId())
             ->save($con)
         ;
@@ -159,6 +160,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             ->setAddress3($invoiceAddress->getAddress3())
             ->setZipcode($invoiceAddress->getZipcode())
             ->setCity($invoiceAddress->getCity())
+            ->setPhone($invoiceAddress->getPhone())
             ->setCountryId($invoiceAddress->getCountryId())
             ->save($con)
         ;
@@ -285,20 +287,6 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
-     */
-    public function setReference(OrderEvent $event)
-    {
-        $event->getOrder()->setRef($this->generateRef());
-    }
-
-    public function generateRef()
-    {
-        /* order addresses are unique */
-        return uniqid('ORD', true);
-    }
-
-    /**
      * Returns an array of event names this subscriber wants to listen to.
      *
      * The array keys are event names and the value can be:
@@ -326,7 +314,6 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_SET_INVOICE_ADDRESS => array("setInvoiceAddress", 128),
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => array("setPaymentModule", 128),
             TheliaEvents::ORDER_PAY => array("create", 128),
-            TheliaEvents::ORDER_BEFORE_CREATE => array("setReference", 128),
             TheliaEvents::ORDER_BEFORE_PAYMENT => array("sendOrderEmail", 128),
         );
     }
