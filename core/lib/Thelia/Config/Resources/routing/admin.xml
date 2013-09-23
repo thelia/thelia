@@ -230,8 +230,9 @@
         <default key="_controller">Thelia\Controller\Admin\FolderController::createAction</default>
     </route>
 
-    <route id="admin.folders.update" path="/admin/folders/update" methods="get">
+    <route id="admin.folders.update" path="/admin/folders/update/{folder_id}">
         <default key="_controller">Thelia\Controller\Admin\FolderController::updateAction</default>
+        <requirement key="folder_id">\d+</requirement>
     </route>
 
     <route id="admin.folders.toggle-online" path="/admin/folders/toggle-online">
@@ -249,6 +250,21 @@
     <route id="admin.folders.update-position" path="/admin/folders/update-position">
         <default key="_controller">Thelia\Controller\Admin\FolderController::updatePositionAction</default>
     </route>
+
+    <!-- content routes management -->
+    <route id="admin.folders.create" path="/admin/content/create">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::createAction</default>
+    </route>
+
+    <route id="admin.content.update" path="admin/content/update/{content_id}">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::updateAction</default>
+        <requirement key="content_id">\d+</requirement>
+    </route>
+
+    <route id="admin.content.save" path="/admin/content/save">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::processUpdateAction</default>
+    </route>
+
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 

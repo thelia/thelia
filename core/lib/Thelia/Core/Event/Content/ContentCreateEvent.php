@@ -20,36 +20,105 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\GreaterThan;
-use Thelia\Core\Translation\Translator;
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Thelia\Core\Event\Content;
 
-class FolderModificationForm extends FolderCreationForm
+
+/**
+ * Class ContentCreateEvent
+ * @package Thelia\Core\Event\Content
+ * @author manuel raynaud <mraynaud@openstudio.fr>
+ */
+class ContentCreateEvent extends ContentEvent
 {
-    use StandardDescriptionFieldsTrait;
+    protected $title;
+    protected $default_folder;
+    protected $locale;
+    protected $visible;
 
-    protected function buildForm()
+    /**
+     * @param mixed $locale
+     *
+     * @return $this
+     */
+    public function setLocale($locale)
     {
-        parent::buildForm();
+        $this->locale = $locale;
 
-        $this->formBuilder
-            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
-
-            ->add("url", "text", array(
-                "label"       => Translator::getInstance()->trans("Rewriten URL *"),
-                "constraints" => array(new NotBlank()),
-                "label_attr" => array("for" => "rewriten_url")
-            ))
-        ;
-
-        // Add standard description fields, excluding title and locale, which a re defined in parent class
-        $this->addStandardDescFields(array('title', 'locale'));
+        return $this;
     }
 
-    public function getName()
+    /**
+     * @return mixed
+     */
+    public function getLocale()
     {
-        return "thelia_folder_modification";
+        return $this->locale;
     }
+
+    /**
+     * @param mixed $default_folder
+     *
+     * @return $this
+     */
+    public function setDefaultFolder($default_folder)
+    {
+        $this->default_folder = $default_folder;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDefaultFolder()
+    {
+        return $this->default_folder;
+    }
+
+
+
+
+    /**
+     * @param mixed $visible
+     *
+     * @return $this
+     */
+    public function setVisible($visible)
+    {
+        $this->visible = $visible;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getVisible()
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @param mixed $title
+     *
+     * @return $this
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+
+
 }

@@ -22,41 +22,39 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
-use Thelia\Core\Event\FolderCreateEvent;
-use Thelia\Core\Event\FolderDeleteEvent;
-use Thelia\Core\Event\FolderToggleVisibilityEvent;
-use Thelia\Core\Event\FolderUpdateEvent;
+use Thelia\Core\Event\Content\ContentCreateEvent;
+use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Form\FolderCreationForm;
-use Thelia\Form\FolderModificationForm;
-use Thelia\Model\FolderQuery;
+use Thelia\Form\ContentCreationForm;
+use Thelia\Form\ContentModificationForm;
+use Thelia\Model\ContentQuery;
+
 
 /**
- * Class FolderController
+ * Class ContentController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <mraynaud@openstudio.fr>
  */
-class FolderController extends AbstractCrudController
+class ContentController extends AbstractCrudController
 {
 
     public function __construct()
     {
         parent::__construct(
-            'folder',
+            'content',
             'manual',
-            'folder_order',
+            'content_order',
 
-            'admin.folder.default',
-            'admin.folder.create',
-            'admin.folder.update',
-            'admin.folder.delete',
+            'admin.content.default',
+            'admin.content.create',
+            'admin.content.update',
+            'admin.content.delete',
 
-            TheliaEvents::FOLDER_CREATE,
-            TheliaEvents::FOLDER_UPDATE,
-            TheliaEvents::FOLDER_DELETE,
-            TheliaEvents::FOLDER_TOGGLE_VISIBILITY,
-            TheliaEvents::FOLDER_UPDATE_POSITION
+            TheliaEvents::CONTENT_CREATE,
+            TheliaEvents::CONTENT_UPDATE,
+            TheliaEvents::CONTENT_DELETE,
+            TheliaEvents::CONTENT_TOGGLE_VISIBILITY,
+            TheliaEvents::CONTENT_UPDATE_POSITION
         );
     }
 
@@ -65,7 +63,7 @@ class FolderController extends AbstractCrudController
      */
     protected function getCreationForm()
     {
-        return new FolderCreationForm($this->getRequest());
+        return new ContentCreationForm($this->getRequest());
     }
 
     /**
@@ -73,16 +71,16 @@ class FolderController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        return new FolderModificationForm($this->getRequest());
+        return new ContentModificationForm($this->getRequest());
     }
 
     /**
      * Hydrate the update form for this object, before passing it to the update template
      *
-     * @param \Thelia\Model\Folder $object
+     * @param \Thelia\Form\ContentModificationForm $object
      */
-    protected function hydrateObjectForm($object) {
-
+    protected function hydrateObjectForm($object)
+    {
         // Prepare the data that will hydrate the form
         $data = array(
             'id'           => $object->getId(),
@@ -93,11 +91,10 @@ class FolderController extends AbstractCrudController
             'postscriptum' => $object->getPostscriptum(),
             'visible'      => $object->getVisible(),
             'url'          => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
-            'parent'       => $object->getParent()
         );
 
         // Setup the object form
-        return new FolderModificationForm($this->getRequest(), "form", $data);
+        return new ContentModificationForm($this->getRequest(), "form", $data);
     }
 
     /**
@@ -107,15 +104,16 @@ class FolderController extends AbstractCrudController
      */
     protected function getCreationEvent($formData)
     {
-        $creationEvent = new FolderCreateEvent();
+        $contentCreateEvent = new ContentCreateEvent();
 
-        $creationEvent
+        $contentCreateEvent
             ->setLocale($formData['locale'])
+            ->setDefaultFolder($formData['default_folder'])
             ->setTitle($formData['title'])
             ->setVisible($formData['visible'])
-            ->setParent($formData['parent']);
+        ;
 
-        return $creationEvent;
+        return $contentCreateEvent;
     }
 
     /**
@@ -125,9 +123,9 @@ class FolderController extends AbstractCrudController
      */
     protected function getUpdateEvent($formData)
     {
-        $updateEvent = new FolderUpdateEvent($formData['id']);
+        $contentUpdateEvent = new ContentUpdateEvent($formData['id']);
 
-        $updateEvent
+        $contentUpdateEvent
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
@@ -135,10 +133,9 @@ class FolderController extends AbstractCrudController
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
             ->setUrl($formData['url'])
-            ->setParent($formData['parent'])
-        ;
+            ->setDefaultFolder($formData['default_folder']);
 
-        return $updateEvent;
+        return $contentUpdateEvent;
     }
 
     /**
@@ -146,79 +143,81 @@ class FolderController extends AbstractCrudController
      */
     protected function getDeleteEvent()
     {
-        return new FolderDeleteEvent($this->getRequest()->get('folder_id'), 0);
-    }
-
-    /**
-     * @return FolderToggleVisibilityEvent|void
-     */
-    protected function createToggleVisibilityEvent()
-    {
-        return new FolderToggleVisibilityEvent($this->getExistingObject());
-    }
-
-    /**
-     * @param $positionChangeMode
-     * @param $positionValue
-     * @return UpdatePositionEvent|void
-     */
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue) {
-
-        return new UpdatePositionEvent(
-            $this->getRequest()->get('folder_id', null),
-            $positionChangeMode,
-            $positionValue
-        );
+        // TODO: Implement getDeleteEvent() method.
     }
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param \Thelia\Core\Event\FolderEvent $event
+     * @param \Thelia\Core\Event\Content\ContentEvent $event
      */
     protected function eventContainsObject($event)
     {
-        return $event->hasFolder();
+        return $event->hasContent();
     }
 
     /**
      * Get the created object from an event.
      *
-     * @param $event \Thelia\Core\Event\FolderEvent $event
+     * @param $event \Thelia\Core\Event\Content\ContentEvent
      *
-     * @return null|\Thelia\Model\Folder
+     * @return null|\Thelia\Model\Content
      */
     protected function getObjectFromEvent($event)
     {
-        return $event->hasFolder() ? $event->getFolder() : null;
+        return $event->getContent();
     }
 
     /**
      * Load an existing object from the database
+     *
+     * @return \Thelia\Model\Content
      */
-    protected function getExistingObject() {
-        return FolderQuery::create()
+    protected function getExistingObject()
+    {
+        return ContentQuery::create()
             ->joinWithI18n($this->getCurrentEditionLocale())
-            ->findOneById($this->getRequest()->get('folder_id', 0));
+            ->findOneById($this->getRequest()->get('content_id', 0));
     }
 
     /**
      * Returns the object label form the object event (name, title, etc.)
      *
-     * @param unknown $object
+     * @param $object \Thelia\Model\Content
+     *
+     * @return string content title
+     *
      */
-    protected function getObjectLabel($object) {
+    protected function getObjectLabel($object)
+    {
         return $object->getTitle();
     }
 
     /**
      * Returns the object ID from the object
      *
-     * @param unknown $object
+     * @param $object \Thelia\Model\Content
+     *
+     * @return int content id
      */
     protected function getObjectId($object)
     {
         return $object->getId();
+    }
+
+    protected function getFolderId()
+    {
+        $folderId = $this->getRequest()->get('folder_id', null);
+
+        if(null === $folderId) {
+            $content = $this->getExistingObject();
+
+            if($content) {
+                $folderId = $content->getDefaultFolderId();
+            }
+        }
+
+        return $folderId ?: 0;
     }
 
     /**
@@ -226,38 +225,54 @@ class FolderController extends AbstractCrudController
      *
      * @param unknown $currentOrder, if any, null otherwise.
      */
-    protected function renderListTemplate($currentOrder) {
-
-        // Get content order
-        $content_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
+    protected function renderListTemplate($currentOrder)
+    {
+        $this->getListOrderFromSession('content', 'content_order', 'manual');
 
         return $this->render('folders',
             array(
-                'folder_order' => $currentOrder,
-                'content_order' => $content_order,
-                'parent' => $this->getRequest()->get('parent', 0)
+                'content_order' => $currentOrder,
+                'parent' => $this->getFolderId()
             ));
-    }
-
-
-    /**
-     * Render the edition template
-     */
-    protected function renderEditionTemplate() {
-
-        return $this->render('folder-edit', $this->getEditionArguments());
     }
 
     protected function getEditionArguments()
     {
         return array(
-            'folder_id' => $this->getRequest()->get('folder_id', 0),
+            'content_id' => $this->getRequest()->get('content_id', 0),
             'current_tab' => $this->getRequest()->get('current_tab', 'general')
         );
     }
 
     /**
-     * @param \Thelia\Core\Event\FolderUpdateEvent $updateEvent
+     * Render the edition template
+     */
+    protected function renderEditionTemplate()
+    {
+        return $this->render('content-edit', $this->getEditionArguments());
+    }
+
+    /**
+     * Redirect to the edition template
+     */
+    protected function redirectToEditionTemplate()
+    {
+        $this->redirect($this->getRoute('admin.content.update', $this->getEditionArguments()));
+    }
+
+    /**
+     * Redirect to the list template
+     */
+    protected function redirectToListTemplate()
+    {
+        $this->redirectToRoute(
+            'admin.content.default',
+            array('parent' => $this->getFolderId())
+        );
+    }
+
+    /**
+     * @param \Thelia\Core\Event\Content\ContentUpdateEvent $updateEvent
      * @return Response|void
      */
     protected function performAdditionalUpdateAction($updateEvent)
@@ -267,62 +282,8 @@ class FolderController extends AbstractCrudController
             // Redirect to parent category list
             $this->redirectToRoute(
                 'admin.folders.default',
-                array('parent' => $updateEvent->getFolder()->getParent())
+                array('parent' => $this->getFolderId())
             );
         }
-    }
-
-    /**
-     * Put in this method post object delete processing if required.
-     *
-     * @param \Thelia\Core\Event\FolderDeleteEvent $deleteEvent the delete event
-     * @return Response a response, or null to continue normal processing
-     */
-    protected function performAdditionalDeleteAction($deleteEvent)
-    {
-        // Redirect to parent category list
-        $this->redirectToRoute(
-            'admin.folders.default',
-            array('parent' => $deleteEvent->getFolder()->getParent())
-        );
-    }
-
-    /**
-     * @param $event \Thelia\Core\Event\UpdatePositionEvent
-     * @return null|Response
-     */
-    protected function performAdditionalUpdatePositionAction($event)
-    {
-
-        $folder = FolderQuery::create()->findPk($event->getObjectId());
-
-        if ($folder != null) {
-            // Redirect to parent category list
-            $this->redirectToRoute(
-                'admin.folders.default',
-                array('parent' => $folder->getParent())
-            );
-        }
-
-        return null;
-    }
-
-    /**
-     * Redirect to the edition template
-     */
-    protected function redirectToEditionTemplate()
-    {
-        $this->redirect($this->getRoute('admin.folders.update', $this->getEditionArguments()));
-    }
-
-    /**
-     * Redirect to the list template
-     */
-    protected function redirectToListTemplate()
-    {
-        $this->redirectToRoute(
-            'admin.folders.default',
-            array('parent' => $this->getRequest()->get('parent', 0))
-        );
     }
 }

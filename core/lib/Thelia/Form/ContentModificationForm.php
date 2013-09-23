@@ -20,14 +20,20 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
-use Thelia\Core\Translation\Translator;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
+use Thelia\Form\StandardDescriptionFieldsTrait;
 
-class FolderModificationForm extends FolderCreationForm
-{
+/**
+ * Class ContentModificationForm
+ * @package Thelia\Form
+ * @author manuel raynaud <mraynaud@openstudio.fr>
+ */
+class ContentModificationForm extends ContentCreationForm {
     use StandardDescriptionFieldsTrait;
 
     protected function buildForm()
@@ -40,7 +46,7 @@ class FolderModificationForm extends FolderCreationForm
             ->add("url", "text", array(
                 "label"       => Translator::getInstance()->trans("Rewriten URL *"),
                 "constraints" => array(new NotBlank()),
-                "label_attr" => array("for" => "rewriten_url")
+                "label_attr" => array("for" => "rewritten_url")
             ))
         ;
 
@@ -50,6 +56,6 @@ class FolderModificationForm extends FolderCreationForm
 
     public function getName()
     {
-        return "thelia_folder_modification";
+        return "thelia_content_modification";
     }
 }

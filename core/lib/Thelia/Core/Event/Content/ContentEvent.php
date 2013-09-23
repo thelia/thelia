@@ -20,36 +20,54 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\GreaterThan;
-use Thelia\Core\Translation\Translator;
-use Symfony\Component\Validator\Constraints\NotBlank;
+namespace Thelia\Core\Event\Content;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Content;
 
-class FolderModificationForm extends FolderCreationForm
+
+/**
+ * Class ContentEvent
+ * @package Thelia\Core\Event\Content
+ * @author manuel raynaud <mraynaud@openstudio.fr>
+ */
+class ContentEvent extends ActionEvent
 {
-    use StandardDescriptionFieldsTrait;
+    /**
+     * @var \Thelia\Model\Content
+     */
+    protected $content;
 
-    protected function buildForm()
+    function __construct(Content $content = null)
     {
-        parent::buildForm();
-
-        $this->formBuilder
-            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
-
-            ->add("url", "text", array(
-                "label"       => Translator::getInstance()->trans("Rewriten URL *"),
-                "constraints" => array(new NotBlank()),
-                "label_attr" => array("for" => "rewriten_url")
-            ))
-        ;
-
-        // Add standard description fields, excluding title and locale, which a re defined in parent class
-        $this->addStandardDescFields(array('title', 'locale'));
+        $this->content = $content;
     }
 
-    public function getName()
+    /**
+     * @param \Thelia\Model\Content $content
+     */
+    public function setContent(Content $content)
     {
-        return "thelia_folder_modification";
+        $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * @return \Thelia\Model\Content
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * check if content exists
+     *
+     * @return bool
+     */
+    public function hasContent()
+    {
+        return null !== $this->content;
     }
 }
