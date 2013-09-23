@@ -8,7 +8,7 @@
     <nav>
         <ul class="breadcrumb">
             <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
-            <li><a href="{url path='admin/coupon/'}">{intl l='Coupon'}</a></li>
+            <li><a href="{url path='admin/coupon'}">{intl l='Coupon'}</a></li>
             <li>{intl l='Update'} {$couponCode}</li>
         </ul>
     </nav>
@@ -48,7 +48,7 @@
             miniBrowser(0, '/test_to_remove/datas_coupon_edit.json');
 
             // Init Rules
-            couponManager.initRules = function() {
+            $.couponManager.initRules = function() {
                 var rules = [];
                 {foreach from=$rulesObject key=k item=rule}
                     // Init rule
@@ -70,13 +70,13 @@
             };
 
             // Save Rules AJAX
-            couponManager.saveRuleAjax = function() {
+            $.couponManager.saveRuleAjax = function() {
                 $('#constraint-add-operators-values').html('<div class="loading" ></div>');
                 var $url = '{$urlAjaxUpdateRules}';
                 $.ajax({
                     type: "POST",
                     url: $url,
-                    data: {literal}{{/literal}rules:JSON.stringify(couponManager.rulesToSave){literal}}{/literal},
+                    data: {literal}{{/literal}rules:JSON.stringify($.couponManager.rulesToSave){literal}}{/literal},
                     statusCode: {
                         404: function() {
                             $('#constraint-add-operators-values').html(
@@ -92,13 +92,13 @@
                         return $(this).val() == 'thelia.constraint.rule.available_for_everyone';
                     }).prop('selected', true);
 
-                    couponManager.onClickUpdateRule();
-                    couponManager.onClickDeleteRule();
+                    $.couponManager.onClickUpdateRule();
+                    $.couponManager.onClickDeleteRule();
                 });
             };
 
             // Reload rule inputs
-            couponManager.loadRuleInputs = function(ruleId, callBack) {
+            $.couponManager.loadRuleInputs = function(ruleId, callBack) {
                 $('#constraint-add-operators-values').html('<div class="loading" ></div>');
                 var url = "{$urlAjaxGetRuleInput}";
                 url = url.replace('ruleId', ruleId)
@@ -113,7 +113,7 @@
                     }
                 }).done(function(data) {
                     $('#constraint-add-operators-values').html(data);
-                    couponManager.ruleToSave.serviceId = ruleId;
+                    $.couponManager.ruleToSave.serviceId = ruleId;
                     if (ruleId == -1) {
                         // Placeholder can't be saved
                         $('#constraint-save-btn').hide();
@@ -125,7 +125,7 @@
             };
 
             // Rules which will be saved
-            couponManager.rulesToSave = couponManager.initRules();
+            $.couponManager.rulesToSave = $.couponManager.initRules();
 
             $('#constraint-save-btn').hide();
 

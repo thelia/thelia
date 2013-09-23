@@ -78,13 +78,13 @@ class CouponController extends BaseAdminController
 
         $args['urlReadCoupon'] = $this->getRoute(
             'admin.coupon.read',
-            array('couponId' => 'couponId'),
+            array('couponId' => 0),
             Router::ABSOLUTE_URL
         );
 
         $args['urlEditCoupon'] = $this->getRoute(
             'admin.coupon.update',
-            array('couponId' => 'couponId'),
+            array('couponId' => 0),
             Router::ABSOLUTE_URL
         );
 
@@ -164,7 +164,7 @@ class CouponController extends BaseAdminController
 
         $args['dateFormat'] = $this->getSession()->getLang()->getDateFormat();
         $args['availableCoupons'] = $this->getAvailableCoupons();
-        $args['formAction'] = 'admin/coupon/create/';
+        $args['formAction'] = 'admin/coupon/create';
 
         return $this->render(
             'coupon-create',
@@ -223,7 +223,7 @@ class CouponController extends BaseAdminController
                 'code' => $coupon->getCode(),
                 'title' => $coupon->getTitle(),
                 'amount' => $coupon->getAmount(),
-                'effect' => $coupon->getType(),
+                'type' => $coupon->getType(),
                 'shortDescription' => $coupon->getShortDescription(),
                 'description' => $coupon->getDescription(),
                 'isEnabled' => ($coupon->getIsEnabled() == 1),
@@ -271,7 +271,7 @@ class CouponController extends BaseAdminController
             Router::ABSOLUTE_URL
         );
 
-        $args['formAction'] = 'admin/coupon/update/' . $couponId;
+        $args['formAction'] = 'admin/coupon/update' . $couponId;
 
         return $this->render('coupon-update', $args);
     }
@@ -347,20 +347,7 @@ class CouponController extends BaseAdminController
         );
 
         $couponEvent = new CouponCreateOrUpdateEvent(
-            $coupon->getCode(),
-            $coupon->getTitle(),
-            $coupon->getAmount(),
-            $coupon->getType(),
-            $coupon->getShortDescription(),
-            $coupon->getDescription(),
-            $coupon->getIsEnabled(),
-            $coupon->getExpirationDate(),
-            $coupon->getIsAvailableOnSpecialOffers(),
-            $coupon->getIsCumulative(),
-            $coupon->getIsRemovingPostage(),
-            $coupon->getMaxUsage(),
-            $rules,
-            $coupon->getLocale()
+            $coupon->getCode(), $coupon->getTitle(), $coupon->getAmount(), $coupon->getType(), $coupon->getShortDescription(), $coupon->getDescription(), $coupon->getIsEnabled(), $coupon->getExpirationDate(), $coupon->getIsAvailableOnSpecialOffers(), $coupon->getIsCumulative(), $coupon->getIsRemovingPostage(), $coupon->getMaxUsage(), $coupon->getLocale()
         );
         $couponEvent->setCoupon($coupon);
 
@@ -497,20 +484,7 @@ class CouponController extends BaseAdminController
             $data = $form->getData();
 
             $couponEvent = new CouponCreateOrUpdateEvent(
-                $data['code'],
-                $data['title'],
-                $data['amount'],
-                $data['type'],
-                $data['shortDescription'],
-                $data['description'],
-                $data['isEnabled'],
-                \DateTime::createFromFormat('Y-m-d', $data['expirationDate']),
-                $data['isAvailableOnSpecialOffers'],
-                $data['isCumulative'],
-                $data['isRemovingPostage'],
-                $data['maxUsage'],
-                new CouponRuleCollection(array()),
-                $data['locale']
+                $data['code'], $data['title'], $data['amount'], $data['type'], $data['shortDescription'], $data['description'], $data['isEnabled'], \DateTime::createFromFormat('Y-m-d', $data['expirationDate']), $data['isAvailableOnSpecialOffers'], $data['isCumulative'], $data['isRemovingPostage'], $data['maxUsage'], $data['locale']
             );
 
             // Dispatch Event to the Action
@@ -538,7 +512,6 @@ class CouponController extends BaseAdminController
         } catch (FormValidationException $e) {
             // Invalid data entered
             $message = 'Please check your input:';
-            $this->logError($action, $message, $e);
 
         } catch (\Exception $e) {
             // Any other error

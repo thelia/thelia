@@ -147,7 +147,7 @@
 
                             {loop name="menu-auth-coupon" type="auth" roles="ADMIN" permissions="admin.coupon.view"}
                             <li class="{if $admin_current_location == 'coupon'}active{/if}" id="coupon_menu">
-                                <a href="{url path='/admin/coupon/'}">{intl l="Coupons"}</a>
+                                <a href="{url path='/admin/coupon'}">{intl l="Coupons"}</a>
                             </li>
                             {/loop}
 

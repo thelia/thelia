@@ -11,7 +11,7 @@
             {/form_field}
 
             {form_field form=$form field='success_url'}
-                <input type="hidden" name="{$name}" value="{url path='/admin/coupon/update/{id}/'}" />
+                <input type="hidden" name="{$name}" value="{url path='/admin/coupon/update/{id}'}" />
             {/form_field}
 
             <div class="span4">
@@ -104,10 +104,10 @@
                         {form_field form=$form field='type'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="type" class="control-label">{intl l='Type :'}</label>
-                                <select name="{$name}" value="{$value}" id="type" class="col-md-12 form-control">
-                                    <option value="-1" data-description="">{intl l='Please select an type'}</option>
+                                <select name="{$name}" id="type" class="col-md-12 form-control">
+                                    <option value="-1" data-description="">{intl l='Please select a coupon type'}</option>
                                     {foreach from=$availableCoupons item=availableCoupon}
-                                        <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" {if $value == $availableCoupon.serviceId}selected="selected"{/if}>
+                                        <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" {if $value == $availableCoupon.serviceId}selected{/if}>
                                             {$availableCoupon.name}
                                         </option>
                                     {/foreach}
@@ -285,4 +285,3 @@
         </section>
     {/if}
 </form>
-
