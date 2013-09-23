@@ -229,6 +229,17 @@ $(function() {
 
     	event.preventDefault();
     });
+
+    // Set proper category ID in combination delete from
+    $('a.combination-delete').click(function(ev) {
+        $('#combination_delete_id').val($(this).data('id'));
+    });
+
+    // In create combination dialog, select all element of conbination list
+    $('#combination_creation_dialog_ok').click(function() {
+    	$('#combination_attributes option').prop('selected', 'selected');
+    });
+
 });
 </script>
 
