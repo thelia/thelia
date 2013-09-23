@@ -1,10 +1,10 @@
 <div class="toolbar toolbar-{$toolbar}" role="toolbar">
     {if $toolbar == "top" }
     <div class="sorter-container">
-        <span class="amount">9 Item(s)</span>
+        {*<span class="amount">9 {intl l="Item(s)"}</span>*}
 
             <span class="limiter">
-                <label for="limit-top">Show</label>
+                <label for="limit-top">{intl l="Show"}</label>
                 <select id="limit-top" name="limit">
                     <option value="{url path="{category attr="url"}" limit="4"}" {if $limit==4}selected{/if}>4</option>
                     <option value="{url path="{category attr="url"}" limit="8"}" {if $limit==8}selected{/if}>8</option>
@@ -12,7 +12,7 @@
                     <option value="{url path="{category attr="url"}" limit="50"}"{if $limit==50}selected{/if}>50</option>
                     <option value="{url path="{category attr="url"}" limit="9999999999"}" {if $limit==9999999999}selected{/if}>All</option>
                 </select>
-                <span class="per-page"> per page</span>
+                <span class="per-page">{intl l="per page"}</span>
             </span><!-- /.limiter -->
 
             <span class="sort-by">

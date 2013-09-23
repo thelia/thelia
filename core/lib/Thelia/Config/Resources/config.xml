@@ -21,6 +21,7 @@
         <loop class="Thelia\Core\Template\Loop\FeatureAvailability" name="feature-availability"/>
         <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature_value"/>
         <loop class="Thelia\Core\Template\Loop\Folder" name="folder"/>
+        <loop class="Thelia\Core\Template\Loop\Module" name="module"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
         <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
@@ -57,6 +58,7 @@
 
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
         <form name="thelia.admin.category.modification" class="Thelia\Form\CategoryModificationForm"/>
+        <form name="thelia.admin.category.image.modification" class="Thelia\Form\CategoryImageModification"/>
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
         <form name="thelia.admin.product.modification" class="Thelia\Form\ProductModificationForm"/>
@@ -237,6 +239,11 @@
         <service id="smarty.plugin.adminUtilities" class="Thelia\Core\Template\Smarty\Plugins\AdminUtilities" scope="request">
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="thelia.securityContext" />
+        </service>
+
+        <service id="smarty.plugin.flashMessage" class="Thelia\Core\Template\Smarty\Plugins\FlashMessage" scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="request" />
         </service>
 
 

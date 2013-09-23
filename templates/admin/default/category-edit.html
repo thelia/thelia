@@ -256,7 +256,8 @@
 		                    </div>
 
 		                    <div class="tab-pane fade {if $current_tab == 'images'}active in{/if}" id="images">
-		                    </div>
+                                {include file='includes/image-upload-form.html' imageType='category' parentId=$category_id}
+                            </div>
 
 		                    <div class="tab-pane fade {if $current_tab == 'documents'}active in{/if}" id="documents">
 		                    </div>
@@ -296,6 +297,14 @@
 {/block}
 
 {block name="javascript-initialization"}
+    {javascripts file='assets/js/dropzone.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/image-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+
 
 <script src="{url file='/tinymce/tinymce.min.js'}"></script>
 <script>
@@ -315,11 +324,9 @@
 		filemanager_title:"{intl l='Files manager'}" ,
 		external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
 	 });
-</script>
-
-<script>
 
 $(function() {
+    $.imageUploadManager.initImageDropZone();
 
     $('.use_default_rewriten_url').click(function(ev) {
     	alert("Not functionnal");

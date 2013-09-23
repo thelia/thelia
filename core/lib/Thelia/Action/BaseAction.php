@@ -23,6 +23,7 @@
 namespace Thelia\Action;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Model\AdminLog;
 use Propel\Runtime\ActiveQuery\PropelQuery;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Event\UpdatePositionEvent;
@@ -71,5 +72,19 @@ class BaseAction
             else if ($mode == UpdatePositionEvent::POSITION_DOWN)
                 return $object->movePositionDown();
         }
+    }
+
+    /**
+     * Helper to append a message to the admin log.
+     *
+     * @param string $message
+     */
+    public function adminLogAppend($message)
+    {
+        AdminLog::append(
+            $message,
+            $this->container->get('request'),
+            $this->container->get('thelia.securityContext')->getAdminUser()
+        );
     }
 }

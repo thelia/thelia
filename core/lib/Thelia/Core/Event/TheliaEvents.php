@@ -165,6 +165,46 @@ final class TheliaEvents
     const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
     const AFTER_UPDATECATEGORY 	= "action.after_updateCategory";
 
+    // -- folder management -----------------------------------------------
+
+    const FOLDER_CREATE            = "action.createFolder";
+    const FOLDER_UPDATE            = "action.updateFolder";
+    const FOLDER_DELETE            = "action.deleteFolder";
+    const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
+    const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
+
+//    const FOLDER_ADD_CONTENT      = "action.categoryAddContent";
+//    const FOLDER_REMOVE_CONTENT   = "action.categoryRemoveContent";
+
+    const BEFORE_CREATEFOLDER = "action.before_createFolder";
+    const AFTER_CREATEFOLDER 	= "action.after_createFolder";
+
+    const BEFORE_DELETEFOLDER = "action.before_deleteFolder";
+    const AFTER_DELETEFOLDER 	= "action.after_deleteFolder";
+
+    const BEFORE_UPDATEFOLDER = "action.before_updateFolder";
+    const AFTER_UPDATEFOLDER 	= "action.after_updateFolder";
+
+    // -- content management -----------------------------------------------
+
+    const CONTENT_CREATE            = "action.createContent";
+    const CONTENT_UPDATE            = "action.updateContent";
+    const CONTENT_DELETE            = "action.deleteContent";
+    const CONTENT_TOGGLE_VISIBILITY = "action.toggleContentVisibility";
+    const CONTENT_UPDATE_POSITION   = "action.updateContentPosition";
+
+//    const FOLDER_ADD_CONTENT      = "action.categoryAddContent";
+//    const FOLDER_REMOVE_CONTENT   = "action.categoryRemoveContent";
+
+    const BEFORE_CREATECONTENT = "action.before_createContent";
+    const AFTER_CREATECONTENT	= "action.after_createContent";
+
+    const BEFORE_DELETECONTENT = "action.before_deleteContent";
+    const AFTER_DELETECONTENT 	= "action.after_deleteContent";
+
+    const BEFORE_UPDATECONTENT = "action.before_updateContent";
+    const AFTER_UPDATECONTENT 	= "action.after_updateContent";
+
     // -- Categories Associated Content ----------------------------------------
 
     const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT   = "action.before_createCategoryAssociatedContent";
@@ -188,7 +228,10 @@ final class TheliaEvents
     const PRODUCT_REMOVE_CONTENT          = "action.productRemoveContent";
     const PRODUCT_UPDATE_CONTENT_POSITION = "action.updateProductContentPosition";
 
-    const PRODUCT_SET_TEMPLATE     = "action.productSetTemplate";
+    const PRODUCT_ADD_COMBINATION    = "action.productAddCombination";
+    const PRODUCT_DELETE_COMBINATION = "action.productDeleteCombination";
+
+    const PRODUCT_SET_TEMPLATE = "action.productSetTemplate";
 
     const PRODUCT_ADD_ACCESSORY             = "action.productAddProductAccessory";
     const PRODUCT_REMOVE_ACCESSORY          = "action.productRemoveProductAccessory";
@@ -277,7 +320,12 @@ final class TheliaEvents
     const ORDER_SET_INVOICE_ADDRESS = "action.order.setInvoiceAddress";
     const ORDER_SET_PAYMENT_MODULE = "action.order.setPaymentModule";
     const ORDER_PAY = "action.order.pay";
-    const ORDER_SET_REFERENCE = "action.order.setReference";
+    const ORDER_BEFORE_CREATE = "action.order.beforeCreate";
+    const ORDER_AFTER_CREATE = "action.order.afterCreate";
+    const ORDER_BEFORE_PAYMENT = "action.order.beforePayment";
+
+    const ORDER_PRODUCT_BEFORE_CREATE = "action.orderProduct.beforeCreate";
+    const ORDER_PRODUCT_AFTER_CREATE = "action.orderProduct.afterCreate";
 
     /**
      * Sent on image processing
@@ -293,6 +341,21 @@ final class TheliaEvents
      * Sent on image cache clear request
      */
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
+
+    /**
+     * Save given images
+     */
+    const IMAGE_SAVE = "action.saveImages";
+
+    /**
+     * Save given images
+     */
+    const IMAGE_UPDATE = "action.updateImages";
+
+    /**
+     * Delete given image
+     */
+    const IMAGE_DELETE = "action.deleteImage";
 
     /**
      * Sent when creating a Coupon

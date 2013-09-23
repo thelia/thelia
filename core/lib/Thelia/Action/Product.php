@@ -61,6 +61,11 @@ use Thelia\Model\ProductSaleElementsQuery;
 use Propel\Runtime\ActiveQuery\PropelQuery;
 use Thelia\Core\Event\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\ProductAddCategoryEvent;
+use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\AttributeCombination;
+use Thelia\Core\Event\ProductCreateCombinationEvent;
+use Propel\Runtime\Propel;
+use Thelia\Model\Map\ProductTableMap;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
@@ -331,7 +336,6 @@ class Product extends BaseAction implements EventSubscriberInterface
 
                 ->setProductId($event->getProductId())
                 ->setFeatureId($event->getFeatureId())
-
             ;
         }
 
@@ -356,6 +360,58 @@ class Product extends BaseAction implements EventSubscriberInterface
         ;
     }
 
+    public function createProductCombination(ProductCreateCombinationEvent $event) {
+
+        $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
+
+        $con->beginTransaction();
+
+        try {
+
+            if ($event->getUseDefaultPricing()) {
+                // Get the default pricing
+                $salesElement = ProductSaleElementsQuery::create()->filterByIsDefault(true)->findOne();
+            }
+            else {
+                // We have to create a new ProductSaleElement
+                echo "no default !!!!";
+                exit;
+            }
+
+            if (null == $salesElement)
+                throw new \LogicException("Cannot create or get the product sales element for this new combination.");
+
+            $combinationAttributes = $event->getAttributeAvList();
+
+            if (count($combinationAttributes) > 0) {
+
+                foreach($combinationAttributes as $attributeAvId) {
+
+                    $attributeAv = AttributeAvQuery::create()->findPk($attributeAvId);
+
+                    if ($attributeAv !== null) {
+                        $attributeCombination = new AttributeCombination();
+
+                        $attributeCombination
+                            ->setAttributeAvId($attributeAvId)
+                            ->setAttribute($attributeAv->getAttribute())
+                            ->setProductSaleElements($salesElement)
+                            ->save();
+                    }
+                }
+            }
+
+            // Store all the stuff !
+            $con->commit();
+        }
+        catch(\Exception $ex) {
+
+            $con->rollback();
+
+            throw $ex;
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -373,6 +429,9 @@ class Product extends BaseAction implements EventSubscriberInterface
             TheliaEvents::PRODUCT_REMOVE_CONTENT            => array("removeContent", 128),
             TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION => array("updateAccessoryPosition", 128),
             TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION   => array("updateContentPosition", 128),
+
+            TheliaEvents::PRODUCT_ADD_COMBINATION    => array("createProductCombination", 128),
+            TheliaEvents::PRODUCT_DELETE_COMBINATION => array("deleteProductCombination", 128),
 
             TheliaEvents::PRODUCT_ADD_ACCESSORY     => array("addAccessory", 128),
             TheliaEvents::PRODUCT_REMOVE_ACCESSORY  => array("removeAccessory", 128),

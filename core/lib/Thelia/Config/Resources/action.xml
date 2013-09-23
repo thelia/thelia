@@ -97,6 +97,16 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.folder" class="Thelia\Action\Folder">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.content" class="Thelia\Action\Content">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 
 </config>

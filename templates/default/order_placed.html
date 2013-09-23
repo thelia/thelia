@@ -24,25 +24,29 @@
                 <a href="cart-step4.php" role="button" class="btn btn-step active"><span class="step-nb">4</span> <span class="step-label">Secure payment</span></a>
             </div>
 
+            {loop type="order" name="placed-order" id=$placed_order_id}
+
             <div id="payment-success" class="panel">
                 <div class="panel-heading">
-                    <h3 class="panel-title">You chose to pay by : <span class="payment-method">Cheque</span></h3>
+                    <h3 class="panel-title">You chose to pay by : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
                 </div>
                 <div class="panel-body">
                     <h3>Thank you for the trust you place in us.</h3>
-                    <p>A summary of your order email has been sent to the following address: email@toto.com</p>
+                    <p>A summary of your order email has been sent to the following address: {customer attr="email"}</p>
                     <p>Your order will be confirmed by us upon receipt of your payment.</p>
 
                     <dl class="dl-horizontal">
                         <dt>Order number : </dt>
-                        <dd>PRO123456788978979</dd>
+                        <dd>{$REF}</dd>
                         <dt>Date : </dt>
-                        <dd>02/12/2013</dd>
+                        <dd>{format_date date=$CREATE_DATE output="date"}</dd>
                         <dt>Total : </dt>
-                        <dd>$216.25</dd>
+                        <dd>{loop type="currency" name="order-currency" id=$CURRENCY}{$SYMBOL}{/loop} {$TOTAL_TAXED_AMOUNT}</dd>
                     </dl>
                 </div>
             </div>
+
+            {/loop}
 
             <a href="{navigate to="index"}" role="button" class="btn btn-checkout-home"><span>Go home</span></a>
 

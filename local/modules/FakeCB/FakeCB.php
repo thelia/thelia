@@ -71,6 +71,15 @@ class FakeCB extends BaseModule implements PaymentModuleInterface
         if(ModuleImageQuery::create()->filterByModule($module)->count() == 0) {
             $this->deployImageFolder($module, sprintf('%s/images', __DIR__));
         }
+
+        /* set module title */
+        $this->setTitle(
+            $module,
+            array(
+                "en_US" => "Credit Card",
+                "fr_FR" => "Carte de crédit",
+            )
+        );
     }
 
     public function destroy()

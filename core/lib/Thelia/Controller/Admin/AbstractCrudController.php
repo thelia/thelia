@@ -527,9 +527,6 @@ abstract class AbstractCrudController extends BaseAdminController
 
         $changeEvent = $this->createToggleVisibilityEvent($this->getRequest());
 
-        // Create and dispatch the change event
-        $changeEvent->setIsDefault(true);
-
         try {
             $this->dispatch($this->visibilityToggleEventIdentifier, $changeEvent);
         } catch (\Exception $ex) {
@@ -537,7 +534,7 @@ abstract class AbstractCrudController extends BaseAdminController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->nullResponse();
     }
 
     /**

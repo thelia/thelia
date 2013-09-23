@@ -37,6 +37,10 @@
             {/form_field}
         {/loop}
 
+        <p class="title title-without-tabs">{intl l='Default pricing'}</p>
+
+        <p>{intl l="The default pricing is used with product that do not have any combinations. It is also used for product with combinations which share the same pricing information"}</p>
+
 	    <div class="row">
 
 	        {* -- Pricing ------------------------------------------------------- *}
@@ -173,81 +177,193 @@
 
     {* -- Attribute combinations -------------------------------------------- *}
 
-    <div class="row">
-        <div class="col-md-12">
+    {module_include location='product_before_combinations'}
 
-            <p class="title title-without-tabs">{intl l='Attribute Combinations'}</p>
+	<div class="row">
+	    <div class="col-md-12">
+            <div class="well well-sm">
 
-            {module_include location='product_before_combinations'}
+				<table class="table table-striped table-condensed" id="category_list">
+				    <caption>
+				        {intl l='Attribute Combinations'}
 
-            {ifloop rel="product-attributes"}
-            <form method="POST" action="{url path='/admin/products/combinations/save'}" {form_enctype form=$form} class="clearfix">
-                <div class="well well-sm">
-                   <p class="title title-without-tabs">{intl l='Create a new combination'}</p>
+				        {module_include location='product_combinations_list_caption'}
 
-				   <div class="form-group">
-				       <label class="control-label">{intl l="Attribute"} : </label>
-				       <select required="required" name="attribute_id" id="attribute_id" class="form-control">
-					       <option value="">{intl l='Select an attribute...'}</option>
-					       {loop name="product-attributes" type="attribute" product=$product_id backend_context="1" lang=$edit_language_id}
-					           <option value="{$ID}">{$TITLE}</option>
-					       {/loop}
-					   </select>
-					   <span class="help-block">{intl l='Select an attribute and click (+) to view available values'}</span>
-					</div>
+				        {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.products.update"}
+				        <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new combination'}" href="#combination_creation_dialog" data-toggle="modal">
+				            <span class="glyphicon glyphicon-plus-sign"></span>
+				        </a>
+				        {/loop}
+				    </caption>
 
+				    <thead>
+				        <tr>
+				            <th>{intl l='Attributes'}</th>
+							<th class="text-center">{intl l='Quantity'}</th>
+							<th class="text-center">{intl l='Price<br />w/o taxes (%currency)' currency=$currency_symbol}</th>
+							<th class="text-center">{intl l='Price<br />w/ taxes (%currency)' currency=$currency_symbol}</th>
+							<th class="text-center">{intl l='Weight (Kg)'}</th>
+							<th class="text-center">{intl l='Is new'}</th>
+							<th class="text-center">{intl l='On sale'}</th>
+							<th class="text-center">{intl l='Sale price<br />w/o taxes (%currency)' currency=$currency_symbol}</th>
+							<th class="text-center">{intl l='Sale price<br />w/ taxes (%currency)' currency=$currency_symbol}</th>
+							<th class="actions">{intl l='Actions'}</th>
+				        </tr>
+				    </thead>
 
-					<div id="attribute_value_selector" class="hide">
-					    <div class="input-group">
-					        {* <label class="control-label">{intl l="Attribute values"} : </label> *}
+				    <tbody>
+                        {loop name="product.sales.elements" type="product_sale_elements" product=$product_id currency=$edit_currency_id}
+				        <tr>
+							<td>
+							{loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$ID}
+							    {$ATTRIBUTE_TITLE}&nbsp;
+							{/loop}
+							</td>
 
-					        <select required="required" name="attribute_value_id" id="attribute_value_id" class="form-control">
-					            <option value="">{intl l='Select an attribute value...'}</option>
-					        </select>
+							<td><input class="form-control text-right" type="text" name="quantity[{$ID}]" value="{format_number number=$QUANTITY}" /></td>
+							<td><input class="form-control text-right" type="text" name="price_wo_taxes[{$ID}]" value="{format_number number=$PRICE_TAX}" /></td>
+							<td><input class="form-control text-right" type="text" name="price_w_taxes[{$ID}]" value="{format_number number=$TAXED_PRICE}" /></td>
+							<td><input class="form-control text-right" type="text" name="weight[{$ID}]" value="{format_number number=$WEIGHT}" /></td>
 
-					        <span class="input-group-btn" id="add_attr_value_button">
-					           <button class="btn btn-default btn-primary action-btn add-value-to-combination" type="button"><span class="glyphicon glyphicon-plus-sign"></span></button>
-					        </span>
-					    </div>
+							<td>
+							    <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+							        <input class="change-default" type="radio" name="on_sale[{$ID}]" value="{$ID}" {if $IS_PROMO}checked="checked"{/if}/>
+							    </div>
+							</td>
 
-					    <span class="help-block">{intl l='Select a value click (+) to add it to the combination'}</span>
-					</div>
+							<td>
+							 <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+							     <input class="change-default" type="radio" name="is_new[{$ID}]" value="{$ID}" {if $IS_NEW}checked="checked"{/if}/>
+							 </div>
+							</td>
 
-                    <div id="attribute_value_selector_empty" class="hide">
-                        <div class="alert alert-info">
-                           {intl l="No available value for this attribute"}
-                       </div>
-                    </div>
+							<td><input class="form-control text-right" type="text" name="sale_price_wo_taxes[{$ID}]" value="{format_number number=$PROMO_PRICE_TAX}" /></td>
+							<td><input class="form-control text-right" type="text" name="sale_price_w_taxes[{$ID}]" value="{format_number number=$TAXED_PROMO_PRICE}" /></td>
 
-                    <div class="form-group">
-                        <div class="alert alert-danger hide" id="combination_attributes_error"></div>
+							<td class="actions">
+							    <a class="btn btn-default btn-xs combination-delete" title="{intl l='Delete this combination'}"  href="#combination_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+							</td>
+				        </tr>
+                        {/loop}
+				    </tbody>
+				</table>
+			</div>
+		 </div>
+	</div>
 
-                        <select multiple="multiple" size="5" name="combination_attributes" id="combination_attributes" class="form-control">
-                        </select>
-
-                        <div class="help-block">
-                            {intl l='To remove a value from the combination, select it and click "remove"'}
-
-		                    <div class="pull-right">
-		                        <button class="btn btn-info btn-xs remove-value-from-combination" type="button">
-		                            {intl l="Remove selected value"} <span class="glyphicon glyphicon-minus-sign"></span>
-		                        </button>
-		                    </div>
-                        </div>
-                    </div>
-
-                </div>
-	        </form>
-            {/ifloop}
-
-                {elseloop rel="product-attributes"}
-		            <div class="alert alert-info">
-		                {intl l="No attributes are attached to this product."}
-		            </div>
-                {/elseloop}
-
- 	            {module_include location='product_after_combinations'}
-
-	    </div> {* com *}
-	</div> {* row *}
+	{module_include location='product_after_combinations'}
 </div>
+
+{* -- Adding a new combination ------------------------------------------------- *}
+
+{* Capture the dialog body, to pass it to the generic dialog *}
+
+{capture "combination_creation_dialog"}
+
+    <input type="hidden" name="product_id" value="{$product_id}" />
+    <input type="hidden" name="current_tab" value="details" />
+
+	<div class="form-group">
+	   <label class="control-label">{intl l="Attribute"} : </label>
+	   <select  name="attribute_id" id="attribute_id" class="form-control">
+	       <option value="">{intl l='Select an attribute...'}</option>
+	       {loop name="product-attributes" type="attribute" product=$product_id backend_context="1" lang=$edit_language_id}
+	           <option value="{$ID}">{$TITLE}</option>
+	       {/loop}
+	   </select>
+	   <span class="help-block">{intl l='Select an attribute and click (+) to view available values'}</span>
+	</div>
+
+
+	<div id="attribute_value_selector" class="hide">
+	    <div class="input-group">
+	        {* <label class="control-label">{intl l="Attribute values"} : </label> *}
+
+	        <select rname="attribute_value_id" id="attribute_value_id" class="form-control">
+	            <option value="">{intl l='Select an attribute value...'}</option>
+	        </select>
+
+	        <span class="input-group-btn" id="add_attr_value_button">
+	           <button class="btn btn-default btn-primary action-btn add-value-to-combination" type="button"><span class="glyphicon glyphicon-plus-sign"></span></button>
+	        </span>
+	    </div>
+
+	    <span class="help-block">{intl l='Select a value click (+) to add it to the combination'}</span>
+	</div>
+
+	<div id="attribute_value_selector_empty" class="hide">
+	    <div class="alert alert-info">
+	       {intl l="No available value for this attribute"}
+	   </div>
+	</div>
+
+	<div class="form-group">
+	    <div class="alert alert-danger hide" id="combination_attributes_error"></div>
+
+	    <select required="required" multiple="multiple" size="5" name="combination_attributes[]" id="combination_attributes" class="form-control">
+	    </select>
+
+	    <div class="help-block">
+	        {intl l='To remove a value from the combination, select it and click "remove"'}
+
+	        <div class="pull-right">
+	            <button class="btn btn-info btn-xs remove-value-from-combination" type="button">
+	                {intl l="Remove selected values"} <span class="glyphicon glyphicon-minus-sign"></span>
+	            </button>
+	        </div>
+	    </div>
+	</div>
+
+    {form_field form=$form field='isnew'}
+    <div class="form-group {if $error}has-error{/if}">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" id="use_default_princing" name="use_default_princing" value="1">
+                {intl l="Use default princing for this combination (you can change this later)"}
+            </label>
+        </div>
+    </div>
+    {/form_field}
+
+{/capture}
+
+{include
+    file = "includes/generic-create-dialog.html"
+
+    dialog_id    = "combination_creation_dialog"
+    dialog_title = {intl l="Create a new combination"}
+    dialog_body  = {$smarty.capture.combination_creation_dialog nofilter}
+
+    dialog_ok_label     = {intl l="Create this combination"}
+
+    form_action        = {url path='/admin/product/combination/add'}
+    form_enctype       = ''
+    form_error_message = ''
+
+    ok_button_id = "combination_creation_dialog_ok"
+}
+
+
+{* -- Delete combination confirmation dialog ----------------------------------- *}
+
+{capture "combination_delete_dialog"}
+
+    <input type="hidden" name="product_id" value="{$product_id}" />
+    <input type="hidden" name="current_tab" value="details" />
+
+    <input type="hidden" name="combination_id" id="combination_delete_id" value="" />
+
+    {module_include location='category_delete_form'}
+
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "combination_delete_dialog"
+    dialog_title    = {intl l="Delete a combunation"}
+    dialog_message  = {intl l="Do you really want to delete this combination ?"}
+
+    form_action         = {url path='/admin/product/combination/delete'}
+    form_content        = {$smarty.capture.combination_delete_dialog nofilter}
+}
