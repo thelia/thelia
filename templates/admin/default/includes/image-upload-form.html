@@ -20,17 +20,6 @@ Parameters:
 
 </div>
 
-{*{block name="javascript-initialization"}*}
-    {*{$smarty.block.parent}*}
-
-    {*{javascripts file='assets/js/image-upload.js'}*}
-        {*<script src="{$asset_url}"></script>*}
-    {*{/javascripts}*}
-    {*{javascripts file='assets/js/dropzone.js'}*}
-        {*<script src="{$asset_url}"></script>*}
-    {*{/javascripts}*}
-{*{/block}*}
-
 <script>
     var imageDropZoneUrl = "{url path="/admin/image/type/$imageType/$parentId/save-ajax"}";
     var imageListUrl = "{url path="/admin/image/type/$imageType/$parentId/list-ajax"}";

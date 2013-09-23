@@ -381,6 +381,7 @@
 		                    </div>
 
 		                    <div class="tab-pane fade {if $current_tab == 'images'}active in{/if}" id="images">
+                                {include file='includes/image-upload-form.html' imageType='product' parentId=$product_id}
 		                    </div>
 
 		                    <div class="tab-pane fade {if $current_tab == 'documents'}active in{/if}" id="documents">
@@ -442,158 +443,164 @@
 {/block}
 
 {block name="javascript-initialization"}
+    {javascripts file='assets/js/dropzone.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/image-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
-{javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
-<script src="{url file='/tinymce/tinymce.min.js'}"></script>
-<script>
-	tinymce.init({
-		selector: ".wysiwyg",
-		theme: "modern",
-		menubar : false,
-		language: "",
-		plugins: [
-		     "advlist autolink link image lists charmap print preview hr anchor pagebreak",
-		     "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
-		     "table contextmenu directionality emoticons paste textcolor filemanager"
-		],
-		toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | styleselect | filemanager | link unlink anchor | image media | forecolor backcolor  | print preview code ",
-		image_advtab: true ,
-		external_filemanager_path:"{url file='/tinymce/plugins/filemanager/'}'",
-		filemanager_title:"{intl l='Files manager'}" ,
-		external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
-	 });
-</script>
+    <script src="{url file='/tinymce/tinymce.min.js'}"></script>
+    <script>
+        tinymce.init({
+            selector: ".wysiwyg",
+            theme: "modern",
+            menubar : false,
+            language: "",
+            plugins: [
+                 "advlist autolink link image lists charmap print preview hr anchor pagebreak",
+                 "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
+                 "table contextmenu directionality emoticons paste textcolor filemanager"
+            ],
+            toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | styleselect | filemanager | link unlink anchor | image media | forecolor backcolor  | print preview code ",
+            image_advtab: true ,
+            external_filemanager_path:"{url file='/tinymce/plugins/filemanager/'}'",
+            filemanager_title:"{intl l='Files manager'}" ,
+            external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
+         });
+    </script>
 
-<script>
-$(function() {
+    <script>
+        $(function() {
 
-    $('.use_default_rewriten_url').click(function(ev) {
-    	alert("Not functionnal");
+            $('.use_default_rewriten_url').click(function(ev) {
+                alert("Not functionnal");
 
-    	ev.preventDefault();
-    });
-
-    // Set proper content ID in delete content from
-    $('a.delete-content').click(function(ev) {
-        $('#content_delete_id').val($(this).data('id'));
-        $('#folder_delete_id').val($('#folder_id').val());
-    });
-
-    // Set proper content ID in accessory delete from
-    $('a.delete-accessory').click(function(ev) {
-        $('#accessory_delete_id').val($(this).data('id'));
-        $('#accessory_category_delete_id').val($('#accessory_category_id').val());
-    });
-
-
-    // Load content on folder selection
-    $('#folder_id').change(function(event) {
-    	var val = $(this).val();
-
-    	if (val != "") {
-	        $.ajax({
-	             url      : '{url path="/admin/product/$product_id/available-related-content/"}' + $(this).val() + '.xml',
-	             type     : 'get',
-	             dataType : 'json',
-	             success  : function(json) {
-	                 $('#content_id :not(:first-child)').remove();
-
-	                 var have_content = false;
-
-	                 $.each(json, function(idx, value) {
-	                     $('#content_id').append($('<option>').text(value.title).attr('value', value.id));
-
-	                     have_content = true; // Lame...
-	                 });
-
-                     if (have_content) {
-                         $('#content_selector_empty').addClass('hide');
-                         $('#content_selector').removeClass('hide');
-                     }
-                     else {
-                         $('#content_selector_empty').removeClass('hide');
-                         $('#content_selector').addClass('hide');
-                     }
-
-                 }
+                ev.preventDefault();
             });
-        }
-        else {
-            $('#content_selector_empty').addClass('hide');
-            $('#content_selector').addClass('hide');
-        }
-    });
 
-    // Load content on folder selection
-    $('#accessory_category_id').change(function(event) {
-        var val = $(this).val();
-
-        if (val != "") {
-            $.ajax({
-                 url      : '{url path="/admin/product/$product_id/available-accessories/"}' + $(this).val() + '.xml',
-                 type     : 'get',
-                 dataType : 'json',
-                 success  : function(json) {
-                     $('#accessory_id :not(:first-child)').remove();
-
-                     var have_content = false;
-
-                     $.each(json, function(idx, value) {
-                         $('#accessory_id').append($('<option>').text(value.title).attr('value', value.id));
-
-                         have_content = true; // Lame...
-                     });
-
-                     if (have_content) {
-                         $('#accessory_selector_empty').addClass('hide');
-                         $('#accessory_selector').removeClass('hide');
-                     }
-                     else {
-                         $('#accessory_selector_empty').removeClass('hide');
-                         $('#accessory_selector').addClass('hide');
-                     }
-
-                 }
+            // Set proper content ID in delete content from
+            $('a.delete-content').click(function(ev) {
+                $('#content_delete_id').val($(this).data('id'));
+                $('#folder_delete_id').val($('#folder_id').val());
             });
-        }
-        else {
-            $('#accessory_selector_empty').addClass('hide');
-            $('#accessory_selector').addClass('hide');
-        }
-    });
 
-    {* Inline editing of accessory position using bootstrap-editable *}
+            // Set proper content ID in accessory delete from
+            $('a.delete-accessory').click(function(ev) {
+                $('#accessory_delete_id').val($(this).data('id'));
+                $('#accessory_category_delete_id').val($('#accessory_category_id').val());
+            });
 
-    $('.accessoryPositionChange').editable({
-        type        : 'text',
-        title       : '{intl l="Enter new accessory position"}',
-        mode        : 'popup',
-        inputclass  : 'input-mini',
-        placement   : 'left',
-        success     : function(response, newValue) {
-            // The URL template
-            var url = "{url path='admin/product/update-accessory-position/' accessory_id='__ID__' product_id=$product_id position='__POS__'}";
 
-            // Perform subtitutions
-            url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);
+            // Load content on folder selection
+            $('#folder_id').change(function(event) {
+                var val = $(this).val();
 
-            // Reload the page
-            location.href = url;
-        }
-    });
+                if (val != "") {
+                    $.ajax({
+                         url      : '{url path="/admin/product/$product_id/available-related-content/"}' + $(this).val() + '.xml',
+                         type     : 'get',
+                         dataType : 'json',
+                         success  : function(json) {
+                             $('#content_id :not(:first-child)').remove();
 
-    // Initialize folder (id={$folder_id}) select value
-    {if $folder_id != 0}
-        $('#folder_id').val("{$folder_id}").change();
-    {/if}
+                             var have_content = false;
 
-    // Initialize folder (id={$folder_id}) select value
-    {if $accessory_category_id != 0}
-        $('#accessory_category_id').val("{$accessory_category_id}").change();
-    {/if}
-});
-</script>
+                             $.each(json, function(idx, value) {
+                                 $('#content_id').append($('<option>').text(value.title).attr('value', value.id));
+
+                                 have_content = true; // Lame...
+                             });
+
+                             if (have_content) {
+                                 $('#content_selector_empty').addClass('hide');
+                                 $('#content_selector').removeClass('hide');
+                             }
+                             else {
+                                 $('#content_selector_empty').removeClass('hide');
+                                 $('#content_selector').addClass('hide');
+                             }
+
+                         }
+                    });
+                }
+                else {
+                    $('#content_selector_empty').addClass('hide');
+                    $('#content_selector').addClass('hide');
+                }
+            });
+
+            // Load content on folder selection
+            $('#accessory_category_id').change(function(event) {
+                var val = $(this).val();
+
+                if (val != "") {
+                    $.ajax({
+                         url      : '{url path="/admin/product/$product_id/available-accessories/"}' + $(this).val() + '.xml',
+                         type     : 'get',
+                         dataType : 'json',
+                         success  : function(json) {
+                             $('#accessory_id :not(:first-child)').remove();
+
+                             var have_content = false;
+
+                             $.each(json, function(idx, value) {
+                                 $('#accessory_id').append($('<option>').text(value.title).attr('value', value.id));
+
+                                 have_content = true; // Lame...
+                             });
+
+                             if (have_content) {
+                                 $('#accessory_selector_empty').addClass('hide');
+                                 $('#accessory_selector').removeClass('hide');
+                             }
+                             else {
+                                 $('#accessory_selector_empty').removeClass('hide');
+                                 $('#accessory_selector').addClass('hide');
+                             }
+
+                         }
+                    });
+                }
+                else {
+                    $('#accessory_selector_empty').addClass('hide');
+                    $('#accessory_selector').addClass('hide');
+                }
+            });
+
+            {* Inline editing of accessory position using bootstrap-editable *}
+
+            $('.accessoryPositionChange').editable({
+                type        : 'text',
+                title       : '{intl l="Enter new accessory position"}',
+                mode        : 'popup',
+                inputclass  : 'input-mini',
+                placement   : 'left',
+                success     : function(response, newValue) {
+                    // The URL template
+                    var url = "{url path='admin/product/update-accessory-position/' accessory_id='__ID__' product_id=$product_id position='__POS__'}";
+
+                    // Perform subtitutions
+                    url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);
+
+                    // Reload the page
+                    location.href = url;
+                }
+            });
+
+            // Initialize folder (id={$folder_id}) select value
+            {if $folder_id != 0}
+                $('#folder_id').val("{$folder_id}").change();
+            {/if}
+
+            // Initialize folder (id={$folder_id}) select value
+            {if $accessory_category_id != 0}
+                $('#accessory_category_id').val("{$accessory_category_id}").change();
+            {/if}
+        });
+    </script>
 {/block}
