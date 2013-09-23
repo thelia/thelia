@@ -77,6 +77,12 @@ abstract class FeatureTemplate implements ActiveRecordInterface
     protected $template_id;
 
     /**
+     * The value for the position field.
+     * @var        int
+     */
+    protected $position;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -394,6 +400,17 @@ abstract class FeatureTemplate implements ActiveRecordInterface
     }
 
     /**
+     * Get the [position] column value.
+     *
+     * @return   int
+     */
+    public function getPosition()
+    {
+
+        return $this->position;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -505,6 +522,27 @@ abstract class FeatureTemplate implements ActiveRecordInterface
     } // setTemplateId()
 
     /**
+     * Set the value of [position] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\FeatureTemplate The current object (for fluent API support)
+     */
+    public function setPosition($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->position !== $v) {
+            $this->position = $v;
+            $this->modifiedColumns[] = FeatureTemplateTableMap::POSITION;
+        }
+
+
+        return $this;
+    } // setPosition()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -592,13 +630,16 @@ abstract class FeatureTemplate implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : FeatureTemplateTableMap::translateFieldName('TemplateId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->template_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FeatureTemplateTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FeatureTemplateTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->position = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : FeatureTemplateTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : FeatureTemplateTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : FeatureTemplateTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -611,7 +652,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = FeatureTemplateTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = FeatureTemplateTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\FeatureTemplate object", 0, $e);
@@ -867,6 +908,9 @@ abstract class FeatureTemplate implements ActiveRecordInterface
         if ($this->isColumnModified(FeatureTemplateTableMap::TEMPLATE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'TEMPLATE_ID';
         }
+        if ($this->isColumnModified(FeatureTemplateTableMap::POSITION)) {
+            $modifiedColumns[':p' . $index++]  = 'POSITION';
+        }
         if ($this->isColumnModified(FeatureTemplateTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -892,6 +936,9 @@ abstract class FeatureTemplate implements ActiveRecordInterface
                         break;
                     case 'TEMPLATE_ID':
                         $stmt->bindValue($identifier, $this->template_id, PDO::PARAM_INT);
+                        break;
+                    case 'POSITION':
+                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -971,9 +1018,12 @@ abstract class FeatureTemplate implements ActiveRecordInterface
                 return $this->getTemplateId();
                 break;
             case 3:
-                return $this->getCreatedAt();
+                return $this->getPosition();
                 break;
             case 4:
+                return $this->getCreatedAt();
+                break;
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1008,8 +1058,9 @@ abstract class FeatureTemplate implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getFeatureId(),
             $keys[2] => $this->getTemplateId(),
-            $keys[3] => $this->getCreatedAt(),
-            $keys[4] => $this->getUpdatedAt(),
+            $keys[3] => $this->getPosition(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1068,9 +1119,12 @@ abstract class FeatureTemplate implements ActiveRecordInterface
                 $this->setTemplateId($value);
                 break;
             case 3:
-                $this->setCreatedAt($value);
+                $this->setPosition($value);
                 break;
             case 4:
+                $this->setCreatedAt($value);
+                break;
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1100,8 +1154,9 @@ abstract class FeatureTemplate implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setFeatureId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setTemplateId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPosition($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -1116,6 +1171,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
         if ($this->isColumnModified(FeatureTemplateTableMap::ID)) $criteria->add(FeatureTemplateTableMap::ID, $this->id);
         if ($this->isColumnModified(FeatureTemplateTableMap::FEATURE_ID)) $criteria->add(FeatureTemplateTableMap::FEATURE_ID, $this->feature_id);
         if ($this->isColumnModified(FeatureTemplateTableMap::TEMPLATE_ID)) $criteria->add(FeatureTemplateTableMap::TEMPLATE_ID, $this->template_id);
+        if ($this->isColumnModified(FeatureTemplateTableMap::POSITION)) $criteria->add(FeatureTemplateTableMap::POSITION, $this->position);
         if ($this->isColumnModified(FeatureTemplateTableMap::CREATED_AT)) $criteria->add(FeatureTemplateTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(FeatureTemplateTableMap::UPDATED_AT)) $criteria->add(FeatureTemplateTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1183,6 +1239,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
     {
         $copyObj->setFeatureId($this->getFeatureId());
         $copyObj->setTemplateId($this->getTemplateId());
+        $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1323,6 +1380,7 @@ abstract class FeatureTemplate implements ActiveRecordInterface
         $this->id = null;
         $this->feature_id = null;
         $this->template_id = null;
+        $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

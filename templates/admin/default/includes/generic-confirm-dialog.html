@@ -29,7 +29,7 @@ Parameters:
                 {$dialog_message nofilter}
             </div>
 
-            <form method="{$form_method|default:POST}" action="{$form_action}" id="{$form_id}">
+            <form method="{$form_method|default:POST}" action="{$form_action}" id="{$form_id|default:"{$dialog_id}_form"}">
 
                 {$form_content nofilter}
 

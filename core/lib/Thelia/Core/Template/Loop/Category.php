@@ -35,6 +35,7 @@ use Thelia\Model\CategoryQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
+use Thelia\Model\ProductQuery;
 
 /**
  *
@@ -73,6 +74,8 @@ class Category extends BaseI18nLoop
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntTypeArgument('parent'),
+            Argument::createIntTypeArgument('product'),
+            Argument::createIntTypeArgument('exclude_product'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
@@ -127,6 +130,22 @@ class Category extends BaseI18nLoop
 
         if ($this->getVisible() != BooleanOrBothType::ANY)
             $search->filterByVisible($this->getVisible() ? 1 : 0);
+
+        $product = $this->getProduct();
+
+        if ($product != null) {
+            $obj = ProductQuery::create()->findPk($product);
+
+            if ($obj != null) $search->filterByProduct($obj, Criteria::IN);
+        }
+
+        $exclude_product = $this->getExclude_product();
+
+        if ($exclude_product != null) {
+            $obj = ProductQuery::create()->findPk($exclude_product);
+
+            if ($obj != null) $search->filterByProduct($obj, Criteria::NOT_IN);
+        }
 
         $orders  = $this->getOrder();
 

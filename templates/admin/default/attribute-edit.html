@@ -303,7 +303,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url path='/admin/configuration/attributes-av/update-position' attributeav_id='__ID__' position='__POS__' attribute_id=$attribute_id}";
+                    var url = "{url noamp='1' path='/admin/configuration/attributes-av/update-position' attributeav_id='__ID__' position='__POS__' attribute_id=$attribute_id}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);

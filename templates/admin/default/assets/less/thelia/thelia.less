@@ -227,6 +227,14 @@
     }
 }
 
+.tab-content {
+    // Center loading indicator
+    .loading {
+        margin: 8em auto;
+        text-align: center;
+    }
+}
+
 // The overall form container
 .form-container {
 
@@ -276,5 +284,8 @@
 .loading{
   background: url("@{imgDir}/ajax-loader.gif") no-repeat;
   height: 30px;
-  width: 30px;
+  display: inline-block;
+  line-height: 30px;
+  padding-left: 40px;
+  width: auto;
 }

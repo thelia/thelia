@@ -136,19 +136,7 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if (null !== $category = CategoryQuery::create()->findPk($event->getObjectId())) {
-
-            $category->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $category->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $category->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $category->movePositionDown();
-        }
+        return $this->genericUpdatePosition(CategoryQuery::create(), $event);
     }
 
     public function addContent(CategoryAddContentEvent $event) {

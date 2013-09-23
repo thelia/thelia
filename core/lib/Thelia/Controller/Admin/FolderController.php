@@ -174,7 +174,7 @@ class FolderController extends AbstractCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param unknown $event
+     * @param \Thelia\Core\Event\FolderEvent $event
      */
     protected function eventContainsObject($event)
     {
@@ -228,14 +228,14 @@ class FolderController extends AbstractCrudController
      */
     protected function renderListTemplate($currentOrder) {
 
-        // Get product order
-        $product_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
+        // Get content order
+        $content_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
 
         return $this->render('folders',
             array(
                 'folder_order' => $currentOrder,
-                'content_order' => $product_order,
-                'folder_id' => $this->getRequest()->get('folder_id', 0)
+                'content_order' => $content_order,
+                'parent' => $this->getRequest()->get('parent', 0)
             ));
     }
 
@@ -267,7 +267,7 @@ class FolderController extends AbstractCrudController
             // Redirect to parent category list
             $this->redirectToRoute(
                 'admin.folders.default',
-                array('folder_id' => $updateEvent->getFolder()->getParent())
+                array('parent' => $updateEvent->getFolder()->getParent())
             );
         }
     }
@@ -283,7 +283,7 @@ class FolderController extends AbstractCrudController
         // Redirect to parent category list
         $this->redirectToRoute(
             'admin.folders.default',
-            array('folder_id' => $deleteEvent->getFolder()->getParent())
+            array('parent' => $deleteEvent->getFolder()->getParent())
         );
     }
 
@@ -300,7 +300,7 @@ class FolderController extends AbstractCrudController
             // Redirect to parent category list
             $this->redirectToRoute(
                 'admin.folders.default',
-                array('folder_id' => $folder->getParent())
+                array('parent' => $folder->getParent())
             );
         }
 
@@ -312,7 +312,7 @@ class FolderController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute("admin.folders.update", $this->getEditionArguments());
+        $this->redirect($this->getRoute('admin.folders.update', $this->getEditionArguments()));
     }
 
     /**
@@ -322,7 +322,7 @@ class FolderController extends AbstractCrudController
     {
         $this->redirectToRoute(
             'admin.folders.default',
-            array('folder_id' => $this->getRequest()->get('folder_id', 0))
+            array('parent' => $this->getRequest()->get('parent', 0))
         );
     }
 }
