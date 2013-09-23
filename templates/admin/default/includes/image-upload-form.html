@@ -11,6 +11,7 @@ Parameters:
     <form action="{url path="/admin/image/type/$imageType/$parentId/save-ajax"}" class="dropzone" id="images-dropzone" enctype="multipart/form-data">
         <div class="fallback">
             <input name="file" type="file" multiple />
+            <button type="submit" class="btn btn-info btn-upload"><span class="glyphicon glyphicon-send"></span> {intl l="Send files"}</button>
         </div>
 
         <div class="btn-browse hide">
@@ -18,6 +19,8 @@ Parameters:
             <span>Or</span>
             <button type="button" class="btn btn-info btn-upload"><span class="glyphicon glyphicon-upload"></span> {intl l="Browse files"}</button>
         </div>
+
+
     </form>
 
     <div class="existing-image">

@@ -62,6 +62,7 @@ $(function($){
                 $imageListArea.html(
                     data
                 );
+                $.imageUploadManager.onClickDeleteImage();
             });
     };
 
