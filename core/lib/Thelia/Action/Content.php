@@ -24,8 +24,11 @@
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Content\ContentCreateEvent;
+use Thelia\Core\Event\Content\ContentDeleteEvent;
+use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\Content as ContentModel;
 use Thelia\Model\FolderQuery;
@@ -76,6 +79,51 @@ class Content extends BaseAction implements EventSubscriberInterface
             $event->setContent($content);
         }
     }
+
+    public function updatePosition(UpdatePositionEvent $event)
+    {
+        if(null !== $content = ContentQuery::create()->findPk($event->getObjectId())) {
+            $content->setDispatcher($this->getDispatcher());
+
+            switch($event->getMode())
+            {
+                case UpdatePositionEvent::POSITION_ABSOLUTE:
+                    $content->changeAbsolutePosition($event->getPosition());
+                    break;
+                case UpdatePositionEvent::POSITION_DOWN:
+                    $content->movePositionDown();
+                    break;
+                case UpdatePositionEvent::POSITION_UP:
+                    $content->movePositionUp();
+                    break;
+            }
+        }
+    }
+
+    public function toggleVisibility(ContentToggleVisibilityEvent $event)
+    {
+        $content = $event->getContent();
+
+        $content
+            ->setDispatcher($this->getDispatcher())
+            ->setVisible(!$content->getVisible())
+            ->save();
+
+    }
+
+    public function delete(ContentDeleteEvent $event)
+    {
+        if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
+            $defaultFolderId = $content->getDefaultFolderId();
+
+            $content->setDispatcher($this->getDispatcher())
+                ->delete();
+
+            $event->setDefaultFolderId($defaultFolderId);
+            $event->setContent($content);
+        }
+    }
+
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
