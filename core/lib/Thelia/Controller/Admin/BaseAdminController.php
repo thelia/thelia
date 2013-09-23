@@ -42,6 +42,7 @@ use Thelia\Log\Tlog;
 use Symfony\Component\Routing\Router;
 use Thelia\Model\Admin;
 use Thelia\Core\Security\Token\CookieTokenProvider;
+use Thelia\Model\CurrencyQuery;
 
 class BaseAdminController extends BaseController
 {
@@ -258,7 +259,7 @@ class BaseAdminController extends BaseController
         // Return the new language if a change is required.
         if (null !== $edit_currency_id = $this->getRequest()->get('edit_currency_id', null)) {
 
-            if (null !== $edit_currency = LangQuery::create()->findOneById($edit_currency_id)) {
+            if (null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
                 return $edit_currency;
             }
         }
