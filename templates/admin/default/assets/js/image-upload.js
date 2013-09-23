@@ -36,7 +36,6 @@ $(function($){
     // Remove image on click
     pictureUploadManager.onClickDeleteImage = function() {
         $('.image-manager .image-delete-btn').on('click', function (e) {
-            console.log('deletingImage');
             e.preventDefault();
             var $this = $(this);
             $this.parent().append('<div class="loading" ></div>');
@@ -58,6 +57,7 @@ $(function($){
                     data
                 );
             });
+            return false;
         });
     };
     pictureUploadManager.onClickDeleteImage();
