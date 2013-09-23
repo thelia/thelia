@@ -243,6 +243,10 @@
         <default key="_controller">Thelia\Controller\Admin\ContentController::setToggleVisibilityAction</default>
     </route>
 
+    <route id="admin.content.delete" path="/admin/content/delete">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::deleteAction</default>
+    </route>
+
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 

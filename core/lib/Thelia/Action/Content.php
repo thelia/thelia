@@ -24,6 +24,7 @@
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Content\ContentCreateEvent;
+use Thelia\Core\Event\Content\ContentDeleteEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -108,6 +109,19 @@ class Content extends BaseAction implements EventSubscriberInterface
             ->setVisible(!$content->getVisible())
             ->save();
 
+    }
+
+    public function delete(ContentDeleteEvent $event)
+    {
+        if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
+            $defaultFolderId = $content->getDefaultFolderId();
+
+            $content->setDispatcher($this->getDispatcher())
+                ->delete();
+
+            $event->setDefaultFolderId($defaultFolderId);
+            $event->setContent($content);
+        }
     }
 
 
