@@ -404,16 +404,16 @@ class FileManager
     {
         switch ($parentType) {
             case ImagesCreateOrUpdateEvent::TYPE_PRODUCT:
-                $uri = '/admin/products/update?product_id=' . $parentId;
+                $uri = '/admin/products/update?product_id=' . $parentId . '&current_tab=images';
                 break;
             case ImagesCreateOrUpdateEvent::TYPE_CATEGORY:
-                $uri = '/admin/categories/update?category_id=' . $parentId;
+                $uri = '/admin/categories/update?category_id=' . $parentId . '&current_tab=images';
                 break;
             case ImagesCreateOrUpdateEvent::TYPE_CONTENT:
-                $uri = '/admin/content/update/' . $parentId;
+                $uri = '/admin/content/update/' . $parentId . '&current_tab=images';
                 break;
             case ImagesCreateOrUpdateEvent::TYPE_FOLDER:
-                $uri = '/admin/folders/update/' . $parentId;
+                $uri = '/admin/folders/update/' . $parentId . '&current_tab=images';
                 break;
             default:
                 $uri = false;
