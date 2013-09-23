@@ -537,6 +537,14 @@
 
     <!-- end mailing system management -->
 
+    <!-- languages system management -->
+
+    <route id="admin.configuration.languages.default" path="/admin/configuration/languages">
+        <default key="_controller">Thelia\Controller\Admin\LanguageController::defaultAction</default>
+    </route>
+
+    <!-- end mailing system management -->
+
 	<!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">
