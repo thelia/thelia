@@ -450,4 +450,24 @@ class FileManager
         );
         return $fileName;
     }
+
+    /**
+     * Check if a file is an image
+     * Check based on mime type
+     *
+     * @param string $mimeType File mime type
+     *
+     * @return bool
+     */
+    public function isImage($mimeType)
+    {
+        $isValid = false;
+
+        $allowedType = array('image/jpeg' , 'image/png' ,'image/gif');
+        if (in_array($mimeType, $allowedType)) {
+            $isValid = true;
+        }
+
+        return $isValid;
+    }
 }

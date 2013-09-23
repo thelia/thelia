@@ -28,6 +28,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Validator\Constraints\Image;
+use Symfony\Component\Validator\Constraints\ImageValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Thelia\Core\Event\ImageCreateOrUpdateEvent;
 use Thelia\Core\Event\ImagesCreateOrUpdateEvent;
 use Thelia\Core\Event\ImageDeleteEvent;
@@ -35,6 +38,10 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
+use Thelia\Model\CategoryImage;
+use Thelia\Model\ContentImage;
+use Thelia\Model\FolderImage;
+use Thelia\Model\ProductImage;
 use Thelia\Tools\FileManager;
 use Thelia\Tools\Rest\ResponseRest;
 
@@ -87,6 +94,30 @@ class FileController extends BaseAdminController
                 $fileBeingUploaded = $this->getRequest()->files->get('file');
 
                 $fileManager = new FileManager($this->container);
+
+                // Validate if file is too big
+                if ($fileBeingUploaded->getError() == 1) {
+                    $message = $this->getTranslator()
+                    ->trans(
+                        'File is too heavy, please retry with a file having a size less than %size%.',
+                        array('%size%' => ini_get('post_max_size')),
+                        'image'
+                    );
+
+                    return new ResponseRest($message, 'text', 403);
+                }
+                // Validate if it is a image or file
+                if (!$fileManager->isImage($fileBeingUploaded->getMimeType())) {
+                    $message = $this->getTranslator()
+                        ->trans(
+                            'You can only upload images (.png, .jpg, .jpeg, .gif)',
+                            array(),
+                            'image'
+                        );
+
+                    return new ResponseRest($message, 'text', 415);
+                }
+
                 $parentModel = $fileManager->getParentImageModel($parentType, $parentId);
                 $imageModel = $fileManager->getImageModel($parentType);
 
@@ -165,7 +196,9 @@ class FileController extends BaseAdminController
      */
     public function viewImageAction($imageId, $parentType)
     {
-        if (null !== $response = $this->checkAuth('admin.image.view')) return $response;
+        if (null !== $response = $this->checkAuth('admin.image.view')) {
+            return $response;
+        }
         try {
             $fileManager = new FileManager($this->container);
             $image = $fileManager->getImageModelQuery($parentType)->findPk($imageId);
@@ -191,7 +224,9 @@ class FileController extends BaseAdminController
      */
     public function updateImageAction($imageId, $parentType)
     {
-        if (null !== $response = $this->checkAuth('admin.image.update')) return $response;
+        if (null !== $response = $this->checkAuth('admin.image.update')) {
+            return $response;
+        }
 
         $message = false;
 
@@ -201,7 +236,7 @@ class FileController extends BaseAdminController
         try {
             $image = $fileManager->getImageModelQuery($parentType)->findPk($imageId);
             $oldImage = clone $image;
-            if(null === $image) {
+            if (null === $image) {
                 throw new \InvalidArgumentException(sprintf('%d image id does not exists', $imageId));
             }
 
@@ -212,7 +247,7 @@ class FileController extends BaseAdminController
 
             $files = $this->getRequest()->files;
             $fileForm = $files->get($imageModification->getName());
-            if(isset($fileForm['file'])) {
+            if (isset($fileForm['file'])) {
                 $event->setUploadedFile($fileForm['file']);
             }
 
@@ -220,9 +255,9 @@ class FileController extends BaseAdminController
 
             $imageUpdated = $event->getModelImage();
 
-            $this->adminLogAppend(sprintf('Image with Ref %s (ID %d) modified', $imageUpdated->getTitle() , $imageUpdated->getId()));
+            $this->adminLogAppend(sprintf('Image with Ref %s (ID %d) modified', $imageUpdated->getTitle(), $imageUpdated->getId()));
 
-            if($this->getRequest()->get('save_mode') == 'close') {
+            if ($this->getRequest()->get('save_mode') == 'close') {
                 $this->redirectToRoute('admin.images');
             } else {
                 $this->redirectSuccess($imageModification);
@@ -243,8 +278,7 @@ class FileController extends BaseAdminController
 
             $this->getParserContext()
                 ->addForm($imageModification)
-                ->setGeneralError($message)
-            ;
+                ->setGeneralError($message);
         }
 
         return $this->render('image-edit', array(
@@ -334,9 +368,9 @@ class FileController extends BaseAdminController
     /**
      * Create Event instance
      *
-     * @param string $parentType Parent Type owning images being saved
-     * @param \Thelia\Model\CategoryImage|\Thelia\Model\ProductImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage $model Image model
-     * @param array $data Post data
+     * @param string                                              $parentType Parent Type owning images being saved
+     * @param CategoryImage|ProductImage|ContentImage|FolderImage $model      Image model
+     * @param array                                               $data       Post data
      *
      * @return ImageCreateOrUpdateEvent
      */

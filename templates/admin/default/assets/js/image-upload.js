@@ -8,11 +8,17 @@ $(function($){
         var imageDropzone = new Dropzone("#images-dropzone", {
             dictDefaultMessage : $('.btn-browse').html(),
             uploadMultiple: false,
-            maxFilesize: 8
+            maxFilesize: 8,
+            accept: function(file, done) {
+                if (file.name == "justinbieber.jpg") {
+
+                    done("Naha, you don't.");
+                }
+                else { done(); }
+            }
         });
 
         imageDropzone.on("success", function(file) {
-            $(".image-manager .dz-file-preview").remove();
             imageDropzone.removeFile(file);
             $.imageUploadManager.updateImageListAjax();
             $.imageUploadManager.onClickDeleteImage();
