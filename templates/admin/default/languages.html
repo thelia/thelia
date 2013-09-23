@@ -180,10 +180,58 @@
     </div>
 </div>
 
+{form name="thelia.admin.language.creation"}
+
+    {* Capture the dialog body, to pass it to the generic dialog *}
+    {capture "creation_dialog"}
+
+        {form_hidden_fields form=$form}
+
+        {* Be sure to get the language_id, even if the form could not be validated *}
+        <input type="hidden" name="language_id" value="{$language_id}" />
+
+        {form_field form=$form field='success_url'}
+           {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+           <input type="hidden" name="{$name}" value="{url path='/admin/configuration/languages/update' language_id='_ID_'}" />
+        {/form_field}
+
+        {form_field form=$form field='title'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Language title'}">
+            </div>
+        {/form_field}
+
+        {form_field form=$form field='isocode'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='ISO Code'}">
+            </div>
+        {/form_field}
+
+        {module_include location='language_create_form'}
+
+    {/capture}
+
+    {include
+        file = "includes/generic-create-dialog.html"
+
+        dialog_id    = "creation_dialog"
+        dialog_title = {intl l="Create a new language"}
+        dialog_body  = {$smarty.capture.creation_dialog nofilter}
+
+        dialog_ok_label     = {intl l="Create this language"}
+
+        form_action        = {url path='/admin/configuration/languages/create'}
+        form_enctype       = {form_enctype form=$form}
+        form_error_message = $form_error_message
+    }
+{/form}
+
 {* Delete confirmation dialog *}
 
 {capture "delete_dialog"}
-    <input type="hidden" name="message_id" id="message_delete_id" value="" />
+    <input type="hidden" name="message_id" id="language_delete_id" value="" />
 
     {module_include location='languages_delete_form'}
 
