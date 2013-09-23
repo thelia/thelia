@@ -265,10 +265,17 @@
         <requirement key="_format">xml|json</requirement>
     </route>
 
-
     <route id="admin.product.add-attribute-value-to-combination" path="/admin/product/{productId}/add-attribute-value-to-combination/{attributeAvId}/{combination}.{_format}" methods="GET">
         <default key="_controller">Thelia\Controller\Admin\ProductController::addAttributeValueToCombinationAction</default>
         <requirement key="_format">xml|json</requirement>
+    </route>
+
+    <route id="admin.product.combination.add" path="/admin/product/combination/add">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::addCombinationAction</default>
+    </route>
+
+    <route id="admin.product.combination.delete" path="/admin/product/combination/delete">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::deleteCombinationAction</default>
     </route>
 
 

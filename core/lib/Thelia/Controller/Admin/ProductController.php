@@ -48,11 +48,14 @@ use Thelia\Model\FeatureQuery;
 use Thelia\Core\Event\FeatureProductDeleteEvent;
 use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Core\Event\ProductSetTemplateEvent;
-use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Core\Event\ProductAddCategoryEvent;
 use Thelia\Core\Event\ProductDeleteCategoryEvent;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\AttributeCombination;
+use Thelia\Model\AttributeAv;
+use Thelia\Core\Event\ProductCreateCombinationEvent;
 
 /**
  * Manages products
@@ -699,6 +702,7 @@ class ProductController extends AbstractCrudController
     }
 
     public function addAttributeValueToCombinationAction($productId, $attributeAvId, $combination) {
+
         $result = array();
 
         // Get attribute for this product
@@ -707,6 +711,8 @@ class ProductController extends AbstractCrudController
         if ($attributeAv !== null) {
 
             $addIt = true;
+
+            $attribute = $attributeAv->getAttribute();
 
             // Check if this attribute is not already present
             $combinationArray = explode(',', $combination);
@@ -717,9 +723,7 @@ class ProductController extends AbstractCrudController
 
                 if ($attrAv !== null) {
 
-                    if ($attrAv->getAttributeId() == $attributeAv->getAttributeId()) {
-
-                        $attribute = AttributeQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($attributeAv->getAttributeId());
+                    if ($attrAv->getAttributeId() == $attribute->getId()) {
 
                         $result['error'] = $this->getTranslator()->trans(
                                 'A value for attribute "%name" is already present in the combination',
@@ -729,13 +733,39 @@ class ProductController extends AbstractCrudController
                         $addIt = false;
                     }
 
-                    $result[] = array('id' => $attrAv->getId(), 'title' => $attrAv->getTitle());
+                    $result[] = array('id' => $attrAv->getId(), 'title' => $attrAv->getAttribute()->getTitle() . " : " . $attrAv->getTitle());
                 }
             }
 
-            if ($addIt) $result[] = array('id' => $attributeAv->getId(), 'title' => $attributeAv->getTitle());
+            if ($addIt) $result[] = array('id' => $attributeAv->getId(), 'title' => $attribute->getTitle() . " : " . $attributeAv->getTitle());
         }
 
         return $this->jsonResponse(json_encode($result));
+    }
+
+    /**
+     * A a new combination to a product
+     */
+    public function addCombinationAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $event = new ProductCreateCombinationEvent(
+                $this->getExistingObject(),
+                $this->getRequest()->get('use_default_princing', 0),
+                $this->getRequest()->get('combination_attributes', array())
+        );
+
+        try {
+            $this->dispatch(TheliaEvents::PRODUCT_ADD_COMBINATION, $event);
+        }
+        catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+echo "done!";
+exit;
+        $this->redirectToEditionTemplate();
     }
 }

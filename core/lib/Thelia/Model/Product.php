@@ -98,8 +98,6 @@ class Product extends BaseProduct
             ->filterByDefaultCategory(true)
             ->findOne()
         ;
-echo "newcat=        $defaultCategoryId ";
-var_dump($productCategory);
 
         if ($productCategory == null || $productCategory->getCategoryId() != $defaultCategoryId) {
             exit;
