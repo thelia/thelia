@@ -1,23 +1,26 @@
 $(function($){
     // Manage picture upload
-    var pictureUploadManager = {};
+    $.imageUploadManager = {};
 
     Dropzone.autoDiscover = false;
+    // Remove image on click
+    $.imageUploadManager.initImageDropZone = function() {
+        var imageDropzone = new Dropzone("#images-dropzone", {
+            dictDefaultMessage : $('.btn-browse').html(),
+            uploadMultiple: false,
+            maxFilesize: 8
+        });
 
-    var imageDropzone = new Dropzone("#images-dropzone", {
-        dictDefaultMessage : $('.btn-browse').html(),
-        uploadMultiple: false,
-        maxFilesize: 8
-    });    
-
-    imageDropzone.on("success", function(file) {
-        $(".image-manager .dz-file-preview").remove();
-        imageDropzone.removeFile(file);
-        pictureUploadManager.updateImageListAjax();
-    });
+        imageDropzone.on("success", function(file) {
+            $(".image-manager .dz-file-preview").remove();
+            imageDropzone.removeFile(file);
+            $.imageUploadManager.updateImageListAjax();
+            $.imageUploadManager.onClickDeleteImage();
+        });
+    };
 
     // Update picture list via AJAX call
-    pictureUploadManager.updateImageListAjax = function() {
+    $.imageUploadManager.updateImageListAjax = function() {
         var $imageListArea = $(".image-manager .existing-image");
         $imageListArea.html('<div class="loading" ></div>');
         $.ajax({
@@ -38,7 +41,7 @@ $(function($){
     };
 
     // Remove image on click
-    pictureUploadManager.onClickDeleteImage = function() {
+    $.imageUploadManager.onClickDeleteImage = function() {
         $('.image-manager .image-delete-btn').on('click', function (e) {
             e.preventDefault();
             var $this = $(this);
@@ -67,5 +70,5 @@ $(function($){
             return false;
         });
     };
-    pictureUploadManager.onClickDeleteImage();
+    $.imageUploadManager.onClickDeleteImage();
 });

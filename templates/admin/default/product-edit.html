@@ -65,7 +65,8 @@
 		                    <li>
                                 <a href="#images"
                                    data-toggle="tab"
-                                   data-href="{url path="/admin/image/type/product/{$product_id}/form-ajax"}">
+                                   data-href="{url path="/admin/image/type/product/{$product_id}/form-ajax"}"
+                                   data-callback="$.imageUploadManager.initImageDropZone">
                                     {intl l="Images"}
                                 </a>
                             </li>
@@ -115,128 +116,134 @@
 
 {block name="javascript-initialization"}
 
-{javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
+    {javascripts file='assets/js/dropzone.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/image-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
-<script src="{url file='/tinymce/tinymce.min.js'}"></script>
-<script>
-	tinymce.init({
-		selector: ".wysiwyg",
-		theme: "modern",
-		menubar : false,
-		language: "",
-		plugins: [
-		     "advlist autolink link image lists charmap print preview hr anchor pagebreak",
-		     "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
-		     "table contextmenu directionality emoticons paste textcolor filemanager"
-		],
-		toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | styleselect | filemanager | link unlink anchor | image media | forecolor backcolor  | print preview code ",
-		image_advtab: true ,
-		external_filemanager_path:"{url file='/tinymce/plugins/filemanager/'}'",
-		filemanager_title:"{intl l='Files manager'}" ,
-		external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
-	 });
-</script>
+    <script src="{url file='/tinymce/tinymce.min.js'}"></script>
+    <script>
+        tinymce.init({
+            selector: ".wysiwyg",
+            theme: "modern",
+            menubar : false,
+            language: "",
+            plugins: [
+                 "advlist autolink link image lists charmap print preview hr anchor pagebreak",
+                 "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
+                 "table contextmenu directionality emoticons paste textcolor filemanager"
+            ],
+            toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | styleselect | filemanager | link unlink anchor | image media | forecolor backcolor  | print preview code ",
+            image_advtab: true ,
+            external_filemanager_path:"{url file='/tinymce/plugins/filemanager/'}'",
+            filemanager_title:"{intl l='Files manager'}" ,
+            external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
+         });
+    </script>
 
-<script>
-$(function() {
+    <script>
+        $(function() {
 
-    // Atomatic ajax tab load, if data-href is defined.
-    $('.nav-tabs a[data-href]').on('shown.bs.tab', function(ev) {
-        var zis = $(this);
-        $(zis.attr('href')).load(zis.data('href'));
-    });
-
-    // Load active tab
-    $('.nav-tabs a[href="#{$current_tab}"]').trigger("click");
-
-    // -- Product details management tab ---------------------------------------
-
-	// Load value on attribute selection
-	$('#attribute_id').change(function(event) {
-	    var val = $(this).val();
-
-	    if (val != "") {
-	        $.ajax({
-	             url      : '{url path="/admin/product/$product_id/attribute-values/"}' + $(this).val() + '.xml',
-	             type     : 'get',
-	             dataType : 'json',
-	             success  : function(json) {
-	                 $('#attribute_value_id :not(:first-child)').remove();
-
-	                 var have_content = false;
-
-	                 $.each(json, function(idx, value) {
-	                     $('#attribute_value_id').append($('<option>').text(value.title).attr('value', value.id));
-
-	                     have_content = true; // Lame...
-	                 });
-
-	                 if (have_content) {
-	                     $('#attribute_value_selector_empty').addClass('hide');
-	                     $('#attribute_value_selector').removeClass('hide');
-	                 }
-	                 else {
-	                     $('#attribute_value_selector_empty').removeClass('hide');
-	                     $('#attribute_value_selector').addClass('hide');
-	                 }
-
-	             }
-	        });
-	    }
-	    else {
-	        $('#attribute_value_selector_empty').addClass('hide');
-	        $('#attribute_value_selector').addClass('hide');
-	    }
-	});
-
-    // Add selected value to the combination
-    $('.add-value-to-combination').click(function(event) {
-
-    	// Hide error message
-    	$('#combination_attributes_error').text('').addClass('hide');
-
-    	// Select all elements
-    	$('#combination_attributes option').prop('selected', 'selected');
-
-        $.ajax({
-            url      : '{url path="/admin/product/$product_id/add-attribute-value-to-combination/"}'
-                            + $('#attribute_value_id').val()
-                            + '/'
-                            + $('#combination_attributes').val()
-                            + '.xml',
-            type     : 'get',
-            dataType : 'json',
-            success  : function(json) {
-                $('#combination_attributes option').remove();
-
-                var have_content = false;
-
-                $.each(json, function(idx, value) {
-                	if (idx != 'error')
-                	    $('#combination_attributes').append($('<option>').text(value.title).attr('value', value.id));
+            // Atomatic ajax tab load, if data-href is defined.
+            $('.nav-tabs a[data-href]').on('shown.bs.tab', function(ev) {
+                var $this = $(this);
+                $($this.attr('href')).load($this.data('href'), function(ev) {
+                    eval($this.data('callback') + '();');
                 });
+            });
 
-                if (json.error)
-                    $('#combination_attributes_error').text(json.error).removeClass('hide');
+            // Load active tab
+            $('.nav-tabs a[href="#{$current_tab}"]').trigger("click");
 
-                $('#attribute_id').val('').change();
-            }
-       });
+            // -- Product details management tab ---------------------------------------
 
-    	event.preventDefault();
-    });
+            // Load value on attribute selection
+            $('#attribute_id').change(function(event) {
+                var val = $(this).val();
 
-    // Remove selected value from combination
-    $('.remove-value-from-combination').click(function() {
+                if (val != "") {
+                    $.ajax({
+                         url      : '{url path="/admin/product/$product_id/attribute-values/"}' + $(this).val() + '.xml',
+                         type     : 'get',
+                         dataType : 'json',
+                         success  : function(json) {
+                             $('#attribute_value_id :not(:first-child)').remove();
 
-    	$('#combination_attributes option:selected').remove();
+                             var have_content = false;
 
-    	event.preventDefault();
-    });
-});
-</script>
+                             $.each(json, function(idx, value) {
+                                 $('#attribute_value_id').append($('<option>').text(value.title).attr('value', value.id));
 
+                                 have_content = true; // Lame...
+                             });
 
+                             if (have_content) {
+                                 $('#attribute_value_selector_empty').addClass('hide');
+                                 $('#attribute_value_selector').removeClass('hide');
+                             }
+                             else {
+                                 $('#attribute_value_selector_empty').removeClass('hide');
+                                 $('#attribute_value_selector').addClass('hide');
+                             }
+
+                         }
+                    });
+                }
+                else {
+                    $('#attribute_value_selector_empty').addClass('hide');
+                    $('#attribute_value_selector').addClass('hide');
+                }
+            });
+
+            // Add selected value to the combination
+            $('.add-value-to-combination').click(function(event) {
+
+                // Hide error message
+                $('#combination_attributes_error').text('').addClass('hide');
+
+                // Select all elements
+                $('#combination_attributes option').prop('selected', 'selected');
+
+                $.ajax({
+                    url      : '{url path="/admin/product/$product_id/add-attribute-value-to-combination/"}'
+                                    + $('#attribute_value_id').val()
+                                    + '/'
+                                    + $('#combination_attributes').val()
+                                    + '.xml',
+                    type     : 'get',
+                    dataType : 'json',
+                    success  : function(json) {
+                        $('#combination_attributes option').remove();
+
+                        var have_content = false;
+
+                        $.each(json, function(idx, value) {
+                            if (idx != 'error')
+                                $('#combination_attributes').append($('<option>').text(value.title).attr('value', value.id));
+                        });
+
+                        if (json.error)
+                            $('#combination_attributes_error').text(json.error).removeClass('hide');
+
+                        $('#attribute_id').val('').change();
+                    }
+               });
+
+                event.preventDefault();
+            });
+
+            // Remove selected value from combination
+            $('.remove-value-from-combination').click(function() {
+
+                $('#combination_attributes option:selected').remove();
+
+                event.preventDefault();
+            });
+        });
+    </script>
 {/block}
