@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Customer;
@@ -30,11 +31,21 @@ use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Model\Base\AddressQuery;
+use Thelia\Model\Address;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\Base\OrderProductQuery;
+use Thelia\Model\OrderStatus;
+use Thelia\Model\CartQuery;
+use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\Cart;
+use Thelia\Model\CartItem;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order as OrderModel;
+use Thelia\Model\Customer as CustomerModel;
 use Thelia\Action\Order;
+use Thelia\Model\ProductQuery;
 use Thelia\Module\BaseModule;
 
 /**
@@ -59,21 +70,34 @@ class OrderTest extends \PHPUnit_Framework_TestCase
      */
     protected $orderEvent;
 
+    /**
+     * @var CustomerModel $customer
+     */
     protected $customer;
+
+    /**
+     * @var Cart $customer
+     */
+    protected $cart;
+
+    /**
+     * @var CartItem[]
+     */
+    protected $cartItems;
 
     public function setUp()
     {
         $container = new ContainerBuilder();
 
-//        $session = new Session(new MockArraySessionStorage());
-//        $request = new Request();
-//        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        $session = new Session(new MockArraySessionStorage());
+        $request = new Request();
+        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
-//        $request->setSession($session);
+        $request->setSession($session);
 
-//        $container->set("event_dispatcher", $dispatcher);
-//        $container->set('request', $request);
-//        $container->set('thelia.securityContext', new SecurityContext($request));
+        $container->set("event_dispatcher", $dispatcher);
+        $container->set('request', $request);
+        $container->set('thelia.securityContext', new SecurityContext($request));
 
         $this->container = $container;
 
@@ -82,10 +106,14 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $this->orderAction = new Order($this->container);
 
         /* load customer */
-        /*$this->customer = $this->loadCustomer();
+        $this->customer = $this->loadCustomer();
         if(null === $this->customer) {
             return;
-        }*/
+        }
+
+        /* fill cart */
+        $this->cart = $this->fillCart();
+
     }
 
     public function loadCustomer()
@@ -98,6 +126,55 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $this->container->get('thelia.securityContext')->setCustomerUser($customer);
 
         return $customer;
+    }
+
+    public function fillCart()
+    {
+        $currency = CurrencyQuery::create()->findOne();
+
+        //create a fake cart in database;
+        $cart = new Cart();
+        $cart->setToken(uniqid("createorder", true))
+            ->setCustomer($this->customer)
+            ->setCurrency($currency)
+            ->save();
+
+        /* add 3 items */
+        $productList = array();
+        for($i=0; $i<3; $i++) {
+            $pse = ProductSaleElementsQuery::create()
+                ->filterByProduct(
+                    ProductQuery::create()
+                        ->filterByVisible(1)
+                        ->filterById($productList, Criteria::NOT_IN)
+                        ->find()
+                )
+                ->filterByQuantity(5, Criteria::GREATER_EQUAL)
+                ->joinProductPrice('pp', Criteria::INNER_JOIN)
+                ->addJoinCondition('pp', 'currency_id = ?', $currency->getId(), null, \PDO::PARAM_INT)
+                ->withColumn('`pp`.price', 'price_PRICE')
+                ->withColumn('`pp`.promo_price', 'price_PROMO_PRICE')
+                ->findOne();
+
+            $productList[] = $pse->getProductId();
+
+            $cartItem = new CartItem();
+            $cartItem
+                ->setCart($cart)
+                ->setProduct($pse->getProduct())
+                ->setProductSaleElements($pse)
+                ->setQuantity($i)
+                ->setPrice($pse->getPrice())
+                ->setPromoPrice($pse->getPromoPrice())
+                ->setPromo($pse->getPromo())
+                ->setPriceEndOfLife(time() + 60*60*24*30)
+                ->save();
+            $this->cartItems[] = $cartItem;
+        }
+
+        $this->container->get('request')->getSession()->setCart($cart->getId());
+
+        return $cart;
     }
 
     public function testSetDeliveryAddress()
@@ -128,15 +205,6 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetDeliveryModule()
     {
-        /*$deliveryModule = ModuleQuery::create()
-            ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
-            ->filterByActivate(1)
-            ->findOne();
-
-        if(null === $deliveryModule) {
-            return;
-        }*/
-
         $this->orderEvent->setDeliveryModule(123);
 
         $this->orderAction->setDeliveryModule($this->orderEvent);
@@ -157,5 +225,133 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             456,
             $this->orderEvent->getOrder()->getPaymentModuleId()
         );
+    }
+
+    public function testCreate()
+    {
+        $validDeliveryAddress = AddressQuery::create()->findOneByCustomerId($this->customer->getId());
+        $validInvoiceAddress = AddressQuery::create()->filterById($validDeliveryAddress->getId(), Criteria::NOT_EQUAL)->findOneByCustomerId($this->customer->getId());
+
+        $deliveryModule = ModuleQuery::create()
+            ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
+            ->filterByActivate(1)
+            ->findOne();
+
+        if(null === $deliveryModule) {
+            return;
+        }
+
+        $paymentModule = ModuleQuery::create()
+            ->filterByType(BaseModule::PAYMENT_MODULE_TYPE)
+            ->filterByActivate(1)
+            ->findOne();
+
+        if(null === $paymentModule) {
+            return;
+        }
+
+        $this->orderEvent->getOrder()->chosenDeliveryAddress = $validDeliveryAddress->getId();
+        $this->orderEvent->getOrder()->chosenInvoiceAddress = $validInvoiceAddress->getId();
+        $this->orderEvent->getOrder()->setDeliveryModuleId($deliveryModule->getId());
+        $this->orderEvent->getOrder()->setPostage(20);
+        $this->orderEvent->getOrder()->setPaymentModuleId($paymentModule->getId());
+
+        /* memorize current stocks */
+        $itemsStock = array();
+        foreach($this->cartItems as $index => $cartItem) {
+            $itemsStock[$index] = $cartItem->getProductSaleElements()->getQuantity();
+        }
+
+        $this->orderAction->create($this->orderEvent);
+
+        $placedOrder = $this->orderEvent->getPlacedOrder();
+
+        $this->assertNotNull($placedOrder);
+        $this->assertNotNull($placedOrder->getId());
+
+        /* check customer */
+        $this->assertEquals($this->customer->getId(), $placedOrder->getCustomerId(), 'customer i does not  match');
+
+        /* check delivery address */
+        $deliveryOrderAddress = $placedOrder->getOrderAddressRelatedByDeliveryOrderAddressId();
+        $this->assertEquals($validDeliveryAddress->getCustomerTitle()->getId(), $deliveryOrderAddress->getCustomerTitleId(), 'delivery address title does not match');
+        $this->assertEquals($validDeliveryAddress->getCompany(), $deliveryOrderAddress->getCompany(), 'delivery address company does not match');
+        $this->assertEquals($validDeliveryAddress->getFirstname(), $deliveryOrderAddress->getFirstname(), 'delivery address fistname does not match');
+        $this->assertEquals($validDeliveryAddress->getLastname(), $deliveryOrderAddress->getLastname(), 'delivery address lastname does not match');
+        $this->assertEquals($validDeliveryAddress->getAddress1(), $deliveryOrderAddress->getAddress1(), 'delivery address address1 does not match');
+        $this->assertEquals($validDeliveryAddress->getAddress2(), $deliveryOrderAddress->getAddress2(), 'delivery address address2 does not match');
+        $this->assertEquals($validDeliveryAddress->getAddress3(), $deliveryOrderAddress->getAddress3(), 'delivery address address3 does not match');
+        $this->assertEquals($validDeliveryAddress->getZipcode(), $deliveryOrderAddress->getZipcode(), 'delivery address zipcode does not match');
+        $this->assertEquals($validDeliveryAddress->getCity(), $deliveryOrderAddress->getCity(), 'delivery address city does not match');
+        $this->assertEquals($validDeliveryAddress->getPhone(), $deliveryOrderAddress->getPhone(), 'delivery address phone does not match');
+        $this->assertEquals($validDeliveryAddress->getCountryId(), $deliveryOrderAddress->getCountryId(), 'delivery address country does not match');
+
+        /* check invoice address */
+        $invoiceOrderAddress = $placedOrder->getOrderAddressRelatedByInvoiceOrderAddressId();
+        $this->assertEquals($validInvoiceAddress->getCustomerTitle()->getId(), $invoiceOrderAddress->getCustomerTitleId(), 'invoice address title does not match');
+        $this->assertEquals($validInvoiceAddress->getCompany(), $invoiceOrderAddress->getCompany(), 'invoice address company does not match');
+        $this->assertEquals($validInvoiceAddress->getFirstname(), $invoiceOrderAddress->getFirstname(), 'invoice address fistname does not match');
+        $this->assertEquals($validInvoiceAddress->getLastname(), $invoiceOrderAddress->getLastname(), 'invoice address lastname does not match');
+        $this->assertEquals($validInvoiceAddress->getAddress1(), $invoiceOrderAddress->getAddress1(), 'invoice address address1 does not match');
+        $this->assertEquals($validInvoiceAddress->getAddress2(), $invoiceOrderAddress->getAddress2(), 'invoice address address2 does not match');
+        $this->assertEquals($validInvoiceAddress->getAddress3(), $invoiceOrderAddress->getAddress3(), 'invoice address address3 does not match');
+        $this->assertEquals($validInvoiceAddress->getZipcode(), $invoiceOrderAddress->getZipcode(), 'invoice address zipcode does not match');
+        $this->assertEquals($validInvoiceAddress->getCity(), $invoiceOrderAddress->getCity(), 'invoice address city does not match');
+        $this->assertEquals($validInvoiceAddress->getPhone(), $invoiceOrderAddress->getPhone(), 'invoice address phone does not match');
+        $this->assertEquals($validInvoiceAddress->getCountryId(), $invoiceOrderAddress->getCountryId(), 'invoice address country does not match');
+
+        /* check currency */
+        $this->assertEquals($this->cart->getCurrencyId(), $placedOrder->getCurrencyId(), 'currency id does not  match');
+        $this->assertEquals($this->cart->getCurrency()->getRate(), $placedOrder->getCurrencyRate(), 'currency rate does not  match');
+
+        /* check delivery module */
+        $this->assertEquals(20, $placedOrder->getPostage(), 'postage does not  match');
+        $this->assertEquals($deliveryModule->getId(), $placedOrder->getDeliveryModuleId(), 'delivery module does not  match');
+
+        /* check payment module */
+        $this->assertEquals($paymentModule->getId(), $placedOrder->getPaymentModuleId(), 'payment module does not  match');
+
+        /* check status */
+        $this->assertEquals(OrderStatus::CODE_NOT_PAID, $placedOrder->getOrderStatus()->getCode(), 'status does not  match');
+
+        /* check lang */
+        $this->assertEquals($this->container->get('request')->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
+
+        /* check ordered product */
+        foreach($this->cartItems as $index => $cartItem) {
+            $orderProduct = OrderProductQuery::create()
+                ->filterByOrderId($placedOrder->getId())
+                ->filterByProductRef($cartItem->getProduct()->getRef())
+                ->filterByProductSaleElementsRef($cartItem->getProductSaleElements()->getRef())
+                ->filterByQuantity($cartItem->getQuantity())
+                ->filterByPrice($cartItem->getPrice(), Criteria::LIKE)
+                ->filterByPromoPrice($cartItem->getPromoPrice(), Criteria::LIKE)
+                ->filterByWasNew($cartItem->getProductSaleElements()->getNewness())
+                ->filterByWasInPromo($cartItem->getPromo())
+                ->filterByWeight($cartItem->getProductSaleElements()->getWeight())
+                ->findOne();
+
+            $this->assertNotNull($orderProduct);
+
+            /* check attribute combinations */
+            $this->assertEquals(
+                $cartItem->getProductSaleElements()->getAttributeCombinations()->count(),
+                $orderProduct->getOrderProductAttributeCombinations()->count()
+            );
+
+            /* check stock decrease */
+            $this->assertEquals(
+                $itemsStock[$index] - $orderProduct->getQuantity(),
+                $cartItem->getProductSaleElements()->getQuantity()
+            );
+
+            /* check tax */
+            $orderProductTaxList = $orderProduct->getOrderProductTaxes();
+            foreach($cartItem->getProduct()->getTaxRule()->getTaxDetail($validDeliveryAddress->getCountry(), $cartItem->getPromo() == 1 ? $cartItem->getPromoPrice() : $cartItem->getPrice()) as $index => $tax) {
+                $orderProductTax = $orderProductTaxList[$index];
+                $this->assertEquals($tax->getAmount(), $orderProductTax->getAmount());
+            }
+        }
+
     }
 }
