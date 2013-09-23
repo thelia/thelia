@@ -12,7 +12,7 @@ $(function($){
             dictDefaultMessage : $('.btn-browse').html(),
             uploadMultiple: false,
             maxFilesize: 8,
-            acceptedFiles: 'image/*'
+            acceptedFiles: 'image/png, image/gif, image/jpeg'
         });    
 
         var totalFiles      = 0,
