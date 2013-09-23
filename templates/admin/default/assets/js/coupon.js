@@ -85,7 +85,7 @@ $(function($){
                     couponManager.createOrUpdateRuleAjax();
                 }
             }
-
+            return false;
         });
     };
     couponManager.onClickSaveRule();
@@ -96,6 +96,7 @@ $(function($){
             e.preventDefault();
             var $this = $(this);
             couponManager.removeRuleAjax($this.attr('data-int'));
+            return false;
         });
     };
     couponManager.onClickDeleteRule();
@@ -109,6 +110,7 @@ $(function($){
 
             // Hide row being updated
             $this.parent().parent().remove();
+            return false;
         });
     };
     couponManager.onClickUpdateRule();

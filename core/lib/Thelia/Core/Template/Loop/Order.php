@@ -23,12 +23,16 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 
+use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
+use Thelia\Model\OrderQuery;
+use Thelia\Type\TypeCollection;
+use Thelia\Type;
 /**
  *
  * @package Thelia\Core\Template\Loop
@@ -37,19 +41,94 @@ use Thelia\Core\Template\Loop\Argument\Argument;
  */
 class Order extends BaseLoop
 {
+    public $countable = true;
+    public $timestampable = true;
+    public $versionable = false;
+
     public function getArgDefinitions()
     {
-        return new ArgumentCollection();
+        return new ArgumentCollection(
+            Argument::createIntListTypeArgument('id'),
+            new Argument(
+                'customer',
+                new TypeCollection(
+                    new Type\IntType(),
+                    new Type\EnumType(array('current'))
+                ),
+                'current'
+            ),
+            Argument::createIntListTypeArgument('status')
+        );
     }
 
     /**
+     * @param $pagination
      *
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
+     * @return LoopResult
      */
     public function exec(&$pagination)
     {
-        // TODO : a coder !
-        return new LoopResult();
+        $search = OrderQuery::create();
+
+        $id = $this->getId();
+
+        if (null !== $id) {
+            $search->filterById($id, Criteria::IN);
+        }
+
+        $customer = $this->getCustomer();
+
+        if ($customer === 'current') {
+            $currentCustomer = $this->securityContext->getCustomerUser();
+            if ($currentCustomer === null) {
+                return new LoopResult();
+            } else {
+                $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
+            }
+        } else {
+            $search->filterByCustomerId($customer, Criteria::EQUAL);
+        }
+
+        $status = $this->getStatus();
+
+        if (null !== $status) {
+            $search->filterByStatusId($status, Criteria::IN);
+        }
+
+        $orders = $this->search($search, $pagination);
+
+        $loopResult = new LoopResult($orders);
+
+        foreach ($orders as $order) {
+            $tax = 0;
+            $amount = $order->getTotalAmount($tax);
+            $loopResultRow = new LoopResultRow($loopResult, $order, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow
+                ->set("ID", $order->getId())
+                ->set("REF", $order->getRef())
+                ->set("CUSTOMER", $order->getCustomerId())
+                ->set("DELIVERY_ADDRESS", $order->getDeliveryOrderAddressId())
+                ->set("INVOICE_ADDRESS", $order->getInvoiceOrderAddressId())
+                ->set("INVOICE_DATE", $order->getInvoiceDate())
+                ->set("CURRENCY", $order->getCurrencyId())
+                ->set("CURRENCY_RATE", $order->getCurrencyRate())
+                ->set("TRANSACTION_REF", $order->getTransactionRef())
+                ->set("DELIVERY_REF", $order->getDeliveryRef())
+                ->set("INVOICE_REF", $order->getInvoiceRef())
+                ->set("POSTAGE", $order->getPostage())
+                ->set("PAYMENT_MODULE", $order->getPaymentModuleId())
+                ->set("DELIVERY_MODULE", $order->getDeliveryModuleId())
+                ->set("STATUS", $order->getStatusId())
+                ->set("LANG", $order->getLangId())
+                ->set("POSTAGE", $order->getPostage())
+                ->set("TOTAL_TAX", $tax)
+                ->set("TOTAL_AMOUNT", $amount - $tax)
+                ->set("TOTAL_TAXED_AMOUNT", $amount)
+            ;
+
+            $loopResult->addRow($loopResultRow);
+        }
+
+        return $loopResult;
     }
 }

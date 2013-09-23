@@ -1,0 +1,403 @@
+<?php
+/**********************************************************************************/
+/*                                                                                */
+/*      Thelia	                                                                  */
+/*                                                                                */
+/*      Copyright (c) OpenStudio                                                  */
+/*      email : info@thelia.net                                                   */
+/*      web : http://www.thelia.net                                               */
+/*                                                                                */
+/*      This program is free software; you can redistribute it and/or modify      */
+/*      it under the terms of the GNU General Public License as published by      */
+/*      the Free Software Foundation; either version 3 of the License             */
+/*                                                                                */
+/*      This program is distributed in the hope that it will be useful,           */
+/*      but WITHOUT ANY WARRANTY; without even the implied warranty of            */
+/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             */
+/*      GNU General Public License for more details.                              */
+/*                                                                                */
+/*      You should have received a copy of the GNU General Public License         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.      */
+/*                                                                                */
+/**********************************************************************************/
+
+namespace Thelia\Controller\Admin;
+
+use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Validator\Constraints\Image;
+use Symfony\Component\Validator\Constraints\ImageValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Thelia\Core\Event\ImageCreateOrUpdateEvent;
+use Thelia\Core\Event\ImagesCreateOrUpdateEvent;
+use Thelia\Core\Event\ImageDeleteEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Log\Tlog;
+use Thelia\Model\CategoryImage;
+use Thelia\Model\ContentImage;
+use Thelia\Model\FolderImage;
+use Thelia\Model\ProductImage;
+use Thelia\Tools\FileManager;
+use Thelia\Tools\Rest\ResponseRest;
+
+/**
+ * Created by JetBrains PhpStorm.
+ * Date: 8/19/13
+ * Time: 3:24 PM
+ *
+ * Control View and Action (Model) via Events
+ * Control Files and Images
+ *
+ * @package File
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ *
+ */
+class FileController extends BaseAdminController
+{
+    /**
+     * Manage how a file collection has to be saved
+     *
+     * @param int    $parentId   Parent id owning files being saved
+     * @param string $parentType Parent Type owning files being saved
+     *
+     * @return Response
+     */
+    public function saveFilesAction($parentId, $parentType)
+    {
+
+
+
+    }
+
+    /**
+     * Manage how a image collection has to be saved
+     *
+     * @param int    $parentId   Parent id owning images being saved
+     * @param string $parentType Parent Type owning images being saved
+     *
+     * @return Response
+     */
+    public function saveImageAjaxAction($parentId, $parentType)
+    {
+        $this->checkAuth('ADMIN', 'admin.image.save');
+        $this->checkXmlHttpRequest();
+
+        if ($this->isParentTypeValid($parentType)) {
+            if ($this->getRequest()->isMethod('POST')) {
+
+                /** @var UploadedFile $fileBeingUploaded */
+                $fileBeingUploaded = $this->getRequest()->files->get('file');
+
+                $fileManager = new FileManager($this->container);
+
+                // Validate if file is too big
+                if ($fileBeingUploaded->getError() == 1) {
+                    $message = $this->getTranslator()
+                    ->trans(
+                        'File is too heavy, please retry with a file having a size less than %size%.',
+                        array('%size%' => ini_get('post_max_size')),
+                        'image'
+                    );
+
+                    return new ResponseRest($message, 'text', 403);
+                }
+                // Validate if it is a image or file
+                if (!$fileManager->isImage($fileBeingUploaded->getMimeType())) {
+                    $message = $this->getTranslator()
+                        ->trans(
+                            'You can only upload images (.png, .jpg, .jpeg, .gif)',
+                            array(),
+                            'image'
+                        );
+
+                    return new ResponseRest($message, 'text', 415);
+                }
+
+                $parentModel = $fileManager->getParentImageModel($parentType, $parentId);
+                $imageModel = $fileManager->getImageModel($parentType);
+
+                if ($parentModel === null || $imageModel === null || $fileBeingUploaded === null) {
+                    return new Response('', 404);
+                }
+
+                $defaultTitle = $parentModel->getTitle();
+                $imageModel->setParentId($parentId);
+                $imageModel->setTitle($defaultTitle);
+
+                $imageCreateOrUpdateEvent = new ImageCreateOrUpdateEvent(
+                    $parentType,
+                    $parentId
+                );
+                $imageCreateOrUpdateEvent->setModelImage($imageModel);
+                $imageCreateOrUpdateEvent->setUploadedFile($fileBeingUploaded);
+                $imageCreateOrUpdateEvent->setParentName($parentModel->getTitle());
+
+
+                // Dispatch Event to the Action
+                $this->dispatch(
+                    TheliaEvents::IMAGE_SAVE,
+                    $imageCreateOrUpdateEvent
+                );
+
+
+                return new ResponseRest(array('status' => true, 'message' => ''));
+            }
+        }
+
+        return new Response('', 404);
+    }
+
+    /**
+     * Manage how a image list will be displayed in AJAX
+     *
+     * @param int    $parentId   Parent id owning images being saved
+     * @param string $parentType Parent Type owning images being saved
+     *
+     * @return Response
+     */
+    public function getImageListAjaxAction($parentId, $parentType)
+    {
+        $this->checkAuth('ADMIN', 'admin.image.save');
+        $this->checkXmlHttpRequest();
+        $args = array('imageType' => $parentType, 'parentId' => $parentId);
+
+        return $this->render('includes/image-upload-list-ajax', $args);
+    }
+
+    /**
+     * Manage how an image list will be uploaded in AJAX
+     *
+     * @param int    $parentId   Parent id owning images being saved
+     * @param string $parentType Parent Type owning images being saved
+     *
+     * @return Response
+     */
+    public function getImageFormAjaxAction($parentId, $parentType)
+    {
+        $this->checkAuth('ADMIN', 'admin.image.save');
+        $this->checkXmlHttpRequest();
+        $args = array('imageType' => $parentType, 'parentId' => $parentId);
+
+        return $this->render('includes/image-upload-form', $args);
+    }
+
+    /**
+     * Manage how an image is viewed
+     *
+     * @param int    $imageId    Parent id owning images being saved
+     * @param string $parentType Parent Type owning images being saved
+     *
+     * @return Response
+     */
+    public function viewImageAction($imageId, $parentType)
+    {
+        if (null !== $response = $this->checkAuth('admin.image.view')) {
+            return $response;
+        }
+        try {
+            $fileManager = new FileManager($this->container);
+            $image = $fileManager->getImageModelQuery($parentType)->findPk($imageId);
+            $redirectUrl = $fileManager->getRedirectionUrl($parentType, $image->getParentId());
+
+            return $this->render('image-edit', array(
+                'imageId' => $imageId,
+                'imageType' => $parentType,
+                'redirectUrl' => $redirectUrl
+            ));
+        } catch (Exception $e) {
+            $this->pageNotFound();
+        }
+    }
+
+    /**
+     * Manage how an image is updated
+     *
+     * @param int    $imageId    Parent id owning images being saved
+     * @param string $parentType Parent Type owning images being saved
+     *
+     * @return Response
+     */
+    public function updateImageAction($imageId, $parentType)
+    {
+        if (null !== $response = $this->checkAuth('admin.image.update')) {
+            return $response;
+        }
+
+        $message = false;
+
+        $fileManager = new FileManager($this->container);
+        $imageModification = $fileManager->getImageForm($parentType, $this->getRequest());
+
+        try {
+            $image = $fileManager->getImageModelQuery($parentType)->findPk($imageId);
+            $oldImage = clone $image;
+            if (null === $image) {
+                throw new \InvalidArgumentException(sprintf('%d image id does not exists', $imageId));
+            }
+
+            $form = $this->validateForm($imageModification);
+
+            $event = $this->createEventInstance($parentType, $image, $form->getData());
+            $event->setOldModelImage($oldImage);
+
+            $files = $this->getRequest()->files;
+            $fileForm = $files->get($imageModification->getName());
+            if (isset($fileForm['file'])) {
+                $event->setUploadedFile($fileForm['file']);
+            }
+
+            $this->dispatch(TheliaEvents::IMAGE_UPDATE, $event);
+
+            $imageUpdated = $event->getModelImage();
+
+            $this->adminLogAppend(sprintf('Image with Ref %s (ID %d) modified', $imageUpdated->getTitle(), $imageUpdated->getId()));
+
+            if ($this->getRequest()->get('save_mode') == 'close') {
+                $this->redirectToRoute('admin.images');
+            } else {
+                $this->redirectSuccess($imageModification);
+            }
+
+        } catch (FormValidationException $e) {
+            $message = sprintf('Please check your input: %s', $e->getMessage());
+        } catch (PropelException $e) {
+            $message = $e->getMessage();
+        } catch (\Exception $e) {
+            $message = sprintf('Sorry, an error occurred: %s', $e->getMessage().' '.$e->getFile());
+        }
+
+        if ($message !== false) {
+            Tlog::getInstance()->error(sprintf('Error during image editing : %s.', $message));
+
+            $imageModification->setErrorMessage($message);
+
+            $this->getParserContext()
+                ->addForm($imageModification)
+                ->setGeneralError($message);
+        }
+
+        return $this->render('image-edit', array(
+            'imageId' => $imageId,
+            'imageType' => $parentType
+        ));
+    }
+
+    /**
+     * Manage how a image has to be deleted (AJAX)
+     *
+     * @param int    $imageId    Parent id owning images being saved
+     * @param string $parentType Parent Type owning images being saved
+     *
+     * @return Response
+     */
+    public function deleteImagesAction($imageId, $parentType)
+    {
+        $this->checkAuth('ADMIN', 'admin.image.delete');
+        $this->checkXmlHttpRequest();
+
+        $fileManager = new FileManager($this->container);
+        $imageModelQuery = $fileManager->getImageModelQuery($parentType);
+        $model = $imageModelQuery->findPk($imageId);
+
+        if ($model == null) {
+            return $this->pageNotFound();
+        }
+
+        // Feed event
+        $imageDeleteEvent = new ImageDeleteEvent(
+            $model,
+            $parentType
+        );
+
+        // Dispatch Event to the Action
+        $this->dispatch(
+            TheliaEvents::IMAGE_DELETE,
+            $imageDeleteEvent
+        );
+
+        $message = $this->getTranslator()
+            ->trans(
+                'Images deleted successfully',
+                array(),
+                'image'
+            );
+
+        return new Response($message);
+    }
+
+    /**
+     * Log error message
+     *
+     * @param string     $parentType Parent type
+     * @param string     $action     Creation|Update|Delete
+     * @param string     $message    Message to log
+     * @param \Exception $e          Exception to log
+     *
+     * @return $this
+     */
+    protected function logError($parentType, $action, $message, $e)
+    {
+        Tlog::getInstance()->error(
+            sprintf(
+                'Error during ' . $parentType . ' ' . $action . ' process : %s. Exception was %s',
+                $message,
+                $e->getMessage()
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Check if parent type is valid or not
+     *
+     * @param string $parentType Parent type
+     *
+     * @return bool
+     */
+    public function isParentTypeValid($parentType)
+    {
+        return (in_array($parentType, ImagesCreateOrUpdateEvent::getAvailableType()));
+    }
+
+    /**
+     * Create Event instance
+     *
+     * @param string                                              $parentType Parent Type owning images being saved
+     * @param CategoryImage|ProductImage|ContentImage|FolderImage $model      Image model
+     * @param array                                               $data       Post data
+     *
+     * @return ImageCreateOrUpdateEvent
+     */
+    private function createEventInstance($parentType, $model, $data)
+    {
+        $imageCreateEvent = new ImageCreateOrUpdateEvent($parentType, null);
+
+        if (isset($data['title'])) {
+            $model->setTitle($data['title']);
+        }
+        if (isset($data['chapo'])) {
+        $model->setChapo($data['chapo']);
+        }
+        if (isset($data['description'])) {
+            $model->setDescription($data['description']);
+        }
+        if (isset($data['file'])) {
+            $model->setFile($data['file']);
+        }
+        if (isset($data['postscriptum'])) {
+            $model->setPostscriptum($data['postscriptum']);
+        }
+
+        $imageCreateEvent->setModelImage($model);
+
+        return $imageCreateEvent;
+    }
+
+
+}

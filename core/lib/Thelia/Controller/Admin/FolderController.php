@@ -22,25 +22,307 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\FolderCreateEvent;
+use Thelia\Core\Event\FolderDeleteEvent;
+use Thelia\Core\Event\FolderToggleVisibilityEvent;
+use Thelia\Core\Event\FolderUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Form\FolderCreationForm;
+use Thelia\Form\FolderModificationForm;
+use Thelia\Model\FolderQuery;
 
 /**
  * Class FolderController
  * @package Thelia\Controller\Admin
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderController extends BaseAdminController
+class FolderController extends AbstractCrudController
 {
-    public function indexAction()
+
+    public function __construct()
     {
-        if (null !== $response = $this->checkAuth("admin.folder.view")) return $response;
-        return $this->render("folders", array("display_folder" => 20));
+        parent::__construct(
+            'folder',
+            'manual',
+            'folder_order',
+
+            'admin.folder.default',
+            'admin.folder.create',
+            'admin.folder.update',
+            'admin.folder.delete',
+
+            TheliaEvents::FOLDER_CREATE,
+            TheliaEvents::FOLDER_UPDATE,
+            TheliaEvents::FOLDER_DELETE,
+            TheliaEvents::FOLDER_TOGGLE_VISIBILITY,
+            TheliaEvents::FOLDER_UPDATE_POSITION
+        );
     }
-    
-    public function updateAction($folder_id)
+
+    /**
+     * Return the creation form for this object
+     */
+    protected function getCreationForm()
+    {
+        return new FolderCreationForm($this->getRequest());
+    }
+
+    /**
+     * Return the update form for this object
+     */
+    protected function getUpdateForm()
+    {
+        return new FolderModificationForm($this->getRequest());
+    }
+
+    /**
+     * Hydrate the update form for this object, before passing it to the update template
+     *
+     * @param \Thelia\Model\Folder $object
+     */
+    protected function hydrateObjectForm($object) {
+
+        // Prepare the data that will hydrate the form
+        $data = array(
+            'id'           => $object->getId(),
+            'locale'       => $object->getLocale(),
+            'title'        => $object->getTitle(),
+            'chapo'        => $object->getChapo(),
+            'description'  => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum(),
+            'visible'      => $object->getVisible(),
+            'url'          => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
+            'parent'       => $object->getParent()
+        );
+
+        // Setup the object form
+        return new FolderModificationForm($this->getRequest(), "form", $data);
+    }
+
+    /**
+     * Creates the creation event with the provided form data
+     *
+     * @param unknown $formData
+     */
+    protected function getCreationEvent($formData)
+    {
+        $creationEvent = new FolderCreateEvent();
+
+        $creationEvent
+            ->setLocale($formData['locale'])
+            ->setTitle($formData['title'])
+            ->setVisible($formData['visible'])
+            ->setParent($formData['parent']);
+
+        return $creationEvent;
+    }
+
+    /**
+     * Creates the update event with the provided form data
+     *
+     * @param unknown $formData
+     */
+    protected function getUpdateEvent($formData)
+    {
+        $updateEvent = new FolderUpdateEvent($formData['id']);
+
+        $updateEvent
+            ->setLocale($formData['locale'])
+            ->setTitle($formData['title'])
+            ->setChapo($formData['chapo'])
+            ->setDescription($formData['description'])
+            ->setPostscriptum($formData['postscriptum'])
+            ->setVisible($formData['visible'])
+            ->setUrl($formData['url'])
+            ->setParent($formData['parent'])
+        ;
+
+        return $updateEvent;
+    }
+
+    /**
+     * Creates the delete event with the provided form data
+     */
+    protected function getDeleteEvent()
+    {
+        return new FolderDeleteEvent($this->getRequest()->get('folder_id'), 0);
+    }
+
+    /**
+     * @return FolderToggleVisibilityEvent|void
+     */
+    protected function createToggleVisibilityEvent()
+    {
+        return new FolderToggleVisibilityEvent($this->getExistingObject());
+    }
+
+    /**
+     * @param $positionChangeMode
+     * @param $positionValue
+     * @return UpdatePositionEvent|void
+     */
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue) {
+
+        return new UpdatePositionEvent(
+            $this->getRequest()->get('folder_id', null),
+            $positionChangeMode,
+            $positionValue
+        );
+    }
+
+    /**
+     * Return true if the event contains the object, e.g. the action has updated the object in the event.
+     *
+     * @param \Thelia\Core\Event\FolderEvent $event
+     */
+    protected function eventContainsObject($event)
+    {
+        return $event->hasFolder();
+    }
+
+    /**
+     * Get the created object from an event.
+     *
+     * @param $event \Thelia\Core\Event\FolderEvent $event
+     *
+     * @return null|\Thelia\Model\Folder
+     */
+    protected function getObjectFromEvent($event)
+    {
+        return $event->hasFolder() ? $event->getFolder() : null;
+    }
+
+    /**
+     * Load an existing object from the database
+     */
+    protected function getExistingObject() {
+        return FolderQuery::create()
+            ->joinWithI18n($this->getCurrentEditionLocale())
+            ->findOneById($this->getRequest()->get('folder_id', 0));
+    }
+
+    /**
+     * Returns the object label form the object event (name, title, etc.)
+     *
+     * @param unknown $object
+     */
+    protected function getObjectLabel($object) {
+        return $object->getTitle();
+    }
+
+    /**
+     * Returns the object ID from the object
+     *
+     * @param unknown $object
+     */
+    protected function getObjectId($object)
+    {
+        return $object->getId();
+    }
+
+    /**
+     * Render the main list template
+     *
+     * @param unknown $currentOrder, if any, null otherwise.
+     */
+    protected function renderListTemplate($currentOrder) {
+
+        // Get content order
+        $content_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
+
+        return $this->render('folders',
+            array(
+                'folder_order' => $currentOrder,
+                'content_order' => $content_order,
+                'parent' => $this->getRequest()->get('parent', 0)
+            ));
+    }
+
+
+    /**
+     * Render the edition template
+     */
+    protected function renderEditionTemplate() {
+
+        return $this->render('folder-edit', $this->getEditionArguments());
+    }
+
+    protected function getEditionArguments()
+    {
+        return array(
+            'folder_id' => $this->getRequest()->get('folder_id', 0),
+            'current_tab' => $this->getRequest()->get('current_tab', 'general')
+        );
+    }
+
+    /**
+     * @param \Thelia\Core\Event\FolderUpdateEvent $updateEvent
+     * @return Response|void
+     */
+    protected function performAdditionalUpdateAction($updateEvent)
+    {
+        if ($this->getRequest()->get('save_mode') != 'stay') {
+
+            // Redirect to parent category list
+            $this->redirectToRoute(
+                'admin.folders.default',
+                array('parent' => $updateEvent->getFolder()->getParent())
+            );
+        }
+    }
+
+    /**
+     * Put in this method post object delete processing if required.
+     *
+     * @param \Thelia\Core\Event\FolderDeleteEvent $deleteEvent the delete event
+     * @return Response a response, or null to continue normal processing
+     */
+    protected function performAdditionalDeleteAction($deleteEvent)
+    {
+        // Redirect to parent category list
+        $this->redirectToRoute(
+            'admin.folders.default',
+            array('parent' => $deleteEvent->getFolder()->getParent())
+        );
+    }
+
+    /**
+     * @param $event \Thelia\Core\Event\UpdatePositionEvent
+     * @return null|Response
+     */
+    protected function performAdditionalUpdatePositionAction($event)
     {
 
-    	return $this->render("folder-edit", array(
-    		"folder_id" => $folder_id
-    	));
+        $folder = FolderQuery::create()->findPk($event->getObjectId());
+
+        if ($folder != null) {
+            // Redirect to parent category list
+            $this->redirectToRoute(
+                'admin.folders.default',
+                array('parent' => $folder->getParent())
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * Redirect to the edition template
+     */
+    protected function redirectToEditionTemplate()
+    {
+        $this->redirect($this->getRoute('admin.folders.update', $this->getEditionArguments()));
+    }
+
+    /**
+     * Redirect to the list template
+     */
+    protected function redirectToListTemplate()
+    {
+        $this->redirectToRoute(
+            'admin.folders.default',
+            array('parent' => $this->getRequest()->get('parent', 0))
+        );
     }
 }

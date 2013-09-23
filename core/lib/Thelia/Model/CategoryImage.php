@@ -2,6 +2,8 @@
 
 namespace Thelia\Model;
 
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Model\Base\CategoryImage as BaseCategoryImage;
 use Propel\Runtime\Connection\ConnectionInterface;
 
@@ -25,4 +27,29 @@ class CategoryImage extends BaseCategoryImage
 
         return true;
     }
+
+    /**
+     * Set Image parent id
+     *
+     * @param int $parentId parent id
+     *
+     * @return $this
+     */
+    public function setParentId($parentId)
+    {
+        $this->setCategoryId($parentId);
+
+        return $this;
+    }
+
+    /**
+     * Get Image parent id
+     *
+     * @return int parent id
+     */
+    public function getParentId()
+    {
+        return $this->getCategoryId();
+    }
+
 }

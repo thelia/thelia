@@ -80,7 +80,7 @@ class OrderDelivery extends BaseForm
             ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
             ->filterByActivate(1)
             ->filterById($value)
-            ->find();
+            ->findOne();
 
         if(null === $module) {
             $context->addViolation("Delivery module ID not found");
