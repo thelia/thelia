@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\Content\ContentCreateEvent;
+use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
@@ -313,5 +314,13 @@ class ContentController extends AbstractCrudController
             $positionChangeMode,
             $positionValue
         );
+    }
+
+    /**
+     * @return FolderToggleVisibilityEvent|void
+     */
+    protected function createToggleVisibilityEvent()
+    {
+        return new ContentToggleVisibilityEvent($this->getExistingObject());
     }
 }

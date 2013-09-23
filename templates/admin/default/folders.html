@@ -567,7 +567,7 @@
 
             $(".contentVisibleToggle").on('switch-change', function(event, data) {
                 $.ajax({
-                   url : "{url path='admin/contents/toggle-online'}",
+                   url : "{url path='admin/content/toggle-online'}",
                    data : {
                        content_id : $(this).data('id'),
                        action : 'visibilityToggle'

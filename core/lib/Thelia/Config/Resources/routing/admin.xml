@@ -239,6 +239,10 @@
         <default key="_controller">Thelia\Controller\Admin\ContentController::updatePositionAction</default>
     </route>
 
+    <route id="admin.content.toggle-online" path="/admin/content/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::setToggleVisibilityAction</default>
+    </route>
+
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 

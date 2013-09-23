@@ -24,6 +24,7 @@
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Content\ContentCreateEvent;
+use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
@@ -97,6 +98,19 @@ class Content extends BaseAction implements EventSubscriberInterface
             }
         }
     }
+
+    public function toggleVisibility(ContentToggleVisibilityEvent $event)
+    {
+        $content = $event->getContent();
+
+        $content
+            ->setDispatcher($this->getDispatcher())
+            ->setVisible(!$content->getVisible())
+            ->save();
+
+    }
+
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
