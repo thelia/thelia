@@ -235,6 +235,10 @@
         <default key="_controller">Thelia\Controller\Admin\ContentController::processUpdateAction</default>
     </route>
 
+    <route id="admin.content.update-position" path="/admin/content/update-position">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::updatePositionAction</default>
+    </route>
+
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 

@@ -26,6 +26,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\Content as ContentModel;
 use Thelia\Model\FolderQuery;
@@ -77,6 +78,25 @@ class Content extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function updatePosition(UpdatePositionEvent $event)
+    {
+        if(null !== $content = ContentQuery::create()->findPk($event->getObjectId())) {
+            $content->setDispatcher($this->getDispatcher());
+
+            switch($event->getMode())
+            {
+                case UpdatePositionEvent::POSITION_ABSOLUTE:
+                    $content->changeAbsolutePosition($event->getPosition());
+                    break;
+                case UpdatePositionEvent::POSITION_DOWN:
+                    $content->movePositionDown();
+                    break;
+                case UpdatePositionEvent::POSITION_UP:
+                    $content->movePositionUp();
+                    break;
+            }
+        }
+    }
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *

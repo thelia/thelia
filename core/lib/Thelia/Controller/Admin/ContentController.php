@@ -25,6 +25,7 @@ namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Form\ContentCreationForm;
 use Thelia\Form\ContentModificationForm;
 use Thelia\Model\ContentQuery;
@@ -285,5 +286,32 @@ class ContentController extends AbstractCrudController
                 array('parent' => $this->getFolderId())
             );
         }
+    }
+
+    /**
+     * @param $event \Thelia\Core\Event\UpdatePositionEvent
+     * @return null|Response
+     */
+    protected function performAdditionalUpdatePositionAction($event)
+    {
+
+        if (null !== $content = ContentQuery::create()->findPk($event->getObjectId())) {
+            // Redirect to parent category list
+            $this->redirectToRoute(
+                'admin.folders.default',
+                array('parent' => $content->getDefaultFolderId())
+            );
+        }
+
+        return null;
+    }
+
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    {
+        return new UpdatePositionEvent(
+            $this->getRequest()->get('content_id', null),
+            $positionChangeMode,
+            $positionValue
+        );
     }
 }
