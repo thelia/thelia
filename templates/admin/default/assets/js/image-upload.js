@@ -11,7 +11,8 @@ $(function($){
         var imageDropzone = new Dropzone("#images-dropzone", {
             dictDefaultMessage : $('.btn-browse').html(),
             uploadMultiple: false,
-            maxFilesize: 8
+            maxFilesize: 8,
+            acceptedFiles: 'image/*'
         });    
 
         var totalFiles      = 0,
@@ -27,14 +28,13 @@ $(function($){
 
         imageDropzone.on("complete", function(file){
             completedFiles += 1;
-            console.log(completedFiles + '===' + totalFiles);
+
             if (completedFiles === totalFiles){
                 $('.dz-message').slideDown();
             }
         });
 
         imageDropzone.on("success", function(file) {
-            $(".image-manager .dz-file-preview").remove();
             imageDropzone.removeFile(file);
             $.imageUploadManager.updateImageListAjax();
             $.imageUploadManager.onClickDeleteImage();
