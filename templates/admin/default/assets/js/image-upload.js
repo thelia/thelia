@@ -2,10 +2,14 @@ $(function($){
     // Manage picture upload
     var pictureUploadManager = {};
 
-    var imageDropzone = new Dropzone("#images-dropzone");
-    Dropzone.options.imageDropzone = {
-        uploadMultiple: false
-    };
+    Dropzone.autoDiscover = false;
+
+    var imageDropzone = new Dropzone("#images-dropzone", {
+        dictDefaultMessage : $('.btn-browse').html(),
+        uploadMultiple: false,
+        maxFilesize: 8
+    });    
+
     imageDropzone.on("success", function(file) {
         $(".image-manager .dz-file-preview").remove();
         imageDropzone.removeFile(file);
@@ -38,7 +42,9 @@ $(function($){
         $('.image-manager .image-delete-btn').on('click', function (e) {
             e.preventDefault();
             var $this = $(this);
-            $this.parent().append('<div class="loading" ></div>');
+            var $parent = $this.parent();
+            $parent.find('a').remove();
+            $parent.append('<div class="loading" ></div>');
             var $url = $this.attr("href");
             var errorMessage = $this.attr("data-error-message");
             $.ajax({
@@ -52,7 +58,8 @@ $(function($){
                     }
                 }
             }).done(function(data) {
-                $this.parent().remove();
+                $parent.parents('tr').remove();
+
                 $(".image-manager .message").html(
                     data
                 );

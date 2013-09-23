@@ -9,7 +9,7 @@
 
         <div id="wrapper" class="container">
 
-            {loop type="image" name="image_edit" source="{$imageType}" id="{$imageId}" width="200" height="100" resize_mode="borders" backend_context="1" lang="$edit_language_id"}
+            {loop type="image" name="image_edit" source="{$imageType}" id="{$imageId}" width="580" backend_context="1" lang="$edit_language_id"}
                 <ul class="breadcrumb">
         			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                     <li><a href="{url path="{$redirectUrl}"}">{intl l="Image"}</a></li>
@@ -44,48 +44,56 @@
 
         					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                            <div class="col-md-6">
-                                                <p class="title title-without-tabs">{intl l="Image informations"}</p>
-
-
-
-                                                <img src="{$IMAGE_URL}" alt="{$TITLE}" />
-                                                {form_field form=$form field='file'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                        <input type="file" id="{$label_attr.for}" name="{$name}" class="form-control" value="" title="{intl l="{$label}"}" placeholder="{intl l='File'}">
+                                            <p class="title title-without-tabs">{intl l="Image informations"}</p>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="control-label">{intl l="Preview"} : </label>
+                                                        <p><img src="{$IMAGE_URL}" alt="{$TITLE}" class="img-thumbnail"></p>
                                                     </div>
-                                                {/form_field}
+                                                </div>
 
-                                                {form_field form=$form field='title'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$TITLE}" title="{intl l="{$label}"}" placeholder="{intl l='Title'}">
-                                                    </div>
-                                                {/form_field}
+                                                <div class="col-md-6">
+                                                    {form_field form=$form field='file'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <input type="file" id="{$label_attr.for}" name="{$name}" class="form-control" value="" title="{intl l="{$label}"}" placeholder="{intl l='File'}">
+                                                        </div>
+                                                    {/form_field}
 
-                                                {form_field form=$form field='chapo'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$CHAPO}" title="{intl l="{$label}"}" placeholder="{intl l='Chapo'}">
-                                                    </div>
-                                                {/form_field}
+                                                    {form_field form=$form field='title'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$TITLE}" title="{intl l="{$label}"}" placeholder="{intl l='Title'}">
+                                                        </div>
+                                                    {/form_field}
 
-                                                {form_field form=$form field='postscriptum'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$POSTSCRIPTUM}" title="{intl l="{$label}"}" placeholder="{intl l='Post Scriptum'}">
-                                                    </div>
-                                                {/form_field}
+                                                    {form_field form=$form field='chapo'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Chapo'}">{$CHAPO}</textarea>
+                                                        </div>
+                                                    {/form_field}
 
-                                                {form_field form=$form field='description'}
-                                                    <div class="form-group {if $error}has-error{/if}">
-                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$DESCRIPTION}" title="{intl l="{$label}"}" placeholder="{intl l='Description'}">
-                                                    </div>
-                                                {/form_field}
-
+                                                    {form_field form=$form field='postscriptum'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Post Scriptum'}">{$POSTSCRIPTUM}</textarea>
+                                                        </div>
+                                                    {/form_field}
+                                                </div>
                                             </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    {form_field form=$form field='description'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control wysiwyg" title="{intl l="{$label}"}" placeholder="{intl l='Description'}">{$DESCRIPTION}</textarea>
+                                                        </div>
+                                                    {/form_field}
+                                                </div>
+                                            </div>                                          
                                         </form>
         							{/form}
 
@@ -117,4 +125,25 @@
     {javascripts file='assets/js/main.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+    
+    <script src="{url file='/tinymce/tinymce.min.js'}"></script>
+    <script>
+        tinymce.init({
+            selector: ".wysiwyg",
+            theme: "modern",
+            menubar : false,
+            language: "",
+            plugins: [
+                 "advlist autolink link image lists charmap print preview hr anchor pagebreak",
+                 "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
+                 "table contextmenu directionality emoticons paste textcolor filemanager"
+            ],
+            toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | styleselect | filemanager | link unlink anchor | image media | forecolor backcolor  | print preview code ",
+            image_advtab: true ,
+            external_filemanager_path:"{url file='/tinymce/plugins/filemanager/'}'",
+            filemanager_title:"{intl l='Files manager'}" ,
+            external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
+         });
+    </script>
+
 {/block}
