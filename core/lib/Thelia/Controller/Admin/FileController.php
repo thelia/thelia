@@ -139,6 +139,23 @@ class FileController extends BaseAdminController
     }
 
     /**
+     * Manage how an image list will be uploaded in AJAX
+     *
+     * @param int    $parentId   Parent id owning images being saved
+     * @param string $parentType Parent Type owning images being saved
+     *
+     * @return Response
+     */
+    public function getImageFormAjaxAction($parentId, $parentType)
+    {
+        $this->checkAuth('ADMIN', 'admin.image.save');
+        $this->checkXmlHttpRequest();
+        $args = array('imageType' => $parentType, 'parentId' => $parentId);
+
+        return $this->render('includes/image-upload-form', $args);
+    }
+
+    /**
      * Manage how an image is viewed
      *
      * @param int    $imageId    Parent id owning images being saved

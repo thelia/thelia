@@ -62,7 +62,13 @@
                                    data-toggle="tab">{intl l="Associations"}</a>
                             </li>
 
-		                    <li><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
+		                    <li>
+                                <a href="#images"
+                                   data-toggle="tab"
+                                   data-href="{url path="/admin/image/type/product/{$product_id}/form-ajax"}">
+                                    {intl l="Images"}
+                                </a>
+                            </li>
 		                    <li><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
 		                    <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
 		 				</ul>

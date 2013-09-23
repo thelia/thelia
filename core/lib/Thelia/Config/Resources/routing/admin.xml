@@ -44,6 +44,11 @@
         <requirement key="parentType">.*</requirement>
         <requirement key="parentId">\d+</requirement>
     </route>
+    <route id="admin.image.form-ajax" path="/admin/image/type/{parentType}/{parentId}/form-ajax">
+        <default key="_controller">Thelia\Controller\Admin\FileController::getImageFormAjaxAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="parentId">\d+</requirement>
+    </route>
     <route id="admin.image.list-ajax" path="/admin/image/type/{parentType}/{parentId}/list-ajax">
         <default key="_controller">Thelia\Controller\Admin\FileController::getImageListAjaxAction</default>
         <requirement key="parentType">.*</requirement>

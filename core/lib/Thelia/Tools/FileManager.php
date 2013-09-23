@@ -413,7 +413,7 @@ class FileManager
                 $uri = '/admin/content/update/' . $parentId;
                 break;
             case ImagesCreateOrUpdateEvent::TYPE_FOLDER:
-                $uri = '/admin/folders/update?folder_id=' . $parentId;
+                $uri = '/admin/folders/update/' . $parentId;
                 break;
             default:
                 $uri = false;
