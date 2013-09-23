@@ -13,7 +13,6 @@ namespace Thelia\Tests\Type;
 use Thelia\Core\Event\ImagesCreateOrUpdateEvent;
 use Thelia\Exception\ImageException;
 use Thelia\Model\Admin;
-use Thelia\Model\ProductImage;
 use Thelia\Tools\FileManager;
 
 class FileManagerTest extends \PHPUnit_Framework_TestCase {
@@ -195,6 +194,9 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $stubProductImage->expects($this->any())
             ->method('save')
             ->will($this->returnValue(10));
+        $stubProductImage->expects($this->any())
+            ->method('getFile')
+            ->will($this->returnValue('file'));
 
         $fileManager = new FileManager($stubContainer);
 
@@ -221,6 +223,9 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $stubCategoryImage->expects($this->any())
             ->method('save')
             ->will($this->returnValue(10));
+        $stubCategoryImage->expects($this->any())
+            ->method('getFile')
+            ->will($this->returnValue('file'));
 
         $fileManager = new FileManager($stubContainer);
 
@@ -247,6 +252,9 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $stubFolderImage->expects($this->any())
             ->method('save')
             ->will($this->returnValue(10));
+        $stubFolderImage->expects($this->any())
+            ->method('getFile')
+            ->will($this->returnValue('file'));
 
         $fileManager = new FileManager($stubContainer);
 
@@ -273,6 +281,9 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $stubContentImage->expects($this->any())
             ->method('save')
             ->will($this->returnValue(10));
+        $stubContentImage->expects($this->any())
+            ->method('getFile')
+            ->will($this->returnValue('file'));
 
         $fileManager = new FileManager($stubContainer);
 
@@ -301,11 +312,13 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $stubProductImage->expects($this->any())
             ->method('save')
             ->will($this->returnValue(10));
+        $stubProductImage->expects($this->any())
+            ->method('getFile')
+            ->will($this->returnValue('file'));
 
         $event = new ImagesCreateOrUpdateEvent('bad', 24);
-        $modelImage = new ProductImage();
 
-        $fileManager->saveImage($event, $modelImage);
+        $fileManager->saveImage($event, $stubProductImage);
     }
 
     /**
@@ -325,6 +338,9 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $stubProductImage->expects($this->any())
             ->method('save')
             ->will($this->returnValue(0));
+        $stubProductImage->expects($this->any())
+            ->method('getFile')
+            ->will($this->returnValue('file'));
 
         $event = new ImagesCreateOrUpdateEvent(ImagesCreateOrUpdateEvent::TYPE_PRODUCT, 24);
 
