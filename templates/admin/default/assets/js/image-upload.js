@@ -3,18 +3,34 @@ $(function($){
     $.imageUploadManager = {};
 
     Dropzone.autoDiscover = false;
+
+    
+
     // Remove image on click
     $.imageUploadManager.initImageDropZone = function() {
         var imageDropzone = new Dropzone("#images-dropzone", {
             dictDefaultMessage : $('.btn-browse').html(),
             uploadMultiple: false,
             maxFilesize: 8,
-            accept: function(file, done) {
-                if (file.name == "justinbieber.jpg") {
+            acceptedFiles: 'image/png, image/gif, image/jpeg'
+        });    
 
-                    done("Naha, you don't.");
-                }
-                else { done(); }
+        var totalFiles      = 0,
+            completedFiles  = 0;
+
+        imageDropzone.on("addedfile", function(file){
+            totalFiles += 1;
+
+            if(totalFiles == 1){
+                $('.dz-message').hide();
+            }
+        });
+
+        imageDropzone.on("complete", function(file){
+            completedFiles += 1;
+
+            if (completedFiles === totalFiles){
+                $('.dz-message').slideDown();
             }
         });
 
@@ -23,6 +39,9 @@ $(function($){
             $.imageUploadManager.updateImageListAjax();
             $.imageUploadManager.onClickDeleteImage();
         });
+        
+              
+
     };
 
     // Update picture list via AJAX call
