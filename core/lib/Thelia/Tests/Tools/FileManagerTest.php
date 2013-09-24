@@ -10,7 +10,7 @@
 namespace Thelia\Tests\Type;
 
 
-use Thelia\Core\Event\ImagesCreateOrUpdateEvent;
+use Thelia\Core\Event\ImageCreateOrUpdateEvent;
 use Thelia\Exception\ImageException;
 use Thelia\Model\Admin;
 use Thelia\Tools\FileManager;
@@ -93,7 +93,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
 
         $newUploadedFiles = array();
 
-        $actual = $fileManager->copyUploadedFile(24, ImagesCreateOrUpdateEvent::TYPE_PRODUCT, $stubProductImage, $stubUploadedFile, $newUploadedFiles);
+        $actual = $fileManager->copyUploadedFile(24, FileManager::TYPE_PRODUCT, $stubProductImage, $stubUploadedFile, $newUploadedFiles);
 
         $this->assertCount(1, $actual);
     }
@@ -175,7 +175,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
 
         $newUploadedFiles = array();
 
-        $actual = $fileManager->copyUploadedFile(24, ImagesCreateOrUpdateEvent::TYPE_PRODUCT, $stubProductImage, $stubUploadedFile, $newUploadedFiles);
+        $actual = $fileManager->copyUploadedFile(24, FileManager::TYPE_PRODUCT, $stubProductImage, $stubUploadedFile, $newUploadedFiles);
 
     }
 
@@ -200,7 +200,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
 
         $fileManager = new FileManager($stubContainer);
 
-        $event = new ImagesCreateOrUpdateEvent(ImagesCreateOrUpdateEvent::TYPE_PRODUCT, 24);
+        $event = new ImageCreateOrUpdateEvent(FileManager::TYPE_PRODUCT, 24);
 
         $expected = 10;
         $actual = $fileManager->saveImage($event, $stubProductImage);
@@ -229,7 +229,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
 
         $fileManager = new FileManager($stubContainer);
 
-        $event = new ImagesCreateOrUpdateEvent(ImagesCreateOrUpdateEvent::TYPE_CATEGORY, 24);
+        $event = new ImageCreateOrUpdateEvent(FileManager::TYPE_CATEGORY, 24);
 
         $expected = 10;
         $actual = $fileManager->saveImage($event, $stubCategoryImage);
@@ -258,7 +258,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
 
         $fileManager = new FileManager($stubContainer);
 
-        $event = new ImagesCreateOrUpdateEvent(ImagesCreateOrUpdateEvent::TYPE_FOLDER, 24);
+        $event = new ImageCreateOrUpdateEvent(FileManager::TYPE_FOLDER, 24);
 
         $expected = 10;
         $actual = $fileManager->saveImage($event, $stubFolderImage);
@@ -287,7 +287,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
 
         $fileManager = new FileManager($stubContainer);
 
-        $event = new ImagesCreateOrUpdateEvent(ImagesCreateOrUpdateEvent::TYPE_CONTENT, 24);
+        $event = new ImageCreateOrUpdateEvent(FileManager::TYPE_CONTENT, 24);
 
         $expected = 10;
         $actual = $fileManager->saveImage($event, $stubContentImage);
@@ -316,7 +316,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
             ->method('getFile')
             ->will($this->returnValue('file'));
 
-        $event = new ImagesCreateOrUpdateEvent('bad', 24);
+        $event = new ImageCreateOrUpdateEvent('bad', 24);
 
         $fileManager->saveImage($event, $stubProductImage);
     }
@@ -342,7 +342,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
             ->method('getFile')
             ->will($this->returnValue('file'));
 
-        $event = new ImagesCreateOrUpdateEvent(ImagesCreateOrUpdateEvent::TYPE_PRODUCT, 24);
+        $event = new ImageCreateOrUpdateEvent(FileManager::TYPE_PRODUCT, 24);
 
         $fileManager->saveImage($event, $stubProductImage);
     }
