@@ -545,6 +545,15 @@
 
     <!-- end mailing system management -->
 
+    <!-- admin profiles management -->
+
+    <route id="admin.configuration.admin-profiles.default" path="/admin/configuration/admin_profiles">
+        <default key="_controller">Thelia\Controller\Admin\AdminProfileController::defaultAction</default>
+    </route>
+
+    <!-- end admin profiles management -->
+
+
 	<!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">

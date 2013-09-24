@@ -106,6 +106,8 @@
         
         <form name="thelia.admin.language.creation" class="Thelia\Form\LanguageCreationForm"/>
 
+        <form name="thelia.admin.admin-profile.creation" class="Thelia\Form\AdminProfileCreationForm"/>
+
     </forms>
 
 
