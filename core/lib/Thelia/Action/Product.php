@@ -56,7 +56,6 @@ use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Core\Event\ProductSetTemplateEvent;
 use Thelia\Model\AttributeCombinationQuery;
-use Thelia\Core\Template\Loop\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Propel\Runtime\ActiveQuery\PropelQuery;
 use Thelia\Core\Event\ProductDeleteCategoryEvent;
@@ -66,6 +65,9 @@ use Thelia\Model\AttributeCombination;
 use Thelia\Core\Event\ProductCreateCombinationEvent;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Core\Event\ProductDeleteCombinationEvent;
+use Thelia\Model\ProductPrice;
+use Thelia\Model\ProductSaleElements;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
@@ -367,19 +369,31 @@ class Product extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
+            $product = $event->getProduct();
 
-            if ($event->getUseDefaultPricing()) {
-                // Get the default pricing
-                $salesElement = ProductSaleElementsQuery::create()->filterByIsDefault(true)->findOne();
-            }
-            else {
-                // We have to create a new ProductSaleElement
-                echo "no default !!!!";
-                exit;
-            }
+            // Create an empty product sale element
+            $salesElement = new ProductSaleElements();
 
-            if (null == $salesElement)
-                throw new \LogicException("Cannot create or get the product sales element for this new combination.");
+            $salesElement
+                ->setProduct($product)
+                ->setRef($product->getRef())
+                ->setPromo(0)
+                ->setNewness(0)
+                ->setWeight(0)
+                ->setIsDefault(false)
+                ->save($con)
+            ;
+
+            // Create an empty product price in the default currency
+            $product_price = new ProductPrice();
+
+            $product_price
+                ->setProductSaleElements($salesElement)
+                ->setPromoPrice(0)
+                ->setPrice(0)
+                ->setCurrencyId($event->getCurrencyId())
+                ->save($con)
+            ;
 
             $combinationAttributes = $event->getAttributeAvList();
 
@@ -409,6 +423,13 @@ class Product extends BaseAction implements EventSubscriberInterface
             $con->rollback();
 
             throw $ex;
+        }
+    }
+
+    public function deleteProductCombination(ProductDeleteCombinationEvent $event) {
+
+        if (null !== $pse = ProductSaleElementsQuery::create()->findPk($event->getProductSaleElementId())) {
+            $pse->delete();
         }
     }
 

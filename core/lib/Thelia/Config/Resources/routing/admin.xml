@@ -223,7 +223,7 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::loadGeneralAjaxTabAction</default>
     </route>
 
-    <!-- Product associations, categories,  content and accessories -->
+    <!-- Product categories, content and accessories -->
 
     <route id="admin.products.related.tab" path="/admin/products/related/tab">
         <default key="_controller">Thelia\Controller\Admin\ProductController::loadRelatedAjaxTabAction</default>
@@ -310,6 +310,16 @@
     <route id="admin.product.combination.delete" path="/admin/product/combination/delete">
         <default key="_controller">Thelia\Controller\Admin\ProductController::deleteCombinationAction</default>
     </route>
+
+    <route id="admin.product.combination.update" path="/admin/product/combination/update">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateCombinationAction</default>
+    </route>
+
+    <route id="admin.product.combination.defaut-price.update" path="/admin/product/default-price/update">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateDefaultPriceAction</default>
+    </route>
+
+
 
 
     <!--  Folder routes management -->
