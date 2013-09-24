@@ -111,21 +111,21 @@
                             {/loop}
 
                             {loop name="menu-auth-order" type="auth" roles="ADMIN" permissions="admin.orders.view"}
-                            <li class="dropdown {if $admin_current_location == 'customer'}active{/if}" id="orders_menu" data-toggle="dropdown">
+                            <li class="dropdown {if $admin_current_location == 'customer'}active{/if}" id="orders_menu">
 
-                                <a href="#">{intl l="Orders"} <span class="caret"></span></a>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Orders"} <span class="caret"></span></a>
 
                                  <ul class="dropdown-menu config_menu" role="menu">
 
                                     <li role="menuitem"><a data-target="{url path='admin/orders'}" href="{url path='admin/orders'}">
                                         {intl l="All orders"}
-                                        <span class="badge badge-important">{count type="order"}</span></a>
+                                        <span class="badge">{count type="order"}</span></a>
                                     </li>
 
                                     {loop name="order-status-list" type="order-status"}
                                     <li role="menuitem">
                                         <a data-target="{url path='admin/orders/$LABEL'}" href="{url path='admin/orders/$LABEL'}">
-                                            {$LABEL} <span class="badge badge-important">{count type="order" status="{$ID}"}</span>
+                                            {$LABEL} <span class="badge">{count type="order" status="{$ID}"}</span>
                                         </a>
                                     </li>
                                     {/loop}
