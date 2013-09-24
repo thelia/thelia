@@ -740,8 +740,45 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('/admin/folders/update/1?current_tab=documents', $actual);
         $actual = $fileManager->getRedirectionUrl('bad', 1, FileManager::FILE_TYPE_DOCUMENTS);
         $this->assertEquals(false, $actual);
+
+        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_FOLDER, 1, 'bad');
+        $this->assertEquals(false, $actual);
     }
 
+
+    /**
+     * @covers Thelia\Tools\FileManager::getFormId
+     */
+    public function testGetFormId()
+    {
+        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\ContainerInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $fileManager = new FileManager($stubContainer);
+
+        $actual = $fileManager->getFormId(FileManager::TYPE_PRODUCT, FileManager::FILE_TYPE_IMAGES);
+        $this->assertEquals('thelia.admin.product.image.modification', $actual);
+        $actual = $fileManager->getFormId(FileManager::TYPE_CATEGORY, FileManager::FILE_TYPE_IMAGES);
+        $this->assertEquals('thelia.admin.category.image.modification', $actual);
+        $actual = $fileManager->getFormId(FileManager::TYPE_CONTENT, FileManager::FILE_TYPE_IMAGES);
+        $this->assertEquals('thelia.admin.content.image.modification', $actual);
+        $actual = $fileManager->getFormId(FileManager::TYPE_FOLDER, FileManager::FILE_TYPE_IMAGES);
+        $this->assertEquals('thelia.admin.folder.image.modification', $actual);
+        $actual = $fileManager->getFormId('bad', FileManager::FILE_TYPE_IMAGES);
+        $this->assertEquals(false, $actual);
+
+        $actual = $fileManager->getFormId(FileManager::TYPE_PRODUCT, FileManager::FILE_TYPE_DOCUMENTS);
+        $this->assertEquals('thelia.admin.product.document.modification', $actual);
+        $actual = $fileManager->getFormId(FileManager::TYPE_CATEGORY, FileManager::FILE_TYPE_DOCUMENTS);
+        $this->assertEquals('thelia.admin.category.document.modification', $actual);
+        $actual = $fileManager->getFormId(FileManager::TYPE_CONTENT, FileManager::FILE_TYPE_DOCUMENTS);
+        $this->assertEquals('thelia.admin.content.document.modification', $actual);
+        $actual = $fileManager->getFormId(FileManager::TYPE_FOLDER, FileManager::FILE_TYPE_DOCUMENTS);
+        $this->assertEquals('thelia.admin.folder.document.modification', $actual);
+        $actual = $fileManager->getFormId('bad', FileManager::FILE_TYPE_DOCUMENTS);
+        $this->assertEquals(false, $actual);
+    }
 
     /**
      * @covers Thelia\Tools\FileManager::renameFile

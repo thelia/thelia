@@ -306,7 +306,7 @@ class FileManager
      * Delete image from file storage and database
      *
      * @param CategoryImage|ProductImage|ContentImage|FolderImage|CategoryDocument|ProductDocument|ContentDocument|FolderDocument $model      File being deleted
-     * @param string                                                                                                              $parentType Parent type
+     * @param string                                                                                                              $parentType Parent type ex : self::TYPE_PRODUCT
      * @param string                                                                                                              $fileType   File type ex FileManager::FILE_TYPE_DOCUMENTS
      *
      * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
@@ -322,7 +322,7 @@ class FileManager
     /**
      * Get image model from type
      *
-     * @param string $parentType Parent type
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
      *
      * @return null|\Thelia\Model\CategoryImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage|\Thelia\Model\ProductImage
      *
@@ -353,7 +353,7 @@ class FileManager
     /**
      * Get document model from type
      *
-     * @param string $parentType Parent type
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
      *
      * @return null|ProductDocument|CategoryDocument|ContentDocument|FolderDocument
      *
@@ -384,7 +384,7 @@ class FileManager
     /**
      * Get image model query from type
      *
-     * @param string $parentType
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
      *
      * @return null|\Thelia\Model\CategoryImageQuery|\Thelia\Model\ContentImageQuery|\Thelia\Model\FolderImageQuery|\Thelia\Model\ProductImageQuery
      *
@@ -415,7 +415,7 @@ class FileManager
     /**
      * Get document model query from type
      *
-     * @param string $parentType
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
      *
      * @return null|ProductDocumentQuery|CategoryDocumentQuery|ContentDocumentQuery|FolderDocumentQuery
      *
@@ -446,7 +446,8 @@ class FileManager
     /**
      * Get form service id from type
      *
-     * @param string $parentType
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
+     * @param string $fileType   Parent id
      *
      * @return string
      *
@@ -488,8 +489,8 @@ class FileManager
     /**
      * Get image parent model from type
      *
-     * @param string $parentType
-     * @param int    $parentId
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
+     * @param int    $parentId   Parent Id
      *
      * @return null|\Thelia\Model\Category|\Thelia\Model\Content|\Thelia\Model\Folder|\Thelia\Model\Product
      *
@@ -520,7 +521,7 @@ class FileManager
     /**
      * Get image parent model from type
      *
-     * @param string  $parentType Parent type
+     * @param string  $parentType Parent type ex : self::TYPE_PRODUCT
      * @param Request $request    Request service
      *
      * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
@@ -552,7 +553,7 @@ class FileManager
     /**
      * Get document parent model from type
      *
-     * @param string  $parentType Parent type
+     * @param string  $parentType Parent type ex : self::TYPE_PRODUCT
      * @param Request $request    Request service
      *
      * @todo refactor make all document using propel inheritance and factorise image behaviour into one single clean action
@@ -585,7 +586,7 @@ class FileManager
      * Get image upload dir
      *
      * @param string $parentType Parent type ex FileManager::TYPE_PRODUCT
-     * @param string $fileType   File type
+     * @param string $fileType   File type ex : self::FILE_TYPE_DOCUMENTS
      *
      * @return string Uri
      */
