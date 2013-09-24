@@ -26,16 +26,16 @@
 
                             <div class="form-container">
                                 <div class="col-md-12">
-
-        						    {form name="thelia.admin.category.document.modification"}
+        						    {form name="$formId"}
         						    	<form method="POST" action="{url path="/admin/document/type/{$documentType}/{$ID}/update"}" enctype="multipart/form-data" class="clearfix">
 
                                             <div class="row inner-toolbar clearfix">
                                                 <div class="col-md-6 inner-actions pull-right">
+                                                    <a href="{url path="{$redirectUrl}"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
                                                     <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-primary" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
-                                                    <a href="{url path="{$redirectUrl}"}" class="btn btn-default btn-info">{intl l='Close'} <span class="glyphicon glyphicon-remove"></span></a>
                                                 </div>
                                             </div>
+
         						        	{form_hidden_fields form=$form}
 
         						        	{form_field form=$form field='success_url'}
@@ -94,7 +94,14 @@
                                                         </div>
                                                     {/form_field}
                                                 </div>
-                                            </div>                                          
+                                            </div>
+
+                                            <div class="row inner-toolbar clearfix">
+                                                <div class="col-md-6 inner-actions pull-right">
+                                                    <a href="{url path="{$redirectUrl}"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
+                                                    <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-primary" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
+                                                </div>
+                                            </div>
                                         </form>
         							{/form}
 
@@ -111,6 +118,11 @@
             {elseloop rel="document_edit"}
                 <div class="row">
                     <div class="col-md-12">
+                        <div class="row inner-toolbar clearfix">
+                            <div class="col-md-6 inner-actions pull-right">
+                                <a href="{url path="{$redirectUrl}"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
+                            </div>
+                        </div>
                         <div class="alert alert-error">
                             {intl l="Sorry, document ID=$documentId was not found."}
                         </div>

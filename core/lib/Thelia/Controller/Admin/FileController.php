@@ -181,9 +181,8 @@ class FileController extends BaseAdminController
                     return new Response('', 404);
                 }
 
-                $defaultTitle = $parentModel->getTitle();
                 $documentModel->setParentId($parentId);
-                $documentModel->setTitle($defaultTitle);
+                $documentModel->setTitle($fileBeingUploaded->getClientOriginalName());
 
                 $documentCreateOrUpdateEvent = new DocumentCreateOrUpdateEvent(
                     $parentType,
@@ -292,12 +291,13 @@ class FileController extends BaseAdminController
         try {
             $fileManager = new FileManager($this->container);
             $image = $fileManager->getImageModelQuery($parentType)->findPk($imageId);
-            $redirectUrl = $fileManager->getRedirectionUrl($parentType, $image->getParentId());
+            $redirectUrl = $fileManager->getRedirectionUrl($parentType, $image->getParentId(), FileManager::FILE_TYPE_IMAGES);
 
             return $this->render('image-edit', array(
                 'imageId' => $imageId,
                 'imageType' => $parentType,
-                'redirectUrl' => $redirectUrl
+                'redirectUrl' => $redirectUrl,
+                'formId' => $fileManager->getFormId($parentType, FileManager::FILE_TYPE_IMAGES)
             ));
         } catch (\Exception $e) {
             $this->pageNotFound();
@@ -320,12 +320,13 @@ class FileController extends BaseAdminController
         try {
             $fileManager = new FileManager($this->container);
             $document = $fileManager->getDocumentModelQuery($parentType)->findPk($documentId);
-            $redirectUrl = $fileManager->getRedirectionUrl($parentType, $document->getParentId());
+            $redirectUrl = $fileManager->getRedirectionUrl($parentType, $document->getParentId(), FileManager::FILE_TYPE_DOCUMENTS);
 
             return $this->render('document-edit', array(
                     'documentId' => $documentId,
                     'documentType' => $parentType,
-                    'redirectUrl' => $redirectUrl
+                    'redirectUrl' => $redirectUrl,
+                    'formId' => $fileManager->getFormId($parentType, FileManager::FILE_TYPE_DOCUMENTS)
                 ));
         } catch (\Exception $e) {
             $this->pageNotFound();
@@ -399,9 +400,13 @@ class FileController extends BaseAdminController
                 ->setGeneralError($message);
         }
 
+        $redirectUrl = $fileManager->getRedirectionUrl($parentType, $image->getParentId(), FileManager::FILE_TYPE_IMAGES);
+
         return $this->render('image-edit', array(
             'imageId' => $imageId,
-            'imageType' => $parentType
+            'imageType' => $parentType,
+                'redirectUrl' => $redirectUrl,
+            'formId' => $fileManager->getFormId($parentType, FileManager::FILE_TYPE_IMAGES)
         ));
     }
 
@@ -415,14 +420,14 @@ class FileController extends BaseAdminController
      */
     public function updateDocumentAction($documentId, $parentType)
     {
-        if (null !== $response = $this->checkAuth('admin.image.update')) {
+        if (null !== $response = $this->checkAuth('admin.document.update')) {
             return $response;
         }
 
         $message = false;
 
         $fileManager = new FileManager($this->container);
-        $documentModification = $fileManager->getImageForm($parentType, $this->getRequest());
+        $documentModification = $fileManager->getDocumentForm($parentType, $this->getRequest());
 
         try {
             $document = $fileManager->getDocumentModelQuery($parentType)->findPk($documentId);
@@ -433,8 +438,8 @@ class FileController extends BaseAdminController
 
             $form = $this->validateForm($documentModification);
 
-            $event = $this->createImageEventInstance($parentType, $document, $form->getData());
-            $event->setOldModelImage($oldDocument);
+            $event = $this->createDocumentEventInstance($parentType, $document, $form->getData());
+            $event->setOldModelDocument($oldDocument);
 
             $files = $this->getRequest()->files;
             $fileForm = $files->get($documentModification->getName());
@@ -444,7 +449,7 @@ class FileController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::DOCUMENT_UPDATE, $event);
 
-            $documentUpdated = $event->getModelImage();
+            $documentUpdated = $event->getModelDocument();
 
             $this->adminLogAppend(sprintf('Document with Ref %s (ID %d) modified', $documentUpdated->getTitle(), $documentUpdated->getId()));
 
@@ -472,9 +477,13 @@ class FileController extends BaseAdminController
                 ->setGeneralError($message);
         }
 
+        $redirectUrl = $fileManager->getRedirectionUrl($parentType, $document->getParentId(), FileManager::FILE_TYPE_DOCUMENTS);
+
         return $this->render('document-edit', array(
                 'documentId' => $documentId,
-                'documentType' => $parentType
+                'documentType' => $parentType,
+                'redirectUrl' => $redirectUrl,
+                'formId' => $fileManager->getFormId($parentType, FileManager::FILE_TYPE_DOCUMENTS)
             ));
     }
 
@@ -640,7 +649,7 @@ class FileController extends BaseAdminController
      * @param CategoryDocument|ProductDocument|ContentDocument|FolderDocument $model      Document model
      * @param array                                                           $data       Post data
      *
-     * @return ImageCreateOrUpdateEvent
+     * @return DocumentCreateOrUpdateEvent
      */
     protected function createDocumentEventInstance($parentType, $model, $data)
     {

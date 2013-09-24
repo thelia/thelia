@@ -444,6 +444,48 @@ class FileManager
     }
 
     /**
+     * Get form service id from type
+     *
+     * @param string $parentType
+     *
+     * @return string
+     *
+     * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function getFormId($parentType, $fileType)
+    {
+        switch ($fileType) {
+            case self::FILE_TYPE_IMAGES:
+                $type = 'image';
+                break;
+            case self::FILE_TYPE_DOCUMENTS:
+                $type = 'document';
+                break;
+            default:
+                return false;
+        }
+
+        switch ($parentType) {
+            case self::TYPE_PRODUCT:
+                $formId = 'thelia.admin.product.' . $type . '.modification';
+                break;
+            case self::TYPE_CATEGORY:
+                $formId = 'thelia.admin.category.' . $type . '.modification';
+                break;
+            case self::TYPE_CONTENT:
+                $formId = 'thelia.admin.content.' . $type . '.modification';
+                break;
+            case self::TYPE_FOLDER:
+                $formId = 'thelia.admin.folder.' . $type . '.modification';
+                break;
+            default:
+                $formId = false;
+        }
+
+        return $formId;
+    }
+
+    /**
      * Get image parent model from type
      *
      * @param string $parentType
@@ -577,24 +619,30 @@ class FileManager
     /**
      * Deduce image redirecting URL from parent type
      *
-     * @param string $parentType Parent type
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
      * @param int    $parentId   Parent id
+     * @param string $fileType   File type ex : self::FILE_TYPE_DOCUMENTS
+     *
      * @return string
      */
-    public function getRedirectionUrl($parentType, $parentId)
+    public function getRedirectionUrl($parentType, $parentId, $fileType)
     {
+        if (!in_array($fileType, self::$availableFileType)) {
+            return false;
+        }
+
         switch ($parentType) {
             case self::TYPE_PRODUCT:
-                $uri = '/admin/products/update?product_id=' . $parentId . '&current_tab=images';
+                $uri = '/admin/products/update?product_id=' . $parentId . '&current_tab=' . $fileType;
                 break;
             case self::TYPE_CATEGORY:
-                $uri = '/admin/categories/update?category_id=' . $parentId . '&current_tab=images';
+                $uri = '/admin/categories/update?category_id=' . $parentId . '&current_tab=' . $fileType;
                 break;
             case self::TYPE_CONTENT:
-                $uri = '/admin/content/update/' . $parentId . '&current_tab=images';
+                $uri = '/admin/content/update/' . $parentId . '?current_tab=' . $fileType;
                 break;
             case self::TYPE_FOLDER:
-                $uri = '/admin/folders/update/' . $parentId . '&current_tab=images';
+                $uri = '/admin/folders/update/' . $parentId . '?current_tab=' . $fileType;
                 break;
             default:
                 $uri = false;

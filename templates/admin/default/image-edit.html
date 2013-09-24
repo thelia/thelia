@@ -27,15 +27,16 @@
                             <div class="form-container">
                                 <div class="col-md-12">
 
-        						    {form name="thelia.admin.category.image.modification"}
+        						    {form name="$formId"}
         						    	<form method="POST" action="{url path="/admin/image/type/{$imageType}/{$ID}/update"}" enctype="multipart/form-data" class="clearfix">
 
                                             <div class="row inner-toolbar clearfix">
                                                 <div class="col-md-6 inner-actions pull-right">
+                                                    <a href="{url path="{$redirectUrl}"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
                                                     <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-primary" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
-                                                    <a href="{url path="{$redirectUrl}"}" class="btn btn-default btn-info">{intl l='Close'} <span class="glyphicon glyphicon-remove"></span></a>
                                                 </div>
                                             </div>
+
         						        	{form_hidden_fields form=$form}
 
         						        	{form_field form=$form field='success_url'}
@@ -50,7 +51,11 @@
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label class="control-label">{intl l="Preview"} : </label>
-                                                        <p><img src="{$IMAGE_URL}" alt="{$TITLE}" class="img-thumbnail"></p>
+                                                        <p>
+                                                            <a href="{$ORIGINAL_IMAGE_URL}" alt="{$TITLE}" target="_blank">
+                                                                <img src="{$IMAGE_URL}" alt="{$TITLE}" class="img-thumbnail">
+                                                            </a>
+                                                        </p>
                                                     </div>
                                                 </div>
 
@@ -93,7 +98,15 @@
                                                         </div>
                                                     {/form_field}
                                                 </div>
-                                            </div>                                          
+                                            </div>
+
+                                            <div class="row inner-toolbar clearfix">
+                                                <div class="col-md-6 inner-actions pull-right">
+                                                    <a href="{url path="{$redirectUrl}"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
+                                                    <button type="submit" name="save_mode" value="stay" class="btn btn-default btn-primary" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>
+                                                </div>
+                                            </div>
+
                                         </form>
         							{/form}
 
@@ -110,6 +123,11 @@
             {elseloop rel="image_edit"}
                 <div class="row">
                     <div class="col-md-12">
+                        <div class="row inner-toolbar clearfix">
+                            <div class="col-md-6 inner-actions pull-right">
+                                <a href="{url path="{$redirectUrl}"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
+                            </div>
+                        </div>
                         <div class="alert alert-error">
                             {intl l="Sorry, image ID=$imageId was not found."}
                         </div>

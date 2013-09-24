@@ -56,7 +56,7 @@ class DocumentDeleteEvent extends ActionEvent
      */
     public function __construct($documentToDelete, $documentType)
     {
-        $this->imageToDelete = $documentToDelete;
+        $this->documentToDelete = $documentToDelete;
         $this->documentType = $documentType;
     }
 
@@ -93,7 +93,7 @@ class DocumentDeleteEvent extends ActionEvent
      */
     public function setDocumentToDelete($documentToDelete)
     {
-        $this->imageToDelete = $documentToDelete;
+        $this->documentToDelete = $documentToDelete;
 
         return $this;
     }

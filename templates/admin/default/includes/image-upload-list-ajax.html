@@ -13,7 +13,9 @@ Parameters:
         {loop type="image" name="image" source="{$imageType}" order="manual-reverse" source_id="{$parentId}" width="200" height="100" resize_mode="borders"}
             <tr>
                 <td>
-                    <img src="{$IMAGE_URL}" alt="{$TITLE}" class="img-thumbnail">
+                    <a href="{url path="/admin/image/type/$imageType/$ID/update"}" alt="{intl l='Update this image'}">
+                        <img src="{$IMAGE_URL}" alt="{$TITLE}" class="img-thumbnail">
+                    </a>
                 </td>
                 <td>
                     <div class="btn-group">

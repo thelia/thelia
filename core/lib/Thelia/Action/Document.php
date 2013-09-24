@@ -25,7 +25,6 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Symfony\Component\HttpFoundation\File\File;
 use Thelia\Core\Event\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\DocumentDeleteEvent;
 use Thelia\Core\Event\DocumentEvent;
@@ -163,6 +162,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         $model = $event->getModelDocument();
 
         $nbModifiedLines = $model->save();
+
         $event->setModelDocument($model);
 
         if (!$nbModifiedLines) {
@@ -201,6 +201,10 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
                 'image'
             )
         );
+
+        if (null !== $event->getUploadedFile()) {
+            $event->getModelDocument()->setTitle($event->getUploadedFile()->getClientOriginalName());
+        }
 
         $fileManager = new FileManager($this->container);
         // Copy and save file

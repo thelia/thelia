@@ -8,6 +8,8 @@ $(function($){
 
     // Remove image on click
     $.imageUploadManager.initImageDropZone = function() {
+        $.imageUploadManager.onClickDeleteImage();
+
         var imageDropzone = new Dropzone("#images-dropzone", {
             dictDefaultMessage : $('.btn-browse').html(),
             uploadMultiple: false,
@@ -96,5 +98,4 @@ $(function($){
             return false;
         });
     };
-    $.imageUploadManager.onClickDeleteImage();
 });
