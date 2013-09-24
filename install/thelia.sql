@@ -51,7 +51,7 @@ CREATE TABLE `product`
         REFERENCES `tax_rule` (`id`)
         ON UPDATE RESTRICT
         ON DELETE SET NULL,
-    CONSTRAINT `fk_product_template1`
+    CONSTRAINT `fk_product_template`
         FOREIGN KEY (`template_id`)
         REFERENCES `template` (`id`)
 ) ENGINE=InnoDB;
@@ -186,7 +186,6 @@ CREATE TABLE `feature`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `visible` INTEGER DEFAULT 0,
-    `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -226,7 +225,7 @@ CREATE TABLE `feature_product`
     `product_id` INTEGER NOT NULL,
     `feature_id` INTEGER NOT NULL,
     `feature_av_id` INTEGER,
-    `by_default` VARCHAR(255),
+    `free_text_value` TEXT,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -262,6 +261,7 @@ CREATE TABLE `feature_template`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `feature_id` INTEGER NOT NULL,
     `template_id` INTEGER NOT NULL,
+    `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -286,7 +286,6 @@ DROP TABLE IF EXISTS `attribute`;
 CREATE TABLE `attribute`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -358,11 +357,12 @@ CREATE TABLE `product_sale_elements`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
-    `ref` VARCHAR(45) NOT NULL,
+    `ref` VARCHAR(255) NOT NULL,
     `quantity` FLOAT NOT NULL,
     `promo` TINYINT DEFAULT 0,
     `newness` TINYINT DEFAULT 0,
-    `weight` FLOAT,
+    `weight` FLOAT DEFAULT 0,
+    `is_default` TINYINT(1) DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -386,6 +386,8 @@ CREATE TABLE `attribute_template`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `attribute_id` INTEGER NOT NULL,
     `template_id` INTEGER NOT NULL,
+    `position` INTEGER,
+    `attribute_templatecol` VARCHAR(45),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -815,7 +817,7 @@ CREATE TABLE `order_product_attribute_combination`
     `attribute_title` VARCHAR(255) NOT NULL,
     `attribute_chapo` TEXT,
     `attribute_description` LONGTEXT,
-    `attribute_postscriptumn` TEXT,
+    `attribute_postscriptum` TEXT,
     `attribute_av_title` VARCHAR(255) NOT NULL,
     `attribute_av_chapo` TEXT,
     `attribute_av_description` LONGTEXT,
@@ -1586,6 +1588,7 @@ CREATE TABLE `order_product_tax`
     `title` VARCHAR(255) NOT NULL,
     `description` LONGTEXT,
     `amount` FLOAT NOT NULL,
+    `promo_amount` FLOAT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),

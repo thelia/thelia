@@ -4,6 +4,13 @@
     {check_auth roles="ADMIN" permissions="{block name="check-permissions"}{/block}" login_tpl="/admin/login"}
 {/block}
 
+{* -- Define some stuff for Smarty ----------------------------------------- *}
+{assign 'order-not-paid' 'warning'}
+{assign 'order-paid' 'success'}
+{assign 'order-processing' 'primary'}
+{assign 'order-sent' 'info'}
+{assign 'order-canceled' 'danger'}
+
 <!DOCTYPE html>
 <html lang="{$lang_code}">
 <head>

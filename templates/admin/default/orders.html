@@ -63,7 +63,7 @@
                                                 {assign "orderStatusLabel" "success"}
                                             {else}
                                                 {if $CODE == 'processing'}
-                                                    {assign "orderStatusLabel" "Primary"}
+                                                    {assign "orderStatusLabel" "primary"}
                                                 {else}
                                                     {if $CODE == 'sent'}
                                                         {assign "orderStatusLabel" "info"}
@@ -85,7 +85,7 @@
 		                               	<td>{$orderInvoiceCompany}</td>
 		                               	<td><a href="{url path="/admin/customer/update/$CUSTOMER"}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
 		                               	<td>{$TOTAL_TAXED_AMOUNT}</td>
-		                               	<td><span class="label label-{$orderStatusLabel}">{$orderStatus}</span></td>
+		                               	<td><span class="label label-{$order-processing}">{$orderStatus}</span></td>
 
 		                                {module_include location='orders_table_row'}
 

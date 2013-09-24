@@ -28,6 +28,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  * @method     ChildProductSaleElementsQuery orderByPromo($order = Criteria::ASC) Order by the promo column
  * @method     ChildProductSaleElementsQuery orderByNewness($order = Criteria::ASC) Order by the newness column
  * @method     ChildProductSaleElementsQuery orderByWeight($order = Criteria::ASC) Order by the weight column
+ * @method     ChildProductSaleElementsQuery orderByIsDefault($order = Criteria::ASC) Order by the is_default column
  * @method     ChildProductSaleElementsQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProductSaleElementsQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -38,6 +39,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  * @method     ChildProductSaleElementsQuery groupByPromo() Group by the promo column
  * @method     ChildProductSaleElementsQuery groupByNewness() Group by the newness column
  * @method     ChildProductSaleElementsQuery groupByWeight() Group by the weight column
+ * @method     ChildProductSaleElementsQuery groupByIsDefault() Group by the is_default column
  * @method     ChildProductSaleElementsQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildProductSaleElementsQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -71,6 +73,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  * @method     ChildProductSaleElements findOneByPromo(int $promo) Return the first ChildProductSaleElements filtered by the promo column
  * @method     ChildProductSaleElements findOneByNewness(int $newness) Return the first ChildProductSaleElements filtered by the newness column
  * @method     ChildProductSaleElements findOneByWeight(double $weight) Return the first ChildProductSaleElements filtered by the weight column
+ * @method     ChildProductSaleElements findOneByIsDefault(boolean $is_default) Return the first ChildProductSaleElements filtered by the is_default column
  * @method     ChildProductSaleElements findOneByCreatedAt(string $created_at) Return the first ChildProductSaleElements filtered by the created_at column
  * @method     ChildProductSaleElements findOneByUpdatedAt(string $updated_at) Return the first ChildProductSaleElements filtered by the updated_at column
  *
@@ -81,6 +84,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  * @method     array findByPromo(int $promo) Return ChildProductSaleElements objects filtered by the promo column
  * @method     array findByNewness(int $newness) Return ChildProductSaleElements objects filtered by the newness column
  * @method     array findByWeight(double $weight) Return ChildProductSaleElements objects filtered by the weight column
+ * @method     array findByIsDefault(boolean $is_default) Return ChildProductSaleElements objects filtered by the is_default column
  * @method     array findByCreatedAt(string $created_at) Return ChildProductSaleElements objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildProductSaleElements objects filtered by the updated_at column
  *
@@ -171,7 +175,7 @@ abstract class ProductSaleElementsQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PRODUCT_ID, REF, QUANTITY, PROMO, NEWNESS, WEIGHT, CREATED_AT, UPDATED_AT FROM product_sale_elements WHERE ID = :p0';
+        $sql = 'SELECT ID, PRODUCT_ID, REF, QUANTITY, PROMO, NEWNESS, WEIGHT, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM product_sale_elements WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -535,6 +539,33 @@ abstract class ProductSaleElementsQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductSaleElementsTableMap::WEIGHT, $weight, $comparison);
+    }
+
+    /**
+     * Filter the query on the is_default column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByIsDefault(true); // WHERE is_default = true
+     * $query->filterByIsDefault('yes'); // WHERE is_default = true
+     * </code>
+     *
+     * @param     boolean|string $isDefault The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
+     */
+    public function filterByIsDefault($isDefault = null, $comparison = null)
+    {
+        if (is_string($isDefault)) {
+            $is_default = in_array(strtolower($isDefault), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(ProductSaleElementsTableMap::IS_DEFAULT, $isDefault, $comparison);
     }
 
     /**

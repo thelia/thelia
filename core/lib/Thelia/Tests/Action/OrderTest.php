@@ -159,7 +159,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 ->setCart($cart)
                 ->setProduct($pse->getProduct())
                 ->setProductSaleElements($pse)
-                ->setQuantity($i)
+                ->setQuantity($i+1)
                 ->setPrice($pse->getPrice())
                 ->setPromoPrice($pse->getPromoPrice())
                 ->setPromo($pse->getPromo())
@@ -343,9 +343,10 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
             /* check tax */
             $orderProductTaxList = $orderProduct->getOrderProductTaxes();
-            foreach($cartItem->getProduct()->getTaxRule()->getTaxDetail($validDeliveryAddress->getCountry(), $cartItem->getPromo() == 1 ? $cartItem->getPromoPrice() : $cartItem->getPrice()) as $index => $tax) {
+            foreach($cartItem->getProduct()->getTaxRule()->getTaxDetail($validDeliveryAddress->getCountry(), $cartItem->getPrice(), $cartItem->getPromoPrice()) as $index => $tax) {
                 $orderProductTax = $orderProductTaxList[$index];
                 $this->assertEquals($tax->getAmount(), $orderProductTax->getAmount());
+                $this->assertEquals($tax->getPromoAmount(), $orderProductTax->getPromoAmount());
             }
         }
 

@@ -32,7 +32,7 @@
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="SET NULL" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
     </foreign-key>
-    <foreign-key foreignTable="template" name="fk_product_template1">
+    <foreign-key foreignTable="template" name="fk_product_template">
       <reference foreign="id" local="template_id" />
     </foreign-key>
     <unique name="ref_UNIQUE">
@@ -55,7 +55,7 @@
   </table>
   <table isCrossRef="true" name="product_category" namespace="Thelia\Model">
     <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="category_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="category_id" primaryKey="true" type="INTEGER" />
     <column name="default_category" type="BOOLEAN" />
     <foreign-key foreignTable="product" name="fk_product_has_category_product1" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
@@ -145,7 +145,6 @@
   <table name="feature" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="0" name="visible" type="INTEGER" />
-    <column name="position" required="true" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
@@ -179,7 +178,7 @@
     <column name="product_id" required="true" type="INTEGER" />
     <column name="feature_id" required="true" type="INTEGER" />
     <column name="feature_av_id" type="INTEGER" />
-    <column name="by_default" size="255" type="VARCHAR" />
+    <column name="free_text_value" type="LONGVARCHAR" />
     <column name="position" type="INTEGER" />
     <foreign-key foreignTable="product" name="fk_feature_prod_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
@@ -205,6 +204,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="feature_id" required="true" type="INTEGER" />
     <column name="template_id" required="true" type="INTEGER" />
+    <column name="position" type="INTEGER" />
     <foreign-key foreignTable="feature" name="fk_feature_template_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="feature_id" />
     </foreign-key>
@@ -221,7 +221,6 @@
   </table>
   <table name="attribute" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
@@ -277,11 +276,12 @@
   <table name="product_sale_elements" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
-    <column name="ref" required="true" size="45" type="VARCHAR" />
+    <column name="ref" required="true" size="255" type="VARCHAR" />
     <column name="quantity" required="true" type="FLOAT" />
     <column defaultValue="0" name="promo" type="TINYINT" />
     <column defaultValue="0" name="newness" type="TINYINT" />
-    <column name="weight" type="FLOAT" />
+    <column defaultValue="0" name="weight" type="FLOAT" />
+    <column defaultValue="0" name="is_default" type="BOOLEAN" />
     <foreign-key foreignTable="product" name="fk_product_sale_element_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
@@ -297,6 +297,8 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="attribute_id" required="true" type="INTEGER" />
     <column name="template_id" required="true" type="INTEGER" />
+    <column name="position" type="INTEGER" />
+    <column name="attribute_templatecol" size="45" type="VARCHAR" />
     <foreign-key foreignTable="attribute" name="fk_attribute_template_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_id" />
     </foreign-key>
@@ -639,7 +641,7 @@
     <column name="attribute_title" required="true" size="255" type="VARCHAR" />
     <column name="attribute_chapo" type="LONGVARCHAR" />
     <column name="attribute_description" type="CLOB" />
-    <column name="attribute_postscriptumn" type="LONGVARCHAR" />
+    <column name="attribute_postscriptum" type="LONGVARCHAR" />
     <column name="attribute_av_title" required="true" size="255" type="VARCHAR" />
     <column name="attribute_av_chapo" type="LONGVARCHAR" />
     <column name="attribute_av_description" type="CLOB" />
@@ -1243,6 +1245,7 @@
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="amount" required="true" type="FLOAT" />
+    <column name="promo_amount" type="FLOAT" />
     <foreign-key foreignTable="order_product" name="fk_ order_product_tax_order_product_id0" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_product_id" />
     </foreign-key>

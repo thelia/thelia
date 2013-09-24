@@ -72,12 +72,6 @@ abstract class Attribute implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the position field.
-     * @var        int
-     */
-    protected $position;
-
-    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -436,17 +430,6 @@ abstract class Attribute implements ActiveRecordInterface
     }
 
     /**
-     * Get the [position] column value.
-     *
-     * @return   int
-     */
-    public function getPosition()
-    {
-
-        return $this->position;
-    }
-
-    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -506,27 +489,6 @@ abstract class Attribute implements ActiveRecordInterface
 
         return $this;
     } // setId()
-
-    /**
-     * Set the value of [position] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Attribute The current object (for fluent API support)
-     */
-    public function setPosition($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->position !== $v) {
-            $this->position = $v;
-            $this->modifiedColumns[] = AttributeTableMap::POSITION;
-        }
-
-
-        return $this;
-    } // setPosition()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -610,16 +572,13 @@ abstract class Attribute implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AttributeTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AttributeTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->position = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AttributeTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AttributeTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AttributeTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AttributeTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -632,7 +591,7 @@ abstract class Attribute implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = AttributeTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = AttributeTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Attribute object", 0, $e);
@@ -959,9 +918,6 @@ abstract class Attribute implements ActiveRecordInterface
         if ($this->isColumnModified(AttributeTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(AttributeTableMap::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = 'POSITION';
-        }
         if ($this->isColumnModified(AttributeTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -981,9 +937,6 @@ abstract class Attribute implements ActiveRecordInterface
                 switch ($columnName) {
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
-                    case 'POSITION':
-                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1057,12 +1010,9 @@ abstract class Attribute implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getPosition();
-                break;
-            case 2:
                 return $this->getCreatedAt();
                 break;
-            case 3:
+            case 2:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1095,9 +1045,8 @@ abstract class Attribute implements ActiveRecordInterface
         $keys = AttributeTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getPosition(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[1] => $this->getCreatedAt(),
+            $keys[2] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1156,12 +1105,9 @@ abstract class Attribute implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setPosition($value);
-                break;
-            case 2:
                 $this->setCreatedAt($value);
                 break;
-            case 3:
+            case 2:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1189,9 +1135,8 @@ abstract class Attribute implements ActiveRecordInterface
         $keys = AttributeTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setPosition($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[1], $arr)) $this->setCreatedAt($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setUpdatedAt($arr[$keys[2]]);
     }
 
     /**
@@ -1204,7 +1149,6 @@ abstract class Attribute implements ActiveRecordInterface
         $criteria = new Criteria(AttributeTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(AttributeTableMap::ID)) $criteria->add(AttributeTableMap::ID, $this->id);
-        if ($this->isColumnModified(AttributeTableMap::POSITION)) $criteria->add(AttributeTableMap::POSITION, $this->position);
         if ($this->isColumnModified(AttributeTableMap::CREATED_AT)) $criteria->add(AttributeTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(AttributeTableMap::UPDATED_AT)) $criteria->add(AttributeTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1270,7 +1214,6 @@ abstract class Attribute implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -2504,7 +2447,6 @@ abstract class Attribute implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

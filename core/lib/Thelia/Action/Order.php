@@ -200,7 +200,8 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             $taxDetail = $product->getTaxRule()->getTaxDetail(
                 $taxCountry,
-                $cartItem->getPromo() == 1 ? $cartItem->getPromoPrice() : $cartItem->getPrice(),
+                $cartItem->getPrice(),
+                $cartItem->getPromoPrice(),
                 $this->getSession()->getLang()->getLocale()
             );
 
@@ -242,7 +243,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                     ->setAttributeTitle($attribute->getTitle())
                     ->setAttributeChapo($attribute->getChapo())
                     ->setAttributeDescription($attribute->getDescription())
-                    ->setAttributePostscriptumn($attribute->getPostscriptum())
+                    ->setAttributePostscriptum($attribute->getPostscriptum())
                     ->setAttributeAvTitle($attributeAv->getTitle())
                     ->setAttributeAvChapo($attributeAv->getChapo())
                     ->setAttributeAvDescription($attributeAv->getDescription())

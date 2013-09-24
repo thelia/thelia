@@ -225,7 +225,7 @@ try {
     for($i=0; $i<4; $i++) {
         $feature = new Thelia\Model\Feature();
         $feature->setVisible(1);
-        $feature->setPosition($i);
+        //$feature->setPosition($i);
         setI18n($faker, $feature);
 
         $feature->save();
@@ -249,7 +249,7 @@ try {
     $attributeList = array();
     for($i=0; $i<4; $i++) {
         $attribute = new Thelia\Model\Attribute();
-        $attribute->setPosition($i);
+        //$attribute->setPosition($i);
         setI18n($faker, $attribute);
 
         $attribute->save();
@@ -460,7 +460,7 @@ try {
                     $featureAvId[array_rand($featureAvId, 1)]
                 );
             } else { //no av
-                $featureProduct->setByDefault($faker->text(10));
+                $featureProduct->setFreeTextValue($faker->text(10));
             }
 
             $featureProduct->save();

@@ -62,9 +62,15 @@ class Order extends BaseOrder
         /* browse all products */
         $orderProductIds = array();
         foreach($this->getOrderProducts() as $orderProduct) {
-            $taxAmount = OrderProductTaxQuery::create()
-                ->withColumn('SUM(' . OrderProductTaxTableMap::AMOUNT . ')', 'total_tax')
-                ->filterByOrderProductId($orderProduct->getId(), Criteria::EQUAL)
+            $taxAmountQuery = OrderProductTaxQuery::create();
+
+            if($orderProduct->getWasInPromo() == 1) {
+                $taxAmountQuery->withColumn('SUM(' . OrderProductTaxTableMap::PROMO_AMOUNT . ')', 'total_tax');
+            } else {
+                $taxAmountQuery->withColumn('SUM(' . OrderProductTaxTableMap::AMOUNT . ')', 'total_tax');
+            }
+
+            $taxAmount = $taxAmountQuery->filterByOrderProductId($orderProduct->getId(), Criteria::EQUAL)
                 ->findOne();
             $amount += ($orderProduct->getWasInPromo() == 1 ? $orderProduct->getPromoPrice() : $orderProduct->getPrice()) * $orderProduct->getQuantity();
             $tax += round($taxAmount->getVirtualColumn('total_tax'), 2) * $orderProduct->getQuantity();

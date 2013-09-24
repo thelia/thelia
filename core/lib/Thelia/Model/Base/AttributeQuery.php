@@ -23,12 +23,10 @@ use Thelia\Model\Map\AttributeTableMap;
  *
  *
  * @method     ChildAttributeQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildAttributeQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildAttributeQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAttributeQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildAttributeQuery groupById() Group by the id column
- * @method     ChildAttributeQuery groupByPosition() Group by the position column
  * @method     ChildAttributeQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAttributeQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -56,12 +54,10 @@ use Thelia\Model\Map\AttributeTableMap;
  * @method     ChildAttribute findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAttribute matching the query, or a new ChildAttribute object populated from the query conditions when no match is found
  *
  * @method     ChildAttribute findOneById(int $id) Return the first ChildAttribute filtered by the id column
- * @method     ChildAttribute findOneByPosition(int $position) Return the first ChildAttribute filtered by the position column
  * @method     ChildAttribute findOneByCreatedAt(string $created_at) Return the first ChildAttribute filtered by the created_at column
  * @method     ChildAttribute findOneByUpdatedAt(string $updated_at) Return the first ChildAttribute filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildAttribute objects filtered by the id column
- * @method     array findByPosition(int $position) Return ChildAttribute objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildAttribute objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildAttribute objects filtered by the updated_at column
  *
@@ -152,7 +148,7 @@ abstract class AttributeQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, POSITION, CREATED_AT, UPDATED_AT FROM attribute WHERE ID = :p0';
+        $sql = 'SELECT ID, CREATED_AT, UPDATED_AT FROM attribute WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -280,47 +276,6 @@ abstract class AttributeQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AttributeTableMap::ID, $id, $comparison);
-    }
-
-    /**
-     * Filter the query on the position column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPosition(1234); // WHERE position = 1234
-     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
-     * </code>
-     *
-     * @param     mixed $position The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildAttributeQuery The current query, for fluid interface
-     */
-    public function filterByPosition($position = null, $comparison = null)
-    {
-        if (is_array($position)) {
-            $useMinMax = false;
-            if (isset($position['min'])) {
-                $this->addUsingAlias(AttributeTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($position['max'])) {
-                $this->addUsingAlias(AttributeTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(AttributeTableMap::POSITION, $position, $comparison);
     }
 
     /**

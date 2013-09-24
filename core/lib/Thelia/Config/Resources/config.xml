@@ -24,6 +24,8 @@
         <loop class="Thelia\Core\Template\Loop\Module" name="module"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
         <loop class="Thelia\Core\Template\Loop\OrderAddress" name="order_address"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProduct" name="order_product"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProductAttributeCombination" name="order_product_attribute_combination"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
         <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
         <loop class="Thelia\Core\Template\Loop\Payment" name="payment"/>

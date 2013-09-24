@@ -27,10 +27,16 @@
                                     {assign "orderCurrency" $SYMBOL}
                                 {/loop}
 
-                                <ul class="nav nav-tabs">
+                                <ul class="nav nav-tabs clearfix">
                                     <li class="active"><a href="#cart" data-toggle="tab"><span class="glyphicon glyphicon-shopping-cart"></span> {intl l="Ordered products"}</a></li>
                                     <li><a href="#bill" data-toggle="tab"><span class="glyphicon glyphicon-list-alt"></span> {intl l="Invoice and Delivery"}</a></li>
                                     <li><a href="#supplements" data-toggle="tab"><span class="glyphicon glyphicon-info-sign"></span> {intl l="Further information"}</a></li>
+                                    <li class="pull-right">
+                                        <select name="order-status" data-toggle="selectpicker">
+                                            <option data-content="<span class='label label-success'>Foo</span>">Foo</option>
+                                            <option data-content="<span class='label label-danger'>Bar</span>">Bar</option>
+                                        </select>
+                                    </li>
                                 </ul>
 
                                 <div class="tab-content">
@@ -42,39 +48,78 @@
                                                 </caption>
                                                 <thead>
                                                     <tr>
-                                                       <th>{intl l="Product"}</th>
-                                                       <th>{intl l="Price"}</th>
-                                                       <th>{intl l="Quantity"}</th>
-                                                       <th>{intl l="Total"}</th>
+                                                       <th class="col-md-7">{intl l="Product"}</th>
+                                                       <th class="col-md-1">{intl l="Unit. price"}</th>
+                                                       <th class="col-md-1">{intl l="Tax"}</th>
+                                                       <th class="col-md-1">{intl l="Unit taxed price"}</th>
+                                                       <th class="col-md-1">{intl l="Quantity"}</th>
+                                                       <th class="col-md-1">{intl l="Taxed total"}</th>
                                                     </tr>
                                                 </thead>
 
                                                 <tbody>
+                                                {loop type="order_product" name="order-products" order=$ID}
+                                                    {if $WAS_IN_PROMO == 1}
+                                                        {assign "realPrice" $PROMO_PRICE}
+                                                        {assign "realTax" $PROMO_PRICE_TAX}
+                                                        {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+                                                    {else}
+                                                        {assign "realPrice" $PRICE}
+                                                        {assign "realTax" $PRICE_TAX}
+                                                        {assign "realTaxedPrice" $TAXED_PRICE}
+                                                    {/if}
                                                     <tr>
-                                                        <td><a href="#">T-Shirt F T1</a></td>
-                                                        <td>20.00 &euro;</td>
-                                                        <td>3</td>
-                                                        <td>60.00 &euro;</td>
+                                                        <td>
+                                                            <a href="#">{$TITLE}</a>
+                                                            {ifloop rel="combinations"}
+                                                            <dl class="dl-horizontal">
+                                                                {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                                                                <dt>{$ATTRIBUTE_TITLE}</dt>
+                                                                <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
+                                                                {/loop}
+                                                            </dl>
+                                                            {/ifloop}
+                                                        </td>
+                                                        <td>{$orderCurrency} {$realPrice}</td>
+                                                        <td>{$orderCurrency} {$realTax}</td>
+                                                        <td>{$orderCurrency} {$realTaxedPrice}</td>
+                                                        <td>{$QUANTITY}</td>
+                                                        <td>{$orderCurrency} {$realTaxedPrice * $QUANTITY}</td>
+                                                    </tr>
+                                                {/loop}
+                                                </tbody>
+                                                <tbody class="table-condensed">
+                                                    <tr class="active">
+                                                        <td colspan="2" class="td-unstyled"></td>
+                                                        <td colspan="3"><strong>{intl l="Total without discount"}</strong></td>
+                                                        <td><strong>{$orderCurrency} {$TOTAL_TAXED_AMOUNT-$POSTAGE}</strong></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><a href="#">T-Shirt F T1</a></td>
-                                                        <td>20.00 &euro;</td>
-                                                        <td>3</td>
-                                                        <td>60.00 &euro;</td>
+                                                        <td colspan="2" class="td-unstyled"></td>
+                                                        <td colspan="3"><strong>{intl l="Discount"}</strong></td>
+                                                        <td><strong>{$orderCurrency} 0</strong></td>
+                                                    </tr>
+                                                    <tr class="active">
+                                                        <td colspan="2" class="td-unstyled"></td>
+                                                        <td colspan="3"><strong>{intl l="Coupon code"}</strong></td>
+                                                        <td><strong>{$orderCurrency} 0</strong></td>
                                                     </tr>
                                                     <tr>
-                                                        <td><a href="#">T-Shirt F T1</a></td>
-                                                        <td>20.00 &euro;</td>
-                                                        <td>3</td>
-                                                        <td>60.00 &euro;</td>
+                                                        <td colspan="2" class="td-unstyled"></td>
+                                                        <td colspan="3"><strong>{intl l="Total including discount"}</strong></td>
+                                                        <td><strong>{$orderCurrency} {$TOTAL_TAXED_AMOUNT-$POSTAGE}</strong></td>
+                                                    </tr>
+                                                    <tr class="active">
+                                                        <td colspan="2" class="td-unstyled"></td>
+                                                        <td colspan="3"><strong>{intl l="Postage"}</strong></td>
+                                                        <td><strong>{$orderCurrency} {$POSTAGE}</strong></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" class="td-unstyled"></td>
+                                                        <td colspan="3" class="last"><strong>{intl l="Total"}</strong></td>
+                                                        <td class="last"><strong>{$orderCurrency} {$TOTAL_TAXED_AMOUNT}</strong></td>
                                                     </tr>
                                                 </tbody>
-                                                <tfoot>
-                                                    <tr class="active">
-                                                        <td colspan="3"><strong>Total</strong></td>
-                                                        <td><strong>180.00 &euro;</strong></td>
-                                                    </tr>
-                                                </tfoot>
                                             </table>
                                         </div>
 
@@ -91,30 +136,6 @@
                                                 <tr>
                                                     <th>{intl l="Transaction reference"}</th>
                                                     <td>{$TRANSACTION_REF}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>{intl l="Total without discount"}</th>
-                                                    <td>@TODO</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>{intl l="Discount"}</th>
-                                                    <td>@TODO</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>{intl l="Coupon code"}</th>
-                                                    <td>@TODO</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>{intl l="Total including discount"}</th>
-                                                    <td>{$orderCurrency} {$TOTAL_TAXED_AMOUNT-$POSTAGE}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>{intl l="Postage"}</th>
-                                                    <td>{$orderCurrency} {$POSTAGE}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>{intl l="Total"}</th>
-                                                    <td>{$orderCurrency} {$TOTAL_TAXED_AMOUNT}</td>
                                                 </tr>
                                                 </tbody>
                                             </table>
@@ -466,4 +487,15 @@
 
     {/form}
     
+{/block}
+
+{block name="javascript-initialization"}
+
+    {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/main.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
 {/block}
