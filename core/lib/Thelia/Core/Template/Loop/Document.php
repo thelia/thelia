@@ -251,9 +251,9 @@ class Document extends BaseI18nLoop
 
                 $loopResultRow
                     ->set("ID"                    , $result->getId())
-                    ->set("LOCALE"                ,$locale)
+                    ->set("LOCALE"                , $locale)
                     ->set("DOCUMENT_URL"          , $event->getFileUrl())
-                    ->set("DOCUMENT_PATH"         , $event->getCacheFilepath())
+                    ->set("DOCUMENT_PATH"         , $event->getDocumentPath())
                     ->set("ORIGINAL_DOCUMENT_PATH", $source_filepath)
                     ->set("TITLE"                 , $result->getVirtualColumn('i18n_TITLE'))
                     ->set("CHAPO"                 , $result->getVirtualColumn('i18n_CHAPO'))
