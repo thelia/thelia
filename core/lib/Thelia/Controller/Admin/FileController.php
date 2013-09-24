@@ -107,7 +107,7 @@ class FileController extends BaseAdminController
                     return new ResponseRest($message, 'text', 415);
                 }
 
-                $parentModel = $fileManager->getParentFIleModel($parentType, $parentId);
+                $parentModel = $fileManager->getParentFileModel($parentType, $parentId);
                 $imageModel = $fileManager->getImageModel($parentType);
 
                 if ($parentModel === null || $imageModel === null || $fileBeingUploaded === null) {

@@ -453,7 +453,7 @@ class FileManager
      *
      * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
      */
-    public function getParentFIleModel($parentType, $parentId)
+    public function getParentFileModel($parentType, $parentId)
     {
         switch ($parentType) {
             case self::TYPE_PRODUCT:
