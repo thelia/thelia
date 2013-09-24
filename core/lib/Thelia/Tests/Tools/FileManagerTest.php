@@ -93,7 +93,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
 
         $newUploadedFiles = array();
 
-        $actual = $fileManager->copyUploadedFile(24, FileManager::TYPE_PRODUCT, $stubProductImage, $stubUploadedFile, $newUploadedFiles);
+        $actual = $fileManager->copyUploadedFile(24, FileManager::TYPE_PRODUCT, $stubProductImage, $stubUploadedFile, $newUploadedFiles, FileManager::FILE_TYPE_IMAGES);
 
         $this->assertCount(1, $actual);
     }
@@ -175,7 +175,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
 
         $newUploadedFiles = array();
 
-        $actual = $fileManager->copyUploadedFile(24, FileManager::TYPE_PRODUCT, $stubProductImage, $stubUploadedFile, $newUploadedFiles);
+        $actual = $fileManager->copyUploadedFile(24, FileManager::TYPE_PRODUCT, $stubProductImage, $stubUploadedFile, $newUploadedFiles, FileManager::FILE_TYPE_DOCUMENTS);
 
     }
 

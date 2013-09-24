@@ -60,25 +60,25 @@
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
         <form name="thelia.admin.category.modification" class="Thelia\Form\CategoryModificationForm"/>
         <form name="thelia.admin.category.image.modification" class="Thelia\Form\CategoryImageModification"/>
-        <form name="thelia.admin.category.image.modification" class="Thelia\Form\CategoryDocumentModification"/>
+        <form name="thelia.admin.category.document.modification" class="Thelia\Form\CategoryDocumentModification"/>
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
         <form name="thelia.admin.product.modification" class="Thelia\Form\ProductModificationForm"/>
         <form name="thelia.admin.product.details.modification" class="Thelia\Form\ProductDetailsModificationForm"/>
         <form name="thelia.admin.product.image.modification" class="Thelia\Form\ProductImageModification"/>
-        <form name="thelia.admin.product.image.modification" class="Thelia\Form\ProductDocumentModification"/>
+        <form name="thelia.admin.product.document.modification" class="Thelia\Form\ProductDocumentModification"/>
 
         <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
 
         <form name="thelia.admin.folder.creation" class="Thelia\Form\FolderCreationForm"/>
         <form name="thelia.admin.folder.modification" class="Thelia\Form\FolderModificationForm"/>
         <form name="thelia.admin.folder.image.modification" class="Thelia\Form\FolderImageModification"/>
-        <form name="thelia.admin.folder.image.modification" class="Thelia\Form\FolderDocumentModification"/>
+        <form name="thelia.admin.folder.document.modification" class="Thelia\Form\FolderDocumentModification"/>
 
         <form name="thelia.admin.content.creation" class="Thelia\Form\ContentCreationForm"/>
         <form name="thelia.admin.content.modification" class="Thelia\Form\ContentModificationForm"/>
         <form name="thelia.admin.content.image.modification" class="Thelia\Form\ContentImageModification"/>
-        <form name="thelia.admin.content.image.modification" class="Thelia\Form\ContentDocumentModification"/>
+        <form name="thelia.admin.content.document.modification" class="Thelia\Form\ContentDocumentModification"/>
 
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
 

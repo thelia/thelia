@@ -103,18 +103,19 @@ class FileManager
      * Copy UploadedFile into the server storage directory
      *
      * @param int                                                                                                                 $parentId     Parent id
-     * @param string                                                                                                              $fileType     Image type
+     * @param string                                                                                                              $parentType   Image type
      * @param FolderImage|ContentImage|CategoryImage|ProductImage|FolderDocument|ContentDocument|CategoryDocument|ProductDocument $model        Model saved
      * @param UploadedFile                                                                                                        $uploadedFile Ready to be uploaded file
+     * @param string                                                                                                              $fileType     File type ex FileManager::FILE_TYPE_IMAGES
      *
      * @throws \Thelia\Exception\ImageException
      * @return UploadedFile
      */
-    public function copyUploadedFile($parentId, $fileType, $model, $uploadedFile)
+    public function copyUploadedFile($parentId, $parentType, $model, $uploadedFile, $fileType)
     {
         $newUploadedFile = null;
         if ($uploadedFile !== null) {
-            $directory = $this->getUploadDir($fileType, FileManager::FILE_TYPE_IMAGES);
+            $directory = $this->getUploadDir($parentType, $fileType);
             $fileName = $this->renameFile($model->getId(), $uploadedFile);
 
             $this->adminLogAppend(
@@ -125,7 +126,7 @@ class FileManager
                         '%fileName%' => $uploadedFile->getClientOriginalName(),
                         '%directory%' => $directory . '/' . $fileName,
                         '%parentId%' => $parentId,
-                        '%parentType%' => $fileType
+                        '%parentType%' => $parentType
                     ),
                     'image'
                 )
@@ -137,8 +138,8 @@ class FileManager
             if (!$model->save()) {
                 throw new ImageException(
                     sprintf(
-                        '*s %s (%s) failed to be saved (image file)',
-                        ucfirst($fileType),
+                        '%s %s (%s) failed to be saved (image file)',
+                        ucfirst($parentType),
                         $model->getFile(),
                         $fileType
                     )
@@ -629,11 +630,17 @@ class FileManager
     public function renameFile($modelId, $uploadedFile)
     {
         $extension = $uploadedFile->getClientOriginalExtension();
+        if (!empty($extension)) {
+            $extension = '.' . strtolower($extension);
+        }
         $fileName = $this->sanitizeFileName(
-            str_replace('.' . $extension, '', $uploadedFile->getClientOriginalName()) . "-" . $modelId . "." . strtolower(
-            $extension
-            )
+            str_replace(
+                $extension,
+                '',
+                $uploadedFile->getClientOriginalName()
+            ) . '-' . $modelId . $extension
         );
+
         return $fileName;
     }
 

@@ -93,45 +93,48 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      *
      * This method updates the cache_file_path and file_url attributes of the event
      *
-     * @param  DocumentEvent $event
-     * @throws \InvalidArgumentException, DocumentException
+     * @param DocumentEvent $event Event
+     *
+     * @throws \Thelia\Exception\DocumentException
+     * @throws \InvalidArgumentException , DocumentException
      */
     public function processDocument(DocumentEvent $event)
     {
         $subdir      = $event->getCacheSubdirectory();
-        $source_file = $event->getSourceFilepath();
+        $sourceFile = $event->getSourceFilepath();
 
-        if (null == $subdir || null == $source_file) {
+        if (null == $subdir || null == $sourceFile) {
             throw new \InvalidArgumentException("Cache sub-directory and source file path cannot be null");
         }
 
-        $originalDocumentPathInCache = $this->getCacheFilePath($subdir, $source_file, true);
+        $originalDocumentPathInCache = $this->getCacheFilePath($subdir, $sourceFile, true);
 
         if (! file_exists($originalDocumentPathInCache)) {
 
-            if (! file_exists($source_file)) {
-                throw new DocumentException(sprintf("Source document file %s does not exists.", $source_file));
+            if (! file_exists($sourceFile)) {
+                throw new DocumentException(sprintf("Source document file %s does not exists.", $sourceFile));
             }
 
             $mode = ConfigQuery::read('original_document_delivery_mode', 'symlink');
 
             if ($mode == 'symlink') {
-                if (false == symlink($source_file, $originalDocumentPathInCache)) {
-                     throw new DocumentException(sprintf("Failed to create symbolic link for %s in %s document cache directory", basename($source_file), $subdir));
+                if (false == symlink($sourceFile, $originalDocumentPathInCache)) {
+                     throw new DocumentException(sprintf("Failed to create symbolic link for %s in %s document cache directory", basename($sourceFile), $subdir));
                 }
-            } else {// mode = 'copy'
-                if (false == @copy($source_file, $originalDocumentPathInCache)) {
-                    throw new DocumentException(sprintf("Failed to copy %s in %s document cache directory", basename($source_file), $subdir));
+            } else {
+                // mode = 'copy'
+                if (false == @copy($sourceFile, $originalDocumentPathInCache)) {
+                    throw new DocumentException(sprintf("Failed to copy %s in %s document cache directory", basename($sourceFile), $subdir));
                 }
             }
         }
 
         // Compute the document URL
-        $document_url = $this->getCacheFileURL($subdir, basename($originalDocumentPathInCache));
+        $documentUrl = $this->getCacheFileURL($subdir, basename($originalDocumentPathInCache));
 
         // Update the event with file path and file URL
-        $event->setDocumentPath($originalDocumentPathInCache);
-        $event->setDocumentUrl(URL::getInstance()->absoluteUrl($document_url, null, URL::PATH_TO_FILE));
+        $event->setDocumentPath($documentUrl);
+        $event->setDocumentUrl(URL::getInstance()->absoluteUrl($documentUrl, null, URL::PATH_TO_FILE));
     }
 
     /**
@@ -173,7 +176,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
             );
         }
 
-        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getDocumentType(), $event->getModelDocument(), $event->getUploadedFile());
+        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getDocumentType(), $event->getModelDocument(), $event->getUploadedFile(), FileManager::FILE_TYPE_DOCUMENTS);
         $event->setUploadedFile($newUploadedFile);
     }
 
@@ -206,10 +209,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
             $url = $fileManager->getUploadDir($event->getDocumentType(), FileManager::FILE_TYPE_DOCUMENTS) . '/' . $event->getOldModelDocument()->getFile();
             unlink(str_replace('..', '', $url));
 
-            $newUploadedFile = $fileManager->copyUploadedFile(
-                $event->getModelDocument()->getParentId(),
-                $event->getDocumentType(),
-                $event->getModelDocument(), $event->getUploadedFile());
+            $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getDocumentType(), $event->getModelDocument(), $event->getUploadedFile(), FileManager::FILE_TYPE_DOCUMENTS);
             $event->setUploadedFile($newUploadedFile);
         }
 

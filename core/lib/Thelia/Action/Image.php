@@ -291,7 +291,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             );
         }
 
-        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile());
+        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile(), FileManager::FILE_TYPE_IMAGES);
         $event->setUploadedFile($newUploadedFile);
     }
 
@@ -321,13 +321,10 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         // Copy and save file
         if ($event->getUploadedFile()) {
             // Remove old picture file from file storage
-            $url = $fileManager->getUploadDir($event->getImageType()) . '/' . $event->getOldModelImage()->getFile();
+            $url = $fileManager->getUploadDir($event->getImageType(), FileManager::FILE_TYPE_IMAGES) . '/' . $event->getOldModelImage()->getFile();
             unlink(str_replace('..', '', $url));
 
-            $newUploadedFile = $fileManager->copyUploadedFile(
-                $event->getModelImage()->getParentId(),
-                $event->getImageType(),
-                $event->getModelImage(), $event->getUploadedFile());
+            $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile(), FileManager::FILE_TYPE_IMAGES);
             $event->setUploadedFile($newUploadedFile);
         }
 

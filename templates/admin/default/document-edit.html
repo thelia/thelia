@@ -5,7 +5,7 @@
 {block name="check-permissions"}admin.document.edit{/block}
 
 {block name="main-content"}
-    <div class="documents edit-image">
+    <div class="documents edit-document">
 
         <div id="wrapper" class="container">
 
@@ -47,6 +47,13 @@
                                             <p class="title title-without-tabs">{intl l="Document informations"}</p>
                                             
                                             <div class="row">
+
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="control-label">{intl l="File"} : </label>
+                                                        <p><a href="{$DOCUMENT_PATH}" title="{$TITLE}" target="_blank">{$TITLE}</a>
+                                                    </div>
+                                                </div>
 
                                                 <div class="col-md-6">
                                                     {form_field form=$form field='file'}

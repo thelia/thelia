@@ -56,16 +56,18 @@
     </route>
     <route id="admin.image.update.view" path="/admin/image/type/{parentType}/{imageId}/update" methods="get">
         <default key="_controller">Thelia\Controller\Admin\FileController::viewImageAction</default>
-        <requirement key="customer_id">\d+</requirement>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="imageId">\d+</requirement>
     </route>
     <route id="admin.image.update.process" path="/admin/image/type/{parentType}/{imageId}/update" methods="post">
         <default key="_controller">Thelia\Controller\Admin\FileController::updateImageAction</default>
-        <requirement key="customer_id">\d+</requirement>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="imageId">\d+</requirement>
     </route>
     <route id="admin.image.delete" path="/admin/image/type/{parentType}/delete/{imageId}">
         <default key="_controller">Thelia\Controller\Admin\FileController::deleteImageAction</default>
         <requirement key="parentType">.*</requirement>
-        <requirement key="parentId">\d+</requirement>
+        <requirement key="imageId">\d+</requirement>
     </route>
 
     <route id="admin.document.save-ajax" path="/admin/document/type/{parentType}/{parentId}/save-ajax">
@@ -85,16 +87,18 @@
     </route>
     <route id="admin.document.update.view" path="/admin/document/type/{parentType}/{documentId}/update" methods="get">
         <default key="_controller">Thelia\Controller\Admin\FileController::viewDocumentAction</default>
-        <requirement key="customer_id">\d+</requirement>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="documentId">\d+</requirement>
     </route>
     <route id="admin.document.update.process" path="/admin/document/type/{parentType}/{documentId}/update" methods="post">
         <default key="_controller">Thelia\Controller\Admin\FileController::updateDocumentAction</default>
-        <requirement key="customer_id">\d+</requirement>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="documentId">\d+</requirement>
     </route>
     <route id="admin.document.delete" path="/admin/document/type/{parentType}/delete/{documentId}">
         <default key="_controller">Thelia\Controller\Admin\FileController::deleteDocumentAction</default>
         <requirement key="parentType">.*</requirement>
-        <requirement key="parentId">\d+</requirement>
+        <requirement key="documentId">\d+</requirement>
     </route>
 
     <!-- Customer rule management -->

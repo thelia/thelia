@@ -69,7 +69,7 @@ class DocumentCreateOrUpdateEvent extends ActionEvent
      */
     public function __construct($documentType, $parentId)
     {
-        $this->imageType = $documentType;
+        $this->documentType = $documentType;
         $this->parentId  = $parentId;
     }
 
@@ -106,7 +106,7 @@ class DocumentCreateOrUpdateEvent extends ActionEvent
      */
     public function setDocumentType($documentType)
     {
-        $this->imageType = $documentType;
+        $this->documentType = $documentType;
 
         return $this;
     }
