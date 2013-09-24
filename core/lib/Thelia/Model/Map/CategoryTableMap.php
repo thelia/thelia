@@ -191,16 +191,12 @@ class CategoryTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('ProductCategory', '\\Thelia\\Model\\ProductCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'ProductCategories');
-        $this->addRelation('FeatureCategory', '\\Thelia\\Model\\FeatureCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'FeatureCategories');
-        $this->addRelation('AttributeCategory', '\\Thelia\\Model\\AttributeCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'AttributeCategories');
         $this->addRelation('CategoryImage', '\\Thelia\\Model\\CategoryImage', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryImages');
         $this->addRelation('CategoryDocument', '\\Thelia\\Model\\CategoryDocument', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryDocuments');
         $this->addRelation('CategoryAssociatedContent', '\\Thelia\\Model\\CategoryAssociatedContent', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryAssociatedContents');
         $this->addRelation('CategoryI18n', '\\Thelia\\Model\\CategoryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CategoryI18ns');
         $this->addRelation('CategoryVersion', '\\Thelia\\Model\\CategoryVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CategoryVersions');
         $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Products');
-        $this->addRelation('Feature', '\\Thelia\\Model\\Feature', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Features');
-        $this->addRelation('Attribute', '\\Thelia\\Model\\Attribute', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Attributes');
     } // buildRelations()
 
     /**
@@ -225,8 +221,6 @@ class CategoryTableMap extends TableMap
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 ProductCategoryTableMap::clearInstancePool();
-                FeatureCategoryTableMap::clearInstancePool();
-                AttributeCategoryTableMap::clearInstancePool();
                 CategoryImageTableMap::clearInstancePool();
                 CategoryDocumentTableMap::clearInstancePool();
                 CategoryAssociatedContentTableMap::clearInstancePool();

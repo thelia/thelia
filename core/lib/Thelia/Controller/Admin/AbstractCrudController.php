@@ -210,31 +210,45 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param unknown $createdObject the created object
+     * @param unknown $createEvent the create event
+     * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalCreateAction($createdObject)
+    protected function performAdditionalCreateAction($createEvent)
     {
-        // Nothing to do
+        return null;
     }
 
     /**
      * Put in this method post object update processing if required.
      *
-     * @param unknown $updatedObject the updated object
+     * @param unknown $updateEvent the update event
+     * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalUpdateAction($updatedObject)
+    protected function performAdditionalUpdateAction($updateEvent)
     {
-        // Nothing to do
+        return null;
     }
 
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param unknown $deletedObject the deleted object
+     * @param unknown $deleteEvent the delete event
+     * @return Response a response, or null to continue normal processing
      */
-    protected function performAdditionalDeleteAction($deletedObject)
+    protected function performAdditionalDeleteAction($deleteEvent)
     {
-        // Nothing to do
+        return null;
+    }
+
+    /**
+     * Put in this method post object position change processing if required.
+     *
+     * @param unknown $deleteEvent the delete event
+     * @return Response a response, or null to continue normal processing
+     */
+    protected function performAdditionalUpdatePositionAction($positionChangeEvent)
+    {
+        return null;
     }
 
     /**
@@ -306,14 +320,18 @@ abstract class AbstractCrudController extends BaseAdminController
                 $this->adminLogAppend(sprintf("%s %s (ID %s) created", ucfirst($this->objectName), $this->getObjectLabel($createdObject), $this->getObjectId($createdObject)));
             }
 
-            $this->performAdditionalCreateAction($createdObject);
+            $response = $this->performAdditionalCreateAction($createEvent);
 
-            // Substitute _ID_ in the URL with the ID of the created object
-            $successUrl = str_replace('_ID_', $this->getObjectId($createdObject), $creationForm->getSuccessUrl());
+            if ($response == null)  {
+                // Substitute _ID_ in the URL with the ID of the created object
+                $successUrl = str_replace('_ID_', $this->getObjectId($createdObject), $creationForm->getSuccessUrl());
 
-            // Redirect to the success URL
-            $this->redirect($successUrl);
-
+                // Redirect to the success URL
+                $this->redirect($successUrl);
+            }
+            else {
+                return $response;
+            }
         }
         catch (FormValidationException $ex) {
             // Form cannot be validated
@@ -393,16 +411,21 @@ abstract class AbstractCrudController extends BaseAdminController
                 $this->adminLogAppend(sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
             }
 
-            $this->performAdditionalUpdateAction($changedObject);
+            $response = $this->performAdditionalUpdateAction($changeEvent);
 
-            // If we have to stay on the same page, do not redirect to the succesUrl,
-            // just redirect to the edit page again.
-            if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirectToEditionTemplate($this->getRequest());
+            if ($response == null) {
+                // If we have to stay on the same page, do not redirect to the succesUrl,
+                // just redirect to the edit page again.
+                if ($this->getRequest()->get('save_mode') == 'stay') {
+                    $this->redirectToEditionTemplate($this->getRequest());
+                }
+
+                // Redirect to the success URL
+                $this->redirect($changeForm->getSuccessUrl());
             }
-
-            // Redirect to the success URL
-            $this->redirect($changeForm->getSuccessUrl());
+            else {
+                return $response;
+            }
         }
         catch (FormValidationException $ex) {
             // Form cannot be validated
@@ -449,7 +472,14 @@ abstract class AbstractCrudController extends BaseAdminController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        $response = $this->performAdditionalUpdatePositionAction($event);
+
+        if ($response == null) {
+            $this->redirectToListTemplate();
+        }
+        else {
+            return $response;
+        }
     }
 
     /**
@@ -462,9 +492,6 @@ abstract class AbstractCrudController extends BaseAdminController
 
         $changeEvent = $this->createToggleVisibilityEvent($this->getRequest());
 
-        // Create and dispatch the change event
-        $changeEvent->setIsDefault(true);
-
         try {
             $this->dispatch($this->visibilityToggleEventIdentifier, $changeEvent);
         } catch (\Exception $ex) {
@@ -472,7 +499,7 @@ abstract class AbstractCrudController extends BaseAdminController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToRoute('admin.categories.default');
+        return $this->nullResponse();
     }
 
     /**
@@ -494,8 +521,12 @@ abstract class AbstractCrudController extends BaseAdminController
             $this->adminLogAppend(
                     sprintf("%s %s (ID %s) deleted", ucfirst($this->objectName), $this->getObjectLabel($deletedObject), $this->getObjectId($deletedObject)));
         }
-        $this->performAdditionalDeleteAction($deletedObject);
 
-        $this->redirectToListTemplate();
+        $response = $this->performAdditionalDeleteAction($deleteEvent);
+
+        if ($response == null)
+            $this->redirectToListTemplate();
+        else
+            return $response;
     }
 }

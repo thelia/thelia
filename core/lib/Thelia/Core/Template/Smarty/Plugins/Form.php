@@ -145,7 +145,7 @@ class Form extends AbstractSmartyPlugin
 
     public function renderFormField($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-        if ($repeat) {
+            if ($repeat) {
 
             $formFieldView = $this->getFormFieldView($params);
 
@@ -153,25 +153,25 @@ class Form extends AbstractSmartyPlugin
 
             $value = $formFieldView->vars["value"];
 /* FIXME: doesnt work. We got "This form should not contain extra fields." error.
-            // We have a collection
-            if (is_array($value)) {
+// We have a collection
+if (is_array($value)) {
 
-                $key = $this->getParam($params, 'value_key');
+$key = $this->getParam($params, 'value_key');
 
-                if ($key != null) {
+if ($key != null) {
 
-                    if (isset($value[$key])) {
+if (isset($value[$key])) {
 
-                        $name  = sprintf("%s[%s]", $formFieldView->vars["full_name"], $key);
-                        $val   = $value[$key];
+$name = sprintf("%s[%s]", $formFieldView->vars["full_name"], $key);
+$val = $value[$key];
 
-                        $this->assignFieldValues($template, $name, $val, $formFieldView->vars);
-                    }
-                }
-            }
-            else {
-                $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVars["value"], $formFieldView->vars);
-            }
+$this->assignFieldValues($template, $name, $val, $formFieldView->vars);
+}
+}
+}
+else {
+$this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVars["value"], $formFieldView->vars);
+}
 */
             $this->assignFieldValues($template, $formFieldView->vars["full_name"], $formFieldView->vars["value"], $formFieldView->vars);
 

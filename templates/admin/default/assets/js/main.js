@@ -40,38 +40,16 @@
             });
         }*/
 
-        // -- Effect description
-        if($('[name=effect]').length){
-            var $effectSelect 	= $('[name=effect]'),
-                $helpBlock 		= $effectSelect.next('.help-block');
 
-            $effectSelect.change(function(){			
-                var description = $(this).find(":selected").data('description');			
-                $helpBlock.text(description);
-            });
-        }
-
-        // -- Max usage --
-        if($('#is-unlimited').length){
-
-            if($('#is-unlimited').is(':checked')){
-                $('#max-usage').hide().attr('value', '-1');
-            }
-
-            $('#is-unlimited').change(function(){
-                if($('#is-unlimited').is(':checked')){
-                    $('#max-usage').hide().attr('value', '-1');
-                }
-                else{
-                    $('#max-usage').show().val('').attr('value', '');
-                }
-            });
-            
-        }
 
         // -- Bootstrap tooltip --
         if($('[rel="tooltip"]').length){            
             $('[rel="tooltip"]').tooltip();
+        }
+
+        // -- Bootstrap select --
+        if($('[data-toggle="selectpicker"]').length){            
+            $('[data-toggle="selectpicker"]').selectpicker();
         }
 
         // -- Confirm Box --

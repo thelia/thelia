@@ -126,8 +126,7 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
      */
     public function isMatching()
     {
-        $constrainValidator = new ConstraintValidator();
-        $constraint1 =$constrainValidator->variableOpComparison(
+        $constraint1 = $this->constraintValidator->variableOpComparison(
             $this->adapter->getNbArticlesInCart(),
             $this->operators[self::INPUT1],
             $this->values[self::INPUT1]

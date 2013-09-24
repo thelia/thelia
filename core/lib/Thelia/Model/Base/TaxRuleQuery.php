@@ -23,10 +23,12 @@ use Thelia\Model\Map\TaxRuleTableMap;
  *
  *
  * @method     ChildTaxRuleQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildTaxRuleQuery orderByIsDefault($order = Criteria::ASC) Order by the is_default column
  * @method     ChildTaxRuleQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildTaxRuleQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildTaxRuleQuery groupById() Group by the id column
+ * @method     ChildTaxRuleQuery groupByIsDefault() Group by the is_default column
  * @method     ChildTaxRuleQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildTaxRuleQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -50,10 +52,12 @@ use Thelia\Model\Map\TaxRuleTableMap;
  * @method     ChildTaxRule findOneOrCreate(ConnectionInterface $con = null) Return the first ChildTaxRule matching the query, or a new ChildTaxRule object populated from the query conditions when no match is found
  *
  * @method     ChildTaxRule findOneById(int $id) Return the first ChildTaxRule filtered by the id column
+ * @method     ChildTaxRule findOneByIsDefault(boolean $is_default) Return the first ChildTaxRule filtered by the is_default column
  * @method     ChildTaxRule findOneByCreatedAt(string $created_at) Return the first ChildTaxRule filtered by the created_at column
  * @method     ChildTaxRule findOneByUpdatedAt(string $updated_at) Return the first ChildTaxRule filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildTaxRule objects filtered by the id column
+ * @method     array findByIsDefault(boolean $is_default) Return ChildTaxRule objects filtered by the is_default column
  * @method     array findByCreatedAt(string $created_at) Return ChildTaxRule objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildTaxRule objects filtered by the updated_at column
  *
@@ -144,7 +148,7 @@ abstract class TaxRuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CREATED_AT, UPDATED_AT FROM tax_rule WHERE ID = :p0';
+        $sql = 'SELECT ID, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM tax_rule WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -272,6 +276,33 @@ abstract class TaxRuleQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TaxRuleTableMap::ID, $id, $comparison);
+    }
+
+    /**
+     * Filter the query on the is_default column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByIsDefault(true); // WHERE is_default = true
+     * $query->filterByIsDefault('yes'); // WHERE is_default = true
+     * </code>
+     *
+     * @param     boolean|string $isDefault The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildTaxRuleQuery The current query, for fluid interface
+     */
+    public function filterByIsDefault($isDefault = null, $comparison = null)
+    {
+        if (is_string($isDefault)) {
+            $is_default = in_array(strtolower($isDefault), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(TaxRuleTableMap::IS_DEFAULT, $isDefault, $comparison);
     }
 
     /**

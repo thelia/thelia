@@ -23,10 +23,19 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
+use Thelia\Model\ConfigQuery;
+use Thelia\Core\Security\Exception\TokenAuthenticationException;
+
 class AdminController extends BaseAdminController
 {
     public function indexAction()
     {
         return $this->render("home");
+    }
+
+    public function updateAction()
+    {
+    	return $this->render("profile-edit");
     }
 }

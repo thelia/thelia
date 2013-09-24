@@ -86,6 +86,8 @@ class Thelia extends Kernel
             $serviceContainer->setLogger('defaultLogger', \Thelia\Log\Tlog::getInstance());
             $con->useDebug(true);
         }
+
+
     }
 
     /**

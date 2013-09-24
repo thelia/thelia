@@ -23,41 +23,62 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
+use Thelia\Model\ProductQuery;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\ExecutionContextInterface;
 
 class ProductCreationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm($change_mode = false)
     {
+        $ref_constraints = array(new NotBlank());
+
+        if (! $change_mode) {
+            $ref_constraints[] = new Callback(array(
+                "methods" => array(array($this, "checkDuplicateRef"))
+            ));
+        }
+
         $this->formBuilder
             ->add("ref", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => "Product reference *",
-                "label_attr" => array(
-                    "for" => "ref"
-                )
+                "constraints" => $ref_constraints,
+                "label"       => "Product reference *",
+                "label_attr"  => array("for" => "ref")
             ))
             ->add("title", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
                 "label" => "Product title *",
-                "label_attr" => array(
-                    "for" => "title"
-                )
+                "label_attr" => array("for" => "title")
             ))
-            ->add("parent", "integer", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
+            ->add("default_category", "integer", array(
+                "constraints" => array(new NotBlank()),
+                "label"       => Translator::getInstance()->trans("Default product category."),
+                "label_attr"  => array("for" => "default_category_field")
             ))
             ->add("locale", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                )
+                "constraints" => array(new NotBlank())
+            ))
+            ->add("visible", "integer", array(
+                "label"      => Translator::getInstance()->trans("This product is online."),
+                "label_attr" => array("for" => "visible_field")
             ))
         ;
+    }
+
+    public function checkDuplicateRef($value, ExecutionContextInterface $context)
+    {
+        $count = ProductQuery::create()->filterByRef($value)->count();
+
+        if ($count > 0) {
+            $context->addViolation(
+                    Translator::getInstance()->trans(
+                            "A product with reference %ref already exists. Please choose another reference.",
+                            array('%ref' => $value)
+            ));
+        }
     }
 
     public function getName()

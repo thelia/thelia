@@ -7,140 +7,96 @@
 
     <nav>
         <ul class="breadcrumb">
-            {include file="includes/coupon_breadcrumb.html"}
+            <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
+            <li><a href="{url path='admin/coupon/'}">{intl l='Coupon'}</a></li>
+            <li>{intl l='Browse'}</li>
         </ul>
     </nav>
 
     <div class="page-header">
-        <h1>Coupons : <small>List of coupons</small></h1>
+        <h1>{intl l='Coupons : '}<small>{intl l='List'}</small></h1>
+        <a href="{$urlCreateCoupon}" class="btn btn-default btn-primary btn-medium">
+            <span class="glyphicon glyphicon-add"></span> {intl l='Create a new coupon'}
+        </a>
     </div>
 
     <section class="row">
 		<div class="col-md-12 general-block-decorator">
-	    	<table class="table table-striped tablesorter">
-	    		<caption>
-	    			List of enabled coupons
-	    		</caption>
-	    		<thead>
-	    			<tr>
-	    				<th>Code</th>
-	    				<th>Title</th>
-	    				<th>Expiration date</th>
-	    				<th>Usage left</th>
-	    				<th class="sorter-false filter-false">Actions</th>
-	    			</tr>
-	    		</thead>
-	    		<tbody>
-	    			<tr>
-	    				<td><a href="#">XMAS13</a></td>
-	    				<td>Coupon for XMAS -30 &euro;</td>
-	    				<td>18/10/2013</td>
-	    				<td>49</td>
-	    				<td>
-	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-	    					<a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#disable"><span class="glyphicon glyphicon-off"></span> Disable</a>
-	    				</td>
-	    			</tr>
-	    			<tr>
-	    				<td><a href="#">XMAS13</a></td>
-	    				<td>Coupon for XMAS -30 &euro;</td>
-	    				<td>05/09/2013</td>
-	    				<td>20</td>
-	    				<td>
-	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-	    					<a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#disable"><span class="glyphicon glyphicon-off"></span> Disable</a>
-	    				</td>
-	    			</tr>
-	    			<tr>
-	    				<td><a href="#">XMAS13</a></td>
-	    				<td>Coupon for XMAS -30 &euro;</td>
-	    				<td>03/12/2013</td>
-	    				<td>9</td>
-	    				<td>
-	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-	    					<a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#disable"><span class="glyphicon glyphicon-off"></span> Disable</a>
-	    				</td>
-	    			</tr>
-	    			<tr>
-	    				<td><a href="#">XMAS13</a></td>
-	    				<td>Coupon for XMAS -30 &euro;</td>
-	    				<td>25/01/2013</td>
-	    				<td>4</td>
-	    				<td>
-	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-	    					<a href="#url" class="btn btn-default btn-danger btn-medium" data-toggle="confirm" data-target="#disable"><span class="glyphicon glyphicon-off"></span> Disable</a>
-	    				</td>
-	    			</tr>
-	    		</tbody>
-	    	</table>
+            <div class="table-responsive">
+    	    	<table class="table table-striped tablesorter">
+    	    		<caption>
+                        {intl l='Enabled coupons'}
+    	    		</caption>
+    	    		<thead>
+    	    			<tr>
+    	    				<th>{block name="coupon-label-code"}{intl l='Code'}{/block}</th>
+    	    				<th>{block name="coupon-label-title"}{intl l='Title'}{/block}</th>
+    	    				<th>{block name="coupon-label-expiration-date"}{intl l='Expiration date'}{/block}</th>
+    	    				<th>{block name="coupon-label-usage-left"}{intl l='Usage left'}{/block}</th>
+    	    				<th class="sorter-false filter-false">{block name="coupon-label-action"}{/block}</th>
+    	    			</tr>
+    	    		</thead>
+    	    		<tbody>
+                        {loop type="coupon" name="list_coupon" is_enabled="1" backend_context="true"}
+                            <tr>
+                                <td>{block name="coupon-code"}<a href="{$urlReadCoupon|replace:'couponId':$ID}">{$CODE}</a>{/block}</td>
+                                <td>{block name="coupon-title"}{$TITLE}{/block}</td>
+                                <td>{block name="coupon-expiration-date"}{$EXPIRATION_DATE}{/block}</td>
+                                <td>{block name="coupon-usage-left"}{$USAGE_LEFT}{/block}</td>
+                                <td>
+                                    {block name="coupon-action"}
+                                        <a href="{$urlEditCoupon|replace:'couponId':$ID}" class="btn btn-default btn-primary btn-medium">
+                                            <span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}
+                                        </a>
+                                    {/block}
+                                </td>
+                            </tr>
+                        {/loop}
+    	    		</tbody>
+    	    	</table>
+            </div>
 		</div>
     </section>
 
     <section class="row">
 		<div class="col-md-12 general-block-decorator">
-	    	<table class="table table-striped tablesorter">
-	    		<caption>
-	    			List of disabled coupons
-	    		</caption>
-	    		<thead>
-	    			<tr>
-	    				<th>Code</th>
-	    				<th>Title</th>
-	    				<th>Expiration date</th>
-	    				<th>Usage left</th>
-	    				<th class="sorter-false filter-false">Actions</th>
-	    			</tr>
-	    		</thead>
-	    		<tbody>
-	    			<tr>
-	    				<td>XMAS13</td>
-	    				<td>Coupon for XMAS -30 &euro;</td>
-	    				<td>18/10/2013</td>
-	    				<td>49</td>
-	    				<td>
-	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-	    					<a href="#url" class="btn btn-default btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="glyphicon glyphicon-ok"></span> Enabled</a>
-	    				</td>
-	    			</tr>
-	    			<tr>
-	    				<td>XMAS13</td>
-	    				<td>Coupon for XMAS -20 &euro;</td>
-	    				<td>05/09/2013</td>
-	    				<td>49</td>
-	    				<td>
-	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-	    					<a href="#url" class="btn btn-default btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="glyphicon glyphicon-ok"></span> Enabled</a>
-	    				</td>
-	    			</tr>
-	    			<tr>
-	    				<td>XMAS13</td>
-	    				<td>Coupon for XMAS -50 &euro;</td>
-	    				<td>03/12/2013</td>
-	    				<td>49</td>
-	    				<td>
-	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-	    					<a href="#url" class="btn btn-default btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="glyphicon glyphicon-ok"></span> Enabled</a>
-	    				</td>
-	    			</tr>
-	    			<tr>
-	    				<td>XMAS13</td>
-	    				<td>Coupon for XMAS -5 &euro;</td>
-	    				<td>25/01/2013</td>
-	    				<td>49</td>
-	    				<td>
-	    					<a href="#url" class="btn btn-default btn-primary btn-medium"><span class="glyphicon glyphicon-edit"></span> Edit</a>
-	    					<a href="#url" class="btn btn-default btn-success btn-medium" data-toggle="confirm" data-target="#enable"><span class="glyphicon glyphicon-ok"></span> Enabled</a>
-	    				</td>
-	    			</tr>
-	    		</tbody>
-	    	</table>
+            <div class="table-responsive">
+    	    	<table class="table table-striped tablesorter">
+    	    		<caption>
+                        {intl l='Disabled coupons'}
+    	    		</caption>
+    	    		<thead>
+    	    			<tr>
+                            <th>{block name="coupon-label-code"}{intl l='Code'}{/block}</th>
+                            <th>{block name="coupon-label-title"}{intl l='Title'}{/block}</th>
+                            <th>{block name="coupon-label-expiration-date"}{intl l='Expiration date'}{/block}</th>
+                            <th>{block name="coupon-label-usage-left"}{intl l='Usage left'}{/block}</th>
+                            <th class="sorter-false filter-false">{block name="coupon-label-action"}{/block}</th>
+    	    			</tr>
+    	    		</thead>
+    	    		<tbody>
+                        {loop type="coupon" name="list_coupon" is_enabled="0" backend_context="true"}
+                            <tr>
+                                <td>{block name="coupon-code"}<a href="{$urlReadCoupon|replace:'couponId':$ID}">{$CODE}</a>{/block}</td>
+                                <td>{block name="coupon-title"}{$TITLE}{/block}</td>
+                                <td>{block name="coupon-expiration-date"}{$EXPIRATION_DATE}{/block}</td>
+                                <td>{block name="coupon-usage-left"}{$USAGE_LEFT}{/block}</td>
+                                <td>
+                                    {block name="coupon-action"}
+                                    <a href="{$urlEditCoupon|replace:'couponId':$ID}" class="btn btn-default btn-primary btn-medium">
+                                        <span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}
+                                    </a>
+                                    {/block}
+                                </td>
+                            </tr>
+                        {/loop}
+    	    		</tbody>
+    	    	</table>
+            </div>
 		</div>
     </section>
 
 </section> <!-- #wrapper -->
-
-{include file='includes/confirmation-modal.html' id="disable" message="{intl l='Do you really want to disable this element ?'}"}
-{include file='includes/confirmation-modal.html' id="enable" message="{intl l='Do you really want to enable this element ?'}"}
 
 {/block}
 

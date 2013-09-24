@@ -39,6 +39,7 @@ class TaxEngineException extends \RuntimeException
     const UNDEFINED_TAX_RULES_COLLECTION = 503;
     const UNDEFINED_REQUIREMENTS = 504;
     const UNDEFINED_REQUIREMENT_VALUE = 505;
+    const UNDEFINED_TAX_RULE = 506;
 
     const BAD_AMOUNT_FORMAT = 601;
 

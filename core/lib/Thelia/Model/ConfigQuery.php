@@ -16,11 +16,32 @@ use Thelia\Model\Base\ConfigQuery as BaseConfigQuery;
  *
  */
 class ConfigQuery extends BaseConfigQuery {
+
+    protected static $cache = array();
+
     public static function read($search, $default = null)
     {
+        if (array_key_exists($search, self::$cache)) {
+            return self::$cache[$search];
+        }
+
         $value = self::create()->findOneByName($search);
 
-        return $value ? $value->getValue() : $default;
+        self::$cache[$search] = $value ? $value->getValue() : $default;
+
+        return self::$cache[$search];
+    }
+
+    public static function resetCache($key = null)
+    {
+        if($key) {
+            if(array_key_exists($key, self::$cache)) {
+                unset(self::$cache[$key]);
+                return true;
+            }
+        }
+        self::$cache = array();
+        return true;
     }
 
     public static function getDefaultLangWhenNoTranslationAvailable()
@@ -35,8 +56,14 @@ class ConfigQuery extends BaseConfigQuery {
 
     public static function getPageNotFoundView()
     {
-        return self::read("page_not_found_view", '404.html');
+        return self::read("page_not_found_view", '404');
     }
+
+    public static function getPassedUrlView()
+    {
+        return self::read('passed_url_view', 'passed-url');
+    }
+
 
     public static function getActiveTemplate()
     {

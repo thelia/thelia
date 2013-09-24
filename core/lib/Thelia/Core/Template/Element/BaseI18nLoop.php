@@ -65,6 +65,8 @@ abstract class BaseI18nLoop extends BaseLoop
     {
         /* manage translations */
 
+        $fr = $this->getForce_return();
+
         return ModelCriteriaTools::getI18n(
             $this->getBackend_context(),
             $this->getLang(),
@@ -73,7 +75,7 @@ abstract class BaseI18nLoop extends BaseLoop
             $columns,
             $foreignTable,
             $foreignKey,
-            $forceReturn
+            $this->getForce_return()
         );
     }
 }

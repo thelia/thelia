@@ -142,52 +142,54 @@
                                                         </a>
                                                     </span>
                                                 </p>
+                                                
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>{intl l="Address"}</th>
+                                                                <th>{intl l="Actions"}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        {loop name="address" type="address" customer="$customer_id" backend_context="1" default="0"}
+                                                            <tr>
+                                                                <td>
+                                                                    <address>
+                                                                        <strong>{loop name="address.title" type="title" id=$TITLE}{$SHORT}{/loop} {$FIRSTNAME} {$LASTNAME}</strong><br>
+                                                                        {$ADDRESS1}<br>
+                                                                        {$ADDRESS2}<br>
+                                                                        {$ADDRESS3}<br>
+                                                                        {if $PHONE}
+                                                                            <abbr title="{intl l="Phone"}">P:</abbr> {$PHONE}<br>
+                                                                        {/if}
+                                                                        {if $CELLPHONE}
+                                                                            <abbr title="{intl l="cell phone"}">P:</abbr> {$CELLPHONE}
+                                                                        {/if}
+                                                                    </address>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="btn-group">
 
-                                                <table class="table table-bordered table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>{intl l="Address"}</th>
-                                                            <th>{intl l="Actions"}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    {loop name="address" type="address" customer="$customer_id" backend_context="1" default="0"}
-                                                        <tr>
-                                                            <td>
-                                                                <address>
-                                                                    <strong>{loop name="address.title" type="title" id=$TITLE}{$SHORT}{/loop} {$FIRSTNAME} {$LASTNAME}</strong><br>
-                                                                    {$ADDRESS1}<br>
-                                                                    {$ADDRESS2}<br>
-                                                                    {$ADDRESS3}<br>
-                                                                    {if $PHONE}
-                                                                        <abbr title="{intl l="Phone"}">P:</abbr> {$PHONE}<br>
-                                                                    {/if}
-                                                                    {if $CELLPHONE}
-                                                                        <abbr title="{intl l="cell phone"}">P:</abbr> {$CELLPHONE}
-                                                                    {/if}
-                                                                </address>
-                                                            </td>
-                                                            <td>
-                                                                <div class="btn-group">
+                                                                        <a class="btn btn-default btn-xs" title="{intl l='Edit this address'}" href="#edit_address_dialog" data-toggle="modal">
+                                                                            <span class="glyphicon glyphicon-edit"></span>
+                                                                        </a>
 
-                                                                    <a class="btn btn-default btn-xs" title="{intl l='Edit this address'}" href="#edit_address_dialog" data-toggle="modal">
-                                                                        <span class="glyphicon glyphicon-edit"></span>
-                                                                    </a>
+                                                                        <a class="btn btn-default btn-xs" title="{intl l='Use this address by default'}" href="#use_address_dialog" data-toggle="modal" rel="tooltip">
+                                                                            <span class="glyphicon glyphicon-pushpin"></span>
+                                                                        </a>
 
-                                                                    <a class="btn btn-default btn-xs" title="{intl l='Use this address by default'}" href="#use_address_dialog" data-toggle="modal" rel="tooltip">
-                                                                        <span class="glyphicon glyphicon-pushpin"></span>
-                                                                    </a>
+                                                                        <a class="btn btn-default btn-xs customer-delete" title="{intl l='Delete this customer and all his orders'}"  href="#delete_address_dialog" data-id="{$ID}" data-toggle="modal">
+                                                                            <span class="glyphicon glyphicon-trash"></span>
+                                                                        </a>
 
-                                                                    <a class="btn btn-default btn-xs customer-delete" title="{intl l='Delete this customer and all his orders'}"  href="#delete_address_dialog" data-id="{$ID}" data-toggle="modal">
-                                                                        <span class="glyphicon glyphicon-trash"></span>
-                                                                    </a>
-
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    {/loop}
-                                                    </tbody>
-                                                </table>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        {/loop}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
 
                                         </form>

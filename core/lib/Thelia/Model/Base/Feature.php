@@ -17,18 +17,18 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Category as ChildCategory;
-use Thelia\Model\CategoryQuery as ChildCategoryQuery;
 use Thelia\Model\Feature as ChildFeature;
 use Thelia\Model\FeatureAv as ChildFeatureAv;
 use Thelia\Model\FeatureAvQuery as ChildFeatureAvQuery;
-use Thelia\Model\FeatureCategory as ChildFeatureCategory;
-use Thelia\Model\FeatureCategoryQuery as ChildFeatureCategoryQuery;
 use Thelia\Model\FeatureI18n as ChildFeatureI18n;
 use Thelia\Model\FeatureI18nQuery as ChildFeatureI18nQuery;
 use Thelia\Model\FeatureProduct as ChildFeatureProduct;
 use Thelia\Model\FeatureProductQuery as ChildFeatureProductQuery;
 use Thelia\Model\FeatureQuery as ChildFeatureQuery;
+use Thelia\Model\FeatureTemplate as ChildFeatureTemplate;
+use Thelia\Model\FeatureTemplateQuery as ChildFeatureTemplateQuery;
+use Thelia\Model\Template as ChildTemplate;
+use Thelia\Model\TemplateQuery as ChildTemplateQuery;
 use Thelia\Model\Map\FeatureTableMap;
 
 abstract class Feature implements ActiveRecordInterface
@@ -109,10 +109,10 @@ abstract class Feature implements ActiveRecordInterface
     protected $collFeatureProductsPartial;
 
     /**
-     * @var        ObjectCollection|ChildFeatureCategory[] Collection to store aggregation of ChildFeatureCategory objects.
+     * @var        ObjectCollection|ChildFeatureTemplate[] Collection to store aggregation of ChildFeatureTemplate objects.
      */
-    protected $collFeatureCategories;
-    protected $collFeatureCategoriesPartial;
+    protected $collFeatureTemplates;
+    protected $collFeatureTemplatesPartial;
 
     /**
      * @var        ObjectCollection|ChildFeatureI18n[] Collection to store aggregation of ChildFeatureI18n objects.
@@ -121,9 +121,9 @@ abstract class Feature implements ActiveRecordInterface
     protected $collFeatureI18nsPartial;
 
     /**
-     * @var        ChildCategory[] Collection to store aggregation of ChildCategory objects.
+     * @var        ChildTemplate[] Collection to store aggregation of ChildTemplate objects.
      */
-    protected $collCategories;
+    protected $collTemplates;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -151,7 +151,7 @@ abstract class Feature implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $categoriesScheduledForDeletion = null;
+    protected $templatesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -169,7 +169,7 @@ abstract class Feature implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $featureCategoriesScheduledForDeletion = null;
+    protected $featureTemplatesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -756,11 +756,11 @@ abstract class Feature implements ActiveRecordInterface
 
             $this->collFeatureProducts = null;
 
-            $this->collFeatureCategories = null;
+            $this->collFeatureTemplates = null;
 
             $this->collFeatureI18ns = null;
 
-            $this->collCategories = null;
+            $this->collTemplates = null;
         } // if (deep)
     }
 
@@ -894,29 +894,29 @@ abstract class Feature implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->categoriesScheduledForDeletion !== null) {
-                if (!$this->categoriesScheduledForDeletion->isEmpty()) {
+            if ($this->templatesScheduledForDeletion !== null) {
+                if (!$this->templatesScheduledForDeletion->isEmpty()) {
                     $pks = array();
                     $pk  = $this->getPrimaryKey();
-                    foreach ($this->categoriesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($remotePk, $pk);
+                    foreach ($this->templatesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
                     }
 
-                    FeatureCategoryQuery::create()
+                    FeatureTemplateQuery::create()
                         ->filterByPrimaryKeys($pks)
                         ->delete($con);
-                    $this->categoriesScheduledForDeletion = null;
+                    $this->templatesScheduledForDeletion = null;
                 }
 
-                foreach ($this->getCategories() as $category) {
-                    if ($category->isModified()) {
-                        $category->save($con);
+                foreach ($this->getTemplates() as $template) {
+                    if ($template->isModified()) {
+                        $template->save($con);
                     }
                 }
-            } elseif ($this->collCategories) {
-                foreach ($this->collCategories as $category) {
-                    if ($category->isModified()) {
-                        $category->save($con);
+            } elseif ($this->collTemplates) {
+                foreach ($this->collTemplates as $template) {
+                    if ($template->isModified()) {
+                        $template->save($con);
                     }
                 }
             }
@@ -955,17 +955,17 @@ abstract class Feature implements ActiveRecordInterface
                 }
             }
 
-            if ($this->featureCategoriesScheduledForDeletion !== null) {
-                if (!$this->featureCategoriesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\FeatureCategoryQuery::create()
-                        ->filterByPrimaryKeys($this->featureCategoriesScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->featureTemplatesScheduledForDeletion !== null) {
+                if (!$this->featureTemplatesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\FeatureTemplateQuery::create()
+                        ->filterByPrimaryKeys($this->featureTemplatesScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->featureCategoriesScheduledForDeletion = null;
+                    $this->featureTemplatesScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collFeatureCategories !== null) {
-            foreach ($this->collFeatureCategories as $referrerFK) {
+                if ($this->collFeatureTemplates !== null) {
+            foreach ($this->collFeatureTemplates as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1181,8 +1181,8 @@ abstract class Feature implements ActiveRecordInterface
             if (null !== $this->collFeatureProducts) {
                 $result['FeatureProducts'] = $this->collFeatureProducts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collFeatureCategories) {
-                $result['FeatureCategories'] = $this->collFeatureCategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collFeatureTemplates) {
+                $result['FeatureTemplates'] = $this->collFeatureTemplates->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collFeatureI18ns) {
                 $result['FeatureI18ns'] = $this->collFeatureI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1366,9 +1366,9 @@ abstract class Feature implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getFeatureCategories() as $relObj) {
+            foreach ($this->getFeatureTemplates() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addFeatureCategory($relObj->copy($deepCopy));
+                    $copyObj->addFeatureTemplate($relObj->copy($deepCopy));
                 }
             }
 
@@ -1425,8 +1425,8 @@ abstract class Feature implements ActiveRecordInterface
         if ('FeatureProduct' == $relationName) {
             return $this->initFeatureProducts();
         }
-        if ('FeatureCategory' == $relationName) {
-            return $this->initFeatureCategories();
+        if ('FeatureTemplate' == $relationName) {
+            return $this->initFeatureTemplates();
         }
         if ('FeatureI18n' == $relationName) {
             return $this->initFeatureI18ns();
@@ -1920,31 +1920,31 @@ abstract class Feature implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collFeatureCategories collection
+     * Clears out the collFeatureTemplates collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addFeatureCategories()
+     * @see        addFeatureTemplates()
      */
-    public function clearFeatureCategories()
+    public function clearFeatureTemplates()
     {
-        $this->collFeatureCategories = null; // important to set this to NULL since that means it is uninitialized
+        $this->collFeatureTemplates = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collFeatureCategories collection loaded partially.
+     * Reset is the collFeatureTemplates collection loaded partially.
      */
-    public function resetPartialFeatureCategories($v = true)
+    public function resetPartialFeatureTemplates($v = true)
     {
-        $this->collFeatureCategoriesPartial = $v;
+        $this->collFeatureTemplatesPartial = $v;
     }
 
     /**
-     * Initializes the collFeatureCategories collection.
+     * Initializes the collFeatureTemplates collection.
      *
-     * By default this just sets the collFeatureCategories collection to an empty array (like clearcollFeatureCategories());
+     * By default this just sets the collFeatureTemplates collection to an empty array (like clearcollFeatureTemplates());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1953,17 +1953,17 @@ abstract class Feature implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initFeatureCategories($overrideExisting = true)
+    public function initFeatureTemplates($overrideExisting = true)
     {
-        if (null !== $this->collFeatureCategories && !$overrideExisting) {
+        if (null !== $this->collFeatureTemplates && !$overrideExisting) {
             return;
         }
-        $this->collFeatureCategories = new ObjectCollection();
-        $this->collFeatureCategories->setModel('\Thelia\Model\FeatureCategory');
+        $this->collFeatureTemplates = new ObjectCollection();
+        $this->collFeatureTemplates->setModel('\Thelia\Model\FeatureTemplate');
     }
 
     /**
-     * Gets an array of ChildFeatureCategory objects which contain a foreign key that references this object.
+     * Gets an array of ChildFeatureTemplate objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1973,109 +1973,109 @@ abstract class Feature implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildFeatureCategory[] List of ChildFeatureCategory objects
+     * @return Collection|ChildFeatureTemplate[] List of ChildFeatureTemplate objects
      * @throws PropelException
      */
-    public function getFeatureCategories($criteria = null, ConnectionInterface $con = null)
+    public function getFeatureTemplates($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collFeatureCategoriesPartial && !$this->isNew();
-        if (null === $this->collFeatureCategories || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collFeatureCategories) {
+        $partial = $this->collFeatureTemplatesPartial && !$this->isNew();
+        if (null === $this->collFeatureTemplates || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFeatureTemplates) {
                 // return empty collection
-                $this->initFeatureCategories();
+                $this->initFeatureTemplates();
             } else {
-                $collFeatureCategories = ChildFeatureCategoryQuery::create(null, $criteria)
+                $collFeatureTemplates = ChildFeatureTemplateQuery::create(null, $criteria)
                     ->filterByFeature($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collFeatureCategoriesPartial && count($collFeatureCategories)) {
-                        $this->initFeatureCategories(false);
+                    if (false !== $this->collFeatureTemplatesPartial && count($collFeatureTemplates)) {
+                        $this->initFeatureTemplates(false);
 
-                        foreach ($collFeatureCategories as $obj) {
-                            if (false == $this->collFeatureCategories->contains($obj)) {
-                                $this->collFeatureCategories->append($obj);
+                        foreach ($collFeatureTemplates as $obj) {
+                            if (false == $this->collFeatureTemplates->contains($obj)) {
+                                $this->collFeatureTemplates->append($obj);
                             }
                         }
 
-                        $this->collFeatureCategoriesPartial = true;
+                        $this->collFeatureTemplatesPartial = true;
                     }
 
-                    $collFeatureCategories->getInternalIterator()->rewind();
+                    $collFeatureTemplates->getInternalIterator()->rewind();
 
-                    return $collFeatureCategories;
+                    return $collFeatureTemplates;
                 }
 
-                if ($partial && $this->collFeatureCategories) {
-                    foreach ($this->collFeatureCategories as $obj) {
+                if ($partial && $this->collFeatureTemplates) {
+                    foreach ($this->collFeatureTemplates as $obj) {
                         if ($obj->isNew()) {
-                            $collFeatureCategories[] = $obj;
+                            $collFeatureTemplates[] = $obj;
                         }
                     }
                 }
 
-                $this->collFeatureCategories = $collFeatureCategories;
-                $this->collFeatureCategoriesPartial = false;
+                $this->collFeatureTemplates = $collFeatureTemplates;
+                $this->collFeatureTemplatesPartial = false;
             }
         }
 
-        return $this->collFeatureCategories;
+        return $this->collFeatureTemplates;
     }
 
     /**
-     * Sets a collection of FeatureCategory objects related by a one-to-many relationship
+     * Sets a collection of FeatureTemplate objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $featureCategories A Propel collection.
+     * @param      Collection $featureTemplates A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildFeature The current object (for fluent API support)
      */
-    public function setFeatureCategories(Collection $featureCategories, ConnectionInterface $con = null)
+    public function setFeatureTemplates(Collection $featureTemplates, ConnectionInterface $con = null)
     {
-        $featureCategoriesToDelete = $this->getFeatureCategories(new Criteria(), $con)->diff($featureCategories);
+        $featureTemplatesToDelete = $this->getFeatureTemplates(new Criteria(), $con)->diff($featureTemplates);
 
 
-        $this->featureCategoriesScheduledForDeletion = $featureCategoriesToDelete;
+        $this->featureTemplatesScheduledForDeletion = $featureTemplatesToDelete;
 
-        foreach ($featureCategoriesToDelete as $featureCategoryRemoved) {
-            $featureCategoryRemoved->setFeature(null);
+        foreach ($featureTemplatesToDelete as $featureTemplateRemoved) {
+            $featureTemplateRemoved->setFeature(null);
         }
 
-        $this->collFeatureCategories = null;
-        foreach ($featureCategories as $featureCategory) {
-            $this->addFeatureCategory($featureCategory);
+        $this->collFeatureTemplates = null;
+        foreach ($featureTemplates as $featureTemplate) {
+            $this->addFeatureTemplate($featureTemplate);
         }
 
-        $this->collFeatureCategories = $featureCategories;
-        $this->collFeatureCategoriesPartial = false;
+        $this->collFeatureTemplates = $featureTemplates;
+        $this->collFeatureTemplatesPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related FeatureCategory objects.
+     * Returns the number of related FeatureTemplate objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related FeatureCategory objects.
+     * @return int             Count of related FeatureTemplate objects.
      * @throws PropelException
      */
-    public function countFeatureCategories(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countFeatureTemplates(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collFeatureCategoriesPartial && !$this->isNew();
-        if (null === $this->collFeatureCategories || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collFeatureCategories) {
+        $partial = $this->collFeatureTemplatesPartial && !$this->isNew();
+        if (null === $this->collFeatureTemplates || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFeatureTemplates) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getFeatureCategories());
+                return count($this->getFeatureTemplates());
             }
 
-            $query = ChildFeatureCategoryQuery::create(null, $criteria);
+            $query = ChildFeatureTemplateQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -2085,53 +2085,53 @@ abstract class Feature implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collFeatureCategories);
+        return count($this->collFeatureTemplates);
     }
 
     /**
-     * Method called to associate a ChildFeatureCategory object to this object
-     * through the ChildFeatureCategory foreign key attribute.
+     * Method called to associate a ChildFeatureTemplate object to this object
+     * through the ChildFeatureTemplate foreign key attribute.
      *
-     * @param    ChildFeatureCategory $l ChildFeatureCategory
+     * @param    ChildFeatureTemplate $l ChildFeatureTemplate
      * @return   \Thelia\Model\Feature The current object (for fluent API support)
      */
-    public function addFeatureCategory(ChildFeatureCategory $l)
+    public function addFeatureTemplate(ChildFeatureTemplate $l)
     {
-        if ($this->collFeatureCategories === null) {
-            $this->initFeatureCategories();
-            $this->collFeatureCategoriesPartial = true;
+        if ($this->collFeatureTemplates === null) {
+            $this->initFeatureTemplates();
+            $this->collFeatureTemplatesPartial = true;
         }
 
-        if (!in_array($l, $this->collFeatureCategories->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddFeatureCategory($l);
+        if (!in_array($l, $this->collFeatureTemplates->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddFeatureTemplate($l);
         }
 
         return $this;
     }
 
     /**
-     * @param FeatureCategory $featureCategory The featureCategory object to add.
+     * @param FeatureTemplate $featureTemplate The featureTemplate object to add.
      */
-    protected function doAddFeatureCategory($featureCategory)
+    protected function doAddFeatureTemplate($featureTemplate)
     {
-        $this->collFeatureCategories[]= $featureCategory;
-        $featureCategory->setFeature($this);
+        $this->collFeatureTemplates[]= $featureTemplate;
+        $featureTemplate->setFeature($this);
     }
 
     /**
-     * @param  FeatureCategory $featureCategory The featureCategory object to remove.
+     * @param  FeatureTemplate $featureTemplate The featureTemplate object to remove.
      * @return ChildFeature The current object (for fluent API support)
      */
-    public function removeFeatureCategory($featureCategory)
+    public function removeFeatureTemplate($featureTemplate)
     {
-        if ($this->getFeatureCategories()->contains($featureCategory)) {
-            $this->collFeatureCategories->remove($this->collFeatureCategories->search($featureCategory));
-            if (null === $this->featureCategoriesScheduledForDeletion) {
-                $this->featureCategoriesScheduledForDeletion = clone $this->collFeatureCategories;
-                $this->featureCategoriesScheduledForDeletion->clear();
+        if ($this->getFeatureTemplates()->contains($featureTemplate)) {
+            $this->collFeatureTemplates->remove($this->collFeatureTemplates->search($featureTemplate));
+            if (null === $this->featureTemplatesScheduledForDeletion) {
+                $this->featureTemplatesScheduledForDeletion = clone $this->collFeatureTemplates;
+                $this->featureTemplatesScheduledForDeletion->clear();
             }
-            $this->featureCategoriesScheduledForDeletion[]= clone $featureCategory;
-            $featureCategory->setFeature(null);
+            $this->featureTemplatesScheduledForDeletion[]= clone $featureTemplate;
+            $featureTemplate->setFeature(null);
         }
 
         return $this;
@@ -2143,7 +2143,7 @@ abstract class Feature implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this Feature is new, it will return
      * an empty collection; or if this Feature has previously
-     * been saved, it will retrieve related FeatureCategories from storage.
+     * been saved, it will retrieve related FeatureTemplates from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -2152,14 +2152,14 @@ abstract class Feature implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildFeatureCategory[] List of ChildFeatureCategory objects
+     * @return Collection|ChildFeatureTemplate[] List of ChildFeatureTemplate objects
      */
-    public function getFeatureCategoriesJoinCategory($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getFeatureTemplatesJoinTemplate($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildFeatureCategoryQuery::create(null, $criteria);
-        $query->joinWith('Category', $joinBehavior);
+        $query = ChildFeatureTemplateQuery::create(null, $criteria);
+        $query->joinWith('Template', $joinBehavior);
 
-        return $this->getFeatureCategories($query, $con);
+        return $this->getFeatureTemplates($query, $con);
     }
 
     /**
@@ -2388,38 +2388,38 @@ abstract class Feature implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collCategories collection
+     * Clears out the collTemplates collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addCategories()
+     * @see        addTemplates()
      */
-    public function clearCategories()
+    public function clearTemplates()
     {
-        $this->collCategories = null; // important to set this to NULL since that means it is uninitialized
-        $this->collCategoriesPartial = null;
+        $this->collTemplates = null; // important to set this to NULL since that means it is uninitialized
+        $this->collTemplatesPartial = null;
     }
 
     /**
-     * Initializes the collCategories collection.
+     * Initializes the collTemplates collection.
      *
-     * By default this just sets the collCategories collection to an empty collection (like clearCategories());
+     * By default this just sets the collTemplates collection to an empty collection (like clearTemplates());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
      * @return void
      */
-    public function initCategories()
+    public function initTemplates()
     {
-        $this->collCategories = new ObjectCollection();
-        $this->collCategories->setModel('\Thelia\Model\Category');
+        $this->collTemplates = new ObjectCollection();
+        $this->collTemplates->setModel('\Thelia\Model\Template');
     }
 
     /**
-     * Gets a collection of ChildCategory objects related by a many-to-many relationship
-     * to the current object by way of the feature_category cross-reference table.
+     * Gets a collection of ChildTemplate objects related by a many-to-many relationship
+     * to the current object by way of the feature_template cross-reference table.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -2430,73 +2430,73 @@ abstract class Feature implements ActiveRecordInterface
      * @param      Criteria $criteria Optional query object to filter the query
      * @param      ConnectionInterface $con Optional connection object
      *
-     * @return ObjectCollection|ChildCategory[] List of ChildCategory objects
+     * @return ObjectCollection|ChildTemplate[] List of ChildTemplate objects
      */
-    public function getCategories($criteria = null, ConnectionInterface $con = null)
+    public function getTemplates($criteria = null, ConnectionInterface $con = null)
     {
-        if (null === $this->collCategories || null !== $criteria) {
-            if ($this->isNew() && null === $this->collCategories) {
+        if (null === $this->collTemplates || null !== $criteria) {
+            if ($this->isNew() && null === $this->collTemplates) {
                 // return empty collection
-                $this->initCategories();
+                $this->initTemplates();
             } else {
-                $collCategories = ChildCategoryQuery::create(null, $criteria)
+                $collTemplates = ChildTemplateQuery::create(null, $criteria)
                     ->filterByFeature($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    return $collCategories;
+                    return $collTemplates;
                 }
-                $this->collCategories = $collCategories;
+                $this->collTemplates = $collTemplates;
             }
         }
 
-        return $this->collCategories;
+        return $this->collTemplates;
     }
 
     /**
-     * Sets a collection of Category objects related by a many-to-many relationship
-     * to the current object by way of the feature_category cross-reference table.
+     * Sets a collection of Template objects related by a many-to-many relationship
+     * to the current object by way of the feature_template cross-reference table.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection $categories A Propel collection.
+     * @param  Collection $templates A Propel collection.
      * @param  ConnectionInterface $con Optional connection object
      * @return ChildFeature The current object (for fluent API support)
      */
-    public function setCategories(Collection $categories, ConnectionInterface $con = null)
+    public function setTemplates(Collection $templates, ConnectionInterface $con = null)
     {
-        $this->clearCategories();
-        $currentCategories = $this->getCategories();
+        $this->clearTemplates();
+        $currentTemplates = $this->getTemplates();
 
-        $this->categoriesScheduledForDeletion = $currentCategories->diff($categories);
+        $this->templatesScheduledForDeletion = $currentTemplates->diff($templates);
 
-        foreach ($categories as $category) {
-            if (!$currentCategories->contains($category)) {
-                $this->doAddCategory($category);
+        foreach ($templates as $template) {
+            if (!$currentTemplates->contains($template)) {
+                $this->doAddTemplate($template);
             }
         }
 
-        $this->collCategories = $categories;
+        $this->collTemplates = $templates;
 
         return $this;
     }
 
     /**
-     * Gets the number of ChildCategory objects related by a many-to-many relationship
-     * to the current object by way of the feature_category cross-reference table.
+     * Gets the number of ChildTemplate objects related by a many-to-many relationship
+     * to the current object by way of the feature_template cross-reference table.
      *
      * @param      Criteria $criteria Optional query object to filter the query
      * @param      boolean $distinct Set to true to force count distinct
      * @param      ConnectionInterface $con Optional connection object
      *
-     * @return int the number of related ChildCategory objects
+     * @return int the number of related ChildTemplate objects
      */
-    public function countCategories($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countTemplates($criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        if (null === $this->collCategories || null !== $criteria) {
-            if ($this->isNew() && null === $this->collCategories) {
+        if (null === $this->collTemplates || null !== $criteria) {
+            if ($this->isNew() && null === $this->collTemplates) {
                 return 0;
             } else {
-                $query = ChildCategoryQuery::create(null, $criteria);
+                $query = ChildTemplateQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -2506,65 +2506,65 @@ abstract class Feature implements ActiveRecordInterface
                     ->count($con);
             }
         } else {
-            return count($this->collCategories);
+            return count($this->collTemplates);
         }
     }
 
     /**
-     * Associate a ChildCategory object to this object
-     * through the feature_category cross reference table.
+     * Associate a ChildTemplate object to this object
+     * through the feature_template cross reference table.
      *
-     * @param  ChildCategory $category The ChildFeatureCategory object to relate
+     * @param  ChildTemplate $template The ChildFeatureTemplate object to relate
      * @return ChildFeature The current object (for fluent API support)
      */
-    public function addCategory(ChildCategory $category)
+    public function addTemplate(ChildTemplate $template)
     {
-        if ($this->collCategories === null) {
-            $this->initCategories();
+        if ($this->collTemplates === null) {
+            $this->initTemplates();
         }
 
-        if (!$this->collCategories->contains($category)) { // only add it if the **same** object is not already associated
-            $this->doAddCategory($category);
-            $this->collCategories[] = $category;
+        if (!$this->collTemplates->contains($template)) { // only add it if the **same** object is not already associated
+            $this->doAddTemplate($template);
+            $this->collTemplates[] = $template;
         }
 
         return $this;
     }
 
     /**
-     * @param    Category $category The category object to add.
+     * @param    Template $template The template object to add.
      */
-    protected function doAddCategory($category)
+    protected function doAddTemplate($template)
     {
-        $featureCategory = new ChildFeatureCategory();
-        $featureCategory->setCategory($category);
-        $this->addFeatureCategory($featureCategory);
+        $featureTemplate = new ChildFeatureTemplate();
+        $featureTemplate->setTemplate($template);
+        $this->addFeatureTemplate($featureTemplate);
         // set the back reference to this object directly as using provided method either results
         // in endless loop or in multiple relations
-        if (!$category->getFeatures()->contains($this)) {
-            $foreignCollection   = $category->getFeatures();
+        if (!$template->getFeatures()->contains($this)) {
+            $foreignCollection   = $template->getFeatures();
             $foreignCollection[] = $this;
         }
     }
 
     /**
-     * Remove a ChildCategory object to this object
-     * through the feature_category cross reference table.
+     * Remove a ChildTemplate object to this object
+     * through the feature_template cross reference table.
      *
-     * @param ChildCategory $category The ChildFeatureCategory object to relate
+     * @param ChildTemplate $template The ChildFeatureTemplate object to relate
      * @return ChildFeature The current object (for fluent API support)
      */
-    public function removeCategory(ChildCategory $category)
+    public function removeTemplate(ChildTemplate $template)
     {
-        if ($this->getCategories()->contains($category)) {
-            $this->collCategories->remove($this->collCategories->search($category));
+        if ($this->getTemplates()->contains($template)) {
+            $this->collTemplates->remove($this->collTemplates->search($template));
 
-            if (null === $this->categoriesScheduledForDeletion) {
-                $this->categoriesScheduledForDeletion = clone $this->collCategories;
-                $this->categoriesScheduledForDeletion->clear();
+            if (null === $this->templatesScheduledForDeletion) {
+                $this->templatesScheduledForDeletion = clone $this->collTemplates;
+                $this->templatesScheduledForDeletion->clear();
             }
 
-            $this->categoriesScheduledForDeletion[] = $category;
+            $this->templatesScheduledForDeletion[] = $template;
         }
 
         return $this;
@@ -2610,8 +2610,8 @@ abstract class Feature implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collFeatureCategories) {
-                foreach ($this->collFeatureCategories as $o) {
+            if ($this->collFeatureTemplates) {
+                foreach ($this->collFeatureTemplates as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2620,8 +2620,8 @@ abstract class Feature implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collCategories) {
-                foreach ($this->collCategories as $o) {
+            if ($this->collTemplates) {
+                foreach ($this->collTemplates as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2639,18 +2639,18 @@ abstract class Feature implements ActiveRecordInterface
             $this->collFeatureProducts->clearIterator();
         }
         $this->collFeatureProducts = null;
-        if ($this->collFeatureCategories instanceof Collection) {
-            $this->collFeatureCategories->clearIterator();
+        if ($this->collFeatureTemplates instanceof Collection) {
+            $this->collFeatureTemplates->clearIterator();
         }
-        $this->collFeatureCategories = null;
+        $this->collFeatureTemplates = null;
         if ($this->collFeatureI18ns instanceof Collection) {
             $this->collFeatureI18ns->clearIterator();
         }
         $this->collFeatureI18ns = null;
-        if ($this->collCategories instanceof Collection) {
-            $this->collCategories->clearIterator();
+        if ($this->collTemplates instanceof Collection) {
+            $this->collTemplates->clearIterator();
         }
-        $this->collCategories = null;
+        $this->collTemplates = null;
     }
 
     /**

@@ -37,7 +37,7 @@ use Thelia\Core\Event\AttributeAvUpdateEvent;
 use Thelia\Core\Event\AttributeEvent;
 
 /**
- * Manages attributes sent by mail
+ * Manages attributes
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
@@ -107,7 +107,7 @@ class AttributeController extends AbstractCrudController
      *
      * @see \Thelia\Controller\Admin\AbstractCrudController::performAdditionalUpdateAction()
      */
-    protected function performAdditionalUpdateAction($updatedObject)
+    protected function performAdditionalUpdateAction($updateEvent)
     {
         $attr_values = $this->getRequest()->get('attribute_values', null);
 
@@ -123,6 +123,8 @@ class AttributeController extends AbstractCrudController
                 $this->dispatch(TheliaEvents::ATTRIBUTE_AV_UPDATE, $event);
             }
         }
+
+        return null;
     }
 
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)

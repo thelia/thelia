@@ -43,7 +43,7 @@
 						        {/form_field}
 
                                 {form_field form=$form field='id'}
-                                <input type="hidden" name="{$name}" value="{$value|htmlspecialchars}" />
+                                <input type="hidden" name="{$name}" value="{$value}" />
                                 {/form_field}
 
 		                        {form_field form=$form field='locale'}
@@ -55,7 +55,7 @@
 								{form_field form=$form field='name'}
 								<div class="form-group {if $error}has-error{/if}">
 									<label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-									<input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value|htmlspecialchars}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="form-control">
+									<input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="form-control">
 								</div>
 					            {/form_field}
 
@@ -71,14 +71,14 @@
 								{form_field form=$form field='title'}
 								<div class="form-group {if $error}has-error{/if}">
 								    <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-									<input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{$value|htmlspecialchars}">
+									<input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{$value}">
 								</div>
 								{/form_field}
 
                                 {form_field form=$form field='subject'}
                                 <div class="form-group {if $error}has-error{/if}">
                                     <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-									<input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Subject'}" placeholder="{intl l='Subject'}" class="form-control" value="{$value|htmlspecialchars}">
+									<input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Subject'}" placeholder="{intl l='Subject'}" class="form-control" value="{$value}">
 								</div>
                                 {/form_field}
 
@@ -88,7 +88,7 @@
 								    	{intl l="{$label}"} :
 								      <span class="label-help-block">{intl l="The mailing template in HTML format."}</span>
 								    </label>
-								    <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control">{$value|htmlspecialchars}</textarea>
+								    <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control">{$value}</textarea>
 								</div>
 								{/form_field}
 
@@ -98,7 +98,7 @@
                                     	{intl l="{$label}"} :
                                       <span class="label-help-block">{intl l="The mailing template in text-only format."}</span>
                                     </label>
-                                    <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control">{$value|htmlspecialchars}</textarea>
+                                    <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control">{$value}</textarea>
                                 </div>
                                 {/form_field}
 

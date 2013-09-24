@@ -136,6 +136,18 @@ abstract class Customer implements ActiveRecordInterface
     protected $discount;
 
     /**
+     * The value for the remember_me_token field.
+     * @var        string
+     */
+    protected $remember_me_token;
+
+    /**
+     * The value for the remember_me_serial field.
+     * @var        string
+     */
+    protected $remember_me_serial;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -583,6 +595,28 @@ abstract class Customer implements ActiveRecordInterface
     }
 
     /**
+     * Get the [remember_me_token] column value.
+     *
+     * @return   string
+     */
+    public function getRememberMeToken()
+    {
+
+        return $this->remember_me_token;
+    }
+
+    /**
+     * Get the [remember_me_serial] column value.
+     *
+     * @return   string
+     */
+    public function getRememberMeSerial()
+    {
+
+        return $this->remember_me_serial;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -879,6 +913,48 @@ abstract class Customer implements ActiveRecordInterface
     } // setDiscount()
 
     /**
+     * Set the value of [remember_me_token] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     */
+    public function setRememberMeToken($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->remember_me_token !== $v) {
+            $this->remember_me_token = $v;
+            $this->modifiedColumns[] = CustomerTableMap::REMEMBER_ME_TOKEN;
+        }
+
+
+        return $this;
+    } // setRememberMeToken()
+
+    /**
+     * Set the value of [remember_me_serial] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     */
+    public function setRememberMeSerial($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->remember_me_serial !== $v) {
+            $this->remember_me_serial = $v;
+            $this->modifiedColumns[] = CustomerTableMap::REMEMBER_ME_SERIAL;
+        }
+
+
+        return $this;
+    } // setRememberMeSerial()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -993,13 +1069,19 @@ abstract class Customer implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : CustomerTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
             $this->discount = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : CustomerTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : CustomerTableMap::translateFieldName('RememberMeToken', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->remember_me_token = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : CustomerTableMap::translateFieldName('RememberMeSerial', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->remember_me_serial = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : CustomerTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : CustomerTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : CustomerTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1012,7 +1094,7 @@ abstract class Customer implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 14; // 14 = CustomerTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 16; // 16 = CustomerTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Customer object", 0, $e);
@@ -1342,6 +1424,12 @@ abstract class Customer implements ActiveRecordInterface
         if ($this->isColumnModified(CustomerTableMap::DISCOUNT)) {
             $modifiedColumns[':p' . $index++]  = 'DISCOUNT';
         }
+        if ($this->isColumnModified(CustomerTableMap::REMEMBER_ME_TOKEN)) {
+            $modifiedColumns[':p' . $index++]  = 'REMEMBER_ME_TOKEN';
+        }
+        if ($this->isColumnModified(CustomerTableMap::REMEMBER_ME_SERIAL)) {
+            $modifiedColumns[':p' . $index++]  = 'REMEMBER_ME_SERIAL';
+        }
         if ($this->isColumnModified(CustomerTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -1394,6 +1482,12 @@ abstract class Customer implements ActiveRecordInterface
                         break;
                     case 'DISCOUNT':
                         $stmt->bindValue($identifier, $this->discount, PDO::PARAM_STR);
+                        break;
+                    case 'REMEMBER_ME_TOKEN':
+                        $stmt->bindValue($identifier, $this->remember_me_token, PDO::PARAM_STR);
+                        break;
+                    case 'REMEMBER_ME_SERIAL':
+                        $stmt->bindValue($identifier, $this->remember_me_serial, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1500,9 +1594,15 @@ abstract class Customer implements ActiveRecordInterface
                 return $this->getDiscount();
                 break;
             case 12:
-                return $this->getCreatedAt();
+                return $this->getRememberMeToken();
                 break;
             case 13:
+                return $this->getRememberMeSerial();
+                break;
+            case 14:
+                return $this->getCreatedAt();
+                break;
+            case 15:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1546,8 +1646,10 @@ abstract class Customer implements ActiveRecordInterface
             $keys[9] => $this->getLang(),
             $keys[10] => $this->getSponsor(),
             $keys[11] => $this->getDiscount(),
-            $keys[12] => $this->getCreatedAt(),
-            $keys[13] => $this->getUpdatedAt(),
+            $keys[12] => $this->getRememberMeToken(),
+            $keys[13] => $this->getRememberMeSerial(),
+            $keys[14] => $this->getCreatedAt(),
+            $keys[15] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1639,9 +1741,15 @@ abstract class Customer implements ActiveRecordInterface
                 $this->setDiscount($value);
                 break;
             case 12:
-                $this->setCreatedAt($value);
+                $this->setRememberMeToken($value);
                 break;
             case 13:
+                $this->setRememberMeSerial($value);
+                break;
+            case 14:
+                $this->setCreatedAt($value);
+                break;
+            case 15:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1680,8 +1788,10 @@ abstract class Customer implements ActiveRecordInterface
         if (array_key_exists($keys[9], $arr)) $this->setLang($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setSponsor($arr[$keys[10]]);
         if (array_key_exists($keys[11], $arr)) $this->setDiscount($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
+        if (array_key_exists($keys[12], $arr)) $this->setRememberMeToken($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setRememberMeSerial($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setCreatedAt($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setUpdatedAt($arr[$keys[15]]);
     }
 
     /**
@@ -1705,6 +1815,8 @@ abstract class Customer implements ActiveRecordInterface
         if ($this->isColumnModified(CustomerTableMap::LANG)) $criteria->add(CustomerTableMap::LANG, $this->lang);
         if ($this->isColumnModified(CustomerTableMap::SPONSOR)) $criteria->add(CustomerTableMap::SPONSOR, $this->sponsor);
         if ($this->isColumnModified(CustomerTableMap::DISCOUNT)) $criteria->add(CustomerTableMap::DISCOUNT, $this->discount);
+        if ($this->isColumnModified(CustomerTableMap::REMEMBER_ME_TOKEN)) $criteria->add(CustomerTableMap::REMEMBER_ME_TOKEN, $this->remember_me_token);
+        if ($this->isColumnModified(CustomerTableMap::REMEMBER_ME_SERIAL)) $criteria->add(CustomerTableMap::REMEMBER_ME_SERIAL, $this->remember_me_serial);
         if ($this->isColumnModified(CustomerTableMap::CREATED_AT)) $criteria->add(CustomerTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CustomerTableMap::UPDATED_AT)) $criteria->add(CustomerTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1781,6 +1893,8 @@ abstract class Customer implements ActiveRecordInterface
         $copyObj->setLang($this->getLang());
         $copyObj->setSponsor($this->getSponsor());
         $copyObj->setDiscount($this->getDiscount());
+        $copyObj->setRememberMeToken($this->getRememberMeToken());
+        $copyObj->setRememberMeSerial($this->getRememberMeSerial());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -2438,10 +2552,10 @@ abstract class Customer implements ActiveRecordInterface
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
-    public function getOrdersJoinOrderAddressRelatedByAddressInvoice($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getOrdersJoinOrderAddressRelatedByInvoiceOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildOrderQuery::create(null, $criteria);
-        $query->joinWith('OrderAddressRelatedByAddressInvoice', $joinBehavior);
+        $query->joinWith('OrderAddressRelatedByInvoiceOrderAddressId', $joinBehavior);
 
         return $this->getOrders($query, $con);
     }
@@ -2463,10 +2577,10 @@ abstract class Customer implements ActiveRecordInterface
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildOrder[] List of ChildOrder objects
      */
-    public function getOrdersJoinOrderAddressRelatedByAddressDelivery($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getOrdersJoinOrderAddressRelatedByDeliveryOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildOrderQuery::create(null, $criteria);
-        $query->joinWith('OrderAddressRelatedByAddressDelivery', $joinBehavior);
+        $query->joinWith('OrderAddressRelatedByDeliveryOrderAddressId', $joinBehavior);
 
         return $this->getOrders($query, $con);
     }
@@ -2492,6 +2606,81 @@ abstract class Customer implements ActiveRecordInterface
     {
         $query = ChildOrderQuery::create(null, $criteria);
         $query->joinWith('OrderStatus', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Customer is new, it will return
+     * an empty collection; or if this Customer has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Customer.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinModuleRelatedByPaymentModuleId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('ModuleRelatedByPaymentModuleId', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Customer is new, it will return
+     * an empty collection; or if this Customer has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Customer.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinModuleRelatedByDeliveryModuleId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('ModuleRelatedByDeliveryModuleId', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Customer is new, it will return
+     * an empty collection; or if this Customer has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Customer.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinLang($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Lang', $joinBehavior);
 
         return $this->getOrders($query, $con);
     }
@@ -2806,6 +2995,8 @@ abstract class Customer implements ActiveRecordInterface
         $this->lang = null;
         $this->sponsor = null;
         $this->discount = null;
+        $this->remember_me_token = null;
+        $this->remember_me_serial = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

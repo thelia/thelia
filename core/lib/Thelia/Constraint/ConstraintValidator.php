@@ -52,7 +52,7 @@ class ConstraintValidator
      *
      * @return bool
      */
-    public function test(CouponRuleCollection $rules)
+    public function isMatching(CouponRuleCollection $rules)
     {
         $isMatching = true;
         /** @var CouponRuleInterface $rule */
@@ -69,10 +69,10 @@ class ConstraintValidator
     /**
      * Do variable comparison
      *
-     * @param mixed $v1 Variable 1
+     * @param mixed  $v1 Variable 1
      * @param string $o  Operator
+     * @param mixed  $v2 Variable 2
      *
-     * @param mixed $v2 Variable 2
      * @throws \Exception
      * @return bool
      */

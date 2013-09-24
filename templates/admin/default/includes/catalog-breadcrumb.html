@@ -2,25 +2,27 @@
 
 <ul class="breadcrumb">
 	<li><a href="{url path='admin/home'}">Home</a></li>
-	<li><a href="{url path='admin/catalog'}">Catalog</a>
+	<li><a href="{url path='admin/catalog'}">Catalog</a></li>
 
-	{ifloop rel="category_path"}</li>
-		{loop name="category_path" type="category-path" visible="*" category=$current_category_id}
-			{if $ID == $current_category_id}
+	{ifloop rel="category_path"}
+		{loop name="category_path" type="category-path" visible="*" category=$category_id}
+			{if $ID == $category_id && $editing_product == false}
 				<li class="active">
-				   {if $action == 'edit'}
-				       {intl l='Editing %cat' cat="{$TITLE}"}
+				   {if $editing_category == true}
+                       {intl l='Editing %cat' cat="{$TITLE}"}
 				   {else}
-				       {$TITLE} <a href="{url path='admin/catalog/category/edit' category_id=$ID}" title="{intl l='Edit this category'}">{intl l="(edit)"}</a>
+                       {$TITLE} <a href="{url path='/admin/categories/update' category_id=$ID}" title="{intl l='Edit this category'}">{intl l="(edit)"}</a>
 			        {/if}
 				</li>
 			{else}
-			   <li><a href="{url path='admin/catalog/category' id=" $ID" action='browse'}">{$TITLE}</a></li>
+			   <li><a href="{url path='/admin/categories' category_id=" $ID" action='browse'}">{$TITLE}</a></li>
 			{/if}
 	   {/loop}
 	{/ifloop}
 
-	{elseloop rel="category_path"}
-	    </li>
-	{/elseloop}
+	{if $editing_product == true}
+        {loop name="product_path" type="product" visible="*" id=$product_id}
+            <li>{intl l="Editing %title" title="$TITLE"}</li>
+        {/loop}
+	{/if}
 </ul>

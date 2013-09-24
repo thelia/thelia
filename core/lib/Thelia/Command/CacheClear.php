@@ -62,18 +62,26 @@ class CacheClear extends ContainerAwareCommand
 
         $this->clearCache($cacheDir, $output);
         if (!$input->getOption("without-assets")) {
-            $this->clearCache(THELIA_WEB_DIR . "/assets", $output);
+            $this->clearCache(THELIA_WEB_DIR . "assets", $output);
         }
 
     }
 
     protected function clearCache($dir, OutputInterface $output)
     {
-        if (!is_writable($dir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $dir));
-        }
-
         $output->writeln(sprintf("Clearing cache in <info>%s</info> directory", $dir));
+
+        try {
+            $directoryBrowser = new \DirectoryIterator($dir);
+        } catch(\UnexpectedValueException $e) {
+            // throws same exception code for does not exist and permission denied ...
+            if(!file_exists($dir)) {
+                $output->writeln(sprintf("<info>%s cache dir already clear</info>", $dir));
+                return;
+            }
+
+            throw $e;
+        }
 
         $fs = new Filesystem();
         try {
@@ -81,7 +89,7 @@ class CacheClear extends ContainerAwareCommand
 
             $output->writeln(sprintf("<info>%s cache dir cleared successfully</info>", $dir));
         } catch (IOException $e) {
-            $output->writeln(sprintf("error during clearing cache : %s", $e->getMessage()));
+            $output->writeln(sprintf("Error during clearing cache : %s", $e->getMessage()));
         }
     }
 }

@@ -1,0 +1,65 @@
+<li class="item">
+<article itemscope itemtype="http://schema.org/Product">
+    <!-- Use the meta tag to specify content that is not visible on the page in any way -->
+    {loop name="brand.feature" type="feature" product=$ID title="brand"}
+    {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+        <meta itemprop="brand" content="{$TITLE}">
+    {/loop}
+    {/loop}
+    {loop name="brand.feature" type="feature" product=$ID title="isbn"}
+    {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+        <meta itemprop="productID" content="isbn:{$TITLE}">
+    {/loop}
+    {/loop}
+
+    <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
+        {loop name="product_thumbnail" type="image" product=$ID width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
+            <img itemprop="image" src="{$IMAGE_URL}" alt="Product #{$LOOP_COUNT}">
+        {/loop}
+        {elseloop rel="product_thumbnail"}
+            {images file="../assets/img/{$width}x{$height}.png"}<img itemprop="image" src="{$asset_url}" alt="Product #{$LOOP_COUNT}">{/images}
+        {/elseloop}
+        <span class="mask"></span>
+    </a>
+
+    <div class="product-info">
+        <h3 class="name"><a href="{$URL}"><span itemprop="name">{$TITLE}</span></a></h3>
+        {if $hasDescription}
+        <div class="description" itemprop="description">
+            <p>{$DESCRIPTION}</p>
+        </div>
+        {/if}
+    </div>
+
+    <div class="product-price">
+        <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+            <meta itemprop="category" content="{category attr="title"}">
+            <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
+            <meta itemprop="priceCurrency" content="{currency attr="symbol"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
+            <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
+            <!-- List of availibility :
+                out_of_stock : http://schema.org/OutOfStock
+                in_stock : http://schema.org/InStock
+                instore_only : http://schema.org/InStoreOnly
+                preorder : http://schema.org/PreOrder
+                online_only : http://schema.org/OnlineOnly
+            -->
+            {if $IS_PROMO }
+                {loop name="productSaleElements_promo" type="product_sale_elements" product=$ID limit="1" order="min_price"}
+                {assign var="default_product_sale_elements" value=$ID}
+                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number=$TAXED_PROMO_PRICE} {currency attr="symbol"}</span></span>
+                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number=$TAXED_PRICE} {currency attr="symbol"}</span></span>
+                {/loop}
+            {else}
+                <span class="regular-price"><span itemprop="price" class="price">{format_number number=$BEST_TAXED_PRICE} {currency attr="symbol"}</span></span>
+            {/if}
+
+        </div>
+        {if $hasBtn}
+        <div class="product-btn">
+            <button class="btn btn-cart">Add to cart</button>
+        </div>
+        {/if}
+    </div>
+</article><!-- /product -->
+</li>

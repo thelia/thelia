@@ -71,6 +71,12 @@ abstract class ContentFolder implements ActiveRecordInterface
     protected $folder_id;
 
     /**
+     * The value for the default_folder field.
+     * @var        boolean
+     */
+    protected $default_folder;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -377,6 +383,17 @@ abstract class ContentFolder implements ActiveRecordInterface
     }
 
     /**
+     * Get the [default_folder] column value.
+     *
+     * @return   boolean
+     */
+    public function getDefaultFolder()
+    {
+
+        return $this->default_folder;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -467,6 +484,35 @@ abstract class ContentFolder implements ActiveRecordInterface
     } // setFolderId()
 
     /**
+     * Sets the value of the [default_folder] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\ContentFolder The current object (for fluent API support)
+     */
+    public function setDefaultFolder($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->default_folder !== $v) {
+            $this->default_folder = $v;
+            $this->modifiedColumns[] = ContentFolderTableMap::DEFAULT_FOLDER;
+        }
+
+
+        return $this;
+    } // setDefaultFolder()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -551,13 +597,16 @@ abstract class ContentFolder implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ContentFolderTableMap::translateFieldName('FolderId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->folder_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ContentFolderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ContentFolderTableMap::translateFieldName('DefaultFolder', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->default_folder = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ContentFolderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ContentFolderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ContentFolderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -570,7 +619,7 @@ abstract class ContentFolder implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = ContentFolderTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = ContentFolderTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ContentFolder object", 0, $e);
@@ -819,6 +868,9 @@ abstract class ContentFolder implements ActiveRecordInterface
         if ($this->isColumnModified(ContentFolderTableMap::FOLDER_ID)) {
             $modifiedColumns[':p' . $index++]  = 'FOLDER_ID';
         }
+        if ($this->isColumnModified(ContentFolderTableMap::DEFAULT_FOLDER)) {
+            $modifiedColumns[':p' . $index++]  = 'DEFAULT_FOLDER';
+        }
         if ($this->isColumnModified(ContentFolderTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -841,6 +893,9 @@ abstract class ContentFolder implements ActiveRecordInterface
                         break;
                     case 'FOLDER_ID':
                         $stmt->bindValue($identifier, $this->folder_id, PDO::PARAM_INT);
+                        break;
+                    case 'DEFAULT_FOLDER':
+                        $stmt->bindValue($identifier, (int) $this->default_folder, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -910,9 +965,12 @@ abstract class ContentFolder implements ActiveRecordInterface
                 return $this->getFolderId();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getDefaultFolder();
                 break;
             case 3:
+                return $this->getCreatedAt();
+                break;
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -946,8 +1004,9 @@ abstract class ContentFolder implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getContentId(),
             $keys[1] => $this->getFolderId(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[2] => $this->getDefaultFolder(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1003,9 +1062,12 @@ abstract class ContentFolder implements ActiveRecordInterface
                 $this->setFolderId($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setDefaultFolder($value);
                 break;
             case 3:
+                $this->setCreatedAt($value);
+                break;
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1034,8 +1096,9 @@ abstract class ContentFolder implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setContentId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setFolderId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[2], $arr)) $this->setDefaultFolder($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1049,6 +1112,7 @@ abstract class ContentFolder implements ActiveRecordInterface
 
         if ($this->isColumnModified(ContentFolderTableMap::CONTENT_ID)) $criteria->add(ContentFolderTableMap::CONTENT_ID, $this->content_id);
         if ($this->isColumnModified(ContentFolderTableMap::FOLDER_ID)) $criteria->add(ContentFolderTableMap::FOLDER_ID, $this->folder_id);
+        if ($this->isColumnModified(ContentFolderTableMap::DEFAULT_FOLDER)) $criteria->add(ContentFolderTableMap::DEFAULT_FOLDER, $this->default_folder);
         if ($this->isColumnModified(ContentFolderTableMap::CREATED_AT)) $criteria->add(ContentFolderTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ContentFolderTableMap::UPDATED_AT)) $criteria->add(ContentFolderTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1123,6 +1187,7 @@ abstract class ContentFolder implements ActiveRecordInterface
     {
         $copyObj->setContentId($this->getContentId());
         $copyObj->setFolderId($this->getFolderId());
+        $copyObj->setDefaultFolder($this->getDefaultFolder());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1261,6 +1326,7 @@ abstract class ContentFolder implements ActiveRecordInterface
     {
         $this->content_id = null;
         $this->folder_id = null;
+        $this->default_folder = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

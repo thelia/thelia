@@ -173,6 +173,22 @@ class Category extends BaseI18nLoop
         $loopResult = new LoopResult($categories);
 
         foreach ($categories as $category) {
+
+            // Find previous and next category
+            $previous = CategoryQuery::create()
+                ->filterByParent($category->getParent())
+                ->filterByPosition($category->getPosition(), Criteria::LESS_THAN)
+                ->orderByPosition(Criteria::DESC)
+                ->findOne()
+            ;
+
+            $next = CategoryQuery::create()
+                ->filterByParent($category->getParent())
+                ->filterByPosition($category->getPosition(), Criteria::GREATER_THAN)
+                ->orderByPosition(Criteria::ASC)
+                ->findOne()
+            ;
+
             /*
              * no cause pagination lost :
              * if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
@@ -190,10 +206,17 @@ class Category extends BaseI18nLoop
                 ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("PARENT", $category->getParent())
                 ->set("URL", $category->getUrl($locale))
-                ->set("PRODUCT_COUNT", $category->countChild())
+                ->set("PRODUCT_COUNT", $category->countAllProducts())
+                ->set("CHILD_COUNT", $category->countChild())
                 ->set("VISIBLE", $category->getVisible() ? "1" : "0")
                 ->set("POSITION", $category->getPosition())
-            ;
+
+                ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                ->set("HAS_NEXT"    , $next != null ? 1 : 0)
+
+                ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                ->set("NEXT"    , $next != null ? $next->getId() : -1)
+                ;
 
             $loopResult->addRow($loopResultRow);
         }

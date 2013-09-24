@@ -65,6 +65,9 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue($ConstraintValidator));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -79,7 +82,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $rules = new CouponRuleCollection();
         $rules->add($rule1);
 
-        $isValid = $ConstraintValidator->test($rules);
+        $isValid = $ConstraintValidator->isMatching($rules);
 
         $expected = true;
         $actual =$isValid;
@@ -99,6 +102,9 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue($ConstraintValidator));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -113,7 +119,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $rules = new CouponRuleCollection();
         $rules->add($rule1);
 
-        $isValid = $ConstraintValidator->test($rules);
+        $isValid = $ConstraintValidator->isMatching($rules);
 
         $expected = false;
         $actual =$isValid;
@@ -136,6 +142,9 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(5));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue($ConstraintValidator));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -160,7 +169,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $rules->add($rule1);
         $rules->add($rule2);
 
-        $isValid = $ConstraintValidator->test($rules);
+        $isValid = $ConstraintValidator->isMatching($rules);
 
         $expected = true;
         $actual =$isValid;
@@ -183,6 +192,9 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(5));
+        $stubAdapter->expects($this->any())
+            ->method('getConstraintValidator')
+            ->will($this->returnValue($ConstraintValidator));
 
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -207,7 +219,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $rules->add($rule1);
         $rules->add($rule2);
 
-        $isValid = $ConstraintValidator->test($rules);
+        $isValid = $ConstraintValidator->isMatching($rules);
 
         $expected = false;
         $actual =$isValid;

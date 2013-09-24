@@ -17,6 +17,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.order" class="Thelia\Action\Order">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.customer" class="Thelia\Action\Customer">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
@@ -33,6 +38,11 @@
         </service>
 
         <service id="thelia.action.category" class="Thelia\Action\Category">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.product" class="Thelia\Action\Product">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
@@ -57,7 +67,17 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.template" class="Thelia\Action\Template">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.attribute" class="Thelia\Action\Attribute">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.feature" class="Thelia\Action\Feature">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
@@ -67,7 +87,22 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.featureav" class="Thelia\Action\FeatureAv">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.httpException" class="Thelia\Action\HttpException">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.folder" class="Thelia\Action\Folder">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.content" class="Thelia\Action\Content">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>

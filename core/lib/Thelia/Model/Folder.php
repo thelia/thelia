@@ -2,22 +2,33 @@
 
 namespace Thelia\Model;
 
+use Thelia\Core\Event\FolderEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Folder as BaseFolder;
 use Thelia\Tools\URL;
+use Propel\Runtime\Connection\ConnectionInterface;
 
 class Folder extends BaseFolder
 {
+    use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
+    use \Thelia\Model\Tools\PositionManagementTrait;
+
+    use \Thelia\Model\Tools\UrlRewritingTrait;
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getRewrittenUrlViewName() {
+        return 'folder';
+    }
+
     /**
      * @return int number of contents for the folder
      */
     public function countChild()
     {
         return FolderQuery::countChild($this->getId());
-    }
-
-    public function getUrl($locale)
-    {
-        return URL::getInstance()->retrieve('folder', $this->getId(), $locale)->toString();
     }
 
     /**
@@ -35,12 +46,60 @@ class Folder extends BaseFolder
 
         foreach($children as $child)
         {
-            $contentsCount += ProductQuery::create()
-                ->filterByCategory($child)
+            $contentsCount += ContentQuery::create()
+                ->filterByFolder($child)
                 ->count();
         }
 
         return $contentsCount;
 
+    }
+
+    /**
+     * Calculate next position relative to our parent
+     */
+    protected function addCriteriaToPositionQuery($query) {
+        $query->filterByParent($this->getParent());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function preInsert(ConnectionInterface $con = null)
+    {
+        $this->setPosition($this->getNextPosition());
+
+        $this->dispatchEvent(TheliaEvents::BEFORE_CREATEFOLDER, new FolderEvent($this));
+
+        return true;
+    }
+
+    public function postInsert(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_CREATEFOLDER, new FolderEvent($this));
+    }
+
+    public function preUpdate(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEFOLDER, new FolderEvent($this));
+
+        return true;
+    }
+
+    public function postUpdate(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_UPDATEFOLDER, new FolderEvent($this));
+    }
+
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_DELETEFOLDER, new FolderEvent($this));
+
+        return true;
+    }
+
+    public function postDelete(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_DELETEFOLDER, new FolderEvent($this));
     }
 }

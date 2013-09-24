@@ -6,6 +6,16 @@
 // Collapse
 .no-js .collapse { display: block!important; }
 
+// thumbnail
+.thumbnail {
+    &.active,
+    &:active {
+        border-style: solid;
+        border-width: 2px;
+    }
+    &.active { border-color: @gray-light; }
+}
+
 // Layout
 .main { margin-bottom: @line-height-computed; }
 .layout-col-1,

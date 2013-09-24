@@ -8,6 +8,7 @@ use Thelia\Model\Base\Cart as BaseCart;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\CartItemQuery;
+use Thelia\TaxEngine\Calculator;
 
 class Cart extends BaseCart
 {
@@ -44,16 +45,18 @@ class Cart extends BaseCart
                 $item->setQuantity($cartItem->getQuantity());
                 $item->setProductSaleElements($productSaleElements);
                 if ($currentDateTime <= $cartItem->getPriceEndOfLife()) {
-                    $item->setPrice($cartItem->getPrice());
-                    $item->setPromoPrice($cartItem->getPromoPrice());
+                    $item->setPrice($cartItem->getPrice())
+                        ->setPromoPrice($cartItem->getPromoPrice())
+                        ->setPromo($productSaleElements->getPromo())
                     // TODO : new price EOF or duplicate current priceEOF from $cartItem ?
-                    $item->setPriceEndOfLife($cartItem->getPriceEndOfLife());
+                        ->setPriceEndOfLife($cartItem->getPriceEndOfLife());
                 } else {
                     $productPrices = ProductPriceQuery::create()->filterByProductSaleElements($productSaleElements)->findOne();
 
-                    $item->setPrice($productPrices->getPrice());
-                    $item->setPromoPrice($productPrices->getPromoPrice());
-                    $item->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30));
+                    $item->setPrice($productPrices->getPrice())
+                        ->setPromoPrice($productPrices->getPromoPrice())
+                        ->setPromo($productSaleElements->getPromo())
+                        ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30));
                 }
                 $item->save();
             }
@@ -72,8 +75,41 @@ class Cart extends BaseCart
         ;
     }
 
-    public function getTaxedAmount()
+    public function getTaxedAmount(Country $country)
     {
+        $taxCalculator = new Calculator();
 
+        $total = 0;
+
+        foreach($this->getCartItems() as $cartItem) {
+            $subtotal = $cartItem->getRealPrice();
+            $subtotal -= $cartItem->getDiscount();
+            /* we round it for the unit price, before the quantity factor */
+            $subtotal = round($taxCalculator->load($cartItem->getProduct(), $country)->getTaxedPrice($subtotal), 2);
+            $subtotal *= $cartItem->getQuantity();
+
+            $total += $subtotal;
+        }
+
+        $total -= $this->getDiscount();
+
+        return $total;
+    }
+
+    public function getTotalAmount()
+    {
+        $total = 0;
+
+        foreach($this->getCartItems() as $cartItem) {
+            $subtotal = $cartItem->getRealPrice();
+            $subtotal -= $cartItem->getDiscount();
+            $subtotal *= $cartItem->getQuantity();
+
+            $total += $subtotal;
+        }
+
+        $total -= $this->getDiscount();
+
+        return $total;
     }
 }

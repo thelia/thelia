@@ -29,6 +29,7 @@ use Thelia\Exception\InvalidCartException;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Cart;
 use Thelia\Model\Currency;
+use Thelia\Model\Order;
 use Thelia\Tools\URL;
 use Thelia\Model\Lang;
 
@@ -43,6 +44,8 @@ use Thelia\Model\Lang;
 class Session extends BaseSession
 {
     /**
+     * @param bool $forceDefault
+     *
      * @return \Thelia\Model\Lang|null
      */
     public function getLang($forceDefault = true)
@@ -164,10 +167,12 @@ class Session extends BaseSession
         $cart = null;
         if ($cart_id) {
             $cart = CartQuery::create()->findPk($cart_id);
-            try {
-                $this->verifyValidCart($cart);
-            } catch (InvalidCartException $e) {
-                $cart = null;
+            if($cart) {
+                try {
+                    $this->verifyValidCart($cart);
+                } catch (InvalidCartException $e) {
+                    $cart = null;
+                }
             }
         }
 
@@ -203,21 +208,46 @@ class Session extends BaseSession
         return $this;
     }
 
-    /**
-     * assign delivery id in session
-     *
-     * @param $delivery_id
-     * @return $this
-     */
-    public function setDelivery($delivery_id)
+    // -- Order ------------------------------------------------------------------
+
+
+    public function setOrder(Order $order)
     {
-        $this->set("thelia.delivery_id", $delivery_id);
+        $this->set("thelia.order", $order);
 
         return $this;
     }
 
-    public function getDelivery()
+    /**
+     * @return Order
+     */
+    public function getOrder()
     {
-        return $this->get("thelia.delivery_id");
+        return $this->get("thelia.order");
+    }
+
+
+    /**
+     * Set consumed coupons by the Customer
+     *
+     * @param array $couponsCode An array of Coupon code
+     *
+     * @return $this
+     */
+    public function setConsumedCoupons(array $couponsCode)
+    {
+        $this->set('thelia.consumed_coupons', $couponsCode);
+
+        return $this;
+    }
+
+    /**
+     * Get Customer consumed coupons
+     *
+     * @return array $couponsCode An array of Coupon code
+     */
+    public function getConsumedCoupons()
+    {
+        return $this->get('thelia.consumed_coupons');
     }
 }

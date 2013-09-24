@@ -21,6 +21,7 @@
             <div class="col-md-12">
                 <form action="{url path='/admin/configuration/variables/update-values'}" method="post">
 	                <div class="general-block-decorator">
+                    <div class="table-responsive">
 	                    <table class="table table-striped table-condensed table-left-aligned">
 	                        <caption class="clearfix">
 	                           {intl l='Thelia system variables'}
@@ -95,7 +96,7 @@
   	                                    {if $SECURED}
   	                                        {$VALUE}
   	                                    {else}
-  	                                        <input id="cancelable_edit_{$ID}" class="js-edit form-control" data-id="{$ID}" type="text" name="variable[{$ID}]" value="{$VALUE|htmlspecialchars}" />
+  	                                        <input id="cancelable_edit_{$ID}" class="js-edit form-control" data-id="{$ID}" type="text" name="variable[{$ID}]" value="{$VALUE}" />
   	                                    {/if}
   	                                </td>
 
@@ -122,6 +123,7 @@
   	                        {/loop}
                           </tbody>
 	                    </table>
+                    </div>
 	                </div>
                 </form>
             </div>

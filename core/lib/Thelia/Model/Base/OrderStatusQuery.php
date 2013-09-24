@@ -420,7 +420,7 @@ abstract class OrderStatusQuery extends ModelCriteria
      *
      * @return ChildOrderStatusQuery The current query, for fluid interface
      */
-    public function joinOrder($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinOrder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Order');
@@ -455,7 +455,7 @@ abstract class OrderStatusQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
      */
-    public function useOrderQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinOrder($relationAlias, $joinType)

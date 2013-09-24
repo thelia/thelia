@@ -13,6 +13,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\CountryQuery;
 
 class Cart extends BaseLoop
 {
@@ -80,9 +81,11 @@ class Cart extends BaseLoop
             return $result;
         }
 
+        $taxCountry = CountryQuery::create()->findPk(64); // @TODO : make it magic;
+
         foreach ($cartItems as $cartItem) {
             $product = $cartItem->getProduct();
-            //$product->setLocale($this->request->getSession()->getLocale());
+            $productSaleElement = $cartItem->getProductSaleElements();
 
             $loopResultRow = new LoopResultRow($result, $cartItem, $this->versionable, $this->timestampable, $this->countable);
 
@@ -92,10 +95,26 @@ class Cart extends BaseLoop
             $loopResultRow->set("QUANTITY", $cartItem->getQuantity());
             $loopResultRow->set("PRICE", $cartItem->getPrice());
             $loopResultRow->set("PRODUCT_ID", $product->getId());
+            $loopResultRow->set("PRODUCT_URL", $product->getUrl($this->request->getSession()->getLang()->getLocale()))
+                ->set("STOCK", $productSaleElement->getQuantity())
+                ->set("PRICE", $cartItem->getPrice())
+                ->set("PROMO_PRICE", $cartItem->getPromoPrice())
+                ->set("TAXED_PRICE", $cartItem->getTaxedPrice($taxCountry))
+                ->set("PROMO_TAXED_PRICE", $cartItem->getTaxedPromoPrice($taxCountry))
+                ->set("IS_PROMO", $cartItem->getPromo() === 1 ? 1 : 0);
             $result->addRow($loopResultRow);
         }
 
         return $result;
     }
 
+    /**
+     * Return the event dispatcher,
+     *
+     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
+    }
 }

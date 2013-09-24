@@ -2,14 +2,18 @@
 @import "navbar.less";
 @import "scaffolding.less";
 @import "type.less";
+@import "grid.less";
 @import "breadcrumbs.less";
 @import "forms.less";
 @import "datepicker.less";
 @import "modals.less";
 @import "tables.less";
 @import "tablesorter.less";
+@import "wizard.less";
 @import "bootstrap-editable.less";
 @import "bootstrap-switch.less";
+@import "bootstrap-select.less";
+@import "jqplot.less";
 
 // -- Base styling ------------------------------------------------------------
 
@@ -33,7 +37,7 @@
 
 .topbar {
 
-	background: url("@{imgDir}/top.jpg") repeat-x;	
+	background: url("@{imgDir}/top.jpg") repeat-x;
 	font-weight: bold;
 
 	.version-info {
@@ -201,7 +205,7 @@
         border-bottom: 2px solid #A5CED8;
         margin-bottom: 0.5em;
     }
-    
+
     // The action bar on the right
     .actions {
         text-align: right;
@@ -215,6 +219,10 @@
         .btn{
             text-transform: none;
         }
+    }
+
+    .inner-actions {
+        margin-top: 0.5em;
     }
 }
 
@@ -247,6 +255,11 @@
             }
         }
     }
+}
+
+// -- Home --
+.dashboard hr{
+    margin-bottom: 10px;
 }
 
 // -- Editable tweaks ---------------------------------------------------------
