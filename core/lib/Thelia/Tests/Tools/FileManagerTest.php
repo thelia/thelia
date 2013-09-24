@@ -719,15 +719,26 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
 
         $fileManager = new FileManager($stubContainer);
 
-        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_PRODUCT, 1);
+        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_PRODUCT, 1, FileManager::FILE_TYPE_IMAGES);
         $this->assertEquals('/admin/products/update?product_id=1&current_tab=images', $actual);
-        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_CATEGORY, 1);
+        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_CATEGORY, 1, FileManager::FILE_TYPE_IMAGES);
         $this->assertEquals('/admin/categories/update?category_id=1&current_tab=images', $actual);
-        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_CONTENT, 1);
-        $this->assertEquals('/admin/content/update/1&current_tab=images', $actual);
-        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_FOLDER, 1);
-        $this->assertEquals('/admin/folders/update/1&current_tab=images', $actual);
-        $actual = $fileManager->getRedirectionUrl('bad', 1);
+        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_CONTENT, 1, FileManager::FILE_TYPE_IMAGES);
+        $this->assertEquals('/admin/content/update/1?current_tab=images', $actual);
+        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_FOLDER, 1, FileManager::FILE_TYPE_IMAGES);
+        $this->assertEquals('/admin/folders/update/1?current_tab=images', $actual);
+        $actual = $fileManager->getRedirectionUrl('bad', 1, FileManager::FILE_TYPE_IMAGES);
+        $this->assertEquals(false, $actual);
+
+        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_PRODUCT, 1, FileManager::FILE_TYPE_DOCUMENTS);
+        $this->assertEquals('/admin/products/update?product_id=1&current_tab=documents', $actual);
+        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_CATEGORY, 1, FileManager::FILE_TYPE_DOCUMENTS);
+        $this->assertEquals('/admin/categories/update?category_id=1&current_tab=documents', $actual);
+        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_CONTENT, 1, FileManager::FILE_TYPE_DOCUMENTS);
+        $this->assertEquals('/admin/content/update/1?current_tab=documents', $actual);
+        $actual = $fileManager->getRedirectionUrl(FileManager::TYPE_FOLDER, 1, FileManager::FILE_TYPE_DOCUMENTS);
+        $this->assertEquals('/admin/folders/update/1?current_tab=documents', $actual);
+        $actual = $fileManager->getRedirectionUrl('bad', 1, FileManager::FILE_TYPE_DOCUMENTS);
         $this->assertEquals(false, $actual);
     }
 
