@@ -553,6 +553,14 @@
 
     <!-- end admin profiles management -->
 
+    <!-- taxe rules management -->
+
+    <route id="admin.configuration.taxes-rules.default" path="/admin/configuration/taxes_rules">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::defaultAction</default>
+    </route>
+
+    <!-- end admin profiles management -->
+
 
 	<!-- The default route, to display a template -->
 
