@@ -72,12 +72,12 @@ abstract class ImageModification extends BaseForm
                 'constraints' => array(
                     new Image(
                         array(
-                            'minWidth' => 200,
-                            'minHeight' => 200
+//                            'minWidth' => 200,
+//                            'minHeight' => 200
                         )
                     )
                 ),
-                'label' => Translator::getInstance()->trans('File'),
+                'label' => Translator::getInstance()->trans('Replace current image by this file'),
                 'label_attr' => array(
                     'for' => 'file'
                 )

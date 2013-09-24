@@ -69,7 +69,7 @@ abstract class DocumentModification extends BaseForm
             'file',
             array(
                 'constraints' => array(),
-                'label' => Translator::getInstance()->trans('File'),
+                'label' => Translator::getInstance()->trans('Replace current document by this file'),
                 'label_attr' => array(
                     'for' => 'file'
                 )

@@ -340,6 +340,26 @@ final class TheliaEvents
     /**
      * Sent on image cache clear request
      */
+    const DOCUMENT_CLEAR_CACHE = "action.clearDocumentCache";
+
+    /**
+     * Save given documents
+     */
+    const DOCUMENT_SAVE = "action.saveDocument";
+
+    /**
+     * Save given documents
+     */
+    const DOCUMENT_UPDATE = "action.updateDocument";
+
+    /**
+     * Delete given document
+     */
+    const DOCUMENT_DELETE = "action.deleteDocument";
+
+    /**
+     * Sent on image cache clear request
+     */
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
 
     /**
