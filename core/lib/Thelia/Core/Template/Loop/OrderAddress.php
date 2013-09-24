@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -26,44 +26,56 @@ namespace Thelia\Core\Template\Loop;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
-
 use Thelia\Core\Template\Element\LoopResultRow;
+
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\OrderQuery;
+
+use Thelia\Model\AddressQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
+
 /**
  *
- * @package Thelia\Core\Template\Loop
+ * OrderAddress loop
  *
- * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * Class OrderAddress
+ * @package Thelia\Core\Template\Loop
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Order extends BaseLoop
+class OrderAddress extends BaseLoop
 {
-    public $countable = true;
     public $timestampable = true;
-    public $versionable = false;
 
-    public function getArgDefinitions()
+    /**
+     * @return ArgumentCollection
+     */
+    protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id'),
+            new Argument(
+                'id',
+                new TypeCollection(
+                    new Type\IntListType(),
+                    new Type\EnumType(array('*', 'any'))
+                )
+            ),
             new Argument(
                 'customer',
                 new TypeCollection(
                     new Type\IntType(),
-                    new Type\EnumType(array('current', '*'))
+                    new Type\EnumType(array('current'))
                 ),
                 'current'
             ),
-            Argument::createIntListTypeArgument('status'),
+            Argument::createBooleanOrBothTypeArgument('default'),
             new Argument(
-                'order',
+                'exclude',
                 new TypeCollection(
-                    new Type\EnumListType(array('create-date', 'create-date-reverse'))
-                ),
-                'create-date-reverse'
+                    new Type\IntListType(),
+                    new Type\EnumType(array('none'))
+                )
             )
         );
     }
@@ -71,15 +83,15 @@ class Order extends BaseLoop
     /**
      * @param $pagination
      *
-     * @return LoopResult
+     * @return \Thelia\Core\Template\Element\LoopResult
      */
     public function exec(&$pagination)
     {
-        $search = OrderQuery::create();
+        $search = OrderAddressQuery::create();
 
         $id = $this->getId();
 
-        if (null !== $id) {
+        if (null !== $id && !in_array($id, array('*', 'any'))) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -92,58 +104,47 @@ class Order extends BaseLoop
             } else {
                 $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
             }
-        } elseif ($customer !== '*') {
+        } else {
             $search->filterByCustomerId($customer, Criteria::EQUAL);
         }
 
-        $status = $this->getStatus();
+        $default = $this->getDefault();
 
-        if (null !== $status) {
-            $search->filterByStatusId($status, Criteria::IN);
+        if ($default === true) {
+            $search->filterByIsDefault(1, Criteria::EQUAL);
+        } else if($default === false) {
+            $search->filterByIsDefault(0, Criteria::EQUAL);
         }
 
-        $orderers = $this->getOrder();
+        $exclude = $this->getExclude();
 
-        foreach ($orderers as $orderer) {
-            switch ($orderer) {
-                case "create-date":
-                    $search->orderByCreatedAt(Criteria::ASC);
-                    break;
-                case "create-date-reverse":
-                    $search->orderByCreatedAt(Criteria::DESC);
-                    break;
-            }
+        if (null !== $exclude && 'none' !== $exclude) {
+            $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $orders = $this->search($search, $pagination);
+        $addresses = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult($orders);
+        $loopResult = new LoopResult($addresses);
 
-        foreach ($orders as $order) {
-            $tax = 0;
-            $amount = $order->getTotalAmount($tax);
-            $loopResultRow = new LoopResultRow($loopResult, $order, $this->versionable, $this->timestampable, $this->countable);
+        foreach ($addresses as $address) {
+            $loopResultRow = new LoopResultRow($loopResult, $address, $this->versionable, $this->timestampable, $this->countable);
             $loopResultRow
-                ->set("ID", $order->getId())
-                ->set("REF", $order->getRef())
-                ->set("CUSTOMER", $order->getCustomerId())
-                ->set("DELIVERY_ADDRESS", $order->getDeliveryOrderAddressId())
-                ->set("INVOICE_ADDRESS", $order->getInvoiceOrderAddressId())
-                ->set("INVOICE_DATE", $order->getInvoiceDate())
-                ->set("CURRENCY", $order->getCurrencyId())
-                ->set("CURRENCY_RATE", $order->getCurrencyRate())
-                ->set("TRANSACTION_REF", $order->getTransactionRef())
-                ->set("DELIVERY_REF", $order->getDeliveryRef())
-                ->set("INVOICE_REF", $order->getInvoiceRef())
-                ->set("POSTAGE", $order->getPostage())
-                ->set("PAYMENT_MODULE", $order->getPaymentModuleId())
-                ->set("DELIVERY_MODULE", $order->getDeliveryModuleId())
-                ->set("STATUS", $order->getStatusId())
-                ->set("LANG", $order->getLangId())
-                ->set("POSTAGE", $order->getPostage())
-                ->set("TOTAL_TAX", $tax)
-                ->set("TOTAL_AMOUNT", $amount - $tax)
-                ->set("TOTAL_TAXED_AMOUNT", $amount)
+                ->set("ID", $address->getId())
+                ->set("LABEL", $address->getLabel())
+                ->set("CUSTOMER", $address->getCustomerId())
+                ->set("TITLE", $address->getTitleId())
+                ->set("COMPANY", $address->getCompany())
+                ->set("FIRSTNAME", $address->getFirstname())
+                ->set("LASTNAME", $address->getLastname())
+                ->set("ADDRESS1", $address->getAddress1())
+                ->set("ADDRESS2", $address->getAddress2())
+                ->set("ADDRESS3", $address->getAddress3())
+                ->set("ZIPCODE", $address->getZipcode())
+                ->set("CITY", $address->getCity())
+                ->set("COUNTRY", $address->getCountryId())
+                ->set("PHONE", $address->getPhone())
+                ->set("CELLPHONE", $address->getCellphone())
+                ->set("DEFAULT", $address->getIsDefault())
             ;
 
             $loopResult->addRow($loopResultRow);
