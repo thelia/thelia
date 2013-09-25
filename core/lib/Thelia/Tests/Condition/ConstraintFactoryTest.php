@@ -24,9 +24,12 @@
 namespace Thelia\Condition\Implementation;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\ConditionCollection;
+use Thelia\Model\CurrencyQuery;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -55,12 +58,6 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuild()
     {
-        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-
-
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
@@ -73,6 +70,31 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getTranslator')
             ->will($this->returnValue($stubTranslator));
+        $stubAdapter->expects($this->any())
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
+
+        $currencies = CurrencyQuery::create();
+        $currencies = $currencies->find();
+        $stubAdapter->expects($this->any())
+            ->method('getAvailableCurrencies')
+            ->will($this->returnValue($currencies));
+
+        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue(new MatchForTotalAmountManager($stubAdapter)));
+
+        $stubContainer->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
+
+        $stubAdapter->expects($this->any())
+            ->method('getContainer')
+            ->will($this->returnValue($stubContainer));
+
 
         $condition1 = new MatchForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -85,7 +107,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         );
         $condition1->setValidatorsFromForm($operators, $values);
 
-        $conditionFactory = new ConditionFactory($this->getContainer());
+        $conditionFactory = new ConditionFactory($stubContainer);
         $ruleManager1 = $conditionFactory->build($condition1->getServiceId(), $operators, $values);
 
         $expected = $condition1;
@@ -96,132 +118,146 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($condition1->getValidators(), $ruleManager1->getValidators());
     }
 
-//    /**
-//     * Check the Rules serialization module
-//     */
-//    public function testBuildFail()
-//    {
-//        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
-//            ->disableOriginalConstructor()
-//            ->getMock();
-//
-//        /** @var AdapterInterface $stubAdapter */
-//        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
-//            ->disableOriginalConstructor()
-//            ->getMock();
-//
-//        $stubAdapter->expects($this->any())
-//            ->method('getTranslator')
-//            ->will($this->returnValue($stubTranslator));
-//
-//        $condition1 = new MatchForTotalAmountManager($stubAdapter);
-//        $operators = array(
-//            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-//            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
-//        );
-//        $values = array(
-//            MatchForTotalAmountManager::INPUT1 => 40.00,
-//            MatchForTotalAmountManager::INPUT2 => 'EUR'
-//        );
-//        $condition1->setValidatorsFromForm($operators, $values);
-//
-//        $conditionFactory = new ConditionFactory($this->getContainer());
-//        $conditionManager1 = $conditionFactory->build('unset.service', $operators, $values);
-//
-//        $expected = false;
-//        $actual = $conditionManager1;
-//
-//        $this->assertEquals($expected, $actual);
-//    }
-//
-//    /**
-//     * Check the Rules serialization module
-//     */
-//    public function testRuleSerialisation()
-//    {
-//        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
-//            ->disableOriginalConstructor()
-//            ->getMock();
-//
-//        /** @var AdapterInterface $stubAdapter */
-//        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
-//            ->disableOriginalConstructor()
-//            ->getMock();
-//
-//        $stubAdapter->expects($this->any())
-//            ->method('getTranslator')
-//            ->will($this->returnValue($stubTranslator));
-//
-//        $condition1 = new MatchForTotalAmountManager($stubAdapter);
-//        $operators = array(
-//            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-//            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
-//        );
-//        $values = array(
-//            MatchForTotalAmountManager::INPUT1 => 40.00,
-//            MatchForTotalAmountManager::INPUT2 => 'EUR'
-//        );
-//        $condition1->setValidatorsFromForm($operators, $values);
-//
-//        $condition2 = new MatchForTotalAmountManager($stubAdapter);
-//        $operators = array(
-//            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-//            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
-//        );
-//        $values = array(
-//            MatchForTotalAmountManager::INPUT1 => 400.00,
-//            MatchForTotalAmountManager::INPUT2 => 'EUR'
-//        );
-//        $condition2->setValidatorsFromForm($operators, $values);
-//
-//        $conditions = new ConditionCollection();
-//        $conditions->add($condition1);
-//        $conditions->add($condition2);
-//
-//        $conditionFactory = new ConditionFactory($this->getContainer());
-//
-//        $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
-//        $unserializedConditions = $conditionFactory->unserializeConditionCollection($serializedConditions);
-//
-//        $expected = (string) $conditions;
-//        $actual = (string) $unserializedConditions;
-//
-//        $this->assertEquals($expected, $actual);
-//    }
-//
-//    /**
-//     * Get Mocked Container with 2 Rules
-//     *
-//     * @return ContainerBuilder
-//     */
-//    public function getContainer()
-//    {
-//        $container = new ContainerBuilder();
-//
-//        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
-//            ->disableOriginalConstructor()
-//            ->getMock();
-//
-//        /** @var AdapterInterface $stubAdapter */
-//        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
-//            ->disableOriginalConstructor()
-//            ->getMock();
-//
-//        $stubAdapter->expects($this->any())
-//            ->method('getTranslator')
-//            ->will($this->returnValue($stubTranslator));
-//
-//        $condition1 = new MatchForTotalAmountManager($stubAdapter);
-//        $condition2 = new MatchForXArticlesManager($stubAdapter);
-//
-//        $adapter = new BaseAdapter($container);
-//
-//        $container->set('thelia.condition.match_for_total_amount', $condition1);
-//        $container->set('thelia.condition.match_for_x_articles', $condition2);
-//        $container->set('thelia.adapter', $adapter);
-//
-//        return $container;
-//    }
+    /**
+     * Check the Rules serialization module
+     */
+    public function testBuildFail()
+    {
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+        $stubAdapter->expects($this->any())
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
+
+        $currencies = CurrencyQuery::create();
+        $currencies = $currencies->find();
+        $stubAdapter->expects($this->any())
+            ->method('getAvailableCurrencies')
+            ->will($this->returnValue($currencies));
+
+        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue(new MatchForTotalAmountManager($stubAdapter)));
+
+        $stubContainer->expects($this->any())
+            ->method('has')
+            ->will($this->returnValueMap(array('unset.service', false)));
+
+        $stubAdapter->expects($this->any())
+            ->method('getContainer')
+            ->will($this->returnValue($stubContainer));
+
+        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $operators = array(
+            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmountManager::INPUT1 => 40.00,
+            MatchForTotalAmountManager::INPUT2 => 'EUR'
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $conditionFactory = new ConditionFactory($stubContainer);
+        $conditionManager1 = $conditionFactory->build('unset.service', $operators, $values);
+
+        $expected = false;
+        $actual = $conditionManager1;
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * Check the Rules serialization module
+     */
+    public function testRuleSerialisation()
+    {
+        $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $stubAdapter->expects($this->any())
+            ->method('getTranslator')
+            ->will($this->returnValue($stubTranslator));
+        $stubAdapter->expects($this->any())
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
+
+        $currencies = CurrencyQuery::create();
+        $currencies = $currencies->find();
+        $stubAdapter->expects($this->any())
+            ->method('getAvailableCurrencies')
+            ->will($this->returnValue($currencies));
+
+        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stubContainer->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue(new MatchForTotalAmountManager($stubAdapter)));
+
+        $stubContainer->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
+
+        $stubAdapter->expects($this->any())
+            ->method('getContainer')
+            ->will($this->returnValue($stubContainer));
+
+        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $operators = array(
+            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmountManager::INPUT1 => 40.00,
+            MatchForTotalAmountManager::INPUT2 => 'EUR'
+        );
+        $condition1->setValidatorsFromForm($operators, $values);
+
+        $condition2 = new MatchForTotalAmountManager($stubAdapter);
+        $operators = array(
+            MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+            MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
+        );
+        $values = array(
+            MatchForTotalAmountManager::INPUT1 => 400.00,
+            MatchForTotalAmountManager::INPUT2 => 'EUR'
+        );
+        $condition2->setValidatorsFromForm($operators, $values);
+
+        $conditions = new ConditionCollection();
+        $conditions->add($condition1);
+        $conditions->add($condition2);
+
+        $conditionFactory = new ConditionFactory($stubContainer);
+
+        $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
+        $unserializedConditions = $conditionFactory->unserializeConditionCollection($serializedConditions);
+
+        $expected = (string) $conditions;
+        $actual = (string) $unserializedConditions;
+
+        $this->assertEquals($expected, $actual);
+    }
 
     /**
      * Tears down the fixture, for example, closes a network connection.
