@@ -85,14 +85,14 @@ class OrderTableMap extends TableMap
     const CUSTOMER_ID = 'order.CUSTOMER_ID';
 
     /**
-     * the column name for the ADDRESS_INVOICE field
+     * the column name for the INVOICE_ORDER_ADDRESS_ID field
      */
-    const ADDRESS_INVOICE = 'order.ADDRESS_INVOICE';
+    const INVOICE_ORDER_ADDRESS_ID = 'order.INVOICE_ORDER_ADDRESS_ID';
 
     /**
-     * the column name for the ADDRESS_DELIVERY field
+     * the column name for the DELIVERY_ORDER_ADDRESS_ID field
      */
-    const ADDRESS_DELIVERY = 'order.ADDRESS_DELIVERY';
+    const DELIVERY_ORDER_ADDRESS_ID = 'order.DELIVERY_ORDER_ADDRESS_ID';
 
     /**
      * the column name for the INVOICE_DATE field
@@ -110,19 +110,19 @@ class OrderTableMap extends TableMap
     const CURRENCY_RATE = 'order.CURRENCY_RATE';
 
     /**
-     * the column name for the TRANSACTION field
+     * the column name for the TRANSACTION_REF field
      */
-    const TRANSACTION = 'order.TRANSACTION';
+    const TRANSACTION_REF = 'order.TRANSACTION_REF';
 
     /**
-     * the column name for the DELIVERY_NUM field
+     * the column name for the DELIVERY_REF field
      */
-    const DELIVERY_NUM = 'order.DELIVERY_NUM';
+    const DELIVERY_REF = 'order.DELIVERY_REF';
 
     /**
-     * the column name for the INVOICE field
+     * the column name for the INVOICE_REF field
      */
-    const INVOICE = 'order.INVOICE';
+    const INVOICE_REF = 'order.INVOICE_REF';
 
     /**
      * the column name for the POSTAGE field
@@ -130,14 +130,14 @@ class OrderTableMap extends TableMap
     const POSTAGE = 'order.POSTAGE';
 
     /**
-     * the column name for the PAYMENT field
+     * the column name for the PAYMENT_MODULE_ID field
      */
-    const PAYMENT = 'order.PAYMENT';
+    const PAYMENT_MODULE_ID = 'order.PAYMENT_MODULE_ID';
 
     /**
-     * the column name for the CARRIER field
+     * the column name for the DELIVERY_MODULE_ID field
      */
-    const CARRIER = 'order.CARRIER';
+    const DELIVERY_MODULE_ID = 'order.DELIVERY_MODULE_ID';
 
     /**
      * the column name for the STATUS_ID field
@@ -145,9 +145,9 @@ class OrderTableMap extends TableMap
     const STATUS_ID = 'order.STATUS_ID';
 
     /**
-     * the column name for the LANG field
+     * the column name for the LANG_ID field
      */
-    const LANG = 'order.LANG';
+    const LANG_ID = 'order.LANG_ID';
 
     /**
      * the column name for the CREATED_AT field
@@ -171,11 +171,11 @@ class OrderTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Ref', 'CustomerId', 'AddressInvoice', 'AddressDelivery', 'InvoiceDate', 'CurrencyId', 'CurrencyRate', 'Transaction', 'DeliveryNum', 'Invoice', 'Postage', 'Payment', 'Carrier', 'StatusId', 'Lang', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'customerId', 'addressInvoice', 'addressDelivery', 'invoiceDate', 'currencyId', 'currencyRate', 'transaction', 'deliveryNum', 'invoice', 'postage', 'payment', 'carrier', 'statusId', 'lang', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(OrderTableMap::ID, OrderTableMap::REF, OrderTableMap::CUSTOMER_ID, OrderTableMap::ADDRESS_INVOICE, OrderTableMap::ADDRESS_DELIVERY, OrderTableMap::INVOICE_DATE, OrderTableMap::CURRENCY_ID, OrderTableMap::CURRENCY_RATE, OrderTableMap::TRANSACTION, OrderTableMap::DELIVERY_NUM, OrderTableMap::INVOICE, OrderTableMap::POSTAGE, OrderTableMap::PAYMENT, OrderTableMap::CARRIER, OrderTableMap::STATUS_ID, OrderTableMap::LANG, OrderTableMap::CREATED_AT, OrderTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'CUSTOMER_ID', 'ADDRESS_INVOICE', 'ADDRESS_DELIVERY', 'INVOICE_DATE', 'CURRENCY_ID', 'CURRENCY_RATE', 'TRANSACTION', 'DELIVERY_NUM', 'INVOICE', 'POSTAGE', 'PAYMENT', 'CARRIER', 'STATUS_ID', 'LANG', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'ref', 'customer_id', 'address_invoice', 'address_delivery', 'invoice_date', 'currency_id', 'currency_rate', 'transaction', 'delivery_num', 'invoice', 'postage', 'payment', 'carrier', 'status_id', 'lang', 'created_at', 'updated_at', ),
+        self::TYPE_PHPNAME       => array('Id', 'Ref', 'CustomerId', 'InvoiceOrderAddressId', 'DeliveryOrderAddressId', 'InvoiceDate', 'CurrencyId', 'CurrencyRate', 'TransactionRef', 'DeliveryRef', 'InvoiceRef', 'Postage', 'PaymentModuleId', 'DeliveryModuleId', 'StatusId', 'LangId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'customerId', 'invoiceOrderAddressId', 'deliveryOrderAddressId', 'invoiceDate', 'currencyId', 'currencyRate', 'transactionRef', 'deliveryRef', 'invoiceRef', 'postage', 'paymentModuleId', 'deliveryModuleId', 'statusId', 'langId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(OrderTableMap::ID, OrderTableMap::REF, OrderTableMap::CUSTOMER_ID, OrderTableMap::INVOICE_ORDER_ADDRESS_ID, OrderTableMap::DELIVERY_ORDER_ADDRESS_ID, OrderTableMap::INVOICE_DATE, OrderTableMap::CURRENCY_ID, OrderTableMap::CURRENCY_RATE, OrderTableMap::TRANSACTION_REF, OrderTableMap::DELIVERY_REF, OrderTableMap::INVOICE_REF, OrderTableMap::POSTAGE, OrderTableMap::PAYMENT_MODULE_ID, OrderTableMap::DELIVERY_MODULE_ID, OrderTableMap::STATUS_ID, OrderTableMap::LANG_ID, OrderTableMap::CREATED_AT, OrderTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'CUSTOMER_ID', 'INVOICE_ORDER_ADDRESS_ID', 'DELIVERY_ORDER_ADDRESS_ID', 'INVOICE_DATE', 'CURRENCY_ID', 'CURRENCY_RATE', 'TRANSACTION_REF', 'DELIVERY_REF', 'INVOICE_REF', 'POSTAGE', 'PAYMENT_MODULE_ID', 'DELIVERY_MODULE_ID', 'STATUS_ID', 'LANG_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'ref', 'customer_id', 'invoice_order_address_id', 'delivery_order_address_id', 'invoice_date', 'currency_id', 'currency_rate', 'transaction_ref', 'delivery_ref', 'invoice_ref', 'postage', 'payment_module_id', 'delivery_module_id', 'status_id', 'lang_id', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, )
     );
 
@@ -186,11 +186,11 @@ class OrderTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'CustomerId' => 2, 'AddressInvoice' => 3, 'AddressDelivery' => 4, 'InvoiceDate' => 5, 'CurrencyId' => 6, 'CurrencyRate' => 7, 'Transaction' => 8, 'DeliveryNum' => 9, 'Invoice' => 10, 'Postage' => 11, 'Payment' => 12, 'Carrier' => 13, 'StatusId' => 14, 'Lang' => 15, 'CreatedAt' => 16, 'UpdatedAt' => 17, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'customerId' => 2, 'addressInvoice' => 3, 'addressDelivery' => 4, 'invoiceDate' => 5, 'currencyId' => 6, 'currencyRate' => 7, 'transaction' => 8, 'deliveryNum' => 9, 'invoice' => 10, 'postage' => 11, 'payment' => 12, 'carrier' => 13, 'statusId' => 14, 'lang' => 15, 'createdAt' => 16, 'updatedAt' => 17, ),
-        self::TYPE_COLNAME       => array(OrderTableMap::ID => 0, OrderTableMap::REF => 1, OrderTableMap::CUSTOMER_ID => 2, OrderTableMap::ADDRESS_INVOICE => 3, OrderTableMap::ADDRESS_DELIVERY => 4, OrderTableMap::INVOICE_DATE => 5, OrderTableMap::CURRENCY_ID => 6, OrderTableMap::CURRENCY_RATE => 7, OrderTableMap::TRANSACTION => 8, OrderTableMap::DELIVERY_NUM => 9, OrderTableMap::INVOICE => 10, OrderTableMap::POSTAGE => 11, OrderTableMap::PAYMENT => 12, OrderTableMap::CARRIER => 13, OrderTableMap::STATUS_ID => 14, OrderTableMap::LANG => 15, OrderTableMap::CREATED_AT => 16, OrderTableMap::UPDATED_AT => 17, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'CUSTOMER_ID' => 2, 'ADDRESS_INVOICE' => 3, 'ADDRESS_DELIVERY' => 4, 'INVOICE_DATE' => 5, 'CURRENCY_ID' => 6, 'CURRENCY_RATE' => 7, 'TRANSACTION' => 8, 'DELIVERY_NUM' => 9, 'INVOICE' => 10, 'POSTAGE' => 11, 'PAYMENT' => 12, 'CARRIER' => 13, 'STATUS_ID' => 14, 'LANG' => 15, 'CREATED_AT' => 16, 'UPDATED_AT' => 17, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'customer_id' => 2, 'address_invoice' => 3, 'address_delivery' => 4, 'invoice_date' => 5, 'currency_id' => 6, 'currency_rate' => 7, 'transaction' => 8, 'delivery_num' => 9, 'invoice' => 10, 'postage' => 11, 'payment' => 12, 'carrier' => 13, 'status_id' => 14, 'lang' => 15, 'created_at' => 16, 'updated_at' => 17, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'CustomerId' => 2, 'InvoiceOrderAddressId' => 3, 'DeliveryOrderAddressId' => 4, 'InvoiceDate' => 5, 'CurrencyId' => 6, 'CurrencyRate' => 7, 'TransactionRef' => 8, 'DeliveryRef' => 9, 'InvoiceRef' => 10, 'Postage' => 11, 'PaymentModuleId' => 12, 'DeliveryModuleId' => 13, 'StatusId' => 14, 'LangId' => 15, 'CreatedAt' => 16, 'UpdatedAt' => 17, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'customerId' => 2, 'invoiceOrderAddressId' => 3, 'deliveryOrderAddressId' => 4, 'invoiceDate' => 5, 'currencyId' => 6, 'currencyRate' => 7, 'transactionRef' => 8, 'deliveryRef' => 9, 'invoiceRef' => 10, 'postage' => 11, 'paymentModuleId' => 12, 'deliveryModuleId' => 13, 'statusId' => 14, 'langId' => 15, 'createdAt' => 16, 'updatedAt' => 17, ),
+        self::TYPE_COLNAME       => array(OrderTableMap::ID => 0, OrderTableMap::REF => 1, OrderTableMap::CUSTOMER_ID => 2, OrderTableMap::INVOICE_ORDER_ADDRESS_ID => 3, OrderTableMap::DELIVERY_ORDER_ADDRESS_ID => 4, OrderTableMap::INVOICE_DATE => 5, OrderTableMap::CURRENCY_ID => 6, OrderTableMap::CURRENCY_RATE => 7, OrderTableMap::TRANSACTION_REF => 8, OrderTableMap::DELIVERY_REF => 9, OrderTableMap::INVOICE_REF => 10, OrderTableMap::POSTAGE => 11, OrderTableMap::PAYMENT_MODULE_ID => 12, OrderTableMap::DELIVERY_MODULE_ID => 13, OrderTableMap::STATUS_ID => 14, OrderTableMap::LANG_ID => 15, OrderTableMap::CREATED_AT => 16, OrderTableMap::UPDATED_AT => 17, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'CUSTOMER_ID' => 2, 'INVOICE_ORDER_ADDRESS_ID' => 3, 'DELIVERY_ORDER_ADDRESS_ID' => 4, 'INVOICE_DATE' => 5, 'CURRENCY_ID' => 6, 'CURRENCY_RATE' => 7, 'TRANSACTION_REF' => 8, 'DELIVERY_REF' => 9, 'INVOICE_REF' => 10, 'POSTAGE' => 11, 'PAYMENT_MODULE_ID' => 12, 'DELIVERY_MODULE_ID' => 13, 'STATUS_ID' => 14, 'LANG_ID' => 15, 'CREATED_AT' => 16, 'UPDATED_AT' => 17, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'customer_id' => 2, 'invoice_order_address_id' => 3, 'delivery_order_address_id' => 4, 'invoice_date' => 5, 'currency_id' => 6, 'currency_rate' => 7, 'transaction_ref' => 8, 'delivery_ref' => 9, 'invoice_ref' => 10, 'postage' => 11, 'payment_module_id' => 12, 'delivery_module_id' => 13, 'status_id' => 14, 'lang_id' => 15, 'created_at' => 16, 'updated_at' => 17, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, )
     );
 
@@ -211,21 +211,21 @@ class OrderTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', false, 45, null);
+        $this->addColumn('REF', 'Ref', 'VARCHAR', true, 45, null);
         $this->addForeignKey('CUSTOMER_ID', 'CustomerId', 'INTEGER', 'customer', 'ID', true, null, null);
-        $this->addForeignKey('ADDRESS_INVOICE', 'AddressInvoice', 'INTEGER', 'order_address', 'ID', false, null, null);
-        $this->addForeignKey('ADDRESS_DELIVERY', 'AddressDelivery', 'INTEGER', 'order_address', 'ID', false, null, null);
+        $this->addForeignKey('INVOICE_ORDER_ADDRESS_ID', 'InvoiceOrderAddressId', 'INTEGER', 'order_address', 'ID', true, null, null);
+        $this->addForeignKey('DELIVERY_ORDER_ADDRESS_ID', 'DeliveryOrderAddressId', 'INTEGER', 'order_address', 'ID', true, null, null);
         $this->addColumn('INVOICE_DATE', 'InvoiceDate', 'DATE', false, null, null);
-        $this->addForeignKey('CURRENCY_ID', 'CurrencyId', 'INTEGER', 'currency', 'ID', false, null, null);
+        $this->addForeignKey('CURRENCY_ID', 'CurrencyId', 'INTEGER', 'currency', 'ID', true, null, null);
         $this->addColumn('CURRENCY_RATE', 'CurrencyRate', 'FLOAT', true, null, null);
-        $this->addColumn('TRANSACTION', 'Transaction', 'VARCHAR', false, 100, null);
-        $this->addColumn('DELIVERY_NUM', 'DeliveryNum', 'VARCHAR', false, 100, null);
-        $this->addColumn('INVOICE', 'Invoice', 'VARCHAR', false, 100, null);
-        $this->addColumn('POSTAGE', 'Postage', 'FLOAT', false, null, null);
-        $this->addColumn('PAYMENT', 'Payment', 'VARCHAR', true, 45, null);
-        $this->addColumn('CARRIER', 'Carrier', 'VARCHAR', true, 45, null);
-        $this->addForeignKey('STATUS_ID', 'StatusId', 'INTEGER', 'order_status', 'ID', false, null, null);
-        $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
+        $this->addColumn('TRANSACTION_REF', 'TransactionRef', 'VARCHAR', false, 100, null);
+        $this->addColumn('DELIVERY_REF', 'DeliveryRef', 'VARCHAR', false, 100, null);
+        $this->addColumn('INVOICE_REF', 'InvoiceRef', 'VARCHAR', false, 100, null);
+        $this->addColumn('POSTAGE', 'Postage', 'FLOAT', true, null, null);
+        $this->addForeignKey('PAYMENT_MODULE_ID', 'PaymentModuleId', 'INTEGER', 'module', 'ID', true, null, null);
+        $this->addForeignKey('DELIVERY_MODULE_ID', 'DeliveryModuleId', 'INTEGER', 'module', 'ID', true, null, null);
+        $this->addForeignKey('STATUS_ID', 'StatusId', 'INTEGER', 'order_status', 'ID', true, null, null);
+        $this->addForeignKey('LANG_ID', 'LangId', 'INTEGER', 'lang', 'ID', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -235,11 +235,14 @@ class OrderTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Currency', '\\Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('Customer', '\\Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('customer_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('OrderAddressRelatedByAddressInvoice', '\\Thelia\\Model\\OrderAddress', RelationMap::MANY_TO_ONE, array('address_invoice' => 'id', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('OrderAddressRelatedByAddressDelivery', '\\Thelia\\Model\\OrderAddress', RelationMap::MANY_TO_ONE, array('address_delivery' => 'id', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('OrderStatus', '\\Thelia\\Model\\OrderStatus', RelationMap::MANY_TO_ONE, array('status_id' => 'id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('Currency', '\\Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('Customer', '\\Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('customer_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('OrderAddressRelatedByInvoiceOrderAddressId', '\\Thelia\\Model\\OrderAddress', RelationMap::MANY_TO_ONE, array('invoice_order_address_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('OrderAddressRelatedByDeliveryOrderAddressId', '\\Thelia\\Model\\OrderAddress', RelationMap::MANY_TO_ONE, array('delivery_order_address_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('OrderStatus', '\\Thelia\\Model\\OrderStatus', RelationMap::MANY_TO_ONE, array('status_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('ModuleRelatedByPaymentModuleId', '\\Thelia\\Model\\Module', RelationMap::MANY_TO_ONE, array('payment_module_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('ModuleRelatedByDeliveryModuleId', '\\Thelia\\Model\\Module', RelationMap::MANY_TO_ONE, array('delivery_module_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('Lang', '\\Thelia\\Model\\Lang', RelationMap::MANY_TO_ONE, array('lang_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('OrderProduct', '\\Thelia\\Model\\OrderProduct', RelationMap::ONE_TO_MANY, array('id' => 'order_id', ), 'CASCADE', 'RESTRICT', 'OrderProducts');
         $this->addRelation('CouponOrder', '\\Thelia\\Model\\CouponOrder', RelationMap::ONE_TO_MANY, array('id' => 'order_id', ), 'CASCADE', 'RESTRICT', 'CouponOrders');
     } // buildRelations()
@@ -408,38 +411,38 @@ class OrderTableMap extends TableMap
             $criteria->addSelectColumn(OrderTableMap::ID);
             $criteria->addSelectColumn(OrderTableMap::REF);
             $criteria->addSelectColumn(OrderTableMap::CUSTOMER_ID);
-            $criteria->addSelectColumn(OrderTableMap::ADDRESS_INVOICE);
-            $criteria->addSelectColumn(OrderTableMap::ADDRESS_DELIVERY);
+            $criteria->addSelectColumn(OrderTableMap::INVOICE_ORDER_ADDRESS_ID);
+            $criteria->addSelectColumn(OrderTableMap::DELIVERY_ORDER_ADDRESS_ID);
             $criteria->addSelectColumn(OrderTableMap::INVOICE_DATE);
             $criteria->addSelectColumn(OrderTableMap::CURRENCY_ID);
             $criteria->addSelectColumn(OrderTableMap::CURRENCY_RATE);
-            $criteria->addSelectColumn(OrderTableMap::TRANSACTION);
-            $criteria->addSelectColumn(OrderTableMap::DELIVERY_NUM);
-            $criteria->addSelectColumn(OrderTableMap::INVOICE);
+            $criteria->addSelectColumn(OrderTableMap::TRANSACTION_REF);
+            $criteria->addSelectColumn(OrderTableMap::DELIVERY_REF);
+            $criteria->addSelectColumn(OrderTableMap::INVOICE_REF);
             $criteria->addSelectColumn(OrderTableMap::POSTAGE);
-            $criteria->addSelectColumn(OrderTableMap::PAYMENT);
-            $criteria->addSelectColumn(OrderTableMap::CARRIER);
+            $criteria->addSelectColumn(OrderTableMap::PAYMENT_MODULE_ID);
+            $criteria->addSelectColumn(OrderTableMap::DELIVERY_MODULE_ID);
             $criteria->addSelectColumn(OrderTableMap::STATUS_ID);
-            $criteria->addSelectColumn(OrderTableMap::LANG);
+            $criteria->addSelectColumn(OrderTableMap::LANG_ID);
             $criteria->addSelectColumn(OrderTableMap::CREATED_AT);
             $criteria->addSelectColumn(OrderTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.REF');
             $criteria->addSelectColumn($alias . '.CUSTOMER_ID');
-            $criteria->addSelectColumn($alias . '.ADDRESS_INVOICE');
-            $criteria->addSelectColumn($alias . '.ADDRESS_DELIVERY');
+            $criteria->addSelectColumn($alias . '.INVOICE_ORDER_ADDRESS_ID');
+            $criteria->addSelectColumn($alias . '.DELIVERY_ORDER_ADDRESS_ID');
             $criteria->addSelectColumn($alias . '.INVOICE_DATE');
             $criteria->addSelectColumn($alias . '.CURRENCY_ID');
             $criteria->addSelectColumn($alias . '.CURRENCY_RATE');
-            $criteria->addSelectColumn($alias . '.TRANSACTION');
-            $criteria->addSelectColumn($alias . '.DELIVERY_NUM');
-            $criteria->addSelectColumn($alias . '.INVOICE');
+            $criteria->addSelectColumn($alias . '.TRANSACTION_REF');
+            $criteria->addSelectColumn($alias . '.DELIVERY_REF');
+            $criteria->addSelectColumn($alias . '.INVOICE_REF');
             $criteria->addSelectColumn($alias . '.POSTAGE');
-            $criteria->addSelectColumn($alias . '.PAYMENT');
-            $criteria->addSelectColumn($alias . '.CARRIER');
+            $criteria->addSelectColumn($alias . '.PAYMENT_MODULE_ID');
+            $criteria->addSelectColumn($alias . '.DELIVERY_MODULE_ID');
             $criteria->addSelectColumn($alias . '.STATUS_ID');
-            $criteria->addSelectColumn($alias . '.LANG');
+            $criteria->addSelectColumn($alias . '.LANG_ID');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

@@ -78,7 +78,7 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
 
     public function testLoad()
     {
-        $productQuery = ProductQuery::create()->findOneById(1);
+        $productQuery = ProductQuery::create()->findOne();
         $countryQuery = CountryQuery::create()->findOneById(64);
 
         $calculator = new Calculator();
@@ -86,7 +86,7 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         $taxRuleQuery = $this->getMock('\Thelia\Model\TaxRuleQuery', array('getTaxCalculatorCollection'));
         $taxRuleQuery->expects($this->once())
             ->method('getTaxCalculatorCollection')
-            ->with($productQuery, $countryQuery)
+            ->with($productQuery->getTaxRule(), $countryQuery)
             ->will($this->returnValue('foo'));
 
         $rewritingUrlQuery = $this->getProperty('taxRuleQuery');

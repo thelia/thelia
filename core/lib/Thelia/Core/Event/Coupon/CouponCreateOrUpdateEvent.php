@@ -78,8 +78,8 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /** @var Coupon Coupon model */
     protected $coupon = null;
 
-    /** @var string Coupon effect */
-    protected $effect;
+    /** @var string Coupon type */
+    protected $type;
 
     /** @var string Language code ISO (ex: fr_FR) */
     protected $locale = null;
@@ -87,36 +87,22 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Constructor
      *
-     * @param string               $code                       Coupon Code
-     * @param string               $title                      Coupon title
-     * @param float                $amount                     Amount removed from the Total Checkout
-     * @param string               $effect                     Coupon effect
-     * @param string               $shortDescription           Coupon short description
-     * @param string               $description                Coupon description
-     * @param boolean              $isEnabled                  Enable/Disable
-     * @param \DateTime            $expirationDate             Coupon expiration date
-     * @param boolean              $isAvailableOnSpecialOffers Is available on special offers
-     * @param boolean              $isCumulative               Is cumulative
-     * @param boolean              $isRemovingPostage          Is removing Postage
-     * @param int                  $maxUsage                   Coupon quantity
-     * @param CouponRuleCollection $rules                      CouponRuleInterface to add
-     * @param string               $locale                     Coupon Language code ISO (ex: fr_FR)
+     * @param string $code                       Coupon Code
+     * @param string $title                      Coupon title
+     * @param float $amount                     Amount removed from the Total Checkout
+     * @param string $type                       Coupon type
+     * @param string $shortDescription           Coupon short description
+     * @param string $description                Coupon description
+     * @param boolean $isEnabled                  Enable/Disable
+     * @param \DateTime $expirationDate             Coupon expiration date
+     * @param boolean $isAvailableOnSpecialOffers Is available on special offers
+     * @param boolean $isCumulative               Is cumulative
+     * @param boolean $isRemovingPostage          Is removing Postage
+     * @param int $maxUsage                   Coupon quantity
+     * @param string $locale                     Coupon Language code ISO (ex: fr_FR)
      */
     public function __construct(
-        $code,
-        $title,
-        $amount,
-        $effect,
-        $shortDescription,
-        $description,
-        $isEnabled,
-        \DateTime $expirationDate,
-        $isAvailableOnSpecialOffers,
-        $isCumulative,
-        $isRemovingPostage,
-        $maxUsage,
-        $rules,
-        $locale
+        $code, $title, $amount, $type, $shortDescription, $description, $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $isRemovingPostage, $maxUsage, $locale
     ) {
         $this->amount = $amount;
         $this->code = $code;
@@ -127,10 +113,9 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         $this->isEnabled = $isEnabled;
         $this->isRemovingPostage = $isRemovingPostage;
         $this->maxUsage = $maxUsage;
-        $this->rules = $rules;
         $this->shortDescription = $shortDescription;
         $this->title = $title;
-        $this->effect = $effect;
+        $this->type = $type;
         $this->locale = $locale;
     }
 
@@ -207,22 +192,6 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Return condition to validate the Coupon or not
-     *
-     * @return CouponRuleCollection
-     */
-    public function getRules()
-    {
-        if ($this->rules === null || !is_object($this->rules)) {
-            $rules = $this->rules;
-        } else {
-            $rules =  clone $this->rules;
-        }
-
-        return $rules;
-    }
-
-    /**
      * Return Coupon expiration date
      *
      * @return \DateTime
@@ -264,13 +233,13 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Get Coupon effect
+     * Get Coupon type (effect)
      *
      * @return string
      */
-    public function getEffect()
+    public function getType()
     {
-        return $this->effect;
+        return $this->type;
     }
 
     /**

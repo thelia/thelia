@@ -11,7 +11,7 @@
             {/form_field}
 
             {form_field form=$form field='success_url'}
-                <input type="hidden" name="{$name}" value="{url path='/admin/coupon/update/{id}/'}" />
+                <input type="hidden" name="{$name}" value="{url path='/admin/coupon/update/{id}'}" />
             {/form_field}
 
             <div class="span4">
@@ -88,11 +88,11 @@
                     <div class="form-group {if $error}has-error{/if}">
 
                         <label for="is-unlimited" class="checkbox control-label">
-                            <input id="is-unlimited" type="checkbox" name="is-unlimited" {if $error}{else}checked{/if} >
+                            <input id="is-unlimited" type="checkbox" name="is-unlimited" >
                             {intl l='Is unlimited'}
                         </label>
                         <label id="max-usage-label" for="max-usage" class="control-label">{intl l='Max usage :'}</label>
-                        <input id="max-usage" type="text" class="form-control" name="{$name}" value="{$value}" placeholder="{intl l='max usage'}">
+                        <input id="max-usage" type="text" class="form-control" name="{$name}" value="{if !$value}-1{else}{$value}{/if}" placeholder="{intl l='max usage'}">
                         {if $error}{$message}{/if}
                     </div>
                 {/form_field}
@@ -101,17 +101,19 @@
             <div class="col-md-8">
                 <div class="well clearfix">
                     <div class="col-md-6">
-                        {form_field form=$form field='effect'}
+                        {form_field form=$form field='type'}
                             <div class="form-group {if $error}has-error{/if}">
-                                <label for="effect" class="control-label">{intl l='Effect :'}</label>
-                                <select name="{$name}" value="{$value}" id="effect" class="col-md-12 form-control">
-                                    <option value="-1" data-description="">{intl l='Please select an effect'}</option>
+                                <label for="type" class="control-label">{intl l='Type :'}</label>
+                                <select name="{$name}" id="type" class="col-md-12 form-control">
+                                    <option value="-1" data-description="">{intl l='Please select a coupon type'}</option>
                                     {foreach from=$availableCoupons item=availableCoupon}
-                                        <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" {if $value == $availableCoupon.serviceId}selected="selected"{/if}>{$availableCoupon.name}</option>
+                                        <option value="{$availableCoupon.serviceId}" data-description="{$availableCoupon.toolTip}" {if $value == $availableCoupon.serviceId}selected{/if}>
+                                            {$availableCoupon.name}
+                                        </option>
                                     {/foreach}
                                 </select>
                                 {if $error}{$message}{/if}
-                                <span id="effectToolTip" class="help-block">{$availableCoupons.0.toolTip}</span>
+                                <span id="typeToolTip" class="help-block">{$availableCoupons.0.toolTip}</span>
                             </div>
                         {/form_field}
                     </div>
@@ -283,4 +285,3 @@
         </section>
     {/if}
 </form>
-

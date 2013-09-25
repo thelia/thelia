@@ -23,18 +23,24 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\Exception\AuthenticationException;
+use Thelia\Exception\OrderException;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\ModuleQuery;
 
 class Security extends AbstractSmartyPlugin
 {
+    protected $request;
     private $securityContext;
 
-    public function __construct(SecurityContext $securityContext)
+    public function __construct(Request $request, SecurityContext $securityContext)
     {
         $this->securityContext = $securityContext;
+        $this->request = $request;
     }
 
     /**
@@ -43,31 +49,57 @@ class Security extends AbstractSmartyPlugin
      * @param  array   $params
      * @param  unknown $smarty
      * @return string  no text is returned.
+     * @throws \Thelia\Core\Security\Exception\AuthenticationException
      */
     public function checkAuthFunction($params, &$smarty)
     {
-           $roles = $this->_explode($this->getParam($params, 'roles'));
-           $permissions = $this->_explode($this->getParam($params, 'permissions'));
+        $roles = $this->_explode($this->getParam($params, 'roles'));
+        $permissions = $this->_explode($this->getParam($params, 'permissions'));
 
-           if (! $this->securityContext->isGranted($roles, $permissions)) {
+        if (! $this->securityContext->isGranted($roles, $permissions)) {
 
-               $ex = new AuthenticationException(
-                       sprintf("User not granted for roles '%s', permissions '%s' in context '%s'.",
-                               implode(',', $roles), implode(',', $permissions), $context
-                       )
-               );
+            $ex = new AuthenticationException(
+                sprintf("User not granted for roles '%s', permissions '%s' in context '%s'.",
+                    implode(',', $roles), implode(',', $permissions), $context
+                )
+            );
 
-               $loginTpl = $this->getParam($params, 'login_tpl');
+            $loginTpl = $this->getParam($params, 'login_tpl');
 
-               if (null != $loginTpl) {
-                   $ex->setLoginTemplate($loginTpl);
-               }
+            if (null != $loginTpl) {
+                $ex->setLoginTemplate($loginTpl);
+            }
 
-               throw $ex;
-           }
+            throw $ex;
+        }
 
-           return '';
+        return '';
      }
+
+    public function checkCartNotEmptyFunction($params, &$smarty)
+    {
+        $cart = $this->request->getSession()->getCart();
+        if($cart===null || $cart->countCartItems() == 0) {
+            throw new OrderException('Cart must not be empty', OrderException::CART_EMPTY, array('empty' => 1));
+        }
+
+        return "";
+    }
+
+    public function checkValidDeliveryFunction($params, &$smarty)
+    {
+        $order = $this->request->getSession()->getOrder();
+        /* Does address and module still exists ? We assume address owner can't change neither module type */
+        if($order !== null) {
+            $checkAddress = AddressQuery::create()->findPk($order->chosenDeliveryAddress);
+            $checkModule = ModuleQuery::create()->findPk($order->getDeliveryModuleId());
+        }
+        if(null === $order || null == $checkAddress || null === $checkModule) {
+            throw new OrderException('Delivery must be defined', OrderException::UNDEFINED_DELIVERY, array('missing' => 1));
+        }
+
+        return "";
+    }
 
     /**
      * Define the various smarty plugins handled by this class
@@ -77,7 +109,9 @@ class Security extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor('function', 'check_auth', $this, 'checkAuthFunction')
+            new SmartyPluginDescriptor('function', 'check_auth', $this, 'checkAuthFunction'),
+            new SmartyPluginDescriptor('function', 'check_cart_not_empty', $this, 'checkCartNotEmptyFunction'),
+            new SmartyPluginDescriptor('function', 'check_valid_delivery', $this, 'checkValidDeliveryFunction'),
         );
     }
 }

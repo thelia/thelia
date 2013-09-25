@@ -36,6 +36,10 @@ use Thelia\Core\Event\CategoryDeleteEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\CategoryToggleVisibilityEvent;
+use Thelia\Core\Event\CategoryAddContentEvent;
+use Thelia\Core\Event\CategoryDeleteContentEvent;
+use Thelia\Model\CategoryAssociatedContent;
+use Thelia\Model\CategoryAssociatedContentQuery;
 
 class Category extends BaseAction implements EventSubscriberInterface
 {
@@ -147,6 +151,38 @@ class Category extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function addContent(CategoryAddContentEvent $event) {
+
+        if (CategoryAssociatedContentQuery::create()
+            ->filterByContentId($event->getContentId())
+             ->filterByCategory($event->getCategory())->count() <= 0) {
+
+            $content = new CategoryAssociatedContent();
+
+            $content
+                ->setDispatcher($this->getDispatcher())
+                ->setCategory($event->getCategory())
+                ->setContentId($event->getContentId())
+                ->save()
+            ;
+         }
+    }
+
+    public function removeContent(CategoryDeleteContentEvent $event) {
+
+        $content = CategoryAssociatedContentQuery::create()
+            ->filterByContentId($event->getContentId())
+            ->filterByCategory($event->getCategory())->findOne()
+        ;
+
+        if ($content !== null) {
+            $content
+                ->setDispatcher($this->getDispatcher())
+                ->delete();
+        }
+    }
+
+
     /**
      * {@inheritDoc}
      */
@@ -157,7 +193,12 @@ class Category extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CATEGORY_UPDATE            => array("update", 128),
             TheliaEvents::CATEGORY_DELETE            => array("delete", 128),
             TheliaEvents::CATEGORY_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
-            TheliaEvents::CATEGORY_UPDATE_POSITION   => array("updatePosition", 128)
+
+            TheliaEvents::CATEGORY_UPDATE_POSITION   => array("updatePosition", 128),
+
+            TheliaEvents::CATEGORY_ADD_CONTENT       => array("addContent", 128),
+            TheliaEvents::CATEGORY_REMOVE_CONTENT    => array("removeContent", 128),
+
         );
     }
 }

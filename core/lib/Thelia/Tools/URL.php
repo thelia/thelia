@@ -43,14 +43,15 @@ class URL
 
     protected static $instance = null;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container = null)
     {
         // Allow singleton style calls once intanciated.
         // For this to work, the URL service has to be instanciated very early. This is done manually
         // in TheliaHttpKernel, by calling $this->container->get('thelia.url.manager');
         self::$instance = $this;
 
-        $this->requestContext = $container->get('router.admin')->getContext();
+        if ($container !== null)
+            $this->requestContext = $container->get('router.admin')->getContext();
 
         $this->retriever = new RewritingRetriever();
         $this->resolver = new RewritingResolver();

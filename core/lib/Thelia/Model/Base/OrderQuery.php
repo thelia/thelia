@@ -24,38 +24,38 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildOrderQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method     ChildOrderQuery orderByCustomerId($order = Criteria::ASC) Order by the customer_id column
- * @method     ChildOrderQuery orderByAddressInvoice($order = Criteria::ASC) Order by the address_invoice column
- * @method     ChildOrderQuery orderByAddressDelivery($order = Criteria::ASC) Order by the address_delivery column
+ * @method     ChildOrderQuery orderByInvoiceOrderAddressId($order = Criteria::ASC) Order by the invoice_order_address_id column
+ * @method     ChildOrderQuery orderByDeliveryOrderAddressId($order = Criteria::ASC) Order by the delivery_order_address_id column
  * @method     ChildOrderQuery orderByInvoiceDate($order = Criteria::ASC) Order by the invoice_date column
  * @method     ChildOrderQuery orderByCurrencyId($order = Criteria::ASC) Order by the currency_id column
  * @method     ChildOrderQuery orderByCurrencyRate($order = Criteria::ASC) Order by the currency_rate column
- * @method     ChildOrderQuery orderByTransaction($order = Criteria::ASC) Order by the transaction column
- * @method     ChildOrderQuery orderByDeliveryNum($order = Criteria::ASC) Order by the delivery_num column
- * @method     ChildOrderQuery orderByInvoice($order = Criteria::ASC) Order by the invoice column
+ * @method     ChildOrderQuery orderByTransactionRef($order = Criteria::ASC) Order by the transaction_ref column
+ * @method     ChildOrderQuery orderByDeliveryRef($order = Criteria::ASC) Order by the delivery_ref column
+ * @method     ChildOrderQuery orderByInvoiceRef($order = Criteria::ASC) Order by the invoice_ref column
  * @method     ChildOrderQuery orderByPostage($order = Criteria::ASC) Order by the postage column
- * @method     ChildOrderQuery orderByPayment($order = Criteria::ASC) Order by the payment column
- * @method     ChildOrderQuery orderByCarrier($order = Criteria::ASC) Order by the carrier column
+ * @method     ChildOrderQuery orderByPaymentModuleId($order = Criteria::ASC) Order by the payment_module_id column
+ * @method     ChildOrderQuery orderByDeliveryModuleId($order = Criteria::ASC) Order by the delivery_module_id column
  * @method     ChildOrderQuery orderByStatusId($order = Criteria::ASC) Order by the status_id column
- * @method     ChildOrderQuery orderByLang($order = Criteria::ASC) Order by the lang column
+ * @method     ChildOrderQuery orderByLangId($order = Criteria::ASC) Order by the lang_id column
  * @method     ChildOrderQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildOrderQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildOrderQuery groupById() Group by the id column
  * @method     ChildOrderQuery groupByRef() Group by the ref column
  * @method     ChildOrderQuery groupByCustomerId() Group by the customer_id column
- * @method     ChildOrderQuery groupByAddressInvoice() Group by the address_invoice column
- * @method     ChildOrderQuery groupByAddressDelivery() Group by the address_delivery column
+ * @method     ChildOrderQuery groupByInvoiceOrderAddressId() Group by the invoice_order_address_id column
+ * @method     ChildOrderQuery groupByDeliveryOrderAddressId() Group by the delivery_order_address_id column
  * @method     ChildOrderQuery groupByInvoiceDate() Group by the invoice_date column
  * @method     ChildOrderQuery groupByCurrencyId() Group by the currency_id column
  * @method     ChildOrderQuery groupByCurrencyRate() Group by the currency_rate column
- * @method     ChildOrderQuery groupByTransaction() Group by the transaction column
- * @method     ChildOrderQuery groupByDeliveryNum() Group by the delivery_num column
- * @method     ChildOrderQuery groupByInvoice() Group by the invoice column
+ * @method     ChildOrderQuery groupByTransactionRef() Group by the transaction_ref column
+ * @method     ChildOrderQuery groupByDeliveryRef() Group by the delivery_ref column
+ * @method     ChildOrderQuery groupByInvoiceRef() Group by the invoice_ref column
  * @method     ChildOrderQuery groupByPostage() Group by the postage column
- * @method     ChildOrderQuery groupByPayment() Group by the payment column
- * @method     ChildOrderQuery groupByCarrier() Group by the carrier column
+ * @method     ChildOrderQuery groupByPaymentModuleId() Group by the payment_module_id column
+ * @method     ChildOrderQuery groupByDeliveryModuleId() Group by the delivery_module_id column
  * @method     ChildOrderQuery groupByStatusId() Group by the status_id column
- * @method     ChildOrderQuery groupByLang() Group by the lang column
+ * @method     ChildOrderQuery groupByLangId() Group by the lang_id column
  * @method     ChildOrderQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildOrderQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -71,17 +71,29 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery rightJoinCustomer($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Customer relation
  * @method     ChildOrderQuery innerJoinCustomer($relationAlias = null) Adds a INNER JOIN clause to the query using the Customer relation
  *
- * @method     ChildOrderQuery leftJoinOrderAddressRelatedByAddressInvoice($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderAddressRelatedByAddressInvoice relation
- * @method     ChildOrderQuery rightJoinOrderAddressRelatedByAddressInvoice($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderAddressRelatedByAddressInvoice relation
- * @method     ChildOrderQuery innerJoinOrderAddressRelatedByAddressInvoice($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderAddressRelatedByAddressInvoice relation
+ * @method     ChildOrderQuery leftJoinOrderAddressRelatedByInvoiceOrderAddressId($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderAddressRelatedByInvoiceOrderAddressId relation
+ * @method     ChildOrderQuery rightJoinOrderAddressRelatedByInvoiceOrderAddressId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderAddressRelatedByInvoiceOrderAddressId relation
+ * @method     ChildOrderQuery innerJoinOrderAddressRelatedByInvoiceOrderAddressId($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderAddressRelatedByInvoiceOrderAddressId relation
  *
- * @method     ChildOrderQuery leftJoinOrderAddressRelatedByAddressDelivery($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderAddressRelatedByAddressDelivery relation
- * @method     ChildOrderQuery rightJoinOrderAddressRelatedByAddressDelivery($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderAddressRelatedByAddressDelivery relation
- * @method     ChildOrderQuery innerJoinOrderAddressRelatedByAddressDelivery($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderAddressRelatedByAddressDelivery relation
+ * @method     ChildOrderQuery leftJoinOrderAddressRelatedByDeliveryOrderAddressId($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderAddressRelatedByDeliveryOrderAddressId relation
+ * @method     ChildOrderQuery rightJoinOrderAddressRelatedByDeliveryOrderAddressId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderAddressRelatedByDeliveryOrderAddressId relation
+ * @method     ChildOrderQuery innerJoinOrderAddressRelatedByDeliveryOrderAddressId($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderAddressRelatedByDeliveryOrderAddressId relation
  *
  * @method     ChildOrderQuery leftJoinOrderStatus($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderStatus relation
  * @method     ChildOrderQuery rightJoinOrderStatus($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderStatus relation
  * @method     ChildOrderQuery innerJoinOrderStatus($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderStatus relation
+ *
+ * @method     ChildOrderQuery leftJoinModuleRelatedByPaymentModuleId($relationAlias = null) Adds a LEFT JOIN clause to the query using the ModuleRelatedByPaymentModuleId relation
+ * @method     ChildOrderQuery rightJoinModuleRelatedByPaymentModuleId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ModuleRelatedByPaymentModuleId relation
+ * @method     ChildOrderQuery innerJoinModuleRelatedByPaymentModuleId($relationAlias = null) Adds a INNER JOIN clause to the query using the ModuleRelatedByPaymentModuleId relation
+ *
+ * @method     ChildOrderQuery leftJoinModuleRelatedByDeliveryModuleId($relationAlias = null) Adds a LEFT JOIN clause to the query using the ModuleRelatedByDeliveryModuleId relation
+ * @method     ChildOrderQuery rightJoinModuleRelatedByDeliveryModuleId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ModuleRelatedByDeliveryModuleId relation
+ * @method     ChildOrderQuery innerJoinModuleRelatedByDeliveryModuleId($relationAlias = null) Adds a INNER JOIN clause to the query using the ModuleRelatedByDeliveryModuleId relation
+ *
+ * @method     ChildOrderQuery leftJoinLang($relationAlias = null) Adds a LEFT JOIN clause to the query using the Lang relation
+ * @method     ChildOrderQuery rightJoinLang($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Lang relation
+ * @method     ChildOrderQuery innerJoinLang($relationAlias = null) Adds a INNER JOIN clause to the query using the Lang relation
  *
  * @method     ChildOrderQuery leftJoinOrderProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderProduct relation
  * @method     ChildOrderQuery rightJoinOrderProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderProduct relation
@@ -97,38 +109,38 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrder findOneById(int $id) Return the first ChildOrder filtered by the id column
  * @method     ChildOrder findOneByRef(string $ref) Return the first ChildOrder filtered by the ref column
  * @method     ChildOrder findOneByCustomerId(int $customer_id) Return the first ChildOrder filtered by the customer_id column
- * @method     ChildOrder findOneByAddressInvoice(int $address_invoice) Return the first ChildOrder filtered by the address_invoice column
- * @method     ChildOrder findOneByAddressDelivery(int $address_delivery) Return the first ChildOrder filtered by the address_delivery column
+ * @method     ChildOrder findOneByInvoiceOrderAddressId(int $invoice_order_address_id) Return the first ChildOrder filtered by the invoice_order_address_id column
+ * @method     ChildOrder findOneByDeliveryOrderAddressId(int $delivery_order_address_id) Return the first ChildOrder filtered by the delivery_order_address_id column
  * @method     ChildOrder findOneByInvoiceDate(string $invoice_date) Return the first ChildOrder filtered by the invoice_date column
  * @method     ChildOrder findOneByCurrencyId(int $currency_id) Return the first ChildOrder filtered by the currency_id column
  * @method     ChildOrder findOneByCurrencyRate(double $currency_rate) Return the first ChildOrder filtered by the currency_rate column
- * @method     ChildOrder findOneByTransaction(string $transaction) Return the first ChildOrder filtered by the transaction column
- * @method     ChildOrder findOneByDeliveryNum(string $delivery_num) Return the first ChildOrder filtered by the delivery_num column
- * @method     ChildOrder findOneByInvoice(string $invoice) Return the first ChildOrder filtered by the invoice column
+ * @method     ChildOrder findOneByTransactionRef(string $transaction_ref) Return the first ChildOrder filtered by the transaction_ref column
+ * @method     ChildOrder findOneByDeliveryRef(string $delivery_ref) Return the first ChildOrder filtered by the delivery_ref column
+ * @method     ChildOrder findOneByInvoiceRef(string $invoice_ref) Return the first ChildOrder filtered by the invoice_ref column
  * @method     ChildOrder findOneByPostage(double $postage) Return the first ChildOrder filtered by the postage column
- * @method     ChildOrder findOneByPayment(string $payment) Return the first ChildOrder filtered by the payment column
- * @method     ChildOrder findOneByCarrier(string $carrier) Return the first ChildOrder filtered by the carrier column
+ * @method     ChildOrder findOneByPaymentModuleId(int $payment_module_id) Return the first ChildOrder filtered by the payment_module_id column
+ * @method     ChildOrder findOneByDeliveryModuleId(int $delivery_module_id) Return the first ChildOrder filtered by the delivery_module_id column
  * @method     ChildOrder findOneByStatusId(int $status_id) Return the first ChildOrder filtered by the status_id column
- * @method     ChildOrder findOneByLang(string $lang) Return the first ChildOrder filtered by the lang column
+ * @method     ChildOrder findOneByLangId(int $lang_id) Return the first ChildOrder filtered by the lang_id column
  * @method     ChildOrder findOneByCreatedAt(string $created_at) Return the first ChildOrder filtered by the created_at column
  * @method     ChildOrder findOneByUpdatedAt(string $updated_at) Return the first ChildOrder filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildOrder objects filtered by the id column
  * @method     array findByRef(string $ref) Return ChildOrder objects filtered by the ref column
  * @method     array findByCustomerId(int $customer_id) Return ChildOrder objects filtered by the customer_id column
- * @method     array findByAddressInvoice(int $address_invoice) Return ChildOrder objects filtered by the address_invoice column
- * @method     array findByAddressDelivery(int $address_delivery) Return ChildOrder objects filtered by the address_delivery column
+ * @method     array findByInvoiceOrderAddressId(int $invoice_order_address_id) Return ChildOrder objects filtered by the invoice_order_address_id column
+ * @method     array findByDeliveryOrderAddressId(int $delivery_order_address_id) Return ChildOrder objects filtered by the delivery_order_address_id column
  * @method     array findByInvoiceDate(string $invoice_date) Return ChildOrder objects filtered by the invoice_date column
  * @method     array findByCurrencyId(int $currency_id) Return ChildOrder objects filtered by the currency_id column
  * @method     array findByCurrencyRate(double $currency_rate) Return ChildOrder objects filtered by the currency_rate column
- * @method     array findByTransaction(string $transaction) Return ChildOrder objects filtered by the transaction column
- * @method     array findByDeliveryNum(string $delivery_num) Return ChildOrder objects filtered by the delivery_num column
- * @method     array findByInvoice(string $invoice) Return ChildOrder objects filtered by the invoice column
+ * @method     array findByTransactionRef(string $transaction_ref) Return ChildOrder objects filtered by the transaction_ref column
+ * @method     array findByDeliveryRef(string $delivery_ref) Return ChildOrder objects filtered by the delivery_ref column
+ * @method     array findByInvoiceRef(string $invoice_ref) Return ChildOrder objects filtered by the invoice_ref column
  * @method     array findByPostage(double $postage) Return ChildOrder objects filtered by the postage column
- * @method     array findByPayment(string $payment) Return ChildOrder objects filtered by the payment column
- * @method     array findByCarrier(string $carrier) Return ChildOrder objects filtered by the carrier column
+ * @method     array findByPaymentModuleId(int $payment_module_id) Return ChildOrder objects filtered by the payment_module_id column
+ * @method     array findByDeliveryModuleId(int $delivery_module_id) Return ChildOrder objects filtered by the delivery_module_id column
  * @method     array findByStatusId(int $status_id) Return ChildOrder objects filtered by the status_id column
- * @method     array findByLang(string $lang) Return ChildOrder objects filtered by the lang column
+ * @method     array findByLangId(int $lang_id) Return ChildOrder objects filtered by the lang_id column
  * @method     array findByCreatedAt(string $created_at) Return ChildOrder objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildOrder objects filtered by the updated_at column
  *
@@ -219,7 +231,7 @@ abstract class OrderQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, REF, CUSTOMER_ID, ADDRESS_INVOICE, ADDRESS_DELIVERY, INVOICE_DATE, CURRENCY_ID, CURRENCY_RATE, TRANSACTION, DELIVERY_NUM, INVOICE, POSTAGE, PAYMENT, CARRIER, STATUS_ID, LANG, CREATED_AT, UPDATED_AT FROM order WHERE ID = :p0';
+        $sql = 'SELECT ID, REF, CUSTOMER_ID, INVOICE_ORDER_ADDRESS_ID, DELIVERY_ORDER_ADDRESS_ID, INVOICE_DATE, CURRENCY_ID, CURRENCY_RATE, TRANSACTION_REF, DELIVERY_REF, INVOICE_REF, POSTAGE, PAYMENT_MODULE_ID, DELIVERY_MODULE_ID, STATUS_ID, LANG_ID, CREATED_AT, UPDATED_AT FROM order WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -422,18 +434,18 @@ abstract class OrderQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the address_invoice column
+     * Filter the query on the invoice_order_address_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByAddressInvoice(1234); // WHERE address_invoice = 1234
-     * $query->filterByAddressInvoice(array(12, 34)); // WHERE address_invoice IN (12, 34)
-     * $query->filterByAddressInvoice(array('min' => 12)); // WHERE address_invoice > 12
+     * $query->filterByInvoiceOrderAddressId(1234); // WHERE invoice_order_address_id = 1234
+     * $query->filterByInvoiceOrderAddressId(array(12, 34)); // WHERE invoice_order_address_id IN (12, 34)
+     * $query->filterByInvoiceOrderAddressId(array('min' => 12)); // WHERE invoice_order_address_id > 12
      * </code>
      *
-     * @see       filterByOrderAddressRelatedByAddressInvoice()
+     * @see       filterByOrderAddressRelatedByInvoiceOrderAddressId()
      *
-     * @param     mixed $addressInvoice The value to use as filter.
+     * @param     mixed $invoiceOrderAddressId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -441,16 +453,16 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function filterByAddressInvoice($addressInvoice = null, $comparison = null)
+    public function filterByInvoiceOrderAddressId($invoiceOrderAddressId = null, $comparison = null)
     {
-        if (is_array($addressInvoice)) {
+        if (is_array($invoiceOrderAddressId)) {
             $useMinMax = false;
-            if (isset($addressInvoice['min'])) {
-                $this->addUsingAlias(OrderTableMap::ADDRESS_INVOICE, $addressInvoice['min'], Criteria::GREATER_EQUAL);
+            if (isset($invoiceOrderAddressId['min'])) {
+                $this->addUsingAlias(OrderTableMap::INVOICE_ORDER_ADDRESS_ID, $invoiceOrderAddressId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($addressInvoice['max'])) {
-                $this->addUsingAlias(OrderTableMap::ADDRESS_INVOICE, $addressInvoice['max'], Criteria::LESS_EQUAL);
+            if (isset($invoiceOrderAddressId['max'])) {
+                $this->addUsingAlias(OrderTableMap::INVOICE_ORDER_ADDRESS_ID, $invoiceOrderAddressId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -461,22 +473,22 @@ abstract class OrderQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(OrderTableMap::ADDRESS_INVOICE, $addressInvoice, $comparison);
+        return $this->addUsingAlias(OrderTableMap::INVOICE_ORDER_ADDRESS_ID, $invoiceOrderAddressId, $comparison);
     }
 
     /**
-     * Filter the query on the address_delivery column
+     * Filter the query on the delivery_order_address_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByAddressDelivery(1234); // WHERE address_delivery = 1234
-     * $query->filterByAddressDelivery(array(12, 34)); // WHERE address_delivery IN (12, 34)
-     * $query->filterByAddressDelivery(array('min' => 12)); // WHERE address_delivery > 12
+     * $query->filterByDeliveryOrderAddressId(1234); // WHERE delivery_order_address_id = 1234
+     * $query->filterByDeliveryOrderAddressId(array(12, 34)); // WHERE delivery_order_address_id IN (12, 34)
+     * $query->filterByDeliveryOrderAddressId(array('min' => 12)); // WHERE delivery_order_address_id > 12
      * </code>
      *
-     * @see       filterByOrderAddressRelatedByAddressDelivery()
+     * @see       filterByOrderAddressRelatedByDeliveryOrderAddressId()
      *
-     * @param     mixed $addressDelivery The value to use as filter.
+     * @param     mixed $deliveryOrderAddressId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -484,16 +496,16 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function filterByAddressDelivery($addressDelivery = null, $comparison = null)
+    public function filterByDeliveryOrderAddressId($deliveryOrderAddressId = null, $comparison = null)
     {
-        if (is_array($addressDelivery)) {
+        if (is_array($deliveryOrderAddressId)) {
             $useMinMax = false;
-            if (isset($addressDelivery['min'])) {
-                $this->addUsingAlias(OrderTableMap::ADDRESS_DELIVERY, $addressDelivery['min'], Criteria::GREATER_EQUAL);
+            if (isset($deliveryOrderAddressId['min'])) {
+                $this->addUsingAlias(OrderTableMap::DELIVERY_ORDER_ADDRESS_ID, $deliveryOrderAddressId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($addressDelivery['max'])) {
-                $this->addUsingAlias(OrderTableMap::ADDRESS_DELIVERY, $addressDelivery['max'], Criteria::LESS_EQUAL);
+            if (isset($deliveryOrderAddressId['max'])) {
+                $this->addUsingAlias(OrderTableMap::DELIVERY_ORDER_ADDRESS_ID, $deliveryOrderAddressId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -504,7 +516,7 @@ abstract class OrderQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(OrderTableMap::ADDRESS_DELIVERY, $addressDelivery, $comparison);
+        return $this->addUsingAlias(OrderTableMap::DELIVERY_ORDER_ADDRESS_ID, $deliveryOrderAddressId, $comparison);
     }
 
     /**
@@ -635,90 +647,90 @@ abstract class OrderQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the transaction column
+     * Filter the query on the transaction_ref column
      *
      * Example usage:
      * <code>
-     * $query->filterByTransaction('fooValue');   // WHERE transaction = 'fooValue'
-     * $query->filterByTransaction('%fooValue%'); // WHERE transaction LIKE '%fooValue%'
+     * $query->filterByTransactionRef('fooValue');   // WHERE transaction_ref = 'fooValue'
+     * $query->filterByTransactionRef('%fooValue%'); // WHERE transaction_ref LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $transaction The value to use as filter.
+     * @param     string $transactionRef The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function filterByTransaction($transaction = null, $comparison = null)
+    public function filterByTransactionRef($transactionRef = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($transaction)) {
+            if (is_array($transactionRef)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $transaction)) {
-                $transaction = str_replace('*', '%', $transaction);
+            } elseif (preg_match('/[\%\*]/', $transactionRef)) {
+                $transactionRef = str_replace('*', '%', $transactionRef);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(OrderTableMap::TRANSACTION, $transaction, $comparison);
+        return $this->addUsingAlias(OrderTableMap::TRANSACTION_REF, $transactionRef, $comparison);
     }
 
     /**
-     * Filter the query on the delivery_num column
+     * Filter the query on the delivery_ref column
      *
      * Example usage:
      * <code>
-     * $query->filterByDeliveryNum('fooValue');   // WHERE delivery_num = 'fooValue'
-     * $query->filterByDeliveryNum('%fooValue%'); // WHERE delivery_num LIKE '%fooValue%'
+     * $query->filterByDeliveryRef('fooValue');   // WHERE delivery_ref = 'fooValue'
+     * $query->filterByDeliveryRef('%fooValue%'); // WHERE delivery_ref LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $deliveryNum The value to use as filter.
+     * @param     string $deliveryRef The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function filterByDeliveryNum($deliveryNum = null, $comparison = null)
+    public function filterByDeliveryRef($deliveryRef = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($deliveryNum)) {
+            if (is_array($deliveryRef)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $deliveryNum)) {
-                $deliveryNum = str_replace('*', '%', $deliveryNum);
+            } elseif (preg_match('/[\%\*]/', $deliveryRef)) {
+                $deliveryRef = str_replace('*', '%', $deliveryRef);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(OrderTableMap::DELIVERY_NUM, $deliveryNum, $comparison);
+        return $this->addUsingAlias(OrderTableMap::DELIVERY_REF, $deliveryRef, $comparison);
     }
 
     /**
-     * Filter the query on the invoice column
+     * Filter the query on the invoice_ref column
      *
      * Example usage:
      * <code>
-     * $query->filterByInvoice('fooValue');   // WHERE invoice = 'fooValue'
-     * $query->filterByInvoice('%fooValue%'); // WHERE invoice LIKE '%fooValue%'
+     * $query->filterByInvoiceRef('fooValue');   // WHERE invoice_ref = 'fooValue'
+     * $query->filterByInvoiceRef('%fooValue%'); // WHERE invoice_ref LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $invoice The value to use as filter.
+     * @param     string $invoiceRef The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function filterByInvoice($invoice = null, $comparison = null)
+    public function filterByInvoiceRef($invoiceRef = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($invoice)) {
+            if (is_array($invoiceRef)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $invoice)) {
-                $invoice = str_replace('*', '%', $invoice);
+            } elseif (preg_match('/[\%\*]/', $invoiceRef)) {
+                $invoiceRef = str_replace('*', '%', $invoiceRef);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(OrderTableMap::INVOICE, $invoice, $comparison);
+        return $this->addUsingAlias(OrderTableMap::INVOICE_REF, $invoiceRef, $comparison);
     }
 
     /**
@@ -763,61 +775,89 @@ abstract class OrderQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the payment column
+     * Filter the query on the payment_module_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByPayment('fooValue');   // WHERE payment = 'fooValue'
-     * $query->filterByPayment('%fooValue%'); // WHERE payment LIKE '%fooValue%'
+     * $query->filterByPaymentModuleId(1234); // WHERE payment_module_id = 1234
+     * $query->filterByPaymentModuleId(array(12, 34)); // WHERE payment_module_id IN (12, 34)
+     * $query->filterByPaymentModuleId(array('min' => 12)); // WHERE payment_module_id > 12
      * </code>
      *
-     * @param     string $payment The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
+     * @see       filterByModuleRelatedByPaymentModuleId()
+     *
+     * @param     mixed $paymentModuleId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function filterByPayment($payment = null, $comparison = null)
+    public function filterByPaymentModuleId($paymentModuleId = null, $comparison = null)
     {
-        if (null === $comparison) {
-            if (is_array($payment)) {
+        if (is_array($paymentModuleId)) {
+            $useMinMax = false;
+            if (isset($paymentModuleId['min'])) {
+                $this->addUsingAlias(OrderTableMap::PAYMENT_MODULE_ID, $paymentModuleId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($paymentModuleId['max'])) {
+                $this->addUsingAlias(OrderTableMap::PAYMENT_MODULE_ID, $paymentModuleId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $payment)) {
-                $payment = str_replace('*', '%', $payment);
-                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(OrderTableMap::PAYMENT, $payment, $comparison);
+        return $this->addUsingAlias(OrderTableMap::PAYMENT_MODULE_ID, $paymentModuleId, $comparison);
     }
 
     /**
-     * Filter the query on the carrier column
+     * Filter the query on the delivery_module_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByCarrier('fooValue');   // WHERE carrier = 'fooValue'
-     * $query->filterByCarrier('%fooValue%'); // WHERE carrier LIKE '%fooValue%'
+     * $query->filterByDeliveryModuleId(1234); // WHERE delivery_module_id = 1234
+     * $query->filterByDeliveryModuleId(array(12, 34)); // WHERE delivery_module_id IN (12, 34)
+     * $query->filterByDeliveryModuleId(array('min' => 12)); // WHERE delivery_module_id > 12
      * </code>
      *
-     * @param     string $carrier The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
+     * @see       filterByModuleRelatedByDeliveryModuleId()
+     *
+     * @param     mixed $deliveryModuleId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function filterByCarrier($carrier = null, $comparison = null)
+    public function filterByDeliveryModuleId($deliveryModuleId = null, $comparison = null)
     {
-        if (null === $comparison) {
-            if (is_array($carrier)) {
+        if (is_array($deliveryModuleId)) {
+            $useMinMax = false;
+            if (isset($deliveryModuleId['min'])) {
+                $this->addUsingAlias(OrderTableMap::DELIVERY_MODULE_ID, $deliveryModuleId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($deliveryModuleId['max'])) {
+                $this->addUsingAlias(OrderTableMap::DELIVERY_MODULE_ID, $deliveryModuleId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $carrier)) {
-                $carrier = str_replace('*', '%', $carrier);
-                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(OrderTableMap::CARRIER, $carrier, $comparison);
+        return $this->addUsingAlias(OrderTableMap::DELIVERY_MODULE_ID, $deliveryModuleId, $comparison);
     }
 
     /**
@@ -864,32 +904,46 @@ abstract class OrderQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the lang column
+     * Filter the query on the lang_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByLang('fooValue');   // WHERE lang = 'fooValue'
-     * $query->filterByLang('%fooValue%'); // WHERE lang LIKE '%fooValue%'
+     * $query->filterByLangId(1234); // WHERE lang_id = 1234
+     * $query->filterByLangId(array(12, 34)); // WHERE lang_id IN (12, 34)
+     * $query->filterByLangId(array('min' => 12)); // WHERE lang_id > 12
      * </code>
      *
-     * @param     string $lang The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
+     * @see       filterByLang()
+     *
+     * @param     mixed $langId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function filterByLang($lang = null, $comparison = null)
+    public function filterByLangId($langId = null, $comparison = null)
     {
-        if (null === $comparison) {
-            if (is_array($lang)) {
+        if (is_array($langId)) {
+            $useMinMax = false;
+            if (isset($langId['min'])) {
+                $this->addUsingAlias(OrderTableMap::LANG_ID, $langId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($langId['max'])) {
+                $this->addUsingAlias(OrderTableMap::LANG_ID, $langId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $lang)) {
-                $lang = str_replace('*', '%', $lang);
-                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(OrderTableMap::LANG, $lang, $comparison);
+        return $this->addUsingAlias(OrderTableMap::LANG_ID, $langId, $comparison);
     }
 
     /**
@@ -1011,7 +1065,7 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function joinCurrency($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinCurrency($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Currency');
@@ -1046,7 +1100,7 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\CurrencyQuery A secondary query class using the current class as primary query
      */
-    public function useCurrencyQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useCurrencyQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinCurrency($relationAlias, $joinType)
@@ -1136,35 +1190,35 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function filterByOrderAddressRelatedByAddressInvoice($orderAddress, $comparison = null)
+    public function filterByOrderAddressRelatedByInvoiceOrderAddressId($orderAddress, $comparison = null)
     {
         if ($orderAddress instanceof \Thelia\Model\OrderAddress) {
             return $this
-                ->addUsingAlias(OrderTableMap::ADDRESS_INVOICE, $orderAddress->getId(), $comparison);
+                ->addUsingAlias(OrderTableMap::INVOICE_ORDER_ADDRESS_ID, $orderAddress->getId(), $comparison);
         } elseif ($orderAddress instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(OrderTableMap::ADDRESS_INVOICE, $orderAddress->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(OrderTableMap::INVOICE_ORDER_ADDRESS_ID, $orderAddress->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByOrderAddressRelatedByAddressInvoice() only accepts arguments of type \Thelia\Model\OrderAddress or Collection');
+            throw new PropelException('filterByOrderAddressRelatedByInvoiceOrderAddressId() only accepts arguments of type \Thelia\Model\OrderAddress or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the OrderAddressRelatedByAddressInvoice relation
+     * Adds a JOIN clause to the query using the OrderAddressRelatedByInvoiceOrderAddressId relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function joinOrderAddressRelatedByAddressInvoice($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinOrderAddressRelatedByInvoiceOrderAddressId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('OrderAddressRelatedByAddressInvoice');
+        $relationMap = $tableMap->getRelation('OrderAddressRelatedByInvoiceOrderAddressId');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1179,14 +1233,14 @@ abstract class OrderQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'OrderAddressRelatedByAddressInvoice');
+            $this->addJoinObject($join, 'OrderAddressRelatedByInvoiceOrderAddressId');
         }
 
         return $this;
     }
 
     /**
-     * Use the OrderAddressRelatedByAddressInvoice relation OrderAddress object
+     * Use the OrderAddressRelatedByInvoiceOrderAddressId relation OrderAddress object
      *
      * @see useQuery()
      *
@@ -1196,11 +1250,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\OrderAddressQuery A secondary query class using the current class as primary query
      */
-    public function useOrderAddressRelatedByAddressInvoiceQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useOrderAddressRelatedByInvoiceOrderAddressIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinOrderAddressRelatedByAddressInvoice($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'OrderAddressRelatedByAddressInvoice', '\Thelia\Model\OrderAddressQuery');
+            ->joinOrderAddressRelatedByInvoiceOrderAddressId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderAddressRelatedByInvoiceOrderAddressId', '\Thelia\Model\OrderAddressQuery');
     }
 
     /**
@@ -1211,35 +1265,35 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function filterByOrderAddressRelatedByAddressDelivery($orderAddress, $comparison = null)
+    public function filterByOrderAddressRelatedByDeliveryOrderAddressId($orderAddress, $comparison = null)
     {
         if ($orderAddress instanceof \Thelia\Model\OrderAddress) {
             return $this
-                ->addUsingAlias(OrderTableMap::ADDRESS_DELIVERY, $orderAddress->getId(), $comparison);
+                ->addUsingAlias(OrderTableMap::DELIVERY_ORDER_ADDRESS_ID, $orderAddress->getId(), $comparison);
         } elseif ($orderAddress instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(OrderTableMap::ADDRESS_DELIVERY, $orderAddress->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(OrderTableMap::DELIVERY_ORDER_ADDRESS_ID, $orderAddress->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByOrderAddressRelatedByAddressDelivery() only accepts arguments of type \Thelia\Model\OrderAddress or Collection');
+            throw new PropelException('filterByOrderAddressRelatedByDeliveryOrderAddressId() only accepts arguments of type \Thelia\Model\OrderAddress or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the OrderAddressRelatedByAddressDelivery relation
+     * Adds a JOIN clause to the query using the OrderAddressRelatedByDeliveryOrderAddressId relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function joinOrderAddressRelatedByAddressDelivery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinOrderAddressRelatedByDeliveryOrderAddressId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('OrderAddressRelatedByAddressDelivery');
+        $relationMap = $tableMap->getRelation('OrderAddressRelatedByDeliveryOrderAddressId');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1254,14 +1308,14 @@ abstract class OrderQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'OrderAddressRelatedByAddressDelivery');
+            $this->addJoinObject($join, 'OrderAddressRelatedByDeliveryOrderAddressId');
         }
 
         return $this;
     }
 
     /**
-     * Use the OrderAddressRelatedByAddressDelivery relation OrderAddress object
+     * Use the OrderAddressRelatedByDeliveryOrderAddressId relation OrderAddress object
      *
      * @see useQuery()
      *
@@ -1271,11 +1325,11 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\OrderAddressQuery A secondary query class using the current class as primary query
      */
-    public function useOrderAddressRelatedByAddressDeliveryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useOrderAddressRelatedByDeliveryOrderAddressIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinOrderAddressRelatedByAddressDelivery($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'OrderAddressRelatedByAddressDelivery', '\Thelia\Model\OrderAddressQuery');
+            ->joinOrderAddressRelatedByDeliveryOrderAddressId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderAddressRelatedByDeliveryOrderAddressId', '\Thelia\Model\OrderAddressQuery');
     }
 
     /**
@@ -1311,7 +1365,7 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @return ChildOrderQuery The current query, for fluid interface
      */
-    public function joinOrderStatus($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinOrderStatus($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('OrderStatus');
@@ -1346,11 +1400,236 @@ abstract class OrderQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\OrderStatusQuery A secondary query class using the current class as primary query
      */
-    public function useOrderStatusQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useOrderStatusQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinOrderStatus($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'OrderStatus', '\Thelia\Model\OrderStatusQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Module object
+     *
+     * @param \Thelia\Model\Module|ObjectCollection $module The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByModuleRelatedByPaymentModuleId($module, $comparison = null)
+    {
+        if ($module instanceof \Thelia\Model\Module) {
+            return $this
+                ->addUsingAlias(OrderTableMap::PAYMENT_MODULE_ID, $module->getId(), $comparison);
+        } elseif ($module instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(OrderTableMap::PAYMENT_MODULE_ID, $module->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByModuleRelatedByPaymentModuleId() only accepts arguments of type \Thelia\Model\Module or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ModuleRelatedByPaymentModuleId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function joinModuleRelatedByPaymentModuleId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ModuleRelatedByPaymentModuleId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ModuleRelatedByPaymentModuleId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ModuleRelatedByPaymentModuleId relation Module object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ModuleQuery A secondary query class using the current class as primary query
+     */
+    public function useModuleRelatedByPaymentModuleIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinModuleRelatedByPaymentModuleId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ModuleRelatedByPaymentModuleId', '\Thelia\Model\ModuleQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Module object
+     *
+     * @param \Thelia\Model\Module|ObjectCollection $module The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByModuleRelatedByDeliveryModuleId($module, $comparison = null)
+    {
+        if ($module instanceof \Thelia\Model\Module) {
+            return $this
+                ->addUsingAlias(OrderTableMap::DELIVERY_MODULE_ID, $module->getId(), $comparison);
+        } elseif ($module instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(OrderTableMap::DELIVERY_MODULE_ID, $module->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByModuleRelatedByDeliveryModuleId() only accepts arguments of type \Thelia\Model\Module or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ModuleRelatedByDeliveryModuleId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function joinModuleRelatedByDeliveryModuleId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ModuleRelatedByDeliveryModuleId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ModuleRelatedByDeliveryModuleId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ModuleRelatedByDeliveryModuleId relation Module object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ModuleQuery A secondary query class using the current class as primary query
+     */
+    public function useModuleRelatedByDeliveryModuleIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinModuleRelatedByDeliveryModuleId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ModuleRelatedByDeliveryModuleId', '\Thelia\Model\ModuleQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Lang object
+     *
+     * @param \Thelia\Model\Lang|ObjectCollection $lang The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByLang($lang, $comparison = null)
+    {
+        if ($lang instanceof \Thelia\Model\Lang) {
+            return $this
+                ->addUsingAlias(OrderTableMap::LANG_ID, $lang->getId(), $comparison);
+        } elseif ($lang instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(OrderTableMap::LANG_ID, $lang->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByLang() only accepts arguments of type \Thelia\Model\Lang or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Lang relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function joinLang($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Lang');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Lang');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Lang relation Lang object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\LangQuery A secondary query class using the current class as primary query
+     */
+    public function useLangQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinLang($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Lang', '\Thelia\Model\LangQuery');
     }
 
     /**

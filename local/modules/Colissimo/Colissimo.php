@@ -25,6 +25,7 @@ namespace Colissimo;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Model\Country;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
 
@@ -57,13 +58,18 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
      *
      * calculate and return delivery price
      *
-     * @param null $country
+     * @param Country $country
      * @return mixed
      */
-    public function calculate($country = null)
+    public function getPostage(Country $country)
     {
-        // TODO: Implement calculate() method.
+        // TODO: Implement getPostage() method.
         return 2;
+    }
+
+    public function afterActivation()
+    {
+
     }
 
     /**
@@ -78,6 +84,11 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
     public function destroy()
     {
         // TODO: Implement destroy() method.
+    }
+
+    public function getCode()
+    {
+        return 'Colissimo';
     }
 
 }

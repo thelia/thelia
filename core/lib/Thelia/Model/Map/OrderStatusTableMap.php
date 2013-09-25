@@ -150,7 +150,7 @@ class OrderStatusTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('CODE', 'Code', 'VARCHAR', false, 45, null);
+        $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -160,7 +160,7 @@ class OrderStatusTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'status_id', ), 'SET NULL', 'RESTRICT', 'Orders');
+        $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'status_id', ), 'RESTRICT', 'RESTRICT', 'Orders');
         $this->addRelation('OrderStatusI18n', '\\Thelia\\Model\\OrderStatusI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'OrderStatusI18ns');
     } // buildRelations()
 
@@ -184,7 +184,6 @@ class OrderStatusTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                OrderTableMap::clearInstancePool();
                 OrderStatusI18nTableMap::clearInstancePool();
             }
 

@@ -97,6 +97,7 @@
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">cart</default>
     </route>
+
     <route id="cart.add.process" path="/cart/add">
         <default key="_controller">Thelia\Controller\Front\CartController::addItem</default>
     </route>
@@ -114,9 +115,33 @@
     <!-- end cart routes -->
 
     <!-- order management process -->
-    <route id="order.delivery.add" path="/delivery/choose/{delivery_id}">
-        <default key="_controller">Thelia\Controller\Front\DeliveryController::select</default>
-        <requirement key="delivery_id">\d+</requirement>
+    <route id="order.delivery.process" path="/order/delivery" methods="post">
+        <default key="_controller">Thelia\Controller\Front\OrderController::deliver</default>
+        <default key="_view">order_delivery</default>
+    </route>
+
+    <route id="order.delivery" path="/order/delivery">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">order_delivery</default>
+    </route>
+
+    <route id="order.invoice.process" path="/order/invoice" methods="post">
+        <default key="_controller">Thelia\Controller\Front\OrderController::invoice</default>
+        <default key="_view">order_invoice</default>
+    </route>
+
+    <route id="order.invoice" path="/order/invoice">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">order_invoice</default>
+    </route>
+
+    <route id="order.payment.process" path="/order/pay">
+        <default key="_controller">Thelia\Controller\Front\OrderController::pay</default>
+    </route>
+
+    <route id="order.placed" path="/order/placed/{order_id}">
+        <default key="_controller">Thelia\Controller\Front\OrderController::orderPlaced</default>
+        <default key="_view">order_placed</default>
     </route>
     <!-- end order management process -->
 

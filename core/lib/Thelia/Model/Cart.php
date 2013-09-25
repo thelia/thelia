@@ -8,6 +8,7 @@ use Thelia\Model\Base\Cart as BaseCart;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\CartItemQuery;
+use Thelia\TaxEngine\Calculator;
 
 class Cart extends BaseCart
 {
@@ -74,9 +75,25 @@ class Cart extends BaseCart
         ;
     }
 
-    public function getTaxedAmount()
+    public function getTaxedAmount(Country $country)
     {
+        $taxCalculator = new Calculator();
 
+        $total = 0;
+
+        foreach($this->getCartItems() as $cartItem) {
+            $subtotal = $cartItem->getRealPrice();
+            $subtotal -= $cartItem->getDiscount();
+            /* we round it for the unit price, before the quantity factor */
+            $subtotal = round($taxCalculator->load($cartItem->getProduct(), $country)->getTaxedPrice($subtotal), 2);
+            $subtotal *= $cartItem->getQuantity();
+
+            $total += $subtotal;
+        }
+
+        $total -= $this->getDiscount();
+
+        return $total;
     }
 
     public function getTotalAmount()
@@ -84,7 +101,11 @@ class Cart extends BaseCart
         $total = 0;
 
         foreach($this->getCartItems() as $cartItem) {
-            $total += $cartItem->getPrice()-$cartItem->getDiscount();
+            $subtotal = $cartItem->getRealPrice();
+            $subtotal -= $cartItem->getDiscount();
+            $subtotal *= $cartItem->getQuantity();
+
+            $total += $subtotal;
         }
 
         $total -= $this->getDiscount();

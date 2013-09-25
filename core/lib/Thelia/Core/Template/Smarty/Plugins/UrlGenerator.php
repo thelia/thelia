@@ -27,6 +27,7 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Tools\URL;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Translation\Translator;
 
 class UrlGenerator extends AbstractSmartyPlugin
 {
@@ -47,11 +48,27 @@ class UrlGenerator extends AbstractSmartyPlugin
     public function generateUrlFunction($params, &$smarty)
     {
         // the path to process
-        $path = $this->getParam($params, 'path');
+        $path = $this->getParam($params, 'path', null);
+        $file = $this->getParam($params, 'file', null);
+
+        if ($file !== null) {
+            $path = $file;
+            $mode = URL::PATH_TO_FILE;
+        }
+        else if ($path !== null) {
+            $mode = URL::WITH_INDEX_PAGE;
+        }
+        else {
+            throw \InvalidArgumentException(Translator::getInstance()->trans("Please specify either 'path' or 'file' parameter in {url} function."));
+        }
 
         $target = $this->getParam($params, 'target', null);
 
-        $url = URL::getInstance()->absoluteUrl($path, $this->getArgsFromParam($params, array('path', 'target')));
+        $url = URL::getInstance()->absoluteUrl(
+                $path,
+                $this->getArgsFromParam($params, array('path', 'file', 'target')),
+                $mode
+        );
 
         if ($target != null) $url .= '#'.$target;
 
@@ -169,7 +186,8 @@ class UrlGenerator extends AbstractSmartyPlugin
 
     protected function getCurrentUrl()
     {
-        return URL::getInstance()->retrieveCurrent($this->request)->toString();
+        //return URL::getInstance()->retrieveCurrent($this->request)->toString();
+        return $this->request->getUri();
     }
 
     protected function getReturnToUrl()

@@ -23,11 +23,13 @@ use Thelia\Model\Map\ProductCategoryTableMap;
  *
  * @method     ChildProductCategoryQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
  * @method     ChildProductCategoryQuery orderByCategoryId($order = Criteria::ASC) Order by the category_id column
+ * @method     ChildProductCategoryQuery orderByDefaultCategory($order = Criteria::ASC) Order by the default_category column
  * @method     ChildProductCategoryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProductCategoryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildProductCategoryQuery groupByProductId() Group by the product_id column
  * @method     ChildProductCategoryQuery groupByCategoryId() Group by the category_id column
+ * @method     ChildProductCategoryQuery groupByDefaultCategory() Group by the default_category column
  * @method     ChildProductCategoryQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildProductCategoryQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -48,11 +50,13 @@ use Thelia\Model\Map\ProductCategoryTableMap;
  *
  * @method     ChildProductCategory findOneByProductId(int $product_id) Return the first ChildProductCategory filtered by the product_id column
  * @method     ChildProductCategory findOneByCategoryId(int $category_id) Return the first ChildProductCategory filtered by the category_id column
+ * @method     ChildProductCategory findOneByDefaultCategory(boolean $default_category) Return the first ChildProductCategory filtered by the default_category column
  * @method     ChildProductCategory findOneByCreatedAt(string $created_at) Return the first ChildProductCategory filtered by the created_at column
  * @method     ChildProductCategory findOneByUpdatedAt(string $updated_at) Return the first ChildProductCategory filtered by the updated_at column
  *
  * @method     array findByProductId(int $product_id) Return ChildProductCategory objects filtered by the product_id column
  * @method     array findByCategoryId(int $category_id) Return ChildProductCategory objects filtered by the category_id column
+ * @method     array findByDefaultCategory(boolean $default_category) Return ChildProductCategory objects filtered by the default_category column
  * @method     array findByCreatedAt(string $created_at) Return ChildProductCategory objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildProductCategory objects filtered by the updated_at column
  *
@@ -143,7 +147,7 @@ abstract class ProductCategoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT PRODUCT_ID, CATEGORY_ID, CREATED_AT, UPDATED_AT FROM product_category WHERE PRODUCT_ID = :p0 AND CATEGORY_ID = :p1';
+        $sql = 'SELECT PRODUCT_ID, CATEGORY_ID, DEFAULT_CATEGORY, CREATED_AT, UPDATED_AT FROM product_category WHERE PRODUCT_ID = :p0 AND CATEGORY_ID = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -328,6 +332,33 @@ abstract class ProductCategoryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductCategoryTableMap::CATEGORY_ID, $categoryId, $comparison);
+    }
+
+    /**
+     * Filter the query on the default_category column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDefaultCategory(true); // WHERE default_category = true
+     * $query->filterByDefaultCategory('yes'); // WHERE default_category = true
+     * </code>
+     *
+     * @param     boolean|string $defaultCategory The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductCategoryQuery The current query, for fluid interface
+     */
+    public function filterByDefaultCategory($defaultCategory = null, $comparison = null)
+    {
+        if (is_string($defaultCategory)) {
+            $default_category = in_array(strtolower($defaultCategory), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(ProductCategoryTableMap::DEFAULT_CATEGORY, $defaultCategory, $comparison);
     }
 
     /**

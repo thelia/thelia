@@ -32,6 +32,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
+use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as CouponModel;
 
@@ -137,11 +138,21 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     {
         $coupon->setDispatcher($this->getDispatcher());
 
+        // Set default rule if none found
+        $noConditionRule = $this->container->get('thelia.constraint.rule.available_for_everyone');
+        $constraintFactory = $this->container->get('thelia.constraint.factory');
+        $couponRuleCollection = new CouponRuleCollection();
+        $couponRuleCollection->add($noConditionRule);
+        $defaultSerializedRule = $constraintFactory->serializeCouponRuleCollection(
+            $couponRuleCollection
+        );
+
+
         $coupon->createOrUpdate(
             $event->getCode(),
             $event->getTitle(),
             $event->getAmount(),
-            $event->getEffect(),
+            $event->getType(),
             $event->isRemovingPostage(),
             $event->getShortDescription(),
             $event->getDescription(),
@@ -150,8 +161,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->isAvailableOnSpecialOffers(),
             $event->isCumulative(),
             $event->getMaxUsage(),
+            $defaultSerializedRule,
             $event->getLocale()
         );
+
+
 
         $event->setCoupon($coupon);
     }

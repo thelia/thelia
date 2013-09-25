@@ -31,6 +31,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
@@ -115,7 +116,7 @@ class ProductSaleElements extends BaseLoop
 
         $currencyId = $this->getCurrency();
         if (null !== $currencyId) {
-            $currency = CurrencyQuery::create()->findOneById($currencyId);
+            $currency = CurrencyQuery::create()->findPk($currencyId);
             if (null === $currency) {
                 throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
             }
@@ -147,17 +148,27 @@ class ProductSaleElements extends BaseLoop
 
         $loopResult = new LoopResult($PSEValues);
 
+        $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
+
         foreach ($PSEValues as $PSEValue) {
             $loopResultRow = new LoopResultRow($loopResult, $PSEValue, $this->versionable, $this->timestampable, $this->countable);
 
             $price = $PSEValue->getPrice();
-            $taxedPrice = $PSEValue->getTaxedPrice(
-                CountryQuery::create()->findOneById(64) // @TODO : make it magic
-            );
+            try {
+                $taxedPrice = $PSEValue->getTaxedPrice(
+                    $taxCountry
+                );
+            } catch(TaxEngineException $e) {
+                $taxedPrice = null;
+            }
             $promoPrice = $PSEValue->getPromoPrice();
-            $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
-                CountryQuery::create()->findOneById(64) // @TODO : make it magic
-            );
+            try {
+                $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
+                    $taxCountry
+                );
+            } catch(TaxEngineException $e) {
+                $taxedPromoPrice = null;
+            }
 
             $loopResultRow->set("ID", $PSEValue->getId())
                 ->set("QUANTITY", $PSEValue->getQuantity())

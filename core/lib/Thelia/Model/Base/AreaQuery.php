@@ -23,13 +23,13 @@ use Thelia\Model\Map\AreaTableMap;
  *
  * @method     ChildAreaQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildAreaQuery orderByName($order = Criteria::ASC) Order by the name column
- * @method     ChildAreaQuery orderByUnit($order = Criteria::ASC) Order by the unit column
+ * @method     ChildAreaQuery orderByPostage($order = Criteria::ASC) Order by the postage column
  * @method     ChildAreaQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAreaQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildAreaQuery groupById() Group by the id column
  * @method     ChildAreaQuery groupByName() Group by the name column
- * @method     ChildAreaQuery groupByUnit() Group by the unit column
+ * @method     ChildAreaQuery groupByPostage() Group by the postage column
  * @method     ChildAreaQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAreaQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -41,22 +41,22 @@ use Thelia\Model\Map\AreaTableMap;
  * @method     ChildAreaQuery rightJoinCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Country relation
  * @method     ChildAreaQuery innerJoinCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the Country relation
  *
- * @method     ChildAreaQuery leftJoinDelivzone($relationAlias = null) Adds a LEFT JOIN clause to the query using the Delivzone relation
- * @method     ChildAreaQuery rightJoinDelivzone($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Delivzone relation
- * @method     ChildAreaQuery innerJoinDelivzone($relationAlias = null) Adds a INNER JOIN clause to the query using the Delivzone relation
+ * @method     ChildAreaQuery leftJoinAreaDeliveryModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the AreaDeliveryModule relation
+ * @method     ChildAreaQuery rightJoinAreaDeliveryModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AreaDeliveryModule relation
+ * @method     ChildAreaQuery innerJoinAreaDeliveryModule($relationAlias = null) Adds a INNER JOIN clause to the query using the AreaDeliveryModule relation
  *
  * @method     ChildArea findOne(ConnectionInterface $con = null) Return the first ChildArea matching the query
  * @method     ChildArea findOneOrCreate(ConnectionInterface $con = null) Return the first ChildArea matching the query, or a new ChildArea object populated from the query conditions when no match is found
  *
  * @method     ChildArea findOneById(int $id) Return the first ChildArea filtered by the id column
  * @method     ChildArea findOneByName(string $name) Return the first ChildArea filtered by the name column
- * @method     ChildArea findOneByUnit(double $unit) Return the first ChildArea filtered by the unit column
+ * @method     ChildArea findOneByPostage(double $postage) Return the first ChildArea filtered by the postage column
  * @method     ChildArea findOneByCreatedAt(string $created_at) Return the first ChildArea filtered by the created_at column
  * @method     ChildArea findOneByUpdatedAt(string $updated_at) Return the first ChildArea filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildArea objects filtered by the id column
  * @method     array findByName(string $name) Return ChildArea objects filtered by the name column
- * @method     array findByUnit(double $unit) Return ChildArea objects filtered by the unit column
+ * @method     array findByPostage(double $postage) Return ChildArea objects filtered by the postage column
  * @method     array findByCreatedAt(string $created_at) Return ChildArea objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildArea objects filtered by the updated_at column
  *
@@ -147,7 +147,7 @@ abstract class AreaQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, NAME, UNIT, CREATED_AT, UPDATED_AT FROM area WHERE ID = :p0';
+        $sql = 'SELECT ID, NAME, POSTAGE, CREATED_AT, UPDATED_AT FROM area WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -307,16 +307,16 @@ abstract class AreaQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the unit column
+     * Filter the query on the postage column
      *
      * Example usage:
      * <code>
-     * $query->filterByUnit(1234); // WHERE unit = 1234
-     * $query->filterByUnit(array(12, 34)); // WHERE unit IN (12, 34)
-     * $query->filterByUnit(array('min' => 12)); // WHERE unit > 12
+     * $query->filterByPostage(1234); // WHERE postage = 1234
+     * $query->filterByPostage(array(12, 34)); // WHERE postage IN (12, 34)
+     * $query->filterByPostage(array('min' => 12)); // WHERE postage > 12
      * </code>
      *
-     * @param     mixed $unit The value to use as filter.
+     * @param     mixed $postage The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -324,16 +324,16 @@ abstract class AreaQuery extends ModelCriteria
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
-    public function filterByUnit($unit = null, $comparison = null)
+    public function filterByPostage($postage = null, $comparison = null)
     {
-        if (is_array($unit)) {
+        if (is_array($postage)) {
             $useMinMax = false;
-            if (isset($unit['min'])) {
-                $this->addUsingAlias(AreaTableMap::UNIT, $unit['min'], Criteria::GREATER_EQUAL);
+            if (isset($postage['min'])) {
+                $this->addUsingAlias(AreaTableMap::POSTAGE, $postage['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($unit['max'])) {
-                $this->addUsingAlias(AreaTableMap::UNIT, $unit['max'], Criteria::LESS_EQUAL);
+            if (isset($postage['max'])) {
+                $this->addUsingAlias(AreaTableMap::POSTAGE, $postage['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -344,7 +344,7 @@ abstract class AreaQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(AreaTableMap::UNIT, $unit, $comparison);
+        return $this->addUsingAlias(AreaTableMap::POSTAGE, $postage, $comparison);
     }
 
     /**
@@ -507,40 +507,40 @@ abstract class AreaQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Delivzone object
+     * Filter the query by a related \Thelia\Model\AreaDeliveryModule object
      *
-     * @param \Thelia\Model\Delivzone|ObjectCollection $delivzone  the related object to use as filter
+     * @param \Thelia\Model\AreaDeliveryModule|ObjectCollection $areaDeliveryModule  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
-    public function filterByDelivzone($delivzone, $comparison = null)
+    public function filterByAreaDeliveryModule($areaDeliveryModule, $comparison = null)
     {
-        if ($delivzone instanceof \Thelia\Model\Delivzone) {
+        if ($areaDeliveryModule instanceof \Thelia\Model\AreaDeliveryModule) {
             return $this
-                ->addUsingAlias(AreaTableMap::ID, $delivzone->getAreaId(), $comparison);
-        } elseif ($delivzone instanceof ObjectCollection) {
+                ->addUsingAlias(AreaTableMap::ID, $areaDeliveryModule->getAreaId(), $comparison);
+        } elseif ($areaDeliveryModule instanceof ObjectCollection) {
             return $this
-                ->useDelivzoneQuery()
-                ->filterByPrimaryKeys($delivzone->getPrimaryKeys())
+                ->useAreaDeliveryModuleQuery()
+                ->filterByPrimaryKeys($areaDeliveryModule->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByDelivzone() only accepts arguments of type \Thelia\Model\Delivzone or Collection');
+            throw new PropelException('filterByAreaDeliveryModule() only accepts arguments of type \Thelia\Model\AreaDeliveryModule or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Delivzone relation
+     * Adds a JOIN clause to the query using the AreaDeliveryModule relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAreaQuery The current query, for fluid interface
      */
-    public function joinDelivzone($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinAreaDeliveryModule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Delivzone');
+        $relationMap = $tableMap->getRelation('AreaDeliveryModule');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -555,14 +555,14 @@ abstract class AreaQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Delivzone');
+            $this->addJoinObject($join, 'AreaDeliveryModule');
         }
 
         return $this;
     }
 
     /**
-     * Use the Delivzone relation Delivzone object
+     * Use the AreaDeliveryModule relation AreaDeliveryModule object
      *
      * @see useQuery()
      *
@@ -570,13 +570,13 @@ abstract class AreaQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\DelivzoneQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\AreaDeliveryModuleQuery A secondary query class using the current class as primary query
      */
-    public function useDelivzoneQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useAreaDeliveryModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinDelivzone($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Delivzone', '\Thelia\Model\DelivzoneQuery');
+            ->joinAreaDeliveryModule($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'AreaDeliveryModule', '\Thelia\Model\AreaDeliveryModuleQuery');
     }
 
     /**

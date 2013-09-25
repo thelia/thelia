@@ -54,7 +54,7 @@ class Coupon extends BaseCoupon
      * @param string    $code                       Coupon Code
      * @param string    $title                      Coupon title
      * @param float     $amount                     Amount removed from the Total Checkout
-     * @param string    $effect                     Coupon effect
+     * @param string    $type                       Coupon type
      * @param bool      $isRemovingPostage          Is removing Postage
      * @param string    $shortDescription           Coupon short description
      * @param string    $description                Coupon description
@@ -63,17 +63,18 @@ class Coupon extends BaseCoupon
      * @param boolean   $isAvailableOnSpecialOffers Is available on special offers
      * @param boolean   $isCumulative               Is cumulative
      * @param int       $maxUsage                   Coupon quantity
+     * @param string    $defaultSerializedRule      Serialized default rule added if none found
      * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
      *
      * @throws \Exception
      */
-    function createOrUpdate($code, $title, $amount, $effect, $isRemovingPostage, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $locale = null)
+    function createOrUpdate($code, $title, $amount, $type, $isRemovingPostage, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $defaultSerializedRule, $locale = null)
     {
         $this->setCode($code)
             ->setTitle($title)
             ->setShortDescription($shortDescription)
             ->setDescription($description)
-            ->setType($effect)
+            ->setType($type)
             ->setAmount($amount)
             ->setIsRemovingPostage($isRemovingPostage)
             ->setIsEnabled($isEnabled)
@@ -81,6 +82,11 @@ class Coupon extends BaseCoupon
             ->setIsAvailableOnSpecialOffers($isAvailableOnSpecialOffers)
             ->setIsCumulative($isCumulative)
             ->setMaxUsage($maxUsage);
+
+        // If no rule given, set default rule
+        if (null === $this->getSerializedRules()) {
+            $this->setSerializedRules($defaultSerializedRule);
+        }
 
         // Set object language (i18n)
         if (!is_null($locale)) {

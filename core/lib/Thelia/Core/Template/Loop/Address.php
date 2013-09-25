@@ -54,7 +54,13 @@ class Address extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id'),
+            new Argument(
+                'id',
+                new TypeCollection(
+                    new Type\IntListType(),
+                    new Type\EnumType(array('*', 'any'))
+                )
+            ),
             new Argument(
                 'customer',
                 new TypeCollection(
@@ -63,8 +69,14 @@ class Address extends BaseLoop
                 ),
                 'current'
             ),
-            Argument::createBooleanTypeArgument('default'),
-            Argument::createIntListTypeArgument('exclude')
+            Argument::createBooleanOrBothTypeArgument('default'),
+            new Argument(
+                'exclude',
+                new TypeCollection(
+                    new Type\IntListType(),
+                    new Type\EnumType(array('none'))
+                )
+            )
         );
     }
 
@@ -79,7 +91,7 @@ class Address extends BaseLoop
 
         $id = $this->getId();
 
-        if (null !== $id) {
+        if (null !== $id && !in_array($id, array('*', 'any'))) {
             $search->filterById($id, Criteria::IN);
         }
 
@@ -106,7 +118,7 @@ class Address extends BaseLoop
 
         $exclude = $this->getExclude();
 
-        if (!is_null($exclude)) {
+        if (null !== $exclude && 'none' !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 

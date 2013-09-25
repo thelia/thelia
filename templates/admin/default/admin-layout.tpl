@@ -51,27 +51,27 @@
 			<div class="container">
 
 		        <div class="row">
-		            <div class="col-md-6">
-		      		    <div class="version-info">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
+		            <div class="col-md-12 clearfix">
+		      		    <div class="version-info pull-left">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
+                        
+                        <div class="clearfix pull-right hidden-xs">
+                            <div class="btn-group pull-right">
+                                <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
+                                <button class="btn btn-default btn-primary"><span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}</button>
+                                <button class="btn btn-default btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="profile" href="{url path='admin/profile/update'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
+                                    <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
 		            </div>
 
 		    		{module_include location='inside_topbar'}
-
-		            <div class="col-md-6 clearfix">
-
-		                <div class="btn-group pull-right">
-		                    <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
-		                    <button class="btn btn-default btn-primary"><span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}</button>
-		                    <button class="btn btn-default btn-primary dropdown-toggle" data-toggle="dropdown">
-		                        <span class="caret"></span>
-		                    </button>
-		                    <ul class="dropdown-menu">
-		                        <li><a class="profile" href="{url path='admin/edit_profile'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
-		                        <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
-		                    </ul>
-		                </div>
-
-		            </div>
+		            
 		        </div>
 
 		    </div>
@@ -86,96 +86,98 @@
 		<nav class="navbar navbar-default" role="navigation">
 
             <div class="container">
+                
+                <div class="row">
+        			<div class="navbar-header">
+        				<button type="button" class="btn navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        					<span class="sr-only">Toggle navigation</span>
+        					<span class="icon-bar"></span>
+        					<span class="icon-bar"></span>
+        					<span class="icon-bar"></span>
+        				</button>
+        			</div>
 
-    			<div class="navbar-header">
-    				<button type="button" class="btn navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-    					<span class="sr-only">Toggle navigation</span>
-    					<span class="icon-bar"></span>
-    					<span class="icon-bar"></span>
-    					<span class="icon-bar"></span>
-    				</button>
-    			</div>
+        			<div class="collapse navbar-collapse navbar-collapse">
+        				<ul class="nav navbar-nav">
 
-    			<div class="collapse navbar-collapse navbar-collapse">
-    				<ul class="nav navbar-nav">
+                            <li class="{if $admin_current_location == 'home'}active{/if}" id="home_menu">
+                                <a href="{url path='/admin/home'}">{intl l="Home"}</a>
+                            </li>
 
-                        <li class="{if $admin_current_location == 'home'}active{/if}" id="home_menu">
-                            <a href="{url path='/admin/home'}">{intl l="Home"}</a>
-                        </li>
+                            {loop name="menu-auth-customer" type="auth" roles="ADMIN" permissions="admin.customers.view"}
+                            <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
+                                <a href="{url path='/admin/customers'}">{intl l="Customers"}</a>
+                            </li>
+                            {/loop}
 
-                        {loop name="menu-auth-customer" type="auth" roles="ADMIN" permissions="admin.customers.view"}
-                        <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
-                            <a href="{url path='/admin/customers'}">{intl l="Customers"}</a>
-                        </li>
+                            {loop name="menu-auth-order" type="auth" roles="ADMIN" permissions="admin.orders.view"}
+                            <li class="dropdown {if $admin_current_location == 'customer'}active{/if}" id="orders_menu" data-toggle="dropdown">
+
+                                <a href="#">{intl l="Orders"} <span class="caret"></span></a>
+
+                                 <ul class="dropdown-menu config_menu" role="menu">
+
+                                    <li role="menuitem"><a data-target="{url path='admin/orders'}" href="{url path='admin/orders'}">
+                                        {intl l="All orders"}
+                                        <span class="badge badge-important">{count type="order"}</span></a>
+                                    </li>
+
+                                    {loop name="order-status-list" type="order-status"}
+                                    <li role="menuitem">
+                                        <a data-target="{url path='admin/orders/$LABEL'}" href="{url path='admin/orders/$LABEL'}">
+                                            {$LABEL} <span class="badge badge-important">{count type="order" status="{$ID}"}</span>
+                                        </a>
+                                    </li>
+                                    {/loop}
+                                </ul>
+                            </li>
+                            {/loop}
+
+                            {loop name="menu-auth-catalog" type="auth" roles="ADMIN" permissions="admin.catalog.view"}
+                            <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
+                                <a href="{url path='/admin/catalog'}">{intl l="Catalog"}</a>
+                            </li>
+                            {/loop}
+
+                            {loop name="menu-auth-content" type="auth" roles="ADMIN" permissions="admin.folders.view"}
+                            <li class="{if $admin_current_location == 'folder'}active{/if}" id="folders_menu">
+                                <a href="{url path='/admin/folders'}">{intl l="Folders"}</a>
+                            </li>
+                            {/loop}
+
+                            {loop name="menu-auth-coupon" type="auth" roles="ADMIN" permissions="admin.coupon.view"}
+                            <li class="{if $admin_current_location == 'coupon'}active{/if}" id="coupon_menu">
+                                <a href="{url path='/admin/coupon'}">{intl l="Coupons"}</a>
+                            </li>
+                            {/loop}
+
+                            {loop name="menu-auth-config" type="auth" roles="ADMIN" permissions="admin.config.view"}
+                            <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
+                                <a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a>
+                            </li>
+                            {/loop}
+
+                            {loop name="menu-auth-modules" type="auth" roles="ADMIN" permissions="admin.modules.view"}
+                            <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
+                                <a href="{url path='/admin/modules'}">{intl l="Modules"}</a>
+                            </li>
+
+                            {module_include location='in_top_menu_items'}
+
+                            {/loop}
+                        </ul>
+
+                        {loop name="top-bar-search" type="auth" roles="ADMIN" permissions="admin.search"}
+                        <form class="navbar-form pull-right hidden-xs" action="{url path='/admin/search'}">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
+                            </div>
+                            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+                        </form>
                         {/loop}
 
-                        {loop name="menu-auth-order" type="auth" roles="ADMIN" permissions="admin.orders.view"}
-                        <li class="dropdown {if $admin_current_location == 'customer'}active{/if}" id="orders_menu" data-toggle="dropdown">
-
-                            <a href="#">{intl l="Orders"} <span class="caret"></span></a>
-
-                             <ul class="dropdown-menu config_menu" role="menu">
-
-                                <li role="menuitem"><a data-target="{url path='admin/orders'}" href="{url path='admin/orders'}">
-                                    {intl l="All orders"}
-                                    <span class="badge badge-important">{count type="order"}</span></a>
-                                </li>
-
-                                {loop name="order-status-list" type="order-status"}
-                                <li role="menuitem">
-                                    <a data-target="{url path='admin/orders/$LABEL'}" href="{url path='admin/orders/$LABEL'}">
-                                        {$LABEL} <span class="badge badge-important">{count type="order" status="{$ID}"}</span>
-                                    </a>
-                                </li>
-                                {/loop}
-                            </ul>
-                        </li>
-                        {/loop}
-
-                        {loop name="menu-auth-catalog" type="auth" roles="ADMIN" permissions="admin.catalog.view"}
-                        <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
-                            <a href="{url path='/admin/catalog'}">{intl l="Catalog"}</a>
-                        </li>
-                        {/loop}
-
-                        {loop name="menu-auth-content" type="auth" roles="ADMIN" permissions="admin.content.view"}
-                        <li class="{if $admin_current_location == 'content'}active{/if}" id="content_menu">
-                            <a href="{url path='/admin/content'}">{intl l="Content"}</a>
-                        </li>
-                        {/loop}
-
-                        {loop name="menu-auth-coupon" type="auth" roles="ADMIN" permissions="admin.coupon.view"}
-                        <li class="{if $admin_current_location == 'coupon'}active{/if}" id="coupon_menu">
-                            <a href="{url path='/admin/coupon/'}">{intl l="Coupons"}</a>
-                        </li>
-                        {/loop}
-
-                        {loop name="menu-auth-config" type="auth" roles="ADMIN" permissions="admin.config.view"}
-                        <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
-                            <a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a>
-                        </li>
-                        {/loop}
-
-                        {loop name="menu-auth-modules" type="auth" roles="ADMIN" permissions="admin.modules.view"}
-                        <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
-                            <a href="{url path='/admin/modules'}">{intl l="Modules"}</a>
-                        </li>
-
-                        {module_include location='in_top_menu_items'}
-
-                        {/loop}
-                    </ul>
-
-                    {loop name="top-bar-search" type="auth" roles="ADMIN" permissions="admin.search"}
-                    <form class="navbar-form pull-right" action="{url path='/admin/search'}">
-                        <div class="form-group">
-                            <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
-                        </div>
-                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
-                    </form>
-                    {/loop}
-
-    			</div>
+        			</div>
+                </div>
             </div>
 		</nav>
 

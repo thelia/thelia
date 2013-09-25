@@ -17,12 +17,18 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
+use Thelia\Model\AreaDeliveryModule as ChildAreaDeliveryModule;
+use Thelia\Model\AreaDeliveryModuleQuery as ChildAreaDeliveryModuleQuery;
 use Thelia\Model\GroupModule as ChildGroupModule;
 use Thelia\Model\GroupModuleQuery as ChildGroupModuleQuery;
 use Thelia\Model\Module as ChildModule;
 use Thelia\Model\ModuleI18n as ChildModuleI18n;
 use Thelia\Model\ModuleI18nQuery as ChildModuleI18nQuery;
+use Thelia\Model\ModuleImage as ChildModuleImage;
+use Thelia\Model\ModuleImageQuery as ChildModuleImageQuery;
 use Thelia\Model\ModuleQuery as ChildModuleQuery;
+use Thelia\Model\Order as ChildOrder;
+use Thelia\Model\OrderQuery as ChildOrderQuery;
 use Thelia\Model\Map\ModuleTableMap;
 
 abstract class Module implements ActiveRecordInterface
@@ -108,10 +114,34 @@ abstract class Module implements ActiveRecordInterface
     protected $updated_at;
 
     /**
+     * @var        ObjectCollection|ChildOrder[] Collection to store aggregation of ChildOrder objects.
+     */
+    protected $collOrdersRelatedByPaymentModuleId;
+    protected $collOrdersRelatedByPaymentModuleIdPartial;
+
+    /**
+     * @var        ObjectCollection|ChildOrder[] Collection to store aggregation of ChildOrder objects.
+     */
+    protected $collOrdersRelatedByDeliveryModuleId;
+    protected $collOrdersRelatedByDeliveryModuleIdPartial;
+
+    /**
+     * @var        ObjectCollection|ChildAreaDeliveryModule[] Collection to store aggregation of ChildAreaDeliveryModule objects.
+     */
+    protected $collAreaDeliveryModules;
+    protected $collAreaDeliveryModulesPartial;
+
+    /**
      * @var        ObjectCollection|ChildGroupModule[] Collection to store aggregation of ChildGroupModule objects.
      */
     protected $collGroupModules;
     protected $collGroupModulesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildModuleImage[] Collection to store aggregation of ChildModuleImage objects.
+     */
+    protected $collModuleImages;
+    protected $collModuleImagesPartial;
 
     /**
      * @var        ObjectCollection|ChildModuleI18n[] Collection to store aggregation of ChildModuleI18n objects.
@@ -145,7 +175,31 @@ abstract class Module implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
+    protected $ordersRelatedByPaymentModuleIdScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $ordersRelatedByDeliveryModuleIdScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $areaDeliveryModulesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
     protected $groupModulesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $moduleImagesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -816,7 +870,15 @@ abstract class Module implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->collOrdersRelatedByPaymentModuleId = null;
+
+            $this->collOrdersRelatedByDeliveryModuleId = null;
+
+            $this->collAreaDeliveryModules = null;
+
             $this->collGroupModules = null;
+
+            $this->collModuleImages = null;
 
             $this->collModuleI18ns = null;
 
@@ -953,6 +1015,57 @@ abstract class Module implements ActiveRecordInterface
                 $this->resetModified();
             }
 
+            if ($this->ordersRelatedByPaymentModuleIdScheduledForDeletion !== null) {
+                if (!$this->ordersRelatedByPaymentModuleIdScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\OrderQuery::create()
+                        ->filterByPrimaryKeys($this->ordersRelatedByPaymentModuleIdScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->ordersRelatedByPaymentModuleIdScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collOrdersRelatedByPaymentModuleId !== null) {
+            foreach ($this->collOrdersRelatedByPaymentModuleId as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->ordersRelatedByDeliveryModuleIdScheduledForDeletion !== null) {
+                if (!$this->ordersRelatedByDeliveryModuleIdScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\OrderQuery::create()
+                        ->filterByPrimaryKeys($this->ordersRelatedByDeliveryModuleIdScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->ordersRelatedByDeliveryModuleIdScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collOrdersRelatedByDeliveryModuleId !== null) {
+            foreach ($this->collOrdersRelatedByDeliveryModuleId as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->areaDeliveryModulesScheduledForDeletion !== null) {
+                if (!$this->areaDeliveryModulesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\AreaDeliveryModuleQuery::create()
+                        ->filterByPrimaryKeys($this->areaDeliveryModulesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->areaDeliveryModulesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collAreaDeliveryModules !== null) {
+            foreach ($this->collAreaDeliveryModules as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->groupModulesScheduledForDeletion !== null) {
                 if (!$this->groupModulesScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\GroupModuleQuery::create()
@@ -964,6 +1077,23 @@ abstract class Module implements ActiveRecordInterface
 
                 if ($this->collGroupModules !== null) {
             foreach ($this->collGroupModules as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->moduleImagesScheduledForDeletion !== null) {
+                if (!$this->moduleImagesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ModuleImageQuery::create()
+                        ->filterByPrimaryKeys($this->moduleImagesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->moduleImagesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collModuleImages !== null) {
+            foreach ($this->collModuleImages as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1203,8 +1333,20 @@ abstract class Module implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
+            if (null !== $this->collOrdersRelatedByPaymentModuleId) {
+                $result['OrdersRelatedByPaymentModuleId'] = $this->collOrdersRelatedByPaymentModuleId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collOrdersRelatedByDeliveryModuleId) {
+                $result['OrdersRelatedByDeliveryModuleId'] = $this->collOrdersRelatedByDeliveryModuleId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collAreaDeliveryModules) {
+                $result['AreaDeliveryModules'] = $this->collAreaDeliveryModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collGroupModules) {
                 $result['GroupModules'] = $this->collGroupModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collModuleImages) {
+                $result['ModuleImages'] = $this->collModuleImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collModuleI18ns) {
                 $result['ModuleI18ns'] = $this->collModuleI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1394,9 +1536,33 @@ abstract class Module implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
+            foreach ($this->getOrdersRelatedByPaymentModuleId() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addOrderRelatedByPaymentModuleId($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getOrdersRelatedByDeliveryModuleId() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addOrderRelatedByDeliveryModuleId($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getAreaDeliveryModules() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAreaDeliveryModule($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getGroupModules() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addGroupModule($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getModuleImages() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addModuleImage($relObj->copy($deepCopy));
                 }
             }
 
@@ -1447,12 +1613,1003 @@ abstract class Module implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
+        if ('OrderRelatedByPaymentModuleId' == $relationName) {
+            return $this->initOrdersRelatedByPaymentModuleId();
+        }
+        if ('OrderRelatedByDeliveryModuleId' == $relationName) {
+            return $this->initOrdersRelatedByDeliveryModuleId();
+        }
+        if ('AreaDeliveryModule' == $relationName) {
+            return $this->initAreaDeliveryModules();
+        }
         if ('GroupModule' == $relationName) {
             return $this->initGroupModules();
+        }
+        if ('ModuleImage' == $relationName) {
+            return $this->initModuleImages();
         }
         if ('ModuleI18n' == $relationName) {
             return $this->initModuleI18ns();
         }
+    }
+
+    /**
+     * Clears out the collOrdersRelatedByPaymentModuleId collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOrdersRelatedByPaymentModuleId()
+     */
+    public function clearOrdersRelatedByPaymentModuleId()
+    {
+        $this->collOrdersRelatedByPaymentModuleId = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collOrdersRelatedByPaymentModuleId collection loaded partially.
+     */
+    public function resetPartialOrdersRelatedByPaymentModuleId($v = true)
+    {
+        $this->collOrdersRelatedByPaymentModuleIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collOrdersRelatedByPaymentModuleId collection.
+     *
+     * By default this just sets the collOrdersRelatedByPaymentModuleId collection to an empty array (like clearcollOrdersRelatedByPaymentModuleId());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initOrdersRelatedByPaymentModuleId($overrideExisting = true)
+    {
+        if (null !== $this->collOrdersRelatedByPaymentModuleId && !$overrideExisting) {
+            return;
+        }
+        $this->collOrdersRelatedByPaymentModuleId = new ObjectCollection();
+        $this->collOrdersRelatedByPaymentModuleId->setModel('\Thelia\Model\Order');
+    }
+
+    /**
+     * Gets an array of ChildOrder objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     * @throws PropelException
+     */
+    public function getOrdersRelatedByPaymentModuleId($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOrdersRelatedByPaymentModuleIdPartial && !$this->isNew();
+        if (null === $this->collOrdersRelatedByPaymentModuleId || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrdersRelatedByPaymentModuleId) {
+                // return empty collection
+                $this->initOrdersRelatedByPaymentModuleId();
+            } else {
+                $collOrdersRelatedByPaymentModuleId = ChildOrderQuery::create(null, $criteria)
+                    ->filterByModuleRelatedByPaymentModuleId($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collOrdersRelatedByPaymentModuleIdPartial && count($collOrdersRelatedByPaymentModuleId)) {
+                        $this->initOrdersRelatedByPaymentModuleId(false);
+
+                        foreach ($collOrdersRelatedByPaymentModuleId as $obj) {
+                            if (false == $this->collOrdersRelatedByPaymentModuleId->contains($obj)) {
+                                $this->collOrdersRelatedByPaymentModuleId->append($obj);
+                            }
+                        }
+
+                        $this->collOrdersRelatedByPaymentModuleIdPartial = true;
+                    }
+
+                    $collOrdersRelatedByPaymentModuleId->getInternalIterator()->rewind();
+
+                    return $collOrdersRelatedByPaymentModuleId;
+                }
+
+                if ($partial && $this->collOrdersRelatedByPaymentModuleId) {
+                    foreach ($this->collOrdersRelatedByPaymentModuleId as $obj) {
+                        if ($obj->isNew()) {
+                            $collOrdersRelatedByPaymentModuleId[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collOrdersRelatedByPaymentModuleId = $collOrdersRelatedByPaymentModuleId;
+                $this->collOrdersRelatedByPaymentModuleIdPartial = false;
+            }
+        }
+
+        return $this->collOrdersRelatedByPaymentModuleId;
+    }
+
+    /**
+     * Sets a collection of OrderRelatedByPaymentModuleId objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $ordersRelatedByPaymentModuleId A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildModule The current object (for fluent API support)
+     */
+    public function setOrdersRelatedByPaymentModuleId(Collection $ordersRelatedByPaymentModuleId, ConnectionInterface $con = null)
+    {
+        $ordersRelatedByPaymentModuleIdToDelete = $this->getOrdersRelatedByPaymentModuleId(new Criteria(), $con)->diff($ordersRelatedByPaymentModuleId);
+
+
+        $this->ordersRelatedByPaymentModuleIdScheduledForDeletion = $ordersRelatedByPaymentModuleIdToDelete;
+
+        foreach ($ordersRelatedByPaymentModuleIdToDelete as $orderRelatedByPaymentModuleIdRemoved) {
+            $orderRelatedByPaymentModuleIdRemoved->setModuleRelatedByPaymentModuleId(null);
+        }
+
+        $this->collOrdersRelatedByPaymentModuleId = null;
+        foreach ($ordersRelatedByPaymentModuleId as $orderRelatedByPaymentModuleId) {
+            $this->addOrderRelatedByPaymentModuleId($orderRelatedByPaymentModuleId);
+        }
+
+        $this->collOrdersRelatedByPaymentModuleId = $ordersRelatedByPaymentModuleId;
+        $this->collOrdersRelatedByPaymentModuleIdPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Order objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Order objects.
+     * @throws PropelException
+     */
+    public function countOrdersRelatedByPaymentModuleId(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOrdersRelatedByPaymentModuleIdPartial && !$this->isNew();
+        if (null === $this->collOrdersRelatedByPaymentModuleId || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrdersRelatedByPaymentModuleId) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getOrdersRelatedByPaymentModuleId());
+            }
+
+            $query = ChildOrderQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModuleRelatedByPaymentModuleId($this)
+                ->count($con);
+        }
+
+        return count($this->collOrdersRelatedByPaymentModuleId);
+    }
+
+    /**
+     * Method called to associate a ChildOrder object to this object
+     * through the ChildOrder foreign key attribute.
+     *
+     * @param    ChildOrder $l ChildOrder
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function addOrderRelatedByPaymentModuleId(ChildOrder $l)
+    {
+        if ($this->collOrdersRelatedByPaymentModuleId === null) {
+            $this->initOrdersRelatedByPaymentModuleId();
+            $this->collOrdersRelatedByPaymentModuleIdPartial = true;
+        }
+
+        if (!in_array($l, $this->collOrdersRelatedByPaymentModuleId->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddOrderRelatedByPaymentModuleId($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param OrderRelatedByPaymentModuleId $orderRelatedByPaymentModuleId The orderRelatedByPaymentModuleId object to add.
+     */
+    protected function doAddOrderRelatedByPaymentModuleId($orderRelatedByPaymentModuleId)
+    {
+        $this->collOrdersRelatedByPaymentModuleId[]= $orderRelatedByPaymentModuleId;
+        $orderRelatedByPaymentModuleId->setModuleRelatedByPaymentModuleId($this);
+    }
+
+    /**
+     * @param  OrderRelatedByPaymentModuleId $orderRelatedByPaymentModuleId The orderRelatedByPaymentModuleId object to remove.
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeOrderRelatedByPaymentModuleId($orderRelatedByPaymentModuleId)
+    {
+        if ($this->getOrdersRelatedByPaymentModuleId()->contains($orderRelatedByPaymentModuleId)) {
+            $this->collOrdersRelatedByPaymentModuleId->remove($this->collOrdersRelatedByPaymentModuleId->search($orderRelatedByPaymentModuleId));
+            if (null === $this->ordersRelatedByPaymentModuleIdScheduledForDeletion) {
+                $this->ordersRelatedByPaymentModuleIdScheduledForDeletion = clone $this->collOrdersRelatedByPaymentModuleId;
+                $this->ordersRelatedByPaymentModuleIdScheduledForDeletion->clear();
+            }
+            $this->ordersRelatedByPaymentModuleIdScheduledForDeletion[]= clone $orderRelatedByPaymentModuleId;
+            $orderRelatedByPaymentModuleId->setModuleRelatedByPaymentModuleId(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByPaymentModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByPaymentModuleIdJoinCurrency($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Currency', $joinBehavior);
+
+        return $this->getOrdersRelatedByPaymentModuleId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByPaymentModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByPaymentModuleIdJoinCustomer($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Customer', $joinBehavior);
+
+        return $this->getOrdersRelatedByPaymentModuleId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByPaymentModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByPaymentModuleIdJoinOrderAddressRelatedByInvoiceOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('OrderAddressRelatedByInvoiceOrderAddressId', $joinBehavior);
+
+        return $this->getOrdersRelatedByPaymentModuleId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByPaymentModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByPaymentModuleIdJoinOrderAddressRelatedByDeliveryOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('OrderAddressRelatedByDeliveryOrderAddressId', $joinBehavior);
+
+        return $this->getOrdersRelatedByPaymentModuleId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByPaymentModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByPaymentModuleIdJoinOrderStatus($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('OrderStatus', $joinBehavior);
+
+        return $this->getOrdersRelatedByPaymentModuleId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByPaymentModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByPaymentModuleIdJoinLang($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Lang', $joinBehavior);
+
+        return $this->getOrdersRelatedByPaymentModuleId($query, $con);
+    }
+
+    /**
+     * Clears out the collOrdersRelatedByDeliveryModuleId collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOrdersRelatedByDeliveryModuleId()
+     */
+    public function clearOrdersRelatedByDeliveryModuleId()
+    {
+        $this->collOrdersRelatedByDeliveryModuleId = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collOrdersRelatedByDeliveryModuleId collection loaded partially.
+     */
+    public function resetPartialOrdersRelatedByDeliveryModuleId($v = true)
+    {
+        $this->collOrdersRelatedByDeliveryModuleIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collOrdersRelatedByDeliveryModuleId collection.
+     *
+     * By default this just sets the collOrdersRelatedByDeliveryModuleId collection to an empty array (like clearcollOrdersRelatedByDeliveryModuleId());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initOrdersRelatedByDeliveryModuleId($overrideExisting = true)
+    {
+        if (null !== $this->collOrdersRelatedByDeliveryModuleId && !$overrideExisting) {
+            return;
+        }
+        $this->collOrdersRelatedByDeliveryModuleId = new ObjectCollection();
+        $this->collOrdersRelatedByDeliveryModuleId->setModel('\Thelia\Model\Order');
+    }
+
+    /**
+     * Gets an array of ChildOrder objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     * @throws PropelException
+     */
+    public function getOrdersRelatedByDeliveryModuleId($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOrdersRelatedByDeliveryModuleIdPartial && !$this->isNew();
+        if (null === $this->collOrdersRelatedByDeliveryModuleId || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrdersRelatedByDeliveryModuleId) {
+                // return empty collection
+                $this->initOrdersRelatedByDeliveryModuleId();
+            } else {
+                $collOrdersRelatedByDeliveryModuleId = ChildOrderQuery::create(null, $criteria)
+                    ->filterByModuleRelatedByDeliveryModuleId($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collOrdersRelatedByDeliveryModuleIdPartial && count($collOrdersRelatedByDeliveryModuleId)) {
+                        $this->initOrdersRelatedByDeliveryModuleId(false);
+
+                        foreach ($collOrdersRelatedByDeliveryModuleId as $obj) {
+                            if (false == $this->collOrdersRelatedByDeliveryModuleId->contains($obj)) {
+                                $this->collOrdersRelatedByDeliveryModuleId->append($obj);
+                            }
+                        }
+
+                        $this->collOrdersRelatedByDeliveryModuleIdPartial = true;
+                    }
+
+                    $collOrdersRelatedByDeliveryModuleId->getInternalIterator()->rewind();
+
+                    return $collOrdersRelatedByDeliveryModuleId;
+                }
+
+                if ($partial && $this->collOrdersRelatedByDeliveryModuleId) {
+                    foreach ($this->collOrdersRelatedByDeliveryModuleId as $obj) {
+                        if ($obj->isNew()) {
+                            $collOrdersRelatedByDeliveryModuleId[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collOrdersRelatedByDeliveryModuleId = $collOrdersRelatedByDeliveryModuleId;
+                $this->collOrdersRelatedByDeliveryModuleIdPartial = false;
+            }
+        }
+
+        return $this->collOrdersRelatedByDeliveryModuleId;
+    }
+
+    /**
+     * Sets a collection of OrderRelatedByDeliveryModuleId objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $ordersRelatedByDeliveryModuleId A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildModule The current object (for fluent API support)
+     */
+    public function setOrdersRelatedByDeliveryModuleId(Collection $ordersRelatedByDeliveryModuleId, ConnectionInterface $con = null)
+    {
+        $ordersRelatedByDeliveryModuleIdToDelete = $this->getOrdersRelatedByDeliveryModuleId(new Criteria(), $con)->diff($ordersRelatedByDeliveryModuleId);
+
+
+        $this->ordersRelatedByDeliveryModuleIdScheduledForDeletion = $ordersRelatedByDeliveryModuleIdToDelete;
+
+        foreach ($ordersRelatedByDeliveryModuleIdToDelete as $orderRelatedByDeliveryModuleIdRemoved) {
+            $orderRelatedByDeliveryModuleIdRemoved->setModuleRelatedByDeliveryModuleId(null);
+        }
+
+        $this->collOrdersRelatedByDeliveryModuleId = null;
+        foreach ($ordersRelatedByDeliveryModuleId as $orderRelatedByDeliveryModuleId) {
+            $this->addOrderRelatedByDeliveryModuleId($orderRelatedByDeliveryModuleId);
+        }
+
+        $this->collOrdersRelatedByDeliveryModuleId = $ordersRelatedByDeliveryModuleId;
+        $this->collOrdersRelatedByDeliveryModuleIdPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Order objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Order objects.
+     * @throws PropelException
+     */
+    public function countOrdersRelatedByDeliveryModuleId(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOrdersRelatedByDeliveryModuleIdPartial && !$this->isNew();
+        if (null === $this->collOrdersRelatedByDeliveryModuleId || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrdersRelatedByDeliveryModuleId) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getOrdersRelatedByDeliveryModuleId());
+            }
+
+            $query = ChildOrderQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModuleRelatedByDeliveryModuleId($this)
+                ->count($con);
+        }
+
+        return count($this->collOrdersRelatedByDeliveryModuleId);
+    }
+
+    /**
+     * Method called to associate a ChildOrder object to this object
+     * through the ChildOrder foreign key attribute.
+     *
+     * @param    ChildOrder $l ChildOrder
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function addOrderRelatedByDeliveryModuleId(ChildOrder $l)
+    {
+        if ($this->collOrdersRelatedByDeliveryModuleId === null) {
+            $this->initOrdersRelatedByDeliveryModuleId();
+            $this->collOrdersRelatedByDeliveryModuleIdPartial = true;
+        }
+
+        if (!in_array($l, $this->collOrdersRelatedByDeliveryModuleId->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddOrderRelatedByDeliveryModuleId($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param OrderRelatedByDeliveryModuleId $orderRelatedByDeliveryModuleId The orderRelatedByDeliveryModuleId object to add.
+     */
+    protected function doAddOrderRelatedByDeliveryModuleId($orderRelatedByDeliveryModuleId)
+    {
+        $this->collOrdersRelatedByDeliveryModuleId[]= $orderRelatedByDeliveryModuleId;
+        $orderRelatedByDeliveryModuleId->setModuleRelatedByDeliveryModuleId($this);
+    }
+
+    /**
+     * @param  OrderRelatedByDeliveryModuleId $orderRelatedByDeliveryModuleId The orderRelatedByDeliveryModuleId object to remove.
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeOrderRelatedByDeliveryModuleId($orderRelatedByDeliveryModuleId)
+    {
+        if ($this->getOrdersRelatedByDeliveryModuleId()->contains($orderRelatedByDeliveryModuleId)) {
+            $this->collOrdersRelatedByDeliveryModuleId->remove($this->collOrdersRelatedByDeliveryModuleId->search($orderRelatedByDeliveryModuleId));
+            if (null === $this->ordersRelatedByDeliveryModuleIdScheduledForDeletion) {
+                $this->ordersRelatedByDeliveryModuleIdScheduledForDeletion = clone $this->collOrdersRelatedByDeliveryModuleId;
+                $this->ordersRelatedByDeliveryModuleIdScheduledForDeletion->clear();
+            }
+            $this->ordersRelatedByDeliveryModuleIdScheduledForDeletion[]= clone $orderRelatedByDeliveryModuleId;
+            $orderRelatedByDeliveryModuleId->setModuleRelatedByDeliveryModuleId(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByDeliveryModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByDeliveryModuleIdJoinCurrency($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Currency', $joinBehavior);
+
+        return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByDeliveryModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByDeliveryModuleIdJoinCustomer($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Customer', $joinBehavior);
+
+        return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByDeliveryModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByDeliveryModuleIdJoinOrderAddressRelatedByInvoiceOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('OrderAddressRelatedByInvoiceOrderAddressId', $joinBehavior);
+
+        return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByDeliveryModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByDeliveryModuleIdJoinOrderAddressRelatedByDeliveryOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('OrderAddressRelatedByDeliveryOrderAddressId', $joinBehavior);
+
+        return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByDeliveryModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByDeliveryModuleIdJoinOrderStatus($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('OrderStatus', $joinBehavior);
+
+        return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByDeliveryModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByDeliveryModuleIdJoinLang($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Lang', $joinBehavior);
+
+        return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
+    }
+
+    /**
+     * Clears out the collAreaDeliveryModules collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAreaDeliveryModules()
+     */
+    public function clearAreaDeliveryModules()
+    {
+        $this->collAreaDeliveryModules = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collAreaDeliveryModules collection loaded partially.
+     */
+    public function resetPartialAreaDeliveryModules($v = true)
+    {
+        $this->collAreaDeliveryModulesPartial = $v;
+    }
+
+    /**
+     * Initializes the collAreaDeliveryModules collection.
+     *
+     * By default this just sets the collAreaDeliveryModules collection to an empty array (like clearcollAreaDeliveryModules());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAreaDeliveryModules($overrideExisting = true)
+    {
+        if (null !== $this->collAreaDeliveryModules && !$overrideExisting) {
+            return;
+        }
+        $this->collAreaDeliveryModules = new ObjectCollection();
+        $this->collAreaDeliveryModules->setModel('\Thelia\Model\AreaDeliveryModule');
+    }
+
+    /**
+     * Gets an array of ChildAreaDeliveryModule objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildAreaDeliveryModule[] List of ChildAreaDeliveryModule objects
+     * @throws PropelException
+     */
+    public function getAreaDeliveryModules($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collAreaDeliveryModulesPartial && !$this->isNew();
+        if (null === $this->collAreaDeliveryModules || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAreaDeliveryModules) {
+                // return empty collection
+                $this->initAreaDeliveryModules();
+            } else {
+                $collAreaDeliveryModules = ChildAreaDeliveryModuleQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collAreaDeliveryModulesPartial && count($collAreaDeliveryModules)) {
+                        $this->initAreaDeliveryModules(false);
+
+                        foreach ($collAreaDeliveryModules as $obj) {
+                            if (false == $this->collAreaDeliveryModules->contains($obj)) {
+                                $this->collAreaDeliveryModules->append($obj);
+                            }
+                        }
+
+                        $this->collAreaDeliveryModulesPartial = true;
+                    }
+
+                    $collAreaDeliveryModules->getInternalIterator()->rewind();
+
+                    return $collAreaDeliveryModules;
+                }
+
+                if ($partial && $this->collAreaDeliveryModules) {
+                    foreach ($this->collAreaDeliveryModules as $obj) {
+                        if ($obj->isNew()) {
+                            $collAreaDeliveryModules[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAreaDeliveryModules = $collAreaDeliveryModules;
+                $this->collAreaDeliveryModulesPartial = false;
+            }
+        }
+
+        return $this->collAreaDeliveryModules;
+    }
+
+    /**
+     * Sets a collection of AreaDeliveryModule objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $areaDeliveryModules A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildModule The current object (for fluent API support)
+     */
+    public function setAreaDeliveryModules(Collection $areaDeliveryModules, ConnectionInterface $con = null)
+    {
+        $areaDeliveryModulesToDelete = $this->getAreaDeliveryModules(new Criteria(), $con)->diff($areaDeliveryModules);
+
+
+        $this->areaDeliveryModulesScheduledForDeletion = $areaDeliveryModulesToDelete;
+
+        foreach ($areaDeliveryModulesToDelete as $areaDeliveryModuleRemoved) {
+            $areaDeliveryModuleRemoved->setModule(null);
+        }
+
+        $this->collAreaDeliveryModules = null;
+        foreach ($areaDeliveryModules as $areaDeliveryModule) {
+            $this->addAreaDeliveryModule($areaDeliveryModule);
+        }
+
+        $this->collAreaDeliveryModules = $areaDeliveryModules;
+        $this->collAreaDeliveryModulesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related AreaDeliveryModule objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related AreaDeliveryModule objects.
+     * @throws PropelException
+     */
+    public function countAreaDeliveryModules(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collAreaDeliveryModulesPartial && !$this->isNew();
+        if (null === $this->collAreaDeliveryModules || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAreaDeliveryModules) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getAreaDeliveryModules());
+            }
+
+            $query = ChildAreaDeliveryModuleQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModule($this)
+                ->count($con);
+        }
+
+        return count($this->collAreaDeliveryModules);
+    }
+
+    /**
+     * Method called to associate a ChildAreaDeliveryModule object to this object
+     * through the ChildAreaDeliveryModule foreign key attribute.
+     *
+     * @param    ChildAreaDeliveryModule $l ChildAreaDeliveryModule
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function addAreaDeliveryModule(ChildAreaDeliveryModule $l)
+    {
+        if ($this->collAreaDeliveryModules === null) {
+            $this->initAreaDeliveryModules();
+            $this->collAreaDeliveryModulesPartial = true;
+        }
+
+        if (!in_array($l, $this->collAreaDeliveryModules->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddAreaDeliveryModule($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param AreaDeliveryModule $areaDeliveryModule The areaDeliveryModule object to add.
+     */
+    protected function doAddAreaDeliveryModule($areaDeliveryModule)
+    {
+        $this->collAreaDeliveryModules[]= $areaDeliveryModule;
+        $areaDeliveryModule->setModule($this);
+    }
+
+    /**
+     * @param  AreaDeliveryModule $areaDeliveryModule The areaDeliveryModule object to remove.
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeAreaDeliveryModule($areaDeliveryModule)
+    {
+        if ($this->getAreaDeliveryModules()->contains($areaDeliveryModule)) {
+            $this->collAreaDeliveryModules->remove($this->collAreaDeliveryModules->search($areaDeliveryModule));
+            if (null === $this->areaDeliveryModulesScheduledForDeletion) {
+                $this->areaDeliveryModulesScheduledForDeletion = clone $this->collAreaDeliveryModules;
+                $this->areaDeliveryModulesScheduledForDeletion->clear();
+            }
+            $this->areaDeliveryModulesScheduledForDeletion[]= clone $areaDeliveryModule;
+            $areaDeliveryModule->setModule(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related AreaDeliveryModules from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildAreaDeliveryModule[] List of ChildAreaDeliveryModule objects
+     */
+    public function getAreaDeliveryModulesJoinArea($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildAreaDeliveryModuleQuery::create(null, $criteria);
+        $query->joinWith('Area', $joinBehavior);
+
+        return $this->getAreaDeliveryModules($query, $con);
     }
 
     /**
@@ -1696,6 +2853,224 @@ abstract class Module implements ActiveRecordInterface
         $query->joinWith('Group', $joinBehavior);
 
         return $this->getGroupModules($query, $con);
+    }
+
+    /**
+     * Clears out the collModuleImages collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addModuleImages()
+     */
+    public function clearModuleImages()
+    {
+        $this->collModuleImages = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collModuleImages collection loaded partially.
+     */
+    public function resetPartialModuleImages($v = true)
+    {
+        $this->collModuleImagesPartial = $v;
+    }
+
+    /**
+     * Initializes the collModuleImages collection.
+     *
+     * By default this just sets the collModuleImages collection to an empty array (like clearcollModuleImages());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initModuleImages($overrideExisting = true)
+    {
+        if (null !== $this->collModuleImages && !$overrideExisting) {
+            return;
+        }
+        $this->collModuleImages = new ObjectCollection();
+        $this->collModuleImages->setModel('\Thelia\Model\ModuleImage');
+    }
+
+    /**
+     * Gets an array of ChildModuleImage objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildModuleImage[] List of ChildModuleImage objects
+     * @throws PropelException
+     */
+    public function getModuleImages($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collModuleImagesPartial && !$this->isNew();
+        if (null === $this->collModuleImages || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collModuleImages) {
+                // return empty collection
+                $this->initModuleImages();
+            } else {
+                $collModuleImages = ChildModuleImageQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collModuleImagesPartial && count($collModuleImages)) {
+                        $this->initModuleImages(false);
+
+                        foreach ($collModuleImages as $obj) {
+                            if (false == $this->collModuleImages->contains($obj)) {
+                                $this->collModuleImages->append($obj);
+                            }
+                        }
+
+                        $this->collModuleImagesPartial = true;
+                    }
+
+                    $collModuleImages->getInternalIterator()->rewind();
+
+                    return $collModuleImages;
+                }
+
+                if ($partial && $this->collModuleImages) {
+                    foreach ($this->collModuleImages as $obj) {
+                        if ($obj->isNew()) {
+                            $collModuleImages[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collModuleImages = $collModuleImages;
+                $this->collModuleImagesPartial = false;
+            }
+        }
+
+        return $this->collModuleImages;
+    }
+
+    /**
+     * Sets a collection of ModuleImage objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $moduleImages A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildModule The current object (for fluent API support)
+     */
+    public function setModuleImages(Collection $moduleImages, ConnectionInterface $con = null)
+    {
+        $moduleImagesToDelete = $this->getModuleImages(new Criteria(), $con)->diff($moduleImages);
+
+
+        $this->moduleImagesScheduledForDeletion = $moduleImagesToDelete;
+
+        foreach ($moduleImagesToDelete as $moduleImageRemoved) {
+            $moduleImageRemoved->setModule(null);
+        }
+
+        $this->collModuleImages = null;
+        foreach ($moduleImages as $moduleImage) {
+            $this->addModuleImage($moduleImage);
+        }
+
+        $this->collModuleImages = $moduleImages;
+        $this->collModuleImagesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ModuleImage objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ModuleImage objects.
+     * @throws PropelException
+     */
+    public function countModuleImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collModuleImagesPartial && !$this->isNew();
+        if (null === $this->collModuleImages || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collModuleImages) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getModuleImages());
+            }
+
+            $query = ChildModuleImageQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModule($this)
+                ->count($con);
+        }
+
+        return count($this->collModuleImages);
+    }
+
+    /**
+     * Method called to associate a ChildModuleImage object to this object
+     * through the ChildModuleImage foreign key attribute.
+     *
+     * @param    ChildModuleImage $l ChildModuleImage
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function addModuleImage(ChildModuleImage $l)
+    {
+        if ($this->collModuleImages === null) {
+            $this->initModuleImages();
+            $this->collModuleImagesPartial = true;
+        }
+
+        if (!in_array($l, $this->collModuleImages->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddModuleImage($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ModuleImage $moduleImage The moduleImage object to add.
+     */
+    protected function doAddModuleImage($moduleImage)
+    {
+        $this->collModuleImages[]= $moduleImage;
+        $moduleImage->setModule($this);
+    }
+
+    /**
+     * @param  ModuleImage $moduleImage The moduleImage object to remove.
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeModuleImage($moduleImage)
+    {
+        if ($this->getModuleImages()->contains($moduleImage)) {
+            $this->collModuleImages->remove($this->collModuleImages->search($moduleImage));
+            if (null === $this->moduleImagesScheduledForDeletion) {
+                $this->moduleImagesScheduledForDeletion = clone $this->collModuleImages;
+                $this->moduleImagesScheduledForDeletion->clear();
+            }
+            $this->moduleImagesScheduledForDeletion[]= clone $moduleImage;
+            $moduleImage->setModule(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -1955,8 +3330,28 @@ abstract class Module implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collOrdersRelatedByPaymentModuleId) {
+                foreach ($this->collOrdersRelatedByPaymentModuleId as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collOrdersRelatedByDeliveryModuleId) {
+                foreach ($this->collOrdersRelatedByDeliveryModuleId as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collAreaDeliveryModules) {
+                foreach ($this->collAreaDeliveryModules as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collGroupModules) {
                 foreach ($this->collGroupModules as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collModuleImages) {
+                foreach ($this->collModuleImages as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1971,10 +3366,26 @@ abstract class Module implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
+        if ($this->collOrdersRelatedByPaymentModuleId instanceof Collection) {
+            $this->collOrdersRelatedByPaymentModuleId->clearIterator();
+        }
+        $this->collOrdersRelatedByPaymentModuleId = null;
+        if ($this->collOrdersRelatedByDeliveryModuleId instanceof Collection) {
+            $this->collOrdersRelatedByDeliveryModuleId->clearIterator();
+        }
+        $this->collOrdersRelatedByDeliveryModuleId = null;
+        if ($this->collAreaDeliveryModules instanceof Collection) {
+            $this->collAreaDeliveryModules->clearIterator();
+        }
+        $this->collAreaDeliveryModules = null;
         if ($this->collGroupModules instanceof Collection) {
             $this->collGroupModules->clearIterator();
         }
         $this->collGroupModules = null;
+        if ($this->collModuleImages instanceof Collection) {
+            $this->collModuleImages->clearIterator();
+        }
+        $this->collModuleImages = null;
         if ($this->collModuleI18ns instanceof Collection) {
             $this->collModuleI18ns->clearIterator();
         }

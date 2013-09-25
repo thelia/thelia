@@ -87,7 +87,7 @@ class Country extends BaseI18nLoop
 
         if (true === $withArea) {
             $search->filterByAreaId(null, Criteria::ISNOTNULL);
-        } elseif (false == $withArea) {
+        } elseif (false === $withArea) {
             $search->filterByAreaId(null, Criteria::ISNULL);
         }
 

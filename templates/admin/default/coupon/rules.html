@@ -10,9 +10,11 @@
             <a data-int="{$i}" class="btn btn-default btn-primary btn-medium constraint-update-btn" href="{$urlEdit}">
                 <span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}
             </a>
-            <a data-int="{$i}" data-target="#delete" data-toggle="confirm" class="btn btn-default btn-danger btn-medium constraint-delete-btn" href="{$urlDelete}">
-                <span class="glyphicon glyphicon-remove"></span> {intl l='Delete'}
-            </a>
+            {if $rules|count != 1}
+                <a data-int="{$i}" data-target="#delete" data-toggle="confirm" class="btn btn-default btn-danger btn-medium constraint-delete-btn" href="{$urlDelete}">
+                    <span class="glyphicon glyphicon-remove"></span> {intl l='Delete'}
+                </a>
+            {/if}
         </td>
     </tr>
 {/foreach}

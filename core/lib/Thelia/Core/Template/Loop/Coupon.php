@@ -31,13 +31,11 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Model\CouponQuery;
 use Thelia\Model\Coupon as MCoupon;
+use Thelia\Model\CouponQuery;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 
@@ -63,7 +61,7 @@ class Coupon extends BaseI18nLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createBooleanOrBothTypeArgument('is_enabled', 1)
+            Argument::createBooleanOrBothTypeArgument('is_enabled')
         );
     }
 
@@ -88,8 +86,8 @@ class Coupon extends BaseI18nLoop
             $search->filterById($id, Criteria::IN);
         }
 
-        if ($isEnabled != BooleanOrBothType::ANY) {
-            $search->filterByIsEnabled($isEnabled ? 1 : 0);
+        if (isset($isEnabled)) {
+            $search->filterByIsEnabled($isEnabled ? true : false);
         }
 
         // Perform search

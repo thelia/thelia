@@ -71,7 +71,7 @@ use Thelia\Core\Event\TheliaEvents;
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  */
-class Image extends BaseAction implements EventSubscriberInterface
+class Image extends BaseCachedFile implements EventSubscriberInterface
 {
     // Resize mode constants
     const EXACT_RATIO_WITH_BORDERS = 1;
@@ -79,38 +79,10 @@ class Image extends BaseAction implements EventSubscriberInterface
     const KEEP_IMAGE_RATIO = 3;
 
     /**
-     * Clear the image cache. Is a subdirectory is specified, only this directory is cleared.
-     * If no directory is specified, the whole cache is cleared.
-     * Only files are deleted, directories will remain.
-     *
-     * @param ImageEvent $event
+     * @return string root of the image cache directory in web space
      */
-    public function clearCache(ImageEvent $event)
-    {
-        $path = $this->getCachePath($event->getCacheSubdirectory(), false);
-
-        $this->clearDirectory($path);
-    }
-
-    /**
-     * Recursively clears the specified directory.
-     *
-     * @param string $path the directory path
-     */
-    protected function clearDirectory($path)
-    {
-        $iterator = new \DirectoryIterator($path);
-
-        foreach ($iterator as $fileinfo) {
-
-            if ($fileinfo->isDot()) continue;
-
-            if ($fileinfo->isFile() || $fileinfo->isLink()) {
-                @unlink($fileinfo->getPathname());
-            } elseif ($fileinfo->isDir()) {
-                $this->clearDirectory($fileinfo->getPathname());
-            }
-        }
+    protected function getCacheDirFromWebRoot() {
+        return ConfigQuery::read('image_cache_dir_from_web_root', 'cache');
     }
 
     /**
@@ -138,9 +110,9 @@ class Image extends BaseAction implements EventSubscriberInterface
         // echo basename($source_file).": ";
 
         // Find cached file path
-        $cacheFilePath = $this->getCacheFilePath($subdir, $source_file, $event);
+        $cacheFilePath = $this->getCacheFilePath($subdir, $source_file, $event->isOriginalImage(), $event->getOptionsHash());
 
-        $originalImagePathInCache = $this->getCacheFilePath($subdir, $source_file, $event, true);
+        $originalImagePathInCache = $this->getCacheFilePath($subdir, $source_file, true);
 
         if (! file_exists($cacheFilePath)) {
 
@@ -257,7 +229,7 @@ class Image extends BaseAction implements EventSubscriberInterface
         // Compute the image URL
         $processed_image_url = $this->getCacheFileURL($subdir, basename($cacheFilePath));
 
-        // compute the full resulution image path in cache
+        // compute the full resolution image path in cache
         $original_image_url = $this->getCacheFileURL($subdir, basename($originalImagePathInCache));
 
         // Update the event with file path and file URL
@@ -357,94 +329,6 @@ class Image extends BaseAction implements EventSubscriberInterface
         }
 
         return $image;
-    }
-
-    /**
-     * Return the absolute URL to the cached image
-     *
-     * @param  string $subdir   the subdirectory related to cache base
-     * @param  string $filename the safe filename, as returned by getCacheFilePath()
-     * @return string the absolute URL to the cached image
-     */
-    protected function getCacheFileURL($subdir, $safe_filename)
-    {
-        $path = $this->getCachePathFromWebRoot($subdir);
-
-        return URL::getInstance()->absoluteUrl(sprintf("%s/%s", $path, $safe_filename), null, URL::PATH_TO_FILE);
-    }
-
-    /**
-     * Return the full path of the cached file
-     *
-     * @param  string  $subdir             the subdirectory related to cache base
-     * @param  string  $filename           the filename
-     * @param  boolean $forceOriginalImage if true, the origiunal image path in the cache dir is returned.
-     * @return string  the cache directory path relative to Web Root
-     */
-    protected function getCacheFilePath($subdir, $filename, ImageEvent $event, $forceOriginalImage = false)
-    {
-        $path = $this->getCachePath($subdir);
-
-        $safe_filename = preg_replace("[^:alnum:\-\._]", "-", strtolower(basename($filename)));
-
-       // Keep original safe name if no tranformations are applied
-       if ($forceOriginalImage || $event->isOriginalImage())
-            return sprintf("%s/%s", $path, $safe_filename);
-        else
-            return sprintf("%s/%s-%s", $path, $event->getOptionsHash(), $safe_filename);
-    }
-
-    /**
-     * Return the cache directory path relative to Web Root
-     *
-     * @param  string $subdir the subdirectory related to cache base, or null to get the cache directory only.
-     * @return string the cache directory path relative to Web Root
-     */
-    protected function getCachePathFromWebRoot($subdir = null)
-    {
-        $cache_dir_from_web_root = ConfigQuery::read('image_cache_dir_from_web_root', 'cache');
-
-        if ($subdir != null) {
-            $safe_subdir = basename($subdir);
-
-            $path = sprintf("%s/%s", $cache_dir_from_web_root, $safe_subdir);
-        } else
-            $path = $cache_dir_from_web_root;
-
-        // Check if path is valid, e.g. in the cache dir
-        return $path;
-    }
-
-    /**
-     * Return the absolute cache directory path
-     *
-     * @param  string            $subdir the subdirectory related to cache base, or null to get the cache base directory.
-     * @throws \RuntimeException if cache directory cannot be created
-     * @return string            the absolute cache directory path
-     */
-    protected function getCachePath($subdir = null, $create_if_not_exists = true)
-    {
-        $cache_base = $this->getCachePathFromWebRoot($subdir);
-
-        $web_root = rtrim(THELIA_WEB_DIR, '/');
-
-        $path = sprintf("%s/%s", $web_root, $cache_base);
-
-        // Create directory (recursively) if it does not exists.
-        if ($create_if_not_exists && !is_dir($path)) {
-            if (!@mkdir($path, 0777, true)) {
-                throw new ImageException(sprintf("Failed to create %s/%s image cache directory",  $cache_base));
-            }
-        }
-
-        // Check if path is valid, e.g. in the cache dir
-        $cache_base = realpath(sprintf("%s/%s", $web_root, $this->getCachePathFromWebRoot()));
-
-        if (strpos(realpath($path), $cache_base) !== 0) {
-            throw new \InvalidArgumentException(sprintf("Invalid cache path %s, with subdirectory %s", $path, $subdir));
-        }
-
-        return $path;
     }
 
     /**

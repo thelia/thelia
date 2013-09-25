@@ -1,3 +1,4 @@
+{block name="no-return-functions"}{/block}
 <!doctype html>
 <!--
  ______   __  __     ______     __         __     ______
@@ -61,7 +62,7 @@ URL: http://www.thelia.net
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="Main Navigation">
                 <ul class="nav navbar-nav navbar-categories">
                     <li class="active"><a href="{url path="/"}" class="home" tabindex="-1">Home</a></li>
-                    <li class="dropdown">
+{*                    <li class="dropdown">
                         <a href="" data-toggle="dropdown" class="dropdown-toggle">Pages</a>
                         <ul class="dropdown-menu list-subnav" role="menu">
                             <li class="active"><a href="index.html" tabindex="-1">Index</a></li>
@@ -78,8 +79,8 @@ URL: http://www.thelia.net
                             <li><a href="product-details.html">Product details</a></li>
                             <li><a href="address.html">New address</a></li>
                         </ul>
-                    </li>
-                    {loop type="category" name="category.navigation" parent="0" limit="3"}
+                    </li>*}
+                    {loop type="category" name="category.navigation" parent="0"}
                         <li><a href="{$URL}">{$TITLE}</a></li>
                     {/loop}
                 </ul>
@@ -94,7 +95,7 @@ URL: http://www.thelia.net
                     <li><a href="{url path="/login"}" class="login">{intl l="Log In!"}</a></li>
                     {/elseloop}
                     <li class="dropdown">
-                        <a href="cart.html" class="dropdown-toggle cart" data-toggle="dropdown">
+                        <a href="{url path="/cart"}" class="dropdown-toggle cart" data-toggle="dropdown">
                             Cart <span class="badge">{cart attr="count_item"}</span>
                         </a>
                     </li>
@@ -313,10 +314,10 @@ URL: http://www.thelia.net
                                     </address>
                                 </li>
                                 <li class="contact-phone">
-                                    <span class="tel" itemprop="telephone">+33 09 08 07 06 05</span>
+                                    <span class="tel" itemprop="telephone">+33 04 44 05 31 00</span>
                                 </li>
                                 <li class="contact-email">
-                                    <a href="mailto:demo@thelia.net" class="email" itemprop="email">demo@thelia.net</a>
+                                    <a href="mailto:demo@thelia.net" class="email" itemprop="email">info@thelia.net</a>
                                 </li>
                             </ul>
                         </div>
