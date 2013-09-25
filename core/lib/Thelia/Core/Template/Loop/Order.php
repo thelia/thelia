@@ -57,7 +57,13 @@ class Order extends BaseLoop
                 ),
                 'current'
             ),
-            Argument::createIntListTypeArgument('status'),
+            new Argument(
+                'status',
+                new TypeCollection(
+                    new Type\IntListType(),
+                    new Type\EnumType(array('*'))
+                )
+            ),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -98,7 +104,7 @@ class Order extends BaseLoop
 
         $status = $this->getStatus();
 
-        if (null !== $status) {
+        if (null !== $status && $status != '*') {
             $search->filterByStatusId($status, Criteria::IN);
         }
 

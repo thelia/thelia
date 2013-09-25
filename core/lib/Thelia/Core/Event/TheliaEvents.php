@@ -301,8 +301,11 @@ final class TheliaEvents
     const ORDER_AFTER_CREATE = "action.order.afterCreate";
     const ORDER_BEFORE_PAYMENT = "action.order.beforePayment";
 
+    const ORDER_UPDATE_STATUS = "action.order.updateStatus";
+
     const ORDER_PRODUCT_BEFORE_CREATE = "action.orderProduct.beforeCreate";
     const ORDER_PRODUCT_AFTER_CREATE = "action.orderProduct.afterCreate";
+
 
     /**
      * Sent on image processing

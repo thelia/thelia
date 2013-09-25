@@ -35,6 +35,7 @@ class OrderEvent extends ActionEvent
     protected $paymentModule = null;
     protected $postage = null;
     protected $ref = null;
+    protected $status = null;
 
     /**
      * @param Order $order
@@ -109,6 +110,14 @@ class OrderEvent extends ActionEvent
     }
 
     /**
+     * @param $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
      * @return null|Order
      */
     public function getOrder()
@@ -170,5 +179,13 @@ class OrderEvent extends ActionEvent
     public function getRef()
     {
         return $this->ref;
+    }
+
+    /**
+     * @return null|int
+     */
+    public function getStatus()
+    {
+        return $this->status;
     }
 }

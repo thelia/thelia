@@ -72,7 +72,7 @@ class CustomerController extends BaseAdminController
             $customer = CustomerQuery::create()->findPk($customer_id);
 
             if(null === $customer) {
-                throw new \InvalidArgumentException(sprintf("%d customer id does not exists", $customer_id));
+                throw new \InvalidArgumentException(sprintf("%d customer id does not exist", $customer_id));
             }
 
             $form = $this->validateForm($customerModification);
@@ -127,7 +127,7 @@ class CustomerController extends BaseAdminController
             $customer = CustomerQuery::create()->findPk($customer_id);
 
             if(null === $customer) {
-                throw new \InvalidArgumentException(Translator::getInstance("The customer you want to delete does not exists"));
+                throw new \InvalidArgumentException(Translator::getInstance("The customer you want to delete does not exist"));
             }
 
             $event = new CustomerEvent($customer);

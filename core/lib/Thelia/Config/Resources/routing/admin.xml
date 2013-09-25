@@ -59,9 +59,9 @@
 
     <!-- end Customer rule management -->
 
-    <!-- Order rule management -->
+    <!-- order management -->
 
-    <route id="admin.order" path="/admin/order">
+    <route id="admin.order.list" path="/admin/orders">
         <default key="_controller">Thelia\Controller\Admin\OrderController::indexAction</default>
     </route>
 
@@ -70,7 +70,11 @@
         <requirement key="order_id">\d+</requirement>
     </route>
 
-    <!-- end Customer rule management -->
+    <route id="admin.order.update.status" path="/admin/order/update/status">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::updateStatus</default>
+    </route>
+
+    <!-- end order management -->
 
     <!-- Categories management -->
 

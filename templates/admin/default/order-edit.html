@@ -11,7 +11,7 @@
 
             <ul class="breadcrumb">
 	            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
-	            <li><a href="{url path='/admin/order'}">{intl l="Orders"}</a></li>
+	            <li><a href="{url path='/admin/orders'}">{intl l="Orders"}</a></li>
 	        </ul>
 
 	        <div class="row">
@@ -27,14 +27,18 @@
                                     {assign "orderCurrency" $SYMBOL}
                                 {/loop}
 
+                                {assign "orderStatusId" $STATUS}
+
                                 <ul class="nav nav-tabs clearfix">
                                     <li class="active"><a href="#cart" data-toggle="tab"><span class="glyphicon glyphicon-shopping-cart"></span> {intl l="Ordered products"}</a></li>
                                     <li><a href="#bill" data-toggle="tab"><span class="glyphicon glyphicon-list-alt"></span> {intl l="Invoice and Delivery"}</a></li>
                                     <li><a href="#supplements" data-toggle="tab"><span class="glyphicon glyphicon-info-sign"></span> {intl l="Further information"}</a></li>
-                                    <li class="pull-right">
+                                    <li class="pull-right select-fixed-width">
                                         <select name="order-status" data-toggle="selectpicker">
-                                            <option data-content="<span class='label label-success'>Foo</span>">Foo</option>
-                                            <option data-content="<span class='label label-danger'>Bar</span>">Bar</option>
+                                            {loop type="order-status" name="all-status"}
+                                                {assign "orderStatusLabel" "order_$CODE"}
+                                                <option {if $ID == $orderStatusId}selected="selected" {/if} value="{$ID}" data-content="<span class='label label-{#$orderStatusLabel#}'>{$TITLE}</span>">{$TITLE}</option>
+                                            {/loop}
                                         </select>
                                     </li>
                                 </ul>

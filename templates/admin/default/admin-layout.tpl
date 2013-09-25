@@ -5,11 +5,7 @@
 {/block}
 
 {* -- Define some stuff for Smarty ----------------------------------------- *}
-{assign 'order-not-paid' 'warning'}
-{assign 'order-paid' 'success'}
-{assign 'order-processing' 'primary'}
-{assign 'order-sent' 'info'}
-{assign 'order-canceled' 'danger'}
+{config_load file='variables.conf'}
 
 <!DOCTYPE html>
 <html lang="{$lang_code}">
@@ -118,21 +114,25 @@
                             {/loop}
 
                             {loop name="menu-auth-order" type="auth" roles="ADMIN" permissions="admin.orders.view"}
-                                <li class="dropdown {if $admin_current_location == 'customer'}active{/if}" id="orders_menu">
+                                <li class="dropdown {if $admin_current_location == 'order'}active{/if}" id="orders_menu">
 
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Orders"} <span class="caret"></span></a>
 
                                     <ul class="dropdown-menu config_menu" role="menu">
 
-                                        <li role="menuitem"><a data-target="{url path='admin/orders'}" href="{url path='admin/orders'}">
+                                        <li role="menuitem">
+                                            <a data-target="{url path='admin/orders'}" href="{url path='admin/orders'}">
                                                 {intl l="All orders"}
-                                                <span class="badge">{count type="order"}</span></a>
+                                                <span class="label label-default pull-right">{count type="order" customer="*" backend_context="1"}</span>
+                                            </a>
                                         </li>
 
                                         {loop name="order-status-list" type="order-status"}
+                                            {assign "orderStatusLabel" "order_$CODE"}
                                             <li role="menuitem">
-                                                <a data-target="{url path='admin/orders/$LABEL'}" href="{url path='admin/orders/$LABEL'}">
-                                                    {$LABEL} <span class="badge">{count type="order" status="{$ID}"}</span>
+                                                <a data-target="{url path='admin/orders/$LABEL'}" href="{url path="admin/orders" status=$ID}">
+                                                    {$TITLE}
+                                                    <span class="label label-{#$orderStatusLabel#} pull-right">{count type="order" customer="*" backend_context="1" status=$ID}</span>
                                                 </a>
                                             </li>
                                         {/loop}
