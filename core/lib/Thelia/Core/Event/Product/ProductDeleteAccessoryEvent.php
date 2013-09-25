@@ -21,68 +21,29 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Product;
 
-class ProductCreateEvent extends ProductEvent
+use Thelia\Core\Event\Product\ProductEvent;
+use Thelia\Model\Product;
+
+class ProductDeleteAccessoryEvent extends ProductEvent
 {
-    protected $ref;
-    protected $title;
-    protected $locale;
-    protected $default_category;
-    protected $visible;
+    protected $accessory_id;
 
-    public function getRef()
+    public function __construct(Product $product, $accessory_id)
     {
-        return $this->ref;
+        parent::__construct($product);
+
+        $this->accessory_id = $accessory_id;
     }
 
-    public function setRef($ref)
+    public function getAccessoryId()
     {
-        $this->ref = $ref;
-        return $this;
+        return $this->accessory_id;
     }
 
-    public function getTitle()
+    public function setAccessoryId($accessory_id)
     {
-        return $this->title;
-    }
-
-    public function setTitle($title)
-    {
-        $this->title = $title;
-        return $this;
-    }
-
-    public function getLocale()
-    {
-        return $this->locale;
-    }
-
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-        return $this;
-    }
-
-    public function getDefaultCategory()
-    {
-        return $this->default_category;
-    }
-
-    public function setDefaultCategory($default_category)
-    {
-        $this->default_category = $default_category;
-        return $this;
-    }
-
-    public function getVisible()
-    {
-        return $this->visible;
-    }
-
-    public function setVisible($visible)
-    {
-        $this->visible = $visible;
-        return $this;
+        $this->accessory_id = $accessory_id;
     }
 }

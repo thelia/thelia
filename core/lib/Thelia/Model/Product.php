@@ -8,7 +8,7 @@ use Thelia\Tools\URL;
 use Thelia\TaxEngine\Calculator;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\ProductEvent;
+use Thelia\Core\Event\Product\ProductEvent;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\ProductTableMap;

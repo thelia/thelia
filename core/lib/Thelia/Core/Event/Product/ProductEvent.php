@@ -21,23 +21,33 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Product;
 
-class ProductDeleteEvent extends ProductEvent
+use Thelia\Model\Product;
+use Thelia\Core\Event\ActionEvent;
+
+class ProductEvent extends ActionEvent
 {
-    public function __construct($product_id)
+    public $product = null;
+
+    public function __construct(Product $product = null)
     {
-        $this->product_id = $product_id;
+        $this->product = $product;
     }
 
-    public function getProductId()
+    public function hasProduct()
     {
-        return $this->product_id;
+        return ! is_null($this->product);
     }
 
-    public function setProductId($product_id)
+    public function getProduct()
     {
-        $this->product_id = $product_id;
+        return $this->product;
+    }
+
+    public function setProduct(Product $product)
+    {
+        $this->product = $product;
 
         return $this;
     }

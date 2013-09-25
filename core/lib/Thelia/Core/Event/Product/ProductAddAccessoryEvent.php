@@ -21,28 +21,29 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Product;
 
+use Thelia\Core\Event\Product\ProductEvent;
 use Thelia\Model\Product;
 
-class ProductDeleteContentEvent extends ProductEvent
+class ProductAddAccessoryEvent extends ProductEvent
 {
-    protected $content_id;
+    protected $accessory_id;
 
-    public function __construct(Product $product, $content_id)
+    public function __construct(Product $product, $accessory_id)
     {
         parent::__construct($product);
 
-        $this->content_id = $content_id;
+        $this->accessory_id = $accessory_id;
     }
 
-    public function getContentId()
+    public function getAccessoryId()
     {
-        return $this->content_id;
+        return $this->accessory_id;
     }
 
-    public function setContentId($content_id)
+    public function setAccessoryId($accessory_id)
     {
-        $this->content_id = $content_id;
+        $this->accessory_id = $accessory_id;
     }
 }

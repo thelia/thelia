@@ -30,14 +30,14 @@ use Thelia\Model\Product as ProductModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\ProductUpdateEvent;
-use Thelia\Core\Event\ProductCreateEvent;
-use Thelia\Core\Event\ProductDeleteEvent;
+use Thelia\Core\Event\Product\ProductUpdateEvent;
+use Thelia\Core\Event\Product\ProductCreateEvent;
+use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\ProductToggleVisibilityEvent;
-use Thelia\Core\Event\ProductAddContentEvent;
-use Thelia\Core\Event\ProductDeleteContentEvent;
+use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
+use Thelia\Core\Event\Product\ProductAddContentEvent;
+use Thelia\Core\Event\Product\ProductDeleteContentEvent;
 use Thelia\Model\ProductAssociatedContent;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductCategory;
@@ -46,15 +46,15 @@ use Thelia\Model\TaxRuleQuery;
 use Thelia\Model\TaxQuery;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\Accessory;
-use Thelia\Core\Event\ProductAddAccessoryEvent;
-use Thelia\Core\Event\ProductDeleteAccessoryEvent;
+use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
 
 class Product extends BaseAction implements EventSubscriberInterface
 {
     /**
      * Create a new product entry
      *
-     * @param ProductCreateEvent $event
+     * @param \Thelia\Core\Event\Product\ProductCreateEvent $event
      */
     public function create(ProductCreateEvent $event)
     {
@@ -80,7 +80,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Change a product
      *
-     * @param ProductUpdateEvent $event
+     * @param \Thelia\Core\Event\Product\ProductUpdateEvent $event
      */
     public function update(ProductUpdateEvent $event)
     {
@@ -109,7 +109,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product entry
      *
-     * @param ProductDeleteEvent $event
+     * @param \Thelia\Core\Event\Product\ProductDeleteEvent $event
      */
     public function delete(ProductDeleteEvent $event)
     {

@@ -21,93 +21,29 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Product;
 
-class ProductUpdateEvent extends ProductCreateEvent
+use Thelia\Core\Event\Product\ProductEvent;
+use Thelia\Model\Product;
+
+class ProductDeleteContentEvent extends ProductEvent
 {
-    protected $product_id;
+    protected $content_id;
 
-    protected $chapo;
-    protected $description;
-    protected $postscriptum;
-
-    protected $url;
-    protected $parent;
-
-    public function __construct($product_id)
+    public function __construct(Product $product, $content_id)
     {
-        $this->product_id = $product_id;
+        parent::__construct($product);
+
+        $this->content_id = $content_id;
     }
 
-    public function getProductId()
+    public function getContentId()
     {
-        return $this->product_id;
+        return $this->content_id;
     }
 
-    public function setProductId($product_id)
+    public function setContentId($content_id)
     {
-        $this->product_id = $product_id;
-
-        return $this;
-    }
-
-    public function getChapo()
-    {
-        return $this->chapo;
-    }
-
-    public function setChapo($chapo)
-    {
-        $this->chapo = $chapo;
-
-        return $this;
-    }
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getPostscriptum()
-    {
-        return $this->postscriptum;
-    }
-
-    public function setPostscriptum($postscriptum)
-    {
-        $this->postscriptum = $postscriptum;
-
-        return $this;
-    }
-
-    public function getUrl()
-    {
-        return $this->url;
-    }
-
-    public function setUrl($url)
-    {
-        $this->url = $url;
-
-        return $this;
-    }
-
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    public function setParent($parent)
-    {
-        $this->parent = $parent;
-
-        return $this;
+        $this->content_id = $content_id;
     }
 }

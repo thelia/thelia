@@ -21,28 +21,10 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Product;
 
-use Thelia\Model\Product;
+use Thelia\Core\Event\Product\ProductEvent;
 
-class ProductAddContentEvent extends ProductEvent
+class ProductToggleVisibilityEvent extends ProductEvent
 {
-    protected $content_id;
-
-    public function __construct(Product $product, $content_id)
-    {
-        parent::__construct($product);
-
-        $this->content_id = $content_id;
-    }
-
-    public function getContentId()
-    {
-        return $this->content_id;
-    }
-
-    public function setContentId($content_id)
-    {
-        $this->content_id = $content_id;
-    }
 }
