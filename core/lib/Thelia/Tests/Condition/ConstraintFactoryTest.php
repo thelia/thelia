@@ -55,6 +55,12 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testBuild()
     {
+        $stubContainer = $this->getMockBuilder('\Symfony\Component\DependencyInjection\Container')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+
+
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
