@@ -56,6 +56,7 @@ use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\AttributeCombination;
 use Thelia\Model\AttributeAv;
 use Thelia\Core\Event\ProductCreateCombinationEvent;
+use Thelia\Core\Event\ProductDeleteCombinationEvent;
 
 /**
  * Manages products
@@ -753,8 +754,8 @@ class ProductController extends AbstractCrudController
 
         $event = new ProductCreateCombinationEvent(
                 $this->getExistingObject(),
-                $this->getRequest()->get('use_default_princing', 0),
-                $this->getRequest()->get('combination_attributes', array())
+                $this->getRequest()->get('combination_attributes', array()),
+                $this->getCurrentEditionCurrency()->getId()
         );
 
         try {
@@ -764,8 +765,33 @@ class ProductController extends AbstractCrudController
             // Any error
             return $this->errorPage($ex);
         }
-echo "done!";
-exit;
+
         $this->redirectToEditionTemplate();
     }
+
+
+    /**
+     * A a new combination to a product
+     */
+    public function deleteCombinationAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $event = new ProductDeleteCombinationEvent(
+                $this->getExistingObject(),
+                $this->getRequest()->get('product_sale_element_id',0)
+        );
+
+        try {
+            $this->dispatch(TheliaEvents::PRODUCT_DELETE_COMBINATION, $event);
+        }
+        catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
 }
