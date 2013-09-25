@@ -165,11 +165,11 @@ interface AdapterInterface
     public function getRequest();
 
     /**
-     * Return Condition Validator
+     * Return Condition Evaluator
      *
      * @return ConditionEvaluator
      */
-    public function getConditionValidator();
+    public function getConditionEvaluator();
 
     /**
      * Return all available currencies

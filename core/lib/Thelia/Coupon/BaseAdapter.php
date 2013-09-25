@@ -27,16 +27,13 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
-use Thelia\Constraint\ConditionValidator;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\Security\SecurityContext;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Cart\CartTrait;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
-use Thelia\Model\LangQuery;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -266,7 +263,7 @@ class BaseAdapter implements AdapterInterface
      *
      * @return ConditionValidator
      */
-    public function getConditionValidator()
+    public function getConditionEvaluator()
     {
         return $this->container->get('thelia.condition.validator');
     }

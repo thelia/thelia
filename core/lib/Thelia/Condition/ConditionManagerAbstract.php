@@ -84,7 +84,7 @@ abstract class ConditionManagerAbstract implements ConditionManagerInterface
     {
         $this->adapter = $adapter;
         $this->translator = $adapter->getTranslator();
-        $this->conditionValidator = $adapter->getConditionValidator();
+        $this->conditionValidator = $adapter->getConditionEvaluator();
     }
 
 //    /**
@@ -94,13 +94,13 @@ abstract class ConditionManagerAbstract implements ConditionManagerInterface
 //     *                          validating $paramsToValidate against
 //     *
 //     * @return $this
-//     * @throws InvalidRuleException
+//     * @throws InvalidConditionException
 //     */
 //    protected function setValidators(array $validators)
 //    {
 //        foreach ($validators as $validator) {
 //            if (!$validator instanceof RuleValidator) {
-//                throw new InvalidRuleException(get_class());
+//                throw new InvalidConditionException(get_class());
 //            }
 //            if (!in_array($validator->getOperator(), $this->availableOperators)) {
 //                throw new InvalidConditionOperatorException(

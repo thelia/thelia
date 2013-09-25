@@ -159,17 +159,17 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
             return false;
         }
 
-        $constraint1 = $this->conditionValidator->variableOpComparison(
+        $condition1 = $this->conditionValidator->variableOpComparison(
             $this->adapter->getCartTotalPrice(),
             $this->operators[self::INPUT1],
             $this->values[self::INPUT1]
         );
-        $constraint2 = $this->conditionValidator->variableOpComparison(
+        $condition2 = $this->conditionValidator->variableOpComparison(
             $this->adapter->getCheckoutCurrency(),
             $this->operators[self::INPUT2],
             $this->values[self::INPUT2]
         );
-        if ($constraint1 && $constraint2) {
+        if ($condition1 && $condition2) {
             return true;
         }
 

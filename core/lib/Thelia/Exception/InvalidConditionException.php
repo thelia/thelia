@@ -21,50 +21,34 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Exception;
+
+use Thelia\Log\Tlog;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test RemoveXPercentForCategoryY Class
+ * Thrown when a Condition is badly implemented
  *
- * @package Coupon
+ * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveXPercentForCategoryYTest extends \PHPUnit_Framework_TestCase
+class InvalidConditionException extends \RuntimeException
 {
-    public function testSomething()
+    /**
+     * InvalidConditionOperatorException thrown when a Condition is badly implemented
+     *
+     * @param string $className Class name
+     */
+    public function __construct($className)
     {
-        // Stop here and mark this test as incomplete.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+
+        $message = 'Invalid Condition given to ' . $className;
+        Tlog::getInstance()->addError($message);
+
+        parent::__construct($message);
     }
-
-//    /**
-//     * Sets up the fixture, for example, opens a network connection.
-//     * This method is called before a test is executed.
-//     */
-//    protected function setUp()
-//    {
-//    }
-//
-//    public function incompleteTest()
-//    {
-//        $this->markTestIncomplete(
-//            'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * Tears down the fixture, for example, closes a network connection.
-//     * This method is called after a test is executed.
-//     */
-//    protected function tearDown()
-//    {
-//    }
-
 }

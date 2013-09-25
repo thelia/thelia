@@ -25,8 +25,8 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Util\PropelModelPager;
-use Thelia\Constraint\ConstraintFactory;
-use Thelia\Constraint\Rule\CouponRuleInterface;
+use Thelia\Condition\ConditionFactory;
+use Thelia\Condition\ConditionManagerInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -68,7 +68,7 @@ class Coupon extends BaseI18nLoop
     /**
      * Execute Loop
      *
-     * @param PropelModelPager $pagination
+     * @param PropelModelPager $pagination Pagination manager
      *
      * @return \Thelia\Core\Template\Element\LoopResult
      */
@@ -94,8 +94,8 @@ class Coupon extends BaseI18nLoop
         $coupons = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
-        /** @var ConstraintFactory $constraintFactory */
-        $constraintFactory = $this->container->get('thelia.condition.factory');
+        /** @var ConditionFactory $conditionFactory */
+        $conditionFactory = $this->container->get('thelia.condition.factory');
 
         /** @var Request $request */
         $request = $this->container->get('request');
@@ -105,7 +105,7 @@ class Coupon extends BaseI18nLoop
         /** @var MCoupon $coupon */
         foreach ($coupons as $coupon) {
             $loopResultRow = new LoopResultRow();
-            $rules = $constraintFactory->unserializeCouponRuleCollection(
+            $conditions = $conditionFactory->unserializeConditionCollection(
                 $coupon->getSerializedRules()
             );
 
@@ -130,10 +130,10 @@ class Coupon extends BaseI18nLoop
             $datediff = $coupon->getExpirationDate()->getTimestamp() - $now;
             $daysLeftBeforeExpiration = floor($datediff/(60*60*24));
 
-            $cleanedRules = array();
-            /** @var CouponRuleInterface $rule */
-            foreach ($rules->getRules() as $rule) {
-                $cleanedRules[] = $rule->getToolTip();
+            $cleanedConditions = array();
+            /** @var ConditionManagerInterface $condition */
+            foreach ($conditions->getConditions() as $condition) {
+                $cleanedConditions[] = $condition->getToolTip();
             }
             $loopResultRow->set("ID", $coupon->getId())
                 ->set("IS_TRANSLATED", $coupon->getVirtualColumn('IS_TRANSLATED'))
@@ -149,7 +149,7 @@ class Coupon extends BaseI18nLoop
                 ->set("IS_AVAILABLE_ON_SPECIAL_OFFERS", $coupon->getIsAvailableOnSpecialOffers())
                 ->set("IS_ENABLED", $coupon->getIsEnabled())
                 ->set("AMOUNT", $coupon->getAmount())
-                ->set("APPLICATION_CONDITIONS", $cleanedRules)
+                ->set("APPLICATION_CONDITIONS", $cleanedConditions)
                 ->set("TOOLTIP", $couponManager->getToolTip())
                 ->set("DAY_LEFT_BEFORE_EXPIRATION", $daysLeftBeforeExpiration)
                 ->set("SERVICE_ID", $couponManager->getServiceId());

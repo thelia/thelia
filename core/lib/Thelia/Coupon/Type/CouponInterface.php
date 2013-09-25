@@ -142,7 +142,7 @@ interface CouponInterface
      *
      * @return ConditionCollection A set of ConditionManagerInterface
      */
-    public function getRules();
+    public function getConditions();
 
     /**
      * Replace the existing Rules by those given in parameter
@@ -151,9 +151,9 @@ interface CouponInterface
      * @param ConditionCollection $rules ConditionManagerInterface to add
      *
      * @return $this
-     * @throws \Thelia\Exception\InvalidRuleException
+     * @throws \Thelia\Exception\InvalidConditionException
      */
-    public function setRules(ConditionCollection $rules);
+    public function setConditions(ConditionCollection $rules);
 
     /**
      * Return Coupon expiration date

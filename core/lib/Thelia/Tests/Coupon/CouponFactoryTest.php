@@ -161,7 +161,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //     * Test if an expired Coupon is build or not (equal)
 //     *
 //     * @covers Thelia\Coupon\CouponFactory::buildCouponFromCode
-//     * @expectedException \Thelia\Exception\InvalidRuleException
+//     * @expectedException \Thelia\Exception\InvalidConditionException
 //     */
 //    public function testBuildCouponFromCodeWithoutRule()
 //    {

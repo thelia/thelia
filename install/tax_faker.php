@@ -1,16 +1,6 @@
 <?php
-use Thelia\Constraint\ConstraintFactory;
-use Thelia\Constraint\ConstraintManager;
-use Thelia\Constraint\Rule\AvailableForTotalAmount;
-use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
-use Thelia\Constraint\Rule\AvailableForXArticlesManager;
-use Thelia\Constraint\Rule\Operators;
-use Thelia\Coupon\ConditionCollection;
-use Thelia\Model\ProductImage;
-use Thelia\Model\CategoryImage;
-use Thelia\Model\FolderImage;
-use Thelia\Model\ContentImage;
-use Imagine\Image\Color;
+use Thelia\Condition\Implementation\MatchForTotalAmountManager;
+use Thelia\Condition\Implementation\MatchForXArticlesManager;
 use Imagine\Image\Point;
 
 require __DIR__ . '/../core/bootstrap.php';

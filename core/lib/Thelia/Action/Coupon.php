@@ -74,7 +74,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Occurring when a Coupon rule is about to be updated
+     * Occurring when a Coupon condition is about to be updated
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon Rule
      */
@@ -86,7 +86,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Occurring when a Coupon rule is about to be consumed
+     * Occurring when a Coupon condition is about to be consumed
      *
      * @param CouponConsumeEvent $event Event consuming Coupon
      */
@@ -138,13 +138,14 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     {
         $coupon->setDispatcher($this->getDispatcher());
 
-        // Set default rule if none found
+        // Set default condition if none found
         /** @var ConditionManagerInterface $noConditionRule */
         $noConditionRule = $this->container->get('thelia.condition.match_for_everyone');
-        $constraintFactory = $this->container->get('thelia.condition.factory');
+        /** @var ConditionFactory $conditionFactory */
+        $conditionFactory = $this->container->get('thelia.condition.factory');
         $couponRuleCollection = new ConditionCollection();
         $couponRuleCollection->add($noConditionRule);
-        $defaultSerializedRule = $constraintFactory->serializeCouponRuleCollection(
+        $defaultSerializedRule = $conditionFactory->serializeConditionCollection(
             $couponRuleCollection
         );
 
@@ -179,11 +180,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     {
         $coupon->setDispatcher($this->getDispatcher());
 
-        /** @var ConditionFactory $constraintFactory */
-        $constraintFactory = $this->container->get('thelia.condition.factory');
+        /** @var ConditionFactory $conditionFactory */
+        $conditionFactory = $this->container->get('thelia.condition.factory');
 
         $coupon->createOrUpdateConditions(
-            $constraintFactory->serializeConditionCollection($event->getConditions()),
+            $conditionFactory->serializeConditionCollection($event->getConditions()),
             $event->getLocale()
         );
 

@@ -28,9 +28,9 @@ namespace Thelia\Coupon;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Manage how Coupons could interact with a Checkout
+ * Manage how Condition could interact with a Checkout
  *
- * @package Coupon
+ * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
@@ -39,9 +39,9 @@ interface RuleOrganizerInterface
     /**
      * Organize ConditionManagerInterface
      *
-     * @param array $rules Array of ConditionManagerInterface
+     * @param array $conditions Array of ConditionManagerInterface
      *
      * @return array Array of ConditionManagerInterface sorted
      */
-    public function organize(array $rules);
+    public function organize(array $conditions);
 }

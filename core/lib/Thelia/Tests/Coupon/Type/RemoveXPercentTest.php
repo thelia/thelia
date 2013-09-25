@@ -169,7 +169,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //     * Test Coupon rule setter
 //     *
 //     * @covers Thelia\Coupon\type\RemoveXPercentManager::setRules
-//     * @expectedException \Thelia\Exception\InvalidRuleException
+//     * @expectedException \Thelia\Exception\InvalidConditionException
 //     *
 //     */
 //    public function testSetRulesInvalid()

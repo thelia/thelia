@@ -21,12 +21,12 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Condition\Implementation;
 
-use Thelia\Constraint\ConditionValidator;
-use Thelia\Constraint\Rule\AvailableForXArticlesManager;
-use Thelia\Constraint\Rule\Operators;
-use Thelia\Constraint\Rule\SerializableRule;
+use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\Operators;
+use Thelia\Condition\SerializableCondition;
+use Thelia\Coupon\AdapterInterface;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -39,11 +39,8 @@ use Thelia\Constraint\Rule\SerializableRule;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
+class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 {
-
-//    /** @var AdapterInterface $stubTheliaAdapter */
-//    protected $stubTheliaAdapter = null;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -57,32 +54,34 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if validity test on BackOffice inputs are working
      *
-     * @covers Thelia\Coupon\Rule\AvailableForXArticlesManager::setValidators
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::setValidators
      * @expectedException \Thelia\Exception\InvalidConditionOperatorException
      */
     public function testInValidBackOfficeInputOperator()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var AdapterInterface $stubAdapter */
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::IN
+            MatchForXArticlesManager::INPUT1 => Operators::IN
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 5
+            MatchForXArticlesManager::INPUT1 => 5
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = true;
         $actual =$isValid;
@@ -92,12 +91,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if validity test on BackOffice inputs are working
      *
-     * @covers Thelia\Coupon\Rule\AvailableForXArticlesManager::setValidators
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::setValidators
      * @expectedException \Thelia\Exception\InvalidConditionValueException
      */
     public function testInValidBackOfficeInputValue()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -105,19 +105,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR
+            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 'X'
+            MatchForXArticlesManager::INPUT1 => 'X'
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = true;
         $actual =$isValid;
@@ -127,12 +127,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Constraint\Rule\AvailableForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
      *
      */
     public function testMatchingRuleInferior()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -140,19 +141,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::INFERIOR
+            MatchForXArticlesManager::INPUT1 => Operators::INFERIOR
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 5
+            MatchForXArticlesManager::INPUT1 => 5
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = true;
         $actual =$isValid;
@@ -162,12 +163,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Constraint\Rule\AvailableForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
      *
      */
     public function testNotMatchingRuleInferior()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -175,19 +177,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::INFERIOR
+            MatchForXArticlesManager::INPUT1 => Operators::INFERIOR
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 4,
+            MatchForXArticlesManager::INPUT1 => 4,
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = false;
         $actual =$isValid;
@@ -197,12 +199,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Constraint\Rule\AvailableForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
      *
      */
     public function testMatchingRuleInferiorEquals()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -210,19 +213,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::INFERIOR_OR_EQUAL,
+            MatchForXArticlesManager::INPUT1 => Operators::INFERIOR_OR_EQUAL,
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 5,
+            MatchForXArticlesManager::INPUT1 => 5,
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = true;
         $actual =$isValid;
@@ -232,12 +235,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Constraint\Rule\AvailableForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
      *
      */
     public function testMatchingRuleInferiorEquals2()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -245,19 +249,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::INFERIOR_OR_EQUAL
+            MatchForXArticlesManager::INPUT1 => Operators::INFERIOR_OR_EQUAL
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 4
+            MatchForXArticlesManager::INPUT1 => 4
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = true;
         $actual =$isValid;
@@ -267,12 +271,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test inferior operator is working
      *
-     * @covers Thelia\Constraint\Rule\AvailableForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
      *
      */
     public function testNotMatchingRuleInferiorEquals()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -280,19 +285,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::INFERIOR_OR_EQUAL
+            MatchForXArticlesManager::INPUT1 => Operators::INFERIOR_OR_EQUAL
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 3
+            MatchForXArticlesManager::INPUT1 => 3
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = false;
         $actual =$isValid;
@@ -302,12 +307,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test equals operator is working
      *
-     * @covers Thelia\Constraint\Rule\AvailableForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
      *
      */
     public function testMatchingRuleEqual()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -315,19 +321,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::EQUAL
+            MatchForXArticlesManager::INPUT1 => Operators::EQUAL
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 4
+            MatchForXArticlesManager::INPUT1 => 4
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = true;
         $actual =$isValid;
@@ -337,12 +343,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test equals operator is working
      *
-     * @covers Thelia\Constraint\Rule\AvailableForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
      *
      */
     public function testNotMatchingRuleEqual()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -350,19 +357,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::EQUAL
+            MatchForXArticlesManager::INPUT1 => Operators::EQUAL
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 5
+            MatchForXArticlesManager::INPUT1 => 5
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = false;
         $actual =$isValid;
@@ -372,12 +379,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Constraint\Rule\AvailableForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
      *
      */
     public function testMatchingRuleSuperiorEquals()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -385,19 +393,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL
+            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 4
+            MatchForXArticlesManager::INPUT1 => 4
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = true;
         $actual =$isValid;
@@ -407,12 +415,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Constraint\Rule\AvailableForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
      *
      */
     public function testMatchingRuleSuperiorEquals2()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -420,19 +429,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL
+            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 3
+            MatchForXArticlesManager::INPUT1 => 3
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = true;
         $actual =$isValid;
@@ -442,12 +451,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Constraint\Rule\AvailableForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
      *
      */
     public function testNotMatchingRuleSuperiorEquals()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -455,19 +465,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL
+            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 5
+            MatchForXArticlesManager::INPUT1 => 5
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = false;
         $actual =$isValid;
@@ -477,12 +487,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Constraint\Rule\AvailableForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
      *
      */
     public function testMatchingRuleSuperior()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -490,19 +501,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR
+            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 3
+            MatchForXArticlesManager::INPUT1 => 3
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = true;
         $actual =$isValid;
@@ -512,12 +523,13 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * Check if test superior operator is working
      *
-     * @covers Thelia\Constraint\Rule\AvailableForXArticlesManager::isMatching
+     * @covers Thelia\Condition\Implementation\MatchForXArticlesManager::isMatching
      *
      */
     public function testNotMatchingRuleSuperior()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -525,19 +537,19 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR
+            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 4
+            MatchForXArticlesManager::INPUT1 => 4
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $isValid = $rule1->isMatching();
+        $isValid = $condition1->isMatching();
 
         $expected = false;
         $actual =$isValid;
@@ -546,7 +558,8 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSerializableRule()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -554,22 +567,22 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR
+            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 4
+            MatchForXArticlesManager::INPUT1 => 4
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $serializableRule = $rule1->getSerializableRule();
+        $serializableRule = $condition1->getSerializableCondition();
 
-        $expected = new SerializableRule();
-        $expected->ruleServiceId = $rule1->getServiceId();
+        $expected = new SerializableCondition();
+        $expected->conditionServiceId = $condition1->getServiceId();
         $expected->operators = $operators;
         $expected->values = $values;
 
@@ -581,7 +594,8 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAvailableOperators()
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -589,20 +603,20 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConditionValidator()));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue(new ConditionEvaluator()));
 
-        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR
+            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 4
+            MatchForXArticlesManager::INPUT1 => 4
         );
-        $rule1->setValidatorsFromForm($operators, $values);
+        $condition1->setValidatorsFromForm($operators, $values);
 
         $expected = array(
-            AvailableForXArticlesManager::INPUT1 => array(
+            MatchForXArticlesManager::INPUT1 => array(
                 Operators::INFERIOR,
                 Operators::INFERIOR_OR_EQUAL,
                 Operators::EQUAL,
@@ -610,7 +624,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
                 Operators::SUPERIOR
             )
         );
-        $actual = $rule1->getAvailableOperators();
+        $actual = $condition1->getAvailableOperators();
 
         $this->assertEquals($expected, $actual);
 
@@ -626,20 +640,20 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 //            ->method('getNbArticlesInCart')
 //            ->will($this->returnValue(4));
 //
-//        $rule1 = new MatchForXArticlesManager($stubAdapter);
+//        $condition1 = new MatchForXArticlesManager($stubAdapter);
 //        $operators = array(
 //            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
 //        );
 //        $values = array(
 //            MatchForXArticlesManager::INPUT1 => 4
 //        );
-//        $rule1->setValidatorsFromForm($operators, $values);
+//        $condition1->setValidatorsFromForm($operators, $values);
 //
 //        $expected = array(
 //            $operators,
 //            $values
 //        );
-//        $actual = $rule1->getValidators();
+//        $actual = $condition1->getValidators();
 //
 //        $this->assertEquals($expected, $actual);
 //

@@ -82,7 +82,7 @@ class ConditionFactory
         if ($conditions !== null) {
             /** @var $condition ConditionManagerInterface */
             foreach ($conditions as $condition) {
-                // Remove all rule if the "no condition" condition is found
+                // Remove all condition if the "no condition" condition is found
 //                if ($condition->getServiceId() == 'thelia.condition.match_for_everyone') {
 //                    return base64_encode(json_encode(array($condition->getSerializableRule())));
 //                }
@@ -153,7 +153,7 @@ class ConditionFactory
      *
      * @param string $conditionServiceId ConditionManager class name
      *
-     * @return array Ready to be drawn rule inputs
+     * @return array Ready to be drawn condition inputs
      */
     public function getInputs($conditionServiceId)
     {

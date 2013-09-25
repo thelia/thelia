@@ -203,9 +203,9 @@ class CouponController extends BaseAdminController
         } else {
             // Display
             // Prepare the data that will hydrate the form
-            /** @var ConditionFactory $constraintFactory */
-            $constraintFactory = $this->container->get('thelia.condition.factory');
-            $conditions = $constraintFactory->unserializeConditionCollection(
+            /** @var ConditionFactory $conditionFactory */
+            $conditionFactory = $this->container->get('thelia.condition.factory');
+            $conditions = $conditionFactory->unserializeConditionCollection(
                 $coupon->getSerializedRules()
             );
 
@@ -318,26 +318,26 @@ class CouponController extends BaseAdminController
             return $this->pageNotFound();
         }
 
-        $rules = new ConditionCollection();
+        $conditions = new ConditionCollection();
 
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->container->get('thelia.condition.factory');
         $conditionsReceived = json_decode($this->getRequest()->get('rules'));
         foreach ($conditionsReceived as $conditionReceived) {
-            $rule = $conditionFactory->build(
+            $condition = $conditionFactory->build(
                 $conditionReceived->serviceId,
                 (array) $conditionReceived->operators,
                 (array) $conditionReceived->values
             );
-            $rules->add(clone $rule);
+            $conditions->add(clone $condition);
         }
 
 //        $coupon->setSerializedRules(
-//            $constraintFactory->serializeCouponRuleCollection($rules)
+//            $conditionFactory->serializeCouponRuleCollection($rules)
 //        );
 
         $conditionEvent = new ConditionCreateOrUpdateEvent(
-            $rules
+            $conditions
         );
         $conditionEvent->setCouponModel($coupon);
 
@@ -350,19 +350,19 @@ class CouponController extends BaseAdminController
 
         $this->adminLogAppend(
             sprintf(
-                'Coupon %s (ID %s) rules updated',
+                'Coupon %s (ID %s) conditions updated',
                 $conditionEvent->getCouponModel()->getTitle(),
                 $conditionEvent->getCouponModel()->getServiceId()
             )
         );
 
-        $cleanedRules = $this->cleanConditionForTemplate($rules);
+        $cleanedConditions = $this->cleanConditionForTemplate($conditions);
 
         return $this->render(
-            'coupon/rules',
+            'coupon/conditions',
             array(
                 'couponId' => $couponId,
-                'rules' => $cleanedRules,
+                'rules' => $cleanedConditions,
                 'urlEdit' => $couponId,
                 'urlDelete' => $couponId
             )
@@ -469,7 +469,7 @@ class CouponController extends BaseAdminController
 
         $message = false;
         try {
-            // Check the form against constraints violations
+            // Check the form against conditions violations
             $form = $this->validateForm($creationForm, 'POST');
 
             // Get the form field values
@@ -525,7 +525,7 @@ class CouponController extends BaseAdminController
     }
 
     /**
-     * Get all available rules
+     * Get all available conditions
      *
      * @return array
      */
@@ -560,18 +560,18 @@ class CouponController extends BaseAdminController
         $cleanedCoupons = array();
         /** @var CouponInterface $availableCoupon */
         foreach ($availableCoupons as $availableCoupon) {
-            $rule = array();
-            $rule['serviceId'] = $availableCoupon->getServiceId();
-            $rule['name'] = $availableCoupon->getName();
-            $rule['toolTip'] = $availableCoupon->getToolTip();
-            $cleanedCoupons[] = $rule;
+            $condition = array();
+            $condition['serviceId'] = $availableCoupon->getServiceId();
+            $condition['name'] = $availableCoupon->getName();
+            $condition['toolTip'] = $availableCoupon->getToolTip();
+            $cleanedCoupons[] = $condition;
         }
 
         return $cleanedCoupons;
     }
 
     /**
-     * Clean rule for template
+     * Clean condition for template
      *
      * @param ConditionCollection $conditions Condition collection
      *

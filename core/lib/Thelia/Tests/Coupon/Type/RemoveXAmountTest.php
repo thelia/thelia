@@ -197,7 +197,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //     * Test Coupon rule setter
 //     *
 //     * @covers Thelia\Coupon\type\RemoveXAmountManager::setRules
-//     * @expectedException \Thelia\Exception\InvalidRuleException
+//     * @expectedException \Thelia\Exception\InvalidConditionException
 //     *
 //     */
 //    public function testSetRulesInvalid()

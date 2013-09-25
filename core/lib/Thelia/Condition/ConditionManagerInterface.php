@@ -121,15 +121,15 @@ interface ConditionManagerInterface
      */
     public function getValidators();
 
-    /**
-     * Populate a Condition from a form admin
-     *
-     * @param array $operators Condition Operator set by the Admin
-     * @param array $values    Condition Values set by the Admin
-     *
-     * @return bool
-     */
-    public function populateFromForm(array$operators, array $values);
+//    /**
+//     * Populate a Condition from a form admin
+//     *
+//     * @param array $operators Condition Operator set by the Admin
+//     * @param array $values    Condition Values set by the Admin
+//     *
+//     * @return bool
+//     */
+//    public function populateFromForm(array$operators, array $values);
 
 
     /**

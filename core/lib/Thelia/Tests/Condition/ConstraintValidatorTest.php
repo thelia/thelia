@@ -21,12 +21,12 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Constraint;
+namespace Thelia\Condition\Implementation;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
-use Thelia\Constraint\Rule\AvailableForXArticlesManager;
-use Thelia\Constraint\Rule\Operators;
+use Thelia\Condition\ConditionEvaluator;
+use Thelia\Condition\Operators;
+use Thelia\Coupon\AdapterInterface;
 use Thelia\Coupon\BaseAdapter;
 use Thelia\Coupon\ConditionCollection;
 
@@ -41,7 +41,7 @@ use Thelia\Coupon\ConditionCollection;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
+class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -54,8 +54,10 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTestSuccess1Rules()
     {
-        $ConstraintValidator = new ConditionValidator();
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        $conditionEvaluator = new ConditionEvaluator();
+
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -66,23 +68,23 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue($ConstraintValidator));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue($conditionEvaluator));
 
-        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubAdapter);
         $operators = array(
-            AvailableForTotalAmountManager::INPUT1 => '>',
-            AvailableForTotalAmountManager::INPUT2 => '=='
+            MatchForTotalAmountManager::INPUT1 => '>',
+            MatchForTotalAmountManager::INPUT2 => '=='
         );
         $values = array(
-            AvailableForTotalAmountManager::INPUT1 => 400.00,
-            AvailableForTotalAmountManager::INPUT2 => 'EUR');
-        $rule1->setValidatorsFromForm($operators, $values);
+            MatchForTotalAmountManager::INPUT1 => 400.00,
+            MatchForTotalAmountManager::INPUT2 => 'EUR');
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $rules = new ConditionCollection();
-        $rules->add($rule1);
+        $conditions = new ConditionCollection();
+        $conditions->add($condition1);
 
-        $isValid = $ConstraintValidator->isMatching($rules);
+        $isValid = $conditionEvaluator->isMatching($conditions);
 
         $expected = true;
         $actual =$isValid;
@@ -91,8 +93,10 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTestFail1Rules()
     {
-        $ConstraintValidator = new ConditionValidator();
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        $conditionEvaluator = new ConditionEvaluator();
+
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -103,33 +107,35 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getCheckoutCurrency')
             ->will($this->returnValue('EUR'));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue($ConstraintValidator));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue($conditionEvaluator));
 
-        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubAdapter);
         $operators = array(
-            AvailableForTotalAmountManager::INPUT1 => '>',
-            AvailableForTotalAmountManager::INPUT2 => '=='
+            MatchForTotalAmountManager::INPUT1 => '>',
+            MatchForTotalAmountManager::INPUT2 => '=='
         );
         $values = array(
-            AvailableForTotalAmountManager::INPUT1 => 400.00,
-            AvailableForTotalAmountManager::INPUT2 => 'EUR');
-        $rule1->setValidatorsFromForm($operators, $values);
+            MatchForTotalAmountManager::INPUT1 => 400.00,
+            MatchForTotalAmountManager::INPUT2 => 'EUR');
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $rules = new ConditionCollection();
-        $rules->add($rule1);
+        $conditions = new ConditionCollection();
+        $conditions->add($condition1);
 
-        $isValid = $ConstraintValidator->isMatching($rules);
+        $isValid = $conditionEvaluator->isMatching($conditions);
 
         $expected = false;
         $actual =$isValid;
-        $this->assertEquals($expected, $actual, 'Constraints validator always think Customer is matching rules');
+        $this->assertEquals($expected, $actual, 'Conditions evaluator always think Customer is matching conditions');
     }
 
     public function testTestSuccess2Rules()
     {
-        $ConstraintValidator = new ConditionValidator();
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        $conditionEvaluator = new ConditionEvaluator();
+
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -143,33 +149,33 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(5));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue($ConstraintValidator));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue($conditionEvaluator));
 
-        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubAdapter);
         $operators = array(
-            AvailableForTotalAmountManager::INPUT1 => '>',
-            AvailableForTotalAmountManager::INPUT2 => '=='
+            MatchForTotalAmountManager::INPUT1 => '>',
+            MatchForTotalAmountManager::INPUT2 => '=='
         );
         $values = array(
-            AvailableForTotalAmountManager::INPUT1 => 400.00,
-            AvailableForTotalAmountManager::INPUT2 => 'EUR');
-        $rule1->setValidatorsFromForm($operators, $values);
+            MatchForTotalAmountManager::INPUT1 => 400.00,
+            MatchForTotalAmountManager::INPUT2 => 'EUR');
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $rule2 = new AvailableForXArticlesManager($stubAdapter);
+        $condition2 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => '>'
+            MatchForXArticlesManager::INPUT1 => '>'
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 4
+            MatchForXArticlesManager::INPUT1 => 4
         );
-        $rule2->setValidatorsFromForm($operators, $values);
+        $condition2->setValidatorsFromForm($operators, $values);
 
-        $rules = new ConditionCollection();
-        $rules->add($rule1);
-        $rules->add($rule2);
+        $conditions = new ConditionCollection();
+        $conditions->add($condition1);
+        $conditions->add($condition2);
 
-        $isValid = $ConstraintValidator->isMatching($rules);
+        $isValid = $conditionEvaluator->isMatching($conditions);
 
         $expected = true;
         $actual =$isValid;
@@ -178,8 +184,10 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTestFail2Rules()
     {
-        $ConstraintValidator = new ConditionValidator();
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        $conditionEvaluator = new ConditionEvaluator();
+
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -193,101 +201,101 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(5));
         $stubAdapter->expects($this->any())
-            ->method('getConstraintValidator')
-            ->will($this->returnValue($ConstraintValidator));
+            ->method('getConditionEvaluator')
+            ->will($this->returnValue($conditionEvaluator));
 
-        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubAdapter);
         $operators = array(
-            AvailableForTotalAmountManager::INPUT1 => '>',
-            AvailableForTotalAmountManager::INPUT2 => '=='
+            MatchForTotalAmountManager::INPUT1 => '>',
+            MatchForTotalAmountManager::INPUT2 => '=='
         );
         $values = array(
-            AvailableForTotalAmountManager::INPUT1 => 400.00,
-            AvailableForTotalAmountManager::INPUT2 => 'EUR');
-        $rule1->setValidatorsFromForm($operators, $values);
+            MatchForTotalAmountManager::INPUT1 => 400.00,
+            MatchForTotalAmountManager::INPUT2 => 'EUR');
+        $condition1->setValidatorsFromForm($operators, $values);
 
-        $rule2 = new AvailableForXArticlesManager($stubAdapter);
+        $condition2 = new MatchForXArticlesManager($stubAdapter);
         $operators = array(
-            AvailableForXArticlesManager::INPUT1 => '>'
+            MatchForXArticlesManager::INPUT1 => '>'
         );
         $values = array(
-            AvailableForXArticlesManager::INPUT1 => 4
+            MatchForXArticlesManager::INPUT1 => 4
         );
-        $rule2->setValidatorsFromForm($operators, $values);
+        $condition2->setValidatorsFromForm($operators, $values);
 
-        $rules = new ConditionCollection();
-        $rules->add($rule1);
-        $rules->add($rule2);
+        $conditions = new ConditionCollection();
+        $conditions->add($condition1);
+        $conditions->add($condition2);
 
-        $isValid = $ConstraintValidator->isMatching($rules);
+        $isValid = $conditionEvaluator->isMatching($conditions);
 
         $expected = false;
         $actual =$isValid;
-        $this->assertEquals($expected, $actual, 'Constraints validator always think Customer is matching rules');
+        $this->assertEquals($expected, $actual, 'Conditions evaluator always think Customer is matching conditions');
     }
 
     public function testVariableOpComparisonSuccess()
     {
-        $ConstraintValidator = new ConditionValidator();
+        $conditionEvaluator = new ConditionEvaluator();
         $expected = true;
-        $actual = $ConstraintValidator->variableOpComparison(1, Operators::EQUAL, 1);
+        $actual = $conditionEvaluator->variableOpComparison(1, Operators::EQUAL, 1);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(1, Operators::DIFFERENT, 2);
+        $actual = $conditionEvaluator->variableOpComparison(1, Operators::DIFFERENT, 2);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(1, Operators::SUPERIOR, 0);
+        $actual = $conditionEvaluator->variableOpComparison(1, Operators::SUPERIOR, 0);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(1, Operators::INFERIOR, 2);
+        $actual = $conditionEvaluator->variableOpComparison(1, Operators::INFERIOR, 2);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(1, Operators::INFERIOR_OR_EQUAL, 1);
+        $actual = $conditionEvaluator->variableOpComparison(1, Operators::INFERIOR_OR_EQUAL, 1);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(1, Operators::INFERIOR_OR_EQUAL, 2);
+        $actual = $conditionEvaluator->variableOpComparison(1, Operators::INFERIOR_OR_EQUAL, 2);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(1, Operators::SUPERIOR_OR_EQUAL, 1);
+        $actual = $conditionEvaluator->variableOpComparison(1, Operators::SUPERIOR_OR_EQUAL, 1);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(1, Operators::SUPERIOR_OR_EQUAL, 0);
+        $actual = $conditionEvaluator->variableOpComparison(1, Operators::SUPERIOR_OR_EQUAL, 0);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(1, Operators::IN, array(1, 2, 3));
+        $actual = $conditionEvaluator->variableOpComparison(1, Operators::IN, array(1, 2, 3));
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(1, Operators::OUT, array(0, 2, 3));
+        $actual = $conditionEvaluator->variableOpComparison(1, Operators::OUT, array(0, 2, 3));
         $this->assertEquals($expected, $actual);
 
     }
 
     public function testVariableOpComparisonFail()
     {
-        $ConstraintValidator = new ConditionValidator();
+        $conditionEvaluator = new ConditionEvaluator();
         $expected = false;
-        $actual = $ConstraintValidator->variableOpComparison(2, Operators::EQUAL, 1);
+        $actual = $conditionEvaluator->variableOpComparison(2, Operators::EQUAL, 1);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(2, Operators::DIFFERENT, 2);
+        $actual = $conditionEvaluator->variableOpComparison(2, Operators::DIFFERENT, 2);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(0, Operators::SUPERIOR, 0);
+        $actual = $conditionEvaluator->variableOpComparison(0, Operators::SUPERIOR, 0);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(3, Operators::INFERIOR, 2);
+        $actual = $conditionEvaluator->variableOpComparison(3, Operators::INFERIOR, 2);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(2, Operators::INFERIOR_OR_EQUAL, 1);
+        $actual = $conditionEvaluator->variableOpComparison(2, Operators::INFERIOR_OR_EQUAL, 1);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(3, Operators::SUPERIOR_OR_EQUAL, 4);
+        $actual = $conditionEvaluator->variableOpComparison(3, Operators::SUPERIOR_OR_EQUAL, 4);
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(0, Operators::IN, array(1, 2, 3));
+        $actual = $conditionEvaluator->variableOpComparison(0, Operators::IN, array(1, 2, 3));
         $this->assertEquals($expected, $actual);
 
-        $actual = $ConstraintValidator->variableOpComparison(2, Operators::OUT, array(0, 2, 3));
+        $actual = $conditionEvaluator->variableOpComparison(2, Operators::OUT, array(0, 2, 3));
         $this->assertEquals($expected, $actual);
 
     }
@@ -297,9 +305,9 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testVariableOpComparisonException()
     {
-        $ConstraintValidator = new ConditionValidator();
+        $conditionEvaluator = new ConditionEvaluator();
         $expected = true;
-        $actual = $ConstraintValidator->variableOpComparison(1, 'bad', 1);
+        $actual = $conditionEvaluator->variableOpComparison(1, 'bad', 1);
         $this->assertEquals($expected, $actual);
     }
 
@@ -316,7 +324,8 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+        /** @var AdapterInterface $stubAdapter */
+        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -324,13 +333,13 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getTranslator')
             ->will($this->returnValue($stubTranslator));
 
-        $rule1 = new AvailableForTotalAmountManager($stubAdapter);
-        $rule2 = new AvailableForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForTotalAmountManager($stubAdapter);
+        $condition2 = new MatchForXArticlesManager($stubAdapter);
 
         $adapter = new BaseAdapter($container);
 
-        $container->set('thelia.condition.match_for_total_amount', $rule1);
-        $container->set('thelia.condition.match_for_x_articles', $rule2);
+        $container->set('thelia.condition.match_for_total_amount', $condition1);
+        $container->set('thelia.condition.match_for_x_articles', $condition2);
         $container->set('thelia.adapter', $adapter);
 
         return $container;
