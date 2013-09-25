@@ -49,7 +49,7 @@ class CouponFactory
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
-    /** @var  CouponAdapterInterface Provide necessary value from Thelia*/
+    /** @var  AdapterInterface Provide necessary value from Thelia*/
     protected $adapter;
 
     /**
@@ -131,7 +131,7 @@ class CouponFactory
         );
 
         /** @var ConstraintFactory $constraintFactory */
-        $constraintFactory = $this->container->get('thelia.constraint.factory');
+        $constraintFactory = $this->container->get('thelia.condition.factory');
         $rules = $constraintFactory->unserializeCouponRuleCollection(
             $model->getSerializedRules()
         );

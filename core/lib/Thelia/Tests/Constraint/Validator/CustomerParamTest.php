@@ -50,7 +50,7 @@ class CustomerParamTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-//    /** @var CouponAdapterInterface $stubTheliaAdapter */
+//    /** @var AdapterInterface $stubTheliaAdapter */
 //    protected $stubTheliaAdapter = null;
 //
 //    /**
@@ -59,16 +59,16 @@ class CustomerParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    protected function setUp()
 //    {
-//        /** @var CouponAdapterInterface $stubTheliaAdapter */
+//        /** @var AdapterInterface $stubTheliaAdapter */
 //        $this->stubTheliaAdapter = $this->generateValidCouponBaseAdapterMock();
 //    }
 //
 //    /**
-//     * Generate valid CouponBaseAdapter
+//     * Generate valid BaseAdapter
 //     *
 //     * @param int $customerId Customer id
 //     *
-//     * @return CouponAdapterInterface
+//     * @return AdapterInterface
 //     */
 //    protected function generateValidCouponBaseAdapterMock($customerId = 4521)
 //    {
@@ -78,9 +78,9 @@ class CustomerParamTest extends \PHPUnit_Framework_TestCase
 //        $customer->setLastname('Lastname');
 //        $customer->setEmail('em@il.com');
 //
-//        /** @var CouponAdapterInterface $stubTheliaAdapter */
+//        /** @var AdapterInterface $stubTheliaAdapter */
 //        $stubTheliaAdapter = $this->getMock(
-//            'Thelia\Coupon\CouponBaseAdapter',
+//            'Thelia\Coupon\BaseAdapter',
 //            array('getCustomer'),
 //            array()
 //        );
@@ -140,7 +140,7 @@ class CustomerParamTest extends \PHPUnit_Framework_TestCase
 ////     */
 ////    public function isSerializableTest()
 ////    {
-////        $adapter = new CouponBaseAdapter();
+////        $adapter = new BaseAdapter();
 ////        $intValidator = 42;
 ////        $intToValidate = -1;
 ////

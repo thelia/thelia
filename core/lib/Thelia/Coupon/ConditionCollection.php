@@ -21,18 +21,78 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Constraint\Rule;
+namespace Thelia\Coupon;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Condition\ConditionManagerInterface;
+use Thelia\Constraint\Rule\CouponRuleInterface;
+use Thelia\Constraint\Rule\SerializableRule;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * @package Constraint
+ * Manage a set of ConditionManagerInterface
+ *
+ * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class AvailableForTotalAmountForCategoryY extends AvailableForTotalAmount
+class ConditionCollection
 {
+    /** @var array Array of ConditionManagerInterface */
+    protected $conditions = array();
+
+    /**
+     * Get Conditions
+     *
+     * @return array Array of ConditionManagerInterface
+     */
+    public function getConditions()
+    {
+        return $this->conditions;
+    }
+
+    /**
+     * Add a ConditionManagerInterface to the Collection
+     *
+     * @param ConditionManagerInterface $condition Condition
+     *
+     * @return $this
+     */
+    public function add(ConditionManagerInterface $condition)
+    {
+        $this->conditions[] = $condition;
+
+        return $this;
+    }
+
+    /**
+     * Check if there is at least one condition in the collection
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return (empty($this->conditions));
+    }
+
+    /**
+     * Allow to compare 2 set of conditions
+     *
+     * @return string Jsoned data
+     */
+    public function __toString()
+    {
+        $arrayToSerialize = array();
+        /** @var ConditionManagerInterface $condition */
+        foreach ($this->getConditions() as $condition) {
+            $arrayToSerialize[] = $condition->getSerializableCondition();
+        }
+
+        return json_encode($arrayToSerialize);
+    }
+
 
 }

@@ -25,7 +25,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Propel;
 use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Coupon\CouponRuleCollection;
+use Thelia\Coupon\ConditionCollection;
 use Thelia\Model\Base\Coupon as BaseCoupon;
 use Thelia\Model\Map\CouponTableMap;
 
@@ -106,16 +106,16 @@ class Coupon extends BaseCoupon
     }
 
     /**
-     * Create or Update this coupon rule
+     * Create or Update this coupon condition
      *
-     * @param string $serializableRules Serialized rules ready to be saved
-     * @param string $locale            Coupon Language code ISO (ex: fr_FR)
+     * @param string $serializableConditions Serialized conditions ready to be saved
+     * @param string $locale                 Coupon Language code ISO (ex: fr_FR)
      *
      * @throws \Exception
      */
-    function createOrUpdateRules($serializableRules, $locale)
+    public function createOrUpdateConditions($serializableConditions, $locale)
     {
-        $this->setSerializedRules($serializableRules);
+        $this->setSerializedRules($serializableConditions);
 
         // Set object language (i18n)
         if (!is_null($locale)) {
@@ -127,13 +127,9 @@ class Coupon extends BaseCoupon
         try {
             $this->save($con);
             $con->commit();
-
         } catch(\Exception $e) {
             $con->rollback();
             throw $e;
         }
     }
-
-
-
 }

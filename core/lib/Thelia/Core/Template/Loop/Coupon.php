@@ -95,7 +95,7 @@ class Coupon extends BaseI18nLoop
 
         $loopResult = new LoopResult();
         /** @var ConstraintFactory $constraintFactory */
-        $constraintFactory = $this->container->get('thelia.constraint.factory');
+        $constraintFactory = $this->container->get('thelia.condition.factory');
 
         /** @var Request $request */
         $request = $this->container->get('request');

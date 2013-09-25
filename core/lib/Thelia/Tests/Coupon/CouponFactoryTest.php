@@ -74,7 +74,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //     * @param bool                 $isUsed            If Coupon has been used yet
 //     * @param bool                 $isEnabled         If Coupon is enabled
 //     * @param \DateTime            $expirationDate    When Coupon expires
-//     * @param CouponRuleCollection $rules             Coupon rules
+//     * @param ConditionCollection $rules             Coupon rules
 //     * @param bool                 $isCumulative      If Coupon is cumulative
 //     * @param bool                 $isRemovingPostage If Coupon is removing postage
 //     *
@@ -109,9 +109,9 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //            $isRemovingPostage
 //        );
 //
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->getMock(
-//            'Thelia\Coupon\CouponBaseAdapter',
+//            'Thelia\Coupon\BaseAdapter',
 //            array('findOneCouponByCode'),
 //            array()
 //        );
@@ -135,7 +135,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //        $date = new \DateTime();
 //        $date->setTimestamp(strtotime("today - 2 months"));
 //
-//        /** @var CouponAdapterInterface $mockAdapter */
+//        /** @var AdapterInterface $mockAdapter */
 //        $mockAdapter = $this->generateCouponModelMock(null, null, null, null, null, null, null, null, $date);
 //        $couponFactory = new CouponFactory($mockAdapter);
 //        $coupon = $couponFactory->buildCouponFromCode('XMAS1');
@@ -151,7 +151,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //    {
 //        $date = new \DateTime();
 //
-//        /** @var CouponAdapterInterface $mockAdapter */
+//        /** @var AdapterInterface $mockAdapter */
 //        $mockAdapter = $this->generateCouponModelMock(null, null, null, null, null, null, null, null, $date);
 //        $couponFactory = new CouponFactory($mockAdapter);
 //        $coupon = $couponFactory->buildCouponFromCode('XMAS1');
@@ -165,8 +165,8 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testBuildCouponFromCodeWithoutRule()
 //    {
-//        /** @var CouponAdapterInterface $mockAdapter */
-//        $mockAdapter = $this->generateCouponModelMock(null, null, null, null, null, null, null, null, null, new CouponRuleCollection(array()));
+//        /** @var AdapterInterface $mockAdapter */
+//        $mockAdapter = $this->generateCouponModelMock(null, null, null, null, null, null, null, null, null, new ConditionCollection(array()));
 //        $couponFactory = new CouponFactory($mockAdapter);
 //        $coupon = $couponFactory->buildCouponFromCode('XMAS1');
 //    }
@@ -178,7 +178,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testBuildCouponFromCode()
 //    {
-//        /** @var CouponAdapterInterface $mockAdapter */
+//        /** @var AdapterInterface $mockAdapter */
 //        $mockAdapter = $this->generateCouponModelMock();
 //        $couponFactory = new CouponFactory($mockAdapter);
 //        /** @var CouponInterface $coupon */
@@ -206,7 +206,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //    /**
 //     * Generate valid CouponRuleInterfaces
 //     *
-//     * @return CouponRuleCollection Set of CouponRuleInterface
+//     * @return ConditionCollection Set of ConditionManagerInterface
 //     */
 //    protected function generateValidRules()
 //    {
@@ -230,7 +230,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 ////                )
 ////            )
 ////        );
-////        $rules = new CouponRuleCollection(array($rule1, $rule2));
+////        $rules = new ConditionCollection(array($rule1, $rule2));
 ////
 ////        return $rules;
 //    }
@@ -247,7 +247,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //     * @param bool                 $isUsed            If Coupon has been used yet
 //     * @param bool                 $isEnabled         If Coupon is enabled
 //     * @param \DateTime            $expirationDate    When Coupon expires
-//     * @param CouponRuleCollection $rules             Coupon rules
+//     * @param ConditionCollection $rules             Coupon rules
 //     * @param bool                 $isCumulative      If Coupon is cumulative
 //     * @param bool                 $isRemovingPostage If Coupon is removing postage
 //     *

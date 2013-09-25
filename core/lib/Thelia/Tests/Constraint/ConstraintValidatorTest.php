@@ -27,15 +27,15 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
-use Thelia\Coupon\CouponBaseAdapter;
-use Thelia\Coupon\CouponRuleCollection;
+use Thelia\Coupon\BaseAdapter;
+use Thelia\Coupon\ConditionCollection;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test ConstraintValidator Class
+ * Unit Test ConditionEvaluator Class
  *
  * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
@@ -54,7 +54,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTestSuccess1Rules()
     {
-        $ConstraintValidator = new ConstraintValidator();
+        $ConstraintValidator = new ConditionValidator();
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -79,7 +79,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
             AvailableForTotalAmountManager::INPUT2 => 'EUR');
         $rule1->setValidatorsFromForm($operators, $values);
 
-        $rules = new CouponRuleCollection();
+        $rules = new ConditionCollection();
         $rules->add($rule1);
 
         $isValid = $ConstraintValidator->isMatching($rules);
@@ -91,7 +91,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTestFail1Rules()
     {
-        $ConstraintValidator = new ConstraintValidator();
+        $ConstraintValidator = new ConditionValidator();
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -116,7 +116,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
             AvailableForTotalAmountManager::INPUT2 => 'EUR');
         $rule1->setValidatorsFromForm($operators, $values);
 
-        $rules = new CouponRuleCollection();
+        $rules = new ConditionCollection();
         $rules->add($rule1);
 
         $isValid = $ConstraintValidator->isMatching($rules);
@@ -128,7 +128,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTestSuccess2Rules()
     {
-        $ConstraintValidator = new ConstraintValidator();
+        $ConstraintValidator = new ConditionValidator();
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -165,7 +165,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         );
         $rule2->setValidatorsFromForm($operators, $values);
 
-        $rules = new CouponRuleCollection();
+        $rules = new ConditionCollection();
         $rules->add($rule1);
         $rules->add($rule2);
 
@@ -178,7 +178,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testTestFail2Rules()
     {
-        $ConstraintValidator = new ConstraintValidator();
+        $ConstraintValidator = new ConditionValidator();
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -215,7 +215,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         );
         $rule2->setValidatorsFromForm($operators, $values);
 
-        $rules = new CouponRuleCollection();
+        $rules = new ConditionCollection();
         $rules->add($rule1);
         $rules->add($rule2);
 
@@ -228,7 +228,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testVariableOpComparisonSuccess()
     {
-        $ConstraintValidator = new ConstraintValidator();
+        $ConstraintValidator = new ConditionValidator();
         $expected = true;
         $actual = $ConstraintValidator->variableOpComparison(1, Operators::EQUAL, 1);
         $this->assertEquals($expected, $actual);
@@ -264,7 +264,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testVariableOpComparisonFail()
     {
-        $ConstraintValidator = new ConstraintValidator();
+        $ConstraintValidator = new ConditionValidator();
         $expected = false;
         $actual = $ConstraintValidator->variableOpComparison(2, Operators::EQUAL, 1);
         $this->assertEquals($expected, $actual);
@@ -297,7 +297,7 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testVariableOpComparisonException()
     {
-        $ConstraintValidator = new ConstraintValidator();
+        $ConstraintValidator = new ConditionValidator();
         $expected = true;
         $actual = $ConstraintValidator->variableOpComparison(1, 'bad', 1);
         $this->assertEquals($expected, $actual);
@@ -327,10 +327,10 @@ class ConstraintValidatorTest extends \PHPUnit_Framework_TestCase
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $rule2 = new AvailableForXArticlesManager($stubAdapter);
 
-        $adapter = new CouponBaseAdapter($container);
+        $adapter = new BaseAdapter($container);
 
-        $container->set('thelia.constraint.rule.available_for_total_amount', $rule1);
-        $container->set('thelia.constraint.rule.available_for_x_articles', $rule2);
+        $container->set('thelia.condition.match_for_total_amount', $rule1);
+        $container->set('thelia.condition.match_for_x_articles', $rule2);
         $container->set('thelia.adapter', $adapter);
 
         return $container;

@@ -27,8 +27,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
-use Thelia\Coupon\CouponBaseAdapter;
-use Thelia\Coupon\CouponRuleCollection;
+use Thelia\Coupon\BaseAdapter;
+use Thelia\Coupon\ConditionCollection;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -169,7 +169,7 @@ class ConstraintFactoryTest extends \PHPUnit_Framework_TestCase
         );
         $rule2->setValidatorsFromForm($operators, $values);
 
-        $rules = new CouponRuleCollection();
+        $rules = new ConditionCollection();
         $rules->add($rule1);
         $rules->add($rule2);
 
@@ -209,10 +209,10 @@ class ConstraintFactoryTest extends \PHPUnit_Framework_TestCase
         $rule1 = new AvailableForTotalAmountManager($stubAdapter);
         $rule2 = new AvailableForXArticlesManager($stubAdapter);
 
-        $adapter = new CouponBaseAdapter($container);
+        $adapter = new BaseAdapter($container);
 
-        $container->set('thelia.constraint.rule.available_for_total_amount', $rule1);
-        $container->set('thelia.constraint.rule.available_for_x_articles', $rule2);
+        $container->set('thelia.condition.match_for_total_amount', $rule1);
+        $container->set('thelia.condition.match_for_x_articles', $rule2);
         $container->set('thelia.adapter', $adapter);
 
         return $container;

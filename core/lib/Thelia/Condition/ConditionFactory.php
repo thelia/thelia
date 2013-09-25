@@ -68,12 +68,12 @@ class ConditionFactory
      *
      * @return string A ready to be stored Condition collection
      */
-    public function serializeCouponRuleCollection(ConditionCollection $collection)
+    public function serializeConditionCollection(ConditionCollection $collection)
     {
         if ($collection->isEmpty()) {
             /** @var ConditionManagerInterface $conditionNone */
             $conditionNone = $this->container->get(
-                'thelia.constraint.rule.available_for_everyone'
+                'thelia.condition.match_for_everyone'
             );
             $collection->add($conditionNone);
         }
@@ -83,7 +83,7 @@ class ConditionFactory
             /** @var $condition ConditionManagerInterface */
             foreach ($conditions as $condition) {
                 // Remove all rule if the "no condition" condition is found
-//                if ($condition->getServiceId() == 'thelia.constraint.rule.available_for_everyone') {
+//                if ($condition->getServiceId() == 'thelia.condition.match_for_everyone') {
 //                    return base64_encode(json_encode(array($condition->getSerializableRule())));
 //                }
                 $serializableConditions[] = $condition->getSerializableCondition();
@@ -100,7 +100,7 @@ class ConditionFactory
      *
      * @return ConditionCollection Conditions ready to be processed
      */
-    public function unserializeCouponRuleCollection($serializedConditions)
+    public function unserializeConditionCollection($serializedConditions)
     {
         $unserializedConditions = json_decode(base64_decode($serializedConditions));
 

@@ -21,47 +21,34 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Constraint\Validator;
+namespace Thelia\Exception;
 
-use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\CouponAdapterInterface;
-use Thelia\Exception\NotImplementedException;
+use Thelia\Log\Tlog;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Get a Param value
+ * Thrown when a Condition receive an invalid Operator
  *
- * @package Constraint
+ * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-abstract class RuleParameterAbstract implements ComparableInterface
+class InvalidConditionOperatorException extends \RuntimeException
 {
-    /** @var Translator Service Translator */
-    protected $translator = null;
-
     /**
-     * Get Parameter value to test against
+     * InvalidConditionOperatorException thrown when a Condition is given a bad Operator
      *
-     * @return mixed
+     * @param string $className Class name
+     * @param string $parameter array key parameter
      */
-    public function getValue()
+    public function __construct($className, $parameter)
     {
-        return new NotImplementedException();
+        $message = 'Invalid Operator for Condition ' . $className . ' on parameter ' . $parameter;
+        Tlog::getInstance()->addError($message);
+
+        parent::__construct($message);
     }
-
-    /**
-     * Get I18n tooltip
-     *
-     * @return string
-     */
-    public function getToolTip()
-    {
-        return new NotImplementedException();
-    }
-
-
 }

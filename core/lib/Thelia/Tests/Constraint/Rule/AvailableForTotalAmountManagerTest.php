@@ -23,10 +23,10 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Constraint\ConstraintValidator;
+use Thelia\Constraint\ConditionValidator;
 use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\Operators;
-use Thelia\Exception\InvalidRuleValueException;
+use Thelia\Exception\InvalidConditionValueException;
 use Thelia\Model\Currency;
 
 /**
@@ -34,7 +34,7 @@ use Thelia\Model\Currency;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test AvailableForTotalAmountManager Class
+ * Unit Test MatchForTotalAmountManager Class
  *
  * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
@@ -42,7 +42,7 @@ use Thelia\Model\Currency;
  */
 class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var CouponAdapterInterface $stubTheliaAdapter */
+    /** @var AdapterInterface $stubTheliaAdapter */
     protected $stubTheliaAdapter = null;
 
     /**
@@ -69,7 +69,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
 
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $currency1 = new Currency();
         $currency1->setCode('EUR');
@@ -95,7 +95,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmountManager::setValidators
-     * @expectedException \Thelia\Exception\InvalidRuleOperatorException
+     * @expectedException \Thelia\Exception\InvalidConditionOperatorException
      *
      */
     public function testInValidBackOfficeInputOperator()
@@ -123,7 +123,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmountManager::setValidators
-     * @expectedException \Thelia\Exception\InvalidRuleOperatorException
+     * @expectedException \Thelia\Exception\InvalidConditionOperatorException
      *
      */
     public function testInValidBackOfficeInputOperator2()
@@ -151,7 +151,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmountManager::setValidators
-     * @expectedException \Thelia\Exception\InvalidRuleValueException
+     * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
     public function testInValidBackOfficeInputValue()
@@ -179,7 +179,7 @@ class AvailableForTotalAmountManagerTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Coupon\Rule\AvailableForTotalAmountManager::setValidators
-     * @expectedException \Thelia\Exception\InvalidRuleValueException
+     * @expectedException \Thelia\Exception\InvalidConditionValueException
      *
      */
     public function testInValidBackOfficeInputValue2()

@@ -1,10 +1,10 @@
 <?php
 use Thelia\Constraint\ConstraintFactory;
-use Thelia\Constraint\Rule\AvailableForEveryoneManager;
+use Thelia\Constraint\Rule\MatchForEveryoneManager;
 use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
-use Thelia\Coupon\CouponRuleCollection;
+use Thelia\Coupon\ConditionCollection;
 
 
 require __DIR__ . '/../core/bootstrap.php';
@@ -685,11 +685,11 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     );
     $rule2->setValidatorsFromForm($operators, $values);
 
-    $rules = new CouponRuleCollection();
+    $rules = new ConditionCollection();
     $rules->add($rule1);
     $rules->add($rule2);
     /** @var ConstraintFactory $constraintFactory */
-    $constraintFactory = $container->get('thelia.constraint.factory');
+    $constraintFactory = $container->get('thelia.condition.factory');
 
     $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
     $coupon1->setSerializedRules($serializedRules);
@@ -729,11 +729,11 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         AvailableForXArticlesManager::INPUT1 => 4,
     );
     $rule1->setValidatorsFromForm($operators, $values);
-    $rules = new CouponRuleCollection();
+    $rules = new ConditionCollection();
     $rules->add($rule1);
 
     /** @var ConstraintFactory $constraintFactory */
-    $constraintFactory = $container->get('thelia.constraint.factory');
+    $constraintFactory = $container->get('thelia.condition.factory');
 
     $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
     $coupon2->setSerializedRules($serializedRules);
@@ -765,15 +765,15 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $date = new \DateTime();
     $coupon3->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
 
-    $rule1 = new AvailableForEveryoneManager($adapter);
+    $rule1 = new MatchForEveryoneManager($adapter);
     $operators = array();
     $values = array();
     $rule1->setValidatorsFromForm($operators, $values);
-    $rules = new CouponRuleCollection();
+    $rules = new ConditionCollection();
     $rules->add($rule1);
 
     /** @var ConstraintFactory $constraintFactory */
-    $constraintFactory = $container->get('thelia.constraint.factory');
+    $constraintFactory = $container->get('thelia.condition.factory');
 
     $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
     $coupon3->setSerializedRules($serializedRules);

@@ -62,7 +62,7 @@ class IntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInferiorDate()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $dateValidatorStart = new \DateTime("2012-07-08");
 //        $dateValidatorInterval = new \DateInterval("P1M"); //1month
 //        $dateToValidate = new \DateTime("2012-07-07");
@@ -81,7 +81,7 @@ class IntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsDate()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $dateValidatorStart = new \DateTime("2012-07-08");
 //        $dateValidatorInterval = new \DateInterval("P1M"); //1month
 //        $dateToValidate = new \DateTime("2012-07-08");
@@ -103,7 +103,7 @@ class IntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsDate2()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $dateValidatorStart = new \DateTime("2012-07-08");
 //        $dateValidatorInterval = new \DateInterval("P1M"); //1month
 //        $dateToValidate = new \DateTime("2012-08-08");
@@ -122,7 +122,7 @@ class IntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testSuperiorDate()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $dateValidatorStart = new \DateTime("2012-07-08");
 //        $dateValidatorInterval = new \DateInterval("P1M"); //1month
 //        $dateToValidate = new \DateTime("2012-08-09");
@@ -140,7 +140,7 @@ class IntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInvalidArgumentException()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $dateValidatorStart = new \DateTime("2012-07-08");
 //        $dateValidatorInterval = new \DateInterval("P1M"); //1month
 //        $dateToValidate = 1377012588;
@@ -156,7 +156,7 @@ class IntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function isSerializableTest()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $dateValidatorStart = new \DateTime("2012-07-08");
 //        $dateValidatorInterval = new \DateInterval("P1M"); //1month
 //

@@ -27,7 +27,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
-use Thelia\Constraint\ConstraintValidator;
+use Thelia\Constraint\ConditionValidator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Coupon\Type\CouponInterface;
@@ -43,12 +43,14 @@ use Thelia\Model\LangQuery;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
+ * Allow to assist in getting relevant data on the current application state
+ *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  * @todo implements
  *
  */
-class CouponBaseAdapter implements CouponAdapterInterface
+class BaseAdapter implements AdapterInterface
 {
     use CartTrait {
         CartTrait::getCart as getCartFromTrait;
@@ -262,11 +264,11 @@ class CouponBaseAdapter implements CouponAdapterInterface
     /**
      * Return Constraint Validator
      *
-     * @return ConstraintValidator
+     * @return ConditionValidator
      */
-    public function getConstraintValidator()
+    public function getConditionValidator()
     {
-        return $this->container->get('thelia.constraint.validator');
+        return $this->container->get('thelia.condition.validator');
     }
 
 

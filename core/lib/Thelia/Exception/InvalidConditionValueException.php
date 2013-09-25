@@ -21,39 +21,35 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Constraint\Rule;
+namespace Thelia\Exception;
+
+use Thelia\Log\Tlog;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * @package Constraint
+ * Thrown when a Condition receives an invalid Parameter
+ *
+ * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class AvailableForDate extends AvailableForPeriod
+class InvalidConditionValueException extends \RuntimeException
 {
-
     /**
-     * Check if backoffice inputs are relevant or not
+     * InvalidConditionValueException thrown when a Condition is given a bad Parameter
      *
-     * @return bool
+     * @param string $className Class name
+     * @param string $parameter array key parameter
      */
-    public function checkBackOfficeInput()
+    public function __construct($className, $parameter)
     {
-        // TODO: Implement checkBackOfficeInput() method.
+
+        $message = 'Invalid Parameter for Condition ' . $className . ' on parameter ' . $parameter;
+        Tlog::getInstance()->addError($message);
+
+        parent::__construct($message);
     }
-
-    /**
-     * Check if Checkout inputs are relevant or not
-     *
-     * @return bool
-     */
-    public function checkCheckoutInput()
-    {
-        // TODO: Implement checkCheckoutInput() method.
-    }
-
-
 }

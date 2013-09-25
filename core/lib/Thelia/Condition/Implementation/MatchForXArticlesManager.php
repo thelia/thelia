@@ -46,7 +46,7 @@ class MatchForXArticlesManager extends ConditionManagerAbstract
     CONST INPUT1 = 'quantity';
 
     /** @var string Service Id from Resources/config.xml  */
-    protected $serviceId = 'thelia.constraint.rule.available_for_x_articles';
+    protected $serviceId = 'thelia.condition.match_for_x_articles';
 
     /** @var array Available Operators (Operators::CONST) */
     protected $availableOperators = array(

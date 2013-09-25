@@ -27,6 +27,8 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
+use Thelia\Condition\ConditionEvaluator;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 
@@ -35,13 +37,13 @@ use Thelia\Model\Coupon;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Allow a CouponManager class to be fed with relevant Thelia data
+ * Allow to assist in getting relevant data on the current application state
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-interface CouponAdapterInterface
+interface AdapterInterface
 {
 
     /**
@@ -163,11 +165,11 @@ interface CouponAdapterInterface
     public function getRequest();
 
     /**
-     * Return Constraint Validator
+     * Return Condition Validator
      *
-     * @return ConstraintValidator
+     * @return ConditionEvaluator
      */
-    public function getConstraintValidator();
+    public function getConditionValidator();
 
     /**
      * Return all available currencies

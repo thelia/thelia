@@ -110,7 +110,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testOperatorInferiorValidBefore()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        // Given
 //        $a = 11;
 //        $operator = Operators::INFERIOR;
@@ -131,7 +131,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorInferiorInvalidEquals()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 12;
 //        $operator = Operators::INFERIOR;
 //        $b = new QuantityParam($adapter, 12);
@@ -151,7 +151,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorInferiorInvalidAfter()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 13;
 //        $operator = Operators::INFERIOR;
 //        $b = new QuantityParam($adapter, 12);
@@ -171,7 +171,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorInferiorOrEqualValidEqual()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 11;
 //        $operator = Operators::INFERIOR_OR_EQUAL;
 //        $b = new QuantityParam($adapter, 11);
@@ -191,7 +191,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorInferiorOrEqualValidBefore()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 10;
 //        $operator = Operators::INFERIOR_OR_EQUAL;
 //        $b = new QuantityParam($adapter, 11);
@@ -211,7 +211,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorInferiorOrEqualInValidAfter()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 12;
 //        $operator = Operators::INFERIOR_OR_EQUAL;
 //        $b = new QuantityParam($adapter, 11);
@@ -231,7 +231,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorEqualValidEqual()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 12;
 //        $operator = Operators::EQUAL;
 //        $b = new QuantityParam($adapter, 12);
@@ -251,7 +251,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorEqualInValidBefore()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 11;
 //        $operator = Operators::EQUAL;
 //        $b = new QuantityParam($adapter, 12);
@@ -271,7 +271,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorEqualInValidAfter()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 13;
 //        $operator = Operators::EQUAL;
 //        $b = new QuantityParam($adapter, 12);
@@ -291,7 +291,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorSuperiorOrEqualValidEqual()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 13;
 //        $operator = Operators::SUPERIOR_OR_EQUAL;
 //        $b = new QuantityParam($adapter, 13);
@@ -311,7 +311,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorSuperiorOrEqualAfter()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 14;
 //        $operator = Operators::SUPERIOR_OR_EQUAL;
 //        $b = new QuantityParam($adapter, 13);
@@ -331,7 +331,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorSuperiorOrEqualInvalidBefore()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 12;
 //        $operator = Operators::SUPERIOR_OR_EQUAL;
 //        $b = new QuantityParam($adapter, 13);
@@ -351,7 +351,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorSuperiorValidAfter()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 13;
 //        $operator = Operators::SUPERIOR;
 //        $b = new QuantityParam($adapter, 12);
@@ -371,7 +371,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorSuperiorInvalidEqual()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 12;
 //        $operator = Operators::SUPERIOR;
 //        $b = new QuantityParam($adapter, 12);
@@ -391,7 +391,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorSuperiorInvalidBefore()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 11;
 //        $operator = Operators::SUPERIOR;
 //        $b = new QuantityParam($adapter, 12);
@@ -411,7 +411,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorDifferentValid()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 12;
 //        $operator = Operators::DIFFERENT;
 //        $b = new QuantityParam($adapter, 11);
@@ -431,7 +431,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorDifferentInvalidEquals()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 11;
 //        $operator = Operators::DIFFERENT;
 //        $b = new QuantityParam($adapter, 11);
@@ -451,7 +451,7 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
 //    public function testOperatorInValid()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $a = 12;
 //        $operator = 'X';
 //        $b = new QuantityParam($adapter, 11);

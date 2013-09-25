@@ -61,7 +61,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInferiorDate()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-07-08");
 //        $dateToValidate = new \DateTime("2012-07-07");
 //        $duration = 10;
@@ -84,7 +84,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsDateRepeatEveryMonthOneTimeFirstPeriodBeginning()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-07-08");
 //        $dateToValidate = new \DateTime("2012-07-08");
 //        $duration = 10;
@@ -106,7 +106,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsDateRepeatEveryMonthOneTimeFirstPeriodMiddle()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-07-08");
 //        $dateToValidate = new \DateTime("2012-07-13");
 //        $duration = 10;
@@ -128,7 +128,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsDateRepeatEveryMonthOneTimeFirstPeriodEnding()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-07-08");
 //        $dateToValidate = new \DateTime("2012-07-18");
 //        $duration = 10;
@@ -150,7 +150,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsDateRepeatEveryMonthOneTimeSecondPeriodBeginning()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-08-08");
 //        $dateToValidate = new \DateTime("2012-08-08");
 //        $duration = 10;
@@ -172,7 +172,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsDateRepeatEveryMonthOneTimeSecondPeriodMiddle()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-08-08");
 //        $dateToValidate = new \DateTime("2012-08-13");
 //        $duration = 10;
@@ -194,7 +194,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsDateRepeatEveryMonthOneTimeSecondPeriodEnding()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-08-08");
 //        $dateToValidate = new \DateTime("2012-08-18");
 //        $duration = 10;
@@ -216,7 +216,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsDateRepeatEveryMonthFourTimeLastPeriodBeginning()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-10-08");
 //        $dateToValidate = new \DateTime("2012-10-08");
 //        $duration = 10;
@@ -238,7 +238,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsDateRepeatEveryMonthFourTimeLastPeriodMiddle()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-10-08");
 //        $dateToValidate = new \DateTime("2012-10-13");
 //        $duration = 10;
@@ -260,7 +260,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsDateRepeatEveryMonthFourTimeLastPeriodEnding()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-10-08");
 //        $dateToValidate = new \DateTime("2012-10-18");
 //        $duration = 10;
@@ -282,7 +282,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testNotEqualsDateRepeatEveryMonthFourTimeInTheBeginning()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-10-08");
 //        $dateToValidate = new \DateTime("2012-07-19");
 //        $duration = 10;
@@ -304,7 +304,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testNotEqualsDateRepeatEveryMonthFourTimeInTheMiddle()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-10-08");
 //        $dateToValidate = new \DateTime("2012-08-01");
 //        $duration = 10;
@@ -327,7 +327,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testNotEqualsDateRepeatEveryMonthFourTimeInTheEnd()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-10-08");
 //        $dateToValidate = new \DateTime("2012-08-07");
 //        $duration = 10;
@@ -351,7 +351,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testSuperiorDateRepeatEveryMonthFourTime()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-07-08");
 //        $dateToValidate = new \DateTime("2012-10-19");
 //        $duration = 10;
@@ -372,7 +372,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInvalidArgumentException()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-07-08");
 //        $dateToValidate = 1377012588;
 //        $duration = 10;
@@ -391,7 +391,7 @@ class RepeatedIntervalParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function isSerializableTest()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $startDateValidator = new \DateTime("2012-07-08");
 //        $dateToValidate = 1377012588;
 //        $duration = 10;

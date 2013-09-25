@@ -62,7 +62,7 @@ class PriceParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInferiorPrice()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //
 //        $priceValidator = 42.50;
 //        $priceToValidate = 1.00;
@@ -81,7 +81,7 @@ class PriceParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInferiorPrice2()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //
 //        $priceValidator = 42.50;
 //        $priceToValidate = 42.49;
@@ -100,7 +100,7 @@ class PriceParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsPrice()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //
 //        $priceValidator = 42.50;
 //        $priceToValidate = 42.50;
@@ -119,7 +119,7 @@ class PriceParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testSuperiorPrice()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //
 //        $priceValidator = 42.50;
 //        $priceToValidate = 42.51;
@@ -137,7 +137,7 @@ class PriceParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInvalidArgumentException()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //
 //        $priceValidator = 42.50;
 //        $priceToValidate = '42.50';
@@ -155,7 +155,7 @@ class PriceParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInvalidArgumentException2()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //
 //        $priceValidator = 42.50;
 //        $priceToValidate = -1;
@@ -173,7 +173,7 @@ class PriceParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInvalidArgumentException3()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //
 //        $priceValidator = 42.50;
 //        $priceToValidate = 0;
@@ -191,7 +191,7 @@ class PriceParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInvalidArgumentException4()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $priceValidator = 42.50;
 //        $priceToValidate = 1;
 //
@@ -208,7 +208,7 @@ class PriceParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function isSerializableTest()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $priceValidator = 42.50;
 //
 //        $param = new PriceParam($adapter, $priceValidator, 'GBP');

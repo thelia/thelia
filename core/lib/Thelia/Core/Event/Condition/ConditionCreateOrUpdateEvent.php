@@ -21,85 +21,86 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Core\Event\Condition;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Constraint\Rule\SerializableRule;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Coupon\ConditionCollection;
+use Thelia\Coupon\Type\CouponInterface;
 
 /**
  * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
+ * Date: 8/29/13
+ * Time: 3:45 PM
  *
- * Manage a set of CouponRuleInterface
+ * Occurring when a Condition is created or updated
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class CouponRuleCollection
+class ConditionCreateOrUpdateEvent extends ActionEvent
 {
-    /** @var array Array of CouponRuleInterface */
-    protected $rules = array();
+    /** @var ConditionCollection Array of ConditionManagerInterface */
+    protected $conditions = null;
+
+    /** @var CouponInterface Coupon model associated with this conditions */
+    protected $couponModel = null;
 
     /**
      * Constructor
+     *
+     * @param ConditionCollection $conditions Array of ConditionManagerInterface
      */
-    function __construct()
+    public function __construct(ConditionCollection $conditions)
     {
-
+        $this->conditions = $conditions;
     }
 
     /**
-     * Get Rules
+     * Get Conditions
      *
-     * @return array Array of CouponRuleInterface
+     * @return null|ConditionCollection Array of ConditionManagerInterface
      */
-    public function getRules()
+    public function getConditions()
     {
-        return $this->rules;
+        return $this->conditions;
     }
 
     /**
-     * Add a CouponRuleInterface to the Collection
+     * Set Conditions
      *
-     * @param CouponRuleInterface $rule Rule
+     * @param ConditionCollection $conditions Array of ConditionManagerInterface
      *
      * @return $this
      */
-    public function add(CouponRuleInterface $rule)
+    public function setConditions(ConditionCollection $conditions)
     {
-        $this->rules[] = $rule;
+        $this->conditions = $conditions;
 
         return $this;
     }
 
     /**
-     * Check if there is at least one rule in the collection
+     * Set Coupon Model associated to this condition
      *
-     * @return bool
+     * @param CouponInterface $couponModel Coupon Model
+     *
+     * @return $this
      */
-    public function isEmpty()
+    public function setCouponModel($couponModel)
     {
-        return (empty($this->rules));
+        $this->couponModel = $couponModel;
+
+        return $this;
     }
 
     /**
-     * Allow to compare 2 set of rules
+     * Get Coupon Model associated to this condition
      *
-     * @return string Jsoned data
+     * @return null|CouponInterface
      */
-    public function __toString()
+    public function getCouponModel()
     {
-        $arrayToSerialize = array();
-        /** @var CouponRuleInterface $rule */
-        foreach ($this->getRules() as $rule) {
-            $arrayToSerialize[] = $rule->getSerializableRule();
-        }
-
-        return json_encode($arrayToSerialize);
+        return $this->couponModel;
     }
-
-
 }

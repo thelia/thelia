@@ -153,7 +153,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testGetEffect()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        $expected = 10;
@@ -186,7 +186,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0, $rule1, $rule2)));
+//        $coupon->setRules(new ConditionCollection(array($rule0, $rule1, $rule2)));
 //
 //        // Then
 //        $expected = 3;
@@ -216,7 +216,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0, $rule1, $rule2)));
+//        $coupon->setRules(new ConditionCollection(array($rule0, $rule1, $rule2)));
 //    }
 //
 //    /**
@@ -228,7 +228,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //    public function testGetEffectIfTotalAmountInferiorTo400Valid()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
 //            Operators::INFERIOR,
 //            400.00
@@ -236,7 +236,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+//        $coupon->setRules(new ConditionCollection(array($rule0)));
 //
 //        // Then
 //        $expected = 10.00;
@@ -253,7 +253,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //    public function testGetEffectIfTotalAmountInferiorOrEqualTo400Valid()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
 //            Operators::INFERIOR_OR_EQUAL,
 //            400.00
@@ -261,7 +261,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+//        $coupon->setRules(new ConditionCollection(array($rule0)));
 //
 //        // Then
 //        $expected = 10.00;
@@ -278,7 +278,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //    public function testGetEffectIfTotalAmountEqualTo400Valid()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
 //            Operators::EQUAL,
 //            400.00
@@ -286,7 +286,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+//        $coupon->setRules(new ConditionCollection(array($rule0)));
 //
 //        // Then
 //        $expected = 10.00;
@@ -303,7 +303,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //    public function testGetEffectIfTotalAmountSuperiorOrEqualTo400Valid()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
 //            Operators::SUPERIOR_OR_EQUAL,
 //            400.00
@@ -311,7 +311,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+//        $coupon->setRules(new ConditionCollection(array($rule0)));
 //
 //        // Then
 //        $expected = 10.00;
@@ -328,7 +328,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //    public function testGetEffectIfTotalAmountSuperiorTo400Valid()
 //    {
 //        // Given
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
 //            Operators::SUPERIOR,
 //            400.00
@@ -336,7 +336,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+//        $coupon->setRules(new ConditionCollection(array($rule0)));
 //
 //        // Then
 //        $expected = 10.00;
@@ -365,7 +365,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //     */
 //    protected function generateValidRuleAvailableForTotalAmountOperatorTo($operator, $amount)
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $validators = array(
 //            AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
 //                $operator,

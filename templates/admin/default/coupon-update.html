@@ -24,8 +24,6 @@
 </section> <!-- #wrapper -->
 {/block}
 
-{include file='includes/confirmation-modal.html'}
-
 {block name="javascript-initialization"}
     {javascripts file='assets/bootstrap-datepicker/js/bootstrap-datepicker.js'}
         <script src="{$asset_url}"></script>
@@ -89,7 +87,7 @@
                     $('#constraint-add-operators-values').html('');
                     // Set the rule selector
                     $("#category-rule option").filter(function() {
-                        return $(this).val() == 'thelia.constraint.rule.available_for_everyone';
+                        return $(this).val() == 'thelia.condition.match_for_everyone';
                     }).prop('selected', true);
 
                     $.couponManager.onClickUpdateRule();

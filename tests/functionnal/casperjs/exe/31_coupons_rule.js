@@ -23,7 +23,7 @@ casper.start(thelia2_login_coupon_update_url, function() {
 
     // Create rule
     this.evaluate(function() {
-        $('#category-rule').val('thelia.constraint.rule.available_for_x_articles').change();
+        $('#category-rule').val('thelia.condition.match_for_x_articles').change();
         return true;
     });
     this.capture('tests/functionnal/casperjs/screenshot/coupons/rule-selected.png');
@@ -133,7 +133,7 @@ casper.thenOpen(thelia2_login_coupon_update_url, function() {
 casper.then(function(){
 // Create rule
     this.evaluate(function() {
-        $('#category-rule').val('thelia.constraint.rule.available_for_total_amount').change();
+        $('#category-rule').val('thelia.condition.match_for_total_amount').change();
         return true;
     });
     this.capture('tests/functionnal/casperjs/screenshot/coupons/rule-selected2.png');
@@ -234,7 +234,7 @@ casper.thenOpen(thelia2_login_coupon_update_url, function() {
 // Test add no condition rule
 casper.then(function(){
     this.evaluate(function() {
-        $('#category-rule').val('thelia.constraint.rule.available_for_x_articles').change();
+        $('#category-rule').val('thelia.condition.match_for_x_articles').change();
         return true;
     });
 });
@@ -274,7 +274,7 @@ casper.thenOpen(thelia2_login_coupon_update_url, function() {
 
 casper.then(function(){
     this.evaluate(function() {
-        $('#category-rule').val('thelia.constraint.rule.available_for_everyone').change();
+        $('#category-rule').val('thelia.condition.match_for_everyone').change();
         return true;
     });
 });

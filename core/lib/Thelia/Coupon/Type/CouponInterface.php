@@ -23,8 +23,8 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Coupon\CouponAdapterInterface;
-use Thelia\Coupon\CouponRuleCollection;
+use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\ConditionCollection;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -140,7 +140,7 @@ interface CouponInterface
     /**
      * Return condition to validate the Coupon or not
      *
-     * @return CouponRuleCollection A set of CouponRuleInterface
+     * @return ConditionCollection A set of ConditionManagerInterface
      */
     public function getRules();
 
@@ -148,12 +148,12 @@ interface CouponInterface
      * Replace the existing Rules by those given in parameter
      * If one Rule is badly implemented, no Rule will be added
      *
-     * @param CouponRuleCollection $rules CouponRuleInterface to add
+     * @param ConditionCollection $rules ConditionManagerInterface to add
      *
      * @return $this
      * @throws \Thelia\Exception\InvalidRuleException
      */
-    public function setRules(CouponRuleCollection $rules);
+    public function setRules(ConditionCollection $rules);
 
     /**
      * Return Coupon expiration date
@@ -209,7 +209,7 @@ interface CouponInterface
 
     /**
      * Check if the current Coupon is matching its conditions (Rules)
-     * Thelia variables are given by the CouponAdapterInterface
+     * Thelia variables are given by the AdapterInterface
      *
      * @return bool
      */

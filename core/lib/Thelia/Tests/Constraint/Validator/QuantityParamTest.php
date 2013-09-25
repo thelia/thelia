@@ -62,7 +62,7 @@ class QuantityParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInferiorQuantity()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $intValidator = 42;
 //        $intToValidate = 0;
 //
@@ -80,7 +80,7 @@ class QuantityParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInferiorQuantity2()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $intValidator = 42;
 //        $intToValidate = 41;
 //
@@ -98,7 +98,7 @@ class QuantityParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsQuantity()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $intValidator = 42;
 //        $intToValidate = 42;
 //
@@ -116,7 +116,7 @@ class QuantityParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testSuperiorQuantity()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $intValidator = 42;
 //        $intToValidate = 43;
 //
@@ -133,7 +133,7 @@ class QuantityParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInvalidArgumentException()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $intValidator = 42;
 //        $intToValidate = '42';
 //
@@ -150,7 +150,7 @@ class QuantityParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInvalidArgumentException2()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $intValidator = 42;
 //        $intToValidate = -1;
 //
@@ -167,7 +167,7 @@ class QuantityParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function isSerializableTest()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $intValidator = 42;
 //        $intToValidate = -1;
 //

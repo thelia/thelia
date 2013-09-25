@@ -62,7 +62,7 @@ class IntegerParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInferiorInteger()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $intValidator = 42;
 //        $intToValidate = 41;
 //
@@ -80,7 +80,7 @@ class IntegerParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsInteger()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $intValidator = 42;
 //        $intToValidate = 42;
 //
@@ -98,7 +98,7 @@ class IntegerParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testSuperiorInteger()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $intValidator = 42;
 //        $intToValidate = 43;
 //
@@ -115,7 +115,7 @@ class IntegerParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInvalidArgumentException()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $intValidator = 42;
 //        $intToValidate = '42';
 //
@@ -132,7 +132,7 @@ class IntegerParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function isSerializableTest()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $intValidator = 42;
 //
 //        $param = new IntegerParam($adapter, $intValidator);

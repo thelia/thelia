@@ -5,7 +5,7 @@ use Thelia\Constraint\Rule\AvailableForTotalAmount;
 use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
-use Thelia\Coupon\CouponRuleCollection;
+use Thelia\Coupon\ConditionCollection;
 use Thelia\Model\ProductImage;
 use Thelia\Model\CategoryImage;
 use Thelia\Model\FolderImage;

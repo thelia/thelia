@@ -51,7 +51,7 @@ class MatchForTotalAmountManager extends ConditionManagerAbstract
     CONST INPUT2 = 'currency';
 
     /** @var string Service Id from Resources/config.xml  */
-    protected $serviceId = 'thelia.constraint.rule.available_for_total_amount';
+    protected $serviceId = 'thelia.condition.match_for_total_amount';
 
     /** @var array Available Operators (Operators::CONST) */
     protected $availableOperators = array(

@@ -25,7 +25,7 @@ use Thelia\Constraint\ConstraintFactory;
 use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
 use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
-use Thelia\Coupon\CouponRuleCollection;
+use Thelia\Coupon\ConditionCollection;
 
 
 require __DIR__ . '/../core/bootstrap.php';

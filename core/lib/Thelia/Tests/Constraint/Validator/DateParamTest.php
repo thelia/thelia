@@ -62,7 +62,7 @@ class DateParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInferiorDate()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $dateValidator = new \DateTime("2012-07-08");
 //        $dateToValidate = new \DateTime("2012-07-07");
 //
@@ -80,7 +80,7 @@ class DateParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testEqualsDate()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $dateValidator = new \DateTime("2012-07-08");
 //        $dateToValidate = new \DateTime("2012-07-08");
 //
@@ -98,7 +98,7 @@ class DateParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testSuperiorDate()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $dateValidator = new \DateTime("2012-07-08");
 //        $dateToValidate = new \DateTime("2012-07-09");
 //
@@ -115,7 +115,7 @@ class DateParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testInvalidArgumentException()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $dateValidator = new \DateTime("2012-07-08");
 //        $dateToValidate = 1377012588;
 //
@@ -130,7 +130,7 @@ class DateParamTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function isSerializableTest()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $dateValidator = new \DateTime("2012-07-08");
 //
 //        $param = new DateParam($adapter, $dateValidator);

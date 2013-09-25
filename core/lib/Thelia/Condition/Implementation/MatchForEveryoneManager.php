@@ -40,7 +40,7 @@ use Thelia\Condition\ConditionManagerAbstract;
 class MatchForEveryoneManager extends ConditionManagerAbstract
 {
     /** @var string Service Id from Resources/config.xml  */
-    protected $serviceId = 'thelia.constraint.rule.available_for_everyone';
+    protected $serviceId = 'thelia.condition.match_for_everyone';
 
     /** @var array Available Operators (Operators::CONST) */
     protected $availableOperators = array();

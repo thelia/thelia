@@ -25,10 +25,10 @@ namespace Thelia\Coupon\Type;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Constraint\ConstraintManager;
-use Thelia\Constraint\ConstraintValidator;
+use Thelia\Constraint\ConditionValidator;
 use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\CouponAdapterInterface;
-use Thelia\Coupon\CouponRuleCollection;
+use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\ConditionCollection;
 use Thelia\Coupon\RuleOrganizerInterface;
 use Thelia\Exception\InvalidRuleException;
 
@@ -45,7 +45,7 @@ use Thelia\Exception\InvalidRuleException;
  */
 abstract class CouponAbstract implements CouponInterface
 {
-    /** @var  CouponAdapterInterface Provide necessary value from Thelia */
+    /** @var  AdapterInterface Provide necessary value from Thelia */
     protected $adapter = null;
 
     /** @var Translator Service Translator */
@@ -54,10 +54,10 @@ abstract class CouponAbstract implements CouponInterface
     /** @var RuleOrganizerInterface  */
     protected $organizer = null;
 
-    /** @var CouponRuleCollection Array of CouponRuleInterface */
+    /** @var ConditionCollection Array of ConditionManagerInterface */
     protected $rules = null;
 
-    /** @var ConstraintValidator Constraint validator */
+    /** @var ConditionValidator Constraint validator */
     protected $constraintValidator = null;
 
 
@@ -106,13 +106,13 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Constructor
      *
-     * @param CouponAdapterInterface $adapter Service adapter
+     * @param AdapterInterface $adapter Service adapter
      */
-    function __construct(CouponAdapterInterface $adapter)
+    function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
         $this->translator = $adapter->getTranslator();
-        $this->constraintValidator = $adapter->getConstraintValidator();
+        $this->constraintValidator = $adapter->getConditionValidator();
     }
 
     /**
@@ -205,7 +205,7 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Return condition to validate the Coupon or not
      *
-     * @return CouponRuleCollection
+     * @return ConditionCollection
      */
     public function getRules()
     {
@@ -216,12 +216,12 @@ abstract class CouponAbstract implements CouponInterface
      * Replace the existing Rules by those given in parameter
      * If one Rule is badly implemented, no Rule will be added
      *
-     * @param CouponRuleCollection $rules CouponRuleInterface to add
+     * @param ConditionCollection $rules ConditionManagerInterface to add
      *
      * @return $this
      * @throws \Thelia\Exception\InvalidRuleException
      */
-    public function setRules(CouponRuleCollection $rules)
+    public function setRules(ConditionCollection $rules)
     {
         $this->rules = $rules;
 
@@ -301,7 +301,7 @@ abstract class CouponAbstract implements CouponInterface
 
     /**
      * Check if the current Coupon is matching its conditions (Rules)
-     * Thelia variables are given by the CouponAdapterInterface
+     * Thelia variables are given by the AdapterInterface
      *
      * @return bool
      */

@@ -23,7 +23,7 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Constraint\ConstraintValidator;
+use Thelia\Constraint\ConditionValidator;
 use Thelia\Constraint\Rule\AvailableForXArticlesManager;
 use Thelia\Constraint\Rule\Operators;
 use Thelia\Constraint\Rule\SerializableRule;
@@ -33,7 +33,7 @@ use Thelia\Constraint\Rule\SerializableRule;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test AvailableForXArticlesManager Class
+ * Unit Test MatchForXArticlesManager Class
  *
  * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
@@ -42,7 +42,7 @@ use Thelia\Constraint\Rule\SerializableRule;
 class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 {
 
-//    /** @var CouponAdapterInterface $stubTheliaAdapter */
+//    /** @var AdapterInterface $stubTheliaAdapter */
 //    protected $stubTheliaAdapter = null;
 
     /**
@@ -58,7 +58,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Coupon\Rule\AvailableForXArticlesManager::setValidators
-     * @expectedException \Thelia\Exception\InvalidRuleOperatorException
+     * @expectedException \Thelia\Exception\InvalidConditionOperatorException
      */
     public function testInValidBackOfficeInputOperator()
     {
@@ -71,7 +71,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -93,7 +93,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      * Check if validity test on BackOffice inputs are working
      *
      * @covers Thelia\Coupon\Rule\AvailableForXArticlesManager::setValidators
-     * @expectedException \Thelia\Exception\InvalidRuleValueException
+     * @expectedException \Thelia\Exception\InvalidConditionValueException
      */
     public function testInValidBackOfficeInputValue()
     {
@@ -106,7 +106,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -141,7 +141,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -176,7 +176,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -211,7 +211,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -246,7 +246,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -281,7 +281,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -316,7 +316,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -351,7 +351,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -386,7 +386,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -421,7 +421,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -456,7 +456,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -491,7 +491,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -526,7 +526,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -555,7 +555,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -590,7 +590,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(4));
         $stubAdapter->expects($this->any())
             ->method('getConstraintValidator')
-            ->will($this->returnValue(new ConstraintValidator()));
+            ->will($this->returnValue(new ConditionValidator()));
 
         $rule1 = new AvailableForXArticlesManager($stubAdapter);
         $operators = array(
@@ -618,7 +618,7 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 
 //    public function testGetValidators()
 //    {
-//        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\CouponBaseAdapter')
+//        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
 //            ->disableOriginalConstructor()
 //            ->getMock();
 //
@@ -626,12 +626,12 @@ class AvailableForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 //            ->method('getNbArticlesInCart')
 //            ->will($this->returnValue(4));
 //
-//        $rule1 = new AvailableForXArticlesManager($stubAdapter);
+//        $rule1 = new MatchForXArticlesManager($stubAdapter);
 //        $operators = array(
-//            AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR
+//            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
 //        );
 //        $values = array(
-//            AvailableForXArticlesManager::INPUT1 => 4
+//            MatchForXArticlesManager::INPUT1 => 4
 //        );
 //        $rule1->setValidatorsFromForm($operators, $values);
 //

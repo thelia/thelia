@@ -39,7 +39,7 @@ use Thelia\Log\Tlog;
 class InvalidRuleException extends \RuntimeException
 {
     /**
-     * InvalidRuleOperatorException thrown when a Rule is badly implemented
+     * InvalidConditionOperatorException thrown when a Rule is badly implemented
      *
      * @param string $className Class name
      */

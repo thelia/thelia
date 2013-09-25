@@ -37,11 +37,11 @@ namespace Thelia\Coupon;
 class RuleOrganizer implements RuleOrganizerInterface
 {
     /**
-     * Organize CouponRuleInterface
+     * Organize ConditionManagerInterface
      *
-     * @param array $rules Array of CouponRuleInterface
+     * @param array $rules Array of ConditionManagerInterface
      *
-     * @return array Array of CouponRuleInterface sorted
+     * @return array Array of ConditionManagerInterface sorted
      */
     public function organize(array $rules)
     {
