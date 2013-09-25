@@ -21,53 +21,117 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
-use Thelia\Model\Folder;
+namespace Thelia\Core\Event\Folder;
+use Thelia\Core\Event\Folder\FolderCreateEvent;
 
 
 /**
- * Class FolderEvent
+ * Class FolderUpdateEvent
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderEvent extends ActionEvent {
+class FolderUpdateEvent extends FolderCreateEvent {
+    protected $folder_id;
 
-    /**
-     * @var \Thelia\Model\Folder
-     */
-    protected $folder;
+    protected $chapo;
+    protected $description;
+    protected $postscriptum;
 
-    function __construct(Folder $folder = null)
+    protected $url;
+
+    function __construct($folder_id)
     {
-        $this->folder = $folder;
+        $this->folder_id = $folder_id;
     }
 
     /**
-     * @param \Thelia\Model\Folder $folder
+     * @param mixed $chapo
      */
-    public function setFolder(Folder $folder)
+    public function setChapo($chapo)
     {
-        $this->folder = $folder;
+        $this->chapo = $chapo;
 
         return $this;
     }
 
     /**
-     * @return \Thelia\Model\Folder
+     * @return mixed
      */
-    public function getFolder()
+    public function getChapo()
     {
-        return $this->folder;
+        return $this->chapo;
     }
 
     /**
-     * test if a folder object exists
-     *
-     * @return bool
+     * @param mixed $description
      */
-    public function hasFolder()
+    public function setDescription($description)
     {
-        return null !== $this->folder;
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param mixed $folder_id
+     */
+    public function setFolderId($folder_id)
+    {
+        $this->folder_id = $folder_id;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFolderId()
+    {
+        return $this->folder_id;
+    }
+
+    /**
+     * @param mixed $postscriptum
+     */
+    public function setPostscriptum($postscriptum)
+    {
+        $this->postscriptum = $postscriptum;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPostscriptum()
+    {
+        return $this->postscriptum;
+    }
+
+    /**
+     * @param mixed $url
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUrl()
+    {
+        return $this->url;
     }
 
 }

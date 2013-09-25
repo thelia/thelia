@@ -21,44 +21,15 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Folder;
+use Thelia\Core\Event\Folder\FolderEvent;
 
 
 /**
- * Class FolderDeleteEvent
+ * Class FolderToggleVisibilityEvent
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderDeleteEvent extends FolderEvent{
-
-    /**
-     * @var int folder id
-     */
-    protected $folder_id;
-
-    /**
-     * @param int $folder_id
-     */
-    function __construct($folder_id)
-    {
-        $this->folder_id = $folder_id;
-    }
-
-    /**
-     * @param int $folder_id
-     */
-    public function setFolderId($folder_id)
-    {
-        $this->folder_id = $folder_id;
-    }
-
-    /**
-     * @return int
-     */
-    public function getFolderId()
-    {
-        return $this->folder_id;
-    }
-
+class FolderToggleVisibilityEvent extends FolderEvent {
 
 }

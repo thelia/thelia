@@ -21,100 +21,54 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Folder;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Folder;
 
 
 /**
- * Class FolderCreateEvent
+ * Class FolderEvent
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderCreateEvent extends FolderEvent {
-    protected $title;
-    protected $parent;
-    protected $locale;
-    protected $visible;
+class FolderEvent extends ActionEvent {
 
     /**
-     * @param mixed $locale
-     *
-     * @return $this
+     * @var \Thelia\Model\Folder
      */
-    public function setLocale($locale)
+    protected $folder;
+
+    function __construct(Folder $folder = null)
     {
-        $this->locale = $locale;
+        $this->folder = $folder;
+    }
+
+    /**
+     * @param \Thelia\Model\Folder $folder
+     */
+    public function setFolder(Folder $folder)
+    {
+        $this->folder = $folder;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return \Thelia\Model\Folder
      */
-    public function getLocale()
+    public function getFolder()
     {
-        return $this->locale;
+        return $this->folder;
     }
 
     /**
-     * @param mixed $parent
+     * test if a folder object exists
      *
-     *
-     * @return $this
+     * @return bool
      */
-    public function setParent($parent)
+    public function hasFolder()
     {
-        $this->parent = $parent;
-
-        return $this;
+        return null !== $this->folder;
     }
-
-    /**
-     * @return mixed
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * @param mixed $title
-     *
-     * @return $this
-     */
-    public function setTitle($title)
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
-     * @param mixed $visible
-     *
-     * @return $this
-     */
-    public function setVisible($visible)
-    {
-        $this->visible = $visible;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getVisible()
-    {
-        return $this->visible;
-    }
-
 
 }

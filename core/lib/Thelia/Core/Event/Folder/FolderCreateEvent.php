@@ -21,34 +21,29 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Folder;
+use Thelia\Core\Event\Folder\FolderEvent;
 
 
 /**
- * Class FolderUpdateEvent
+ * Class FolderCreateEvent
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderUpdateEvent extends FolderCreateEvent {
-    protected $folder_id;
-
-    protected $chapo;
-    protected $description;
-    protected $postscriptum;
-
-    protected $url;
-
-    function __construct($folder_id)
-    {
-        $this->folder_id = $folder_id;
-    }
+class FolderCreateEvent extends FolderEvent {
+    protected $title;
+    protected $parent;
+    protected $locale;
+    protected $visible;
 
     /**
-     * @param mixed $chapo
+     * @param mixed $locale
+     *
+     * @return $this
      */
-    public function setChapo($chapo)
+    public function setLocale($locale)
     {
-        $this->chapo = $chapo;
+        $this->locale = $locale;
 
         return $this;
     }
@@ -56,17 +51,20 @@ class FolderUpdateEvent extends FolderCreateEvent {
     /**
      * @return mixed
      */
-    public function getChapo()
+    public function getLocale()
     {
-        return $this->chapo;
+        return $this->locale;
     }
 
     /**
-     * @param mixed $description
+     * @param mixed $parent
+     *
+     *
+     * @return $this
      */
-    public function setDescription($description)
+    public function setParent($parent)
     {
-        $this->description = $description;
+        $this->parent = $parent;
 
         return $this;
     }
@@ -74,17 +72,19 @@ class FolderUpdateEvent extends FolderCreateEvent {
     /**
      * @return mixed
      */
-    public function getDescription()
+    public function getParent()
     {
-        return $this->description;
+        return $this->parent;
     }
 
     /**
-     * @param mixed $folder_id
+     * @param mixed $title
+     *
+     * @return $this
      */
-    public function setFolderId($folder_id)
+    public function setTitle($title)
     {
-        $this->folder_id = $folder_id;
+        $this->title = $title;
 
         return $this;
     }
@@ -92,17 +92,19 @@ class FolderUpdateEvent extends FolderCreateEvent {
     /**
      * @return mixed
      */
-    public function getFolderId()
+    public function getTitle()
     {
-        return $this->folder_id;
+        return $this->title;
     }
 
     /**
-     * @param mixed $postscriptum
+     * @param mixed $visible
+     *
+     * @return $this
      */
-    public function setPostscriptum($postscriptum)
+    public function setVisible($visible)
     {
-        $this->postscriptum = $postscriptum;
+        $this->visible = $visible;
 
         return $this;
     }
@@ -110,27 +112,10 @@ class FolderUpdateEvent extends FolderCreateEvent {
     /**
      * @return mixed
      */
-    public function getPostscriptum()
+    public function getVisible()
     {
-        return $this->postscriptum;
+        return $this->visible;
     }
 
-    /**
-     * @param mixed $url
-     */
-    public function setUrl($url)
-    {
-        $this->url = $url;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getUrl()
-    {
-        return $this->url;
-    }
 
 }

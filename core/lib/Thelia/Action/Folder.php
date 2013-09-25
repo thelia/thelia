@@ -23,10 +23,10 @@
 
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\FolderCreateEvent;
-use Thelia\Core\Event\FolderDeleteEvent;
-use Thelia\Core\Event\FolderToggleVisibilityEvent;
-use Thelia\Core\Event\FolderUpdateEvent;
+use Thelia\Core\Event\Folder\FolderCreateEvent;
+use Thelia\Core\Event\Folder\FolderDeleteEvent;
+use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
+use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\FolderQuery;
