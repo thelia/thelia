@@ -21,36 +21,51 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Constraint\Rule;
+namespace Thelia\Condition;
 
-use InvalidArgumentException;
-use Symfony\Component\Translation\Translator;
-use Thelia\Constraint\ConstraintValidator;
-use Thelia\Constraint\Validator\QuantityParam;
-use Thelia\Constraint\Validator\RuleValidator;
-use Thelia\Coupon\CouponAdapterInterface;
-use Thelia\Exception\InvalidRuleException;
-use Thelia\Exception\InvalidRuleValueException;
-use Thelia\Type\FloatType;
+use Thelia\Core\Translation\Translator;
+use Thelia\Coupon\AdapterInterface;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Allow every one, perform no check
+ * Manage how the application checks its state in order to check if it matches the implemented condition
  *
- * @package Constraint
+ * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class AvailableForEveryoneManager extends CouponRuleAbstract
+interface ConditionManagerInterface
 {
-    /** @var string Service Id from Resources/config.xml  */
-    protected $serviceId = 'thelia.constraint.rule.available_for_everyone';
+    /**
+     * Constructor
+     *
+     * @param AdapterInterface $adapter Service adapter
+     */
+    function __construct(AdapterInterface $adapter);
 
-    /** @var array Available Operators (Operators::CONST) */
-    protected $availableOperators = array();
+    /**
+     * Get Rule Service id
+     *
+     * @return string
+     */
+    public function getServiceId();
+
+//    /**
+//     * Check if backoffice inputs are relevant or not
+//     *
+//     * @return bool
+//     */
+//    public function checkBackOfficeInput();
+
+//    /**
+//     * Check if Checkout inputs are relevant or not
+//     *
+//     * @return bool
+//     */
+//    public function checkCheckoutInput();
 
     /**
      * Check validators relevancy and store them
@@ -61,75 +76,67 @@ class AvailableForEveryoneManager extends CouponRuleAbstract
      * @throws \InvalidArgumentException
      * @return $this
      */
-    public function setValidatorsFromForm(array $operators, array $values)
-    {
-        $this->setValidators();
+    public function setValidatorsFromForm(array $operators, array $values);
 
-        return $this;
-    }
-
-    /**
-     * Check validators relevancy and store them
-     *
-     * @throws \InvalidArgumentException
-     * @return $this
-     */
-    protected function setValidators()
-    {
-        $this->operators = array();
-        $this->values = array();
-
-        return $this;
-    }
+//    /**
+//     * Check if the current Checkout matches this condition
+//     *
+//     * @return bool
+//     */
+//    public function isMatching();
 
     /**
-     * Test if Customer meets conditions
+     * Test if the current application state matches conditions
      *
      * @return bool
      */
-    public function isMatching()
-    {
-        return true;
-    }
+    public function isMatching();
+
+    /**
+     * Return all available Operators for this condition
+     *
+     * @return array Operators::CONST
+     */
+    public function getAvailableOperators();
+
 
     /**
      * Get I18n name
      *
      * @return string
      */
-    public function getName()
-    {
-        return $this->translator->trans(
-            'Everybody can use it (no condition)',
-            array(),
-            'constraint'
-        );
-    }
+    public function getName();
 
     /**
      * Get I18n tooltip
      *
      * @return string
      */
-    public function getToolTip()
-    {
-        $toolTip = $this->translator->trans(
-            'Will return always true',
-            array(),
-            'constraint'
-        );
-
-        return $toolTip;
-    }
+    public function getToolTip();
 
     /**
-     * Generate inputs ready to be drawn
+     * Return all validators
      *
      * @return array
      */
-    protected function generateInputs()
-    {
-        return array();
-    }
+    public function getValidators();
+
+//    /**
+//     * Populate a Rule from a form admin
+//     *
+//     * @param array $operators Rule Operator set by the Admin
+//     * @param array $values    Rule Values set by the Admin
+//     *
+//     * @return bool
+//     */
+//    public function populateFromForm(array$operators, array $values);
+
+
+    /**
+     * Return a serializable Condition
+     *
+     * @return SerializableCondition
+     */
+    public function getSerializableCondition();
 
 }

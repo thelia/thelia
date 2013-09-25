@@ -21,61 +21,108 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Constraint\Rule;
+namespace Thelia\Condition\Implementation;
+
+use InvalidArgumentException;
+use Thelia\Condition\ConditionManagerAbstract;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * A rule set by an admin ready to be serialized and stored in DataBase
+ * Allow every one, perform no check
  *
- * @package Constraint
+ * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class SerializableRule
+class MatchForEveryoneManager extends ConditionManagerAbstract
 {
-    /** @var string Rule Service id  */
-    public $ruleServiceId = null;
+    /** @var string Service Id from Resources/config.xml  */
+    protected $serviceId = 'thelia.constraint.rule.available_for_everyone';
 
-    /** @var array Operators set by Admin for this Rule */
-    public $operators = array();
-
-    /** @var array Values set by Admin for this Rule */
-    public $values = array();
+    /** @var array Available Operators (Operators::CONST) */
+    protected $availableOperators = array();
 
     /**
-     * Get Operators set by Admin for this Rule
+     * Check validators relevancy and store them
      *
-     * @return array
+     * @param array $operators Operators the Admin set in BackOffice
+     * @param array $values    Values the Admin set in BackOffice
+     *
+     * @throws \InvalidArgumentException
+     * @return $this
      */
-    public function getOperators()
+    public function setValidatorsFromForm(array $operators, array $values)
     {
-        return $this->operators;
+        $this->setValidators();
+
+        return $this;
     }
 
     /**
-     * Get Rule Service id
+     * Check validators relevancy and store them
+     *
+     * @throws \InvalidArgumentException
+     * @return $this
+     */
+    protected function setValidators()
+    {
+        $this->operators = array();
+        $this->values = array();
+
+        return $this;
+    }
+
+    /**
+     * Test if Customer meets conditions
+     *
+     * @return bool
+     */
+    public function isMatching()
+    {
+        return true;
+    }
+
+    /**
+     * Get I18n name
      *
      * @return string
      */
-    public function getRuleServiceId()
+    public function getName()
     {
-        return $this->ruleServiceId;
+        return $this->translator->trans(
+            'Everybody can use it (no condition)',
+            array(),
+            'condition'
+        );
     }
 
     /**
-     * Get Values set by Admin for this Rule
+     * Get I18n tooltip
+     *
+     * @return string
+     */
+    public function getToolTip()
+    {
+        $toolTip = $this->translator->trans(
+            'Will return always true',
+            array(),
+            'condition'
+        );
+
+        return $toolTip;
+    }
+
+    /**
+     * Generate inputs ready to be drawn
      *
      * @return array
      */
-    public function getValues()
+    protected function generateInputs()
     {
-        return $this->values;
+        return array();
     }
-
-
-
 
 }

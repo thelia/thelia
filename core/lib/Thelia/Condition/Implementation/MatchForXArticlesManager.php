@@ -21,18 +21,13 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Constraint\Rule;
+namespace Thelia\Condition\Implementation;
 
 use InvalidArgumentException;
-use Symfony\Component\Translation\Translator;
-use Thelia\Constraint\ConstraintValidator;
-use Thelia\Constraint\Validator\QuantityParam;
-use Thelia\Constraint\Validator\RuleValidator;
-use Thelia\Coupon\CouponAdapterInterface;
-use Thelia\Exception\InvalidRuleException;
-use Thelia\Exception\InvalidRuleOperatorException;
-use Thelia\Exception\InvalidRuleValueException;
-use Thelia\Type\FloatType;
+use Thelia\Condition\ConditionManagerAbstract;
+use Thelia\Condition\Operators;
+use Thelia\Exception\InvalidConditionOperatorException;
+use Thelia\Exception\InvalidConditionValueException;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -41,13 +36,13 @@ use Thelia\Type\FloatType;
  *
  * Check a Checkout against its Product number
  *
- * @package Constraint
+ * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class AvailableForXArticlesManager extends CouponRuleAbstract
+class MatchForXArticlesManager extends ConditionManagerAbstract
 {
-    /** Rule 1st parameter : quantity */
+    /** Condition 1st parameter : quantity */
     CONST INPUT1 = 'quantity';
 
     /** @var string Service Id from Resources/config.xml  */
@@ -89,7 +84,8 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
      * @param string $quantityOperator Quantity Operator ex <
      * @param int    $quantityValue    Quantity set to meet condition
      *
-     * @throws \InvalidArgumentException
+     * @throws \Thelia\Exception\InvalidConditionValueException
+     * @throws \Thelia\Exception\InvalidConditionOperatorException
      * @return $this
      */
     protected function setValidators($quantityOperator, $quantityValue)
@@ -99,13 +95,13 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
             $this->availableOperators[self::INPUT1]
         );
         if (!$isOperator1Legit) {
-            throw new InvalidRuleOperatorException(
+            throw new InvalidConditionOperatorException(
                 get_class(), 'quantity'
             );
         }
 
         if ((int) $quantityValue <= 0) {
-            throw new InvalidRuleValueException(
+            throw new InvalidConditionValueException(
                 get_class(), 'quantity'
             );
         }
@@ -127,15 +123,16 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
      */
     public function isMatching()
     {
-        $constraint1 = $this->constraintValidator->variableOpComparison(
+        $condition1 = $this->conditionValidator->variableOpComparison(
             $this->adapter->getNbArticlesInCart(),
             $this->operators[self::INPUT1],
             $this->values[self::INPUT1]
         );
 
-        if ($constraint1) {
+        if ($condition1) {
             return true;
         }
+
         return false;
     }
 
@@ -149,7 +146,7 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
         return $this->translator->trans(
             'Number of articles in cart',
             array(),
-            'constraint'
+            'condition'
         );
     }
 
@@ -170,7 +167,7 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
                 '%operator%' => $i18nOperator,
                 '%quantity%' => $this->values[self::INPUT1]
             ),
-            'constraint'
+            'condition'
         );
 
         return $toolTip;
@@ -186,7 +183,7 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
         $name1 = $this->translator->trans(
             'Quantity',
             array(),
-            'constraint'
+            'condition'
         );
 
         return array(
@@ -200,5 +197,4 @@ class AvailableForXArticlesManager extends CouponRuleAbstract
             )
         );
     }
-
 }

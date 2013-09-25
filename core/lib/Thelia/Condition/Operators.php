@@ -21,17 +21,16 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Constraint\Rule;
+namespace Thelia\Condition;
 
-use Symfony\Component\Translation\Translator;
-use Thelia\Constraint\Validator\ComparableInterface;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Represent available Operations in rule checking
+ * Represent available Operations in condition checking
  *
  * @package Constraint
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
@@ -72,56 +71,56 @@ abstract class Operators
             $ret = $translator->trans(
                 'inferior to',
                 array(),
-                'constraint'
+                'condition'
             );
             break;
         case self::INFERIOR_OR_EQUAL:
             $ret = $translator->trans(
                 'inferior or equal to',
                 array(),
-                'constraint'
+                'condition'
             );
             break;
         case self::EQUAL:
             $ret = $translator->trans(
                 'equal to',
                 array(),
-                'constraint'
+                'condition'
             );
             break;
         case self::SUPERIOR_OR_EQUAL:
             $ret = $translator->trans(
                 'superior or equal to',
                 array(),
-                'constraint'
+                'condition'
             );
             break;
         case self::SUPERIOR:
             $ret = $translator->trans(
                 'superior to',
                 array(),
-                'constraint'
+                'condition'
             );
             break;
         case self::DIFFERENT:
             $ret = $translator->trans(
                 'different from',
                 array(),
-                'constraint'
+                'condition'
             );
             break;
         case self::IN:
             $ret = $translator->trans(
                 'in',
                 array(),
-                'constraint'
+                'condition'
             );
             break;
         case self::OUT:
             $ret = $translator->trans(
                 'not in',
                 array(),
-                'constraint'
+                'condition'
             );
             break;
         default:

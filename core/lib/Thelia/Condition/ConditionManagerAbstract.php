@@ -21,17 +21,12 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Constraint\Rule;
+namespace Thelia\Condition;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
-use Thelia\Constraint\ConstraintValidator;
 use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\CouponAdapterInterface;
-use Thelia\Constraint\Validator\ComparableInterface;
-use Thelia\Constraint\Validator\RuleValidator;
-use Thelia\Exception\InvalidRuleException;
-use Thelia\Exception\InvalidRuleOperatorException;
-use Thelia\Exception\InvalidRuleValueException;
+use Thelia\Coupon\AdapterInterface;
+use Thelia\Exception\InvalidConditionValueException;
 use Thelia\Model\Currency;
 use Thelia\Type\FloatType;
 
@@ -46,7 +41,7 @@ use Thelia\Type\FloatType;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-abstract class CouponRuleAbstract implements CouponRuleInterface
+abstract class ConditionManagerAbstract implements ConditionManagerInterface
 {
 //    /** Operator key in $validators */
 //    CONST OPERATOR = 'operator';
@@ -65,7 +60,7 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
 //    /** @var array Parameters to be validated */
 //    protected $paramsToValidate = array();
 
-    /** @var  CouponAdapterInterface Provide necessary value from Thelia */
+    /** @var  AdapterInterface Provide necessary value from Thelia */
     protected $adapter = null;
 
     /** @var Translator Service Translator */
@@ -77,19 +72,19 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     /** @var array Values set by Admin in BackOffice */
     protected $values = array();
 
-    /** @var ConstraintValidator Constaints validator */
-    protected $constraintValidator = null;
+    /** @var ConditionEvaluator Conditions validator */
+    protected $conditionValidator = null;
 
     /**
      * Constructor
      *
-     * @param CouponAdapterInterface $adapter Service adapter
+     * @param AdapterInterface $adapter Service adapter
      */
-    function __construct(CouponAdapterInterface $adapter)
+    public function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
         $this->translator = $adapter->getTranslator();
-        $this->constraintValidator = $adapter->getConstraintValidator();
+        $this->conditionValidator = $adapter->getConditionValidator();
     }
 
 //    /**
@@ -108,7 +103,7 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
 //                throw new InvalidRuleException(get_class());
 //            }
 //            if (!in_array($validator->getOperator(), $this->availableOperators)) {
-//                throw new InvalidRuleOperatorException(
+//                throw new InvalidConditionOperatorException(
 //                    get_class(),
 //                    $validator->getOperator()
 //                );
@@ -149,7 +144,7 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
 //    }
 
     /**
-     * Return all available Operators for this Rule
+     * Return all available Operators for this Condition
      *
      * @return array Operators::CONST
      */
@@ -161,7 +156,7 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
 //    /**
 //     * Check if Operators set for this Rule in the BackOffice are legit
 //     *
-//     * @throws InvalidRuleOperatorException if Operator is not allowed
+//     * @throws InvalidConditionOperatorException if Operator is not allowed
 //     * @return bool
 //     */
 //    protected function checkBackOfficeInputsOperators()
@@ -172,7 +167,7 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
 //            if (!isset($operator)
 //                ||!in_array($operator, $this->availableOperators)
 //            ) {
-//                throw new InvalidRuleOperatorException(get_class(), $key);
+//                throw new InvalidConditionOperatorException(get_class(), $key);
 //            }
 //        }
 //        return true;
@@ -233,7 +228,7 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     }
 
     /**
-     * Get Rule Service id
+     * Get ConditionManager Service id
      *
      * @return string
      */
@@ -243,7 +238,7 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     }
 
     /**
-     * Validate if Operator given is available for this Coupon
+     * Validate if Operator given is available for this Condition
      *
      * @param string $operator           Operator to validate ex <
      * @param array  $availableOperators Available operators
@@ -256,19 +251,19 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
     }
 
     /**
-     * Return a serializable Rule
+     * Return a serializable Condition
      *
-     * @return SerializableRule
+     * @return SerializableCondition
      */
-    public function getSerializableRule()
+    public function getSerializableCondition()
     {
-        $serializableRule = new SerializableRule();
-        $serializableRule->ruleServiceId = $this->serviceId;
-        $serializableRule->operators = $this->operators;
+        $serializableCondition = new SerializableCondition();
+        $serializableCondition->conditionServiceId = $this->serviceId;
+        $serializableCondition->operators = $this->operators;
 
-        $serializableRule->values = $this->values;
+        $serializableCondition->values = $this->values;
 
-        return $serializableRule;
+        return $serializableCondition;
     }
 
 
@@ -278,20 +273,20 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
      * @param string $currencyValue Currency EUR|USD|..
      *
      * @return bool
-     * @throws \Thelia\Exception\InvalidRuleValueException
+     * @throws \Thelia\Exception\InvalidConditionValueException
      */
     protected function IsCurrencyValid($currencyValue)
     {
         $availableCurrencies = $this->adapter->getAvailableCurrencies();
         /** @var Currency $currency */
         $currencyFound = false;
-        foreach ($availableCurrencies as $key => $currency) {
+        foreach ($availableCurrencies as $currency) {
             if ($currencyValue == $currency->getCode()) {
                 $currencyFound = true;
             }
         }
         if (!$currencyFound) {
-            throw new InvalidRuleValueException(
+            throw new InvalidConditionValueException(
                 get_class(), 'currency'
             );
         }
@@ -305,13 +300,13 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
      * @param float $priceValue Price value to check
      *
      * @return bool
-     * @throws \Thelia\Exception\InvalidRuleValueException
+     * @throws \Thelia\Exception\InvalidConditionValueException
      */
     protected function isPriceValid($priceValue)
     {
         $floatType = new FloatType();
         if (!$floatType->isValid($priceValue) || $priceValue <= 0) {
-            throw new InvalidRuleValueException(
+            throw new InvalidConditionValueException(
                 get_class(), 'price'
             );
         }

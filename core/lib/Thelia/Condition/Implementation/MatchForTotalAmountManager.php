@@ -21,38 +21,33 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Constraint\Rule;
+namespace Thelia\Condition\Implementation;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
-use Symfony\Component\Translation\Translator;
-use Thelia\Coupon\CouponAdapterInterface;
-use Thelia\Constraint\Validator\PriceParam;
-use Thelia\Constraint\Validator\RuleValidator;
-use Thelia\Exception\InvalidRuleException;
-use Thelia\Exception\InvalidRuleOperatorException;
-use Thelia\Exception\InvalidRuleValueException;
+use Thelia\Condition\ConditionManagerAbstract;
+use Thelia\Condition\Operators;
+use Thelia\Exception\InvalidConditionOperatorException;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
-use Thelia\Type\FloatType;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Rule AvailableForTotalAmount
+ * Condition AvailableForTotalAmount
  * Check if a Checkout total amount match criteria
  *
- * @package Constraint
+ * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class AvailableForTotalAmountManager extends CouponRuleAbstract
+class MatchForTotalAmountManager extends ConditionManagerAbstract
 {
-    /** Rule 1st parameter : price */
+    /** Condition 1st parameter : price */
     CONST INPUT1 = 'price';
 
-    /** Rule 1st parameter : currency */
+    /** Condition 1st parameter : currency */
     CONST INPUT2 = 'currency';
 
     /** @var string Service Id from Resources/config.xml  */
@@ -101,7 +96,7 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
      * @param string $currencyOperator Currency Operator ex =
      * @param string $currencyValue    Currency set to meet condition
      *
-     * @throws \InvalidArgumentException
+     * @throws \Thelia\Exception\InvalidConditionOperatorException
      * @return $this
      */
     protected function setValidators($priceOperator, $priceValue, $currencyOperator, $currencyValue)
@@ -111,7 +106,7 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
             $this->availableOperators[self::INPUT1]
         );
         if (!$isOperator1Legit) {
-            throw new InvalidRuleOperatorException(
+            throw new InvalidConditionOperatorException(
                 get_class(), 'price'
             );
         }
@@ -121,7 +116,7 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
             $this->availableOperators[self::INPUT2]
         );
         if (!$isOperator1Legit) {
-            throw new InvalidRuleOperatorException(
+            throw new InvalidConditionOperatorException(
                 get_class(), 'price'
             );
         }
@@ -164,12 +159,12 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
             return false;
         }
 
-        $constraint1 = $this->constraintValidator->variableOpComparison(
+        $constraint1 = $this->conditionValidator->variableOpComparison(
             $this->adapter->getCartTotalPrice(),
             $this->operators[self::INPUT1],
             $this->values[self::INPUT1]
         );
-        $constraint2 = $this->constraintValidator->variableOpComparison(
+        $constraint2 = $this->conditionValidator->variableOpComparison(
             $this->adapter->getCheckoutCurrency(),
             $this->operators[self::INPUT2],
             $this->values[self::INPUT2]
@@ -177,6 +172,7 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
         if ($constraint1 && $constraint2) {
             return true;
         }
+
         return false;
     }
 
@@ -190,7 +186,7 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
         return $this->translator->trans(
             'Cart total amount',
             array(),
-            'constraint'
+            'condition'
         );
     }
 
@@ -212,7 +208,7 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
                 '%amount%' => $this->values[self::INPUT1],
                 '%currency%' => $this->values[self::INPUT2]
             ),
-            'constraint'
+            'condition'
         );
 
         return $toolTip;
@@ -235,12 +231,12 @@ class AvailableForTotalAmountManager extends CouponRuleAbstract
         $name1 = $this->translator->trans(
             'Price',
             array(),
-            'constraint'
+            'condition'
         );
         $name2 = $this->translator->trans(
             'Currency',
             array(),
-            'constraint'
+            'condition'
         );
 
         return array(
