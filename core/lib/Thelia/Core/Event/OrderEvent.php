@@ -36,6 +36,7 @@ class OrderEvent extends ActionEvent
     protected $postage = null;
     protected $ref = null;
     protected $status = null;
+    protected $deliveryRef = null;
 
     /**
      * @param Order $order
@@ -118,6 +119,14 @@ class OrderEvent extends ActionEvent
     }
 
     /**
+     * @param $deliveryRef
+     */
+    public function setDeliveryRef($deliveryRef)
+    {
+        $this->deliveryRef = $deliveryRef;
+    }
+
+    /**
      * @return null|Order
      */
     public function getOrder()
@@ -187,5 +196,13 @@ class OrderEvent extends ActionEvent
     public function getStatus()
     {
         return $this->status;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getDeliveryRef()
+    {
+        return $this->deliveryRef;
     }
 }

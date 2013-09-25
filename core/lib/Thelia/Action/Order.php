@@ -301,6 +301,19 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * @param OrderEvent $event
+     */
+    public function updateDeliveryRef(OrderEvent $event)
+    {
+        $order = $event->getOrder();
+
+        $order->setDeliveryRef($event->getDeliveryRef());
+        $order->save();
+
+        $event->setOrder($order);
+    }
+
+    /**
      * Returns an array of event names this subscriber wants to listen to.
      *
      * The array keys are event names and the value can be:
@@ -330,6 +343,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_PAY => array("create", 128),
             TheliaEvents::ORDER_BEFORE_PAYMENT => array("sendOrderEmail", 128),
             TheliaEvents::ORDER_UPDATE_STATUS => array("updateStatus", 128),
+            TheliaEvents::ORDER_UPDATE_DELIVERY_REF => array("updateDeliveryRef", 128),
         );
     }
 

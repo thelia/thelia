@@ -28,6 +28,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Tools\URL;
 
 /**
  * Class OrderController
@@ -50,17 +51,22 @@ class OrderController extends BaseAdminController
     	));
     }
 
-    public function updateStatus()
+    public function updateStatus($order_id = null)
     {
         if (null !== $response = $this->checkAuth("admin.order.update")) return $response;
 
         $message = null;
 
         try {
-            $orderId = $this->getRequest()->get("order_id");
-            $order = OrderQuery::create()->findPk($orderId);
+            if($order_id !== null) {
+                $order_id = $order_id;
+            } else {
+                $order_id = $this->getRequest()->get("order_id");
+            }
 
-            $statusId = $this->getRequest()->get("status_id");
+            $order = OrderQuery::create()->findPk($order_id);
+
+            $statusId = $this->getRequest()->request->get("status_id");
             $status = OrderStatusQuery::create()->findPk($statusId);
 
             if(null === $order) {
@@ -90,12 +96,42 @@ class OrderController extends BaseAdminController
             $params["order_page"] = $browsedPage;
             $this->redirectToRoute("admin.order.list", $params);
         } else {
-            $params["order_id"] = $orderId;
-            $this->redirectToRoute("admin.order.update.view", $params);
+            $params["order_id"] = $order_id;
+            $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", $params)));
+        }
+    }
+
+    public function updateDeliveryRef($order_id)
+    {
+        if (null !== $response = $this->checkAuth("admin.order.update")) return $response;
+
+        $message = null;
+
+        try {
+            $order = OrderQuery::create()->findPk($order_id);
+
+            $deliveryRef = $this->getRequest()->get("delivery_ref");
+
+            if(null === $order) {
+                throw new \InvalidArgumentException("The order you want to update status does not exist");
+            }
+
+            $event = new OrderEvent($order);
+            $event->setDeliveryRef($deliveryRef);
+
+            $this->dispatch(TheliaEvents::ORDER_UPDATE_DELIVERY_REF, $event);
+        } catch(\Exception $e) {
+            $message = $e->getMessage();
         }
 
+        $params = array();
 
+        if ($message) {
+            $params["update_status_error_message"] = $message;
+        }
 
+        $params["order_id"] = $order_id;
 
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", $params)));
     }
 }

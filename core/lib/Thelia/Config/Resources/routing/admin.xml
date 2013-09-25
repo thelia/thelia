@@ -70,8 +70,16 @@
         <requirement key="order_id">\d+</requirement>
     </route>
 
-    <route id="admin.order.update.status" path="/admin/order/update/status">
+    <route id="admin.order.list.update.status" path="/admin/order/update/status">
         <default key="_controller">Thelia\Controller\Admin\OrderController::updateStatus</default>
+    </route>
+
+    <route id="admin.order.update.status" path="/admin/order/update/{order_id}/status">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::updateStatus</default>
+    </route>
+
+    <route id="admin.order.update.deliveryRef" path="/admin/order/update/{order_id}/delivery-ref">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::updateDeliveryRef</default>
     </route>
 
     <!-- end order management -->
