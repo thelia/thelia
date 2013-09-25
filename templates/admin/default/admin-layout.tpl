@@ -228,8 +228,16 @@
 	{* -- Javascript section ------------------------------------------------ *}
 
 	{block name="before-javascript-include"}{/block}
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script>
+        if (typeof jQuery == 'undefined') {
+            {javascripts file='assets/js/libs/jquery.js'}
+            document.write(unescape("%3Cscript src='{$asset_url}' %3E%3C/script%3E"));
+            {/javascripts}
+        }
+    </script>
 
-	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+
 
     {debugbar_renderjs}
     {debugbar_renderresult}

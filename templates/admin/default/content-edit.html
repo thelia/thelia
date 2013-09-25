@@ -57,7 +57,7 @@
                 {form name="thelia.admin.content.modification"}
                     <form method="POST" action="{url path='/admin/content/save'}" {form_enctype form=$form} class="clearfix">
 
-                        {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/folders' parent=0}"}
+                        {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/folders' parent=$DEFAULT_FOLDER}"}
 
                         {* Be sure to get the folder ID, even if the form could not be validated *}
                         <input type="hidden" name="content_id" value="{$content_id}" />
