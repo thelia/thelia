@@ -288,7 +288,7 @@
                              <td>
                              {admin_position_block
                                  permission="admin.content.edit"
-                                 path={url path='/admin/contents/update-position' content_id=$ID}
+                                 path={url path='/admin/content/update-position' content_id=$ID}
                                  url_parameter="content_id"
                                  in_place_edit_class="contentPositionChange"
                                  position=$POSITION
@@ -511,7 +511,7 @@
     dialog_title    = {intl l="Delete content"}
     dialog_message  = {intl l="Do you really want to delete this content ?"}
 
-    form_action         = {url path='/admin/contents/delete'}
+    form_action         = {url path='/admin/content/delete'}
     form_content        = {$smarty.capture.content_delete_dialog nofilter}
 }
 {/block}
@@ -567,7 +567,7 @@
 
             $(".contentVisibleToggle").on('switch-change', function(event, data) {
                 $.ajax({
-                   url : "{url path='admin/contents/toggle-online'}",
+                   url : "{url path='admin/content/toggle-online'}",
                    data : {
                        content_id : $(this).data('id'),
                        action : 'visibilityToggle'
