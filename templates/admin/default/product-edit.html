@@ -70,7 +70,13 @@
                                     {intl l="Images"}
                                 </a>
                             </li>
-		                    <li><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
+		                    <li>
+                                <a href="#documents"
+                                   data-toggle="tab"
+                                   data-href="{url path="/admin/document/type/product/{$product_id}/form-ajax"}"
+                                   data-callback="$.documentUploadManager.initDocumentDropZone">
+                                    {intl l="Documents"}
+                                </a>
 		                    <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
 		 				</ul>
 
@@ -120,6 +126,9 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
     {javascripts file='assets/js/image-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/document-upload.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
     {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}

@@ -1,26 +1,25 @@
 $(function($){
-    // Manage picture upload
-    $.imageUploadManager = {};
+    // Manage document upload
+    $.documentUploadManager = {};
 
     Dropzone.autoDiscover = false;
 
     
 
     // Remove image on click
-    $.imageUploadManager.initImageDropZone = function() {
-        $.imageUploadManager.onClickDeleteImage();
+    $.documentUploadManager.initDocumentDropZone = function() {
+        $.documentUploadManager.onClickDeleteDocument();
 
-        var imageDropzone = new Dropzone("#images-dropzone", {
+        var documentDropzone = new Dropzone("#documents-dropzone", {
             dictDefaultMessage : $('.btn-browse').html(),
             uploadMultiple: false,
-            maxFilesize: 8,
-            acceptedFiles: 'image/png, image/gif, image/jpeg'
+            maxFilesize: 8
         });    
 
         var totalFiles      = 0,
             completedFiles  = 0;
 
-        imageDropzone.on("addedfile", function(file){
+        documentDropzone.on("addedfile", function(file){
             totalFiles += 1;
 
             if(totalFiles == 1){
@@ -28,7 +27,7 @@ $(function($){
             }
         });
 
-        imageDropzone.on("complete", function(file){
+        documentDropzone.on("complete", function(file){
             completedFiles += 1;
 
             if (completedFiles === totalFiles){
@@ -36,10 +35,10 @@ $(function($){
             }
         });
 
-        imageDropzone.on("success", function(file) {
-            imageDropzone.removeFile(file);
-            $.imageUploadManager.updateImageListAjax();
-            $.imageUploadManager.onClickDeleteImage();
+        documentDropzone.on("success", function(file) {
+            documentDropzone.removeFile(file);
+            $.documentUploadManager.updateDocumentListAjax();
+            $.documentUploadManager.onClickDeleteDocument();
         });
         
               
@@ -47,30 +46,30 @@ $(function($){
     };
 
     // Update picture list via AJAX call
-    $.imageUploadManager.updateImageListAjax = function() {
-        var $imageListArea = $(".image-manager .existing-image");
-        $imageListArea.html('<div class="loading" ></div>');
+    $.documentUploadManager.updateDocumentListAjax = function() {
+        var $documentListArea = $(".document-manager .existing-document");
+        $documentListArea.html('<div class="loading" ></div>');
         $.ajax({
             type: "POST",
-            url: imageListUrl,
+            url: documentListUrl,
             statusCode: {
                 404: function() {
-                    $imageListArea.html(
-                        imageListErrorMessage
+                    $documentListArea.html(
+                        documentListErrorMessage
                     );
                 }
             }
         }).done(function(data) {
-                $imageListArea.html(
+                $documentListArea.html(
                     data
                 );
-                $.imageUploadManager.onClickDeleteImage();
+                $.documentUploadManager.onClickDeleteDocument();
             });
     };
 
     // Remove image on click
-    $.imageUploadManager.onClickDeleteImage = function() {
-        $('.image-manager .image-delete-btn').on('click', function (e) {
+    $.documentUploadManager.onClickDeleteDocument = function() {
+        $('.document-manager .document-delete-btn').on('click', function (e) {
             e.preventDefault();
             var $this = $(this);
             var $parent = $this.parent();
@@ -83,7 +82,7 @@ $(function($){
                 url: $url,
                 statusCode: {
                     404: function() {
-                        $(".image-manager .message").html(
+                        $(".document-manager .message").html(
                             errorMessage
                         );
                     }
@@ -91,7 +90,7 @@ $(function($){
             }).done(function(data) {
                 $parent.parents('tr').remove();
 
-                $(".image-manager .message").html(
+                $(".document-manager .message").html(
                     data
                 );
             });

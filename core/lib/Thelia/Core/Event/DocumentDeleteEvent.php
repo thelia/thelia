@@ -23,62 +23,90 @@
 
 namespace Thelia\Core\Event;
 
+use Thelia\Model\CategoryDocument;
+use Thelia\Model\ContentDocument;
+use Thelia\Model\FolderDocument;
+use Thelia\Model\ProductDocument;
+
 /**
- * Class DocumentEvent
+ * Created by JetBrains PhpStorm.
+ * Date: 9/18/13
+ * Time: 3:56 PM
  *
- * @package Thelia\Core\Event
+ * Occurring when a Document is about to be deleted
+ *
+ * @package Document
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ *
  */
-class DocumentEvent extends CachedFileEvent
+class DocumentDeleteEvent extends ActionEvent
 {
-    protected $documentPath;
-    protected $documentUrl;
+    /** @var string Document type */
+    protected $documentType = null;
+
+    /** @var CategoryDocument|ProductDocument|ContentDocument|FolderDocument Document about to be deleted */
+    protected $documentToDelete = null;
 
     /**
-     * Get Document path
+     * Constructor
      *
-     * @return string The document file path
+     * @param CategoryDocument|ProductDocument|ContentDocument|FolderDocument $documentToDelete Document about to be deleted
+     * @param string                                                          $documentType     Document type
+     *                                                                                          ex : FileManager::TYPE_CATEGORY
      */
-    public function getDocumentPath()
+    public function __construct($documentToDelete, $documentType)
     {
-        return $this->documentPath;
+        $this->documentToDelete = $documentToDelete;
+        $this->documentType = $documentType;
     }
 
     /**
-     * Set Document path
+     * Set picture type
      *
-     * @param string $documentPath the document file path
+     * @param string $documentType Document type
      *
      * @return $this
      */
-    public function setDocumentPath($documentPath)
+    public function setDocumentType($documentType)
     {
-        $this->documentPath = $documentPath;
+        $this->documentType = $documentType;
 
         return $this;
     }
 
     /**
-     * Get Document URL
+     * Get picture type
      *
-     * @return string The document URL
+     * @return string
      */
-    public function getDocumentUrl()
+    public function getDocumentType()
     {
-        return $this->documentUrl;
+        return $this->documentType;
     }
 
     /**
-     * Set Document URL
+     * Set Document about to be deleted
      *
-     * @param string $documentUrl the document URL
+     * @param CategoryDocument|ProductDocument|ContentDocument|FolderDocument $documentToDelete Document about to be deleted
      *
      * @return $this
      */
-    public function setDocumentUrl($documentUrl)
+    public function setDocumentToDelete($documentToDelete)
     {
-        $this->documentUrl = $documentUrl;
+        $this->documentToDelete = $documentToDelete;
 
         return $this;
     }
+
+    /**
+     * Get Document about to be deleted
+     *
+     * @return CategoryDocument|ProductDocument|ContentDocument|FolderDocument
+     */
+    public function getDocumentToDelete()
+    {
+        return $this->documentToDelete;
+    }
+
 
 }

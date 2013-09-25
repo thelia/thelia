@@ -24,24 +24,38 @@ namespace Thelia\Tools;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Thelia\Core\Event\ImagesCreateOrUpdateEvent;
+use Thelia\Core\Event\DocumentCreateOrUpdateEvent;
+use Thelia\Core\Event\ImageCreateOrUpdateEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\ImageException;
+use Thelia\Form\CategoryDocumentModification;
 use Thelia\Form\CategoryImageModification;
+use Thelia\Form\ContentDocumentModification;
 use Thelia\Form\ContentImageModification;
+use Thelia\Form\FolderDocumentModification;
 use Thelia\Form\FolderImageModification;
+use Thelia\Form\ProductDocumentModification;
 use Thelia\Form\ProductImageModification;
 use Thelia\Model\AdminLog;
+use Thelia\Model\CategoryDocument;
+use Thelia\Model\CategoryDocumentQuery;
 use Thelia\Model\CategoryImage;
 use Thelia\Model\CategoryImageQuery;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\ContentDocument;
+use Thelia\Model\ContentDocumentQuery;
 use Thelia\Model\ContentImage;
 use Thelia\Model\ContentImageQuery;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\Exception\InvalidArgumentException;
+use Thelia\Model\FolderDocument;
+use Thelia\Model\FolderDocumentQuery;
 use Thelia\Model\FolderImage;
 use Thelia\Model\FolderImageQuery;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\ProductDocument;
+use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductQuery;
@@ -65,6 +79,9 @@ class FileManager
     CONST TYPE_FOLDER   = 'folder';
     CONST TYPE_MODULE   = 'module';
 
+    CONST FILE_TYPE_IMAGES   = 'images';
+    CONST FILE_TYPE_DOCUMENTS   = 'documents';
+
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
@@ -85,42 +102,46 @@ class FileManager
     /**
      * Copy UploadedFile into the server storage directory
      *
-     * @param int                                                 $parentId         Parent id
-     * @param string                                              $imageType        Image type
-     * @param FolderImage|ContentImage|CategoryImage|ProductImage $modelImage       Image saved
-     * @param UploadedFile                                        $uploadedFile     Ready to be uploaded file
+     * @param int                                                                                                                 $parentId     Parent id
+     * @param string                                                                                                              $parentType   Image type
+     * @param FolderImage|ContentImage|CategoryImage|ProductImage|FolderDocument|ContentDocument|CategoryDocument|ProductDocument $model        Model saved
+     * @param UploadedFile                                                                                                        $uploadedFile Ready to be uploaded file
+     * @param string                                                                                                              $fileType     File type ex FileManager::FILE_TYPE_IMAGES
      *
      * @throws \Thelia\Exception\ImageException
      * @return UploadedFile
      */
-    public function copyUploadedFile($parentId, $imageType, $modelImage, $uploadedFile)
+    public function copyUploadedFile($parentId, $parentType, $model, $uploadedFile, $fileType)
     {
+        $newUploadedFile = null;
         if ($uploadedFile !== null) {
-            $directory = $this->getUploadDir($imageType);
-            $fileName = $this->renameFile($modelImage->getId(), $uploadedFile);
+            $directory = $this->getUploadDir($parentType, $fileType);
+            $fileName = $this->renameFile($model->getId(), $uploadedFile);
 
             $this->adminLogAppend(
                 $this->translator->trans(
-                    'Uploading picture %pictureName% to %directory% for parent_id %parentId% (%parentType%)',
+                    'Uploading %type% %fileName% to %directory% for parent_id %parentId% (%parentType%)',
                     array(
-                        '%pictureName%' => $uploadedFile->getClientOriginalName(),
+                        '%type%' => $fileType,
+                        '%fileName%' => $uploadedFile->getClientOriginalName(),
                         '%directory%' => $directory . '/' . $fileName,
                         '%parentId%' => $parentId,
-                        '%parentType%' => $imageType
+                        '%parentType%' => $parentType
                     ),
                     'image'
                 )
             );
 
             $newUploadedFile = $uploadedFile->move($directory, $fileName);
-            $modelImage->setFile($fileName);
+            $model->setFile($fileName);
 
-            if (!$modelImage->save()) {
+            if (!$model->save()) {
                 throw new ImageException(
                     sprintf(
-                        'Image %s (%s) failed to be saved (image file)',
-                        $modelImage->getFile(),
-                        $imageType
+                        '%s %s (%s) failed to be saved (image file)',
+                        ucfirst($parentType),
+                        $model->getFile(),
+                        $fileType
                     )
                 );
             }
@@ -132,32 +153,32 @@ class FileManager
     /**
      * Save image into the database
      *
-     * @param ImagesCreateOrUpdateEvent                            $event      Image event
+     * @param ImageCreateOrUpdateEvent                            $event      Image event
      * @param FolderImage|ContentImage|CategoryImage|ProductImage $modelImage Image to save
      *
      * @return int Nb lines modified
      * @throws \Thelia\Exception\ImageException
      * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
      */
-    public function saveImage(ImagesCreateOrUpdateEvent $event, $modelImage)
+    public function saveImage(ImageCreateOrUpdateEvent $event, $modelImage)
     {
         $nbModifiedLines = 0;
 
         if ($modelImage->getFile() !== null) {
             switch ($event->getImageType()) {
-                case ImagesCreateOrUpdateEvent::TYPE_PRODUCT:
+                case self::TYPE_PRODUCT:
                     /** @var ProductImage $modelImage */
                     $modelImage->setProductId($event->getParentId());
                     break;
-                case ImagesCreateOrUpdateEvent::TYPE_CATEGORY:
+                case self::TYPE_CATEGORY:
                     /** @var CategoryImage $modelImage */
                     $modelImage->setCategoryId($event->getParentId());
                     break;
-                case ImagesCreateOrUpdateEvent::TYPE_CONTENT:
+                case self::TYPE_CONTENT:
                     /** @var ContentImage $modelImage */
                     $modelImage->setContentId($event->getParentId());
                     break;
-                case ImagesCreateOrUpdateEvent::TYPE_FOLDER:
+                case self::TYPE_FOLDER:
                     /** @var FolderImage $modelImage */
                     $modelImage->setFolderId($event->getParentId());
                     break;
@@ -167,7 +188,7 @@ class FileManager
                             'Picture parent type is unknown (available types : %s)',
                             implode(
                                 ',',
-                                $event->getAvailableType()
+                                self::getAvailableTypes()
                             )
                         )
                     );
@@ -179,6 +200,64 @@ class FileManager
                     sprintf(
                         'Image %s failed to be saved (image content)',
                         $modelImage->getFile()
+                    )
+                );
+            }
+        }
+
+        return $nbModifiedLines;
+    }
+
+    /**
+     * Save document into the database
+     *
+     * @param DocumentCreateOrUpdateEvent                                     $event         Image event
+     * @param FolderDocument|ContentDocument|CategoryDocument|ProductDocument $modelDocument Document to save
+     *
+     * @throws \Thelia\Model\Exception\InvalidArgumentException
+     * @return int Nb lines modified
+     * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function saveDocument(DocumentCreateOrUpdateEvent $event, $modelDocument)
+    {
+        $nbModifiedLines = 0;
+
+        if ($modelDocument->getFile() !== null) {
+            switch ($event->getDocumentType()) {
+                case self::TYPE_PRODUCT:
+                    /** @var ProductImage $modelImage */
+                    $modelDocument->setProductId($event->getParentId());
+                    break;
+                case self::TYPE_CATEGORY:
+                    /** @var CategoryImage $modelImage */
+                    $modelDocument->setCategoryId($event->getParentId());
+                    break;
+                case self::TYPE_CONTENT:
+                    /** @var ContentImage $modelImage */
+                    $modelDocument->setContentId($event->getParentId());
+                    break;
+                case self::TYPE_FOLDER:
+                    /** @var FolderImage $modelImage */
+                    $modelDocument->setFolderId($event->getParentId());
+                    break;
+                default:
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            'Document parent type is unknown (available types : %s)',
+                            implode(
+                                ',',
+                                self::getAvailableTypes()
+                            )
+                        )
+                    );
+            }
+
+            $nbModifiedLines = $modelDocument->save();
+            if (!$nbModifiedLines) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Document %s failed to be saved (document content)',
+                        $modelDocument->getFile()
                     )
                 );
             }
@@ -226,21 +305,24 @@ class FileManager
     /**
      * Delete image from file storage and database
      *
-     * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageModel Image being deleted
-     * @param string $parentType Parent type
+     * @param CategoryImage|ProductImage|ContentImage|FolderImage|CategoryDocument|ProductDocument|ContentDocument|FolderDocument $model      File being deleted
+     * @param string                                                                                                              $parentType Parent type ex : self::TYPE_PRODUCT
+     * @param string                                                                                                              $fileType   File type ex FileManager::FILE_TYPE_DOCUMENTS
+     *
+     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
      */
-    public function deleteImage($imageModel, $parentType)
+    public function deleteFile($model, $parentType, $fileType)
     {
-        $url = $this->getUploadDir($parentType) . '/' . $imageModel->getFile();
+        $url = $this->getUploadDir($parentType, $fileType) . '/' . $model->getFile();
         unlink(str_replace('..', '', $url));
-        $imageModel->delete();
+        $model->delete();
     }
 
 
     /**
      * Get image model from type
      *
-     * @param string $parentType Parent type
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
      *
      * @return null|\Thelia\Model\CategoryImage|\Thelia\Model\ContentImage|\Thelia\Model\FolderImage|\Thelia\Model\ProductImage
      *
@@ -249,17 +331,48 @@ class FileManager
     public function getImageModel($parentType)
     {
         switch ($parentType) {
-            case ImagesCreateOrUpdateEvent::TYPE_PRODUCT:
+            case self::TYPE_PRODUCT:
                 $model = new ProductImage();
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_CATEGORY:
+            case self::TYPE_CATEGORY:
                 $model = new CategoryImage();
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_CONTENT:
+            case self::TYPE_CONTENT:
                 $model = new ContentImage();
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_FOLDER:
+            case self::TYPE_FOLDER:
                 $model = new FolderImage();
+                break;
+            default:
+                $model = null;
+        }
+
+        return $model;
+    }
+
+    /**
+     * Get document model from type
+     *
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
+     *
+     * @return null|ProductDocument|CategoryDocument|ContentDocument|FolderDocument
+     *
+     * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function getDocumentModel($parentType)
+    {
+        switch ($parentType) {
+            case self::TYPE_PRODUCT:
+                $model = new ProductDocument();
+                break;
+            case self::TYPE_CATEGORY:
+                $model = new CategoryDocument();
+                break;
+            case self::TYPE_CONTENT:
+                $model = new ContentDocument();
+                break;
+            case self::TYPE_FOLDER:
+                $model = new FolderDocument();
                 break;
             default:
                 $model = null;
@@ -271,7 +384,7 @@ class FileManager
     /**
      * Get image model query from type
      *
-     * @param string $parentType
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
      *
      * @return null|\Thelia\Model\CategoryImageQuery|\Thelia\Model\ContentImageQuery|\Thelia\Model\FolderImageQuery|\Thelia\Model\ProductImageQuery
      *
@@ -280,16 +393,16 @@ class FileManager
     public function getImageModelQuery($parentType)
     {
         switch ($parentType) {
-            case ImagesCreateOrUpdateEvent::TYPE_PRODUCT:
+            case self::TYPE_PRODUCT:
                 $model = new ProductImageQuery();
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_CATEGORY:
+            case self::TYPE_CATEGORY:
                 $model = new CategoryImageQuery();
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_CONTENT:
+            case self::TYPE_CONTENT:
                 $model = new ContentImageQuery();
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_FOLDER:
+            case self::TYPE_FOLDER:
                 $model = new FolderImageQuery();
                 break;
             default:
@@ -300,28 +413,102 @@ class FileManager
     }
 
     /**
+     * Get document model query from type
+     *
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
+     *
+     * @return null|ProductDocumentQuery|CategoryDocumentQuery|ContentDocumentQuery|FolderDocumentQuery
+     *
+     * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function getDocumentModelQuery($parentType)
+    {
+        switch ($parentType) {
+            case self::TYPE_PRODUCT:
+                $model = new ProductDocumentQuery();
+                break;
+            case self::TYPE_CATEGORY:
+                $model = new CategoryDocumentQuery();
+                break;
+            case self::TYPE_CONTENT:
+                $model = new ContentDocumentQuery();
+                break;
+            case self::TYPE_FOLDER:
+                $model = new FolderDocumentQuery();
+                break;
+            default:
+                $model = null;
+        }
+
+        return $model;
+    }
+
+    /**
+     * Get form service id from type
+     *
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
+     * @param string $fileType   Parent id
+     *
+     * @return string
+     *
+     * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function getFormId($parentType, $fileType)
+    {
+        switch ($fileType) {
+            case self::FILE_TYPE_IMAGES:
+                $type = 'image';
+                break;
+            case self::FILE_TYPE_DOCUMENTS:
+                $type = 'document';
+                break;
+            default:
+                return false;
+        }
+
+        switch ($parentType) {
+            case self::TYPE_PRODUCT:
+                $formId = 'thelia.admin.product.' . $type . '.modification';
+                break;
+            case self::TYPE_CATEGORY:
+                $formId = 'thelia.admin.category.' . $type . '.modification';
+                break;
+            case self::TYPE_CONTENT:
+                $formId = 'thelia.admin.content.' . $type . '.modification';
+                break;
+            case self::TYPE_FOLDER:
+                $formId = 'thelia.admin.folder.' . $type . '.modification';
+                break;
+            default:
+                $formId = false;
+        }
+
+        return $formId;
+    }
+
+    /**
      * Get image parent model from type
      *
-     * @param string $parentType
-     * @param int    $parentId
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
+     * @param int    $parentId   Parent Id
      *
      * @return null|\Thelia\Model\Category|\Thelia\Model\Content|\Thelia\Model\Folder|\Thelia\Model\Product
      *
      * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
      */
-    public function getParentImageModel($parentType, $parentId)
+    public function getParentFileModel($parentType, $parentId)
     {
         switch ($parentType) {
-            case ImagesCreateOrUpdateEvent::TYPE_PRODUCT:
+            case self::TYPE_PRODUCT:
                 $model = ProductQuery::create()->findPk($parentId);
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_CATEGORY:
+            case self::TYPE_CATEGORY:
                 $model = CategoryQuery::create()->findPk($parentId);
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_CONTENT:
+            case self::TYPE_CONTENT:
                 $model = ContentQuery::create()->findPk($parentId);
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_FOLDER:
+            case self::TYPE_FOLDER:
                 $model = FolderQuery::create()->findPk($parentId);
                 break;
             default:
@@ -334,7 +521,7 @@ class FileManager
     /**
      * Get image parent model from type
      *
-     * @param string  $parentType Parent type
+     * @param string  $parentType Parent type ex : self::TYPE_PRODUCT
      * @param Request $request    Request service
      *
      * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
@@ -343,20 +530,52 @@ class FileManager
     public function getImageForm($parentType, Request $request)
     {
         switch ($parentType) {
-            case ImagesCreateOrUpdateEvent::TYPE_PRODUCT:
+            case self::TYPE_PRODUCT:
                 $form = new ProductImageModification($request);
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_CATEGORY:
+            case self::TYPE_CATEGORY:
                 $form = new CategoryImageModification($request);
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_CONTENT:
+            case self::TYPE_CONTENT:
                 $form = new ContentImageModification($request);
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_FOLDER:
+            case self::TYPE_FOLDER:
                 $form = new FolderImageModification($request);
                 break;
             default:
-                $model = null;
+                $form = null;
+        }
+
+        return $form;
+
+    }
+
+    /**
+     * Get document parent model from type
+     *
+     * @param string  $parentType Parent type ex : self::TYPE_PRODUCT
+     * @param Request $request    Request service
+     *
+     * @todo refactor make all document using propel inheritance and factorise image behaviour into one single clean action
+     * @return ProductDocumentModification|CategoryDocumentModification|ContentDocumentModification|FolderDocumentModification
+     */
+    public function getDocumentForm($parentType, Request $request)
+    {
+        switch ($parentType) {
+            case self::TYPE_PRODUCT:
+                $form = new ProductDocumentModification($request);
+                break;
+            case self::TYPE_CATEGORY:
+                $form = new CategoryDocumentModification($request);
+                break;
+            case self::TYPE_CONTENT:
+                $form = new ContentDocumentModification($request);
+                break;
+            case self::TYPE_FOLDER:
+                $form = new FolderDocumentModification($request);
+                break;
+            default:
+                $form = null;
         }
 
         return $form;
@@ -366,54 +585,29 @@ class FileManager
     /**
      * Get image upload dir
      *
-     * @param string $parentType Parent type
+     * @param string $parentType Parent type ex FileManager::TYPE_PRODUCT
+     * @param string $fileType   File type ex : self::FILE_TYPE_DOCUMENTS
      *
      * @return string Uri
      */
-    public function getUploadDir($parentType)
+    public function getUploadDir($parentType, $fileType)
     {
-        switch ($parentType) {
-            case ImagesCreateOrUpdateEvent::TYPE_PRODUCT:
-                $uri = THELIA_LOCAL_DIR . 'media/images/' . ImagesCreateOrUpdateEvent::TYPE_PRODUCT;
-                break;
-            case ImagesCreateOrUpdateEvent::TYPE_CATEGORY:
-                $uri = THELIA_LOCAL_DIR . 'media/images/' . ImagesCreateOrUpdateEvent::TYPE_CATEGORY;
-                break;
-            case ImagesCreateOrUpdateEvent::TYPE_CONTENT:
-                $uri = THELIA_LOCAL_DIR . 'media/images/' . ImagesCreateOrUpdateEvent::TYPE_CONTENT;
-                break;
-            case ImagesCreateOrUpdateEvent::TYPE_FOLDER:
-                $uri = THELIA_LOCAL_DIR . 'media/images/' . ImagesCreateOrUpdateEvent::TYPE_FOLDER;
-                break;
-            default:
-                $uri = null;
+        if (!in_array($fileType, self::$availableFileType)) {
+            return false;
         }
 
-        return $uri;
-
-    }
-
-    /**
-     * Deduce image redirecting URL from parent type
-     *
-     * @param string $parentType Parent type
-     * @param int    $parentId   Parent id
-     * @return string
-     */
-    public function getRedirectionUrl($parentType, $parentId)
-    {
         switch ($parentType) {
-            case ImagesCreateOrUpdateEvent::TYPE_PRODUCT:
-                $uri = '/admin/products/update?product_id=' . $parentId . '&current_tab=images';
+            case self::TYPE_PRODUCT:
+                $uri = THELIA_LOCAL_DIR . 'media/' . $fileType . '/' . self::TYPE_PRODUCT;
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_CATEGORY:
-                $uri = '/admin/categories/update?category_id=' . $parentId . '&current_tab=images';
+            case self::TYPE_CATEGORY:
+                $uri = THELIA_LOCAL_DIR . 'media/' . $fileType . '/' . self::TYPE_CATEGORY;
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_CONTENT:
-                $uri = '/admin/content/update/' . $parentId . '&current_tab=images';
+            case self::TYPE_CONTENT:
+                $uri = THELIA_LOCAL_DIR . 'media/' . $fileType . '/' . self::TYPE_CONTENT;
                 break;
-            case ImagesCreateOrUpdateEvent::TYPE_FOLDER:
-                $uri = '/admin/folders/update/' . $parentId . '&current_tab=images';
+            case self::TYPE_FOLDER:
+                $uri = THELIA_LOCAL_DIR . 'media/' . $fileType . '/' . self::TYPE_FOLDER;
                 break;
             default:
                 $uri = false;
@@ -423,13 +617,55 @@ class FileManager
 
     }
 
-    /** @var array Available image parent type */
+    /**
+     * Deduce image redirecting URL from parent type
+     *
+     * @param string $parentType Parent type ex : self::TYPE_PRODUCT
+     * @param int    $parentId   Parent id
+     * @param string $fileType   File type ex : self::FILE_TYPE_DOCUMENTS
+     *
+     * @return string
+     */
+    public function getRedirectionUrl($parentType, $parentId, $fileType)
+    {
+        if (!in_array($fileType, self::$availableFileType)) {
+            return false;
+        }
+
+        switch ($parentType) {
+            case self::TYPE_PRODUCT:
+                $uri = '/admin/products/update?product_id=' . $parentId . '&current_tab=' . $fileType;
+                break;
+            case self::TYPE_CATEGORY:
+                $uri = '/admin/categories/update?category_id=' . $parentId . '&current_tab=' . $fileType;
+                break;
+            case self::TYPE_CONTENT:
+                $uri = '/admin/content/update/' . $parentId . '?current_tab=' . $fileType;
+                break;
+            case self::TYPE_FOLDER:
+                $uri = '/admin/folders/update/' . $parentId . '?current_tab=' . $fileType;
+                break;
+            default:
+                $uri = false;
+        }
+
+        return $uri;
+
+    }
+
+    /** @var array Available file parent type */
     public static $availableType = array(
         self::TYPE_PRODUCT,
         self::TYPE_CATEGORY,
         self::TYPE_CONTENT,
         self::TYPE_FOLDER,
         self::TYPE_MODULE
+    );
+
+    /** @var array Available file type type */
+    public static $availableFileType = array(
+        self::FILE_TYPE_DOCUMENTS,
+        self::FILE_TYPE_IMAGES
     );
 
     /**
@@ -443,11 +679,17 @@ class FileManager
     public function renameFile($modelId, $uploadedFile)
     {
         $extension = $uploadedFile->getClientOriginalExtension();
+        if (!empty($extension)) {
+            $extension = '.' . strtolower($extension);
+        }
         $fileName = $this->sanitizeFileName(
-            str_replace('.' . $extension, '', $uploadedFile->getClientOriginalName()) . "-" . $modelId . "." . strtolower(
-            $extension
-            )
+            str_replace(
+                $extension,
+                '',
+                $uploadedFile->getClientOriginalName()
+            ) . '-' . $modelId . $extension
         );
+
         return $fileName;
     }
 
@@ -469,5 +711,21 @@ class FileManager
         }
 
         return $isValid;
+    }
+
+    /**
+     * Return all document and image types
+     *
+     * @return array
+     */
+    public static function getAvailableTypes()
+    {
+        return array(
+            self::TYPE_CATEGORY,
+            self::TYPE_CONTENT,
+            self::TYPE_FOLDER,
+            self::TYPE_PRODUCT,
+            self::TYPE_MODULE,
+        );
     }
 }

@@ -260,6 +260,7 @@
                             </div>
 
 		                    <div class="tab-pane fade {if $current_tab == 'documents'}active in{/if}" id="documents">
+                                {include file='includes/document-upload-form.html' documentType='category' parentId=$category_id}
 		                    </div>
 
 		                    <div class="tab-pane fade {if $current_tab == 'modules'}active in{/if}" id="modules">
@@ -303,6 +304,9 @@
     {javascripts file='assets/js/image-upload.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+    {javascripts file='assets/js/document-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
 
 
@@ -327,6 +331,7 @@
 
 $(function() {
     $.imageUploadManager.initImageDropZone();
+    $.documentUploadManager.initDocumentDropZone();
 
     $('.use_default_rewriten_url').click(function(ev) {
     	alert("Not functionnal");

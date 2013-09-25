@@ -291,7 +291,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             );
         }
 
-        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile());
+        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile(), FileManager::FILE_TYPE_IMAGES);
         $event->setUploadedFile($newUploadedFile);
     }
 
@@ -321,20 +321,16 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         // Copy and save file
         if ($event->getUploadedFile()) {
             // Remove old picture file from file storage
-            $url = $fileManager->getUploadDir($event->getImageType()) . '/' . $event->getOldModelImage()->getFile();
+            $url = $fileManager->getUploadDir($event->getImageType(), FileManager::FILE_TYPE_IMAGES) . '/' . $event->getOldModelImage()->getFile();
             unlink(str_replace('..', '', $url));
 
-            $newUploadedFile = $fileManager->copyUploadedFile(
-                $event->getModelImage()->getParentId(),
-                $event->getImageType(),
-                $event->getModelImage(), $event->getUploadedFile());
+            $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile(), FileManager::FILE_TYPE_IMAGES);
             $event->setUploadedFile($newUploadedFile);
         }
 
         // Update image modifications
         $event->getModelImage()->save();
         $event->setModelImage($event->getModelImage());
-
     }
 
     /**
@@ -350,7 +346,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $fileManager = new FileManager($this->container);
 
         try {
-            $fileManager->deleteImage($event->getImageToDelete(), $event->getImageType());
+            $fileManager->deleteFile($event->getImageToDelete(), $event->getImageType(), FileManager::FILE_TYPE_IMAGES);
 
             $this->adminLogAppend(
                 $this->container->get('thelia.translator')->trans(
@@ -362,7 +358,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     'image'
                 )
             );
-        } catch(\Exception $e) {
+        } catch(\Exception $e){
             $this->adminLogAppend(
                 $this->container->get('thelia.translator')->trans(
                     'Fail to delete image for %id% with parent id %parentId% (Exception : %e%)',
