@@ -208,7 +208,10 @@ class CouponController extends BaseAdminController
             $conditions = $conditionFactory->unserializeConditionCollection(
                 $coupon->getSerializedRules()
             );
-
+var_dump($coupon->getIsEnabled());;
+var_dump($coupon->getIsAvailableOnSpecialOffers());;
+var_dump($coupon->getIsCumulative());;
+var_dump($coupon->getIsRemovingPostage());;
             $data = array(
                 'code' => $coupon->getCode(),
                 'title' => $coupon->getTitle(),
@@ -222,15 +225,15 @@ class CouponController extends BaseAdminController
                 'isCumulative' => ($coupon->getIsCumulative() == 1),
                 'isRemovingPostage' => ($coupon->getIsRemovingPostage() == 1),
                 'maxUsage' => $coupon->getMaxUsage(),
-                'rules' => $conditions,
+                'conditions' => $conditions,
                 'locale' => $coupon->getLocale(),
             );
 
-            $args['rulesObject'] = array();
+            $args['conditionsObject'] = array();
 
             /** @var ConditionManagerInterface $condition */
             foreach ($conditions->getConditions() as $condition) {
-                $args['rulesObject'][] = array(
+                $args['conditionsObject'][] = array(
                     'serviceId' => $condition->getServiceId(),
                     'name' => $condition->getName(),
                     'tooltip' => $condition->getToolTip(),
@@ -238,7 +241,7 @@ class CouponController extends BaseAdminController
                 );
             }
 
-            $args['rules'] = $this->cleanConditionForTemplate($conditions);
+            $args['conditions'] = $this->cleanConditionForTemplate($conditions);
 
             // Setup the object form
             $changeForm = new CouponCreationForm($this->getRequest(), 'form', $data);
@@ -249,14 +252,14 @@ class CouponController extends BaseAdminController
         $args['couponCode'] = $coupon->getCode();
         $args['availableCoupons'] = $this->getAvailableCoupons();
         $args['availableConditions'] = $this->getAvailableConditions();
-        $args['urlAjaxGetRuleInput'] = $this->getRoute(
-            'admin.coupon.rule.input',
-            array('ruleId' => 'ruleId'),
+        $args['urlAjaxGetConditionInput'] = $this->getRoute(
+            'admin.coupon.condition.input',
+            array('conditionId' => 'conditionId'),
             Router::ABSOLUTE_URL
         );
 
-        $args['urlAjaxUpdateRules'] = $this->getRoute(
-            'admin.coupon.rule.update',
+        $args['urlAjaxUpdateConditions'] = $this->getRoute(
+            'admin.coupon.condition.update',
             array('couponId' => $couponId),
             Router::ABSOLUTE_URL
         );
@@ -269,11 +272,11 @@ class CouponController extends BaseAdminController
     /**
      * Manage Coupons read display
      *
-     * @param string $ruleId Rule service id
+     * @param string $conditionId Condition service id
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getRuleInputAction($ruleId)
+    public function getConditionInputAction($conditionId)
     {
         $this->checkAuth('ADMIN', 'admin.coupon.read');
 
@@ -281,7 +284,7 @@ class CouponController extends BaseAdminController
 
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->container->get('thelia.condition.factory');
-        $inputs = $conditionFactory->getInputs($ruleId);
+        $inputs = $conditionFactory->getInputs($conditionId);
 
         if ($inputs === null) {
             return $this->pageNotFound();
@@ -290,7 +293,7 @@ class CouponController extends BaseAdminController
         return $this->render(
             'coupon/condition-input-ajax',
             array(
-                'ruleId' => $ruleId,
+                'conditionId' => $conditionId,
                 'inputs' => $inputs
             )
         );
@@ -304,7 +307,7 @@ class CouponController extends BaseAdminController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function updateRulesAction($couponId)
+    public function updateConditionsAction($couponId)
     {
         $this->checkAuth('ADMIN', 'admin.coupon.read');
 
@@ -322,7 +325,7 @@ class CouponController extends BaseAdminController
 
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->container->get('thelia.condition.factory');
-        $conditionsReceived = json_decode($this->getRequest()->get('rules'));
+        $conditionsReceived = json_decode($this->getRequest()->get('conditions'));
         foreach ($conditionsReceived as $conditionReceived) {
             $condition = $conditionFactory->build(
                 $conditionReceived->serviceId,
@@ -332,8 +335,8 @@ class CouponController extends BaseAdminController
             $conditions->add(clone $condition);
         }
 
-//        $coupon->setSerializedRules(
-//            $conditionFactory->serializeCouponRuleCollection($rules)
+//        $coupon->setSerializedConditions(
+//            $conditionFactory->serializeCouponConditionCollection($conditions)
 //        );
 
         $conditionEvent = new ConditionCreateOrUpdateEvent(
@@ -362,7 +365,7 @@ class CouponController extends BaseAdminController
             'coupon/conditions',
             array(
                 'couponId' => $couponId,
-                'rules' => $cleanedConditions,
+                'conditions' => $cleanedConditions,
                 'urlEdit' => $couponId,
                 'urlDelete' => $couponId
             )
@@ -412,7 +415,7 @@ class CouponController extends BaseAdminController
         $couponBeingCreated->setAmount($data['amount']);
         $couponBeingCreated->setIsEnabled($data['isEnabled']);
         $couponBeingCreated->setExpirationDate($data['expirationDate']);
-        $couponBeingCreated->setSerializedRules(
+        $couponBeingCreated->setSerializedConditions(
             new ConditionCollection(
                 array()
             )
@@ -589,22 +592,22 @@ class CouponController extends BaseAdminController
     }
 
 //    /**
-//     * Validation Rule creation
+//     * Validation Condition creation
 //     *
-//     * @param string $type     Rule class type
-//     * @param string $operator Rule operator (<, >, =, etc)
-//     * @param array  $values   Rules values
+//     * @param string $type     Condition class type
+//     * @param string $operator Condition operator (<, >, =, etc)
+//     * @param array  $values   Condition values
 //     *
 //     * @return bool
 //     */
-//    protected function validateRulesCreation($type, $operator, $values)
+//    protected function validateConditionsCreation($type, $operator, $values)
 //    {
 //        /** @var AdapterInterface $adapter */
 //        $adapter = $this->container->get('thelia.adapter');
 //        $validator = new PriceParam()
 //        try {
-//            $rule = new AvailableForTotalAmount($adapter, $validators);
-//            $rule = new $type($adapter, $validators);
+//            $condition = new AvailableForTotalAmount($adapter, $validators);
+//            $condition = new $type($adapter, $validators);
 //        } catch (\Exception $e) {
 //            return false;
 //        }

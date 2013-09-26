@@ -264,12 +264,12 @@
         <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
         <requirement key="couponId">\d+</requirement>
     </route>
-    <route id="admin.coupon.rule.input" path="/admin/coupon/rule/{ruleId}">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::getRuleInputAction</default>
-        <requirement key="ruleId">.*</requirement>
+    <route id="admin.coupon.condition.input" path="/admin/coupon/condition/{conditionId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::getConditionInputAction</default>
+        <requirement key="conditionId">.*</requirement>
     </route>
-    <route id="admin.coupon.rule.update" path="/admin/coupon/{couponId}/rule/update">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::updateRulesAction</default>
+    <route id="admin.coupon.condition.update" path="/admin/coupon/{couponId}/condition/update">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::updateConditionsAction</default>
         <requirement key="couponId">\d+</requirement>
     </route>
     <route id="admin.coupon.consume" path="/admin/coupon/consume/{couponCode}">

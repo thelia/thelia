@@ -662,8 +662,8 @@ Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentes
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
     $coupon1->setAmount(10.00);
-    $coupon1->setIsUsed(1);
-    $coupon1->setIsEnabled(1);
+    $coupon1->setIsUsed(true);
+    $coupon1->setIsEnabled(true);
     $date = new \DateTime();
     $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 3 months")));
 
@@ -698,9 +698,9 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
     $coupon1->setSerializedRules($serializedConditions);
     $coupon1->setMaxUsage(40);
-    $coupon1->setIsCumulative(1);
-    $coupon1->setIsRemovingPostage(0);
-    $coupon1->setIsAvailableOnSpecialOffers(1);
+    $coupon1->setIsCumulative(true);
+    $coupon1->setIsRemovingPostage(false);
+    $coupon1->setIsAvailableOnSpecialOffers(true);
     $coupon1->save();
 
 
@@ -720,8 +720,8 @@ Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentes
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
     $coupon2->setAmount(10.00);
-    $coupon2->setIsUsed(1);
-    $coupon2->setIsEnabled(1);
+    $coupon2->setIsUsed(true);
+    $coupon2->setIsEnabled(true);
     $date = new \DateTime();
     $coupon2->setExpirationDate($date->setTimestamp(strtotime("today + 1 months")));
 
@@ -742,9 +742,9 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
     $coupon2->setSerializedRules($serializedConditions);
     $coupon2->setMaxUsage(-1);
-    $coupon2->setIsCumulative(0);
-    $coupon2->setIsRemovingPostage(1);
-    $coupon2->setIsAvailableOnSpecialOffers(1);
+    $coupon2->setIsCumulative(false);
+    $coupon2->setIsRemovingPostage(true);
+    $coupon2->setIsAvailableOnSpecialOffers(true);
     $coupon2->save();
 
 
@@ -764,8 +764,8 @@ Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentes
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
     $coupon3->setAmount(10.00);
-    $coupon3->setIsUsed(0);
-    $coupon3->setIsEnabled(0);
+    $coupon3->setIsUsed(false);
+    $coupon3->setIsEnabled(false);
     $date = new \DateTime();
     $coupon3->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
 
@@ -782,8 +782,8 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $serializedConditions = $constraintCondition->serializeConditionCollection($conditions);
     $coupon3->setSerializedRules($serializedConditions);
     $coupon3->setMaxUsage(-1);
-    $coupon3->setIsCumulative(1);
-    $coupon3->setIsRemovingPostage(0);
-    $coupon3->setIsAvailableOnSpecialOffers(0);
+    $coupon3->setIsCumulative(true);
+    $coupon3->setIsRemovingPostage(false);
+    $coupon3->setIsAvailableOnSpecialOffers(false);
     $coupon3->save();
 }

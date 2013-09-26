@@ -57,7 +57,7 @@ class OrderProductTaxTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class OrderProductTaxTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the ID field
@@ -95,6 +95,11 @@ class OrderProductTaxTableMap extends TableMap
     const AMOUNT = 'order_product_tax.AMOUNT';
 
     /**
+     * the column name for the PROMO_AMOUNT field
+     */
+    const PROMO_AMOUNT = 'order_product_tax.PROMO_AMOUNT';
+
+    /**
      * the column name for the CREATED_AT field
      */
     const CREATED_AT = 'order_product_tax.CREATED_AT';
@@ -116,12 +121,12 @@ class OrderProductTaxTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'OrderProductId', 'Title', 'Description', 'Amount', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'orderProductId', 'title', 'description', 'amount', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(OrderProductTaxTableMap::ID, OrderProductTaxTableMap::ORDER_PRODUCT_ID, OrderProductTaxTableMap::TITLE, OrderProductTaxTableMap::DESCRIPTION, OrderProductTaxTableMap::AMOUNT, OrderProductTaxTableMap::CREATED_AT, OrderProductTaxTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_PRODUCT_ID', 'TITLE', 'DESCRIPTION', 'AMOUNT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'order_product_id', 'title', 'description', 'amount', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'OrderProductId', 'Title', 'Description', 'Amount', 'PromoAmount', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'orderProductId', 'title', 'description', 'amount', 'promoAmount', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(OrderProductTaxTableMap::ID, OrderProductTaxTableMap::ORDER_PRODUCT_ID, OrderProductTaxTableMap::TITLE, OrderProductTaxTableMap::DESCRIPTION, OrderProductTaxTableMap::AMOUNT, OrderProductTaxTableMap::PROMO_AMOUNT, OrderProductTaxTableMap::CREATED_AT, OrderProductTaxTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_PRODUCT_ID', 'TITLE', 'DESCRIPTION', 'AMOUNT', 'PROMO_AMOUNT', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'order_product_id', 'title', 'description', 'amount', 'promo_amount', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -131,12 +136,12 @@ class OrderProductTaxTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderProductId' => 1, 'Title' => 2, 'Description' => 3, 'Amount' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderProductId' => 1, 'title' => 2, 'description' => 3, 'amount' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(OrderProductTaxTableMap::ID => 0, OrderProductTaxTableMap::ORDER_PRODUCT_ID => 1, OrderProductTaxTableMap::TITLE => 2, OrderProductTaxTableMap::DESCRIPTION => 3, OrderProductTaxTableMap::AMOUNT => 4, OrderProductTaxTableMap::CREATED_AT => 5, OrderProductTaxTableMap::UPDATED_AT => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_PRODUCT_ID' => 1, 'TITLE' => 2, 'DESCRIPTION' => 3, 'AMOUNT' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'order_product_id' => 1, 'title' => 2, 'description' => 3, 'amount' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderProductId' => 1, 'Title' => 2, 'Description' => 3, 'Amount' => 4, 'PromoAmount' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderProductId' => 1, 'title' => 2, 'description' => 3, 'amount' => 4, 'promoAmount' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        self::TYPE_COLNAME       => array(OrderProductTaxTableMap::ID => 0, OrderProductTaxTableMap::ORDER_PRODUCT_ID => 1, OrderProductTaxTableMap::TITLE => 2, OrderProductTaxTableMap::DESCRIPTION => 3, OrderProductTaxTableMap::AMOUNT => 4, OrderProductTaxTableMap::PROMO_AMOUNT => 5, OrderProductTaxTableMap::CREATED_AT => 6, OrderProductTaxTableMap::UPDATED_AT => 7, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_PRODUCT_ID' => 1, 'TITLE' => 2, 'DESCRIPTION' => 3, 'AMOUNT' => 4, 'PROMO_AMOUNT' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'order_product_id' => 1, 'title' => 2, 'description' => 3, 'amount' => 4, 'promo_amount' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -160,6 +165,7 @@ class OrderProductTaxTableMap extends TableMap
         $this->addColumn('TITLE', 'Title', 'VARCHAR', true, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'CLOB', false, null, null);
         $this->addColumn('AMOUNT', 'Amount', 'FLOAT', true, null, null);
+        $this->addColumn('PROMO_AMOUNT', 'PromoAmount', 'FLOAT', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -328,6 +334,7 @@ class OrderProductTaxTableMap extends TableMap
             $criteria->addSelectColumn(OrderProductTaxTableMap::TITLE);
             $criteria->addSelectColumn(OrderProductTaxTableMap::DESCRIPTION);
             $criteria->addSelectColumn(OrderProductTaxTableMap::AMOUNT);
+            $criteria->addSelectColumn(OrderProductTaxTableMap::PROMO_AMOUNT);
             $criteria->addSelectColumn(OrderProductTaxTableMap::CREATED_AT);
             $criteria->addSelectColumn(OrderProductTaxTableMap::UPDATED_AT);
         } else {
@@ -336,6 +343,7 @@ class OrderProductTaxTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.TITLE');
             $criteria->addSelectColumn($alias . '.DESCRIPTION');
             $criteria->addSelectColumn($alias . '.AMOUNT');
+            $criteria->addSelectColumn($alias . '.PROMO_AMOUNT');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

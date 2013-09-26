@@ -87,10 +87,10 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
     protected $attribute_description;
 
     /**
-     * The value for the attribute_postscriptumn field.
+     * The value for the attribute_postscriptum field.
      * @var        string
      */
-    protected $attribute_postscriptumn;
+    protected $attribute_postscriptum;
 
     /**
      * The value for the attribute_av_title field.
@@ -451,14 +451,14 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
     }
 
     /**
-     * Get the [attribute_postscriptumn] column value.
+     * Get the [attribute_postscriptum] column value.
      *
      * @return   string
      */
-    public function getAttributePostscriptumn()
+    public function getAttributePostscriptum()
     {
 
-        return $this->attribute_postscriptumn;
+        return $this->attribute_postscriptum;
     }
 
     /**
@@ -655,25 +655,25 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
     } // setAttributeDescription()
 
     /**
-     * Set the value of [attribute_postscriptumn] column.
+     * Set the value of [attribute_postscriptum] column.
      *
      * @param      string $v new value
      * @return   \Thelia\Model\OrderProductAttributeCombination The current object (for fluent API support)
      */
-    public function setAttributePostscriptumn($v)
+    public function setAttributePostscriptum($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->attribute_postscriptumn !== $v) {
-            $this->attribute_postscriptumn = $v;
-            $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUMN;
+        if ($this->attribute_postscriptum !== $v) {
+            $this->attribute_postscriptum = $v;
+            $this->modifiedColumns[] = OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUM;
         }
 
 
         return $this;
-    } // setAttributePostscriptumn()
+    } // setAttributePostscriptum()
 
     /**
      * Set the value of [attribute_av_title] column.
@@ -853,8 +853,8 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OrderProductAttributeCombinationTableMap::translateFieldName('AttributeDescription', TableMap::TYPE_PHPNAME, $indexType)];
             $this->attribute_description = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderProductAttributeCombinationTableMap::translateFieldName('AttributePostscriptumn', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->attribute_postscriptumn = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderProductAttributeCombinationTableMap::translateFieldName('AttributePostscriptum', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->attribute_postscriptum = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OrderProductAttributeCombinationTableMap::translateFieldName('AttributeAvTitle', TableMap::TYPE_PHPNAME, $indexType)];
             $this->attribute_av_title = (null !== $col) ? (string) $col : null;
@@ -1138,8 +1138,8 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION)) {
             $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_DESCRIPTION';
         }
-        if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUMN)) {
-            $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_POSTSCRIPTUMN';
+        if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUM)) {
+            $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_POSTSCRIPTUM';
         }
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE)) {
             $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_AV_TITLE';
@@ -1185,8 +1185,8 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
                     case 'ATTRIBUTE_DESCRIPTION':
                         $stmt->bindValue($identifier, $this->attribute_description, PDO::PARAM_STR);
                         break;
-                    case 'ATTRIBUTE_POSTSCRIPTUMN':
-                        $stmt->bindValue($identifier, $this->attribute_postscriptumn, PDO::PARAM_STR);
+                    case 'ATTRIBUTE_POSTSCRIPTUM':
+                        $stmt->bindValue($identifier, $this->attribute_postscriptum, PDO::PARAM_STR);
                         break;
                     case 'ATTRIBUTE_AV_TITLE':
                         $stmt->bindValue($identifier, $this->attribute_av_title, PDO::PARAM_STR);
@@ -1284,7 +1284,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
                 return $this->getAttributeDescription();
                 break;
             case 5:
-                return $this->getAttributePostscriptumn();
+                return $this->getAttributePostscriptum();
                 break;
             case 6:
                 return $this->getAttributeAvTitle();
@@ -1338,7 +1338,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
             $keys[2] => $this->getAttributeTitle(),
             $keys[3] => $this->getAttributeChapo(),
             $keys[4] => $this->getAttributeDescription(),
-            $keys[5] => $this->getAttributePostscriptumn(),
+            $keys[5] => $this->getAttributePostscriptum(),
             $keys[6] => $this->getAttributeAvTitle(),
             $keys[7] => $this->getAttributeAvChapo(),
             $keys[8] => $this->getAttributeAvDescription(),
@@ -1406,7 +1406,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
                 $this->setAttributeDescription($value);
                 break;
             case 5:
-                $this->setAttributePostscriptumn($value);
+                $this->setAttributePostscriptum($value);
                 break;
             case 6:
                 $this->setAttributeAvTitle($value);
@@ -1455,7 +1455,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
         if (array_key_exists($keys[2], $arr)) $this->setAttributeTitle($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setAttributeChapo($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setAttributeDescription($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setAttributePostscriptumn($arr[$keys[5]]);
+        if (array_key_exists($keys[5], $arr)) $this->setAttributePostscriptum($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setAttributeAvTitle($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setAttributeAvChapo($arr[$keys[7]]);
         if (array_key_exists($keys[8], $arr)) $this->setAttributeAvDescription($arr[$keys[8]]);
@@ -1478,7 +1478,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_TITLE)) $criteria->add(OrderProductAttributeCombinationTableMap::ATTRIBUTE_TITLE, $this->attribute_title);
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_CHAPO)) $criteria->add(OrderProductAttributeCombinationTableMap::ATTRIBUTE_CHAPO, $this->attribute_chapo);
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION)) $criteria->add(OrderProductAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION, $this->attribute_description);
-        if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUMN)) $criteria->add(OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUMN, $this->attribute_postscriptumn);
+        if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUM)) $criteria->add(OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUM, $this->attribute_postscriptum);
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE)) $criteria->add(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE, $this->attribute_av_title);
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO)) $criteria->add(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO, $this->attribute_av_chapo);
         if ($this->isColumnModified(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION)) $criteria->add(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION, $this->attribute_av_description);
@@ -1552,7 +1552,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
         $copyObj->setAttributeTitle($this->getAttributeTitle());
         $copyObj->setAttributeChapo($this->getAttributeChapo());
         $copyObj->setAttributeDescription($this->getAttributeDescription());
-        $copyObj->setAttributePostscriptumn($this->getAttributePostscriptumn());
+        $copyObj->setAttributePostscriptum($this->getAttributePostscriptum());
         $copyObj->setAttributeAvTitle($this->getAttributeAvTitle());
         $copyObj->setAttributeAvChapo($this->getAttributeAvChapo());
         $copyObj->setAttributeAvDescription($this->getAttributeAvDescription());
@@ -1648,7 +1648,7 @@ abstract class OrderProductAttributeCombination implements ActiveRecordInterface
         $this->attribute_title = null;
         $this->attribute_chapo = null;
         $this->attribute_description = null;
-        $this->attribute_postscriptumn = null;
+        $this->attribute_postscriptum = null;
         $this->attribute_av_title = null;
         $this->attribute_av_chapo = null;
         $this->attribute_av_description = null;

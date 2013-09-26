@@ -36,7 +36,7 @@
                 {form_field form=$form field='isEnabled'}
                     <div class="form-group {if $error}has-error{/if}">
                         <label for="is-enabled" class="checkbox control-label">
-                            <input id="is-enabled" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                            <input id="is-enabled" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
                             {if $error}{$message}{/if}
                             {intl l='Is enabled'}
                         </label>
@@ -45,8 +45,9 @@
 
                 {form_field form=$form field='isAvailableOnSpecialOffers'}
                     <div class="form-group {if $error}has-error{/if}">
+                        {$value|var_dump}
                         <label for="is-available-on-special-offers" class="checkbox control-label">
-                            <input id="is-available-on-special-offers" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                            <input id="is-available-on-special-offers" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
                             {if $error}{$message}{/if}
                             {intl l='Is available on special offers'}
                         </label>
@@ -56,7 +57,7 @@
                 {form_field form=$form field='isCumulative'}
                     <div class="form-group {if $error}has-error{/if}">
                         <label for="is-cumulative" class="checkbox control-label">
-                            <input id="is-cumulative" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                            <input id="is-cumulative" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
                             {if $error}{$message}{/if}
                             {intl l='Is cumulative'}
                         </label>
@@ -66,7 +67,7 @@
                 {form_field form=$form field='isRemovingPostage'}
                     <div class="form-group {if $error}has-error{/if}">
                         <label for="is-removing-postage" class="checkbox control-label">
-                            <input id="is-removing-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{else}value="0"{/if} >
+                            <input id="is-removing-postage" type="checkbox" name="{$name}" {if $value}value="1" checked{/if} />
                             {if $error}{$message}{/if}
                             {intl l='Is removing postage'}
                         </label>
@@ -166,7 +167,7 @@
 
         </div>
     </section>
-    {if $noRules}
+    {if $noConditions}
         {include file='includes/notifications.html' message={intl l='Please save your Coupon in oder to affect it some conditions'}}
     {else}
         <section class="row">
@@ -181,8 +182,8 @@
                         <th>{intl l='Actions'}</th>
                     </tr>
                     </thead>
-                    <tbody id="constraint-list">
-                        {include file='coupon/conditions.html' conditions=$rules}
+                    <tbody id="condition-list">
+                        {include file='coupon/conditions.html' conditions=$conditions}
                     </tbody>
                 </table>
             </div>
@@ -190,11 +191,11 @@
 
         <section class="row">
             <div class="col-md-12 general-block-decorator clearfix">
-                <a id="constraint-save-btn" title="{intl l='Save this rule'}" class="btn btn-default btn-primary pull-right" data-toggle="confirm" data-script="">
+                <a id="condition-save-btn" title="{intl l='Save this condition'}" class="btn btn-default btn-primary pull-right" data-toggle="confirm" data-script="">
                     <span class="glyphicon glyphicon-plus-sign"></span> {intl l='Save this condition'}
                 </a>
 
-                <div id="rule-add-organizer" class="form-group col-md-2">
+                <div id="condition-add-organizer" class="form-group col-md-2">
                     <label for="type">{intl l='Condition type :'}</label>
                     <label class="radio">
                         <input type="radio" name="type" class="form-control" id="type" value="1" checked> {intl l='And'}
@@ -204,17 +205,17 @@
                     </label>
                 </div>
 
-                <div id="rule-add-type" class="form-group col-md-4">
-                    <label for="categoryRule">{intl l='Rule\'s category :'}</label>
-                    <select name="categoryRule" id="category-rule" class="form-control">
-                        <option value="-1" >{intl l='Please select a rule category'}</option>
-                        {foreach from=$availableRules item=availableRule}
-                            <option value="{$availableRule.serviceId}" data-description="{$availableRule.toolTip}">{$availableRule.name}</option>
+                <div id="condition-add-type" class="form-group col-md-4">
+                    <label for="categoryCondition">{intl l='Condition\'s category :'}</label>
+                    <select name="categoryCondition" id="category-condition" class="form-control">
+                        <option value="-1" >{intl l='Please select a condition category'}</option>
+                        {foreach from=$availableConditions item=availableCondition}
+                            <option value="{$availableCondition.serviceId}" data-description="{$availableCondition.toolTip}">{$availableCondition.name}</option>
                         {/foreach}
                     </select>
                 </div>
 
-                <div id="constraint-add-operators-values" class="form-group col-md-6">
+                <div id="condition-add-operators-values" class="form-group col-md-6">
                     {*<label for="operator">{intl l='Operator :'}</label>*}
                     {*<div class="row">*}
                         {*<div class="col-lg-6">*}

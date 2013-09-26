@@ -71,32 +71,32 @@
 
 <script>
 
-    // Init Rules to set
-    // Update only if no rule are already set
-    if(!$.couponManager.ruleToSave){
-        $.couponManager.ruleToSave['serviceId'] = '{$ruleId}';
-        $.couponManager.ruleToSave['operators'] = {literal}{}{/literal};
-        $.couponManager.ruleToSave['values'] = {literal}{}{/literal};
+    // Init conditions to set
+    // Update only if no condition are already set
+    if(!$.couponManager.conditionToSave){
+        $.couponManager.conditionToSave['serviceId'] = '{$conditionId}';
+        $.couponManager.conditionToSave['operators'] = {literal}{}{/literal};
+        $.couponManager.conditionToSave['values'] = {literal}{}{/literal};
     } else {
     }
 {foreach from=$inputs.inputs key=name item=input}
-        $.couponManager.ruleToSave['operators']['{$name nofilter}'] = '{foreach from=$inputs.inputs[$name].availableOperators key=keyOperator item=valueOperator name=operators}{if $smarty.foreach.operators.first}{$keyOperator nofilter}{/if}{/foreach}';
-        $.couponManager.ruleToSave['values']['{$name nofilter}'] = '{if count($inputs.inputs[$name].availableValues) != 0}{foreach from=$inputs.inputs[$name].availableValues key=keyValue item=valueValue name=values}{if $smarty.foreach.values.first}{$keyValue nofilter}{/if}{/foreach}{else}to set{/if}';
+        $.couponManager.conditionToSave['operators']['{$name nofilter}'] = '{foreach from=$inputs.inputs[$name].availableOperators key=keyOperator item=valueOperator name=operators}{if $smarty.foreach.operators.first}{$keyOperator nofilter}{/if}{/foreach}';
+        $.couponManager.conditionToSave['values']['{$name nofilter}'] = '{if count($inputs.inputs[$name].availableValues) != 0}{foreach from=$inputs.inputs[$name].availableValues key=keyValue item=valueValue name=values}{if $smarty.foreach.values.first}{$keyValue nofilter}{/if}{/foreach}{else}to set{/if}';
 {/foreach}
 
 
-    // Fill in ready to be saved rule array
+    // Fill in ready to be saved condition array
     $.couponManager.onInputsChange = function() {literal}{{/literal}
 {foreach from=$inputs.inputs key=name item=input}
         // Operator selector
         $('#{$name}-operator').change(function (e) {
             var $this = $(this);
-            $.couponManager.ruleToSave['operators']['{$name nofilter}'] = $this.val();
+            $.couponManager.conditionToSave['operators']['{$name nofilter}'] = $this.val();
         });
         // Value input
         $('#{$name}-value').change(function (e) {
             var $this = $(this);
-            $.couponManager.ruleToSave['values']['{$name nofilter}'] = $this.val();
+            $.couponManager.conditionToSave['values']['{$name nofilter}'] = $this.val();
         });
 {/foreach}
     {literal}}{/literal}

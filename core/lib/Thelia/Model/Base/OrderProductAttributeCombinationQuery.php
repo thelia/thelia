@@ -26,7 +26,7 @@ use Thelia\Model\Map\OrderProductAttributeCombinationTableMap;
  * @method     ChildOrderProductAttributeCombinationQuery orderByAttributeTitle($order = Criteria::ASC) Order by the attribute_title column
  * @method     ChildOrderProductAttributeCombinationQuery orderByAttributeChapo($order = Criteria::ASC) Order by the attribute_chapo column
  * @method     ChildOrderProductAttributeCombinationQuery orderByAttributeDescription($order = Criteria::ASC) Order by the attribute_description column
- * @method     ChildOrderProductAttributeCombinationQuery orderByAttributePostscriptumn($order = Criteria::ASC) Order by the attribute_postscriptumn column
+ * @method     ChildOrderProductAttributeCombinationQuery orderByAttributePostscriptum($order = Criteria::ASC) Order by the attribute_postscriptum column
  * @method     ChildOrderProductAttributeCombinationQuery orderByAttributeAvTitle($order = Criteria::ASC) Order by the attribute_av_title column
  * @method     ChildOrderProductAttributeCombinationQuery orderByAttributeAvChapo($order = Criteria::ASC) Order by the attribute_av_chapo column
  * @method     ChildOrderProductAttributeCombinationQuery orderByAttributeAvDescription($order = Criteria::ASC) Order by the attribute_av_description column
@@ -39,7 +39,7 @@ use Thelia\Model\Map\OrderProductAttributeCombinationTableMap;
  * @method     ChildOrderProductAttributeCombinationQuery groupByAttributeTitle() Group by the attribute_title column
  * @method     ChildOrderProductAttributeCombinationQuery groupByAttributeChapo() Group by the attribute_chapo column
  * @method     ChildOrderProductAttributeCombinationQuery groupByAttributeDescription() Group by the attribute_description column
- * @method     ChildOrderProductAttributeCombinationQuery groupByAttributePostscriptumn() Group by the attribute_postscriptumn column
+ * @method     ChildOrderProductAttributeCombinationQuery groupByAttributePostscriptum() Group by the attribute_postscriptum column
  * @method     ChildOrderProductAttributeCombinationQuery groupByAttributeAvTitle() Group by the attribute_av_title column
  * @method     ChildOrderProductAttributeCombinationQuery groupByAttributeAvChapo() Group by the attribute_av_chapo column
  * @method     ChildOrderProductAttributeCombinationQuery groupByAttributeAvDescription() Group by the attribute_av_description column
@@ -63,7 +63,7 @@ use Thelia\Model\Map\OrderProductAttributeCombinationTableMap;
  * @method     ChildOrderProductAttributeCombination findOneByAttributeTitle(string $attribute_title) Return the first ChildOrderProductAttributeCombination filtered by the attribute_title column
  * @method     ChildOrderProductAttributeCombination findOneByAttributeChapo(string $attribute_chapo) Return the first ChildOrderProductAttributeCombination filtered by the attribute_chapo column
  * @method     ChildOrderProductAttributeCombination findOneByAttributeDescription(string $attribute_description) Return the first ChildOrderProductAttributeCombination filtered by the attribute_description column
- * @method     ChildOrderProductAttributeCombination findOneByAttributePostscriptumn(string $attribute_postscriptumn) Return the first ChildOrderProductAttributeCombination filtered by the attribute_postscriptumn column
+ * @method     ChildOrderProductAttributeCombination findOneByAttributePostscriptum(string $attribute_postscriptum) Return the first ChildOrderProductAttributeCombination filtered by the attribute_postscriptum column
  * @method     ChildOrderProductAttributeCombination findOneByAttributeAvTitle(string $attribute_av_title) Return the first ChildOrderProductAttributeCombination filtered by the attribute_av_title column
  * @method     ChildOrderProductAttributeCombination findOneByAttributeAvChapo(string $attribute_av_chapo) Return the first ChildOrderProductAttributeCombination filtered by the attribute_av_chapo column
  * @method     ChildOrderProductAttributeCombination findOneByAttributeAvDescription(string $attribute_av_description) Return the first ChildOrderProductAttributeCombination filtered by the attribute_av_description column
@@ -76,7 +76,7 @@ use Thelia\Model\Map\OrderProductAttributeCombinationTableMap;
  * @method     array findByAttributeTitle(string $attribute_title) Return ChildOrderProductAttributeCombination objects filtered by the attribute_title column
  * @method     array findByAttributeChapo(string $attribute_chapo) Return ChildOrderProductAttributeCombination objects filtered by the attribute_chapo column
  * @method     array findByAttributeDescription(string $attribute_description) Return ChildOrderProductAttributeCombination objects filtered by the attribute_description column
- * @method     array findByAttributePostscriptumn(string $attribute_postscriptumn) Return ChildOrderProductAttributeCombination objects filtered by the attribute_postscriptumn column
+ * @method     array findByAttributePostscriptum(string $attribute_postscriptum) Return ChildOrderProductAttributeCombination objects filtered by the attribute_postscriptum column
  * @method     array findByAttributeAvTitle(string $attribute_av_title) Return ChildOrderProductAttributeCombination objects filtered by the attribute_av_title column
  * @method     array findByAttributeAvChapo(string $attribute_av_chapo) Return ChildOrderProductAttributeCombination objects filtered by the attribute_av_chapo column
  * @method     array findByAttributeAvDescription(string $attribute_av_description) Return ChildOrderProductAttributeCombination objects filtered by the attribute_av_description column
@@ -171,7 +171,7 @@ abstract class OrderProductAttributeCombinationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, ORDER_PRODUCT_ID, ATTRIBUTE_TITLE, ATTRIBUTE_CHAPO, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_POSTSCRIPTUMN, ATTRIBUTE_AV_TITLE, ATTRIBUTE_AV_CHAPO, ATTRIBUTE_AV_DESCRIPTION, ATTRIBUTE_AV_POSTSCRIPTUM, CREATED_AT, UPDATED_AT FROM order_product_attribute_combination WHERE ID = :p0';
+        $sql = 'SELECT ID, ORDER_PRODUCT_ID, ATTRIBUTE_TITLE, ATTRIBUTE_CHAPO, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_POSTSCRIPTUM, ATTRIBUTE_AV_TITLE, ATTRIBUTE_AV_CHAPO, ATTRIBUTE_AV_DESCRIPTION, ATTRIBUTE_AV_POSTSCRIPTUM, CREATED_AT, UPDATED_AT FROM order_product_attribute_combination WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -432,32 +432,32 @@ abstract class OrderProductAttributeCombinationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the attribute_postscriptumn column
+     * Filter the query on the attribute_postscriptum column
      *
      * Example usage:
      * <code>
-     * $query->filterByAttributePostscriptumn('fooValue');   // WHERE attribute_postscriptumn = 'fooValue'
-     * $query->filterByAttributePostscriptumn('%fooValue%'); // WHERE attribute_postscriptumn LIKE '%fooValue%'
+     * $query->filterByAttributePostscriptum('fooValue');   // WHERE attribute_postscriptum = 'fooValue'
+     * $query->filterByAttributePostscriptum('%fooValue%'); // WHERE attribute_postscriptum LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $attributePostscriptumn The value to use as filter.
+     * @param     string $attributePostscriptum The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderProductAttributeCombinationQuery The current query, for fluid interface
      */
-    public function filterByAttributePostscriptumn($attributePostscriptumn = null, $comparison = null)
+    public function filterByAttributePostscriptum($attributePostscriptum = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($attributePostscriptumn)) {
+            if (is_array($attributePostscriptum)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $attributePostscriptumn)) {
-                $attributePostscriptumn = str_replace('*', '%', $attributePostscriptumn);
+            } elseif (preg_match('/[\%\*]/', $attributePostscriptum)) {
+                $attributePostscriptum = str_replace('*', '%', $attributePostscriptum);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUMN, $attributePostscriptumn, $comparison);
+        return $this->addUsingAlias(OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUM, $attributePostscriptum, $comparison);
     }
 
     /**

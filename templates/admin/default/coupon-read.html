@@ -122,11 +122,11 @@
                                 <td>{intl l='Application field'}</td>
                                 <td>
                                     <ul class="list-unstyled">
-                                        {foreach from=$APPLICATION_CONDITIONS item=rule name=rulesForeach}
-                                            {if !$smarty.foreach.rulesForeach.first}
+                                        {foreach from=$APPLICATION_CONDITIONS item=condition name=conditionsForeach}
+                                            {if !$smarty.foreach.conditionsForeach.first}
                                                 <li><span class="label label-info">{intl l='And'}</span></li>
                                             {/if}
-                                            <li>{$rule nofilter}</li>
+                                            <li>{$condition nofilter}</li>
                                         {/foreach}
                                     </ul>
                                 </td>
