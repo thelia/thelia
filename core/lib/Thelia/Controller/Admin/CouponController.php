@@ -206,7 +206,7 @@ class CouponController extends BaseAdminController
             /** @var ConditionFactory $conditionFactory */
             $conditionFactory = $this->container->get('thelia.condition.factory');
             $conditions = $conditionFactory->unserializeConditionCollection(
-                $coupon->getSerializedRules()
+                $coupon->getSerializedConditions()
             );
 var_dump($coupon->getIsEnabled());;
 var_dump($coupon->getIsAvailableOnSpecialOffers());;

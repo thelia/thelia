@@ -132,7 +132,7 @@ class CouponFactory
         /** @var ConditionFactory $conditionFactory */
         $conditionFactory = $this->container->get('thelia.condition.factory');
         $conditions = $conditionFactory->unserializeConditionCollection(
-            $model->getSerializedRules()
+            $model->getSerializedConditions()
         );
 
         $couponManager->setConditions($conditions);

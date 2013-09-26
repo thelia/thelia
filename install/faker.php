@@ -463,7 +463,8 @@ try {
                     $featureAvId[array_rand($featureAvId, 1)]
                 );
             } else { //no av
-                $featureProduct->setByDefault($faker->text(10));
+                // @todo uncomment
+//                $featureProduct->setByDefault($faker->text(10));
             }
 
             $featureProduct->save();
@@ -696,7 +697,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $conditionFactory = $container->get('thelia.condition.factory');
 
     $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
-    $coupon1->setSerializedRules($serializedConditions);
+    $coupon1->setSerializedConditions($serializedConditions);
     $coupon1->setMaxUsage(40);
     $coupon1->setIsCumulative(true);
     $coupon1->setIsRemovingPostage(false);
@@ -740,7 +741,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $conditionFactory = $container->get('thelia.condition.factory');
 
     $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
-    $coupon2->setSerializedRules($serializedConditions);
+    $coupon2->setSerializedConditions($serializedConditions);
     $coupon2->setMaxUsage(-1);
     $coupon2->setIsCumulative(false);
     $coupon2->setIsRemovingPostage(true);
@@ -780,7 +781,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $constraintCondition = $container->get('thelia.condition.factory');
 
     $serializedConditions = $constraintCondition->serializeConditionCollection($conditions);
-    $coupon3->setSerializedRules($serializedConditions);
+    $coupon3->setSerializedConditions($serializedConditions);
     $coupon3->setMaxUsage(-1);
     $coupon3->setIsCumulative(true);
     $coupon3->setIsRemovingPostage(false);

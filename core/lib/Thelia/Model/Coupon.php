@@ -84,8 +84,8 @@ class Coupon extends BaseCoupon
             ->setMaxUsage($maxUsage);
 
         // If no rule given, set default rule
-        if (null === $this->getSerializedRules()) {
-            $this->setSerializedRules($defaultSerializedRule);
+        if (null === $this->getSerializedConditions()) {
+            $this->setSerializedConditions($defaultSerializedRule);
         }
 
         // Set object language (i18n)
@@ -115,7 +115,7 @@ class Coupon extends BaseCoupon
      */
     public function createOrUpdateConditions($serializableConditions, $locale)
     {
-        $this->setSerializedRules($serializableConditions);
+        $this->setSerializedConditions($serializableConditions);
 
         // Set object language (i18n)
         if (!is_null($locale)) {

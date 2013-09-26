@@ -327,7 +327,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //            $rules = $this->generateValidRules();
 //        }
 //
-//        $coupon->setSerializedRules(base64_encode(serialize($rules)));
+//        $coupon->setSerializedConditions(base64_encode(serialize($rules)));
 //
 //        $coupon->setIsCumulative($isCumulative);
 //        $coupon->setIsRemovingPostage($isRemovingPostage);

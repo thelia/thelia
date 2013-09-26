@@ -106,7 +106,7 @@ class Coupon extends BaseI18nLoop
         foreach ($coupons as $coupon) {
             $loopResultRow = new LoopResultRow();
             $conditions = $conditionFactory->unserializeConditionCollection(
-                $coupon->getSerializedRules()
+                $coupon->getSerializedConditions()
             );
 
             /** @var CouponInterface $couponManager */
