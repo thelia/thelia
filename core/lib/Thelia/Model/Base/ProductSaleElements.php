@@ -103,9 +103,17 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
     /**
      * The value for the weight field.
+     * Note: this column has a database default value of: 0
      * @var        double
      */
     protected $weight;
+
+    /**
+     * The value for the is_default field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $is_default;
 
     /**
      * The value for the created_at field.
@@ -178,6 +186,8 @@ abstract class ProductSaleElements implements ActiveRecordInterface
     {
         $this->promo = 0;
         $this->newness = 0;
+        $this->weight = 0;
+        $this->is_default = false;
     }
 
     /**
@@ -514,6 +524,17 @@ abstract class ProductSaleElements implements ActiveRecordInterface
     }
 
     /**
+     * Get the [is_default] column value.
+     *
+     * @return   boolean
+     */
+    public function getIsDefault()
+    {
+
+        return $this->is_default;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -705,6 +726,35 @@ abstract class ProductSaleElements implements ActiveRecordInterface
     } // setWeight()
 
     /**
+     * Sets the value of the [is_default] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
+     */
+    public function setIsDefault($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_default !== $v) {
+            $this->is_default = $v;
+            $this->modifiedColumns[] = ProductSaleElementsTableMap::IS_DEFAULT;
+        }
+
+
+        return $this;
+    } // setIsDefault()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -764,6 +814,14 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                 return false;
             }
 
+            if ($this->weight !== 0) {
+                return false;
+            }
+
+            if ($this->is_default !== false) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -812,13 +870,16 @@ abstract class ProductSaleElements implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductSaleElementsTableMap::translateFieldName('Weight', TableMap::TYPE_PHPNAME, $indexType)];
             $this->weight = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductSaleElementsTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductSaleElementsTableMap::translateFieldName('IsDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_default = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ProductSaleElementsTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ProductSaleElementsTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ProductSaleElementsTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -831,7 +892,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 9; // 9 = ProductSaleElementsTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 10; // 10 = ProductSaleElementsTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ProductSaleElements object", 0, $e);
@@ -1145,6 +1206,9 @@ abstract class ProductSaleElements implements ActiveRecordInterface
         if ($this->isColumnModified(ProductSaleElementsTableMap::WEIGHT)) {
             $modifiedColumns[':p' . $index++]  = 'WEIGHT';
         }
+        if ($this->isColumnModified(ProductSaleElementsTableMap::IS_DEFAULT)) {
+            $modifiedColumns[':p' . $index++]  = 'IS_DEFAULT';
+        }
         if ($this->isColumnModified(ProductSaleElementsTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -1182,6 +1246,9 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                         break;
                     case 'WEIGHT':
                         $stmt->bindValue($identifier, $this->weight, PDO::PARAM_STR);
+                        break;
+                    case 'IS_DEFAULT':
+                        $stmt->bindValue($identifier, (int) $this->is_default, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1273,9 +1340,12 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                 return $this->getWeight();
                 break;
             case 7:
-                return $this->getCreatedAt();
+                return $this->getIsDefault();
                 break;
             case 8:
+                return $this->getCreatedAt();
+                break;
+            case 9:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1314,8 +1384,9 @@ abstract class ProductSaleElements implements ActiveRecordInterface
             $keys[4] => $this->getPromo(),
             $keys[5] => $this->getNewness(),
             $keys[6] => $this->getWeight(),
-            $keys[7] => $this->getCreatedAt(),
-            $keys[8] => $this->getUpdatedAt(),
+            $keys[7] => $this->getIsDefault(),
+            $keys[8] => $this->getCreatedAt(),
+            $keys[9] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1392,9 +1463,12 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                 $this->setWeight($value);
                 break;
             case 7:
-                $this->setCreatedAt($value);
+                $this->setIsDefault($value);
                 break;
             case 8:
+                $this->setCreatedAt($value);
+                break;
+            case 9:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1428,8 +1502,9 @@ abstract class ProductSaleElements implements ActiveRecordInterface
         if (array_key_exists($keys[4], $arr)) $this->setPromo($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setNewness($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setWeight($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[7], $arr)) $this->setIsDefault($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
     }
 
     /**
@@ -1448,6 +1523,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
         if ($this->isColumnModified(ProductSaleElementsTableMap::PROMO)) $criteria->add(ProductSaleElementsTableMap::PROMO, $this->promo);
         if ($this->isColumnModified(ProductSaleElementsTableMap::NEWNESS)) $criteria->add(ProductSaleElementsTableMap::NEWNESS, $this->newness);
         if ($this->isColumnModified(ProductSaleElementsTableMap::WEIGHT)) $criteria->add(ProductSaleElementsTableMap::WEIGHT, $this->weight);
+        if ($this->isColumnModified(ProductSaleElementsTableMap::IS_DEFAULT)) $criteria->add(ProductSaleElementsTableMap::IS_DEFAULT, $this->is_default);
         if ($this->isColumnModified(ProductSaleElementsTableMap::CREATED_AT)) $criteria->add(ProductSaleElementsTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ProductSaleElementsTableMap::UPDATED_AT)) $criteria->add(ProductSaleElementsTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1519,6 +1595,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
         $copyObj->setPromo($this->getPromo());
         $copyObj->setNewness($this->getNewness());
         $copyObj->setWeight($this->getWeight());
+        $copyObj->setIsDefault($this->getIsDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -2445,6 +2522,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
         $this->promo = null;
         $this->newness = null;
         $this->weight = null;
+        $this->is_default = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

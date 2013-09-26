@@ -39,6 +39,8 @@ use Thelia\Core\Event\TemplateDeleteAttributeEvent;
 use Thelia\Core\Event\TemplateAddAttributeEvent;
 use Thelia\Core\Event\TemplateAddFeatureEvent;
 use Thelia\Core\Event\TemplateDeleteFeatureEvent;
+use Thelia\Model\FeatureTemplateQuery;
+use Thelia\Model\AttributeTemplateQuery;
 
 /**
  * Manages product templates
@@ -255,6 +257,21 @@ class TemplateController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
+    public function updateAttributePositionAction() {
+
+        // Find attribute_template
+        $attributeTemplate = AttributeTemplateQuery::create()
+            ->filterByTemplateId($this->getRequest()->get('template_id', null))
+            ->filterByAttributeId($this->getRequest()->get('attribute_id', null))
+            ->findOne()
+        ;
+
+        return $this->genericUpdatePositionAction(
+                $attributeTemplate,
+                TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION
+        );
+    }
+
     public function addFeatureAction() {
 
         // Check current user authorization
@@ -299,4 +316,18 @@ class TemplateController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
+    public function updateFeaturePositionAction() {
+
+        // Find feature_template
+        $featureTemplate = FeatureTemplateQuery::create()
+            ->filterByTemplateId($this->getRequest()->get('template_id', null))
+            ->filterByFeatureId($this->getRequest()->get('feature_id', null))
+            ->findOne()
+        ;
+
+        return $this->genericUpdatePositionAction(
+                $featureTemplate,
+                TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION
+        );
+    }
 }

@@ -246,9 +246,11 @@
         </div>
 
         <div class="tab-pane fade" id="images">
+            {include file='includes/image-upload-form.html' imageType='content' parentId=$content_id}
         </div>
 
         <div class="tab-pane fade" id="documents">
+            {include file='includes/document-upload-form.html' documentType='content' parentId=$content_id}
         </div>
 
         <div class="tab-pane fade" id="modules">
@@ -286,9 +288,20 @@ form_content    = {$smarty.capture.delete_content_dialog nofilter}
 {/block}
 
 {block name="javascript-initialization"}
-    <script>
+    {javascripts file='assets/js/dropzone.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/image-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/document-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
+    <script>
         $(function() {
+            $.imageUploadManager.initImageDropZone();
+            $.documentUploadManager.initDocumentDropZone();
 
             $('.use_default_rewriten_url').click(function(ev) {
                 alert("Not functionnal");

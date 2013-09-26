@@ -48,8 +48,9 @@ class UrlGenerator extends AbstractSmartyPlugin
     public function generateUrlFunction($params, &$smarty)
     {
         // the path to process
-        $path = $this->getParam($params, 'path', null);
-        $file = $this->getParam($params, 'file', null);
+        $path  = $this->getParam($params, 'path', null);
+        $file  = $this->getParam($params, 'file', null); // Do not invoke index.php in URL (get a static file in web space
+        $noamp = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
 
         if ($file !== null) {
             $path = $file;
@@ -66,9 +67,11 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         $url = URL::getInstance()->absoluteUrl(
                 $path,
-                $this->getArgsFromParam($params, array('path', 'file', 'target')),
+                $this->getArgsFromParam($params, array('noamp', 'path', 'file', 'target')),
                 $mode
         );
+
+        if ($noamp == null) $url = str_replace('&', '&amp;', $url);
 
         if ($target != null) $url .= '#'.$target;
 

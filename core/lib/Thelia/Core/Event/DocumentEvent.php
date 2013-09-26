@@ -23,43 +23,60 @@
 
 namespace Thelia\Core\Event;
 
+/**
+ * Class DocumentEvent
+ *
+ * @package Thelia\Core\Event
+ */
 class DocumentEvent extends CachedFileEvent
 {
-    protected $document_path;
-    protected $document_url;
+    protected $documentPath;
+    protected $documentUrl;
 
     /**
-     * @return the document file path
+     * Get Document path
+     *
+     * @return string The document file path
      */
     public function getDocumentPath()
     {
-        return $this->document_path;
+        return $this->documentPath;
     }
 
     /**
-     * @param string $document_path the document file path
+     * Set Document path
+     *
+     * @param string $documentPath the document file path
+     *
+     * @return $this
      */
-    public function setDocumentPath($document_path)
+    public function setDocumentPath($documentPath)
     {
-        $this->document_path = $document_path;
+        $this->documentPath = $documentPath;
 
         return $this;
     }
 
     /**
-     * @return the document URL
+     * Get Document URL
+     *
+     * @return string The document URL
      */
     public function getDocumentUrl()
     {
-        return $this->document_url;
+        return $this->documentUrl;
     }
 
     /**
-     * @param string $document_url the document URL
+     * Set Document URL
+     *
+     * @param string $documentUrl the document URL
+     *
+     * @return $this
      */
-    public function setDocumentUrl($document_url)
+    public function setDocumentUrl($documentUrl)
     {
-        $this->document_url = $document_url;
+        $this->documentUrl = $documentUrl;
 
         return $this;
     }

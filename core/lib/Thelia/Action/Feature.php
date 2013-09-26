@@ -123,19 +123,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if (null !== $feature = FeatureQuery::create()->findPk($event->getObjectId())) {
-
-            $feature->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $feature->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $feature->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $feature->movePositionDown();
-        }
+        return $this->genericUpdatePosition(FeatureQuery::create(), $event);
     }
 
     protected function doAddToAllTemplates(FeatureModel $feature)
