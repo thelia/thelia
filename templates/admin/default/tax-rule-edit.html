@@ -21,10 +21,10 @@
 
                 <div class="title title-without-tabs">
                    {intl l="Edit tax rule $TITLE"}
-                </div>     
-                
+                </div>
+
                 <form action="" method="post">
-                    
+
                     <div class="form-group">
                         <label for="" class="label-control">{intl l="Choose a country"} :</label>
                         <div class="input-group">
@@ -39,14 +39,14 @@
                     </div>
 
                 </form>
-                
+
                 <p><strong>{intl l="Countries that have the same tax rule"} :<strong></p>
                 <p class="lead">
                     <span class="label label-info">Italy</span>
                     <span class="label label-info">England</span>
                     <span class="label label-info">Japan</span>
                 </p>
-                
+
                 <div class="row">
                     <div class="col-md-6">
 
@@ -57,12 +57,12 @@
                             </p>
                         </div> -->
 
-                        <div class="panel panel-default place">
+                        <div id="panel" class="panel panel-default place">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Create a tax rule</h3>
                             </div>
                             <div class="panel-body">
-                                
+
                                 <div class="drop-group droppable add-to-group">
                                     <p class="drop-message">
                                         <span class="glyphicon glyphicon-plus"></span>
@@ -84,7 +84,7 @@
                     </div>
                     <div class="col-md-6">
 
-                        <div class="panel panel-default take">
+                        <div id="panel-list" class="panel panel-default take">
                             <div class="panel-heading">
                                 <h3 class="panel-title">List of taxes</h3>
                             </div>
@@ -93,7 +93,7 @@
                                 <div class="draggable">Dapibus ac facilisis in</div>
                                 <div class="draggable">Morbi leo risus</div>
                                 <div class="draggable">Porta ac consectetur ac</div>
-                                <div class="draggable">Vestibulum at eros</div>                        
+                                <div class="draggable">Vestibulum at eros</div>
                             </div>
                             <div class="panel-footer droppable remove-from-group">
                                 <p class="drop-message">
@@ -102,7 +102,7 @@
                                 </p>
                             </div>
                         </div>
-                                                            
+
                     </div>
                 </div>
 
@@ -114,7 +114,7 @@
 {/block}
 
 {block name="javascript-initialization"}
-    
+
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
@@ -124,18 +124,22 @@
     {/javascripts}
 
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    {literal}
     <script>
+    <!--
         $(function() {
 
-            // Création du tableau des règles de taxe
+            // Cache jQuery Objects
+            var $group = $('#panel');
+            var $list = $('#panel-list');
+
+            // Build array of taxes rules
             $('#apply-taxes-rules').click(function(){
                 var taxesRules = [],
                     index;
 
-                $('.place .panel-body .drop-group').each(function(i){
-
+                $('.drop-group',$group).each(function(i){
                     var $this = $(this);
-                    
                     index = i;
                     taxesRules[index] = [];
 
@@ -143,86 +147,126 @@
                         taxesRules[index][j] = [];
                         taxesRules[index][j] = $(this).text();
                     });
-
                 });
-
-            });            
-
-            $('.place .panel-body').sortable({
-                axis: "y",                
-                revert: true,
-                containment: "parent",
-                items : "> div"
             });
 
-            $(".draggable").draggable({                
-                cursor: "move",
-                revert: true,
-                containment: "document",
+            // Make the list of taxes draggable
+            $('.draggable', $list).draggable({
+                cursor: 'move',
+                helper: 'clone',
+                //containment: "document",
                 opacity: 0.5,
-                start: function(event, ui){
-                    // Initilisation du droppable pour nouveaux groupes
-                    initDrop();                    
-                },
-                stop: function(event, ui) {
+                revert: "invalid", // when not dropped, the item will revert back to its initial position
+                zIndex: 10
+            });
 
-                    var $zone = $('.panel-body').find('.droppable');
-                    var zoneLength = $zone.length;                    
-                    
-                    if(zoneLength > 1){
-                        $zone.each(function(){
-                            var $this = $(this);
-                            var draggableLength = $('.draggable', $this).length;
+            // Droppable Options
+            var droppableOptions = {
+                accept: "#panel-list .draggable", // Controls which draggable elements are accepted
+                hoverClass: 'over',
+                drop: function( event, ui ) {
+                    var $current_group = $(this),
+                        $tax = ui.draggable;
 
-                            // Si une zone est vide on la supprime
-                            if(draggableLength == 0){
-                                $this.slideUp(function(){
-                                    $this.remove();
-                                });
-                            }                            
+                    // Move taxes
+                    $tax.fadeOut(function() {
+                        $(this).remove();
+                        $tax.appendTo( $current_group ).fadeIn();
 
+                    });
+                }
+            };
+
+            // let the drop-group be droppable & sortable, accepting the tax items
+            $('.add-to-group', $group)
+            .sortable({ // Sort
+                //axis: 'y',
+                cursor: 'crosshair',
+                items: "div",
+                revert: true,
+            }).droppable(droppableOptions);
+
+
+            // Allow the user to create a new drop-group
+            $('.create-group', $group)
+            .droppable({
+                accept: "#panel-list .draggable", // Controls which draggable elements are accepted
+                hoverClass: 'over',
+                drop: function( event, ui ) {
+                    var $tax = ui.draggable;
+                    var $create_group;
+
+                    // Check if we have already an empty group
+                    var $empty_group = $group.find('.drop-group:not(:has(> .draggable))');
+                    if($empty_group.size() > 0){ // if yes (Use the first empty group)
+                        $create_group = $empty_group.filter(':first');
+
+                        // Move taxes
+                        $tax.fadeOut(function() {
+                            $(this).remove();
+                            $tax.appendTo( $create_group ).show();
+                            $group.find('.panel-body').append($create_group);
                         });
-                    }      
 
+                    }else{ //if no (Create a new group)
+                        $create_group = $group.find('.drop-group:last-child').clone();
+
+                        // Remove taxes
+                        $create_group.find('.draggable').remove();
+
+                        // Make the new group droppable
+                        $create_group
+                        .sortable({ // Sort
+                            //axis: 'y',
+                            cursor: 'crosshair',
+                            items: "div",
+                            revert: true,
+                        })
+                        .droppable(droppableOptions);
+
+                        // Move taxes
+                        $tax.fadeOut(function() {
+                            $(this).remove();
+                            $tax.appendTo( $create_group ).show();
+                            $group.find('.panel-body').append($create_group);
+                        });
+                    }
                 }
             });
 
-            // Initialisation du droppable
-            initDrop();
 
-            // Fonction droppable
-            function initDrop() {
-                $(".droppable").droppable({
-                    hoverClass: "over",
-                    drop: function( event, ui ) {
-                        var $this       = $(this),
-                            $elem       = ui.draggable.detach();
+             // let the gallery be droppable as well, accepting items from the trash
+            $('.remove-from-group', $list)
+            .droppable({
+                accept: "#panel .draggable",
+                hoverClass: 'over',
+                drop: function( event, ui ) {
+                    var $tax = ui.draggable.clone(); ui.draggable.remove();
 
-                        // On ajout au groupe existant
-                        if($this.hasClass('add-to-group')){
-                            $this.find('.drop-message').after($elem);
+                    // Move taxes
+                    $tax.fadeOut(function() {
+                        //$(this).remove();
+                        $tax.removeClass('ui-sortable-helper').addClass('ui-draggable').removeAttr('style').draggable({
+                            cursor: 'move',
+                            helper: 'clone',
+                            //containment: "document",
+                            opacity: 0.5,
+                            revert: "invalid", // when not dropped, the item will revert back to its initial position
+                            zIndex: 10
+                        }).prependTo( $list.find('.panel-body') ).fadeIn();
+
+                        // Check if we have an empty group
+                        var $zone = $('.add-to-group', $group);
+                        var $empty_zone = $zone.filter(':not(:has(> .draggable))');
+                        if($zone.size() > $empty_zone.size()){ // Remove empty group only if we have more than 1 group
+                            $empty_zone.slideUp(function(){ $(this).remove(); });
                         }
-                        // On crée un nouveau groupe
-                        else if($this.hasClass('create-group')){
-                            var $dropZone = $this.prev('.panel-body').find('.drop-group:last-child').clone();
-                            $dropZone.find('.draggable').remove();
-                            
-                            var $panelBody = $this.prev('.panel-body');
-                            $panelBody.append($dropZone);
-                            
-                            var $newZone = $panelBody.find('.drop-group:last-child');
-                            $newZone.find('.drop-message').after($elem);                            
-                        }
-                        // On supprime d'un groupe
-                        else if($this.hasClass('remove-from-group')){
-                            var $panelBody = $this.prev('.panel-body');
-                            $panelBody.append($elem);
-                        }
-                    }
-                });
-            }
-                
+                    });
+                }
+            });
         });
+    // -->
     </script>
+    {/literal}
 
 {/block}
