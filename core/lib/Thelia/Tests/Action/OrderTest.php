@@ -25,13 +25,16 @@ namespace Thelia\Tests\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\Event\OrderAddressEvent;
 use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Base\OrderAddressQuery;
 use Thelia\Model\Base\OrderProductQuery;
 use Thelia\Model\Base\OrderQuery;
+use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Cart;
@@ -398,5 +401,51 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             $deliveryRef,
             OrderQuery::create()->findPk($order->getId())->getDeliveryRef()
         );
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param OrderModel $order
+     */
+    public function testUpdateAddress(OrderModel $order)
+    {
+        $deliveryRef = uniqid('DELREF');
+        $orderAddress = OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId());
+        $title = $orderAddress->getCustomerTitleId() == 3 ? 1 : 3;
+        $country = $orderAddress->getCountryId() == 64 ? 1 : 64;
+        $orderAddressEvent = new OrderAddressEvent(
+            $title, 'B', 'C', 'D', 'E', 'F', 'G', 'H', $country, 'J', 'K'
+        );
+        $orderAddressEvent->setOrderAddress($orderAddress);
+        $orderAddressEvent->setOrder($order);
+
+        $this->orderAction->updateAddress($orderAddressEvent);
+
+        $newOrderAddress = OrderAddressQuery::create()->findPk($orderAddress->getId());
+
+        $this->assertEquals($title, $orderAddressEvent->getOrderAddress()->getCustomerTitleId());
+        $this->assertEquals('B', $orderAddressEvent->getOrderAddress()->getFirstname());
+        $this->assertEquals('C', $orderAddressEvent->getOrderAddress()->getLastname());
+        $this->assertEquals('D', $orderAddressEvent->getOrderAddress()->getAddress1());
+        $this->assertEquals('E', $orderAddressEvent->getOrderAddress()->getAddress2());
+        $this->assertEquals('F', $orderAddressEvent->getOrderAddress()->getAddress3());
+        $this->assertEquals('G', $orderAddressEvent->getOrderAddress()->getZipcode());
+        $this->assertEquals('H', $orderAddressEvent->getOrderAddress()->getCity());
+        $this->assertEquals($country, $orderAddressEvent->getOrderAddress()->getCountryId());
+        $this->assertEquals('J', $orderAddressEvent->getOrderAddress()->getPhone());
+        $this->assertEquals('K', $orderAddressEvent->getOrderAddress()->getCompany());
+
+        $this->assertEquals($title, $newOrderAddress->getCustomerTitleId());
+        $this->assertEquals('B', $newOrderAddress->getFirstname());
+        $this->assertEquals('C', $newOrderAddress->getLastname());
+        $this->assertEquals('D', $newOrderAddress->getAddress1());
+        $this->assertEquals('E', $newOrderAddress->getAddress2());
+        $this->assertEquals('F', $newOrderAddress->getAddress3());
+        $this->assertEquals('G', $newOrderAddress->getZipcode());
+        $this->assertEquals('H', $newOrderAddress->getCity());
+        $this->assertEquals($country, $newOrderAddress->getCountryId());
+        $this->assertEquals('J', $newOrderAddress->getPhone());
+        $this->assertEquals('K', $newOrderAddress->getCompany());
     }
 }

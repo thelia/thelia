@@ -331,6 +331,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             ->setAddress3($event->getAddress3())
             ->setZipcode($event->getZipcode())
             ->setCity($event->getCity())
+            ->setCountryId($event->getCountry())
             ->setPhone($event->getPhone())
         ;
         $orderAddress->save();
