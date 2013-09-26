@@ -78,6 +78,7 @@
 
         <form name="thelia.order.delivery" class="Thelia\Form\OrderDelivery"/>
         <form name="thelia.order.payment" class="Thelia\Form\OrderPayment"/>
+        <form name="thelia.order.update.address" class="Thelia\Form\OrderUpdateAddress"/>
 
         <form name="thelia.admin.config.creation" class="Thelia\Form\ConfigCreationForm"/>
         <form name="thelia.admin.config.modification" class="Thelia\Form\ConfigModificationForm"/>

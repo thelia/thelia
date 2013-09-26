@@ -97,6 +97,7 @@ class OrderController extends BaseAdminController
             $this->redirectToRoute("admin.order.list", $params);
         } else {
             $params["order_id"] = $order_id;
+            $params["tab"] = $this->getRequest()->get("tab", 'cart');
             $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", $params)));
         }
     }
@@ -131,6 +132,7 @@ class OrderController extends BaseAdminController
         }
 
         $params["order_id"] = $order_id;
+        $params["tab"] = $this->getRequest()->get("tab", 'bill');
 
         $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", $params)));
     }

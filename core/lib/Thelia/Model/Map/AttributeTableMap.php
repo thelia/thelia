@@ -57,7 +57,7 @@ class AttributeTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -67,12 +67,17 @@ class AttributeTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
      * the column name for the ID field
      */
     const ID = 'attribute.ID';
+
+    /**
+     * the column name for the POSITION field
+     */
+    const POSITION = 'attribute.POSITION';
 
     /**
      * the column name for the CREATED_AT field
@@ -105,12 +110,12 @@ class AttributeTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AttributeTableMap::ID, AttributeTableMap::CREATED_AT, AttributeTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AttributeTableMap::ID, AttributeTableMap::POSITION, AttributeTableMap::CREATED_AT, AttributeTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -120,12 +125,12 @@ class AttributeTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'CreatedAt' => 1, 'UpdatedAt' => 2, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'createdAt' => 1, 'updatedAt' => 2, ),
-        self::TYPE_COLNAME       => array(AttributeTableMap::ID => 0, AttributeTableMap::CREATED_AT => 1, AttributeTableMap::UPDATED_AT => 2, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CREATED_AT' => 1, 'UPDATED_AT' => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'created_at' => 1, 'updated_at' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Position' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'position' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        self::TYPE_COLNAME       => array(AttributeTableMap::ID => 0, AttributeTableMap::POSITION => 1, AttributeTableMap::CREATED_AT => 2, AttributeTableMap::UPDATED_AT => 3, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'POSITION' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'position' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -145,6 +150,7 @@ class AttributeTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -326,10 +332,12 @@ class AttributeTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(AttributeTableMap::ID);
+            $criteria->addSelectColumn(AttributeTableMap::POSITION);
             $criteria->addSelectColumn(AttributeTableMap::CREATED_AT);
             $criteria->addSelectColumn(AttributeTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
+            $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

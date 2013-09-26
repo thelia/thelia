@@ -24,11 +24,13 @@ use Thelia\Model\Map\FeatureTableMap;
  *
  * @method     ChildFeatureQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildFeatureQuery orderByVisible($order = Criteria::ASC) Order by the visible column
+ * @method     ChildFeatureQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildFeatureQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildFeatureQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildFeatureQuery groupById() Group by the id column
  * @method     ChildFeatureQuery groupByVisible() Group by the visible column
+ * @method     ChildFeatureQuery groupByPosition() Group by the position column
  * @method     ChildFeatureQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildFeatureQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -57,11 +59,13 @@ use Thelia\Model\Map\FeatureTableMap;
  *
  * @method     ChildFeature findOneById(int $id) Return the first ChildFeature filtered by the id column
  * @method     ChildFeature findOneByVisible(int $visible) Return the first ChildFeature filtered by the visible column
+ * @method     ChildFeature findOneByPosition(int $position) Return the first ChildFeature filtered by the position column
  * @method     ChildFeature findOneByCreatedAt(string $created_at) Return the first ChildFeature filtered by the created_at column
  * @method     ChildFeature findOneByUpdatedAt(string $updated_at) Return the first ChildFeature filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildFeature objects filtered by the id column
  * @method     array findByVisible(int $visible) Return ChildFeature objects filtered by the visible column
+ * @method     array findByPosition(int $position) Return ChildFeature objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildFeature objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildFeature objects filtered by the updated_at column
  *
@@ -152,7 +156,7 @@ abstract class FeatureQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, VISIBLE, CREATED_AT, UPDATED_AT FROM feature WHERE ID = :p0';
+        $sql = 'SELECT ID, VISIBLE, POSITION, CREATED_AT, UPDATED_AT FROM feature WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -321,6 +325,47 @@ abstract class FeatureQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(FeatureTableMap::VISIBLE, $visible, $comparison);
+    }
+
+    /**
+     * Filter the query on the position column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPosition(1234); // WHERE position = 1234
+     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
+     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * </code>
+     *
+     * @param     mixed $position The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildFeatureQuery The current query, for fluid interface
+     */
+    public function filterByPosition($position = null, $comparison = null)
+    {
+        if (is_array($position)) {
+            $useMinMax = false;
+            if (isset($position['min'])) {
+                $this->addUsingAlias(FeatureTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($position['max'])) {
+                $this->addUsingAlias(FeatureTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(FeatureTableMap::POSITION, $position, $comparison);
     }
 
     /**
