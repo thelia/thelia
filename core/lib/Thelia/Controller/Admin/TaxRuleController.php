@@ -36,4 +36,10 @@ class TaxRuleController extends BaseAdminController
         return $this->render("taxes-rules", array("display_taxes_rules" => 20));
     }
 
+    public function updateAction($tax_rule_id){
+        return $this->render("tax-rule-edit", array(
+            "tax_rule_id" => $tax_rule_id
+        ));
+    }
+
 }

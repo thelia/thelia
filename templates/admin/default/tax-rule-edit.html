@@ -1,0 +1,228 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Edit a tax rule'}{/block}
+
+{block name="check-permissions"}admin.configuration.taxes-rules.edit{/block}
+
+{block name="main-content"}
+<div class="taxes-rules edit-taxes-rules">
+
+    <div id="wrapper" class="container">
+
+        <ul class="breadcrumb">
+            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+            <li><a href="{url path='/admin/configuration/taxes_rules'}">{intl l="Taxes rules"}</a></li>
+            <li>{intl l='Editing tax rule "%name"' name="{$TITLE}"}</li>
+        </ul>
+
+        <div class="row">
+            <div class="col-md-12 general-block-decorator clearfix">
+
+                <div class="title title-without-tabs">
+                   {intl l="Edit tax rule $TITLE"}
+                </div>     
+                
+                <form action="" method="post">
+                    
+                    <div class="form-group">
+                        <label for="" class="label-control">{intl l="Choose a country"} :</label>
+                        <div class="input-group">
+                            <select name="" id="" data-toggle="selectpicker">
+                                <option value="">France</option>
+                                <option value="">Spanish</option>
+                            </select>
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span></button>
+                            </span>
+                        </div>
+                    </div>
+
+                </form>
+                
+                <p><strong>{intl l="Countries that have the same tax rule"} :<strong></p>
+                <p class="lead">
+                    <span class="label label-info">Italy</span>
+                    <span class="label label-info">England</span>
+                    <span class="label label-info">Japan</span>
+                </p>
+                
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <!-- <div class="panel droppable place">
+                            <p id="drop-message">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                {intl l="Drop tax here to create a tax rule"}
+                            </p>
+                        </div> -->
+
+                        <div class="panel panel-default place">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Create a tax rule</h3>
+                            </div>
+                            <div class="panel-body">
+                                
+                                <div class="drop-group droppable add-to-group">
+                                    <p class="drop-message">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                        <span class="message">{intl l="Add tax to this group"}</span>
+                                    </p>
+                                </div>
+
+                            </div>
+                            <div class="panel-footer droppable create-group">
+                                <p class="drop-message">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    <span class="message">{intl l="Drop tax here to create a tax group"}</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <button type="button" id="apply-taxes-rules" class="btn btn-default btn-primary btn-block"><span class="glyphicon glyphicon-check"></span> {intl l="Apply"}</button>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <div class="panel panel-default take">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">List of taxes</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="draggable">Cras justo odio</div>
+                                <div class="draggable">Dapibus ac facilisis in</div>
+                                <div class="draggable">Morbi leo risus</div>
+                                <div class="draggable">Porta ac consectetur ac</div>
+                                <div class="draggable">Vestibulum at eros</div>                        
+                            </div>
+                            <div class="panel-footer droppable remove-from-group">
+                                <p class="drop-message">
+                                    <span class="glyphicon glyphicon-minus"></span>
+                                    <span class="message">{intl l="Drop tax here to delete from group"}</span>
+                                </p>
+                            </div>
+                        </div>
+                                                            
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{/block}
+
+{block name="javascript-initialization"}
+    
+    {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/main.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script>
+        $(function() {
+
+            // Création du tableau des règles de taxe
+            $('#apply-taxes-rules').click(function(){
+                var taxesRules = [],
+                    index;
+
+                $('.place .panel-body .drop-group').each(function(i){
+
+                    var $this = $(this);
+                    
+                    index = i;
+                    taxesRules[index] = [];
+
+                    $('.draggable', $this).each(function(j){
+                        taxesRules[index][j] = [];
+                        taxesRules[index][j] = $(this).text();
+                    });
+
+                });
+
+            });            
+
+            $('.place .panel-body').sortable({
+                axis: "y",                
+                revert: true,
+                containment: "parent",
+                items : "> div"
+            });
+
+            $(".draggable").draggable({                
+                cursor: "move",
+                revert: true,
+                containment: "document",
+                opacity: 0.5,
+                start: function(event, ui){
+                    // Initilisation du droppable pour nouveaux groupes
+                    initDrop();                    
+                },
+                stop: function(event, ui) {
+
+                    var $zone = $('.panel-body').find('.droppable');
+                    var zoneLength = $zone.length;                    
+                    
+                    if(zoneLength > 1){
+                        $zone.each(function(){
+                            var $this = $(this);
+                            var draggableLength = $('.draggable', $this).length;
+
+                            // Si une zone est vide on la supprime
+                            if(draggableLength == 0){
+                                $this.slideUp(function(){
+                                    $this.remove();
+                                });
+                            }                            
+
+                        });
+                    }      
+
+                }
+            });
+
+            // Initialisation du droppable
+            initDrop();
+
+            // Fonction droppable
+            function initDrop() {
+                $(".droppable").droppable({
+                    hoverClass: "over",
+                    drop: function( event, ui ) {
+                        var $this       = $(this),
+                            $elem       = ui.draggable.detach();
+
+                        // On ajout au groupe existant
+                        if($this.hasClass('add-to-group')){
+                            $this.find('.drop-message').after($elem);
+                        }
+                        // On crée un nouveau groupe
+                        else if($this.hasClass('create-group')){
+                            var $dropZone = $this.prev('.panel-body').find('.drop-group:last-child').clone();
+                            $dropZone.find('.draggable').remove();
+                            
+                            var $panelBody = $this.prev('.panel-body');
+                            $panelBody.append($dropZone);
+                            
+                            var $newZone = $panelBody.find('.drop-group:last-child');
+                            $newZone.find('.drop-message').after($elem);                            
+                        }
+                        // On supprime d'un groupe
+                        else if($this.hasClass('remove-from-group')){
+                            var $panelBody = $this.prev('.panel-body');
+                            $panelBody.append($elem);
+                        }
+                    }
+                });
+            }
+                
+        });
+    </script>
+
+{/block}
