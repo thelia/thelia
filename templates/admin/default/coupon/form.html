@@ -167,13 +167,13 @@
         </div>
     </section>
     {if $noRules}
-        {include file='includes/notifications.html' message={intl l='Please save your Coupon in oder to affect it some application fields'}}
+        {include file='includes/notifications.html' message={intl l='Please save your Coupon in oder to affect it some conditions'}}
     {else}
         <section class="row">
             <div class="col-md-12 general-block-decorator">
                 <table class="table table-striped">
                     <caption class="clearfix">
-                        {intl l='Rules'}
+                        {intl l='Conditions'}
                     </caption>
                     <thead>
                     <tr>
@@ -182,7 +182,7 @@
                     </tr>
                     </thead>
                     <tbody id="constraint-list">
-                        {include file='coupon/rules.html' rules=$rules}
+                        {include file='coupon/conditions.html' conditions=$rules}
                     </tbody>
                 </table>
             </div>
@@ -191,7 +191,7 @@
         <section class="row">
             <div class="col-md-12 general-block-decorator clearfix">
                 <a id="constraint-save-btn" title="{intl l='Save this rule'}" class="btn btn-default btn-primary pull-right" data-toggle="confirm" data-script="">
-                    <span class="glyphicon glyphicon-plus-sign"></span> {intl l='Save this rule'}
+                    <span class="glyphicon glyphicon-plus-sign"></span> {intl l='Save this condition'}
                 </a>
 
                 <div id="rule-add-organizer" class="form-group col-md-2">
