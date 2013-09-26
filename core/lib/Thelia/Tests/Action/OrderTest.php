@@ -31,6 +31,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Base\OrderProductQuery;
+use Thelia\Model\Base\OrderQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Cart;
@@ -350,5 +351,52 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             }
         }
 
+        return $placedOrder;
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param OrderModel $order
+     */
+    public function testUpdateStatus(OrderModel $order)
+    {
+        $newStatus = $order->getStatusId() == 5 ? 1 : 5;
+        $this->orderEvent->setStatus($newStatus);
+        $this->orderEvent->setOrder($order);
+
+        $this->orderAction->updateStatus($this->orderEvent);
+
+        $this->assertEquals(
+            $newStatus,
+            $this->orderEvent->getOrder()->getStatusId()
+        );
+        $this->assertEquals(
+            $newStatus,
+            OrderQuery::create()->findPk($order->getId())->getStatusId()
+        );
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param OrderModel $order
+     */
+    public function testUpdateDeliveryRef(OrderModel $order)
+    {
+        $deliveryRef = uniqid('DELREF');
+        $this->orderEvent->setDeliveryRef($deliveryRef);
+        $this->orderEvent->setOrder($order);
+
+        $this->orderAction->updateDeliveryRef($this->orderEvent);
+
+        $this->assertEquals(
+            $deliveryRef,
+            $this->orderEvent->getOrder()->getDeliveryRef()
+        );
+        $this->assertEquals(
+            $deliveryRef,
+            OrderQuery::create()->findPk($order->getId())->getDeliveryRef()
+        );
     }
 }
