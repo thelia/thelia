@@ -74,8 +74,10 @@ $(function($){
             e.preventDefault();
             var $this = $(this);
             var $parent = $this.parent();
-            $parent.find('a').remove();
-            $parent.append('<div class="loading" ></div>');
+            var $greatParent = $parent.parent();
+
+            $greatParent.append('<div class="loading" ></div>');
+            $greatParent.find('.btn-group').remove();
             var $url = $this.attr("href");
             var errorMessage = $this.attr("data-error-message");
             $.ajax({
@@ -89,8 +91,7 @@ $(function($){
                     }
                 }
             }).done(function(data) {
-                $parent.parents('tr').remove();
-
+                $greatParent.remove();
                 $(".image-manager .message").html(
                     data
                 );
