@@ -26,6 +26,7 @@ namespace Thelia\Action;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\OrderAddressEvent;
 use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\OrderException;
@@ -314,6 +315,30 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * @param OrderAddressEvent $event
+     */
+    public function updateAddress(OrderAddressEvent $event)
+    {
+        $orderAddress = $event->getOrderAddress();
+
+        $orderAddress
+            ->setCustomerTitleId($event->getTitle())
+            ->setCompany($event->getCompany())
+            ->setFirstname($event->getFirstname())
+            ->setLastname($event->getLastname())
+            ->setAddress1($event->getAddress1())
+            ->setAddress2($event->getAddress2())
+            ->setAddress3($event->getAddress3())
+            ->setZipcode($event->getZipcode())
+            ->setCity($event->getCity())
+            ->setPhone($event->getPhone())
+        ;
+        $orderAddress->save();
+
+        $event->setOrderAddress($orderAddress);
+    }
+
+    /**
      * Returns an array of event names this subscriber wants to listen to.
      *
      * The array keys are event names and the value can be:
@@ -344,6 +369,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_BEFORE_PAYMENT => array("sendOrderEmail", 128),
             TheliaEvents::ORDER_UPDATE_STATUS => array("updateStatus", 128),
             TheliaEvents::ORDER_UPDATE_DELIVERY_REF => array("updateDeliveryRef", 128),
+            TheliaEvents::ORDER_UPDATE_ADDRESS => array("updateAddress", 128),
         );
     }
 

@@ -23,9 +23,12 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\OrderAddressEvent;
 use Thelia\Core\Event\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
+use Thelia\Form\OrderUpdateAddress;
+use Thelia\Model\Base\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
 use Thelia\Tools\URL;
@@ -121,6 +124,62 @@ class OrderController extends BaseAdminController
             $event->setDeliveryRef($deliveryRef);
 
             $this->dispatch(TheliaEvents::ORDER_UPDATE_DELIVERY_REF, $event);
+        } catch(\Exception $e) {
+            $message = $e->getMessage();
+        }
+
+        $params = array();
+
+        if ($message) {
+            $params["update_status_error_message"] = $message;
+        }
+
+        $params["order_id"] = $order_id;
+        $params["tab"] = $this->getRequest()->get("tab", 'bill');
+
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", $params)));
+    }
+
+    public function updateAddress($order_id)
+    {
+        if (null !== $response = $this->checkAuth("admin.order.update")) return $response;
+
+        $message = null;
+
+        $orderUpdateAddress = new OrderUpdateAddress($this->getRequest());
+
+        try {
+            $order = OrderQuery::create()->findPk($order_id);
+
+            if(null === $order) {
+                throw new \InvalidArgumentException("The order you want to update does not exist");
+            }
+
+            $form = $this->validateForm($orderUpdateAddress, "post");
+
+            $orderAddress = OrderAddressQuery::create()->findPk($form->get("id")->getData());
+
+            if($orderAddress->getId() !== $order->getInvoiceOrderAddressId() && $orderAddress->getId() !== $order->getDeliveryOrderAddressId()) {
+                throw new \InvalidArgumentException("The order address you want to update does not belong to the current order not exist");
+            }
+
+            $event = new OrderAddressEvent(
+                $form->get("title")->getData(),
+                $form->get("firstname")->getData(),
+                $form->get("lastname")->getData(),
+                $form->get("address1")->getData(),
+                $form->get("address2")->getData(),
+                $form->get("address3")->getData(),
+                $form->get("zipcode")->getData(),
+                $form->get("city")->getData(),
+                $form->get("country")->getData(),
+                $form->get("phone")->getData(),
+                $form->get("company")->getData()
+            );
+            $event->setOrderAddress($orderAddress);
+            $event->setOrder($order);
+
+            $this->dispatch(TheliaEvents::ORDER_UPDATE_ADDRESS, $event);
         } catch(\Exception $e) {
             $message = $e->getMessage();
         }

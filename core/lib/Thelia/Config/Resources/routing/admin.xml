@@ -82,6 +82,10 @@
         <default key="_controller">Thelia\Controller\Admin\OrderController::updateDeliveryRef</default>
     </route>
 
+    <route id="admin.order.update.address" path="/admin/order/update/{order_id}/address">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::updateAddress</default>
+    </route>
+
     <!-- end order management -->
 
     <!-- Categories management -->

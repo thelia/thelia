@@ -22,8 +22,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Form;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\CountryQuery;
+use Thelia\Model\CustomerTitleQuery;
+use Thelia\Model\OrderAddressQuery;
 
 /**
  * Class AddressUpdateForm
@@ -35,9 +40,25 @@ class OrderUpdateAddress extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
+            ->add("id", "integer", array(
+                "constraints" => array(
+                    new NotBlank(),
+                    new Callback(array(
+                        "methods" => array(
+                            array($this, "verifyId")
+                        )
+                    ))
+                ),
+                "required" => true
+            ))
             ->add("title", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
+                    new Callback(array(
+                        "methods" => array(
+                            array($this, "verifyTitle")
+                        )
+                    ))
                 ),
                 "label" => Translator::getInstance()->trans("Title"),
                 "label_attr" => array(
@@ -103,7 +124,12 @@ class OrderUpdateAddress extends BaseForm
             ))
             ->add("country", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
+                    new Callback(array(
+                        "methods" => array(
+                            array($this, "verifyCountry")
+                        )
+                    ))
                 ),
                 "label" => Translator::getInstance()->trans("Country"),
                 "label_attr" => array(
@@ -132,5 +158,35 @@ class OrderUpdateAddress extends BaseForm
     public function getName()
     {
         return "thelia_order_address_update";
+    }
+
+    public function verifyId($value, ExecutionContextInterface $context)
+    {
+        $address = OrderAddressQuery::create()
+            ->findPk($value);
+
+        if(null === $address) {
+            $context->addViolation("Order address ID not found");
+        }
+    }
+
+    public function verifyTitle($value, ExecutionContextInterface $context)
+    {
+        $address = CustomerTitleQuery::create()
+            ->findPk($value);
+
+        if(null === $address) {
+            $context->addViolation("Title ID not found");
+        }
+    }
+
+    public function verifyCountry($value, ExecutionContextInterface $context)
+    {
+        $address = CountryQuery::create()
+            ->findPk($value);
+
+        if(null === $address) {
+            $context->addViolation("Country ID not found");
+        }
     }
 }
