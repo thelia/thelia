@@ -26,6 +26,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\ConditionManagerInterface;
+use Thelia\Core\Event\Condition\ConditionCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -68,7 +69,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      */
     public function update(CouponCreateOrUpdateEvent $event)
     {
-        $coupon = $event->getCoupon();
+        $coupon = $event->getCouponModel();
 
         $this->createOrUpdate($coupon, $event);
     }
@@ -76,13 +77,13 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /**
      * Occurring when a Coupon condition is about to be updated
      *
-     * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon Rule
+     * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon condition
      */
     public function updateCondition(CouponCreateOrUpdateEvent $event)
     {
-        $coupon = $event->getCoupon();
+        $modelCoupon = $event->getCouponModel();
 
-        $this->createOrUpdateCondition($coupon, $event);
+        $this->createOrUpdateCondition($modelCoupon, $event);
     }
 
     /**
@@ -153,7 +154,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getCode(),
             $event->getTitle(),
             $event->getAmount(),
-            $event->getType(),
+            $event->getServiceId(),
             $event->isRemovingPostage(),
             $event->getShortDescription(),
             $event->getDescription(),
@@ -166,7 +167,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getLocale()
         );
 
-        $event->setCoupon($coupon);
+        $event->setCouponModel($coupon);
     }
 
     /**
@@ -188,7 +189,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->getLocale()
         );
 
-        $event->setCoupon($coupon);
+        $event->setCouponModel($coupon);
     }
 
     /**

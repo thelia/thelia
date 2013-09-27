@@ -31,7 +31,7 @@ use Thelia\Model\Coupon;
  * Date: 8/29/13
  * Time: 3:45 PM
  *
- * Occurring when a Coupon is created
+ * Occurring when a Coupon is created or updated
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
@@ -76,10 +76,10 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     protected $isAvailableOnSpecialOffers = false;
 
     /** @var Coupon Coupon model */
-    protected $coupon = null;
+    protected $couponModel = null;
 
-    /** @var string Coupon type */
-    protected $type;
+    /** @var string Coupon Service id */
+    protected $serviceId;
 
     /** @var string Language code ISO (ex: fr_FR) */
     protected $locale = null;
@@ -90,7 +90,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param string    $code                       Coupon Code
      * @param string    $title                      Coupon title
      * @param float     $amount                     Amount removed from the Total Checkout
-     * @param string    $type                       Coupon type
+     * @param string    $serviceId                  Coupon Service id
      * @param string    $shortDescription           Coupon short description
      * @param string    $description                Coupon description
      * @param bool      $isEnabled                  Enable/Disable
@@ -102,7 +102,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
      */
     public function __construct(
-        $code, $title, $amount, $type, $shortDescription, $description, $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $isRemovingPostage, $maxUsage, $locale
+        $code, $title, $amount, $serviceId, $shortDescription, $description, $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $isRemovingPostage, $maxUsage, $locale
     )
     {
         $this->amount = $amount;
@@ -116,7 +116,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         $this->maxUsage = $maxUsage;
         $this->shortDescription = $shortDescription;
         $this->title = $title;
-        $this->type = $type;
+        $this->serviceId = $serviceId;
         $this->locale = $locale;
     }
 
@@ -234,13 +234,13 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * Get Coupon type (effect)
+     * Get Coupon Service id (Type)
      *
      * @return string
      */
-    public function getType()
+    public function getServiceId()
     {
-        return $this->type;
+        return $this->serviceId;
     }
 
     /**
@@ -256,13 +256,13 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /**
      * Set Coupon Model
      *
-     * @param \Thelia\Model\Coupon $coupon Coupon Model
+     * @param Coupon $couponModel Coupon Model
      *
      * @return $this
      */
-    public function setCoupon($coupon)
+    public function setCouponModel(Coupon $couponModel)
     {
-        $this->coupon = $coupon;
+        $this->couponModel = $couponModel;
 
         return $this;
     }
@@ -272,13 +272,13 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      *
      * @return \Thelia\Model\Coupon
      */
-    public function getCoupon()
+    public function getCouponModel()
     {
-        return $this->coupon;
+        return $this->couponModel;
     }
 
     /**
-     * Get Rules
+     * Get Conditions
      *
      * @return null|ConditionCollection Array of ConditionManagerInterface
      */
@@ -288,15 +288,15 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     }
 
     /**
-     * set Rules
+     * Set Conditions
      *
-     * @param ConditionCollection $rules Array of ConditionManagerInterface
+     * @param ConditionCollection $conditions Array of ConditionManagerInterface
      *
      * @return $this
      */
-    public function setConditions(ConditionCollection $rules)
+    public function setConditions(ConditionCollection $conditions)
     {
-        $this->conditions = $rules;
+        $this->conditions = $conditions;
 
         return $this;
     }

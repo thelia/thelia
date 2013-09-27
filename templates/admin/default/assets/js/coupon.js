@@ -89,7 +89,7 @@ $(function($){
 
     // Save conditions on click
     $.couponManager.onClickSaveCondition = function() {
-        $('#constraint-save-btn').on('click', function () {
+        $('#condition-save-btn').on('click', function () {
             if($('#category-condition').val() == 'thelia.condition.match_for_everyone') {
 //                // @todo translate message + put it in modal
                 var r = confirm("Do you really want to set this coupon available to everyone ?");
@@ -106,7 +106,7 @@ $(function($){
 
     // Remove condition on click
     $.couponManager.onClickDeleteCondition = function() {
-        $('.constraint-delete-btn').on('click', function (e) {
+        $('.condition-delete-btn').on('click', function (e) {
             e.preventDefault();
             var $this = $(this);
             $.couponManager.removeConditionAjax($this.attr('data-int'));

@@ -27,7 +27,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\ConditionManagerInterface;
-use Thelia\Core\Event\Condition\ConditionCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -336,23 +335,36 @@ class CouponController extends BaseAdminController
 //            $conditionFactory->serializeCouponConditionCollection($conditions)
 //        );
 
-        $conditionEvent = new ConditionCreateOrUpdateEvent(
-            $conditions
+        $couponEvent = new CouponCreateOrUpdateEvent(
+            $coupon->getCode(),
+            $coupon->getTitle(),
+            $coupon->getAmount(),
+            $coupon->getType(),
+            $coupon->getShortDescription(),
+            $coupon->getDescription(),
+            $coupon->getIsEnabled(),
+            $coupon->getExpirationDate(),
+            $coupon->getIsAvailableOnSpecialOffers(),
+            $coupon->getIsCumulative(),
+            $coupon->getIsRemovingPostage(),
+            $coupon->getMaxUsage(),
+            $coupon->getLocale()
         );
-        $conditionEvent->setCouponModel($coupon);
+        $couponEvent->setCouponModel($coupon);
+        $couponEvent->setConditions($conditions);
 
         $eventToDispatch = TheliaEvents::COUPON_CONDITION_UPDATE;
         // Dispatch Event to the Action
         $this->dispatch(
             $eventToDispatch,
-            $conditionEvent
+            $couponEvent
         );
 
         $this->adminLogAppend(
             sprintf(
                 'Coupon %s (ID %s) conditions updated',
-                $conditionEvent->getCouponModel()->getTitle(),
-                $conditionEvent->getCouponModel()->getServiceId()
+                $couponEvent->getCouponModel()->getTitle(),
+                $couponEvent->getCouponModel()->getType()
             )
         );
 
@@ -489,14 +501,14 @@ class CouponController extends BaseAdminController
                 sprintf(
                     'Coupon %s (ID ) ' . $log,
                     $couponEvent->getTitle(),
-                    $couponEvent->getCoupon()->getId()
+                    $couponEvent->getCouponModel()->getId()
                 )
             );
 
             $this->redirect(
                 str_replace(
                     '{id}',
-                    $couponEvent->getCoupon()->getId(),
+                    $couponEvent->getCouponModel()->getId(),
                     $creationForm->getSuccessUrl()
                 )
             );
