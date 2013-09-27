@@ -42,6 +42,7 @@ use Thelia\Log\Tlog;
 use Symfony\Component\Routing\Router;
 use Thelia\Model\Admin;
 use Thelia\Core\Security\Token\CookieTokenProvider;
+use Thelia\Model\CurrencyQuery;
 
 class BaseAdminController extends BaseController
 {
@@ -251,6 +252,23 @@ class BaseAdminController extends BaseController
     }
 
     /**
+     * Get the current edition currency ID, checking if a change was requested in the current request.
+     */
+    protected function getCurrentEditionCurrency()
+    {
+        // Return the new language if a change is required.
+        if (null !== $edit_currency_id = $this->getRequest()->get('edit_currency_id', null)) {
+
+            if (null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
+                return $edit_currency;
+            }
+        }
+
+        // Otherwise return the lang stored in session.
+        return $this->getSession()->getAdminEditionCurrency();
+    }
+
+    /**
      * Get the current edition lang ID, checking if a change was requested in the current request.
      */
     protected function getCurrentEditionLang()
@@ -376,6 +394,9 @@ class BaseAdminController extends BaseController
         // Find the current edit language ID
         $edition_language = $this->getCurrentEditionLang();
 
+        // Find the current edit currency ID
+        $edition_currency = $this->getCurrentEditionCurrency();
+
         // Prepare common template variables
         $args = array_merge($args, array(
             'locale'               => $session->getLang()->getLocale(),
@@ -385,11 +406,16 @@ class BaseAdminController extends BaseController
             'edit_language_id'     => $edition_language->getId(),
             'edit_language_locale' => $edition_language->getLocale(),
 
+            'edit_currency_id'     => $edition_currency->getId(),
+
             'current_url'          => $this->getRequest()->getUri()
         ));
 
-        // Update the current edition language in session
-        $this->getSession()->setAdminEditionLang($edition_language);
+        // Update the current edition language & currency in session
+        $this->getSession()
+            ->setAdminEditionLang($edition_language)
+            ->setAdminEditionCurrency($edition_currency)
+        ;
 
         // Render the template.
         try {

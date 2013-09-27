@@ -36,6 +36,10 @@
             <argument type="service" id="service_container"/>
              <tag name="kernel.event_subscriber"/>
         </service>
+        <service id="thelia.action.document" class="Thelia\Action\Document">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
 
         <service id="thelia.action.category" class="Thelia\Action\Category">
             <argument type="service" id="service_container"/>

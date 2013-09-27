@@ -31,5 +31,5 @@ $('#{$dialog_id}').on('hidden.bs.modal', function() {
     $("#{$dialog_id} .error").removeClass('error');
 
     // Empty field values
-    $("#{$dialog_id} input[type=text]").val('');
+    $("#{$dialog_id} input[type=text], #{$dialog_id} select").val('');
 });

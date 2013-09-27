@@ -79,7 +79,7 @@ class FeatureValue extends BaseI18nLoop
     {
         $search = FeatureProductQuery::create();
 
-        // manage featureAv translations
+         // manage featureAv translations
         $locale = $this->configureI18nProcessing(
             $search,
             array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),

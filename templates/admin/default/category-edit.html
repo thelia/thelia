@@ -163,7 +163,7 @@
 									            <div class="col-md-6">
 									                <div class="form-group">
 									                    <select name="folder_id" id="folder_id" class="form-control">
-									                        <option value="">Select a folder...</option>
+									                        <option value="">{intl l='Select a folder...'}</option>
 									                        {loop name="folders" type="folder-tree" folder="0" backend_context="1" lang="$edit_language_id"}
 									                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
 									                        {/loop}
@@ -176,7 +176,7 @@
 									                <div id="content_selector" class="hide">
 									                    <div class="input-group">
 									                        <select required="required" name="content_id" id="content_id" class="form-control">
-									                            <option value="">Select a folder content...</option>
+									                            <option value="">{intl l='Select a folder content...'}</option>
 									                        </select>
 									                        <span class="input-group-btn" id="content_add_button">
 									                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
@@ -256,9 +256,11 @@
 		                    </div>
 
 		                    <div class="tab-pane fade {if $current_tab == 'images'}active in{/if}" id="images">
-		                    </div>
+                                {include file='includes/image-upload-form.html' imageType='category' parentId=$category_id}
+                            </div>
 
 		                    <div class="tab-pane fade {if $current_tab == 'documents'}active in{/if}" id="documents">
+                                {include file='includes/document-upload-form.html' documentType='category' parentId=$category_id}
 		                    </div>
 
 		                    <div class="tab-pane fade {if $current_tab == 'modules'}active in{/if}" id="modules">
@@ -296,6 +298,17 @@
 {/block}
 
 {block name="javascript-initialization"}
+    {javascripts file='assets/js/dropzone.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/image-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/document-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+
 
 <script src="{url file='/tinymce/tinymce.min.js'}"></script>
 <script>
@@ -315,11 +328,10 @@
 		filemanager_title:"{intl l='Files manager'}" ,
 		external_plugins: { "filemanager" : "{url file='/tinymce/plugins/filemanager/plugin.min.js'}"}
 	 });
-</script>
-
-<script>
 
 $(function() {
+    $.imageUploadManager.initImageDropZone();
+    $.documentUploadManager.initDocumentDropZone();
 
     $('.use_default_rewriten_url').click(function(ev) {
     	alert("Not functionnal");

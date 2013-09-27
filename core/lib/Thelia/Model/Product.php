@@ -87,12 +87,46 @@ class Product extends BaseProduct
         return $this;
     }
 
+    public function updateDefaultCategory($defaultCategoryId) {
+
+        // Allow uncategorized products (NULL instead of 0, to bypass delete cascade constraint)
+        if ($defaultCategoryId <= 0) $defaultCategoryId = NULL;
+
+        // Update the default category
+        $productCategory = ProductCategoryQuery::create()
+            ->filterByProductId($this->getId())
+            ->filterByDefaultCategory(true)
+            ->findOne()
+        ;
+
+        if ($productCategory == null || $productCategory->getCategoryId() != $defaultCategoryId) {
+            exit;
+            // Delete the old default category
+            if ($productCategory !== null) $productCategory->delete();
+
+            // Add the new default category
+            $productCategory = new ProductCategory();
+
+            $productCategory
+                ->setProduct($this)
+                ->setCategoryId($defaultCategoryId)
+                ->setDefaultCategory(true)
+                ->save()
+            ;
+        }
+    }
+
     /**
      * Create a new product, along with the default category ID
      *
      * @param int $defaultCategoryId the default category ID of this product
+     * @param float $basePrice the product base price
+     * @param int $priceCurrencyId the price currency Id
+     * @param int $taxRuleId the product tax rule ID
+     * @param float $baseWeight base weight in Kg
      */
-    public function create($defaultCategoryId) {
+
+    public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight) {
 
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
@@ -105,17 +139,12 @@ class Product extends BaseProduct
             $this->save($con);
 
             // Add the default category
-            $pc = new ProductCategory();
-
-            $pc
-                ->setProduct($this)
-                ->setCategoryId($defaultCategoryId)
-                ->setDefaultCategory(true)
-                ->save($con)
-            ;
+            $this->updateDefaultCategory($defaultCategoryId);
 
             // Set the position
             $this->setPosition($this->getNextPosition())->save($con);
+
+            $this->setTaxRuleId($taxRuleId);
 
             // Create an empty product sale element
             $sale_elements = new ProductSaleElements();
@@ -125,7 +154,8 @@ class Product extends BaseProduct
                 ->setRef($this->getRef())
                 ->setPromo(0)
                 ->setNewness(0)
-                ->setWeight(0)
+                ->setWeight($baseWeight)
+                ->setIsDefault(true)
                 ->save($con)
             ;
 
@@ -134,9 +164,9 @@ class Product extends BaseProduct
 
             $product_price
                 ->setProductSaleElements($sale_elements)
-                ->setPromoPrice(0)
-                ->setPrice(0)
-                ->setCurrency(CurrencyQuery::create()->findOneByByDefault(true))
+                ->setPromoPrice($basePrice)
+                ->setPrice($basePrice)
+                ->setCurrencyId($priceCurrencyId)
                 ->save($con)
             ;
 

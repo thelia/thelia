@@ -41,6 +41,8 @@ use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Model\FeatureTemplateQuery;
+use Thelia\Model\TemplateQuery;
+use Thelia\Model\Map\FeatureTemplateTableMap;
 
 /**
  *
@@ -70,7 +72,7 @@ class Feature extends BaseI18nLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
             ),
@@ -108,39 +110,55 @@ class Feature extends BaseI18nLoop
 
         $product = $this->getProduct();
         $template = $this->getTemplate();
-
-        if (null !== $product) {
-            // Find the template assigned to the product.
-            $productObj = ProductQuery::create()->findPk($product);
-
-            // Ignore if the product cannot be found.
-            if ($productObj !== null)
-                $template = $productObj->getTemplate();
-         }
-
-         // If we have to filter by template, find all features assigned to this template, and filter by found IDs
-        if (null !== $template) {
-            $search->filterById(
-                FeatureTemplateQuery::create()->filterByTemplateId($template)->select('feature_id')->find(),
-                Criteria::IN
-            );
-        }
-
         $exclude_template = $this->getExcludeTemplate();
 
-        // If we have to filter by template, find all features assigned to this template, and filter by found IDs
+        $use_feature_pos = true;
+
+        if (null !== $product) {
+            // Find all template assigned to the products.
+            $products = ProductQuery::create()->findById($product);
+
+            // Ignore if the product cannot be found.
+            if ($products !== null) {
+
+                // Create template array
+                if ($template == null) $template = array();
+
+                foreach($products as $product) {
+                    $tpl_id = $product->getTemplateId();
+
+                    if (! is_null($tpl_id)) $template[] = $tpl_id;
+                }
+            }
+        }
+
+        if (! empty($template)) {
+
+            // Join with feature_template table to get position
+            $search
+                ->withColumn(FeatureTemplateTableMap::POSITION, 'position')
+                ->filterByTemplate(TemplateQuery::create()->findById($template), Criteria::IN)
+            ;
+
+            $use_feature_pos = false;
+        }
+
         if (null !== $exclude_template) {
-            // Exclure tous les attribut qui sont attachés aux templates indiqués
-            $search->filterById(
-                    FeatureTemplateQuery::create()->filterByTemplateId($exclude_template)->select('feature_id')->find(),
-                    Criteria::NOT_IN
-            );
+            $exclude_features = FeatureTemplateQuery::create()->filterByTemplateId($exclude_template)->select('feature_id')->find();
+
+            $search
+                ->joinFeatureTemplate(null, Criteria::LEFT_JOIN)
+                ->withColumn(FeatureTemplateTableMap::POSITION, 'position')
+                ->filterById($exclude_features, Criteria::NOT_IN)
+            ;
+
+            $use_feature_pos = false;
         }
 
         $title = $this->getTitle();
 
         if (null !== $title) {
-            //find all feture that match exactly this title and find with all locales.
+            //find all feature that match exactly this title and find with all locales.
             $features = FeatureI18nQuery::create()
                 ->filterByTitle($title, Criteria::LIKE)
                 ->select('id')
@@ -158,6 +176,12 @@ class Feature extends BaseI18nLoop
 
         foreach ($orders as $order) {
             switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
@@ -165,13 +189,21 @@ class Feature extends BaseI18nLoop
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
-                    $search->orderByPosition(Criteria::ASC);
+                    if ($use_feature_pos)
+                        $search->orderByPosition(Criteria::ASC);
+                     else
+                        $search->addAscendingOrderByColumn(FeatureTemplateTableMap::POSITION);
                     break;
                 case "manual_reverse":
-                    $search->orderByPosition(Criteria::DESC);
+                    if ($use_feature_pos)
+                        $search->orderByPosition(Criteria::DESC);
+                     else
+                        $search->addDescendingOrderByColumn(FeatureTemplateTableMap::POSITION);
                     break;
             }
+
         }
+
 
         /* perform search */
         $features = $this->search($search, $pagination);
@@ -187,7 +219,8 @@ class Feature extends BaseI18nLoop
                 ->set("CHAPO", $feature->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $feature->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $feature->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $feature->getPosition());
+                ->set("POSITION", $use_feature_pos ? $feature->getPosition() : $feature->getVirtualColumn('position'))
+            ;
 
             $loopResult->addRow($loopResultRow);
         }
