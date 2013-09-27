@@ -24,7 +24,7 @@
 namespace Thelia\Coupon;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Constraint\Rule\CouponRuleInterface;
+use Thelia\Condition\ConditionManagerInterface;
 use Thelia\Coupon\Type\CouponInterface;
 
 /**
@@ -40,7 +40,7 @@ use Thelia\Coupon\Type\CouponInterface;
  */
 class CouponManager
 {
-    /** @var CouponAdapterInterface Provides necessary value from Thelia */
+    /** @var AdapterInterface Provides necessary value from Thelia */
     protected $adapter = null;
 
     /** @var ContainerInterface Service Container */
@@ -52,15 +52,15 @@ class CouponManager
     /** @var array Available Coupons (Services) */
     protected $availableCoupons = array();
 
-    /** @var array Available Rules (Services) */
-    protected $availableRules = array();
+    /** @var array Available Conditions (Services) */
+    protected $availableConditions = array();
 
     /**
      * Constructor
      *
      * @param ContainerInterface $container Service container
      */
-    function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->adapter = $container->get('thelia.adapter');
@@ -191,29 +191,29 @@ class CouponManager
     }
 
     /**
-     * Build a CouponRuleInterface from data coming from a form
+     * Build a ConditionManagerInterface from data coming from a form
      *
-     * @param string $ruleServiceId Rule service id you want to instantiate
-     * @param array  $operators     Rule Operator set by the Admin
-     * @param array  $values        Rule Values set by the Admin
+     * @param string $conditionServiceId Condition service id you want to instantiate
+     * @param array  $operators          Condition Operator set by the Admin
+     * @param array  $values             Condition Values set by the Admin
      *
-     * @return CouponRuleInterface
+     * @return ConditionManagerInterface
      */
-    public function buildRuleFromForm($ruleServiceId, array $operators, array $values)
+    public function buildRuleFromForm($conditionServiceId, array $operators, array $values)
     {
-        $rule = false;
+        $condition = false;
         try {
 
-            if ($this->container->has($ruleServiceId)) {
-                /** @var CouponRuleInterface $rule */
-                $rule = $this->container->get($ruleServiceId);
-                $rule->populateFromForm($operators, $values);
+            if ($this->container->has($conditionServiceId)) {
+                /** @var ConditionManagerInterface $condition */
+                $condition = $this->container->get($conditionServiceId);
+                $condition->populateFromForm($operators, $values);
             }
         } catch (\InvalidArgumentException $e) {
 
         }
 
-        return $rule;
+        return $condition;
     }
 
     /**
@@ -239,11 +239,11 @@ class CouponManager
     /**
      * Add an available ConstraintManager (Services)
      *
-     * @param CouponRuleInterface $rule CouponRuleInterface
+     * @param ConditionManagerInterface $condition ConditionManagerInterface
      */
-    public function addAvailableRule(CouponRuleInterface $rule)
+    public function addAvailableRule(ConditionManagerInterface $condition)
     {
-        $this->availableRules[] = $rule;
+        $this->availableConditions[] = $condition;
     }
 
     /**
@@ -251,8 +251,8 @@ class CouponManager
      *
      * @return array
      */
-    public function getAvailableRules()
+    public function getAvailableConditions()
     {
-        return $this->availableRules;
+        return $this->availableConditions;
     }
 }

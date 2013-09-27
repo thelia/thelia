@@ -241,7 +241,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         // Compute the image URL
         $processed_image_url = $this->getCacheFileURL($subdir, basename($cacheFilePath));
 
-        // compute the full resulution image path in cache
+        // compute the full resolution image path in cache
         $original_image_url = $this->getCacheFileURL($subdir, basename($originalImagePathInCache));
 
         // Update the event with file path and file URL

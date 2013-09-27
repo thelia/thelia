@@ -25,7 +25,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Propel;
 use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Coupon\CouponRuleCollection;
+use Thelia\Coupon\ConditionCollection;
 use Thelia\Model\Base\Coupon as BaseCoupon;
 use Thelia\Model\Map\CouponTableMap;
 
@@ -54,7 +54,7 @@ class Coupon extends BaseCoupon
      * @param string    $code                       Coupon Code
      * @param string    $title                      Coupon title
      * @param float     $amount                     Amount removed from the Total Checkout
-     * @param string    $effect                     Coupon effect
+     * @param string    $type                       Coupon type
      * @param bool      $isRemovingPostage          Is removing Postage
      * @param string    $shortDescription           Coupon short description
      * @param string    $description                Coupon description
@@ -63,17 +63,18 @@ class Coupon extends BaseCoupon
      * @param boolean   $isAvailableOnSpecialOffers Is available on special offers
      * @param boolean   $isCumulative               Is cumulative
      * @param int       $maxUsage                   Coupon quantity
+     * @param string    $defaultSerializedRule      Serialized default rule added if none found
      * @param string    $locale                     Coupon Language code ISO (ex: fr_FR)
      *
      * @throws \Exception
      */
-    function createOrUpdate($code, $title, $amount, $effect, $isRemovingPostage, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $locale = null)
+    function createOrUpdate($code, $title, $amount, $type, $isRemovingPostage, $shortDescription, $description, $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $defaultSerializedRule, $locale = null)
     {
         $this->setCode($code)
             ->setTitle($title)
             ->setShortDescription($shortDescription)
             ->setDescription($description)
-            ->setType($effect)
+            ->setType($type)
             ->setAmount($amount)
             ->setIsRemovingPostage($isRemovingPostage)
             ->setIsEnabled($isEnabled)
@@ -81,6 +82,11 @@ class Coupon extends BaseCoupon
             ->setIsAvailableOnSpecialOffers($isAvailableOnSpecialOffers)
             ->setIsCumulative($isCumulative)
             ->setMaxUsage($maxUsage);
+
+        // If no rule given, set default rule
+        if (null === $this->getSerializedConditions()) {
+            $this->setSerializedConditions($defaultSerializedRule);
+        }
 
         // Set object language (i18n)
         if (!is_null($locale)) {
@@ -100,16 +106,16 @@ class Coupon extends BaseCoupon
     }
 
     /**
-     * Create or Update this coupon rule
+     * Create or Update this coupon condition
      *
-     * @param string $serializableRules Serialized rules ready to be saved
-     * @param string $locale            Coupon Language code ISO (ex: fr_FR)
+     * @param string $serializableConditions Serialized conditions ready to be saved
+     * @param string $locale                 Coupon Language code ISO (ex: fr_FR)
      *
      * @throws \Exception
      */
-    function createOrUpdateRules($serializableRules, $locale)
+    public function createOrUpdateConditions($serializableConditions, $locale)
     {
-        $this->setSerializedRules($serializableRules);
+        $this->setSerializedConditions($serializableConditions);
 
         // Set object language (i18n)
         if (!is_null($locale)) {
@@ -121,13 +127,9 @@ class Coupon extends BaseCoupon
         try {
             $this->save($con);
             $con->commit();
-
         } catch(\Exception $e) {
             $con->rollback();
             throw $e;
         }
     }
-
-
-
 }

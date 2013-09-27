@@ -428,19 +428,19 @@ final class TheliaEvents
     const AFTER_CONSUME_COUPON 	= "action.after_consume_coupon";
 
     /**
-     * Sent when attempting to update Coupon Rule
+     * Sent when attempting to update Coupon Condition
      */
-    const COUPON_RULE_UPDATE 	= "action.update_coupon_rule";
+    const COUPON_CONDITION_UPDATE 	= "action.update_coupon_condition";
 
     /**
-     * Sent just before an attempt to update a Coupon Rule
+     * Sent just before an attempt to update a Coupon Condition
      */
-    const BEFORE_COUPON_RULE_UPDATE 	= "action.before_update_coupon_rule";
+    const BEFORE_COUPON_CONDITION_UPDATE 	= "action.before_update_coupon_condition";
 
     /**
-     * Sent just after an attempt to update a Coupon Rule
+     * Sent just after an attempt to update a Coupon Condition
      */
-    const AFTER_COUPON_RULE_UPDATE 	= "action.after_update_coupon_rule";
+    const AFTER_COUPON_CONDITION_UPDATE 	= "action.after_update_coupon_condition";
 
     // -- Configuration management ---------------------------------------------
 

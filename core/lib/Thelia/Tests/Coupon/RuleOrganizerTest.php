@@ -23,6 +23,7 @@
 
 namespace Thelia\Coupon;
 
+use Thelia\Coupon\RuleOrganizer;
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
@@ -47,7 +48,7 @@ class RuleOrganizerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new RuleOrganizer;
+        $this->object = new RuleOrganizer();
     }
 
     /**

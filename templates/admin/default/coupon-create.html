@@ -8,7 +8,7 @@
     <nav>
         <ul class="breadcrumb">
             <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
-            <li><a href="{url path='admin/coupon/'}">{intl l='Coupon'}</a></li>
+            <li><a href="{url path='admin/coupon'}">{intl l='Coupon'}</a></li>
             <li>{intl l='Create'}</li>
         </ul>
     </nav>
@@ -18,7 +18,7 @@
     </div>
 
     {form name="thelia.admin.coupon.creation"}
-    {include file='coupon/form.html' formAction={url path={$formAction}} noRules=true}
+    {include file='coupon/form.html' formAction={url path={$formAction}} noConditions=true}
     {/form}
 </section> <!-- #wrapper -->
 
