@@ -8,11 +8,11 @@
 
 {block name="breadcrumb"}
     <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">You are here: </strong>
+        <strong id="breadcrumb-label">{intl l="You are here"} : </strong>
         <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">Home</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/cart"}" itemprop="url"><span itemprop="title">Cart</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">My order</span></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/cart"}" itemprop="url"><span itemprop="title">{intl l="Cart"}</span></a></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{intl l="My order"}</span></li>
         </ul>
     </nav><!-- /.nav-breadcrumb -->
 {/block}
@@ -21,13 +21,13 @@
     <div class="main">
         <article class="col-main" role="main" aria-labelledby="main-label">
 
-            <h1 id="main-label" class="page-header">Your Cart</h1>
+            <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
 
             <div class="btn-group checkout-progress">
-                <a href="{url path="/cart"}" role="button" class="btn btn-step"><span class="step-nb">1</span> <span class="step-label"> <span>Your Cart</span></a>
-                <a href="{url path="/order/delivery"}" role="button" class="btn btn-step"><span class="step-nb">2</span> <span class="step-label">Billing and delivery</span></a>
-                <a href="#" role="button" class="btn btn-step active"><span class="step-nb">3</span> <span class="step-label">Check my order</span></a>
-                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">Secure payment</span></a>
+                <a href="{url path="/cart"}" role="button" class="btn btn-step"><span class="step-nb">1</span> <span class="step-label"> <span>{intl l="Your Cart"}</span></a>
+                <a href="{url path="/order/delivery"}" role="button" class="btn btn-step"><span class="step-nb">2</span> <span class="step-label">{intl l="Billing and delivery"}</span></a>
+                <a href="#" role="button" class="btn btn-step active"><span class="step-nb">3</span> <span class="step-label">{intl l="Check my order"}</span></a>
+                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">{intl l="Secure payment"}</span></a>
             </div>
 
             {form name="thelia.order.payment"}
@@ -49,20 +49,20 @@
                     <tr>
                         <th class="image">&nbsp;</th>
                         <th class="product">
-                            <span class="hidden-xs">Product Name</span>
-                            <span class="visible-xs">Name</span>
+                            <span class="hidden-xs">{intl l="Product Name"}</span>
+                            <span class="visible-xs">{intl l="Name"}</span>
                         </th>
                         <th class="unitprice">
-                            <span class="hidden-xs">Unit Price</span>
-                            <span class="visible-xs">Price</span>
+                            <span class="hidden-xs">{intl l="Unit Price"}</span>
+                            <span class="visible-xs">{intl l="Price"}</span>
                         </th>
                         <th class="qty">
-                            <span class="hidden-xs">Quantity</span>
-                            <span class="visible-xs">Quantity</span>
+                            <span class="hidden-xs">{intl l="Quantity"}</span>
+                            <span class="visible-xs">{intl l="Quantity"}</span>
                         </th>
                         <th class="subprice">
-                            <span class="hidden-xs">Total <abbr title="Tax Inclusive">TTC</abbr></span>
-                            <span class="visible-xs">Total</span>
+                            <span class="hidden-xs">{intl l="Total"} <abbr title="{intl l="Tax Inclusive"}">{intl l="TTC"}</abbr></span>
+                            <span class="visible-xs">{intl l="Total"}</span>
                         </th>
                     </tr>
                     </thead>
@@ -86,13 +86,13 @@
                         </td>
                         <td class="product" >
                             <h3 class="name">
-                                Product #{$cart_count}
+                                {$TITLE}
                             </h3>
                             <div class="product-options">
                                 <dl class="dl-horizontal">
-                                    <dt>Available :</dt>
-                                    <dd>In Stock</dd>
-                                    <dt>No.</dt>
+                                    <dt>{intl l="Available"} :</dt>
+                                    <dd>{intl l="In Stock"}</dd>
+                                    <dt>{intl l="No."}</dt>
                                     <dd>{$REF}</dd>
                                     {*<dt>Select Size</dt>
                                     <dd>Large</dd>
@@ -107,7 +107,7 @@
                             {if $IS_PROMO == 1}
                                 {assign "real_price" $PROMO_TAXED_PRICE}
                                 <div class="special-price"><span class="price">{currency attr="symbol"} {$PROMO_TAXED_PRICE}</span></div>
-                                <small class="old-price">instead of <span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></small>
+                                <small class="old-price">{intl l="instead of"} <span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></small>
                             {else}
                                 {assign "real_price" $TAXED_PRICE}
                                 <div class="special-price"><span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></div>
@@ -127,7 +127,7 @@
                     <tfoot>
                     <tr >
                         <td rowspan="3" colspan="3" class="empty">&nbsp;</td>
-                        <th class="shipping">Shipping Tax</th>
+                        <th class="shipping">{intl l="Shipping Tax"}</th>
                         <td class="shipping">
                             <div class="shipping-price">
                                 <span class="price">{currency attr="symbol"} {order attr="postage"}</span>
@@ -135,18 +135,18 @@
                         </td>
                     </tr>
                     <tr >
-                        <th class="coupon"><label for="coupon">Enter your coupon code if you have one</label></th>
+                        <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
                         <td class="coupon">
                             <div class="input-group">
                                 <input type="text" name="coupon" id="coupon" class="form-control">
 												<span class="input-group-btn">
-													<button type="button" class="btn btn-coupon">Ok</button>
+													<button type="button" class="btn btn-coupon">{intl l="Ok"}</button>
 												</span>
                             </div><!-- /input-group -->
                         </td>
                     </tr>
                     <tr >
-                        <th class="total">Total <abbr title="Tax Inclusive">TTC</abbr></th>
+                        <th class="total">{intl l="Total"} <abbr title="{intl l="Tax Inclusive"}">{intl l="TTC"}</abbr></th>
                         <td class="total">
                             <div class="total-price">
                                 <span class="price">{currency attr="symbol"} {{cart attr="total_taxed_price"} + {order attr="postage"}}</span>
@@ -158,8 +158,8 @@
 
                 <div id="cart-address">
                     <div class="panel">
-                        {loop type="address" name="delivery-address" id="{order attr="delivery_address"}"}
-                        <div class="panel-heading">Delivery address</div>
+                        {loop type="address" name="delivery-address" id={order attr="delivery_address"}}
+                        <div class="panel-heading">{intl l="Delivery address"}</div>
                         <div class="panel-body">
                             <span class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$LASTNAME|upper} {$FIRSTNAME|ucwords}</span>
                             <span class="org">{$COMPANY}</span>
@@ -181,7 +181,7 @@
                     {form_field form=$form field='invoice-address'}
 
                     <div class="panel">
-                        <div class="panel-heading">Billing address</div>
+                        <div class="panel-heading">{intl l="Billing addres"}s</div>
 
                         {if $error}
                             <span class="help-block"><span class="icon-remove"></span> {$message}</span>
@@ -191,7 +191,17 @@
 
                             <table class="col-md-12">
 
-                        {loop type="address" name="invoice-address" default="{if !$error && $value}*{else}true{/if}" id="{if !$error && $value}{$value}{else}*{/if}"}
+                        {if !$error && $value}
+                            {assign defaultParam '*'}
+                        {else}
+                            {assign defaultParam 'true'}
+                        {/if}
+                        {if !$error && $value}
+                            {assign idParam $value}
+                        {else}
+                            {assign idParam '*'}
+                        {/if}
+                        {loop type="address" name="invoice-address" default=$defaultParam id=$idParam}
 
                             <tr>
                                 <td>
@@ -217,14 +227,24 @@
                             {if !$error}
                             <tr class="js-change-invoice-address">
                                 <td colspan="2">
-                                    <a href="#" class="btn btn-change-address">Change address</a>
+                                    <a href="#" class="btn btn-change-address">{intl l="Change address"}</a>
                                 </td>
                             </tr>
                             {/if}
 
                         {/loop}
 
-                        {loop type="address" name="invoice-address" default="{if !$error && $value}*{else}false{/if}" exclude="{if !$error && $value}{$value}{else}none{/if}"}
+                        {if !$error && $value}
+                            {assign defaultParam '*'}
+                        {else}
+                            {assign defaultParam 'false'}
+                        {/if}
+                        {if !$error && $value}
+                            {assign excludeParam $value}
+                        {else}
+                            {assign excludeParam 'none'}
+                        {/if}
+                        {loop type="address" name="invoice-address" default=$defaultParam exclude=$excludeParam}
 
                             <tr class="js-other-invoice-address {if !$error}hidden{/if}">
                                 <td>
@@ -261,7 +281,7 @@
                 {form_field form=$form field='payment-module'}
 
                 <div id="payment-method" class="panel">
-                    <div class="panel-heading">Choose your payment method</div>
+                    <div class="panel-heading">{intl l="Choose your payment method"}</div>
 
                     {if $error}
                         <span class="help-block"><span class="icon-remove"></span> {$message}</span>
@@ -294,8 +314,8 @@
 
                 {/form_field}
 
-                <a href="{url path="/order/delivery"}" role="button" class="btn btn-back"><span>Back</span></a>
-                <button type="submit" class="btn btn-checkout-next"><span>Next Step</span></button>
+                <a href="{url path="/order/delivery"}" role="button" class="btn btn-back"><span>{intl l="Back"}</span></a>
+                <button type="submit" class="btn btn-checkout-next"><span>{intl l="Next Step"}</span></button>
             </form>
 
             {/form}

@@ -2,11 +2,11 @@
 
 {block name="breadcrumb"}
     <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">You are here: </strong>
+        <strong id="breadcrumb-label">{intl l="You are here"} : </strong>
         <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">Home</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/cart"}" itemprop="url"><span itemprop="title">Cart</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">Secure Payment</span></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/cart"}" itemprop="url"><span itemprop="title">{intl l="Cart"}</span></a></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{intl l="Secure Payment"}</span></li>
         </ul>
     </nav><!-- /.nav-breadcrumb -->
 {/block}
@@ -15,32 +15,32 @@
     <div class="main">
         <article class="col-main clearfix" role="main" aria-labelledby="main-label">
 
-            <h1 id="main-label" class="page-header">Your Cart</h1>
+            <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
 
             <div class="btn-group checkout-progress">
-                <a href="cart.php" role="button" class="btn btn-step disabled"><span class="step-nb">1</span> <span class="step-label">Your Cart</span></a>
-                <a href="cart-step2.php" role="button" class="btn btn-step disabled"><span class="step-nb">2</span> <span class="step-label">Billing and delivery</span></a>
-                <a href="cart-step3.php" role="button" class="btn btn-step disabled"><span class="step-nb">3</span> <span class="step-label">Check my order</span></a>
-                <a href="cart-step4.php" role="button" class="btn btn-step active"><span class="step-nb">4</span> <span class="step-label">Secure payment</span></a>
+                <a href="cart.php" role="button" class="btn btn-step disabled"><span class="step-nb">1</span> <span class="step-label">{intl l="Your Cart"}</span></a>
+                <a href="cart-step2.php" role="button" class="btn btn-step disabled"><span class="step-nb">2</span> <span class="step-label">{intl l="Billing and delivery"}</span></a>
+                <a href="cart-step3.php" role="button" class="btn btn-step disabled"><span class="step-nb">3</span> <span class="step-label">{intl l="Check my order"}</span></a>
+                <a href="cart-step4.php" role="button" class="btn btn-step active"><span class="step-nb">4</span> <span class="step-label">{intl l="Secure payment"}</span></a>
             </div>
 
             {loop type="order" name="placed-order" id=$placed_order_id}
 
             <div id="payment-success" class="panel">
                 <div class="panel-heading">
-                    <h3 class="panel-title">You chose to pay by : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                    <h3 class="panel-title">{intl l="You chose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
                 </div>
                 <div class="panel-body">
-                    <h3>Thank you for the trust you place in us.</h3>
-                    <p>A summary of your order email has been sent to the following address: {customer attr="email"}</p>
-                    <p>Your order will be confirmed by us upon receipt of your payment.</p>
+                    <h3>{intl l="Thank you for the trust you place in us."}</h3>
+                    <p>{intl l="A summary of your order email has been sent to the following address"} : {customer attr="email"}</p>
+                    <p>{intl l="Your order will be confirmed by us upon receipt of your payment."}</p>
 
                     <dl class="dl-horizontal">
-                        <dt>Order number : </dt>
+                        <dt>{intl l="Order number"} : </dt>
                         <dd>{$REF}</dd>
-                        <dt>Date : </dt>
+                        <dt>{intl l="Date"} : </dt>
                         <dd>{format_date date=$CREATE_DATE output="date"}</dd>
-                        <dt>Total : </dt>
+                        <dt>{intl l="Total"} : </dt>
                         <dd>{loop type="currency" name="order-currency" id=$CURRENCY}{$SYMBOL}{/loop} {$TOTAL_TAXED_AMOUNT}</dd>
                     </dl>
                 </div>
@@ -48,7 +48,7 @@
 
             {/loop}
 
-            <a href="{navigate to="index"}" role="button" class="btn btn-checkout-home"><span>Go home</span></a>
+            <a href="{navigate to="index"}" role="button" class="btn btn-checkout-home"><span>{intl l="Go home"}</span></a>
 
         </article>
 
