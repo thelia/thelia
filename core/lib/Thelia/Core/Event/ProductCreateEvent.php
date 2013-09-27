@@ -31,6 +31,11 @@ class ProductCreateEvent extends ProductEvent
     protected $default_category;
     protected $visible;
 
+    protected $basePrice;
+    protected $baseWeight;
+    protected $taxRuleId;
+    protected $currencyId;
+
     public function getRef()
     {
         return $this->ref;
@@ -83,6 +88,50 @@ class ProductCreateEvent extends ProductEvent
     public function setVisible($visible)
     {
         $this->visible = $visible;
+        return $this;
+    }
+
+    public function getBasePrice()
+    {
+        return $this->basePrice;
+    }
+
+    public function setBasePrice($basePrice)
+    {
+        $this->basePrice = $basePrice;
+        return $this;
+    }
+
+    public function getBaseWeight()
+    {
+        return $this->baseWeight;
+    }
+
+    public function setBaseWeight($baseWeight)
+    {
+        $this->baseWeight = $baseWeight;
+        return $this;
+    }
+
+    public function getTaxRuleId()
+    {
+        return $this->taxRuleId;
+    }
+
+    public function setTaxRuleId($taxRuleId)
+    {
+        $this->taxRuleId = $taxRuleId;
+        return $this;
+    }
+
+    public function getCurrencyId()
+    {
+        return $this->currencyId;
+    }
+
+    public function setCurrencyId($currencyId)
+    {
+        $this->currencyId = $currencyId;
         return $this;
     }
 }

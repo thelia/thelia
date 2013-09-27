@@ -25,6 +25,7 @@ use Thelia\Model\Map\AttributeTemplateTableMap;
  * @method     ChildAttributeTemplateQuery orderByAttributeId($order = Criteria::ASC) Order by the attribute_id column
  * @method     ChildAttributeTemplateQuery orderByTemplateId($order = Criteria::ASC) Order by the template_id column
  * @method     ChildAttributeTemplateQuery orderByPosition($order = Criteria::ASC) Order by the position column
+ * @method     ChildAttributeTemplateQuery orderByAttributeTemplatecol($order = Criteria::ASC) Order by the attribute_templatecol column
  * @method     ChildAttributeTemplateQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAttributeTemplateQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -32,6 +33,7 @@ use Thelia\Model\Map\AttributeTemplateTableMap;
  * @method     ChildAttributeTemplateQuery groupByAttributeId() Group by the attribute_id column
  * @method     ChildAttributeTemplateQuery groupByTemplateId() Group by the template_id column
  * @method     ChildAttributeTemplateQuery groupByPosition() Group by the position column
+ * @method     ChildAttributeTemplateQuery groupByAttributeTemplatecol() Group by the attribute_templatecol column
  * @method     ChildAttributeTemplateQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAttributeTemplateQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -54,6 +56,7 @@ use Thelia\Model\Map\AttributeTemplateTableMap;
  * @method     ChildAttributeTemplate findOneByAttributeId(int $attribute_id) Return the first ChildAttributeTemplate filtered by the attribute_id column
  * @method     ChildAttributeTemplate findOneByTemplateId(int $template_id) Return the first ChildAttributeTemplate filtered by the template_id column
  * @method     ChildAttributeTemplate findOneByPosition(int $position) Return the first ChildAttributeTemplate filtered by the position column
+ * @method     ChildAttributeTemplate findOneByAttributeTemplatecol(string $attribute_templatecol) Return the first ChildAttributeTemplate filtered by the attribute_templatecol column
  * @method     ChildAttributeTemplate findOneByCreatedAt(string $created_at) Return the first ChildAttributeTemplate filtered by the created_at column
  * @method     ChildAttributeTemplate findOneByUpdatedAt(string $updated_at) Return the first ChildAttributeTemplate filtered by the updated_at column
  *
@@ -61,6 +64,7 @@ use Thelia\Model\Map\AttributeTemplateTableMap;
  * @method     array findByAttributeId(int $attribute_id) Return ChildAttributeTemplate objects filtered by the attribute_id column
  * @method     array findByTemplateId(int $template_id) Return ChildAttributeTemplate objects filtered by the template_id column
  * @method     array findByPosition(int $position) Return ChildAttributeTemplate objects filtered by the position column
+ * @method     array findByAttributeTemplatecol(string $attribute_templatecol) Return ChildAttributeTemplate objects filtered by the attribute_templatecol column
  * @method     array findByCreatedAt(string $created_at) Return ChildAttributeTemplate objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildAttributeTemplate objects filtered by the updated_at column
  *
@@ -151,7 +155,7 @@ abstract class AttributeTemplateQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, ATTRIBUTE_ID, TEMPLATE_ID, POSITION, CREATED_AT, UPDATED_AT FROM attribute_template WHERE ID = :p0';
+        $sql = 'SELECT ID, ATTRIBUTE_ID, TEMPLATE_ID, POSITION, ATTRIBUTE_TEMPLATECOL, CREATED_AT, UPDATED_AT FROM attribute_template WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -406,6 +410,35 @@ abstract class AttributeTemplateQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AttributeTemplateTableMap::POSITION, $position, $comparison);
+    }
+
+    /**
+     * Filter the query on the attribute_templatecol column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByAttributeTemplatecol('fooValue');   // WHERE attribute_templatecol = 'fooValue'
+     * $query->filterByAttributeTemplatecol('%fooValue%'); // WHERE attribute_templatecol LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $attributeTemplatecol The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAttributeTemplateQuery The current query, for fluid interface
+     */
+    public function filterByAttributeTemplatecol($attributeTemplatecol = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($attributeTemplatecol)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $attributeTemplatecol)) {
+                $attributeTemplatecol = str_replace('*', '%', $attributeTemplatecol);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(AttributeTemplateTableMap::ATTRIBUTE_TEMPLATECOL, $attributeTemplatecol, $comparison);
     }
 
     /**

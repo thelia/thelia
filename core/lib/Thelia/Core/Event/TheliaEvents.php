@@ -210,8 +210,8 @@ final class TheliaEvents
     const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT   = "action.before_createCategoryAssociatedContent";
     const AFTER_CREATECATEGORY_ASSOCIATED_CONTENT 	= "action.after_createCategoryAssociatedContent";
 
-    const BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT   = "action.before_deleteCategoryAssociatedContenty";
-    const AFTER_DELETECATEGORY_ASSOCIATED_CONTENT 	= "action.after_deleteproduct_accessory";
+    const BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT   = "action.before_deleteCategoryAssociatedContent";
+    const AFTER_DELETECATEGORY_ASSOCIATED_CONTENT 	= "action.after_deleteCategoryAssociatedContent";
 
     const BEFORE_UPDATECATEGORY_ASSOCIATED_CONTENT   = "action.before_updateCategoryAssociatedContent";
     const AFTER_UPDATECATEGORY_ASSOCIATED_CONTENT 	= "action.after_updateCategoryAssociatedContent";
@@ -224,12 +224,24 @@ final class TheliaEvents
     const PRODUCT_TOGGLE_VISIBILITY = "action.toggleProductVisibility";
     const PRODUCT_UPDATE_POSITION   = "action.updateProductPosition";
 
-    const PRODUCT_ADD_CONTENT      = "action.productAddContent";
-    const PRODUCT_REMOVE_CONTENT   = "action.productRemoveContent";
+    const PRODUCT_ADD_CONTENT             = "action.productAddContent";
+    const PRODUCT_REMOVE_CONTENT          = "action.productRemoveContent";
+    const PRODUCT_UPDATE_CONTENT_POSITION = "action.updateProductContentPosition";
 
-    const PRODUCT_ADD_ACCESSORY             = "action.productAddAccessory";
-    const PRODUCT_REMOVE_ACCESSORY          = "action.productRemoveAccessory";
-    const PRODUCT_UPDATE_ACCESSORY_POSITION = "action.updateProductPosition";
+    const PRODUCT_ADD_COMBINATION    = "action.productAddCombination";
+    const PRODUCT_DELETE_COMBINATION = "action.productDeleteCombination";
+
+    const PRODUCT_SET_TEMPLATE = "action.productSetTemplate";
+
+    const PRODUCT_ADD_ACCESSORY             = "action.productAddProductAccessory";
+    const PRODUCT_REMOVE_ACCESSORY          = "action.productRemoveProductAccessory";
+    const PRODUCT_UPDATE_ACCESSORY_POSITION = "action.updateProductAccessoryPosition";
+
+    const PRODUCT_FEATURE_UPDATE_VALUE = "action.updateProductFeatureValue";
+    const PRODUCT_FEATURE_DELETE_VALUE = "action.deleteProductFeatureValue";
+
+    const PRODUCT_ADD_CATEGORY    = "action.addProductCategory";
+    const PRODUCT_REMOVE_CATEGORY = "action.deleteProductCategory";
 
     const BEFORE_CREATEPRODUCT = "action.before_createproduct";
     const AFTER_CREATEPRODUCT  = "action.after_createproduct";
@@ -251,16 +263,27 @@ final class TheliaEvents
     const BEFORE_UPDATEACCESSORY = "action.before_updateAccessory";
     const AFTER_UPDATEACCESSORY  = "action.after_updateAccessory";
 
-    // -- Product Associated Content --------------------------------------------------
+    // -- Product Associated Content -------------------------------------------
 
     const BEFORE_CREATEPRODUCT_ASSOCIATED_CONTENT   = "action.before_createProductAssociatedContent";
     const AFTER_CREATEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_createProductAssociatedContent";
 
-    const BEFORE_DELETEPRODUCT_ASSOCIATED_CONTENT   = "action.before_deleteProductAssociatedContenty";
-    const AFTER_DELETEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_deleteproduct_accessory";
+    const BEFORE_DELETEPRODUCT_ASSOCIATED_CONTENT   = "action.before_deleteProductAssociatedContent";
+    const AFTER_DELETEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_deleteProductAssociatedContent";
 
     const BEFORE_UPDATEPRODUCT_ASSOCIATED_CONTENT   = "action.before_updateProductAssociatedContent";
     const AFTER_UPDATEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_updateProductAssociatedContent";
+
+    // -- Feature product ------------------------------------------------------
+
+    const BEFORE_CREATEFEATURE_PRODUCT = "action.before_createFeatureProduct";
+    const AFTER_CREATEFEATURE_PRODUCT  = "action.after_createFeatureProduct";
+
+    const BEFORE_DELETEFEATURE_PRODUCT = "action.before_deleteFeatureProduct";
+    const AFTER_DELETEFEATURE_PRODUCT  = "action.after_deleteFeatureProduct";
+
+    const BEFORE_UPDATEFEATURE_PRODUCT = "action.before_updateFeatureProduct";
+    const AFTER_UPDATEFEATURE_PRODUCT  = "action.after_updateFeatureProduct";
 
     /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart
@@ -317,7 +340,42 @@ final class TheliaEvents
     /**
      * Sent on image cache clear request
      */
+    const DOCUMENT_CLEAR_CACHE = "action.clearDocumentCache";
+
+    /**
+     * Save given documents
+     */
+    const DOCUMENT_SAVE = "action.saveDocument";
+
+    /**
+     * Save given documents
+     */
+    const DOCUMENT_UPDATE = "action.updateDocument";
+
+    /**
+     * Delete given document
+     */
+    const DOCUMENT_DELETE = "action.deleteDocument";
+
+    /**
+     * Sent on image cache clear request
+     */
     const IMAGE_CLEAR_CACHE = "action.clearImageCache";
+
+    /**
+     * Save given images
+     */
+    const IMAGE_SAVE = "action.saveImages";
+
+    /**
+     * Save given images
+     */
+    const IMAGE_UPDATE = "action.updateImages";
+
+    /**
+     * Delete given image
+     */
+    const IMAGE_DELETE = "action.deleteImage";
 
     /**
      * Sent when creating a Coupon
@@ -429,6 +487,7 @@ final class TheliaEvents
     const AFTER_DELETECURRENCY  = "action.after_deleteCurrency";
 
     const CHANGE_DEFAULT_CURRENCY = 'action.changeDefaultCurrency';
+
     // -- Product templates management -----------------------------------------
 
     const TEMPLATE_CREATE          = "action.createTemplate";
@@ -440,6 +499,9 @@ final class TheliaEvents
 
     const TEMPLATE_ADD_FEATURE    = "action.templateAddFeature";
     const TEMPLATE_DELETE_FEATURE = "action.templateDeleteFeature";
+
+    const TEMPLATE_CHANGE_FEATURE_POSITION   = "action.templateChangeAttributePosition";
+    const TEMPLATE_CHANGE_ATTRIBUTE_POSITION = "action.templateChangeFeaturePosition";
 
     const BEFORE_CREATETEMPLATE = "action.before_createTemplate";
     const AFTER_CREATETEMPLATE  = "action.after_createTemplate";

@@ -166,20 +166,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if (null !== $currency = CurrencyQuery::create()->findPk($event->getObjectId())) {
-
-            $currency->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-            echo "loaded $mode !";
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $currency->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $currency->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $currency->movePositionDown();
-        }
+        return $this->genericUpdatePosition(CurrencyQuery::create(), $event);
     }
 
     /**
