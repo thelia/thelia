@@ -532,9 +532,9 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
             ->getMock();
 
         $fileManager = new FileManager($stubContainer);
-        $badFileName = 'azeéràçè§^"$*+-_°)(&é<>@#ty';
+        $badFileName = 'a/ze\érà~çè§^"$*+-_°)(&é<>@#ty2/[\/:*?"<>|]/fi?.fUPPERile.exel../e*';
 
-        $expected = 'azeyryZyy-_yty';
+        $expected = 'azer-_ty2fi.fupperile.exel..e';
         $actual = $fileManager->sanitizeFileName($badFileName);
 
         $this->assertEquals($expected, $actual);
@@ -802,7 +802,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
 
         $fileManager = new FileManager($stubContainer);
 
-        $expected = 'or1-g_nalyfilenme-1.yml';
+        $expected = 'or1-g_nalfilenme-1.yml';
         $actual = $fileManager->renameFile(1, $stubUploadedFile);
 
         $this->assertEquals($expected, $actual);
@@ -830,7 +830,7 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
 
         $fileManager = new FileManager($stubContainer);
 
-        $expected = 'or1-g_nalyfilenme-1';
+        $expected = 'or1-g_nalfilenme-1';
         $actual = $fileManager->renameFile(1, $stubUploadedFile);
 
         $this->assertEquals($expected, $actual);
