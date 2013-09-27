@@ -89,7 +89,7 @@ class Delivery extends BaseSpecificModule
                 ->set('CHAPO', $deliveryModule->getVirtualColumn('i18n_CHAPO'))
                 ->set('DESCRIPTION', $deliveryModule->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set('POSTSCRIPTUM', $deliveryModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set('PRICE', $moduleInstance->calculate($country))
+                ->set('POSTAGE', $moduleInstance->getPostage($country))
             ;
 
             $loopResult->addRow($loopResultRow);

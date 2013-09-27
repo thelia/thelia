@@ -9,7 +9,7 @@
 ////    verbose:true
 ////});
 //
-//casper.test.comment('Testing coupons rules');
+casper.test.comment('Testing coupons rules');
 //
 ////UPDATE COUPON RULE
 //casper.start(thelia2_login_coupon_update_url, function() {
@@ -306,7 +306,7 @@
 //    test.assertDoesntExist('tbody#constraint-list tr:nth-child(2)');
 //});
 //
-////RUN
-//casper.run(function() {
-//    this.test.done();
-//});
+//RUN
+casper.run(function() {
+    this.test.done();
+});

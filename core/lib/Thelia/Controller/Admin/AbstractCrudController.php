@@ -58,6 +58,7 @@ abstract class AbstractCrudController extends BaseAdminController
      * @param string $objectName the lower case object name. Example. "message"
      *
      * @param string $defaultListOrder the default object list order, or null if list is not sortable. Example: manual
+     * @param string $orderRequestParameterName Name of the request parameter that set the list order (null if list is not sortable)
      *
      * @param string $viewPermissionIdentifier the 'view' permission identifier. Example: "admin.configuration.message.view"
      * @param string $createPermissionIdentifier the 'create' permission identifier. Example: "admin.configuration.message.create"
@@ -445,6 +446,8 @@ abstract class AbstractCrudController extends BaseAdminController
 
     /**
      * Update object position (only for objects whichsupport that)
+     *
+     * FIXME: integrate with genericUpdatePositionAction
      */
     public function updatePositionAction()
     {
@@ -482,6 +485,38 @@ abstract class AbstractCrudController extends BaseAdminController
         }
     }
 
+    protected function genericUpdatePositionAction($object, $eventName, $doFinalRedirect = true) {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+
+        if ($object != null) {
+
+            try {
+                $mode = $this->getRequest()->get('mode', null);
+
+                if ($mode == 'up')
+                    $mode = UpdatePositionEvent::POSITION_UP;
+                else if ($mode == 'down')
+                    $mode = UpdatePositionEvent::POSITION_DOWN;
+                else
+                    $mode = UpdatePositionEvent::POSITION_ABSOLUTE;
+
+                $position = $this->getRequest()->get('position', null);
+
+                $event = new UpdatePositionEvent($object->getId(), $mode, $position);
+
+                $this->dispatch($eventName, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        if ($doFinalRedirect) $this->redirectToEditionTemplate();
+    }
+
     /**
      * Online status toggle (only for object which support it)
      */
@@ -492,9 +527,6 @@ abstract class AbstractCrudController extends BaseAdminController
 
         $changeEvent = $this->createToggleVisibilityEvent($this->getRequest());
 
-        // Create and dispatch the change event
-        $changeEvent->setIsDefault(true);
-
         try {
             $this->dispatch($this->visibilityToggleEventIdentifier, $changeEvent);
         } catch (\Exception $ex) {
@@ -502,7 +534,7 @@ abstract class AbstractCrudController extends BaseAdminController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->nullResponse();
     }
 
     /**

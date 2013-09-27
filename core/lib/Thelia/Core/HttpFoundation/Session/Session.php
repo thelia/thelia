@@ -65,23 +65,6 @@ class Session extends BaseSession
         return $this;
     }
 
-    public function getAdminEditionLang()
-    {
-        $lang = $this->get('thelia.admin.edition.lang');
-
-        if (null === $lang) {
-            $lang =  Lang::getDefaultLanguage();
-        }
-        return $lang;
-    }
-
-    public function setAdminEditionLang($langId)
-    {
-        $this->set('thelia.admin.edition.lang', $langId);
-
-        return $this;
-    }
-
     public function setCurrency(Currency $currency)
     {
         $this->set("thelia.current.currency", $currency);
@@ -96,6 +79,43 @@ class Session extends BaseSession
             $currency = Currency::getDefaultCurrency();
         }
         return $currency;
+    }
+
+    // -- Admin lang and currency ----------------------------------------------
+
+    public function getAdminEditionCurrency()
+    {
+        $currency = $this->get('thelia.admin.edition.currency', null);
+
+        if (null === $currency) {
+            $currency =  Currency::getDefaultCurrency();
+        }
+
+        return $currency;
+    }
+
+    public function setAdminEditionCurrency($currencyId)
+    {
+        $this->set('thelia.admin.edition.currency', $currencyId);
+
+        return $this;
+    }
+
+    public function getAdminEditionLang()
+    {
+        $lang = $this->get('thelia.admin.edition.lang');
+
+        if (null === $lang) {
+            $lang =  Lang::getDefaultLanguage();
+        }
+        return $lang;
+    }
+
+    public function setAdminEditionLang($lang)
+    {
+        $this->set('thelia.admin.edition.lang', $lang);
+
+        return $this;
     }
 
     // -- Customer user --------------------------------------------------------
@@ -218,6 +238,9 @@ class Session extends BaseSession
         return $this;
     }
 
+    /**
+     * @return Order
+     */
     public function getOrder()
     {
         return $this->get("thelia.order");

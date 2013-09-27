@@ -1,0 +1,51 @@
+{extends file='layout.tpl'}
+
+{block name="breadcrumb"}
+    <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
+        <strong id="breadcrumb-label">You are here: </strong>
+        <ul class="breadcrumb" itemprop="breadcrumb">
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
+            {loop name="category_path" type="category-path" category="{category attr="id"}"}
+            {if $ID == {category attr="id"}}
+                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active">
+                    <span itemprop="title">{$TITLE}</span>
+                </li>
+            {else}
+                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{$URL}"  itemprop="url"><span itemprop="title">{$TITLE}</span></a></li>
+            {/if}
+            {/loop}
+        </ul>
+    </nav><!-- /.nav-breadcrumb -->
+{/block}
+
+{block name="main-content"}
+    <div class="main layout-col-2-left">
+        {$limit={$smarty.get.limit|default:8}}
+        {$product_page={$smarty.get.page|default:1}}
+        {$product_order={$smarty.get.order|default:'alpha'}}
+        <article class="col-main {$smarty.get.mode|default:"grid"}" role="main">
+            {include file="includes/category-toolbar.html" toolbar="top" limit=$limit order=$product_order}
+            <div id="category-products">
+                <div class="products-content">
+                    <ul class="product-col-4">
+                        {loop type="product" name="product_list" category={category attr="id"} limit=$limit page=$product_page order=$product_order}
+                            {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="218" height="146"}
+                        {/loop}
+                    </ul>
+                </div>
+            </div><!-- /#category-products -->
+            {include file="includes/category-toolbar.html" toolbar="bottom"}
+        </article>
+
+        <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
+
+            {include file="includes/menu.html"}
+
+            {include file="includes/categories-filters.html"}
+
+        </aside>
+
+    </div>
+
+    </div><!-- /.container -->
+{/block}

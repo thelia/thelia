@@ -160,6 +160,24 @@ try {
         "test@thelia.net",
         "azerty"
     );
+    for ($j = 0; $j <= 3; $j++) {
+        $address = new Thelia\Model\Address();
+        $address->setLabel($faker->text(20))
+            ->setTitleId(rand(1,3))
+            ->setFirstname($faker->firstname)
+            ->setLastname($faker->lastname)
+            ->setAddress1($faker->streetAddress)
+            ->setAddress2($faker->streetAddress)
+            ->setAddress3($faker->streetAddress)
+            ->setCellphone($faker->phoneNumber)
+            ->setPhone($faker->phoneNumber)
+            ->setZipcode($faker->postcode)
+            ->setCity($faker->city)
+            ->setCountryId(64)
+            ->setCustomer($customer)
+            ->save()
+        ;
+    }
 
     for($i = 0; $i < 50; $i++) {
         $customer = new Thelia\Model\Customer();
@@ -281,7 +299,7 @@ try {
         $folder = new Thelia\Model\Folder();
         $folder->setParent(0);
         $folder->setVisible(1);
-        $folder->setPosition($i);
+        $folder->setPosition($i+1);
         setI18n($faker, $folder);
 
         $folder->save();
@@ -294,11 +312,11 @@ try {
         $document->setFolderId($folder->getId());
         generate_document($document, 1, 'folder', $folder->getId());
 
-        for($j=1; $j<rand(0, 5); $j++) {
+        for($j=0; $j<3; $j++) {
             $subfolder = new Thelia\Model\Folder();
             $subfolder->setParent($folder->getId());
             $subfolder->setVisible(1);
-            $subfolder->setPosition($j);
+            $subfolder->setPosition($j+1);
             setI18n($faker, $subfolder);
 
             $subfolder->save();
@@ -311,7 +329,7 @@ try {
             $document->setFolderId($folder->getId());
             generate_document($document, 1, 'folder', $subfolder->getId());
 
-            for($k=0; $k<rand(0, 5); $k++) {
+            for($k=0; $k<4; $k++) {
                 $content = new Thelia\Model\Content();
                 $content->addFolder($subfolder);
 
@@ -320,8 +338,8 @@ try {
                 $collection->prepend($contentFolders[0]->setDefaultFolder(1));
                 $content->setContentFolders($collection);
 
-                $content->setVisible(rand(1, 10)>7 ? 0 : 1);
-                $content->setPosition($k);
+                $content->setVisible(1);
+                $content->setPosition($k+1);
                 setI18n($faker, $content);
 
                 $content->save();
@@ -404,6 +422,7 @@ try {
             $stock->setPromo($faker->randomNumber(0,1));
             $stock->setNewness($faker->randomNumber(0,1));
             $stock->setWeight($faker->randomFloat(2, 100,10000));
+            $stock->setIsDefault($i == 0);
             $stock->save();
 
             $productPrice = new \Thelia\Model\ProductPrice();
@@ -442,7 +461,7 @@ try {
                     $featureAvId[array_rand($featureAvId, 1)]
                 );
             } else { //no av
-                $featureProduct->setByDefault($faker->text(10));
+                $featureProduct->setFreeTextValue($faker->text(10));
             }
 
             $featureProduct->save();

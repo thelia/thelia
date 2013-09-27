@@ -31,6 +31,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
@@ -147,29 +148,41 @@ class ProductSaleElements extends BaseLoop
 
         $loopResult = new LoopResult($PSEValues);
 
+        $taxCountry = CountryQuery::create()->findPk(64);  // @TODO : make it magic
+
         foreach ($PSEValues as $PSEValue) {
             $loopResultRow = new LoopResultRow($loopResult, $PSEValue, $this->versionable, $this->timestampable, $this->countable);
 
             $price = $PSEValue->getPrice();
-            $taxedPrice = $PSEValue->getTaxedPrice(
-                CountryQuery::create()->findOneById(64) // @TODO : make it magic
-            );
+            try {
+                $taxedPrice = $PSEValue->getTaxedPrice(
+                    $taxCountry
+                );
+            } catch(TaxEngineException $e) {
+                $taxedPrice = null;
+            }
             $promoPrice = $PSEValue->getPromoPrice();
-            $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
-                CountryQuery::create()->findOneById(64) // @TODO : make it magic
-            );
+            try {
+                $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
+                    $taxCountry
+                );
+            } catch(TaxEngineException $e) {
+                $taxedPromoPrice = null;
+            }
 
-            $loopResultRow->set("ID", $PSEValue->getId())
-                ->set("QUANTITY", $PSEValue->getQuantity())
-                ->set("IS_PROMO", $PSEValue->getPromo() === 1 ? 1 : 0)
-                ->set("IS_NEW", $PSEValue->getNewness() === 1 ? 1 : 0)
-                ->set("WEIGHT", $PSEValue->getWeight())
-                ->set("PRICE", $price)
-                ->set("PRICE_TAX", $taxedPrice - $price)
-                ->set("TAXED_PRICE", $taxedPrice)
-                ->set("PROMO_PRICE", $promoPrice)
-                ->set("PROMO_PRICE_TAX", $taxedPromoPrice - $promoPrice)
-                ->set("TAXED_PROMO_PRICE", $taxedPromoPrice);
+            $loopResultRow
+                ->set("ID"                , $PSEValue->getId())
+                ->set("QUANTITY"          , $PSEValue->getQuantity())
+                ->set("IS_PROMO"          , $PSEValue->getPromo() === 1 ? 1 : 0)
+                ->set("IS_NEW"            , $PSEValue->getNewness() === 1 ? 1 : 0)
+                ->set("IS_DEFAULT"        , $PSEValue->getIsDefault() === 1 ? 1 : 0)
+                ->set("WEIGHT"            , $PSEValue->getWeight())
+                ->set("PRICE"             , $price)
+                ->set("PRICE_TAX"         , $taxedPrice - $price)
+                ->set("TAXED_PRICE"       , $taxedPrice)
+                ->set("PROMO_PRICE"       , $promoPrice)
+                ->set("PROMO_PRICE_TAX"   , $taxedPromoPrice - $promoPrice)
+                ->set("TAXED_PROMO_PRICE" , $taxedPromoPrice);
 
             $loopResult->addRow($loopResultRow);
         }

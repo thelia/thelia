@@ -24,6 +24,8 @@ use Thelia\Model\GroupModuleQuery as ChildGroupModuleQuery;
 use Thelia\Model\Module as ChildModule;
 use Thelia\Model\ModuleI18n as ChildModuleI18n;
 use Thelia\Model\ModuleI18nQuery as ChildModuleI18nQuery;
+use Thelia\Model\ModuleImage as ChildModuleImage;
+use Thelia\Model\ModuleImageQuery as ChildModuleImageQuery;
 use Thelia\Model\ModuleQuery as ChildModuleQuery;
 use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
@@ -136,6 +138,12 @@ abstract class Module implements ActiveRecordInterface
     protected $collGroupModulesPartial;
 
     /**
+     * @var        ObjectCollection|ChildModuleImage[] Collection to store aggregation of ChildModuleImage objects.
+     */
+    protected $collModuleImages;
+    protected $collModuleImagesPartial;
+
+    /**
      * @var        ObjectCollection|ChildModuleI18n[] Collection to store aggregation of ChildModuleI18n objects.
      */
     protected $collModuleI18ns;
@@ -186,6 +194,12 @@ abstract class Module implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $groupModulesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $moduleImagesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -864,6 +878,8 @@ abstract class Module implements ActiveRecordInterface
 
             $this->collGroupModules = null;
 
+            $this->collModuleImages = null;
+
             $this->collModuleI18ns = null;
 
         } // if (deep)
@@ -1061,6 +1077,23 @@ abstract class Module implements ActiveRecordInterface
 
                 if ($this->collGroupModules !== null) {
             foreach ($this->collGroupModules as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->moduleImagesScheduledForDeletion !== null) {
+                if (!$this->moduleImagesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ModuleImageQuery::create()
+                        ->filterByPrimaryKeys($this->moduleImagesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->moduleImagesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collModuleImages !== null) {
+            foreach ($this->collModuleImages as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1312,6 +1345,9 @@ abstract class Module implements ActiveRecordInterface
             if (null !== $this->collGroupModules) {
                 $result['GroupModules'] = $this->collGroupModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collModuleImages) {
+                $result['ModuleImages'] = $this->collModuleImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collModuleI18ns) {
                 $result['ModuleI18ns'] = $this->collModuleI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1524,6 +1560,12 @@ abstract class Module implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getModuleImages() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addModuleImage($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getModuleI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addModuleI18n($relObj->copy($deepCopy));
@@ -1582,6 +1624,9 @@ abstract class Module implements ActiveRecordInterface
         }
         if ('GroupModule' == $relationName) {
             return $this->initGroupModules();
+        }
+        if ('ModuleImage' == $relationName) {
+            return $this->initModuleImages();
         }
         if ('ModuleI18n' == $relationName) {
             return $this->initModuleI18ns();
@@ -2811,6 +2856,224 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collModuleImages collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addModuleImages()
+     */
+    public function clearModuleImages()
+    {
+        $this->collModuleImages = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collModuleImages collection loaded partially.
+     */
+    public function resetPartialModuleImages($v = true)
+    {
+        $this->collModuleImagesPartial = $v;
+    }
+
+    /**
+     * Initializes the collModuleImages collection.
+     *
+     * By default this just sets the collModuleImages collection to an empty array (like clearcollModuleImages());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initModuleImages($overrideExisting = true)
+    {
+        if (null !== $this->collModuleImages && !$overrideExisting) {
+            return;
+        }
+        $this->collModuleImages = new ObjectCollection();
+        $this->collModuleImages->setModel('\Thelia\Model\ModuleImage');
+    }
+
+    /**
+     * Gets an array of ChildModuleImage objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildModuleImage[] List of ChildModuleImage objects
+     * @throws PropelException
+     */
+    public function getModuleImages($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collModuleImagesPartial && !$this->isNew();
+        if (null === $this->collModuleImages || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collModuleImages) {
+                // return empty collection
+                $this->initModuleImages();
+            } else {
+                $collModuleImages = ChildModuleImageQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collModuleImagesPartial && count($collModuleImages)) {
+                        $this->initModuleImages(false);
+
+                        foreach ($collModuleImages as $obj) {
+                            if (false == $this->collModuleImages->contains($obj)) {
+                                $this->collModuleImages->append($obj);
+                            }
+                        }
+
+                        $this->collModuleImagesPartial = true;
+                    }
+
+                    $collModuleImages->getInternalIterator()->rewind();
+
+                    return $collModuleImages;
+                }
+
+                if ($partial && $this->collModuleImages) {
+                    foreach ($this->collModuleImages as $obj) {
+                        if ($obj->isNew()) {
+                            $collModuleImages[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collModuleImages = $collModuleImages;
+                $this->collModuleImagesPartial = false;
+            }
+        }
+
+        return $this->collModuleImages;
+    }
+
+    /**
+     * Sets a collection of ModuleImage objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $moduleImages A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildModule The current object (for fluent API support)
+     */
+    public function setModuleImages(Collection $moduleImages, ConnectionInterface $con = null)
+    {
+        $moduleImagesToDelete = $this->getModuleImages(new Criteria(), $con)->diff($moduleImages);
+
+
+        $this->moduleImagesScheduledForDeletion = $moduleImagesToDelete;
+
+        foreach ($moduleImagesToDelete as $moduleImageRemoved) {
+            $moduleImageRemoved->setModule(null);
+        }
+
+        $this->collModuleImages = null;
+        foreach ($moduleImages as $moduleImage) {
+            $this->addModuleImage($moduleImage);
+        }
+
+        $this->collModuleImages = $moduleImages;
+        $this->collModuleImagesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ModuleImage objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ModuleImage objects.
+     * @throws PropelException
+     */
+    public function countModuleImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collModuleImagesPartial && !$this->isNew();
+        if (null === $this->collModuleImages || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collModuleImages) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getModuleImages());
+            }
+
+            $query = ChildModuleImageQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModule($this)
+                ->count($con);
+        }
+
+        return count($this->collModuleImages);
+    }
+
+    /**
+     * Method called to associate a ChildModuleImage object to this object
+     * through the ChildModuleImage foreign key attribute.
+     *
+     * @param    ChildModuleImage $l ChildModuleImage
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function addModuleImage(ChildModuleImage $l)
+    {
+        if ($this->collModuleImages === null) {
+            $this->initModuleImages();
+            $this->collModuleImagesPartial = true;
+        }
+
+        if (!in_array($l, $this->collModuleImages->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddModuleImage($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ModuleImage $moduleImage The moduleImage object to add.
+     */
+    protected function doAddModuleImage($moduleImage)
+    {
+        $this->collModuleImages[]= $moduleImage;
+        $moduleImage->setModule($this);
+    }
+
+    /**
+     * @param  ModuleImage $moduleImage The moduleImage object to remove.
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeModuleImage($moduleImage)
+    {
+        if ($this->getModuleImages()->contains($moduleImage)) {
+            $this->collModuleImages->remove($this->collModuleImages->search($moduleImage));
+            if (null === $this->moduleImagesScheduledForDeletion) {
+                $this->moduleImagesScheduledForDeletion = clone $this->collModuleImages;
+                $this->moduleImagesScheduledForDeletion->clear();
+            }
+            $this->moduleImagesScheduledForDeletion[]= clone $moduleImage;
+            $moduleImage->setModule(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears out the collModuleI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -3087,6 +3350,11 @@ abstract class Module implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collModuleImages) {
+                foreach ($this->collModuleImages as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collModuleI18ns) {
                 foreach ($this->collModuleI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -3114,6 +3382,10 @@ abstract class Module implements ActiveRecordInterface
             $this->collGroupModules->clearIterator();
         }
         $this->collGroupModules = null;
+        if ($this->collModuleImages instanceof Collection) {
+            $this->collModuleImages->clearIterator();
+        }
+        $this->collModuleImages = null;
         if ($this->collModuleI18ns instanceof Collection) {
             $this->collModuleI18ns->clearIterator();
         }

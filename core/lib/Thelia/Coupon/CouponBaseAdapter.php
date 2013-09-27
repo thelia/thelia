@@ -266,4 +266,14 @@ class CouponBaseAdapter implements CouponAdapterInterface
     {
         return $this->container->get('thelia.constraint.validator');
     }
+
+    /**
+     * Return the event dispatcher,
+     *
+     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    public function getDispatcher()
+    {
+        return $this->container->get('event_dispatcher');
+    }
 }

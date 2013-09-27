@@ -27,6 +27,7 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Tools\URL;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Translation\Translator;
 
 class UrlGenerator extends AbstractSmartyPlugin
 {
@@ -47,11 +48,30 @@ class UrlGenerator extends AbstractSmartyPlugin
     public function generateUrlFunction($params, &$smarty)
     {
         // the path to process
-        $path = $this->getParam($params, 'path');
+        $path  = $this->getParam($params, 'path', null);
+        $file  = $this->getParam($params, 'file', null); // Do not invoke index.php in URL (get a static file in web space
+        $noamp = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
+
+        if ($file !== null) {
+            $path = $file;
+            $mode = URL::PATH_TO_FILE;
+        }
+        else if ($path !== null) {
+            $mode = URL::WITH_INDEX_PAGE;
+        }
+        else {
+            throw \InvalidArgumentException(Translator::getInstance()->trans("Please specify either 'path' or 'file' parameter in {url} function."));
+        }
 
         $target = $this->getParam($params, 'target', null);
 
-        $url = URL::getInstance()->absoluteUrl($path, $this->getArgsFromParam($params, array('path', 'target')));
+        $url = URL::getInstance()->absoluteUrl(
+                $path,
+                $this->getArgsFromParam($params, array('noamp', 'path', 'file', 'target')),
+                $mode
+        );
+
+        if ($noamp == null) $url = str_replace('&', '&amp;', $url);
 
         if ($target != null) $url .= '#'.$target;
 
@@ -169,7 +189,8 @@ class UrlGenerator extends AbstractSmartyPlugin
 
     protected function getCurrentUrl()
     {
-        return URL::getInstance()->retrieveCurrent($this->request)->toString();
+        //return URL::getInstance()->retrieveCurrent($this->request)->toString();
+        return $this->request->getUri();
     }
 
     protected function getReturnToUrl()

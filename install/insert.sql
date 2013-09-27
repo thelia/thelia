@@ -19,20 +19,23 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('image_cache_dir_from_web_root', 'cache/images', 0, 0, NOW(), NOW()),
 ('document_cache_dir_from_web_root', 'cache/documents', 0, 0, NOW(), NOW()),
 ('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', 0, 0, NOW(), NOW()),
-('page_not_found_view', '404.html', 0, 0, NOW(), NOW()),
+('page_not_found_view', '404', 0, 0, NOW(), NOW()),
+('passed_url_view', 'passed-url', 0, 0, NOW(), NOW()),
 ('use_tax_free_amounts', 0, 0, 0, NOW(), NOW()),
 ('process_assets', '1', 0, 0, NOW(), NOW()),
 ('thelia_admin_remember_me_cookie_name', 'tarmcn', 0, 0, NOW(), NOW()),
 ('thelia_admin_remember_me_cookie_expiration', 2592000, 0, 0, NOW(), NOW()),
 ('thelia_customer_remember_me_cookie_name', 'tcrmcn', 0, 0, NOW(), NOW()),
 ('thelia_customer_remember_me_cookie_expiration', 31536000, 0, 0, NOW(), NOW()),
-('session_config.handlers', 'Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler', 0, 0, NOW(), NOW())
+('session_config.handlers', 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\NativeFileSessionHandler', 0, 0, NOW(), NOW())
 ;
 
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
-(1, 'DebugBar', 1, 1, 1, 'DebugBar\\DebugBar', NOW(), NOW()),
-(2, 'Colissimo', 2, 1, 1, 'Colissimo\\Colissimo', NOW(), NOW());
+(1, 'TheliaDebugBar', 1, 1, 1, 'TheliaDebugBar\\TheliaDebugBar', NOW(), NOW()),
+(2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', NOW(), NOW()),
+(3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', NOW(), NOW()),
+(4, 'FakeCB', 3, 0, 2, 'FakeCB\\FakeCB', NOW(), NOW());
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 ('2',  'en_US',  '72h delivery', NULL,  NULL,  NULL),
@@ -67,6 +70,21 @@ VALUES
 (3, 'fr_FR', 'Livre anglaise'),
 (3, 'en_US', 'UK Pound');
 
+INSERT INTO `area` (`id`, `name`, `postage`, `created_at`, `updated_at`) VALUES
+(1, 'France', NULL, NOW(), NOW()),
+(2, 'Area 1', NULL, NOW(), NOW()),
+(3, 'Area 2', NULL, NOW(), NOW()),
+(4, 'Area 3', NULL, NOW(), NOW()),
+(5, 'Area 4', NULL, NOW(), NOW()),
+(6, 'Area 5', NULL, NOW(), NOW()),
+(7, 'Area 6', NULL, NOW(), NOW()),
+(8, 'Area 7', NULL, NOW(), NOW()),
+(9, 'Area 8', NULL, NOW(), NOW()),
+(10, 'DOM', NULL, NOW(), NOW()),
+(11, 'TOM', NULL, NOW(), NOW());
+
+INSERT INTO `area_delivery_module` (`id`, `area_id`, `delivery_module_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, NOW(), NOW());
 
 INSERT INTO `country` (`id`, `area_id`, `isocode`, `isoalpha2`, `isoalpha3`, `by_default`, `created_at`, `updated_at`) VALUES
 (1, NULL, '4', 'AF', 'AFG', 0, NOW(), NOW()),
@@ -130,7 +148,7 @@ INSERT INTO `country` (`id`, `area_id`, `isocode`, `isoalpha2`, `isoalpha3`, `by
 (61, NULL, '231', 'ET', 'ETH', 0, NOW(), NOW()),
 (62, NULL, '242', 'FJ', 'FJI', 0, NOW(), NOW()),
 (63, NULL, '246', 'FI', 'FIN', 0, NOW(), NOW()),
-(64, NULL, '250', 'FR', 'FRA', 1, NOW(), NOW()),
+(64, 1, '250', 'FR', 'FRA', 1, NOW(), NOW()),
 (65, NULL, '266', 'GA', 'GAB', 0, NOW(), NOW()),
 (66, NULL, '270', 'GM', 'GMB', 0, NOW(), NOW()),
 (67, NULL, '268', 'GE', 'GEO', 0, NOW(), NOW()),
@@ -1135,17 +1153,36 @@ INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `upda
 INSERT INTO `tax_i18n` (`id`, `locale`, `title`)
   VALUES
   (1, 'fr_FR', 'TVA française à 19.6%'),
-  (1, 'en_UK', 'french 19.6% tax');
+  (1, 'en_US', 'French 19.6% VAT');
 
-INSERT INTO  `tax_rule` (`id`, `created_at`, `updated_at`)
+INSERT INTO  `tax_rule` (`id`, `is_default`, `created_at`, `updated_at`)
   VALUES
-  (1, NOW(), NOW());
+  (1, 1, NOW(), NOW());
 
 INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`)
   VALUES
   (1, 'fr_FR', 'TVA française à 19.6%'),
-  (1, 'en_UK', 'french 19.6% tax');
+  (1, 'en_US', 'French 19.6% VAT');
 
 INSERT INTO  `tax_rule_country` (`tax_rule_id`, `country_id`, `tax_id`, `position`, `created_at`, `updated_at`)
   VALUES
   (1, 64, 1, 1, NOW(), NOW());
+
+INSERT INTO `order_status`(`id`, `code`, `created_at`, `updated_at`) VALUES
+(1, 'not_paid', NOW(), NOW()),
+(2, 'paid', NOW(), NOW()),
+(3, 'processing', NOW(), NOW()),
+(4, 'sent', NOW(), NOW()),
+(5, 'canceled', NOW(), NOW());
+
+INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(1, 'en_US', 'Not paid', '', '', ''),
+(1, 'fr_FR', 'Non payée', '', '', ''),
+(2, 'en_US', 'Paid', '', '', ''),
+(2, 'fr_FR', 'Payée', '', '', ''),
+(3, 'en_US', 'Processing', '', '', ''),
+(3, 'fr_FR', 'Traitement', '', '', ''),
+(4, 'en_US', 'Sent', '', '', ''),
+(4, 'fr_FR', 'Envoyée', '', '', ''),
+(5, 'en_US', 'Canceled', '', '', ''),
+(5, 'fr_FR', 'Annulée', '', '', '');

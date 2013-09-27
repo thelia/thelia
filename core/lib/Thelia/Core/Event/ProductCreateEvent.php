@@ -25,10 +25,27 @@ namespace Thelia\Core\Event;
 
 class ProductCreateEvent extends ProductEvent
 {
+    protected $ref;
     protected $title;
-    protected $parent;
     protected $locale;
+    protected $default_category;
     protected $visible;
+
+    protected $basePrice;
+    protected $baseWeight;
+    protected $taxRuleId;
+    protected $currencyId;
+
+    public function getRef()
+    {
+        return $this->ref;
+    }
+
+    public function setRef($ref)
+    {
+        $this->ref = $ref;
+        return $this;
+    }
 
     public function getTitle()
     {
@@ -38,19 +55,6 @@ class ProductCreateEvent extends ProductEvent
     public function setTitle($title)
     {
         $this->title = $title;
-
-        return $this;
-    }
-
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    public function setParent($parent)
-    {
-        $this->parent = $parent;
-
         return $this;
     }
 
@@ -62,7 +66,17 @@ class ProductCreateEvent extends ProductEvent
     public function setLocale($locale)
     {
         $this->locale = $locale;
+        return $this;
+    }
 
+    public function getDefaultCategory()
+    {
+        return $this->default_category;
+    }
+
+    public function setDefaultCategory($default_category)
+    {
+        $this->default_category = $default_category;
         return $this;
     }
 
@@ -74,7 +88,50 @@ class ProductCreateEvent extends ProductEvent
     public function setVisible($visible)
     {
         $this->visible = $visible;
+        return $this;
+    }
 
+    public function getBasePrice()
+    {
+        return $this->basePrice;
+    }
+
+    public function setBasePrice($basePrice)
+    {
+        $this->basePrice = $basePrice;
+        return $this;
+    }
+
+    public function getBaseWeight()
+    {
+        return $this->baseWeight;
+    }
+
+    public function setBaseWeight($baseWeight)
+    {
+        $this->baseWeight = $baseWeight;
+        return $this;
+    }
+
+    public function getTaxRuleId()
+    {
+        return $this->taxRuleId;
+    }
+
+    public function setTaxRuleId($taxRuleId)
+    {
+        $this->taxRuleId = $taxRuleId;
+        return $this;
+    }
+
+    public function getCurrencyId()
+    {
+        return $this->currencyId;
+    }
+
+    public function setCurrencyId($currencyId)
+    {
+        $this->currencyId = $currencyId;
         return $this;
     }
 }

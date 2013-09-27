@@ -132,7 +132,7 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Thelia\Core\Template\Element\LoopResult', $methodReturn);
     }
 
-    public function baseTestSearchById($id)
+    public function baseTestSearchById($id, $other_args = array())
     {
         $this->instance->initializeArgs(array_merge(
             $this->getMandatoryArguments(),
@@ -140,7 +140,8 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
                 "type" => "foo",
                 "name" => "foo",
                 "id" => $id,
-            )
+            ),
+            $other_args
         ));
 
         $dummy = null;

@@ -8,11 +8,391 @@
 
 		    {module_include location='home_top'}
 
-			<div class="col-md-12">
-			This is the administration home page. Put some interesting statistics here, and display useful information :)
+			<div class="col-md-12 general-block-decorator dashboard">
+
+				<div class="title title-without-tabs clearfix">
+					{intl l='Dashboard'}
+					<div class="btn-group pull-right">
+						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+						<button type="button" class="btn btn-default disabled"><span class="glyphicon glyphicon-calendar"></span></button>
+						<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
+					</div>
+				</div>
+
+				<div class="text-center clearfix">
+					<div class="btn-group">
+						<button type="button" class="btn btn-default active" data-toggle="jqplot" data-target="sales"><span class="glyphicon glyphicon-euro"></span> {intl l="Sales"}</button>
+						<button type="button" class="btn btn-primary" data-toggle="jqplot" data-target="registration"><span class="glyphicon glyphicon-user"></span> {intl l="New customers"}</button>
+						<button type="button" class="btn btn-success" data-toggle="jqplot" data-target="orders"><span class="glyphicon glyphicon-shopping-cart"></span> {intl l="Orders"}</button>
+						<button type="button" class="btn btn-info" data-toggle="jqplot" data-target="first-orders"><span class="glyphicon glyphicon-thumbs-up"></span> {intl l="First orders"}</button>
+						<button type="button" class="btn btn-danger" data-toggle="jqplot" data-target="aborted-orders"><span class="glyphicon glyphicon-thumbs-down"></span> {intl l="Aborted orders"}</button>
+					</div>
+				</div>
+
+				<hr/>
+
+				<div class="jqplot-content">
+					<div id="jqplot"></div>
+
+					<div id="sales" data-toggle="jqplot-serie" class="active"></div>
+					<div id="registration" data-toggle="jqplot-serie"></div>
+					<div id="orders" data-toggle="jqplot-serie"></div>
+					<div id="first-orders" data-toggle="jqplot-serie"></div>
+					<div id="aborted-orders" data-toggle="jqplot-serie"></div>
+				</div>
+
+ 			</div>
+
+
+	 		<div class="row">
+	 			<div class="col-md-4">
+					<div class="general-block-decorator">
+						<div class="title title-without-tabs">{intl l="Shop Informations"}</div>
+						<div class="table-responsive">
+							<table class="table table-striped">
+								<tbody>
+									<tr>
+										<th>{intl l="Customers"}</th>
+		                                <td>1</td>
+									</tr>
+									<tr>
+										<th>{intl l="Categories"}</th>
+		                                <td>8</td>
+									</tr>
+									<tr>
+										<th>{intl l="Products"}</th>
+		                                <td>43</td>
+									</tr>
+									<tr>
+										<th>{intl l="Online products"}</th>
+		                                <td>43</td>
+									</tr>
+									<tr>
+										<th>{intl l="Offline products"}</th>
+		                                <td>0</td>
+									</tr>
+									<tr>
+										<th>{intl l="Orders"}</th>
+		                                <td>1</td>
+									</tr>
+									<tr>
+										<th>{intl l="Pending orders"}</th>
+		                                <td>1</td>
+									</tr>
+									<tr>
+										<th>{intl l="In process orderst"}</th>
+		                                <td>0</td>
+									</tr>
+									<tr>
+										<th>{intl l="Shipped orders"}</th>
+		                                <td>0</td>
+									</tr>
+									<tr>
+										<th>{intl l="Canceled orders"}</th>
+		                                <td>0</td>
+									</tr>
+					            </tbody>
+					        </table>
+					    </div>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="general-block-decorator">
+						<div class="title title-without-tabs">{intl l="Sales statistics"}</div>
+
+						<ul class="nav nav-tabs">
+							<li class="active"><a href="#statjour" data-toggle="tab">{intl l="Today"}</a></li>
+							<li><a href="#statmois" data-toggle="tab">{intl l="This month"}</a></li>
+							<li><a href="#statannee" data-toggle="tab">{intl l="This year"}</a></li>
+						</ul>
+
+						<div class="tab-content">
+							<div class="tab-pane fade active in" id="statjour">
+								<div class="table-responsive">
+									<table class="table table-striped">
+		                                <tbody>
+                                            <tr>
+                                                <th>{intl l="Overall sales"}</th>
+                                                <td>2500.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Sales excluding shipping"}</th>
+                                                <td>2000.00 €</td>
+                                            </tr>
+		                                    <tr>
+		                                        <th>{intl l="Yesterday sales"}</th>
+		                                        <td>1700.00 €</td>
+		                                    </tr>
+		                                    <tr>
+		                                        <th>{intl l="Waiting orders"}</th>
+		                                        <td>4</td>
+		                                    </tr>
+		                                    <tr>
+		                                        <th>{intl l="In process orders"}</th>
+		                                        <td>52</td>
+		                                    </tr>
+		                                    <tr>
+		                                        <th>{intl l="Canceled orders"}</th>
+		                                        <td>3</td>
+		                                    </tr>
+		                                    <tr>
+		                                        <th>{intl l="Average cart"}</th>
+		                                        <td>25.00 €</td>
+		                                    </tr>
+		                           		</tbody>
+		                        	</table>
+		                        </div>
+	                        </div>
+							<div class="tab-pane fade" id="statmois">
+								<div class="table-responsive">
+		                            <table class="table table-striped">
+		                                <tbody>
+                                            <tr>
+                                                <th>{intl l="Overall sales"}</th>
+                                                <td>2500.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Sales excluding shipping"}</th>
+                                                <td>2000.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Previous month sales"}</th>
+                                                <td>1700.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Waiting orders"}</th>
+                                                <td>4</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="In process orders"}</th>
+                                                <td>52</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Canceled orders"}</th>
+                                                <td>3</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Average cart"}</th>
+                                                <td>25.00 €</td>
+                                            </tr>
+		                           		</tbody>
+		                        	</table>
+		                        </div>
+							</div>
+							<div class="tab-pane fade" id="statannee">
+								<div class="table-responsive">
+		                            <table class="table table-striped">
+		                                <tbody>
+                                            <tr>
+                                                <th>{intl l="Overall sales"}</th>
+                                                <td>2500.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Sales excluding shipping"}</th>
+                                                <td>2000.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Previous year sales"}</th>
+                                                <td>1700.00 €</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Waiting orders"}</th>
+                                                <td>4</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="In process orders"}</th>
+                                                <td>52</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Canceled orders"}</th>
+                                                <td>3</td>
+                                            </tr>
+                                            <tr>
+                                                <th>{intl l="Average cart"}</th>
+                                                <td>25.00 €</td>
+                                            </tr>
+		                           		</tbody>
+		                            </table>
+		                        </div>
+	                        </div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="general-block-decorator">
+						<div class="title title-without-tabs">{intl l="Thelia informations"}</div>
+						<div class="table-responsive">
+							<table class="table table-striped">
+								<tbody>
+									<tr>
+										<th>{intl l="Current version"}</th>
+										<td>V2.0.0-beta</td>
+									</tr>
+									<tr>
+										<th>{intl l="Latest version available"}</th>
+										<td><a href="">V1.5.4.2</a></td>
+									</tr>
+									<tr>
+										<th>{intl l="News"}</th>
+										<td><a href="" target="_blank">{intl l="Click here"}</a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
 			</div>
 
 			{module_include location='home_bottom'}
 		</div>
 	</div>
+{/block}
+
+{block name="javascript-initialization"}
+
+	{javascripts file='assets/js/jqplot/jquery.jqplot.min.js'}
+        <script src="{$asset_url}"></script>
+
+		{javascripts file='assets/js/jqplot/plugins/jqplot.highlighter.min.js'}
+			<script type="text/javascript" src="{$asset_url}"></script>
+		{/javascripts}
+		{javascripts file='assets/js/jqplot/plugins/jqplot.barRenderer.min.js'}
+			<script type="text/javascript" src="{$asset_url}"></script>
+		{/javascripts}
+		{javascripts file='assets/js/jqplot/plugins/jqplot.pieRenderer.min.js'}
+			<script type="text/javascript" src="{$asset_url}"></script>
+		{/javascripts}
+
+        <script>
+
+        	(function($, window, document){
+
+			    $(function(){
+
+			    	var $elem			= $('#jqplot');
+
+		            var url 			= "{url file='/test_to_remove/admin-stats.json'}",
+		    			series 			= [],
+		    			seriesColors 	= [],
+		    			ticks 			= [],
+		    			days 			= 0,
+		    			jqplot;
+
+		    		var options = {
+	    				animate: true,
+	    				axesDefaults: {
+	    					tickOptions: { showMark: true, showGridline: true }
+	    				},
+	    				axes: {
+				            xaxis: {
+				                borderColor: '#ccc',
+				                ticks : ticks,
+				                tickOptions:    { showGridline: false }
+				            },
+				            yaxis: {
+								tickOptions: { showGridline: true, showMark: false, showLabel: false, shadow: false }
+							}
+				        },
+						seriesDefaults: {
+							lineWidth: 3,
+							shadow : false,
+							markerOptions: { shadow : false, style: 'filledCircle', size: 12 }
+						},
+						grid: {
+					        background: '#FFF',
+					        shadow : false,
+					        borderColor : '#FFF'
+					    },
+					    highlighter: {
+					    	show: true,
+					        sizeAdjust: 7,
+					        tooltipLocation: 'n',
+					        tooltipContentEditor: function(str, seriesIndex, pointIndex, plot){
+
+					        	// Return axis value : data value
+				                return ticks[pointIndex][1] + ': ' + plot.data[seriesIndex][pointIndex][1];
+				            }
+    					}
+					};
+
+					// Get datas Json
+					$.getJSON(url)
+		            .done(function(data) {
+
+			    		// Init series datas and colors
+						initJqplotDatas(series, seriesColors, options, data);
+
+						// Add days to xaxis
+						for(var i = 1; i < (days+1); i++){
+			    			ticks.push([i-1, i]);
+			    		}
+
+			    		// Start jqplot
+			    		var elementId = $elem.attr('id');
+			    		jqplot = $.jqplot(elementId, series, options);
+
+			    		$('[data-toggle="jqplot"]').each(function(){
+
+			    			$(this).click(function(){
+
+			    				if($('[data-toggle="jqplot-serie"].active').length > 1 || !$(this).hasClass('active')){
+
+				    				// Active button and jqplot-serie management
+				    				$(this).toggleClass('active');
+
+				    				var id = $(this).data('target');
+				    				$('[data-toggle="jqplot-serie"]#' + id).toggleClass('active');
+
+				    				// Reinit variables
+				    				series = [];
+				    				seriesColors = [];
+
+				    				// Init series datas and colors
+						    		initJqplotDatas(series, seriesColors, options, data);
+
+				    				// Restart jqplot
+				    				jqplot.destroy();
+				    				jqplot = $.jqplot(elementId, series, options);
+			    				}
+
+			    			});
+
+			    		});
+
+						$(window).bind('resize', function(event, ui) {
+	        				jqplot.replot( { resetAxes: true } );
+	    				});
+
+		            })
+		            .fail(function() {
+		                $elem.append('<div class="alert alert-danger">An error occurred while reading from JSON file</div>');
+		            });
+
+
+    				function initJqplotDatas(series, seriesColors, options, json){
+    					$('[data-toggle="jqplot-serie"].active').each(function(i){
+    						var position = $(this).index() - 1;
+			    			series.push(json.series[position].datas);
+			    			seriesColors.push(json.series[position].color);
+			    		});
+
+    					// Number of days to display ( = datas.length in one serie)
+    					days = json.series[0].datas.length;
+
+			    		// Graph title
+			    		options.title = json.title;
+
+			    		// Graph series colors
+			    		options.seriesColors = seriesColors;
+    				}
+
+			    });
+
+			}(window.jQuery, window, document));
+
+        </script>
+    {/javascripts}
 {/block}

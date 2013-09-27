@@ -23,6 +23,10 @@
 namespace Thelia\Action;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Model\AdminLog;
+use Propel\Runtime\ActiveQuery\PropelQuery;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\Event\UpdatePositionEvent;
 
 class BaseAction
 {
@@ -44,5 +48,43 @@ class BaseAction
     public function getDispatcher()
     {
         return $this->container->get('event_dispatcher');
+    }
+
+
+    /**
+     * Changes object position, selecting absolute ou relative change.
+     *
+     * @param $query the query to retrieve the object to move
+     * @param UpdatePositionEvent $event
+     */
+    protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event)
+    {
+        if (null !== $object = $query->findPk($event->getObjectId())) {
+
+            $object->setDispatcher($this->getDispatcher());
+
+            $mode = $event->getMode();
+
+            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
+                return $object->changeAbsolutePosition($event->getPosition());
+            else if ($mode == UpdatePositionEvent::POSITION_UP)
+                return $object->movePositionUp();
+            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
+                return $object->movePositionDown();
+        }
+    }
+
+    /**
+     * Helper to append a message to the admin log.
+     *
+     * @param string $message
+     */
+    public function adminLogAppend($message)
+    {
+        AdminLog::append(
+            $message,
+            $this->container->get('request'),
+            $this->container->get('thelia.securityContext')->getAdminUser()
+        );
     }
 }

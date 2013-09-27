@@ -74,6 +74,7 @@ class Accessory extends Product
         $search = AccessoryQuery::create();
 
         $product = $this->getProduct();
+
         $search->filterByProductId($product, Criteria::IN);
 
         $order = $this->getOrder();
@@ -93,8 +94,16 @@ class Accessory extends Product
         $accessories = $this->search($search);
 
         $accessoryIdList = array(0);
+        $accessoryPosition = $accessoryId = array();
+
         foreach ($accessories as $accessory) {
-            array_push($accessoryIdList, $accessory->getAccessory());
+
+            $accessoryProductId = $accessory->getAccessory();
+
+            array_push($accessoryIdList, $accessoryProductId);
+
+            $accessoryPosition[$accessoryProductId] = $accessory->getPosition();
+            $accessoryId[$accessoryProductId] = $accessory->getId();
         }
 
         $receivedIdList = $this->getId();
@@ -106,7 +115,18 @@ class Accessory extends Product
             $this->args->get('id')->setValue( implode(',', array_intersect($receivedIdList, $accessoryIdList)) );
         }
 
-        return parent::exec($pagination);
-    }
+        $loopResult = parent::exec($pagination);
 
+        foreach($loopResult as $loopResultRow) {
+
+            $accessoryProductId = $loopResultRow->get('ID');
+
+            $loopResultRow
+                ->set("ID"      , $accessoryId[$accessoryProductId])
+                ->set("POSITION", $accessoryPosition[$accessoryProductId])
+                ;
+        }
+
+        return $loopResult;
+    }
 }

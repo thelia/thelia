@@ -23,10 +23,13 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\CategoryDeleteEvent;
+use Thelia\Core\Event\ImageCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\CategoryUpdateEvent;
 use Thelia\Core\Event\CategoryCreateEvent;
+use Thelia\Log\Tlog;
 use Thelia\Model\CategoryQuery;
 use Thelia\Form\CategoryModificationForm;
 use Thelia\Form\CategoryCreationForm;
@@ -34,7 +37,6 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\CategoryDeleteContentEvent;
 use Thelia\Core\Event\CategoryAddContentEvent;
-use Thelia\Model\CategoryAssociatedContent;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -133,7 +135,7 @@ class CategoryController extends AbstractCrudController
             'description'  => $object->getDescription(),
             'postscriptum' => $object->getPostscriptum(),
             'visible'      => $object->getVisible(),
-            'url'          => $object->getRewritenUrl($this->getCurrentEditionLocale()),
+            'url'          => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
             'parent'       => $object->getParent()
         );
 
@@ -306,6 +308,39 @@ class CategoryController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
+    /**
+     * Add category pictures
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function addRelatedPictureAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.categories.update")) {
+            return $response;
+        }
+
+//        $content_id = intval($this->getRequest()->get('content_id'));
+//
+//        if ($content_id > 0) {
+//
+//            $event = new CategoryAddContentEvent(
+//                $this->getExistingObject(),
+//                $content_id
+//            );
+//
+//            try {
+//                $this->dispatch(TheliaEvents::CATEGORY_ADD_CONTENT, $event);
+//            }
+//            catch (\Exception $ex) {
+//                // Any error
+//                return $this->errorPage($ex);
+//            }
+//        }
+
+        $this->redirectToEditionTemplate();
+    }
+
     public function deleteRelatedContentAction() {
 
         // Check current user authorization
@@ -331,4 +366,5 @@ class CategoryController extends AbstractCrudController
 
         $this->redirectToEditionTemplate();
     }
+
 }

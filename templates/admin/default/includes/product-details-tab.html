@@ -1,0 +1,389 @@
+<div class="form-container">
+
+    {loop name="product.sales.elements.test" type="product_sale_elements" product=$product_id currency=$edit_currency_id backend_context="1"}
+    {/loop}
+
+    {elseloop rel="product.sales.elements.test"}
+	    {form name="thelia.admin.product.details.modification"}
+	    <form method="POST" action="{url path='/admin/product/default-price/update'}" {form_enctype form=$form} class="clearfix">
+
+		    {include
+		        file = "includes/inner-form-toolbar.html"
+	            hide_submit_buttons = false
+	            show_currencies = true
+
+		        page_url  = "{url path='/admin/products/update' product_id=$ID}"
+		        close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
+		    }
+
+	        {* Be sure to get the product ID, even if the form could not be validated *}
+	        <input type="hidden" name="product_id" value="{$product_id}" />
+
+	        <input type="hidden" name="current_tab" value="details" />
+
+	        {form_hidden_fields form=$form}
+
+	        {form_field form=$form field='id'}
+	            <input type="hidden" name="{$name}" value="{$value}" />
+	        {/form_field}
+
+	        {form_field form=$form field='success_url'}
+	            <input type="hidden" name="{$name}" value="{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}" />
+	        {/form_field}
+
+	        {loop type="currency" name="product-currency" id=$edit_currency_id backend_context="1"}
+
+	            {$currency_symbol = $SYMBOL}
+	            {$currency_name = $NAME}
+
+	            {form_field form=$form field='currency'}
+	                <input type="hidden" name="{$name}" value="{$ID}" />
+	            {/form_field}
+	        {/loop}
+
+	        <p class="title title-without-tabs">{intl l='Default pricing'}</p>
+
+	        <p>{intl l="The default pricing is used with product that do not have any combinations. It is also used for product with combinations which share the same pricing information"}</p>
+
+		    <div class="row">
+
+		        {* -- Pricing ------------------------------------------------------- *}
+
+		        <div class="col-md-4">
+	                <div class="well well-sm">
+			            <p class="title title-without-tabs">{intl l='Pricing'}</p>
+
+			               <p></p> <!-- LAME !!! FIXME -->
+
+			              {form_field form=$form field='price'}
+			                  <div class="form-group {if $error}has-error{/if}">
+			                      <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+
+			                         <div class="input-group">
+			                             <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
+			                             <span class="input-group-addon">{$currency_symbol}</span>
+			                         </div>
+			                  </div>
+			              {/form_field}
+
+			              {form_field form=$form field='tax_rule'}
+			                  <div class="form-group {if $error}has-error{/if}">
+			                      <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+			                      <div class="form-group">
+			                          <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
+			                              <option value="">{intl l="Select a tax tule"}</option>
+			                              {loop name="tax" type="tax-rule" backend_context="1"}
+			                                  <option value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}>{$TITLE}</option>
+			                              {/loop}
+			                          </select>
+			                      </div>
+
+			                  </div>
+			              {/form_field}
+
+			              {form_field form=$form field='price_with_tax'}
+			                  <div class="form-group {if $error}has-error{/if}">
+			                      <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+			                      <div class="input-group">
+			                          <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
+			                          <span class="input-group-addon">{$currency_symbol}</span>
+			                      </div>
+			                  </div>
+			              {/form_field}
+
+			              {module_include location='product_details_pricing_form'}
+			          </div>
+		        </div>
+
+
+		        {* -- Promotion ------------------------------------------------- *}
+
+		        <div class="col-md-4">
+	                <div class="well well-sm">
+			            <p class="title title-without-tabs">{intl l='Promotion'}</p>
+
+			            {form_field form=$form field='sale_price'}
+			                <div class="form-group {if $error}has-error{/if}">
+			                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+
+			                    <div class="input-group">
+			                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
+			                        <span class="input-group-addon">{$currency_symbol}</span>
+			                    </div>
+			               </div>
+			            {/form_field}
+
+						{form_field form=$form field='onsale'}
+						<div class="form-group {if $error}has-error{/if}">
+						    <div class="checkbox">
+						        <label>
+						            <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+						            {$label}
+						        </label>
+						    </div>
+						</div>
+						{/form_field}
+
+			            {form_field form=$form field='isnew'}
+			            <div class="form-group {if $error}has-error{/if}">
+			                <div class="checkbox">
+			                    <label>
+			                        <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+			                        {$label}
+			                    </label>
+			                </div>
+			            </div>
+			            {/form_field}
+
+			            {module_include location='product_details_promotion_form'}
+			        </div>
+		         </div>
+
+
+		         {* -- Shipping -------------------------------------------------- *}
+
+		         <div class="col-md-4">
+		             <div class="well well-sm">
+			             <p class="title title-without-tabs">{intl l='Shipping'}</p>
+
+			             {form_field form=$form field='weight'}
+			                <div class="form-group {if $error}has-error{/if}">
+			                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+
+			                    <div class="input-group">
+			                        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product weight'}">
+			                        <span class="input-group-addon">{intl l="Kg"}</span>
+			                    </div>
+			                </div>
+			             {/form_field}
+
+		                {module_include location='product_details_shipping_form'}
+
+		                 <p class="title title-without-tabs">{intl l='Quantity'}</p>
+
+		                 {form_field form=$form field='quantity'}
+		                    <div class="form-group {if $error}has-error{/if}">
+		                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+
+		                        <div class="form-group">
+		                            <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Current quantity'}">
+		                        </div>
+		                    </div>
+		                 {/form_field}
+
+			             {module_include location='product_details_quantity_form'}
+			        </div>
+			    </div>
+	        </div>
+	    </form>
+	    {/form}
+    {/elseloop}
+
+    {* -- Attribute combinations -------------------------------------------- *}
+
+	<div class="row">
+	    <div class="col-md-12">
+
+	        {ifloop rel="product.sales.elements"}
+		        <form method="POST" action="{url path='/admin/product/combinations/update'}">
+
+			        {include
+			            file = "includes/inner-form-toolbar.html"
+			            hide_submit_buttons = false
+			            show_currencies = true
+			            page_url  = "{url path='/admin/products/update' product_id=$ID}"
+			            close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
+			        }
+
+	                {module_include location='product_before_combinations'}
+
+					<table class="table table-striped table-condensed" id="category_list">
+					    <caption>
+					        {intl l='Attribute Combinations'}
+
+					        {module_include location='product_combinations_list_caption'}
+
+					        {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.products.update"}
+					        <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new combination'}" href="#combination_creation_dialog" data-toggle="modal">
+					            <span class="glyphicon glyphicon-plus-sign"></span>
+					        </a>
+					        {/loop}
+					    </caption>
+
+					    <thead>
+					        <tr>
+					            <th>{intl l='Attributes'}</th>
+								<th class="text-center">{intl l='Quantity'}</th>
+								<th class="text-center">{intl l='Price<br />w/o taxes (%currency)' currency=$currency_symbol}</th>
+								<th class="text-center">{intl l='Price<br />w/ taxes (%currency)' currency=$currency_symbol}</th>
+								<th class="text-center">{intl l='Weight (Kg)'}</th>
+                                <th class="text-center">{intl l='Default'}</th>
+                                <th class="text-center">{intl l='Is new'}</th>
+								<th class="text-center">{intl l='On sale'}</th>
+								<th class="text-center">{intl l='Sale price<br />w/o taxes (%currency)' currency=$currency_symbol}</th>
+								<th class="text-center">{intl l='Sale price<br />w/ taxes (%currency)' currency=$currency_symbol}</th>
+								<th class="actions">{intl l='Actions'}</th>
+					        </tr>
+					    </thead>
+
+					    <tbody>
+	                        {loop name="product.sales.elements" type="product_sale_elements" product=$product_id currency=$edit_currency_id backend_context="1"}
+					        <tr>
+								<td>
+								{loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$ID backend_context="1"}
+								    {$ATTRIBUTE_TITLE}&nbsp;
+								{/loop}
+								</td>
+
+								<td><input class="form-control text-right" type="text" name="quantity[{$ID}]" value="{$QUANTITY}" /></td>
+								<td><input class="form-control text-right" type="text" name="price_wo_taxes[{$ID}]" value="{format_number number=$PRICE}" /></td>
+								<td><input class="form-control text-right" type="text" name="price_w_taxes[{$ID}]" value="{format_number number=$TAXED_PRICE}" /></td>
+								<td><input class="form-control text-right" type="text" name="weight[{$ID}]" value="{$WEIGHT}" /></td>
+
+                                <td class="text-center">
+                                    <input class="form-control" type="radio" name="default" value="{$ID}" {if $IS_DEFAULT}checked="checked"{/if}/>
+                                </td>
+
+								<td class="text-center">
+								    <input class="form-control" type="checkbox" name="on_sale[{$ID}]" value="{$ID}" {if $IS_PROMO}checked="checked"{/if}/>
+								</td>
+
+								<td class="text-center">
+							         <input class="form-control" type="checkbox" name="is_new[{$ID}]" value="{$ID}" {if $IS_NEW}checked="checked"{/if}/>
+								</td>
+
+								<td><input class="form-control text-right" type="text" name="sale_price_wo_taxes[{$ID}]" value="{format_number number=$PROMO_PRICE}" /></td>
+								<td><input class="form-control text-right" type="text" name="sale_price_w_taxes[{$ID}]" value="{format_number number=$TAXED_PROMO_PRICE}" /></td>
+
+								<td class="actions">
+								    <a class="btn btn-default btn-xs combination-delete" title="{intl l='Delete this combination'}"  href="#combination_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+								</td>
+					        </tr>
+	                        {/loop}
+					    </tbody>
+					</table>
+
+                    {module_include location='product_after_combinations'}
+                   </form>
+
+		        {/ifloop}
+
+		        {elseloop rel="product.sales.elements"}
+	                <p class="title title-without-tabs">{intl l='Attribute Combinations'}</p>
+
+	                <div class="alert alert-info">
+	                    {intl
+	                     l='This product has no combination. The default price is used. <a data-toggle="modal" href="%url">Click here to create a new combination</a>'
+	                       url='#combination_creation_dialog'
+	                    }
+	                </div>
+			    {/elseloop}
+
+			    {module_include location='product_after_combinations'}
+
+			</div>
+		 </div>
+	</div>
+
+{* -- Adding a new combination ------------------------------------------------- *}
+
+{* Capture the dialog body, to pass it to the generic dialog *}
+
+{capture "combination_creation_dialog"}
+
+    <input type="hidden" name="product_id" value="{$product_id}" />
+    <input type="hidden" name="current_tab" value="details" />
+
+	<div class="form-group">
+	   <label class="control-label">{intl l="Attribute"} : </label>
+	   <select  name="attribute_id" id="attribute_id" class="form-control">
+	       <option value="">{intl l='Select an attribute...'}</option>
+	       {loop name="product-attributes" type="attribute" product=$product_id backend_context="1" lang=$edit_language_id}
+	           <option value="{$ID}">{$TITLE}</option>
+	       {/loop}
+	   </select>
+	   <span class="help-block">{intl l='Select an attribute and click (+) to view available values'}</span>
+	</div>
+
+
+	<div id="attribute_value_selector" class="hide">
+	    <div class="input-group">
+	        {* <label class="control-label">{intl l="Attribute values"} : </label> *}
+
+	        <select rname="attribute_value_id" id="attribute_value_id" class="form-control">
+	            <option value="">{intl l='Select an attribute value...'}</option>
+	        </select>
+
+	        <span class="input-group-btn" id="add_attr_value_button">
+	           <button class="btn btn-default btn-primary action-btn add-value-to-combination" type="button"><span class="glyphicon glyphicon-plus-sign"></span></button>
+	        </span>
+	    </div>
+
+	    <span class="help-block">{intl l='Select a value click (+) to add it to the combination'}</span>
+	</div>
+
+	<div id="attribute_value_selector_empty" class="hide">
+	    <div class="alert alert-info">
+	       {intl l="No available value for this attribute"}
+	   </div>
+	</div>
+
+	<div class="form-group">
+	    <div class="alert alert-danger hide" id="combination_attributes_error"></div>
+
+	    <select required="required" multiple="multiple" size="5" name="combination_attributes[]" id="combination_attributes" class="form-control">
+	    </select>
+
+	    <div class="help-block">
+	        {intl l='To remove a value from the combination, select it and click "remove"'}
+
+	        <div class="pull-right">
+	            <button class="btn btn-info btn-xs remove-value-from-combination" type="button">
+	                {intl l="Remove selected values"} <span class="glyphicon glyphicon-minus-sign"></span>
+	            </button>
+	        </div>
+	    </div>
+	</div>
+
+{/capture}
+
+{include
+    file = "includes/generic-create-dialog.html"
+
+    dialog_id    = "combination_creation_dialog"
+    dialog_title = {intl l="Create a new combination"}
+    dialog_body  = {$smarty.capture.combination_creation_dialog nofilter}
+
+    dialog_ok_label     = {intl l="Create this combination"}
+
+    form_action        = {url path='/admin/product/combination/add'}
+    form_enctype       = ''
+    form_error_message = ''
+
+    ok_button_id = "combination_creation_dialog_ok"
+}
+
+
+{* -- Delete combination confirmation dialog ----------------------------------- *}
+
+{capture "combination_delete_dialog"}
+
+    <input type="hidden" name="product_id" value="{$product_id}" />
+    <input type="hidden" name="current_tab" value="details" />
+
+    <input type="hidden" name="product_sale_element_id" id="combination_delete_id" value="" />
+
+    {module_include location='category_delete_form'}
+
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "combination_delete_dialog"
+    dialog_title    = {intl l="Delete a combunation"}
+    dialog_message  = {intl l="Do you really want to delete this combination ?"}
+
+    form_action     = {url path='/admin/product/combination/delete'}
+    form_content    = {$smarty.capture.combination_delete_dialog nofilter}
+}

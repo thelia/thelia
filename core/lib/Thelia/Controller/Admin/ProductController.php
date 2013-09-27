@@ -39,6 +39,24 @@ use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\ProductAssociatedContentQuery;
+use Thelia\Model\AccessoryQuery;
+use Thelia\Model\CategoryQuery;
+use Thelia\Core\Event\ProductAddAccessoryEvent;
+use Thelia\Core\Event\ProductDeleteAccessoryEvent;
+use Thelia\Core\Event\FeatureProductUpdateEvent;
+use Thelia\Model\FeatureQuery;
+use Thelia\Core\Event\FeatureProductDeleteEvent;
+use Thelia\Model\FeatureTemplateQuery;
+use Thelia\Core\Event\ProductSetTemplateEvent;
+use Thelia\Core\Event\ProductAddCategoryEvent;
+use Thelia\Core\Event\ProductDeleteCategoryEvent;
+use Thelia\Model\AttributeQuery;
+use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\AttributeCombination;
+use Thelia\Model\AttributeAv;
+use Thelia\Core\Event\ProductCreateCombinationEvent;
+use Thelia\Core\Event\ProductDeleteCombinationEvent;
 
 /**
  * Manages products
@@ -68,6 +86,35 @@ class ProductController extends AbstractCrudController
         );
     }
 
+    /**
+     * Attributes ajax tab loading
+     */
+    public function loadAttributesAjaxTabAction() {
+
+        return $this->render(
+                'ajax/product-attributes-tab',
+                array(
+                    'product_id' => $this->getRequest()->get('product_id', 0),
+                )
+        );
+    }
+
+    /**
+     * Related information ajax tab loading
+     */
+    public function loadRelatedAjaxTabAction() {
+
+        return $this->render(
+                'ajax/product-related-tab',
+                array(
+                        'product_id'             => $this->getRequest()->get('product_id', 0),
+                        'folder_id'              => $this->getRequest()->get('folder_id', 0),
+                        'accessory_category_id'  => $this->getRequest()->get('accessory_category_id', 0)
+
+                )
+        );
+    }
+
     protected function getCreationForm()
     {
         return new ProductCreationForm($this->getRequest());
@@ -83,10 +130,15 @@ class ProductController extends AbstractCrudController
         $createEvent = new ProductCreateEvent();
 
         $createEvent
+            ->setRef($formData['ref'])
             ->setTitle($formData['title'])
-            ->setLocale($formData["locale"])
-            ->setParent($formData['parent'])
+            ->setLocale($formData['locale'])
+            ->setDefaultCategory($formData['default_category'])
             ->setVisible($formData['visible'])
+            ->setBasePrice($formData['price'])
+            ->setBaseWeight($formData['weight'])
+            ->setCurrencyId($formData['currency'])
+            ->setTaxRuleId($formData['tax_rule'])
         ;
 
         return $createEvent;
@@ -105,8 +157,8 @@ class ProductController extends AbstractCrudController
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
             ->setUrl($formData['url'])
-            ->setParent($formData['parent'])
-        ;
+            ->setDefaultCategory($formData['default_category'])
+         ;
 
         return $changeEvent;
     }
@@ -132,17 +184,25 @@ class ProductController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
+        // Get the default produc sales element
+        $salesElement = ProductSaleElementsQuery::create()->filterByProduct($object)->filterByIsDefault(true)->findOne();
+
+//        $prices = $salesElement->getProductPrices();
+
         // Prepare the data that will hydrate the form
         $data = array(
-            'id'           => $object->getId(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'chapo'        => $object->getChapo(),
-            'description'  => $object->getDescription(),
-            'postscriptum' => $object->getPostscriptum(),
-            'visible'      => $object->getVisible(),
-            'url'          => $object->getRewritenUrl($this->getCurrentEditionLocale()),
-            'parent'       => $object->getParent()
+            'id'               => $object->getId(),
+            'ref'              => $object->getRef(),
+            'locale'           => $object->getLocale(),
+            'title'            => $object->getTitle(),
+            'chapo'            => $object->getChapo(),
+            'description'      => $object->getDescription(),
+            'postscriptum'     => $object->getPostscriptum(),
+            'visible'          => $object->getVisible(),
+            'url'              => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
+            'default_category' => $object->getDefaultCategoryId()
+
+            // A terminer pour les prix
         );
 
         // Setup the object form
@@ -174,10 +234,25 @@ class ProductController extends AbstractCrudController
     protected function getEditionArguments()
     {
         return array(
-                'product_id' => $this->getRequest()->get('product_id', 0),
-                'folder_id' => $this->getRequest()->get('folder_id', 0),
-                'current_tab' => $this->getRequest()->get('current_tab', 'general')
+                'category_id'           => $this->getCategoryId(),
+                'product_id'            => $this->getRequest()->get('product_id', 0),
+                'folder_id'             => $this->getRequest()->get('folder_id', 0),
+                'accessory_category_id' => $this->getRequest()->get('accessory_category_id', 0),
+                'current_tab'          => $this->getRequest()->get('current_tab', 'general')
         );
+    }
+
+    protected function getCategoryId() {
+        // Trouver le category_id, soit depuis la reques, souit depuis le produit courant
+        $category_id = $this->getRequest()->get('category_id', null);
+
+        if ($category_id == null) {
+            $product = $this->getExistingObject();
+
+            if ($product !== null) $category_id = $product->getDefaultCategoryId();
+        }
+
+        return $category_id != null ? $category_id : 0;
     }
 
     protected function renderListTemplate($currentOrder)
@@ -187,18 +262,15 @@ class ProductController extends AbstractCrudController
         return $this->render('categories',
                 array(
                     'product_order' => $currentOrder,
-                    'product_id' => $this->getRequest()->get('product_id', 0)
+                    'category_id' => $this->getCategoryId()
         ));
     }
 
     protected function redirectToListTemplate()
     {
-        // Redirect to the product default category list
-        $product = $this->getExistingObject();
-
         $this->redirectToRoute(
                 'admin.products.default',
-                array('category_id' => $product != null ? $product->getDefaultCategory() : 0)
+                array('category_id' => $this->getCategoryId())
         );
     }
 
@@ -238,7 +310,7 @@ class ProductController extends AbstractCrudController
         // Redirect to parent product list
         $this->redirectToRoute(
                 'admin.products.default',
-                array('category_id' => $deleteEvent->getProduct()->getDefaultCategory())
+                array('category_id' => $this->getCategoryId())
         );
     }
 
@@ -249,25 +321,21 @@ class ProductController extends AbstractCrudController
             // Redirect to parent product list
             $this->redirectToRoute(
                     'admin.categories.default',
-                    array('category_id' => $product->getDefaultCategory())
+                    array('category_id' => $this->getCategoryId())
             );
         }
     }
 
-    protected function performAdditionalUpdatePositionAction($event)
+    protected function performAdditionalUpdatePositionAction($positionEvent)
     {
-        $product = ProductQuery::create()->findPk($event->getObjectId());
-
-        if ($product != null) {
-            // Redirect to parent product list
-            $this->redirectToRoute(
-                    'admin.categories.default',
-                    array('category_id' => $product->getDefaultCategory())
-            );
-        }
-
-        return null;
+        // Redirect to parent product list
+        $this->redirectToRoute(
+                'admin.categories.default',
+                array('category_id' => $this->getCategoryId())
+        );
     }
+
+    // -- Related content management -------------------------------------------
 
     public function getAvailableRelatedContentAction($productId, $folderId)
     {
@@ -347,4 +415,383 @@ class ProductController extends AbstractCrudController
 
         $this->redirectToEditionTemplate();
     }
+
+
+    // -- Accessories management ----------------------------------------------
+
+    public function getAvailableAccessoriesAction($productId, $categoryId)
+    {
+        $result = array();
+
+        $categories = CategoryQuery::create()->filterById($categoryId)->find();
+
+        if ($categories !== null) {
+
+            $list = ProductQuery::create()
+            ->joinWithI18n($this->getCurrentEditionLocale())
+            ->filterByCategory($categories, Criteria::IN)
+            ->filterById(AccessoryQuery::create()->select('accessory')->findByProductId($productId), Criteria::NOT_IN)
+            ->find();
+            ;
+
+            if ($list !== null) {
+                foreach($list as $item) {
+                    $result[] = array('id' => $item->getId(), 'title' => $item->getTitle());
+                }
+            }
+        }
+
+        return $this->jsonResponse(json_encode($result));
+    }
+
+    public function addAccessoryAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $accessory_id = intval($this->getRequest()->get('accessory_id'));
+
+        if ($accessory_id > 0) {
+
+            $event = new ProductAddAccessoryEvent(
+                    $this->getExistingObject(),
+                    $accessory_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::PRODUCT_ADD_ACCESSORY, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    public function deleteAccessoryAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $accessory_id = intval($this->getRequest()->get('accessory_id'));
+
+        if ($accessory_id > 0) {
+
+            $event = new ProductDeleteAccessoryEvent(
+                    $this->getExistingObject(),
+                    $accessory_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::PRODUCT_REMOVE_ACCESSORY, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    /**
+     * Update accessory position
+     */
+    public function updateAccessoryPositionAction()
+    {
+        $accessory = AccessoryQuery::create()->findPk($this->getRequest()->get('accessory_id', null));
+
+        return $this->genericUpdatePositionAction(
+                $accessory,
+                TheliaEvents::PRODUCT_UPDATE_ACCESSORY_POSITION
+        );
+    }
+
+    /**
+     * Update related content position
+     */
+    public function updateContentPositionAction()
+    {
+        $content = ProductAssociatedContentQuery::create()->findPk($this->getRequest()->get('content_id', null));
+
+        return $this->genericUpdatePositionAction(
+                $content,
+                TheliaEvents::PRODUCT_UPDATE_CONTENT_POSITION
+        );
+    }
+
+    /**
+     * Change product template for a given product.
+     *
+     * @param unknown $productId
+     */
+    public function setProductTemplateAction($productId) {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth('admin.products.update')) return $response;
+
+        $product = ProductQuery::create()->findPk($productId);
+
+        if ($product != null) {
+
+            $template_id = intval($this->getRequest()->get('template_id', 0));
+
+            $this->dispatch(
+                    TheliaEvents::PRODUCT_SET_TEMPLATE,
+                    new ProductSetTemplateEvent($product, $template_id)
+            );
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    /**
+     * Update product attributes and features
+     */
+    public function updateAttributesAndFeaturesAction($productId) {
+
+        $product = ProductQuery::create()->findPk($productId);
+
+        if ($product != null) {
+
+            $featureTemplate = FeatureTemplateQuery::create()->filterByTemplateId($product->getTemplateId())->find();
+
+            if ($featureTemplate !== null) {
+
+                // Get all features for the template attached to this product
+                $allFeatures = FeatureQuery::create()
+                    ->filterByFeatureTemplate($featureTemplate)
+                    ->find();
+
+                $updatedFeatures = array();
+
+                // Update all features values, starting with feature av. values
+                $featureValues = $this->getRequest()->get('feature_value', array());
+
+                foreach($featureValues as $featureId => $featureValueList) {
+
+                    // Delete all features av. for this feature.
+                    $event = new FeatureProductDeleteEvent($productId, $featureId);
+
+                    $this->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $event);
+
+                    // Add then all selected values
+                    foreach($featureValueList as $featureValue) {
+                        $event = new FeatureProductUpdateEvent($productId, $featureId, $featureValue);
+
+                        $this->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $event);
+                    }
+
+                    $updatedFeatures[] = $featureId;
+                }
+
+                // Update then features text values
+                $featureTextValues = $this->getRequest()->get('feature_text_value', array());
+
+                foreach($featureTextValues as $featureId => $featureValue) {
+
+                    // considere empty text as empty feature value (e.g., we will delete it)
+                    if (empty($featureValue)) continue;
+
+                    $event = new FeatureProductUpdateEvent($productId, $featureId, $featureValue, true);
+
+                    $this->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $event);
+
+                    $updatedFeatures[] = $featureId;
+                }
+
+                // Delete features which don't have any values
+                foreach($allFeatures as $feature) {
+
+                    if (! in_array($feature->getId(), $updatedFeatures)) {
+                        $event = new FeatureProductDeleteEvent($productId, $feature->getId());
+
+                        $this->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $event);
+                    }
+                }
+            }
+        }
+
+        // If we have to stay on the same page, do not redirect to the succesUrl,
+        // just redirect to the edit page again.
+        if ($this->getRequest()->get('save_mode') == 'stay') {
+            $this->redirectToEditionTemplate($this->getRequest());
+        }
+
+        // Redirect to the category/product list
+        $this->redirectToListTemplate();
+    }
+
+    public function addAdditionalCategoryAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $category_id = intval($this->getRequest()->get('additional_category_id'));
+
+        if ($category_id > 0) {
+
+            $event = new ProductAddCategoryEvent(
+                    $this->getExistingObject(),
+                    $category_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::PRODUCT_ADD_CATEGORY, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    public function deleteAdditionalCategoryAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $category_id = intval($this->getRequest()->get('additional_category_id'));
+
+        if ($category_id > 0) {
+
+            $event = new ProductDeleteCategoryEvent(
+                    $this->getExistingObject(),
+                    $category_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::PRODUCT_REMOVE_CATEGORY, $event);
+            }
+            catch (\Exception $ex) {
+                // Any error
+                return $this->errorPage($ex);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    // -- Product combination management ---------------------------------------
+
+    public function getAttributeValuesAction($productId, $attributeId) {
+
+        $result = array();
+
+        // Get attribute for this product
+        $attribute = AttributeQuery::create()->findPk($attributeId);
+
+        if ($attribute !== null) {
+
+            $values = AttributeAvQuery::create()
+                ->joinWithI18n($this->getCurrentEditionLocale())
+                ->filterByAttribute($attribute)
+                ->find();
+            ;
+
+            if ($values !== null) {
+                foreach($values as $value) {
+                    $result[] = array('id' => $value->getId(), 'title' => $value->getTitle());
+                }
+            }
+        }
+
+        return $this->jsonResponse(json_encode($result));
+    }
+
+    public function addAttributeValueToCombinationAction($productId, $attributeAvId, $combination) {
+
+        $result = array();
+
+        // Get attribute for this product
+        $attributeAv = AttributeAvQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($attributeAvId);
+
+        if ($attributeAv !== null) {
+
+            $addIt = true;
+
+            $attribute = $attributeAv->getAttribute();
+
+            // Check if this attribute is not already present
+            $combinationArray = explode(',', $combination);
+
+            foreach ($combinationArray as $id) {
+
+                $attrAv = AttributeAvQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($id);
+
+                if ($attrAv !== null) {
+
+                    if ($attrAv->getAttributeId() == $attribute->getId()) {
+
+                        $result['error'] = $this->getTranslator()->trans(
+                                'A value for attribute "%name" is already present in the combination',
+                                array('%name' => $attribute->getTitle())
+                        );
+
+                        $addIt = false;
+                    }
+
+                    $result[] = array('id' => $attrAv->getId(), 'title' => $attrAv->getAttribute()->getTitle() . " : " . $attrAv->getTitle());
+                }
+            }
+
+            if ($addIt) $result[] = array('id' => $attributeAv->getId(), 'title' => $attribute->getTitle() . " : " . $attributeAv->getTitle());
+        }
+
+        return $this->jsonResponse(json_encode($result));
+    }
+
+    /**
+     * A a new combination to a product
+     */
+    public function addCombinationAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $event = new ProductCreateCombinationEvent(
+                $this->getExistingObject(),
+                $this->getRequest()->get('combination_attributes', array()),
+                $this->getCurrentEditionCurrency()->getId()
+        );
+
+        try {
+            $this->dispatch(TheliaEvents::PRODUCT_ADD_COMBINATION, $event);
+        }
+        catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+
+    /**
+     * A a new combination to a product
+     */
+    public function deleteCombinationAction() {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $event = new ProductDeleteCombinationEvent(
+                $this->getExistingObject(),
+                $this->getRequest()->get('product_sale_element_id',0)
+        );
+
+        try {
+            $this->dispatch(TheliaEvents::PRODUCT_DELETE_COMBINATION, $event);
+        }
+        catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
 }

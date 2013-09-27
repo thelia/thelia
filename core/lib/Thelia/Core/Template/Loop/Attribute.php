@@ -41,7 +41,8 @@ use Thelia\Type\BooleanOrBothType;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\TemplateQuery;
 use Thelia\Model\AttributeTemplateQuery;
-
+use Thelia\Core\Translation\Translator;
+use Thelia\Model\Map\AttributeTemplateTableMap;
 /**
  *
  * Attribute loop
@@ -106,33 +107,50 @@ class Attribute extends BaseI18nLoop
 
         $product = $this->getProduct();
         $template = $this->getTemplate();
-
-        if (null !== $product) {
-            // Find the template assigned to the product.
-            $productObj = ProductQuery::create()->findPk($product);
-
-            // Ignore if the product cannot be found.
-            if ($productObj !== null)
-                $template = $productObj->getTemplate();
-         }
-
-         // If we have to filter by template, find all attributes assigned to this template, and filter by found IDs
-        if (null !== $template) {
-            $search->filterById(
-                AttributeTemplateQuery::create()->filterByTemplateId($template)->select('attribute_id')->find(),
-                Criteria::IN
-            );
-        }
-
         $exclude_template = $this->getExcludeTemplate();
 
-        // If we have to filter by template, find all attributes assigned to this template, and filter by found IDs
-        if (null !== $exclude_template) {
-            // Exclure tous les attribut qui sont attachés aux templates indiqués
-            $search->filterById(
-                    AttributeTemplateQuery::create()->filterByTemplateId($exclude_template)->select('attribute_id')->find(),
-                    Criteria::NOT_IN
-            );
+        $use_attribute_pos = true;
+
+        if (null !== $product) {
+            // Find all template assigned to the products.
+            $products = ProductQuery::create()->findById($product);
+
+            // Ignore if the product cannot be found.
+            if ($products !== null) {
+
+                // Create template array
+                if ($template == null) $template = array();
+
+                foreach($products as $product) {
+                    $tpl_id = $product->getTemplateId();
+
+                    if (! is_null($tpl_id)) $template[] = $tpl_id;
+                }
+            }
+        }
+
+        if (! empty($template)) {
+
+            // Join with feature_template table to get position
+            $search
+                ->withColumn(AttributeTemplateTableMap::POSITION, 'position')
+                ->filterByTemplate(TemplateQuery::create()->findById($template), Criteria::IN)
+            ;
+
+            $use_attribute_pos = false;
+        }
+        else if (null !== $exclude_template) {
+
+            // Join with attribute_template table to get position
+            $exclude_attributes = AttributeTemplateQuery::create()->filterByTemplateId($exclude_template)->select('attribute_id')->find();
+
+            $search
+                ->joinAttributeTemplate(null, Criteria::LEFT_JOIN)
+                ->withColumn(AttributeTemplateTableMap::POSITION, 'position')
+                ->filterById($exclude_attributes, Criteria::NOT_IN)
+            ;
+
+            $use_attribute_pos = false;
         }
 
         $orders  = $this->getOrder();
@@ -152,10 +170,16 @@ class Attribute extends BaseI18nLoop
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
-                    $search->orderByPosition(Criteria::ASC);
+                    if ($use_attribute_pos)
+                        $search->orderByPosition(Criteria::ASC);
+                     else
+                        $search->addAscendingOrderByColumn(AttributeTemplateTableMap::POSITION);
                     break;
                 case "manual_reverse":
-                    $search->orderByPosition(Criteria::DESC);
+                    if ($use_attribute_pos)
+                        $search->orderByPosition(Criteria::DESC);
+                     else
+                        $search->addDescendingOrderByColumn(AttributeTemplateTableMap::POSITION);
                     break;
             }
         }
@@ -174,7 +198,8 @@ class Attribute extends BaseI18nLoop
                 ->set("CHAPO", $attribute->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $attribute->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $attribute->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION", $attribute->getPosition());
+                ->set("POSITION", $use_attribute_pos ? $attribute->getPosition() : $attribute->getVirtualColumn('position'))
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

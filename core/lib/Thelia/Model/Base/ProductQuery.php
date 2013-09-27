@@ -857,7 +857,7 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
-    public function joinTemplate($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinTemplate($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Template');
@@ -892,7 +892,7 @@ abstract class ProductQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\TemplateQuery A secondary query class using the current class as primary query
      */
-    public function useTemplateQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useTemplateQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinTemplate($relationAlias, $joinType)

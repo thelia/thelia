@@ -25,12 +25,25 @@ namespace Thelia\Exception;
 
 class OrderException extends \RuntimeException
 {
+    /**
+     * @var string The cart template name
+     */
+    public $cartRoute = "cart.view";
+    public $orderDeliveryRoute = "order.delivery";
+
+    public $arguments = array();
+
     const UNKNOWN_EXCEPTION = 0;
 
     const CART_EMPTY = 100;
 
-    public function __construct($message, $code = null, $previous = null)
+    const UNDEFINED_DELIVERY = 200;
+
+    public function __construct($message, $code = null, $arguments = array(), $previous = null)
     {
+        if(is_array($arguments)) {
+            $this->arguments = $arguments;
+        }
         if ($code === null) {
             $code = self::UNKNOWN_EXCEPTION;
         }
