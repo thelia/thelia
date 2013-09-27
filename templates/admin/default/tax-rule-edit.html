@@ -150,121 +150,81 @@
                 });
             });
 
-            // Make the list of taxes draggable
-            $('.draggable', $list).draggable({
+            // Default options for draggable
+            var dragOptions = {
                 cursor: 'move',
-                helper: 'clone',
                 containment: "document",
                 opacity: 0.5,
                 revert: "invalid", // when not dropped, the item will revert back to its initial position
                 zIndex: 10
-            });
+            };
 
-            // Droppable Options
-            var droppableOptions = {
-                accept: "#panel-list .draggable", // Controls which draggable elements are accepted
-                hoverClass: 'over',
-                drop: function( event, ui ) {
-                    var $current_group = $(this),
-                        $tax = ui.draggable;
-
-                    // Move taxes
-                    $tax.fadeOut(function() {
-                        $(this).remove();
-                        $tax.appendTo( $current_group ).fadeIn();
-
-                    });
+            // Default options for sortabble
+            var sortOptions = {
+                cursor: 'crosshair',
+                items: 'div',
+                update: function( event, ui ){
+                    // Check if we have an empty group
+                    var $zone = $('.add-to-group', $group);
+                    if($zone.size() > 1 && $(this).find('> div').size() == 0){ // Remove empty group only if we have more than 1 group
+                        $(this).slideUp(function(){ $(this).remove(); });
+                    }
                 }
             };
 
-            // let the drop-group be droppable & sortable, accepting the tax items
-            $('.add-to-group', $group)
-            .sortable({ // Sort
-                //axis: 'y',
-                cursor: 'crosshair',
-                items: "div",
-                revert: true,
-            }).droppable(droppableOptions);
-
-
-            // Allow the user to create a new drop-group
-            $('.create-group', $group)
-            .droppable({
+            // Default options for droppable
+            var dropOptions = {
                 accept: "#panel-list .draggable", // Controls which draggable elements are accepted
-                hoverClass: 'over',
+                hoverClass: "over",
                 drop: function( event, ui ) {
-                    var $tax = ui.draggable;
-                    var $create_group;
+                    var $drop = $(this);
 
-                    // Check if we have already an empty group
-                    var $empty_group = $group.find('.drop-group:not(:has(> .draggable))');
-                    if($empty_group.size() > 0){ // if yes (Use the first empty group)
-                        $create_group = $empty_group.filter(':first');
+                    if($(this).hasClass('create-group')){
+                        // Check if we have already an empty group
+                        var $empty_group = $group.find('.drop-group:not(:has(> div))');
+                        if($empty_group.size() > 0){ // if yes (Use the first empty group)
+                            $drop = $empty_group.filter(':first');
+                        }else{ //if no (Create a new group)
+                            $drop = $group.find('.drop-group:last-child').clone().appendTo($group.find('.panel-body'));
 
-                        // Move taxes
-                        $tax.fadeOut(function() {
-                            $(this).remove();
-                            $tax.appendTo( $create_group ).show();
-                            $group.find('.panel-body').append($create_group);
-                        });
+                            // Remove taxes
+                            $drop.find('> div').remove();
 
-                    }else{ //if no (Create a new group)
-                        $create_group = $group.find('.drop-group:last-child').clone();
-
-                        // Remove taxes
-                        $create_group.find('.draggable').remove();
-
-                        // Make the new group droppable
-                        $create_group
-                        .sortable({ // Sort
-                            //axis: 'y',
-                            cursor: 'crosshair',
-                            items: "div",
-                            revert: true,
-                        })
-                        .droppable(droppableOptions);
-
-                        // Move taxes
-                        $tax.fadeOut(function() {
-                            $(this).remove();
-                            $tax.appendTo( $create_group ).show();
-                            $group.find('.panel-body').append($create_group);
-                        });
+                            // Make the new group droppable
+                            $drop
+                            .droppable(dropOptions)
+                            .sortable(sortOptions);
+                        }
                     }
+                    $("<div></div>").addClass('drag').text( ui.draggable.text() ).appendTo( $drop );
+                     ui.draggable.remove();
                 }
-            });
+            };
 
 
-             // let the gallery be droppable as well, accepting items from the trash
+            // Make the list of taxes draggable
+            $('.draggable', $list).draggable(dragOptions);
+
+
+            // let the drop-group be droppable & sortable, accepting the tax items
+            $('.droppable', $group)
+            .droppable(dropOptions)
+            .sortable(sortOptions);
+
+            // let the gallery be droppable as well, accepting items from the trash
             $('.remove-from-group', $list)
             .droppable({
-                accept: "#panel .draggable",
+                accept: "#panel .drag",
                 hoverClass: 'over',
                 drop: function( event, ui ) {
-                    var $tax = ui.draggable.clone(); ui.draggable.remove();
 
-                    // Move taxes
-                    $tax.fadeOut(function() {
-                        //$(this).remove();
-                        $tax.removeClass('ui-sortable-helper').addClass('ui-draggable').removeAttr('style').draggable({
-                            cursor: 'move',
-                            helper: 'clone',
-                            //containment: "document",
-                            opacity: 0.5,
-                            revert: "invalid", // when not dropped, the item will revert back to its initial position
-                            zIndex: 10
-                        }).prependTo( $list.find('.panel-body') ).fadeIn();
+                    $("<div></div>").addClass('draggable').text( ui.draggable.text() ).draggable(dragOptions).appendTo(  $list.find('.panel-body') );
+                    ui.draggable.remove();
 
-                        // Check if we have an empty group
-                        var $zone = $('.add-to-group', $group);
-                        var $empty_zone = $zone.filter(':not(:has(> .draggable))');
-                        if($zone.size() > $empty_zone.size()){ // Remove empty group only if we have more than 1 group
-                            $empty_zone.slideUp(function(){ $(this).remove(); });
-                        }
-                    });
                 }
             });
         });
+
      // -->
     </script>
     {/literal}
