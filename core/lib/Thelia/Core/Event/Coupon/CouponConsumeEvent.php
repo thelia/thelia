@@ -23,8 +23,6 @@
 
 namespace Thelia\Core\Event\Coupon;
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Coupon\CouponRuleCollection;
-use Thelia\Model\Coupon;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -56,7 +54,7 @@ class CouponConsumeEvent extends ActionEvent
      * @param bool   $isValid  If Coupon is valid or
      *                         if Customer meets coupon conditions
      */
-    function __construct($code, $discount = null, $isValid  = null)
+    public function __construct($code, $discount = null, $isValid  = null)
     {
         $this->code = $code;
         $this->discount = $discount;
@@ -135,8 +133,5 @@ class CouponConsumeEvent extends ActionEvent
     {
         return $this->isValid;
     }
-
-
-
 
 }

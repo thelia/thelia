@@ -95,9 +95,9 @@ class OrderProductAttributeCombinationTableMap extends TableMap
     const ATTRIBUTE_DESCRIPTION = 'order_product_attribute_combination.ATTRIBUTE_DESCRIPTION';
 
     /**
-     * the column name for the ATTRIBUTE_POSTSCRIPTUMN field
+     * the column name for the ATTRIBUTE_POSTSCRIPTUM field
      */
-    const ATTRIBUTE_POSTSCRIPTUMN = 'order_product_attribute_combination.ATTRIBUTE_POSTSCRIPTUMN';
+    const ATTRIBUTE_POSTSCRIPTUM = 'order_product_attribute_combination.ATTRIBUTE_POSTSCRIPTUM';
 
     /**
      * the column name for the ATTRIBUTE_AV_TITLE field
@@ -141,11 +141,11 @@ class OrderProductAttributeCombinationTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'OrderProductId', 'AttributeTitle', 'AttributeChapo', 'AttributeDescription', 'AttributePostscriptumn', 'AttributeAvTitle', 'AttributeAvChapo', 'AttributeAvDescription', 'AttributeAvPostscriptum', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'orderProductId', 'attributeTitle', 'attributeChapo', 'attributeDescription', 'attributePostscriptumn', 'attributeAvTitle', 'attributeAvChapo', 'attributeAvDescription', 'attributeAvPostscriptum', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(OrderProductAttributeCombinationTableMap::ID, OrderProductAttributeCombinationTableMap::ORDER_PRODUCT_ID, OrderProductAttributeCombinationTableMap::ATTRIBUTE_TITLE, OrderProductAttributeCombinationTableMap::ATTRIBUTE_CHAPO, OrderProductAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION, OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUMN, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_POSTSCRIPTUM, OrderProductAttributeCombinationTableMap::CREATED_AT, OrderProductAttributeCombinationTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_PRODUCT_ID', 'ATTRIBUTE_TITLE', 'ATTRIBUTE_CHAPO', 'ATTRIBUTE_DESCRIPTION', 'ATTRIBUTE_POSTSCRIPTUMN', 'ATTRIBUTE_AV_TITLE', 'ATTRIBUTE_AV_CHAPO', 'ATTRIBUTE_AV_DESCRIPTION', 'ATTRIBUTE_AV_POSTSCRIPTUM', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'order_product_id', 'attribute_title', 'attribute_chapo', 'attribute_description', 'attribute_postscriptumn', 'attribute_av_title', 'attribute_av_chapo', 'attribute_av_description', 'attribute_av_postscriptum', 'created_at', 'updated_at', ),
+        self::TYPE_PHPNAME       => array('Id', 'OrderProductId', 'AttributeTitle', 'AttributeChapo', 'AttributeDescription', 'AttributePostscriptum', 'AttributeAvTitle', 'AttributeAvChapo', 'AttributeAvDescription', 'AttributeAvPostscriptum', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'orderProductId', 'attributeTitle', 'attributeChapo', 'attributeDescription', 'attributePostscriptum', 'attributeAvTitle', 'attributeAvChapo', 'attributeAvDescription', 'attributeAvPostscriptum', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(OrderProductAttributeCombinationTableMap::ID, OrderProductAttributeCombinationTableMap::ORDER_PRODUCT_ID, OrderProductAttributeCombinationTableMap::ATTRIBUTE_TITLE, OrderProductAttributeCombinationTableMap::ATTRIBUTE_CHAPO, OrderProductAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION, OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUM, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_POSTSCRIPTUM, OrderProductAttributeCombinationTableMap::CREATED_AT, OrderProductAttributeCombinationTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'ORDER_PRODUCT_ID', 'ATTRIBUTE_TITLE', 'ATTRIBUTE_CHAPO', 'ATTRIBUTE_DESCRIPTION', 'ATTRIBUTE_POSTSCRIPTUM', 'ATTRIBUTE_AV_TITLE', 'ATTRIBUTE_AV_CHAPO', 'ATTRIBUTE_AV_DESCRIPTION', 'ATTRIBUTE_AV_POSTSCRIPTUM', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'order_product_id', 'attribute_title', 'attribute_chapo', 'attribute_description', 'attribute_postscriptum', 'attribute_av_title', 'attribute_av_chapo', 'attribute_av_description', 'attribute_av_postscriptum', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
     );
 
@@ -156,11 +156,11 @@ class OrderProductAttributeCombinationTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderProductId' => 1, 'AttributeTitle' => 2, 'AttributeChapo' => 3, 'AttributeDescription' => 4, 'AttributePostscriptumn' => 5, 'AttributeAvTitle' => 6, 'AttributeAvChapo' => 7, 'AttributeAvDescription' => 8, 'AttributeAvPostscriptum' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderProductId' => 1, 'attributeTitle' => 2, 'attributeChapo' => 3, 'attributeDescription' => 4, 'attributePostscriptumn' => 5, 'attributeAvTitle' => 6, 'attributeAvChapo' => 7, 'attributeAvDescription' => 8, 'attributeAvPostscriptum' => 9, 'createdAt' => 10, 'updatedAt' => 11, ),
-        self::TYPE_COLNAME       => array(OrderProductAttributeCombinationTableMap::ID => 0, OrderProductAttributeCombinationTableMap::ORDER_PRODUCT_ID => 1, OrderProductAttributeCombinationTableMap::ATTRIBUTE_TITLE => 2, OrderProductAttributeCombinationTableMap::ATTRIBUTE_CHAPO => 3, OrderProductAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION => 4, OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUMN => 5, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE => 6, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO => 7, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION => 8, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_POSTSCRIPTUM => 9, OrderProductAttributeCombinationTableMap::CREATED_AT => 10, OrderProductAttributeCombinationTableMap::UPDATED_AT => 11, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_PRODUCT_ID' => 1, 'ATTRIBUTE_TITLE' => 2, 'ATTRIBUTE_CHAPO' => 3, 'ATTRIBUTE_DESCRIPTION' => 4, 'ATTRIBUTE_POSTSCRIPTUMN' => 5, 'ATTRIBUTE_AV_TITLE' => 6, 'ATTRIBUTE_AV_CHAPO' => 7, 'ATTRIBUTE_AV_DESCRIPTION' => 8, 'ATTRIBUTE_AV_POSTSCRIPTUM' => 9, 'CREATED_AT' => 10, 'UPDATED_AT' => 11, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'order_product_id' => 1, 'attribute_title' => 2, 'attribute_chapo' => 3, 'attribute_description' => 4, 'attribute_postscriptumn' => 5, 'attribute_av_title' => 6, 'attribute_av_chapo' => 7, 'attribute_av_description' => 8, 'attribute_av_postscriptum' => 9, 'created_at' => 10, 'updated_at' => 11, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'OrderProductId' => 1, 'AttributeTitle' => 2, 'AttributeChapo' => 3, 'AttributeDescription' => 4, 'AttributePostscriptum' => 5, 'AttributeAvTitle' => 6, 'AttributeAvChapo' => 7, 'AttributeAvDescription' => 8, 'AttributeAvPostscriptum' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'orderProductId' => 1, 'attributeTitle' => 2, 'attributeChapo' => 3, 'attributeDescription' => 4, 'attributePostscriptum' => 5, 'attributeAvTitle' => 6, 'attributeAvChapo' => 7, 'attributeAvDescription' => 8, 'attributeAvPostscriptum' => 9, 'createdAt' => 10, 'updatedAt' => 11, ),
+        self::TYPE_COLNAME       => array(OrderProductAttributeCombinationTableMap::ID => 0, OrderProductAttributeCombinationTableMap::ORDER_PRODUCT_ID => 1, OrderProductAttributeCombinationTableMap::ATTRIBUTE_TITLE => 2, OrderProductAttributeCombinationTableMap::ATTRIBUTE_CHAPO => 3, OrderProductAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION => 4, OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUM => 5, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE => 6, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO => 7, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION => 8, OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_POSTSCRIPTUM => 9, OrderProductAttributeCombinationTableMap::CREATED_AT => 10, OrderProductAttributeCombinationTableMap::UPDATED_AT => 11, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ORDER_PRODUCT_ID' => 1, 'ATTRIBUTE_TITLE' => 2, 'ATTRIBUTE_CHAPO' => 3, 'ATTRIBUTE_DESCRIPTION' => 4, 'ATTRIBUTE_POSTSCRIPTUM' => 5, 'ATTRIBUTE_AV_TITLE' => 6, 'ATTRIBUTE_AV_CHAPO' => 7, 'ATTRIBUTE_AV_DESCRIPTION' => 8, 'ATTRIBUTE_AV_POSTSCRIPTUM' => 9, 'CREATED_AT' => 10, 'UPDATED_AT' => 11, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'order_product_id' => 1, 'attribute_title' => 2, 'attribute_chapo' => 3, 'attribute_description' => 4, 'attribute_postscriptum' => 5, 'attribute_av_title' => 6, 'attribute_av_chapo' => 7, 'attribute_av_description' => 8, 'attribute_av_postscriptum' => 9, 'created_at' => 10, 'updated_at' => 11, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
     );
 
@@ -185,7 +185,7 @@ class OrderProductAttributeCombinationTableMap extends TableMap
         $this->addColumn('ATTRIBUTE_TITLE', 'AttributeTitle', 'VARCHAR', true, 255, null);
         $this->addColumn('ATTRIBUTE_CHAPO', 'AttributeChapo', 'LONGVARCHAR', false, null, null);
         $this->addColumn('ATTRIBUTE_DESCRIPTION', 'AttributeDescription', 'CLOB', false, null, null);
-        $this->addColumn('ATTRIBUTE_POSTSCRIPTUMN', 'AttributePostscriptumn', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('ATTRIBUTE_POSTSCRIPTUM', 'AttributePostscriptum', 'LONGVARCHAR', false, null, null);
         $this->addColumn('ATTRIBUTE_AV_TITLE', 'AttributeAvTitle', 'VARCHAR', true, 255, null);
         $this->addColumn('ATTRIBUTE_AV_CHAPO', 'AttributeAvChapo', 'LONGVARCHAR', false, null, null);
         $this->addColumn('ATTRIBUTE_AV_DESCRIPTION', 'AttributeAvDescription', 'CLOB', false, null, null);
@@ -358,7 +358,7 @@ class OrderProductAttributeCombinationTableMap extends TableMap
             $criteria->addSelectColumn(OrderProductAttributeCombinationTableMap::ATTRIBUTE_TITLE);
             $criteria->addSelectColumn(OrderProductAttributeCombinationTableMap::ATTRIBUTE_CHAPO);
             $criteria->addSelectColumn(OrderProductAttributeCombinationTableMap::ATTRIBUTE_DESCRIPTION);
-            $criteria->addSelectColumn(OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUMN);
+            $criteria->addSelectColumn(OrderProductAttributeCombinationTableMap::ATTRIBUTE_POSTSCRIPTUM);
             $criteria->addSelectColumn(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_TITLE);
             $criteria->addSelectColumn(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_CHAPO);
             $criteria->addSelectColumn(OrderProductAttributeCombinationTableMap::ATTRIBUTE_AV_DESCRIPTION);
@@ -371,7 +371,7 @@ class OrderProductAttributeCombinationTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_TITLE');
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_CHAPO');
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_DESCRIPTION');
-            $criteria->addSelectColumn($alias . '.ATTRIBUTE_POSTSCRIPTUMN');
+            $criteria->addSelectColumn($alias . '.ATTRIBUTE_POSTSCRIPTUM');
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_AV_TITLE');
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_AV_CHAPO');
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_AV_DESCRIPTION');

@@ -25,13 +25,11 @@ namespace Thelia\Coupon;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
-use Thelia\Constraint\ConstraintFactory;
-use Thelia\Constraint\Rule\CouponRuleInterface;
+use Thelia\Condition\ConditionFactory;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Exception\CouponExpiredException;
-use Thelia\Exception\InvalidRuleException;
+use Thelia\Exception\InvalidConditionException;
 use Thelia\Model\Coupon;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -49,7 +47,7 @@ class CouponFactory
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
-    /** @var  CouponAdapterInterface Provide necessary value from Thelia*/
+    /** @var  AdapterInterface Provide necessary value from Thelia*/
     protected $adapter;
 
     /**
@@ -57,7 +55,7 @@ class CouponFactory
      *
      * @param ContainerInterface $container Service container
      */
-    function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->adapter = $container->get('thelia.adapter');
@@ -69,6 +67,7 @@ class CouponFactory
      * @param string $couponCode Coupon code ex: XMAS
      *
      * @throws \Thelia\Exception\CouponExpiredException
+     * @throws \Thelia\Exception\InvalidConditionException
      * @throws \Symfony\Component\Translation\Exception\NotFoundResourceException
      * @return CouponInterface ready to be processed
      */
@@ -87,9 +86,9 @@ class CouponFactory
         }
 
         /** @var CouponInterface $couponInterface */
-        $couponInterface = $this->buildCouponInterfacFromModel($couponModel);
-        if ($couponInterface->getRules()->isEmpty()) {
-            throw new InvalidRuleException(
+        $couponInterface = $this->buildCouponInterfaceFromModel($couponModel);
+        if ($couponInterface->getConditions()->isEmpty()) {
+            throw new InvalidConditionException(
                 get_class($couponInterface)
             );
         }
@@ -104,7 +103,7 @@ class CouponFactory
      *
      * @return CouponInterface ready to use CouponInterface object instance
      */
-    protected function buildCouponInterfacFromModel(Coupon $model)
+    protected function buildCouponInterfaceFromModel(Coupon $model)
     {
         $isCumulative = ($model->getIsCumulative() == 1 ? true : false);
         $isRemovingPostage = ($model->getIsRemovingPostage() == 1 ? true : false);
@@ -130,13 +129,13 @@ class CouponFactory
             $model->getExpirationDate()
         );
 
-        /** @var ConstraintFactory $constraintFactory */
-        $constraintFactory = $this->container->get('thelia.constraint.factory');
-        $rules = $constraintFactory->unserializeCouponRuleCollection(
-            $model->getSerializedRules()
+        /** @var ConditionFactory $conditionFactory */
+        $conditionFactory = $this->container->get('thelia.condition.factory');
+        $conditions = $conditionFactory->unserializeConditionCollection(
+            $model->getSerializedConditions()
         );
 
-        $couponManager->setRules($rules);
+        $couponManager->setConditions($conditions);
 
         return $couponManager;
     }

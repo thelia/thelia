@@ -8,7 +8,7 @@
     <nav>
         <ul class="breadcrumb">
             <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
-            <li><a href="{url path='admin/coupon/'}">{intl l='Coupon'}</a></li>
+            <li><a href="{url path='admin/coupon'}">{intl l='Coupon'}</a></li>
             <li>{intl l='Update'} {$couponCode}</li>
         </ul>
     </nav>
@@ -18,13 +18,11 @@
     </div>
 
     {form name="thelia.admin.coupon.creation"}
-        {include file='coupon/form.html' formAction={url path={$formAction}} form=$form noRules=false}
+        {include file='coupon/form.html' formAction={url path={$formAction}} form=$form noConditions=false}
     {/form}
 
 </section> <!-- #wrapper -->
 {/block}
-
-{include file='includes/confirmation-modal.html'}
 
 {block name="javascript-initialization"}
     {javascripts file='assets/bootstrap-datepicker/js/bootstrap-datepicker.js'}
@@ -47,87 +45,87 @@
         $(function($){
             miniBrowser(0, '/test_to_remove/datas_coupon_edit.json');
 
-            // Init Rules
-            couponManager.initRules = function() {
-                var rules = [];
-                {foreach from=$rulesObject key=k item=rule}
-                    // Init rule
-                    var rule = {};
-                    rule['serviceId'] = '{$rule.serviceId nofilter}';
-                    rule['operators'] = {};
-                    rule['values'] = {};
+            // Init Conditions
+            $.couponManager.initConditions = function() {
+                var conditions = [];
+                {foreach from=$conditionsObject key=k item=condition}
+                    // Init condition
+                    var condition = {};
+                    condition['serviceId'] = '{$condition.serviceId nofilter}';
+                    condition['operators'] = {};
+                    condition['values'] = {};
 
-                    {foreach from=$rule.validators.setOperators key=input item=operator}
-                        rule['operators']['{$input nofilter}'] = '{$operator nofilter}';
-                        rule['values']['{$input nofilter}'] = '{$rule.validators.setValues[$input] nofilter}';
+                    {foreach from=$condition.validators.setOperators key=input item=operator}
+                        condition['operators']['{$input nofilter}'] = '{$operator nofilter}';
+                        condition['values']['{$input nofilter}'] = '{$condition.validators.setValues[$input] nofilter}';
                     {/foreach}
 
-                    // Add rule
-                    rules.push(rule);
+                    // Add condition
+                    conditions.push(condition);
                 {/foreach}
 
-                return rules;
+                return conditions;
             };
 
-            // Save Rules AJAX
-            couponManager.saveRuleAjax = function() {
-                $('#constraint-add-operators-values').html('<div class="loading" ></div>');
-                var $url = '{$urlAjaxUpdateRules}';
+            // Save Conditions AJAX
+            $.couponManager.saveConditionAjax = function() {
+                $('#condition-add-operators-values').html('<div class="loading" ></div>');
+                var $url = '{$urlAjaxUpdateConditions}';
                 $.ajax({
                     type: "POST",
                     url: $url,
-                    data: {literal}{{/literal}rules:JSON.stringify(couponManager.rulesToSave){literal}}{/literal},
+                    data: {literal}{{/literal}conditions:JSON.stringify($.couponManager.conditionsToSave){literal}}{/literal},
                     statusCode: {
                         404: function() {
-                            $('#constraint-add-operators-values').html(
+                            $('#condition-add-operators-values').html(
                                 '{intl l='Please retry'}'
                             );
                         }
                     }
                 }).done(function(data) {
-                    $('#constraint-list').html(data);
-                    $('#constraint-add-operators-values').html('');
-                    // Set the rule selector
-                    $("#category-rule option").filter(function() {
-                        return $(this).val() == 'thelia.constraint.rule.available_for_everyone';
+                    $('#condition-list').html(data);
+                    $('#condition-add-operators-values').html('');
+                    // Set the condition selector
+                    $("#category-condition option").filter(function() {
+                        return $(this).val() == 'thelia.condition.match_for_everyone';
                     }).prop('selected', true);
 
-                    couponManager.onClickUpdateRule();
-                    couponManager.onClickDeleteRule();
+                    $.couponManager.onClickUpdateCondition();
+                    $.couponManager.onClickDeleteCondition();
                 });
             };
 
-            // Reload rule inputs
-            couponManager.loadRuleInputs = function(ruleId, callBack) {
-                $('#constraint-add-operators-values').html('<div class="loading" ></div>');
-                var url = "{$urlAjaxGetRuleInput}";
-                url = url.replace('ruleId', ruleId)
+            // Reload condition inputs
+            $.couponManager.loadConditionInputs = function(conditionId, callBack) {
+                $('#condition-add-operators-values').html('<div class="loading" ></div>');
+                var url = "{$urlAjaxGetConditionInput}";
+                url = url.replace('conditionId', conditionId)
                 $.ajax({
                     url: url,
                     statusCode: {
                         404: function() {
-                            $('#constraint-add-operators-values').html(
-                                '{intl l='Please select another rule'}'
+                            $('#condition-add-operators-values').html(
+                                '{intl l='Please select another condition'}'
                             );
                         }
                     }
                 }).done(function(data) {
-                    $('#constraint-add-operators-values').html(data);
-                    couponManager.ruleToSave.serviceId = ruleId;
-                    if (ruleId == -1) {
+                    $('#condition-add-operators-values').html(data);
+                    $.couponManager.conditionToSave.serviceId = conditionId;
+                    if (conditionId == -1) {
                         // Placeholder can't be saved
-                        $('#constraint-save-btn').hide();
+                        $('#condition-save-btn').hide();
                     } else {
-                        $('#constraint-save-btn').show();
+                        $('#condition-save-btn').show();
                     }
                     return callBack();
                 });
             };
 
-            // Rules which will be saved
-            couponManager.rulesToSave = couponManager.initRules();
+            // Conditions which will be saved
+            $.couponManager.conditionsToSave = $.couponManager.initConditions();
 
-            $('#constraint-save-btn').hide();
+            $('#condition-save-btn').hide();
 
         });
     </script>

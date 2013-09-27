@@ -87,7 +87,7 @@ class CouponCreationForm extends BaseForm
                 )
             )
             ->add(
-                'effect',
+                'type',
                 'text',
                 array(
                     'constraints' => array(
