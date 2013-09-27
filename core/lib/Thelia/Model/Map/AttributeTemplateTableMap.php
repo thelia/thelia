@@ -57,7 +57,7 @@ class AttributeTemplateTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class AttributeTemplateTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the ID field
@@ -88,11 +88,6 @@ class AttributeTemplateTableMap extends TableMap
      * the column name for the POSITION field
      */
     const POSITION = 'attribute_template.POSITION';
-
-    /**
-     * the column name for the ATTRIBUTE_TEMPLATECOL field
-     */
-    const ATTRIBUTE_TEMPLATECOL = 'attribute_template.ATTRIBUTE_TEMPLATECOL';
 
     /**
      * the column name for the CREATED_AT field
@@ -116,12 +111,12 @@ class AttributeTemplateTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'AttributeId', 'TemplateId', 'Position', 'AttributeTemplatecol', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'attributeId', 'templateId', 'position', 'attributeTemplatecol', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AttributeTemplateTableMap::ID, AttributeTemplateTableMap::ATTRIBUTE_ID, AttributeTemplateTableMap::TEMPLATE_ID, AttributeTemplateTableMap::POSITION, AttributeTemplateTableMap::ATTRIBUTE_TEMPLATECOL, AttributeTemplateTableMap::CREATED_AT, AttributeTemplateTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'ATTRIBUTE_ID', 'TEMPLATE_ID', 'POSITION', 'ATTRIBUTE_TEMPLATECOL', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'attribute_id', 'template_id', 'position', 'attribute_templatecol', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'AttributeId', 'TemplateId', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'attributeId', 'templateId', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AttributeTemplateTableMap::ID, AttributeTemplateTableMap::ATTRIBUTE_ID, AttributeTemplateTableMap::TEMPLATE_ID, AttributeTemplateTableMap::POSITION, AttributeTemplateTableMap::CREATED_AT, AttributeTemplateTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'ATTRIBUTE_ID', 'TEMPLATE_ID', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'attribute_id', 'template_id', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -131,12 +126,12 @@ class AttributeTemplateTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'AttributeId' => 1, 'TemplateId' => 2, 'Position' => 3, 'AttributeTemplatecol' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'attributeId' => 1, 'templateId' => 2, 'position' => 3, 'attributeTemplatecol' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(AttributeTemplateTableMap::ID => 0, AttributeTemplateTableMap::ATTRIBUTE_ID => 1, AttributeTemplateTableMap::TEMPLATE_ID => 2, AttributeTemplateTableMap::POSITION => 3, AttributeTemplateTableMap::ATTRIBUTE_TEMPLATECOL => 4, AttributeTemplateTableMap::CREATED_AT => 5, AttributeTemplateTableMap::UPDATED_AT => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ATTRIBUTE_ID' => 1, 'TEMPLATE_ID' => 2, 'POSITION' => 3, 'ATTRIBUTE_TEMPLATECOL' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'attribute_id' => 1, 'template_id' => 2, 'position' => 3, 'attribute_templatecol' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'AttributeId' => 1, 'TemplateId' => 2, 'Position' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'attributeId' => 1, 'templateId' => 2, 'position' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(AttributeTemplateTableMap::ID => 0, AttributeTemplateTableMap::ATTRIBUTE_ID => 1, AttributeTemplateTableMap::TEMPLATE_ID => 2, AttributeTemplateTableMap::POSITION => 3, AttributeTemplateTableMap::CREATED_AT => 4, AttributeTemplateTableMap::UPDATED_AT => 5, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ATTRIBUTE_ID' => 1, 'TEMPLATE_ID' => 2, 'POSITION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'attribute_id' => 1, 'template_id' => 2, 'position' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -160,7 +155,6 @@ class AttributeTemplateTableMap extends TableMap
         $this->addForeignKey('ATTRIBUTE_ID', 'AttributeId', 'INTEGER', 'attribute', 'ID', true, null, null);
         $this->addForeignKey('TEMPLATE_ID', 'TemplateId', 'INTEGER', 'template', 'ID', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
-        $this->addColumn('ATTRIBUTE_TEMPLATECOL', 'AttributeTemplatecol', 'VARCHAR', false, 45, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -329,7 +323,6 @@ class AttributeTemplateTableMap extends TableMap
             $criteria->addSelectColumn(AttributeTemplateTableMap::ATTRIBUTE_ID);
             $criteria->addSelectColumn(AttributeTemplateTableMap::TEMPLATE_ID);
             $criteria->addSelectColumn(AttributeTemplateTableMap::POSITION);
-            $criteria->addSelectColumn(AttributeTemplateTableMap::ATTRIBUTE_TEMPLATECOL);
             $criteria->addSelectColumn(AttributeTemplateTableMap::CREATED_AT);
             $criteria->addSelectColumn(AttributeTemplateTableMap::UPDATED_AT);
         } else {
@@ -337,7 +330,6 @@ class AttributeTemplateTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_ID');
             $criteria->addSelectColumn($alias . '.TEMPLATE_ID');
             $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.ATTRIBUTE_TEMPLATECOL');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

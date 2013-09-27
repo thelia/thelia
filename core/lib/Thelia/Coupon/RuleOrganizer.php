@@ -30,20 +30,20 @@ namespace Thelia\Coupon;
  *
  * Manage how Coupons could interact with a Checkout
  *
- * @package Coupon
+ * @package Condition
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
 class RuleOrganizer implements RuleOrganizerInterface
 {
     /**
-     * Organize CouponRuleInterface
+     * Organize ConditionManagerInterface
      *
-     * @param array $rules Array of CouponRuleInterface
+     * @param array $conditions Array of ConditionManagerInterface
      *
-     * @return array Array of CouponRuleInterface sorted
+     * @return array Array of ConditionManagerInterface sorted
      */
-    public function organize(array $rules)
+    public function organize(array $conditions)
     {
         // TODO: Implement organize() method.
     }
