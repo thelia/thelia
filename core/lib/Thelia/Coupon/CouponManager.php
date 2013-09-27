@@ -241,7 +241,7 @@ class CouponManager
      *
      * @param ConditionManagerInterface $condition ConditionManagerInterface
      */
-    public function addAvailableRule(ConditionManagerInterface $condition)
+    public function addAvailableCondition(ConditionManagerInterface $condition)
     {
         $this->availableConditions[] = $condition;
     }

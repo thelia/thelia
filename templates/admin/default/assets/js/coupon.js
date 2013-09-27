@@ -55,7 +55,7 @@ $(function($){
         $.couponManager.conditionToSave = $.couponManager.conditionsToSave[id];
 
         // Set the condition selector
-        $("#category-rule option").filter(function() {
+        $("#category-condition option").filter(function() {
             return $(this).val() == $.couponManager.conditionToSave.serviceId;
         }).prop('selected', true);
 
@@ -90,7 +90,7 @@ $(function($){
     // Save conditions on click
     $.couponManager.onClickSaveCondition = function() {
         $('#constraint-save-btn').on('click', function () {
-            if($('#category-rule').val() == 'thelia.condition.match_for_everyone') {
+            if($('#category-condition').val() == 'thelia.condition.match_for_everyone') {
 //                // @todo translate message + put it in modal
                 var r = confirm("Do you really want to set this coupon available to everyone ?");
                 if (r == true) {
@@ -140,7 +140,7 @@ $(function($){
 
     // Reload condition inputs when changing effect
     $.couponManager.onConditionChange = function() {
-        $('#category-rule').on('change', function () {
+        $('#category-condition').on('change', function () {
             $.couponManager.loadConditionInputs($(this).val(), function() {});
         });
     };
@@ -152,9 +152,9 @@ $(function($){
 
     // Set max usage to unlimited or not
     $.couponManager.onUsageUnlimitedChange = function() {
-        var isUnlimited = $('#is-unlimited');
+        var $isUnlimited = $('#is-unlimited');
         if ($('#max-usage').val() == -1) {
-            isUnlimited.prop('checked', true);
+            $isUnlimited.prop('checked', true);
             $('#max-usage').hide();
             $('#max-usage-label').hide();
         } else {
@@ -163,7 +163,7 @@ $(function($){
             $('#max-usage-label').show();
         }
 
-        isUnlimited.change(function(){
+        $isUnlimited.change(function(){
             var $this = $(this);
             if ($this.is(':checked')) {
                 $('#max-usage').hide().val('-1');

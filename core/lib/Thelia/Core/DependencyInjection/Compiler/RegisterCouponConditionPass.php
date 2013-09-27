@@ -35,11 +35,13 @@ use Symfony\Component\DependencyInjection\Reference;
  * Class RegisterListenersPass
  * Source code come from Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass class
  *
+ * Register all available Conditions for the coupon module
+ *
  * @package Thelia\Core\DependencyInjection\Compiler
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RegisterRulePass implements CompilerPassInterface
+class RegisterCouponConditionPass implements CompilerPassInterface
 {
     /**
      * You can modify the container here before it is dumped to PHP code.
@@ -55,11 +57,11 @@ class RegisterRulePass implements CompilerPassInterface
         }
 
         $couponManager = $container->getDefinition('thelia.coupon.manager');
-        $services = $container->findTaggedServiceIds("thelia.coupon.addRule");
+        $services = $container->findTaggedServiceIds("thelia.coupon.addCondition");
 
-        foreach ($services as $id => $rule) {
+        foreach ($services as $id => $condition) {
             $couponManager->addMethodCall(
-                'addAvailableRule',
+                'addAvailableCondition',
                 array(
                     new Reference($id)
                 )

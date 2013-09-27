@@ -208,10 +208,7 @@ class CouponController extends BaseAdminController
             $conditions = $conditionFactory->unserializeConditionCollection(
                 $coupon->getSerializedConditions()
             );
-var_dump($coupon->getIsEnabled());;
-var_dump($coupon->getIsAvailableOnSpecialOffers());;
-var_dump($coupon->getIsCumulative());;
-var_dump($coupon->getIsRemovingPostage());;
+
             $data = array(
                 'code' => $coupon->getCode(),
                 'title' => $coupon->getTitle(),
@@ -219,11 +216,11 @@ var_dump($coupon->getIsRemovingPostage());;
                 'type' => $coupon->getType(),
                 'shortDescription' => $coupon->getShortDescription(),
                 'description' => $coupon->getDescription(),
-                'isEnabled' => ($coupon->getIsEnabled() == 1),
+                'isEnabled' => $coupon->getIsEnabled(),
                 'expirationDate' => $coupon->getExpirationDate('Y-m-d'),
-                'isAvailableOnSpecialOffers' => ($coupon->getIsAvailableOnSpecialOffers() == 1),
-                'isCumulative' => ($coupon->getIsCumulative() == 1),
-                'isRemovingPostage' => ($coupon->getIsRemovingPostage() == 1),
+                'isAvailableOnSpecialOffers' => $coupon->getIsAvailableOnSpecialOffers(),
+                'isCumulative' => $coupon->getIsCumulative(),
+                'isRemovingPostage' => $coupon->getIsRemovingPostage(),
                 'maxUsage' => $coupon->getMaxUsage(),
                 'conditions' => $conditions,
                 'locale' => $coupon->getLocale(),
@@ -264,7 +261,7 @@ var_dump($coupon->getIsRemovingPostage());;
             Router::ABSOLUTE_URL
         );
 
-        $args['formAction'] = 'admin/coupon/update' . $couponId;
+        $args['formAction'] = 'admin/coupon/update/' . $couponId;
 
         return $this->render('coupon-update', $args);
     }
