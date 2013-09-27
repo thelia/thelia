@@ -141,7 +141,7 @@ try {
 
     $stmt->execute();
 
-    echo "Creating customer\n";
+    echo "Creating customers\n";
 
     //customer
     $customer = new Thelia\Model\Customer();
@@ -291,7 +291,7 @@ try {
         ->save();
     }
 
-    echo "Creating folders and content\n";
+    echo "Creating folders and contents\n";
 
     //folders and contents
     $contentIdList = array();

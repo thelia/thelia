@@ -238,7 +238,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->findOne();
 
         if(null === $deliveryModule) {
-            return;
+            throw new \Exception('No Delivery Module fixture found');
         }
 
         $paymentModule = ModuleQuery::create()
@@ -247,7 +247,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->findOne();
 
         if(null === $paymentModule) {
-            return;
+            throw new \Exception('No Payment Module fixture found');
         }
 
         $this->orderEvent->getOrder()->chosenDeliveryAddress = $validDeliveryAddress->getId();
