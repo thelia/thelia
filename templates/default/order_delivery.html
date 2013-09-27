@@ -7,11 +7,11 @@
 
 {block name="breadcrumb"}
     <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">You are here: </strong>
+        <strong id="breadcrumb-label">{intl l="You are here"} : </strong>
         <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">Home</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/cart"}" itemprop="url"><span itemprop="title">Cart</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">Billing and delivery</span></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/cart"}" itemprop="url"><span itemprop="title">{intl l="Cart"}</span></a></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{intl l="Billing and delivery"}</span></li>
         </ul>
     </nav><!-- /.nav-breadcrumb -->
 {/block}
@@ -20,13 +20,13 @@
     <div class="main">
         <article id="cart" class="col-main" role="main" aria-labelledby="main-label">
 
-            <h1 id="main-label" class="page-header">Your Cart</h1>
+            <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
 
             <div class="btn-group checkout-progress">
-                <a href="{url path="/cart"}" role="button" class="btn btn-step"><span class="step-nb">1</span> <span class="step-label">Your Cart</span></a>
-                <a href="#" role="button" class="btn btn-step active"><span class="step-nb">2</span> <span class="step-label">Billing and delivery</span></a>
-                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">3</span> <span class="step-label">Check my order</span></a>
-                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">Secure payment</span></a>
+                <a href="{url path="/cart"}" role="button" class="btn btn-step"><span class="step-nb">1</span> <span class="step-label">{intl l="Your Cart"}</span></a>
+                <a href="#" role="button" class="btn btn-step active"><span class="step-nb">2</span> <span class="step-label">{intl l="Billing and delivery"}</span></a>
+                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">3</span> <span class="step-label">{intl l="Check my order"}</span></a>
+                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">{intl l="Secure payment"}</span></a>
             </div>
 
             {form name="thelia.order.delivery"}
@@ -40,8 +40,8 @@
 
                 <div id="delivery-address" class="panel">
                     <div class="panel-heading clearfix">
-                        <a href="{url path="/address/create"}" class="btn btn-add-address">Add a new address</a>
-                        Chose your delivery address
+                        <a href="{url path="/address/create"}" class="btn btn-add-address">{intl l="Add a new address"}</a>
+                        {intl l="Chose your delivery address"}
                         {if $error}
                             <span class="help-block"><span class="icon-remove"></span> {$message}</span>
                         {/if}
@@ -95,7 +95,7 @@
                                 </td>
                                 <td>
                                     <div class="group-btn">
-                                        <a href="{url path="/address/update/{$ID}"}" class="btn btn-edit-address" data-toggle="tooltip" title="Edit this address"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
+                                        <a href="{url path="/address/update/{$ID}"}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
                                         {if $DEFAULT != 1}
                                             <a href="{url path="/address/delete/{$ID}"}" class="btn btn-remove-address js-remove-address" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
                                         {/if}
@@ -116,7 +116,7 @@
 
                 <div id="delivery-method" class="panel">
                     <div class="panel-heading">
-                        Choose your delivery method
+                        {intl l="Choose your delivery method"}
                         {if $error}
                             <span class="help-block"><span class="icon-remove"></span> {$message}</span>
                         {/if}
@@ -137,8 +137,8 @@
 
                 {/form_field}
 
-                <a href="{url path="/cart"}" role="button" class="btn btn-back"><span>Back</span></a>
-                <button type="submit" class="btn btn-checkout-next"><span>Next Step</span></button>
+                <a href="{url path="/cart"}" role="button" class="btn btn-back"><span>{intl l="Back"}</span></a>
+                <button type="submit" class="btn btn-checkout-next"><span>{intl l="Next Step"}</span></button>
 
             </form>
             {/form}
