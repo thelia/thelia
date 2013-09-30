@@ -21,8 +21,9 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Image;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Thelia\Core\Event\ActionEvent;
 
 /**
  * Created by JetBrains PhpStorm.

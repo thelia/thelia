@@ -25,8 +25,8 @@ namespace Thelia\Tests\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Thelia\Core\Event\OrderAddressEvent;
-use Thelia\Core\Event\OrderEvent;
+use Thelia\Core\Event\Order\OrderAddressEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
@@ -66,7 +66,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
     protected $orderAction;
 
     /**
-     * @var OrderEvent $orderEvent
+     * @var \Thelia\Core\Event\Order\OrderEvent $orderEvent
      */
     protected $orderEvent;
 

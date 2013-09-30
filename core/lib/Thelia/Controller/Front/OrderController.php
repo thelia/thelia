@@ -25,7 +25,7 @@ namespace Thelia\Controller\Front;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Event\OrderEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Form\OrderDelivery;

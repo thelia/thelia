@@ -21,8 +21,9 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Order;
 
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Order;
 use Thelia\Model\OrderAddress;
 

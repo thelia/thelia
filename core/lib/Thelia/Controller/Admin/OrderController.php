@@ -23,8 +23,8 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\OrderAddressEvent;
-use Thelia\Core\Event\OrderEvent;
+use Thelia\Core\Event\Order\OrderAddressEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\OrderUpdateAddress;

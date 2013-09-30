@@ -21,7 +21,9 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Image;
+
+use Thelia\Core\Event\CachedFileEvent;
 
 class ImageEvent extends CachedFileEvent
 {

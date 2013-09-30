@@ -27,10 +27,10 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Thelia\Core\Event\ImageCreateOrUpdateEvent;
+use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
 use Thelia\Core\Event\ImagesCreateOrUpdateEvent;
-use Thelia\Core\Event\ImageDeleteEvent;
-use Thelia\Core\Event\ImageEvent;
+use Thelia\Core\Event\Image\ImageDeleteEvent;
+use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Model\CategoryImage;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ContentImage;
@@ -106,7 +106,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      *
      * This method updates the cache_file_path and file_url attributes of the event
      *
-     * @param  ImageEvent                 $event
+     * @param  \Thelia\Core\Event\Image\ImageEvent                 $event
      * @throws \InvalidArgumentException, ImageException
      */
     public function processImage(ImageEvent $event)
@@ -255,7 +255,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     /**
      * Take care of saving image in the database and file storage
      *
-     * @param ImageCreateOrUpdateEvent $event Image event
+     * @param \Thelia\Core\Event\Image\ImageCreateOrUpdateEvent $event Image event
      *
      * @throws \Thelia\Exception\ImageException
      * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action

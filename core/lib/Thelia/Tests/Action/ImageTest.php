@@ -28,7 +28,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 
 use Thelia\Action\Image;
-use Thelia\Core\Event\ImageEvent;
+use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Model\ConfigQuery;
 
 /**

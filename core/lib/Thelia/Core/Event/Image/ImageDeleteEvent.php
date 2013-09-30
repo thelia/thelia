@@ -21,8 +21,9 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Image;
 
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\CategoryImage;
 use Thelia\Model\ContentImage;
 use Thelia\Model\FolderImage;

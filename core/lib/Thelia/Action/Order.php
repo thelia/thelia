@@ -26,8 +26,8 @@ namespace Thelia\Action;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\OrderAddressEvent;
-use Thelia\Core\Event\OrderEvent;
+use Thelia\Core\Event\Order\OrderAddressEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Exception\OrderException;
 use Thelia\Exception\TheliaProcessException;
@@ -51,7 +51,7 @@ use Thelia\Tools\I18n;
 class Order extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setDeliveryAddress(OrderEvent $event)
     {
@@ -63,7 +63,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setDeliveryModule(OrderEvent $event)
     {
@@ -76,7 +76,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setInvoiceAddress(OrderEvent $event)
     {
@@ -88,7 +88,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setPaymentModule(OrderEvent $event)
     {
@@ -100,7 +100,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function create(OrderEvent $event)
     {
@@ -281,7 +281,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function sendOrderEmail(OrderEvent $event)
     {
