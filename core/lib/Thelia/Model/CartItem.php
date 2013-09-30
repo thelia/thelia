@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\CartItem as BaseCartItem;
 use Thelia\Model\ConfigQuery;
-use Thelia\Core\Event\CartEvent;
+use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\TaxEngine\Calculator;
 
 class CartItem extends BaseCartItem

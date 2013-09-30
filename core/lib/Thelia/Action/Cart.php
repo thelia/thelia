@@ -25,7 +25,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\CartEvent;
+use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\CartItem;
@@ -45,7 +45,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      *
      * add an article in the current cart
-     * @param \Thelia\Core\Event\CartEvent $event
+     * @param \Thelia\Core\Event\Cart\CartEvent $event
      */
     public function addItem(CartEvent $event)
     {
@@ -77,7 +77,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * Delete specify article present into cart
      *
-     * @param \Thelia\Core\Event\CartEvent $event
+     * @param \Thelia\Core\Event\Cart\CartEvent $event
      */
     public function deleteItem(CartEvent $event)
     {
@@ -97,7 +97,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * don't use Form here just test the Request.
      *
-     * @param \Thelia\Core\Event\CartEvent $event
+     * @param \Thelia\Core\Event\Cart\CartEvent $event
      */
     public function changeItem(CartEvent $event)
     {
