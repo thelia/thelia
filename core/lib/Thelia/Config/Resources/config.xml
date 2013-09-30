@@ -21,6 +21,7 @@
         <loop class="Thelia\Core\Template\Loop\FeatureAvailability" name="feature-availability"/>
         <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature_value"/>
         <loop class="Thelia\Core\Template\Loop\Folder" name="folder"/>
+        <loop class="Thelia\Core\Template\Loop\FolderPath" name="folder-path"/>
         <loop class="Thelia\Core\Template\Loop\Module" name="module"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
         <loop class="Thelia\Core\Template\Loop\OrderAddress" name="order_address"/>
