@@ -24,12 +24,11 @@
 namespace Thelia\Core\Event\Folder;
 use Thelia\Core\Event\Folder\FolderEvent;
 
-
 /**
  * Class FolderToggleVisibilityEvent
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderToggleVisibilityEvent extends FolderEvent {
-
+class FolderToggleVisibilityEvent extends FolderEvent
+{
 }

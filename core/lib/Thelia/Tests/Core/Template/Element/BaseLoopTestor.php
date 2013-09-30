@@ -103,7 +103,6 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
                 $stubRequestContext
             ));
 
-
         $this->container->set('request', $request);
         $this->container->set('event_dispatcher', new EventDispatcher());
         $this->container->set('thelia.securityContext', new SecurityContext($request));

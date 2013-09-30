@@ -25,20 +25,19 @@ namespace Thelia\Core\Event\Folder;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Folder;
 
-
 /**
  * Class FolderEvent
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderEvent extends ActionEvent {
-
+class FolderEvent extends ActionEvent
+{
     /**
      * @var \Thelia\Model\Folder
      */
     protected $folder;
 
-    function __construct(Folder $folder = null)
+    public function __construct(Folder $folder = null)
     {
         $this->folder = $folder;
     }

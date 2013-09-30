@@ -92,7 +92,7 @@ class OrderUpdateAddress extends BaseForm
                     "for" => "address1_update"
                 )
             ))
-            ->add("address2", "text", array(                
+            ->add("address2", "text", array(
                 "label" => Translator::getInstance()->trans("Additional address"),
                 "label_attr" => array(
                     "for" => "address2_update"
@@ -165,7 +165,7 @@ class OrderUpdateAddress extends BaseForm
         $address = OrderAddressQuery::create()
             ->findPk($value);
 
-        if(null === $address) {
+        if (null === $address) {
             $context->addViolation("Order address ID not found");
         }
     }
@@ -175,7 +175,7 @@ class OrderUpdateAddress extends BaseForm
         $address = CustomerTitleQuery::create()
             ->findPk($value);
 
-        if(null === $address) {
+        if (null === $address) {
             $context->addViolation("Title ID not found");
         }
     }
@@ -185,7 +185,7 @@ class OrderUpdateAddress extends BaseForm
         $address = CountryQuery::create()
             ->findPk($value);
 
-        if(null === $address) {
+        if (null === $address) {
             $context->addViolation("Country ID not found");
         }
     }

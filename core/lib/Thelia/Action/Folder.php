@@ -32,15 +32,13 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Folder as FolderModel;
 
-
 /**
  * Class Folder
  * @package Thelia\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Folder extends BaseAction implements EventSubscriberInterface {
-
-
+class Folder extends BaseAction implements EventSubscriberInterface
+{
     public function update(FolderUpdateEvent $event)
     {
 
@@ -103,11 +101,10 @@ class Folder extends BaseAction implements EventSubscriberInterface {
 
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if(null !== $folder = FolderQuery::create()->findPk($event->getObjectId())) {
+        if (null !== $folder = FolderQuery::create()->findPk($event->getObjectId())) {
             $folder->setDispatcher($this->getDispatcher());
 
-            switch($event->getMode())
-            {
+            switch ($event->getMode()) {
                 case UpdatePositionEvent::POSITION_ABSOLUTE:
                     $folder->changeAbsolutePosition($event->getPosition());
                     break;

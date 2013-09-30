@@ -158,7 +158,7 @@ class ProductSaleElements extends BaseLoop
                 $taxedPrice = $PSEValue->getTaxedPrice(
                     $taxCountry
                 );
-            } catch(TaxEngineException $e) {
+            } catch (TaxEngineException $e) {
                 $taxedPrice = null;
             }
             $promoPrice = $PSEValue->getPromoPrice();
@@ -166,7 +166,7 @@ class ProductSaleElements extends BaseLoop
                 $taxedPromoPrice = $PSEValue->getTaxedPromoPrice(
                     $taxCountry
                 );
-            } catch(TaxEngineException $e) {
+            } catch (TaxEngineException $e) {
                 $taxedPromoPrice = null;
             }
 

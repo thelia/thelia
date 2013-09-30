@@ -159,7 +159,7 @@ class AssociatedContent extends Content
 
         $loopResult = parent::exec($pagination);
 
-        foreach($loopResult as $loopResultRow) {
+        foreach ($loopResult as $loopResultRow) {
 
             $relatedContentId = $loopResultRow->get('ID');
 

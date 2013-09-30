@@ -25,15 +25,12 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Router;
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\Document\DocumentDeleteEvent;
 use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
 use Thelia\Core\Event\Image\ImageDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Translation\Translator;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\CategoryDocument;
@@ -61,7 +58,6 @@ use Thelia\Tools\Rest\ResponseRest;
  */
 class FileController extends BaseAdminController
 {
-
 
     /**
      * Manage how a image collection has to be saved
@@ -126,13 +122,11 @@ class FileController extends BaseAdminController
                 $imageCreateOrUpdateEvent->setUploadedFile($fileBeingUploaded);
                 $imageCreateOrUpdateEvent->setParentName($parentModel->getTitle());
 
-
                 // Dispatch Event to the Action
                 $this->dispatch(
                     TheliaEvents::IMAGE_SAVE,
                     $imageCreateOrUpdateEvent
                 );
-
 
                 return new ResponseRest(array('status' => true, 'message' => ''));
             }
@@ -192,13 +186,11 @@ class FileController extends BaseAdminController
                 $documentCreateOrUpdateEvent->setUploadedFile($fileBeingUploaded);
                 $documentCreateOrUpdateEvent->setParentName($parentModel->getTitle());
 
-
                 // Dispatch Event to the Action
                 $this->dispatch(
                     TheliaEvents::DOCUMENT_SAVE,
                     $documentCreateOrUpdateEvent
                 );
-
 
                 return new ResponseRest(array('status' => true, 'message' => ''));
             }
@@ -675,6 +667,5 @@ class FileController extends BaseAdminController
 
         return $documentCreateEvent;
     }
-
 
 }

@@ -60,9 +60,9 @@ class ImageCreateOrUpdateEvent extends ActionEvent
     /**
      * Constructor
      *
-     * @param string $imageType   Image type
+     * @param string $imageType Image type
      *                            ex : FileManager::TYPE_CATEGORY
-     * @param int    $parentId    Image parent id
+     * @param int $parentId Image parent id
      */
     public function __construct($imageType, $parentId)
     {
@@ -209,6 +209,5 @@ class ImageCreateOrUpdateEvent extends ActionEvent
     {
         return $this->oldModelImage;
     }
-
 
 }

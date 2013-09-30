@@ -24,7 +24,6 @@
 namespace Thelia\Core\Event\Product;
 use Thelia\Core\Event\ProductEvent;
 use Thelia\Model\Product;
-use Thelia\Core\Event\ActionEvent;
 
 class ProductSetTemplateEvent extends ProductEvent
 {

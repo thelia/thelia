@@ -25,7 +25,6 @@ namespace Thelia\Tests\Action\ImageTest;
 use Thelia\Action\Customer;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 
-
 /**
  * Class CustomerTest
  * @package Thelia\Tests\Action\ImageTest

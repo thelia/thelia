@@ -31,10 +31,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\AddressQuery;
 use Thelia\Model\OrderAddressQuery;
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
 
 /**
  *

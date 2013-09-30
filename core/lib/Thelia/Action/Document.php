@@ -33,11 +33,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Tools\FileManager;
 use Thelia\Tools\URL;
 
-use Imagine\Document\ImagineInterface;
-use Imagine\Document\DocumentInterface;
-use Imagine\Document\Box;
 use Imagine\Document\Color;
-use Imagine\Document\Point;
 use Thelia\Exception\DocumentException;
 use Thelia\Core\Event\TheliaEvents;
 
@@ -80,7 +76,8 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
     /**
      * @return string root of the document cache directory in web space
      */
-    protected function getCacheDirFromWebRoot() {
+    protected function getCacheDirFromWebRoot()
+    {
         return ConfigQuery::read('document_cache_dir_from_web_root', 'cache');
     }
 
@@ -95,7 +92,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      * @param DocumentEvent $event Event
      *
      * @throws \Thelia\Exception\DocumentException
-     * @throws \InvalidArgumentException , DocumentException
+     * @throws \InvalidArgumentException           , DocumentException
      */
     public function processDocument(DocumentEvent $event)
     {
@@ -247,7 +244,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
                     'document'
                 )
             );
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->adminLogAppend(
                 $this->container->get('thelia.translator')->trans(
                     'Fail to delete document for %id% with parent id %parentId% (Exception : %e%)',

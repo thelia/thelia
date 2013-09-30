@@ -46,9 +46,9 @@ class Security extends AbstractSmartyPlugin
     /**
      * Process security check function
      *
-     * @param  array   $params
-     * @param  unknown $smarty
-     * @return string  no text is returned.
+     * @param  array                                                   $params
+     * @param  unknown                                                 $smarty
+     * @return string                                                  no text is returned.
      * @throws \Thelia\Core\Security\Exception\AuthenticationException
      */
     public function checkAuthFunction($params, &$smarty)
@@ -79,7 +79,7 @@ class Security extends AbstractSmartyPlugin
     public function checkCartNotEmptyFunction($params, &$smarty)
     {
         $cart = $this->request->getSession()->getCart();
-        if($cart===null || $cart->countCartItems() == 0) {
+        if ($cart===null || $cart->countCartItems() == 0) {
             throw new OrderException('Cart must not be empty', OrderException::CART_EMPTY, array('empty' => 1));
         }
 
@@ -90,11 +90,11 @@ class Security extends AbstractSmartyPlugin
     {
         $order = $this->request->getSession()->getOrder();
         /* Does address and module still exists ? We assume address owner can't change neither module type */
-        if($order !== null) {
+        if ($order !== null) {
             $checkAddress = AddressQuery::create()->findPk($order->chosenDeliveryAddress);
             $checkModule = ModuleQuery::create()->findPk($order->getDeliveryModuleId());
         }
-        if(null === $order || null == $checkAddress || null === $checkModule) {
+        if (null === $order || null == $checkAddress || null === $checkModule) {
             throw new OrderException('Delivery must be defined', OrderException::UNDEFINED_DELIVERY, array('missing' => 1));
         }
 

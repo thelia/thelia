@@ -104,7 +104,7 @@ class CustomerController extends BaseFrontController
                 $this->processLogin($customerCreateEvent->getCustomer());
 
                 $cart = $this->getCart($this->getRequest());
-                if($cart->getCartItems()->count() > 0) {
+                if ($cart->getCartItems()->count() > 0) {
                     $this->redirectToRoute("cart.view");
                 } else {
                     $this->redirectSuccess($customerCreation);

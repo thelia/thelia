@@ -148,7 +148,7 @@ class TheliaHttpKernel extends HttpKernel
         $currency = null;
         if ($request->query->has("currency")) {
             $currency = Model\CurrencyQuery::create()->findOneByCode($request->query->get("currency"));
-            if($currency) {
+            if ($currency) {
                 $this->container->get("event_dispatcher")->dispatch(TheliaEvents::CHANGE_DEFAULT_CURRENCY, new CurrencyEvent($currency));
             }
         } else {

@@ -109,5 +109,4 @@ class DocumentDeleteEvent extends ActionEvent
         return $this->documentToDelete;
     }
 
-
 }

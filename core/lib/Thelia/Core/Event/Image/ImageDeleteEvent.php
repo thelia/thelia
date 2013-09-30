@@ -52,7 +52,7 @@ class ImageDeleteEvent extends ActionEvent
      * Constructor
      *
      * @param CategoryImage|ProductImage|ContentImage|FolderImage $imageToDelete Image about to be deleted
-     * @param string                                              $imageType   Image type
+     * @param string                                              $imageType     Image type
      *                                                                         ex : FileManager::TYPE_CATEGORY
      */
     public function __construct($imageToDelete, $imageType)
@@ -108,6 +108,5 @@ class ImageDeleteEvent extends ActionEvent
     {
         return $this->imageToDelete;
     }
-
 
 }

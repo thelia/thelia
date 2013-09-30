@@ -45,7 +45,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
             $this->display404($event);
         }
 
-        if($event->getException() instanceof AccessDeniedHttpException) {
+        if ($event->getException() instanceof AccessDeniedHttpException) {
             $this->display403($event);
         }
     }

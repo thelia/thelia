@@ -48,10 +48,9 @@ class CustomerController extends BaseAdminController
     public function viewAction($customer_id)
     {
         if (null !== $response = $this->checkAuth("admin.customer.view")) return $response;
-
-    	return $this->render("customer-edit", array(
-    		"customer_id" => $customer_id
-    	));
+        return $this->render("customer-edit", array(
+            "customer_id" => $customer_id
+        ));
     }
 
     /**
@@ -71,7 +70,7 @@ class CustomerController extends BaseAdminController
         try {
             $customer = CustomerQuery::create()->findPk($customer_id);
 
-            if(null === $customer) {
+            if (null === $customer) {
                 throw new \InvalidArgumentException(sprintf("%d customer id does not exist", $customer_id));
             }
 
@@ -86,7 +85,7 @@ class CustomerController extends BaseAdminController
 
             $this->adminLogAppend(sprintf("Customer with Ref %s (ID %d) modified", $customerUpdated->getRef() , $customerUpdated->getId()));
 
-            if($this->getRequest()->get("save_mode") == "close") {
+            if ($this->getRequest()->get("save_mode") == "close") {
                 $this->redirectToRoute("admin.customers");
             } else {
                 $this->redirectSuccess($customerModification);
@@ -126,14 +125,14 @@ class CustomerController extends BaseAdminController
             $customer_id = $this->getRequest()->get("customer_id");
             $customer = CustomerQuery::create()->findPk($customer_id);
 
-            if(null === $customer) {
+            if (null === $customer) {
                 throw new \InvalidArgumentException(Translator::getInstance("The customer you want to delete does not exist"));
             }
 
             $event = new CustomerEvent($customer);
 
             $this->dispatch(TheliaEvents::CUSTOMER_DELETEACCOUNT, $event);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $message = $e->getMessage();
         }
 

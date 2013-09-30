@@ -31,13 +31,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Base\OrderProductQuery;
-use Thelia\Model\CountryQuery;
-use Thelia\Model\CurrencyQuery;
-use Thelia\Model\Map\OrderProductTableMap;
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
 
 /**
  *
@@ -75,7 +69,6 @@ class OrderProduct extends BaseLoop
             ->withColumn('SUM(`opt`.AMOUNT)', 'TOTAL_TAX')
             ->withColumn('SUM(`opt`.PROMO_AMOUNT)', 'TOTAL_PROMO_TAX')
             ->groupById();
-
 
         $order = $this->getOrder();
 

@@ -113,7 +113,7 @@ class AttributeController extends AbstractCrudController
 
         if ($attr_values !== null) {
 
-            foreach($attr_values as $id => $value) {
+            foreach ($attr_values as $id => $value) {
 
                 $event = new AttributeAvUpdateEvent($id);
 
@@ -168,7 +168,7 @@ class AttributeController extends AbstractCrudController
 
         $attr_array = array();
 
-        foreach($attr_av_list as $attr_av) {
+        foreach ($attr_av_list as $attr_av) {
             $attr_array[$attr_av->getId()] = $attr_av->getTitle();
         }
 
@@ -262,8 +262,7 @@ class AttributeController extends AbstractCrudController
 
                 $this->dispatch($eventType, $event);
             }
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }

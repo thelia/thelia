@@ -117,7 +117,7 @@ class Accessory extends Product
 
         $loopResult = parent::exec($pagination);
 
-        foreach($loopResult as $loopResultRow) {
+        foreach ($loopResult as $loopResultRow) {
 
             $accessoryProductId = $loopResultRow->get('ID');
 

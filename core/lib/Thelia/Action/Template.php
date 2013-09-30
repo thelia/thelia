@@ -33,14 +33,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Template\TemplateUpdateEvent;
 use Thelia\Core\Event\Template\TemplateCreateEvent;
 use Thelia\Core\Event\Template\TemplateDeleteEvent;
-use Thelia\Model\ConfigQuery;
-use Thelia\Model\TemplateAv;
-use Thelia\Model\TemplateAvQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\Category\CategoryEvent;
-use Thelia\Core\Event\Template\TemplateEvent;
-use Thelia\Model\TemplateTemplate;
-use Thelia\Model\TemplateTemplateQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Core\Event\Template\TemplateAddAttributeEvent;
 use Thelia\Core\Event\Template\TemplateDeleteAttributeEvent;
@@ -121,8 +114,8 @@ class Template extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function addAttribute(TemplateAddAttributeEvent $event) {
-
+    public function addAttribute(TemplateAddAttributeEvent $event)
+    {
         if (null === AttributeTemplateQuery::create()->filterByAttributeId($event->getAttributeId())->filterByTemplate($event->getTemplate())->findOne()) {
 
             $attribute_template = new AttributeTemplate();
@@ -155,8 +148,8 @@ class Template extends BaseAction implements EventSubscriberInterface
         return $this->genericUpdatePosition(FeatureTemplateQuery::create(), $event);
     }
 
-    public function deleteAttribute(TemplateDeleteAttributeEvent $event) {
-
+    public function deleteAttribute(TemplateDeleteAttributeEvent $event)
+    {
         $attribute_template = AttributeTemplateQuery::create()
             ->filterByAttributeId($event->getAttributeId())
             ->filterByTemplate($event->getTemplate())->findOne()
@@ -165,8 +158,8 @@ class Template extends BaseAction implements EventSubscriberInterface
         if ($attribute_template !== null) $attribute_template->delete();
     }
 
-    public function addFeature(TemplateAddFeatureEvent $event) {
-
+    public function addFeature(TemplateAddFeatureEvent $event)
+    {
         if (null === FeatureTemplateQuery::create()->filterByFeatureId($event->getFeatureId())->filterByTemplate($event->getTemplate())->findOne()) {
 
             $feature_template = new FeatureTemplate();
@@ -179,8 +172,8 @@ class Template extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function deleteFeature(TemplateDeleteFeatureEvent $event) {
-
+    public function deleteFeature(TemplateDeleteFeatureEvent $event)
+    {
         $feature_template = FeatureTemplateQuery::create()
             ->filterByFeatureId($event->getFeatureId())
             ->filterByTemplate($event->getTemplate())->findOne()

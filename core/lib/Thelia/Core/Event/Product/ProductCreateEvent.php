@@ -46,6 +46,7 @@ class ProductCreateEvent extends ProductEvent
     public function setRef($ref)
     {
         $this->ref = $ref;
+
         return $this;
     }
 
@@ -57,6 +58,7 @@ class ProductCreateEvent extends ProductEvent
     public function setTitle($title)
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -68,6 +70,7 @@ class ProductCreateEvent extends ProductEvent
     public function setLocale($locale)
     {
         $this->locale = $locale;
+
         return $this;
     }
 
@@ -79,6 +82,7 @@ class ProductCreateEvent extends ProductEvent
     public function setDefaultCategory($default_category)
     {
         $this->default_category = $default_category;
+
         return $this;
     }
 
@@ -90,6 +94,7 @@ class ProductCreateEvent extends ProductEvent
     public function setVisible($visible)
     {
         $this->visible = $visible;
+
         return $this;
     }
 
@@ -101,6 +106,7 @@ class ProductCreateEvent extends ProductEvent
     public function setBasePrice($basePrice)
     {
         $this->basePrice = $basePrice;
+
         return $this;
     }
 
@@ -112,6 +118,7 @@ class ProductCreateEvent extends ProductEvent
     public function setBaseWeight($baseWeight)
     {
         $this->baseWeight = $baseWeight;
+
         return $this;
     }
 
@@ -123,6 +130,7 @@ class ProductCreateEvent extends ProductEvent
     public function setTaxRuleId($taxRuleId)
     {
         $this->taxRuleId = $taxRuleId;
+
         return $this;
     }
 
@@ -134,6 +142,7 @@ class ProductCreateEvent extends ProductEvent
     public function setCurrencyId($currencyId)
     {
         $this->currencyId = $currencyId;
+
         return $this;
     }
 }

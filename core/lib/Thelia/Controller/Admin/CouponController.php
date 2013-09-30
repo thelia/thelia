@@ -31,7 +31,6 @@ use Thelia\Core\Event\Condition\ConditionCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\ConditionCollection;
 use Thelia\Coupon\Type\CouponInterface;
@@ -298,7 +297,6 @@ var_dump($coupon->getIsRemovingPostage());;
             )
         );
     }
-
 
     /**
      * Manage Coupons read display
@@ -612,7 +610,5 @@ var_dump($coupon->getIsRemovingPostage());;
 //            return false;
 //        }
 //    }
-
-
 
 }

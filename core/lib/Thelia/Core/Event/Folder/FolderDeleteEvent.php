@@ -24,14 +24,13 @@
 namespace Thelia\Core\Event\Folder;
 use Thelia\Core\Event\Folder\FolderEvent;
 
-
 /**
  * Class FolderDeleteEvent
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderDeleteEvent extends FolderEvent{
-
+class FolderDeleteEvent extends FolderEvent
+{
     /**
      * @var int folder id
      */
@@ -40,7 +39,7 @@ class FolderDeleteEvent extends FolderEvent{
     /**
      * @param int $folder_id
      */
-    function __construct($folder_id)
+    public function __construct($folder_id)
     {
         $this->folder_id = $folder_id;
     }
@@ -60,6 +59,5 @@ class FolderDeleteEvent extends FolderEvent{
     {
         return $this->folder_id;
     }
-
 
 }

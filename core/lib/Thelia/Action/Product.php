@@ -33,7 +33,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
-use Thelia\Model\ConfigQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
 use Thelia\Core\Event\Product\ProductAddContentEvent;
@@ -41,21 +40,16 @@ use Thelia\Core\Event\Product\ProductDeleteContentEvent;
 use Thelia\Model\ProductAssociatedContent;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductCategory;
-use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
-use Thelia\Model\TaxQuery;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\Accessory;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Model\FeatureProduct;
-use Thelia\Model\FeatureQuery;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Core\Event\Product\ProductSetTemplateEvent;
-use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\ProductSaleElementsQuery;
-use Propel\Runtime\ActiveQuery\PropelQuery;
 use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Model\AttributeAvQuery;
@@ -181,8 +175,8 @@ class Product extends BaseAction implements EventSubscriberInterface
         return $this->genericUpdatePosition(ProductQuery::create(), $event);
     }
 
-    public function addContent(ProductAddContentEvent $event) {
-
+    public function addContent(ProductAddContentEvent $event)
+    {
         if (ProductAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
              ->filterByProduct($event->getProduct())->count() <= 0) {
@@ -198,8 +192,8 @@ class Product extends BaseAction implements EventSubscriberInterface
          }
     }
 
-    public function removeContent(ProductDeleteContentEvent $event) {
-
+    public function removeContent(ProductDeleteContentEvent $event)
+    {
         $content = ProductAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
             ->filterByProduct($event->getProduct())->findOne()
@@ -212,8 +206,8 @@ class Product extends BaseAction implements EventSubscriberInterface
             ;
     }
 
-    public function addCategory(ProductAddCategoryEvent $event) {
-
+    public function addCategory(ProductAddCategoryEvent $event)
+    {
         if (ProductCategoryQuery::create()
             ->filterByProduct($event->getProduct())
             ->filterByCategoryId($event->getCategoryId())
@@ -230,8 +224,8 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function removeCategory(ProductDeleteCategoryEvent $event) {
-
+    public function removeCategory(ProductDeleteCategoryEvent $event)
+    {
         $productCategory = ProductCategoryQuery::create()
             ->filterByProduct($event->getProduct())
             ->filterByCategoryId($event->getCategoryId())
@@ -240,8 +234,8 @@ class Product extends BaseAction implements EventSubscriberInterface
         if ($productCategory != null) $productCategory->delete();
     }
 
-    public function addAccessory(ProductAddAccessoryEvent $event) {
-
+    public function addAccessory(ProductAddAccessoryEvent $event)
+    {
         if (AccessoryQuery::create()
             ->filterByAccessory($event->getAccessoryId())
             ->filterByProductId($event->getProduct()->getId())->count() <= 0) {
@@ -257,8 +251,8 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function removeAccessory(ProductDeleteAccessoryEvent $event) {
-
+    public function removeAccessory(ProductDeleteAccessoryEvent $event)
+    {
         $accessory = AccessoryQuery::create()
             ->filterByAccessory($event->getAccessoryId())
             ->filterByProductId($event->getProduct()->getId())->findOne()
@@ -271,8 +265,8 @@ class Product extends BaseAction implements EventSubscriberInterface
             ;
     }
 
-    public function setProductTemplate(ProductSetTemplateEvent $event) {
-
+    public function setProductTemplate(ProductSetTemplateEvent $event)
+    {
         $product = $event->getProduct();
 
         // Delete all product feature relations
@@ -310,8 +304,8 @@ class Product extends BaseAction implements EventSubscriberInterface
         return $this->genericUpdatePosition(ProductAssociatedContentQuery::create(), $event);
     }
 
-    public function updateFeatureProductValue(FeatureProductUpdateEvent $event) {
-
+    public function updateFeatureProductValue(FeatureProductUpdateEvent $event)
+    {
         // If the feature is not free text, it may have one ore more values.
         // If the value exists, we do not change it
         // If the value does not exists, we create it.
@@ -343,8 +337,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
         if ($event->getIsTextValue() == true) {
             $featureProduct->setFreeTextValue($event->getFeatureValue());
-        }
-        else {
+        } else {
             $featureProduct->setFeatureAvId($event->getFeatureValue());
         }
 
@@ -353,8 +346,8 @@ class Product extends BaseAction implements EventSubscriberInterface
         $event->setFeatureProduct($featureProduct);
     }
 
-    public function deleteFeatureProductValue(FeatureProductDeleteEvent $event) {
-
+    public function deleteFeatureProductValue(FeatureProductDeleteEvent $event)
+    {
         $featureProduct = FeatureProductQuery::create()
             ->filterByProductId($event->getProductId())
             ->filterByFeatureId($event->getFeatureId())
@@ -362,8 +355,8 @@ class Product extends BaseAction implements EventSubscriberInterface
         ;
     }
 
-    public function createProductCombination(ProductCreateCombinationEvent $event) {
-
+    public function createProductCombination(ProductCreateCombinationEvent $event)
+    {
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
         $con->beginTransaction();
@@ -399,7 +392,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             if (count($combinationAttributes) > 0) {
 
-                foreach($combinationAttributes as $attributeAvId) {
+                foreach ($combinationAttributes as $attributeAvId) {
 
                     $attributeAv = AttributeAvQuery::create()->findPk($attributeAvId);
 
@@ -417,8 +410,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-        }
-        catch(\Exception $ex) {
+        } catch (\Exception $ex) {
 
             $con->rollback();
 
@@ -426,8 +418,8 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function deleteProductCombination(ProductDeleteCombinationEvent $event) {
-
+    public function deleteProductCombination(ProductDeleteCombinationEvent $event)
+    {
         if (null !== $pse = ProductSaleElementsQuery::create()->findPk($event->getProductSaleElementId())) {
             $pse->delete();
         }

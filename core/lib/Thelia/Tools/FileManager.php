@@ -156,7 +156,7 @@ class FileManager
      * @param ImageCreateOrUpdateEvent                            $event      Image event
      * @param FolderImage|ContentImage|CategoryImage|ProductImage $modelImage Image to save
      *
-     * @return int Nb lines modified
+     * @return int                              Nb lines modified
      * @throws \Thelia\Exception\ImageException
      * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
      */
@@ -215,7 +215,7 @@ class FileManager
      * @param FolderDocument|ContentDocument|CategoryDocument|ProductDocument $modelDocument Document to save
      *
      * @throws \Thelia\Model\Exception\InvalidArgumentException
-     * @return int Nb lines modified
+     * @return int                                              Nb lines modified
      * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
      */
     public function saveDocument(DocumentCreateOrUpdateEvent $event, $modelDocument)
@@ -296,7 +296,6 @@ class FileManager
         );
     }
 
-
     /**
      * Delete image from file storage and database
      *
@@ -312,7 +311,6 @@ class FileManager
         unlink(str_replace('..', '', $url));
         $model->delete();
     }
-
 
     /**
      * Get image model from type

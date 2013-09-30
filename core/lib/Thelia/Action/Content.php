@@ -31,8 +31,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\Content as ContentModel;
-use Thelia\Model\FolderQuery;
-
 
 /**
  * Class Content
@@ -82,11 +80,10 @@ class Content extends BaseAction implements EventSubscriberInterface
 
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if(null !== $content = ContentQuery::create()->findPk($event->getObjectId())) {
+        if (null !== $content = ContentQuery::create()->findPk($event->getObjectId())) {
             $content->setDispatcher($this->getDispatcher());
 
-            switch($event->getMode())
-            {
+            switch ($event->getMode()) {
                 case UpdatePositionEvent::POSITION_ABSOLUTE:
                     $content->changeAbsolutePosition($event->getPosition());
                     break;
@@ -123,7 +120,6 @@ class Content extends BaseAction implements EventSubscriberInterface
             $event->setContent($content);
         }
     }
-
 
     /**
      * Returns an array of event names this subscriber wants to listen to.

@@ -86,14 +86,14 @@ class Address extends BaseAction implements EventSubscriberInterface
                 ->save()
             ;
 
-            if($event->getIsDefault()) {
+            if ($event->getIsDefault()) {
                 $addressModel->makeItDefault();
             }
 
             $event->setAddress($addressModel);
             $con->commit();
 
-        } catch(PropelException $e) {
+        } catch (PropelException $e) {
             $con->rollback();
             throw $e;
         }

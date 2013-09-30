@@ -247,6 +247,7 @@ class TheliaLoop extends AbstractSmartyPlugin
         // Find pagination
         $pagination = self::getPagination($loopName);
         if ($pagination === null) { // loop gas no result
+
             return '';
         }
 

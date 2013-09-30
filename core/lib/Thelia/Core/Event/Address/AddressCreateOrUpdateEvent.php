@@ -244,8 +244,6 @@ class AddressCreateOrUpdateEvent extends ActionEvent
         return $this->isDefault;
     }
 
-
-
     /**
      * @param \Thelia\Model\Customer $customer
      */

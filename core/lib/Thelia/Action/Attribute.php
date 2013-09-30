@@ -33,11 +33,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
 use Thelia\Core\Event\Attribute\AttributeCreateEvent;
 use Thelia\Core\Event\Attribute\AttributeDeleteEvent;
-use Thelia\Model\ConfigQuery;
-use Thelia\Model\AttributeAv;
-use Thelia\Model\AttributeAvQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Core\Event\Attribute\AttributeEvent;
 use Thelia\Model\AttributeTemplate;
 use Thelia\Model\AttributeTemplateQuery;
@@ -130,7 +126,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
     {
         $templates = TemplateQuery::create()->find();
 
-        foreach($templates as $template) {
+        foreach ($templates as $template) {
 
             $attribute_template = new AttributeTemplate();
 

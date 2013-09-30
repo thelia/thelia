@@ -33,7 +33,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
-use Thelia\Model\ConfigQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\Category\CategoryAddContentEvent;
@@ -139,8 +138,8 @@ class Category extends BaseAction implements EventSubscriberInterface
         return $this->genericUpdatePosition(CategoryQuery::create(), $event);
     }
 
-    public function addContent(CategoryAddContentEvent $event) {
-
+    public function addContent(CategoryAddContentEvent $event)
+    {
         if (CategoryAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
              ->filterByCategory($event->getCategory())->count() <= 0) {
@@ -156,8 +155,8 @@ class Category extends BaseAction implements EventSubscriberInterface
          }
     }
 
-    public function removeContent(CategoryDeleteContentEvent $event) {
-
+    public function removeContent(CategoryDeleteContentEvent $event)
+    {
         $content = CategoryAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
             ->filterByCategory($event->getCategory())->findOne()
@@ -169,7 +168,6 @@ class Category extends BaseAction implements EventSubscriberInterface
                 ->delete();
         }
     }
-
 
     /**
      * {@inheritDoc}

@@ -24,7 +24,6 @@
 namespace Thelia\Tests\Rewriting;
 use Thelia\Model\Folder;
 
-
 /**
  * Class FolderRewritingTest
  * @package Thelia\Tests\Rewriting
@@ -36,7 +35,7 @@ class FolderRewritingTest extends BaseRewritingObject
     /**
      * @return mixed an instance of Product, Folder, Content or Category Model
      */
-    function getObject()
+    public function getObject()
     {
         return new Folder();
     }

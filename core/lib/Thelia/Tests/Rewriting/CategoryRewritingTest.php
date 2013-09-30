@@ -24,7 +24,6 @@
 namespace Thelia\Tests\Rewriting;
 use Thelia\Model\Category;
 
-
 /**
  * Class CategoryRewritingTest
  * @package Thelia\Tests\Rewriting
@@ -36,7 +35,7 @@ class CategoryRewritingTest extends BaseRewritingObject
     /**
      * @return \Thelia\Model\Category
      */
-    function getObject()
+    public function getObject()
     {
         return new Category();
     }

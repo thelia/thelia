@@ -31,17 +31,12 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\Base\CategoryQuery;
-use Thelia\Model\Base\ProductCategoryQuery;
 use Thelia\Model\Base\AttributeQuery;
-use Thelia\Model\Map\ProductCategoryTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
-use Thelia\Type\BooleanOrBothType;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\TemplateQuery;
 use Thelia\Model\AttributeTemplateQuery;
-use Thelia\Core\Translation\Translator;
 use Thelia\Model\Map\AttributeTemplateTableMap;
 /**
  *
@@ -121,7 +116,7 @@ class Attribute extends BaseI18nLoop
                 // Create template array
                 if ($template == null) $template = array();
 
-                foreach($products as $product) {
+                foreach ($products as $product) {
                     $tpl_id = $product->getTemplateId();
 
                     if (! is_null($tpl_id)) $template[] = $tpl_id;
@@ -138,8 +133,7 @@ class Attribute extends BaseI18nLoop
             ;
 
             $use_attribute_pos = false;
-        }
-        else if (null !== $exclude_template) {
+        } elseif (null !== $exclude_template) {
 
             // Join with attribute_template table to get position
             $exclude_attributes = AttributeTemplateQuery::create()->filterByTemplateId($exclude_template)->select('attribute_id')->find();

@@ -24,13 +24,13 @@
 namespace Thelia\Core\Event\Folder;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 
-
 /**
  * Class FolderUpdateEvent
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderUpdateEvent extends FolderCreateEvent {
+class FolderUpdateEvent extends FolderCreateEvent
+{
     protected $folder_id;
 
     protected $chapo;
@@ -39,7 +39,7 @@ class FolderUpdateEvent extends FolderCreateEvent {
 
     protected $url;
 
-    function __construct($folder_id)
+    public function __construct($folder_id)
     {
         $this->folder_id = $folder_id;
     }

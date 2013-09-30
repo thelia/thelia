@@ -33,11 +33,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Feature\FeatureUpdateEvent;
 use Thelia\Core\Event\Feature\FeatureCreateEvent;
 use Thelia\Core\Event\Feature\FeatureDeleteEvent;
-use Thelia\Model\ConfigQuery;
-use Thelia\Model\FeatureAv;
-use Thelia\Model\FeatureAvQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Core\Event\Feature\FeatureEvent;
 use Thelia\Model\FeatureTemplate;
 use Thelia\Model\FeatureTemplateQuery;
@@ -130,7 +126,7 @@ class Feature extends BaseAction implements EventSubscriberInterface
     {
         $templates = TemplateQuery::create()->find();
 
-        foreach($templates as $template) {
+        foreach ($templates as $template) {
 
             $feature_template = new FeatureTemplate();
 

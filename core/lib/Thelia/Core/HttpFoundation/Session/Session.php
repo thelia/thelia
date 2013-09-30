@@ -51,10 +51,10 @@ class Session extends BaseSession
     public function getLang($forceDefault = true)
     {
         $lang = $this->get("thelia.current.lang");
-        if(null === $lang && $forceDefault)
-        {
+        if (null === $lang && $forceDefault) {
             $lang = Lang::getDefaultLanguage();
         }
+
         return $lang;
     }
 
@@ -74,10 +74,10 @@ class Session extends BaseSession
     {
         $currency = $this->get("thelia.current.currency");
 
-        if(null === $currency && $forceDefault)
-        {
+        if (null === $currency && $forceDefault) {
             $currency = Currency::getDefaultCurrency();
         }
+
         return $currency;
     }
 
@@ -108,6 +108,7 @@ class Session extends BaseSession
         if (null === $lang) {
             $lang =  Lang::getDefaultLanguage();
         }
+
         return $lang;
     }
 
@@ -187,7 +188,7 @@ class Session extends BaseSession
         $cart = null;
         if ($cart_id) {
             $cart = CartQuery::create()->findPk($cart_id);
-            if($cart) {
+            if ($cart) {
                 try {
                     $this->verifyValidCart($cart);
                 } catch (InvalidCartException $e) {
@@ -230,7 +231,6 @@ class Session extends BaseSession
 
     // -- Order ------------------------------------------------------------------
 
-
     public function setOrder(Order $order)
     {
         $this->set("thelia.order", $order);
@@ -245,7 +245,6 @@ class Session extends BaseSession
     {
         return $this->get("thelia.order");
     }
-
 
     /**
      * Set consumed coupons by the Customer

@@ -33,7 +33,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
 use Thelia\Core\Event\Attribute\AttributeAvCreateEvent;
 use Thelia\Core\Event\Attribute\AttributeAvDeleteEvent;
-use Thelia\Model\ConfigQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
 
 class AttributeAv extends BaseAction implements EventSubscriberInterface
@@ -114,7 +113,6 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
     {
         return $this->genericUpdatePosition(AttributeAvQuery::create(), $event);
     }
-
 
     /**
      * {@inheritDoc}

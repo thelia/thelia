@@ -24,7 +24,6 @@ namespace Thelia\Action;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Model\AdminLog;
-use Propel\Runtime\ActiveQuery\PropelQuery;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Event\UpdatePositionEvent;
 
@@ -49,7 +48,6 @@ class BaseAction
     {
         return $this->container->get('event_dispatcher');
     }
-
 
     /**
      * Changes object position, selecting absolute ou relative change.

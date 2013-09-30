@@ -331,7 +331,6 @@ final class TheliaEvents
     const ORDER_PRODUCT_BEFORE_CREATE = "action.orderProduct.beforeCreate";
     const ORDER_PRODUCT_AFTER_CREATE = "action.orderProduct.afterCreate";
 
-
     /**
      * Sent on image processing
      */
@@ -570,7 +569,6 @@ final class TheliaEvents
 
     const BEFORE_DELETEATTRIBUTE_AV = "action.before_deleteAttributeAv";
     const AFTER_DELETEATTRIBUTE_AV  = "action.after_deleteAttributeAv";
-
 
     // -- Features values management ----------------------------------------
 

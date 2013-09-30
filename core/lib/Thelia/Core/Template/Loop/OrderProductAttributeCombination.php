@@ -32,8 +32,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\Base\OrderProductAttributeCombinationQuery;
-use Thelia\Model\Map\AttributeAvTableMap;
-use Thelia\Model\Map\AttributeTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 

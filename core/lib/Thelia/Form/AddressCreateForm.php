@@ -102,7 +102,7 @@ class AddressCreateForm extends BaseForm
                     "for" => "address1_create"
                 )
             ))
-            ->add("address2", "text", array(                
+            ->add("address2", "text", array(
                 "label" => Translator::getInstance()->trans("Additional address"),
                 "label_attr" => array(
                     "for" => "address2_create"

@@ -112,7 +112,7 @@ class Address extends BaseLoop
 
         if ($default === true) {
             $search->filterByIsDefault(1, Criteria::EQUAL);
-        } else if($default === false) {
+        } elseif ($default === false) {
             $search->filterByIsDefault(0, Criteria::EQUAL);
         }
 

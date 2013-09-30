@@ -32,7 +32,6 @@ use Thelia\Form\ContentCreationForm;
 use Thelia\Form\ContentModificationForm;
 use Thelia\Model\ContentQuery;
 
-
 /**
  * Class ContentController
  * @package Thelia\Controller\Admin
@@ -212,10 +211,10 @@ class ContentController extends AbstractCrudController
     {
         $folderId = $this->getRequest()->get('folder_id', null);
 
-        if(null === $folderId) {
+        if (null === $folderId) {
             $content = $this->getExistingObject();
 
-            if($content) {
+            if ($content) {
                 $folderId = $content->getDefaultFolderId();
             }
         }
@@ -275,7 +274,7 @@ class ContentController extends AbstractCrudController
     }
 
     /**
-     * @param \Thelia\Core\Event\Content\ContentUpdateEvent $updateEvent
+     * @param  \Thelia\Core\Event\Content\ContentUpdateEvent $updateEvent
      * @return Response|void
      */
     protected function performAdditionalUpdateAction($updateEvent)
@@ -293,8 +292,8 @@ class ContentController extends AbstractCrudController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param \Thelia\Core\Event\Content\ContentDeleteEvent $deleteEvent the delete event
-     * @return Response a response, or null to continue normal processing
+     * @param  \Thelia\Core\Event\Content\ContentDeleteEvent $deleteEvent the delete event
+     * @return Response                                      a response, or null to continue normal processing
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {

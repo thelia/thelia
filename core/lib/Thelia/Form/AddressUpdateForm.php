@@ -103,7 +103,7 @@ class AddressUpdateForm extends AddressCreateForm
                     "for" => "address1_update"
                 )
             ))
-            ->add("address2", "text", array(                
+            ->add("address2", "text", array(
                 "label" => Translator::getInstance()->trans("Additional address"),
                 "label_attr" => array(
                     "for" => "address2_update"

@@ -23,13 +23,11 @@
 
 namespace Thelia\Action;
 
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Exception\OrderException;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\OrderProductAttributeCombination;
@@ -39,7 +37,6 @@ use Thelia\Model\OrderStatus;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderStatusQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Tools\I18n;
 
 /**
@@ -177,7 +174,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         /* fulfill order_products and decrease stock */
 
-        foreach($cartItems as $cartItem) {
+        foreach ($cartItems as $cartItem) {
             $product = $cartItem->getProduct();
 
             /* get translation */
@@ -186,7 +183,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $pse = $cartItem->getProductSaleElements();
 
             /* check still in stock */
-            if($cartItem->getQuantity() > $pse->getQuantity()) {
+            if ($cartItem->getQuantity() > $pse->getQuantity()) {
                 throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
             }
 
@@ -228,13 +225,13 @@ class Order extends BaseAction implements EventSubscriberInterface
             $orderProduct->save($con);
 
             /* fulfill order_product_tax */
-            foreach($taxDetail as $tax) {
+            foreach ($taxDetail as $tax) {
                 $tax->setOrderProductId($orderProduct->getId());
                 $tax->save($con);
             }
 
             /* fulfill order_attribute_combination and decrease stock */
-            foreach($pse->getAttributeCombinations() as $attributeCombination) {
+            foreach ($pse->getAttributeCombinations() as $attributeCombination) {
                 $attribute = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'Attribute', $attributeCombination->getAttributeId());
                 $attributeAv = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'AttributeAv', $attributeCombination->getAttributeAvId());
 

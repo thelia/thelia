@@ -24,7 +24,6 @@
 namespace Thelia\Core\Security\Authentication;
 
 use Thelia\Core\Security\Authentication\AuthenticatorInterface;
-use Thelia\Core\Security\UserProvider\UserProviderInterface;
 use Thelia\Core\Security\UserProvider\TokenUserProvider;
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
 
@@ -51,7 +50,6 @@ class TokenAuthenticator implements AuthenticatorInterface
         $user = $this->userProvider->getUser($keyData);
 
         if ($user === null) throw new TokenAuthenticationException("No user matches the provided token");
-
         return $user;
     }
 }

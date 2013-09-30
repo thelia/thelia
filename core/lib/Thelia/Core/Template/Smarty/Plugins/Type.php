@@ -23,26 +23,20 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
-use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Security\Exception\AuthenticationException;
-use Thelia\Exception\OrderException;
-use Thelia\Model\AddressQuery;
-use Thelia\Model\ModuleQuery;
 
 class Type extends AbstractSmartyPlugin
 {
     public function assertTypeModifier($value, $option)
     {
         $typeClass = "\\Thelia\\Type\\$option";
-        if(!class_exists($typeClass)) {
+        if (!class_exists($typeClass)) {
             throw new \InvalidArgumentException(sprintf("Invalid type name `%s` in `assertType` modifier", $option));
         }
 
         $typeInstance = new $typeClass();
-        if(!$typeInstance->isValid($value)) {
+        if (!$typeInstance->isValid($value)) {
             return '';
         }
 

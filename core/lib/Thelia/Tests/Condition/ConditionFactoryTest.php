@@ -23,7 +23,6 @@
 
 namespace Thelia\Condition\Implementation;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Operators;
@@ -94,7 +93,6 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $stubAdapter->expects($this->any())
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
-
 
         $condition1 = new MatchForTotalAmountManager($stubAdapter);
         $operators = array(
@@ -302,7 +300,6 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
 
-
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -312,7 +309,6 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             MatchForTotalAmountManager::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
-
 
         $conditions = new ConditionCollection();
         $conditions->add($condition1);
@@ -369,7 +365,6 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getContainer')
             ->will($this->returnValue($stubContainer));
 
-
         $operators = array(
             MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
             MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
@@ -379,7 +374,6 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             MatchForTotalAmountManager::INPUT2 => 'EUR'
         );
         $condition1->setValidatorsFromForm($operators, $values);
-
 
         $conditions = new ConditionCollection();
         $conditions->add($condition1);

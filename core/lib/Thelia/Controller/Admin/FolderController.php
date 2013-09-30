@@ -81,8 +81,8 @@ class FolderController extends AbstractCrudController
      *
      * @param \Thelia\Model\Folder $object
      */
-    protected function hydrateObjectForm($object) {
-
+    protected function hydrateObjectForm($object)
+    {
         // Prepare the data that will hydrate the form
         $data = array(
             'id'           => $object->getId(),
@@ -162,8 +162,8 @@ class FolderController extends AbstractCrudController
      * @param $positionValue
      * @return UpdatePositionEvent|void
      */
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue) {
-
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    {
         return new UpdatePositionEvent(
             $this->getRequest()->get('folder_id', null),
             $positionChangeMode,
@@ -196,7 +196,8 @@ class FolderController extends AbstractCrudController
     /**
      * Load an existing object from the database
      */
-    protected function getExistingObject() {
+    protected function getExistingObject()
+    {
         return FolderQuery::create()
             ->joinWithI18n($this->getCurrentEditionLocale())
             ->findOneById($this->getRequest()->get('folder_id', 0));
@@ -207,7 +208,8 @@ class FolderController extends AbstractCrudController
      *
      * @param unknown $object
      */
-    protected function getObjectLabel($object) {
+    protected function getObjectLabel($object)
+    {
         return $object->getTitle();
     }
 
@@ -226,8 +228,8 @@ class FolderController extends AbstractCrudController
      *
      * @param unknown $currentOrder, if any, null otherwise.
      */
-    protected function renderListTemplate($currentOrder) {
-
+    protected function renderListTemplate($currentOrder)
+    {
         // Get content order
         $content_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
 
@@ -239,12 +241,11 @@ class FolderController extends AbstractCrudController
             ));
     }
 
-
     /**
      * Render the edition template
      */
-    protected function renderEditionTemplate() {
-
+    protected function renderEditionTemplate()
+    {
         return $this->render('folder-edit', $this->getEditionArguments());
     }
 
@@ -257,7 +258,7 @@ class FolderController extends AbstractCrudController
     }
 
     /**
-     * @param \Thelia\Core\Event\Folder\FolderUpdateEvent $updateEvent
+     * @param  \Thelia\Core\Event\Folder\FolderUpdateEvent $updateEvent
      * @return Response|void
      */
     protected function performAdditionalUpdateAction($updateEvent)
@@ -275,8 +276,8 @@ class FolderController extends AbstractCrudController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param \Thelia\Core\Event\Folder\FolderDeleteEvent $deleteEvent the delete event
-     * @return Response a response, or null to continue normal processing
+     * @param  \Thelia\Core\Event\Folder\FolderDeleteEvent $deleteEvent the delete event
+     * @return Response                                    a response, or null to continue normal processing
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {

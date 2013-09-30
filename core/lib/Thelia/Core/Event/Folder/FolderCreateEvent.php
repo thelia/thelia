@@ -24,13 +24,13 @@
 namespace Thelia\Core\Event\Folder;
 use Thelia\Core\Event\Folder\FolderEvent;
 
-
 /**
  * Class FolderCreateEvent
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class FolderCreateEvent extends FolderEvent {
+class FolderCreateEvent extends FolderEvent
+{
     protected $title;
     protected $parent;
     protected $locale;
@@ -116,6 +116,5 @@ class FolderCreateEvent extends FolderEvent {
     {
         return $this->visible;
     }
-
 
 }

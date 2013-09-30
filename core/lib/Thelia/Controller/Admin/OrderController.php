@@ -26,7 +26,6 @@ namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Translation\Translator;
 use Thelia\Form\OrderUpdateAddress;
 use Thelia\Model\Base\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
@@ -48,10 +47,9 @@ class OrderController extends BaseAdminController
 
     public function viewAction($order_id)
     {
-
-    	return $this->render("order-edit", array(
-    		"order_id" => $order_id
-    	));
+        return $this->render("order-edit", array(
+            "order_id" => $order_id
+        ));
     }
 
     public function updateStatus($order_id = null)
@@ -61,7 +59,7 @@ class OrderController extends BaseAdminController
         $message = null;
 
         try {
-            if($order_id !== null) {
+            if ($order_id !== null) {
                 $order_id = $order_id;
             } else {
                 $order_id = $this->getRequest()->get("order_id");
@@ -72,10 +70,10 @@ class OrderController extends BaseAdminController
             $statusId = $this->getRequest()->request->get("status_id");
             $status = OrderStatusQuery::create()->findPk($statusId);
 
-            if(null === $order) {
+            if (null === $order) {
                 throw new \InvalidArgumentException("The order you want to update status does not exist");
             }
-            if(null === $status) {
+            if (null === $status) {
                 throw new \InvalidArgumentException("The status you want to set to the order does not exist");
             }
 
@@ -83,7 +81,7 @@ class OrderController extends BaseAdminController
             $event->setStatus($statusId);
 
             $this->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $message = $e->getMessage();
         }
 
@@ -95,7 +93,7 @@ class OrderController extends BaseAdminController
 
         $browsedPage = $this->getRequest()->get("order_page");
 
-        if($browsedPage) {
+        if ($browsedPage) {
             $params["order_page"] = $browsedPage;
             $this->redirectToRoute("admin.order.list", $params);
         } else {
@@ -116,7 +114,7 @@ class OrderController extends BaseAdminController
 
             $deliveryRef = $this->getRequest()->get("delivery_ref");
 
-            if(null === $order) {
+            if (null === $order) {
                 throw new \InvalidArgumentException("The order you want to update status does not exist");
             }
 
@@ -124,7 +122,7 @@ class OrderController extends BaseAdminController
             $event->setDeliveryRef($deliveryRef);
 
             $this->dispatch(TheliaEvents::ORDER_UPDATE_DELIVERY_REF, $event);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $message = $e->getMessage();
         }
 
@@ -151,7 +149,7 @@ class OrderController extends BaseAdminController
         try {
             $order = OrderQuery::create()->findPk($order_id);
 
-            if(null === $order) {
+            if (null === $order) {
                 throw new \InvalidArgumentException("The order you want to update does not exist");
             }
 
@@ -159,7 +157,7 @@ class OrderController extends BaseAdminController
 
             $orderAddress = OrderAddressQuery::create()->findPk($form->get("id")->getData());
 
-            if($orderAddress->getId() !== $order->getInvoiceOrderAddressId() && $orderAddress->getId() !== $order->getDeliveryOrderAddressId()) {
+            if ($orderAddress->getId() !== $order->getInvoiceOrderAddressId() && $orderAddress->getId() !== $order->getDeliveryOrderAddressId()) {
                 throw new \InvalidArgumentException("The order address you want to update does not belong to the current order not exist");
             }
 
@@ -180,7 +178,7 @@ class OrderController extends BaseAdminController
             $event->setOrder($order);
 
             $this->dispatch(TheliaEvents::ORDER_UPDATE_ADDRESS, $event);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $message = $e->getMessage();
         }
 

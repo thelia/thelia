@@ -107,7 +107,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         /* load customer */
         $this->customer = $this->loadCustomer();
-        if(null === $this->customer) {
+        if (null === $this->customer) {
             return;
         }
 
@@ -119,7 +119,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
     public function loadCustomer()
     {
         $customer = CustomerQuery::create()->findOne();
-        if(null === $customer) {
+        if (null === $customer) {
             return null;
         }
 
@@ -141,7 +141,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         /* add 3 items */
         $productList = array();
-        for($i=0; $i<3; $i++) {
+        for ($i=0; $i<3; $i++) {
             $pse = ProductSaleElementsQuery::create()
                 ->filterByProduct(
                     ProductQuery::create()
@@ -237,7 +237,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->filterByActivate(1)
             ->findOne();
 
-        if(null === $deliveryModule) {
+        if (null === $deliveryModule) {
             throw new \Exception('No Delivery Module fixture found');
         }
 
@@ -246,7 +246,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->filterByActivate(1)
             ->findOne();
 
-        if(null === $paymentModule) {
+        if (null === $paymentModule) {
             throw new \Exception('No Payment Module fixture found');
         }
 
@@ -258,7 +258,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         /* memorize current stocks */
         $itemsStock = array();
-        foreach($this->cartItems as $index => $cartItem) {
+        foreach ($this->cartItems as $index => $cartItem) {
             $itemsStock[$index] = $cartItem->getProductSaleElements()->getQuantity();
         }
 
@@ -318,7 +318,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->container->get('request')->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
 
         /* check ordered product */
-        foreach($this->cartItems as $index => $cartItem) {
+        foreach ($this->cartItems as $index => $cartItem) {
             $orderProduct = OrderProductQuery::create()
                 ->filterByOrderId($placedOrder->getId())
                 ->filterByProductRef($cartItem->getProduct()->getRef())
@@ -347,7 +347,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
             /* check tax */
             $orderProductTaxList = $orderProduct->getOrderProductTaxes();
-            foreach($cartItem->getProduct()->getTaxRule()->getTaxDetail($validDeliveryAddress->getCountry(), $cartItem->getPrice(), $cartItem->getPromoPrice()) as $index => $tax) {
+            foreach ($cartItem->getProduct()->getTaxRule()->getTaxDetail($validDeliveryAddress->getCountry(), $cartItem->getPrice(), $cartItem->getPromoPrice()) as $index => $tax) {
                 $orderProductTax = $orderProductTaxList[$index];
                 $this->assertEquals($tax->getAmount(), $orderProductTax->getAmount());
                 $this->assertEquals($tax->getPromoAmount(), $orderProductTax->getPromoAmount());

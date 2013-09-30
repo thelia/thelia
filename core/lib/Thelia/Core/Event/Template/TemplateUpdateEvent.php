@@ -57,6 +57,7 @@ class TemplateUpdateEvent extends TemplateCreateEvent
     public function setFeatureList($feature_list)
     {
         $this->feature_list = $feature_list;
+
         return $this;
     }
 
@@ -68,6 +69,7 @@ class TemplateUpdateEvent extends TemplateCreateEvent
     public function setAttributeList($attribute_list)
     {
         $this->attribute_list = $attribute_list;
+
         return $this;
     }
 }

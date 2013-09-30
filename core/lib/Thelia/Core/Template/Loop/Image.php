@@ -318,8 +318,7 @@ class Image extends BaseI18nLoop
                 ;
 
                 $loopResult->addRow($loopResultRow);
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 // Ignore the result and log an error
                 Tlog::getInstance()->addError("Failed to process image in image loop: ", $this->args);
             }

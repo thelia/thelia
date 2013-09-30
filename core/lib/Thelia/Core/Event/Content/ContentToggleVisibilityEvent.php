@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Content;
 
-
 /**
  * Class ContentToggleVisibilityEvent
  * @package Thelia\Core\Event\Content
