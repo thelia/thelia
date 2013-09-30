@@ -21,7 +21,7 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Product;
 
 use Thelia\Model\ProductAssociatedContent;
 use Thelia\Core\Event\ActionEvent;
