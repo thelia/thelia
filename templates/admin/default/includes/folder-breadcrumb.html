@@ -2,9 +2,9 @@
 
 <ul class="breadcrumb">
 	<li><a href="{url path='admin/home'}">{intl l="Home"}</a></li>
-	<li><a href="{url path='admin/folders'}">{intl l="Folders"}</a>
+	<li><a href="{url path='admin/folders'}">{intl l="Folders"}</a></li>
 
-	{ifloop rel="folder_path"}</li>
+	{ifloop rel="folder_path"}
 		{loop name="folder_path" type="folder-path" visible="*" folder=$folder_id}
 			{if $ID == $parent}
 				<li class="active">
@@ -19,10 +19,6 @@
 			{/if}
 	   {/loop}
 	{/ifloop}
-
-	{elseloop rel="folder_path"}
-	    </li>
-	{/elseloop}
 
     {if $editing_content == true}
         {loop name="content_path" type="content" visible="*" id=$content_id}
