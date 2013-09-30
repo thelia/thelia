@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Product\ProductUpdateEvent;

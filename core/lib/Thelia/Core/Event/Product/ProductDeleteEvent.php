@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Product;
 
-use Thelia\Core\Event\Product\ProductEvent;
 
 class ProductDeleteEvent extends ProductEvent
 {
