@@ -21,34 +21,29 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Category;
 
-use Thelia\Model\CategoryAssociatedContent;
-use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\Category\CategoryEvent;
+use Thelia\Model\Category;
 
-class CategoryAssociatedContentEvent extends ActionEvent
+class CategoryDeleteContentEvent extends CategoryEvent
 {
-    public $content = null;
+    protected $content_id;
 
-    public function __construct(CategoryAssociatedContent $content = null)
+    public function __construct(Category $category, $content_id)
     {
-        $this->content = $content;
+        parent::__construct($category);
+
+        $this->content_id = $content_id;
     }
 
-    public function hasCategoryAssociatedContent()
+    public function getContentId()
     {
-        return ! is_null($this->content);
+        return $this->content_id;
     }
 
-    public function getCategoryAssociatedContent()
+    public function setContentId($content_id)
     {
-        return $this->content;
-    }
-
-    public function setCategoryAssociatedContent(CategoryAssociatedContent $content)
-    {
-        $this->content = $content;
-
-        return $this;
+        $this->content_id = $content_id;
     }
 }

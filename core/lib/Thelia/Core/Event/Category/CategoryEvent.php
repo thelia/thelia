@@ -21,92 +21,33 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Category;
 
-class CategoryUpdateEvent extends CategoryCreateEvent
+use Thelia\Model\Category;
+use Thelia\Core\Event\ActionEvent;
+
+class CategoryEvent extends ActionEvent
 {
-    protected $category_id;
+    public $category = null;
 
-    protected $chapo;
-    protected $description;
-    protected $postscriptum;
-
-    protected $url;
-    protected $parent;
-
-    public function __construct($category_id)
+    public function __construct(Category $category = null)
     {
-        $this->category_id = $category_id;
+        $this->category = $category;
     }
 
-    public function getCategoryId()
+    public function hasCategory()
     {
-        return $this->category_id;
+        return ! is_null($this->category);
     }
 
-    public function setCategoryId($category_id)
+    public function getCategory()
     {
-        $this->category_id = $category_id;
-
-        return $this;
+        return $this->category;
     }
 
-    public function getChapo()
+    public function setCategory(Category $category)
     {
-        return $this->chapo;
-    }
-
-    public function setChapo($chapo)
-    {
-        $this->chapo = $chapo;
-
-        return $this;
-    }
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getPostscriptum()
-    {
-        return $this->postscriptum;
-    }
-
-    public function setPostscriptum($postscriptum)
-    {
-        $this->postscriptum = $postscriptum;
-
-        return $this;
-    }
-
-    public function getUrl()
-    {
-        return $this->url;
-    }
-
-    public function setUrl($url)
-    {
-        $this->url = $url;
-
-        return $this;
-    }
-
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    public function setParent($parent)
-    {
-        $this->parent = $parent;
+        $this->category = $category;
 
         return $this;
     }

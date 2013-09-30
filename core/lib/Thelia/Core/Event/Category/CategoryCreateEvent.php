@@ -21,33 +21,61 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Category;
 
-use Thelia\Model\Category;
-use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\Category\CategoryEvent;
 
-class CategoryEvent extends ActionEvent
+class CategoryCreateEvent extends CategoryEvent
 {
-    public $category = null;
+    protected $title;
+    protected $parent;
+    protected $locale;
+    protected $visible;
 
-    public function __construct(Category $category = null)
+    public function getTitle()
     {
-        $this->category = $category;
+        return $this->title;
     }
 
-    public function hasCategory()
+    public function setTitle($title)
     {
-        return ! is_null($this->category);
+        $this->title = $title;
+
+        return $this;
     }
 
-    public function getCategory()
+    public function getParent()
     {
-        return $this->category;
+        return $this->parent;
     }
 
-    public function setCategory(Category $category)
+    public function setParent($parent)
     {
-        $this->category = $category;
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getVisible()
+    {
+        return $this->visible;
+    }
+
+    public function setVisible($visible)
+    {
+        $this->visible = $visible;
 
         return $this;
     }

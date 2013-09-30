@@ -37,7 +37,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\TemplateAv;
 use Thelia\Model\TemplateAvQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\CategoryEvent;
+use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Core\Event\Template\TemplateEvent;
 use Thelia\Model\TemplateTemplate;
 use Thelia\Model\TemplateTemplateQuery;
