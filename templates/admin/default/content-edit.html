@@ -8,7 +8,7 @@
     <div class="folder edit-folder">
     <div id="wrapper" class="container">
 
-    {* include file="includes/folder-breadcrumb.html" editing_category="true" *}
+    {include file="includes/folder-breadcrumb.html" editing_category="false" editing_content="true"}
 
     <div class="row">
     {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id"}

@@ -131,7 +131,7 @@ class FolderPath extends BaseI18nLoop
 
                     // Prevent circular refererences
                     if (in_array($parent, $ids)) {
-                        throw new \LogicException(sprintf("Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)", $id, $parent));
+                        throw new \LogicException(sprintf("Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)", $id, $parent));
                     }
 
                     $ids[] = $parent;

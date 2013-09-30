@@ -1,11 +1,11 @@
 {* Breadcrumb for folders browsing and editing *}
 
 <ul class="breadcrumb">
-	<li><a href="{url path='admin/home'}">Home</a></li>
-	<li><a href="{url path='admin/folders'}">Folders</a>
+	<li><a href="{url path='admin/home'}">{intl l="Home"}</a></li>
+	<li><a href="{url path='admin/folders'}">{intl l="Folders"}</a>
 
 	{ifloop rel="folder_path"}</li>
-		{loop name="folder_path" type="folder-path" visible="*" folder=$parent}
+		{loop name="folder_path" type="folder-path" visible="*" folder=$folder_id}
 			{if $ID == $parent}
 				<li class="active">
 				   {if $editing_folder == true}
@@ -23,4 +23,10 @@
 	{elseloop rel="folder_path"}
 	    </li>
 	{/elseloop}
+
+    {if $editing_content == true}
+        {loop name="content_path" type="content" visible="*" id=$content_id}
+            <li>{intl l="Editing %title" title="$TITLE"}</li>
+        {/loop}
+    {/if}
 </ul>

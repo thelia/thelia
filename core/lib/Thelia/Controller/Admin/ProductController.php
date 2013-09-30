@@ -43,6 +43,7 @@ use Thelia\Model\CategoryQuery;
 
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
+use Thelia\Model\ProductSaleElementsQuery;
 
 /**
  * Manages products

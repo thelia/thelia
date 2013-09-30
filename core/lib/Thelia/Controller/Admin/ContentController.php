@@ -242,7 +242,8 @@ class ContentController extends AbstractCrudController
     {
         return array(
             'content_id' => $this->getRequest()->get('content_id', 0),
-            'current_tab' => $this->getRequest()->get('current_tab', 'general')
+            'current_tab' => $this->getRequest()->get('current_tab', 'general'),
+            'folder_id' => $this->getFolderId(),
         );
     }
 
