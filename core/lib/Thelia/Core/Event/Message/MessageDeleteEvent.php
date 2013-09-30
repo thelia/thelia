@@ -21,15 +21,13 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Message;
 
-class MessageUpdateEvent extends MessageCreateEvent
+use Thelia\Core\Event\Message\MessageEvent;
+
+class MessageDeleteEvent extends MessageEvent
 {
     protected $message_id;
-
-    protected $text_message;
-    protected $html_message;
-    protected $subject;
 
     public function __construct($message_id)
     {
@@ -44,42 +42,6 @@ class MessageUpdateEvent extends MessageCreateEvent
     public function setMessageId($message_id)
     {
         $this->message_id = $message_id;
-
-        return $this;
-    }
-
-    public function getTextMessage()
-    {
-        return $this->text_message;
-    }
-
-    public function setTextMessage($text_message)
-    {
-        $this->text_message = $text_message;
-
-        return $this;
-    }
-
-    public function getHtmlMessage()
-    {
-        return $this->html_message;
-    }
-
-    public function setHtmlMessage($html_message)
-    {
-        $this->html_message = $html_message;
-
-        return $this;
-    }
-
-    public function getSubject()
-    {
-        return $this->subject;
-    }
-
-    public function setSubject($subject)
-    {
-        $this->subject = $subject;
 
         return $this;
     }

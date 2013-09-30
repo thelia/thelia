@@ -21,31 +21,62 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
-use Thelia\Model\Message;
+namespace Thelia\Core\Event\Message;
 
-class MessageEvent extends ActionEvent
+use Thelia\Core\Event\Message\MessageEvent;
+
+class MessageCreateEvent extends MessageEvent
 {
-    protected $message = null;
+    protected $message_name;
+    protected $locale;
+    protected $title;
+    protected $secured;
 
-    public function __construct(Message $message = null)
+    // Use message_name to prevent conflict with Event::name property.
+    public function getMessageName()
     {
-        $this->message = $message;
+        return $this->message_name;
     }
 
-    public function hasMessage()
+    public function setMessageName($message_name)
     {
-        return ! is_null($this->message);
+        $this->message_name = $message_name;
+
+        return $this;
     }
 
-    public function getMessage()
+    public function getLocale()
     {
-        return $this->message;
+        return $this->locale;
     }
 
-    public function setMessage($message)
+    public function setLocale($locale)
     {
-        $this->message = $message;
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getSecured()
+    {
+        return $this->secured;
+    }
+
+    public function setSecured($secured)
+    {
+        $this->secured = $secured;
 
         return $this;
     }

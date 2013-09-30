@@ -23,9 +23,9 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\MessageDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;use Thelia\Core\Event\MessageUpdateEvent;
-use Thelia\Core\Event\MessageCreateEvent;
+use Thelia\Core\Event\Message\MessageDeleteEvent;
+use Thelia\Core\Event\TheliaEvents;use Thelia\Core\Event\Message\MessageUpdateEvent;
+use Thelia\Core\Event\Message\MessageCreateEvent;
 use Thelia\Model\MessageQuery;
 use Thelia\Form\MessageModificationForm;
 use Thelia\Form\MessageCreationForm;
