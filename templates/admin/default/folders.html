@@ -21,18 +21,18 @@
                         <caption>
                             {* display parent folder name, and get current folder ID *}
                             {loop name="folder_title" type="folder" visible="*" id=$parent}
-                            {intl l="Folders in %fold" fold=$TITLE}
-                            {$fold_id = $ID}
+                                {intl l="Folders in %fold" fold=$TITLE}
+                                {$fold_id = $ID}
                             {/loop}
                             {elseloop rel="folder_title"}
-                            {intl l="Top level folders"}
+                                {intl l="Top level folders"}
                             {/elseloop}
-
+{*
                             <td class="object-title">
                                 <a href="{url path='admin/folders' parent=$ID}" title="{intl l='Browse this folder'}">
                                     {$TITLE}
                                 </a>
-                            </td>
+                            </td>*}
                             {module_include location='folder_list_caption'}
 
                             {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.folders.create"}
