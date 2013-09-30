@@ -21,36 +21,21 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Feature;
 
-class FeatureAvCreateEvent extends FeatureAvEvent
+use Thelia\Core\Event\Feature\FeatureCreateEvent;
+
+class FeatureUpdateEvent extends FeatureCreateEvent
 {
-    protected $title;
-    protected $locale;
     protected $feature_id;
 
-    public function getLocale()
+    protected $description;
+    protected $chapo;
+    protected $postscriptum;
+
+    public function __construct($feature_id)
     {
-        return $this->locale;
-    }
-
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-
-        return $this;
-    }
-
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    public function setTitle($title)
-    {
-        $this->title = $title;
-
-        return $this;
+        $this->setFeatureId($feature_id);
     }
 
     public function getFeatureId()
@@ -65,4 +50,39 @@ class FeatureAvCreateEvent extends FeatureAvEvent
         return $this;
     }
 
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getChapo()
+    {
+        return $this->chapo;
+    }
+
+    public function setChapo($chapo)
+    {
+        $this->chapo = $chapo;
+
+        return $this;
+    }
+
+    public function getPostscriptum()
+    {
+        return $this->postscriptum;
+    }
+
+    public function setPostscriptum($postscriptum)
+    {
+        $this->postscriptum = $postscriptum;
+
+        return $this;
+    }
 }

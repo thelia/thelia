@@ -21,32 +21,50 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
-use Thelia\Model\Feature;
+namespace Thelia\Core\Event\Feature;
 
-class FeatureEvent extends ActionEvent
+use Thelia\Core\Event\Feature\FeatureAvEvent;
+
+class FeatureAvCreateEvent extends FeatureAvEvent
 {
-    protected $feature = null;
+    protected $title;
+    protected $locale;
+    protected $feature_id;
 
-    public function __construct(Feature $feature = null)
+    public function getLocale()
     {
-        $this->feature = $feature;
+        return $this->locale;
     }
 
-    public function hasFeature()
+    public function setLocale($locale)
     {
-        return ! is_null($this->feature);
-    }
-
-    public function getFeature()
-    {
-        return $this->feature;
-    }
-
-    public function setFeature($feature)
-    {
-        $this->feature = $feature;
+        $this->locale = $locale;
 
         return $this;
     }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getFeatureId()
+    {
+        return $this->feature_id;
+    }
+
+    public function setFeatureId($feature_id)
+    {
+        $this->feature_id = $feature_id;
+
+        return $this;
+    }
+
 }

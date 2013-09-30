@@ -30,9 +30,9 @@ use Thelia\Model\FeatureAv as FeatureAvModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\FeatureAvUpdateEvent;
-use Thelia\Core\Event\FeatureAvCreateEvent;
-use Thelia\Core\Event\FeatureAvDeleteEvent;
+use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
+use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
+use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
 

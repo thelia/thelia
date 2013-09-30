@@ -21,26 +21,50 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Feature;
 
-class FeatureDeleteEvent extends FeatureEvent
+use Thelia\Core\Event\Feature\FeatureEvent;
+
+class FeatureCreateEvent extends FeatureEvent
 {
-    protected $feature_id;
+    protected $title;
+    protected $locale;
+    protected $add_to_all_templates;
 
-    public function __construct($feature_id)
+    public function getLocale()
     {
-        $this->setFeatureId($feature_id);
+        return $this->locale;
     }
 
-    public function getFeatureId()
+    public function setLocale($locale)
     {
-        return $this->feature_id;
-    }
-
-    public function setFeatureId($feature_id)
-    {
-        $this->feature_id = $feature_id;
+        $this->locale = $locale;
 
         return $this;
     }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getAddToAllTemplates()
+    {
+        return $this->add_to_all_templates;
+    }
+
+    public function setAddToAllTemplates($add_to_all_templates)
+    {
+        $this->add_to_all_templates = $add_to_all_templates;
+
+        return $this;
+    }
+
 }

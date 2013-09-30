@@ -5,7 +5,7 @@ namespace Thelia\Model;
 use Thelia\Model\Base\Feature as BaseFeature;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\FeatureEvent;
+use Thelia\Core\Event\Feature\FeatureEvent;
 
 class Feature extends BaseFeature {
 

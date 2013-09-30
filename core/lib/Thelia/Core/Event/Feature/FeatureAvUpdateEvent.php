@@ -21,11 +21,17 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Feature;
 
-class FeatureAvDeleteEvent extends FeatureAvEvent
+use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
+
+class FeatureAvUpdateEvent extends FeatureAvCreateEvent
 {
     protected $featureAv_id;
+
+    protected $description;
+    protected $chapo;
+    protected $postscriptum;
 
     public function __construct($featureAv_id)
     {
@@ -40,6 +46,42 @@ class FeatureAvDeleteEvent extends FeatureAvEvent
     public function setFeatureAvId($featureAv_id)
     {
         $this->featureAv_id = $featureAv_id;
+
+        return $this;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getChapo()
+    {
+        return $this->chapo;
+    }
+
+    public function setChapo($chapo)
+    {
+        $this->chapo = $chapo;
+
+        return $this;
+    }
+
+    public function getPostscriptum()
+    {
+        return $this->postscriptum;
+    }
+
+    public function setPostscriptum($postscriptum)
+    {
+        $this->postscriptum = $postscriptum;
 
         return $this;
     }

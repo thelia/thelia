@@ -21,65 +21,27 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Feature;
 
-class FeatureUpdateEvent extends FeatureCreateEvent
+use Thelia\Core\Event\Feature\FeatureAvEvent;
+
+class FeatureAvDeleteEvent extends FeatureAvEvent
 {
-    protected $feature_id;
+    protected $featureAv_id;
 
-    protected $description;
-    protected $chapo;
-    protected $postscriptum;
-
-    public function __construct($feature_id)
+    public function __construct($featureAv_id)
     {
-        $this->setFeatureId($feature_id);
+        $this->setFeatureAvId($featureAv_id);
     }
 
-    public function getFeatureId()
+    public function getFeatureAvId()
     {
-        return $this->feature_id;
+        return $this->featureAv_id;
     }
 
-    public function setFeatureId($feature_id)
+    public function setFeatureAvId($featureAv_id)
     {
-        $this->feature_id = $feature_id;
-
-        return $this;
-    }
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getChapo()
-    {
-        return $this->chapo;
-    }
-
-    public function setChapo($chapo)
-    {
-        $this->chapo = $chapo;
-
-        return $this;
-    }
-
-    public function getPostscriptum()
-    {
-        return $this->postscriptum;
-    }
-
-    public function setPostscriptum($postscriptum)
-    {
-        $this->postscriptum = $postscriptum;
+        $this->featureAv_id = $featureAv_id;
 
         return $this;
     }
