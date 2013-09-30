@@ -50,13 +50,6 @@
                 <div class="row">
                     <div class="col-md-6">
 
-                        <!-- <div class="panel droppable place">
-                            <p id="drop-message">
-                                <span class="glyphicon glyphicon-plus"></span>
-                                {intl l="Drop tax here to create a tax rule"}
-                            </p>
-                        </div> -->
-
                         <div class="panel panel-default place">
                             <div class="panel-heading">
                                 <h3 class="panel-title">Create a tax rule</h3>
@@ -79,7 +72,7 @@
                             </div>
                         </div>
 
-                        <button type="button" id="apply-taxes-rules" class="btn btn-default btn-primary btn-block"><span class="glyphicon glyphicon-check"></span> {intl l="Apply"}</button>
+                        <a href="#delete_dialog" data-toggle="modal" id="apply-taxes-rules" class="btn btn-default btn-primary btn-block"><span class="glyphicon glyphicon-check"></span> {intl l="Apply"}</a>
 
                     </div>
                     <div class="col-md-6">
@@ -110,6 +103,34 @@
         </div>
 
     </div>
+    
+    {* Delete confirmation dialog *}
+
+    {capture "delete_dialog"}
+        
+        <form action="" method="">
+            <div class="form-group">
+                <select name="" id="" data-toggle="selectpicker" multiple>
+                    <option value="1">France</option>
+                    <option value="2">England</option>
+                    <option value="3">Spain</option>
+                </select>
+            </div>
+        </form>
+
+    {/capture}
+
+    {include
+        file = "includes/generic-confirm-dialog.html"
+
+        dialog_id       = "delete_dialog"
+        dialog_title    = {intl l="Delete attribute"}
+        dialog_message  = {intl l="Do you really want to delete this attribute ? It will be removed from all product templates."}
+
+        form_action     = {url path='/admin/configuration/attributes/delete'}
+        form_content    = {$smarty.capture.delete_dialog nofilter}
+    }
+
 </div>
 {/block}
 
