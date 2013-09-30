@@ -203,7 +203,7 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
     {
         $instance = $this->getInstanceFromParams($params);
 
-        $formView = $instance->getForm();
+        $formView = $instance->getView();
 
         if ($formView->vars["multipart"]) {
             return sprintf('%s="%s"',"enctype", "multipart/form-data");
