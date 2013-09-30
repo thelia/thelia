@@ -20,9 +20,10 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Customer;
 
 use Symfony\Component\EventDispatcher\Event;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Customer;
 
 /**

@@ -22,8 +22,8 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Front;
 
-use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
-use Thelia\Core\Event\CustomerLoginEvent;
+use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
@@ -257,7 +257,7 @@ class CustomerController extends BaseFrontController
 
     /**
      * @param $data
-     * @return CustomerCreateOrUpdateEvent
+     * @return \Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent
      */
     private function createEventInstance($data)
     {

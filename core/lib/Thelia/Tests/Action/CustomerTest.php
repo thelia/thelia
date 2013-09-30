@@ -23,7 +23,7 @@
 
 namespace Thelia\Tests\Action\ImageTest;
 use Thelia\Action\Customer;
-use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 
 
 /**

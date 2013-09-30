@@ -17,7 +17,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Core\Security\Role\Role;
-use Thelia\Core\Event\CustomerEvent;
+use Thelia\Core\Event\Customer\CustomerEvent;
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
