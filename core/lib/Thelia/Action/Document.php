@@ -25,9 +25,9 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Thelia\Core\Event\DocumentCreateOrUpdateEvent;
-use Thelia\Core\Event\DocumentDeleteEvent;
-use Thelia\Core\Event\DocumentEvent;
+use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
+use Thelia\Core\Event\Document\DocumentDeleteEvent;
+use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Exception\ImageException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\FileManager;
@@ -139,7 +139,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
     /**
      * Take care of saving document in the database and file storage
      *
-     * @param DocumentCreateOrUpdateEvent $event Document event
+     * @param \Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent $event Document event
      *
      * @throws \Thelia\Exception\ImageException
      * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
@@ -183,7 +183,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
     /**
      * Take care of updating document in the database and file storage
      *
-     * @param DocumentCreateOrUpdateEvent $event Document event
+     * @param \Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent $event Document event
      *
      * @throws \Thelia\Exception\ImageException
      * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
@@ -225,7 +225,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
     /**
      * Take care of deleting document in the database and file storage
      *
-     * @param DocumentDeleteEvent $event Image event
+     * @param \Thelia\Core\Event\Document\DocumentDeleteEvent $event Image event
      *
      * @throws \Exception
      * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action

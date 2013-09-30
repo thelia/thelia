@@ -24,7 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Core\Event\DocumentEvent;
+use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Type\TypeCollection;

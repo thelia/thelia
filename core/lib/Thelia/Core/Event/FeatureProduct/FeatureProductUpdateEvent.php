@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,34 +17,74 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
-use Thelia\Model\Product;
+namespace Thelia\Core\Event\FeatureProduct;
+use Thelia\Core\Event\FeatureProduct\FeatureProductEvent;
+use Thelia\Model\FeatureProduct;
 
-class ProductDeleteCategoryEvent extends ProductEvent
+class FeatureProductUpdateEvent extends FeatureProductEvent
 {
-    protected $category_id;
+    protected $product_id;
+    protected $feature_id;
+    protected $feature_value;
+    protected $is_text_value;
 
-    public function __construct(Product $product, $category_id)
+    public function __construct($product_id, $feature_id, $feature_value, $is_text_value = false)
     {
-        parent::__construct($product);
-
-        $this->category_id = $category_id;
+        $this->product_id = $product_id;
+        $this->feature_id = $feature_id;
+        $this->feature_value = $feature_value;
+        $this->is_text_value = $is_text_value;
     }
 
-    public function getCategoryId()
+    public function getProductId()
     {
-        return $this->category_id;
+        return $this->product_id;
     }
 
-    public function setCategoryId($category_id)
+    public function setProductId($product_id)
     {
-        $this->category_id = $category_id;
+        $this->product_id = $product_id;
 
         return $this;
     }
 
+    public function getFeatureId()
+    {
+        return $this->feature_id;
+    }
+
+    public function setFeatureId($feature_id)
+    {
+        $this->feature_id = $feature_id;
+
+        return $this;
+    }
+
+    public function getFeatureValue()
+    {
+        return $this->feature_value;
+    }
+
+    public function setFeatureValue($feature_value)
+    {
+        $this->feature_value = $feature_value;
+
+        return $this;
+    }
+
+    public function getIsTextValue()
+    {
+        return $this->is_text_value;
+    }
+
+    public function setIsTextValue($is_text_value)
+    {
+        $this->is_text_value = $is_text_value;
+
+        return $this;
+    }
 }

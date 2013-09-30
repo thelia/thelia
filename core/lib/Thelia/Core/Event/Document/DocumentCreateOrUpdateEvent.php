@@ -21,8 +21,9 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Document;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\CategoryDocument;
 use Thelia\Model\ContentDocument;
 use Thelia\Model\FolderDocument;

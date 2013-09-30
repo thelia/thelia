@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,48 +17,46 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
-use Thelia\Model\Product;
+namespace Thelia\Core\Event\FeatureProduct;
+use Thelia\Core\Event\FeatureProduct\FeatureProductEvent;
+use Thelia\Model\FeatureProduct;
 
-class ProductCreateCombinationEvent extends ProductEvent
+class FeatureProductDeleteEvent extends FeatureProductEvent
 {
-    protected $attribute_av_list;
-    protected $currency_id;
+    protected $product_id;
+    protected $feature_id;
 
-    public function __construct(Product $product, $attribute_av_list, $currency_id)
+    public function __construct($product_id, $feature_id)
     {
-        parent::__construct($product);
-
-        $this->attribute_av_list = $attribute_av_list;
-        $this->currency_id = $currency_id;
+        $this->product_id = $product_id;
+        $this->feature_id = $feature_id;
     }
 
-    public function getAttributeAvList()
+    public function getProductId()
     {
-        return $this->attribute_av_list;
+        return $this->product_id;
     }
 
-    public function setAttributeAvList($attribute_av_list)
+    public function setProductId($product_id)
     {
-        $this->attribute_av_list = $attribute_av_list;
+        $this->product_id = $product_id;
 
         return $this;
     }
 
-    public function getCurrencyId()
+    public function getFeatureId()
     {
-        return $this->currency_id;
+        return $this->feature_id;
     }
 
-    public function setCurrencyId($currency_id)
+    public function setFeatureId($feature_id)
     {
-        $this->currency_id = $currency_id;
+        $this->feature_id = $feature_id;
 
         return $this;
     }
-
 }

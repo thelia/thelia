@@ -24,7 +24,7 @@ namespace Thelia\Tools;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Thelia\Core\Event\DocumentCreateOrUpdateEvent;
+use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\ImageCreateOrUpdateEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;

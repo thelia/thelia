@@ -21,7 +21,8 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\FeatureProduct;
+use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\FeatureProduct;
 
 class FeatureProductEvent extends ActionEvent

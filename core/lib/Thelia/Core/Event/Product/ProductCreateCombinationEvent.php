@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia                                                                       */
+/*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,73 +17,49 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
-use Thelia\Model\FeatureProduct;
+namespace Thelia\Core\Event\Product;
+use Thelia\Core\Event\ProductEvent;
+use Thelia\Model\Product;
 
-class FeatureProductUpdateEvent extends FeatureProductEvent
+class ProductCreateCombinationEvent extends ProductEvent
 {
-    protected $product_id;
-    protected $feature_id;
-    protected $feature_value;
-    protected $is_text_value;
+    protected $attribute_av_list;
+    protected $currency_id;
 
-    public function __construct($product_id, $feature_id, $feature_value, $is_text_value = false)
+    public function __construct(Product $product, $attribute_av_list, $currency_id)
     {
-        $this->product_id = $product_id;
-        $this->feature_id = $feature_id;
-        $this->feature_value = $feature_value;
-        $this->is_text_value = $is_text_value;
+        parent::__construct($product);
+
+        $this->attribute_av_list = $attribute_av_list;
+        $this->currency_id = $currency_id;
     }
 
-    public function getProductId()
+    public function getAttributeAvList()
     {
-        return $this->product_id;
+        return $this->attribute_av_list;
     }
 
-    public function setProductId($product_id)
+    public function setAttributeAvList($attribute_av_list)
     {
-        $this->product_id = $product_id;
+        $this->attribute_av_list = $attribute_av_list;
 
         return $this;
     }
 
-    public function getFeatureId()
+    public function getCurrencyId()
     {
-        return $this->feature_id;
+        return $this->currency_id;
     }
 
-    public function setFeatureId($feature_id)
+    public function setCurrencyId($currency_id)
     {
-        $this->feature_id = $feature_id;
+        $this->currency_id = $currency_id;
 
         return $this;
     }
 
-    public function getFeatureValue()
-    {
-        return $this->feature_value;
-    }
-
-    public function setFeatureValue($feature_value)
-    {
-        $this->feature_value = $feature_value;
-
-        return $this;
-    }
-
-    public function getIsTextValue()
-    {
-        return $this->is_text_value;
-    }
-
-    public function setIsTextValue($is_text_value)
-    {
-        $this->is_text_value = $is_text_value;
-
-        return $this;
-    }
 }

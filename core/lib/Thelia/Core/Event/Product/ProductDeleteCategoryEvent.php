@@ -21,27 +21,31 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Product;
+use Thelia\Core\Event\ProductEvent;
 use Thelia\Model\Product;
 
-class ProductDeleteCombinationEvent extends ProductEvent
+class ProductDeleteCategoryEvent extends ProductEvent
 {
-    protected $product_sale_element_id;
+    protected $category_id;
 
-    public function __construct(Product $product, $product_sale_element_id)
+    public function __construct(Product $product, $category_id)
     {
         parent::__construct($product);
 
-        $this->product_sale_element_id = $product_sale_element_id;
+        $this->category_id = $category_id;
     }
 
-    public function getProductSaleElementId()
+    public function getCategoryId()
     {
-        return $this->product_sale_element_id;
+        return $this->category_id;
     }
 
-    public function setProductSaleElementId($product_sale_element_id)
+    public function setCategoryId($category_id)
     {
-        $this->product_sale_element_id = $product_sale_element_id;
+        $this->category_id = $category_id;
+
+        return $this;
     }
+
 }

@@ -10,7 +10,7 @@
 namespace Thelia\Tests\Type;
 
 
-use Thelia\Core\Event\DocumentCreateOrUpdateEvent;
+use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\ImageCreateOrUpdateEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\ImageException;

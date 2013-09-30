@@ -28,7 +28,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 
 use Thelia\Action\Document;
-use Thelia\Core\Event\DocumentEvent;
+use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Model\ConfigQuery;
 
 /**

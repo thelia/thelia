@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia                                                                       */
+/*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,45 +17,69 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
-use Thelia\Model\FeatureProduct;
+namespace Thelia\Core\Event\Document;
+use Thelia\Core\Event\CachedFileEvent;
 
-class FeatureProductDeleteEvent extends FeatureProductEvent
+/**
+ * Class DocumentEvent
+ *
+ * @package Thelia\Core\Event
+ */
+class DocumentEvent extends CachedFileEvent
 {
-    protected $product_id;
-    protected $feature_id;
+    protected $documentPath;
+    protected $documentUrl;
 
-    public function __construct($product_id, $feature_id)
+    /**
+     * Get Document path
+     *
+     * @return string The document file path
+     */
+    public function getDocumentPath()
     {
-        $this->product_id = $product_id;
-        $this->feature_id = $feature_id;
+        return $this->documentPath;
     }
 
-    public function getProductId()
+    /**
+     * Set Document path
+     *
+     * @param string $documentPath the document file path
+     *
+     * @return $this
+     */
+    public function setDocumentPath($documentPath)
     {
-        return $this->product_id;
-    }
-
-    public function setProductId($product_id)
-    {
-        $this->product_id = $product_id;
+        $this->documentPath = $documentPath;
 
         return $this;
     }
 
-    public function getFeatureId()
+    /**
+     * Get Document URL
+     *
+     * @return string The document URL
+     */
+    public function getDocumentUrl()
     {
-        return $this->feature_id;
+        return $this->documentUrl;
     }
 
-    public function setFeatureId($feature_id)
+    /**
+     * Set Document URL
+     *
+     * @param string $documentUrl the document URL
+     *
+     * @return $this
+     */
+    public function setDocumentUrl($documentUrl)
     {
-        $this->feature_id = $feature_id;
+        $this->documentUrl = $documentUrl;
 
         return $this;
     }
+
 }
