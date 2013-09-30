@@ -21,31 +21,32 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
-use Thelia\Model\Attribute;
+namespace Thelia\Core\Event\Attribute;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\AttributeAv;
 
-class AttributeEvent extends ActionEvent
+class AttributeAvEvent extends ActionEvent
 {
-    protected $attribute = null;
+    protected $attributeAv = null;
 
-    public function __construct(Attribute $attribute = null)
+    public function __construct(AttributeAv $attributeAv = null)
     {
-        $this->attribute = $attribute;
+        $this->attributeAv = $attributeAv;
     }
 
-    public function hasAttribute()
+    public function hasAttributeAv()
     {
-        return ! is_null($this->attribute);
+        return ! is_null($this->attributeAv);
     }
 
-    public function getAttribute()
+    public function getAttributeAv()
     {
-        return $this->attribute;
+        return $this->attributeAv;
     }
 
-    public function setAttribute($attribute)
+    public function setAttributeAv($attributeAv)
     {
-        $this->attribute = $attribute;
+        $this->attributeAv = $attributeAv;
 
         return $this;
     }

@@ -21,48 +21,33 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Attribute;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Attribute;
 
-class AttributeAvCreateEvent extends AttributeAvEvent
+class AttributeEvent extends ActionEvent
 {
-    protected $title;
-    protected $locale;
-    protected $attribute_id;
+    protected $attribute = null;
 
-    public function getLocale()
+    public function __construct(Attribute $attribute = null)
     {
-        return $this->locale;
+        $this->attribute = $attribute;
     }
 
-    public function setLocale($locale)
+    public function hasAttribute()
     {
-        $this->locale = $locale;
+        return ! is_null($this->attribute);
+    }
+
+    public function getAttribute()
+    {
+        return $this->attribute;
+    }
+
+    public function setAttribute($attribute)
+    {
+        $this->attribute = $attribute;
 
         return $this;
     }
-
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    public function setTitle($title)
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
-    public function getAttributeId()
-    {
-        return $this->attribute_id;
-    }
-
-    public function setAttributeId($attribute_id)
-    {
-        $this->attribute_id = $attribute_id;
-
-        return $this;
-    }
-
 }

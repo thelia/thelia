@@ -5,7 +5,7 @@ namespace Thelia\Model;
 use Thelia\Model\Base\Attribute as BaseAttribute;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\AttributeEvent;
+use Thelia\Core\Event\Attribute\AttributeEvent;
 
 class Attribute extends BaseAttribute {
 

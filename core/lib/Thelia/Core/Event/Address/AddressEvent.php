@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia                                                                       */
+/*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,70 +17,37 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Address;
+use Symfony\Component\EventDispatcher\Event;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Address;
 
-class AttributeAvUpdateEvent extends AttributeAvCreateEvent
+/**
+ * Class AddressEvent
+ * @package Thelia\Core\Event
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+class AddressEvent extends ActionEvent
 {
-    protected $attributeAv_id;
+    /**
+     * @var \Thelia\Model\Address
+     */
+    protected $address;
 
-    protected $description;
-    protected $chapo;
-    protected $postscriptum;
-
-    public function __construct($attributeAv_id)
+    public function __construct(Address $address)
     {
-        $this->setAttributeAvId($attributeAv_id);
+        $this->address = $address;
     }
 
-    public function getAttributeAvId()
+    /**
+     * @return \Thelia\Model\Address
+     */
+    public function getAddress()
     {
-        return $this->attributeAv_id;
-    }
-
-    public function setAttributeAvId($attributeAv_id)
-    {
-        $this->attributeAv_id = $attributeAv_id;
-
-        return $this;
-    }
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getChapo()
-    {
-        return $this->chapo;
-    }
-
-    public function setChapo($chapo)
-    {
-        $this->chapo = $chapo;
-
-        return $this;
-    }
-
-    public function getPostscriptum()
-    {
-        return $this->postscriptum;
-    }
-
-    public function setPostscriptum($postscriptum)
-    {
-        $this->postscriptum = $postscriptum;
-
-        return $this;
+        return $this->address;
     }
 }

@@ -21,7 +21,9 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Attribute;
+
+use Thelia\Core\Event\Attribute\AttributeEvent;
 
 class AttributeCreateEvent extends AttributeEvent
 {
