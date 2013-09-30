@@ -5,7 +5,7 @@ namespace Thelia\Model;
 use Thelia\Model\Base\FeatureAv as BaseFeatureAv;
 use Thelia\Core\Event\TheliaEvents;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\FeatureAvEvent;
+use Thelia\Core\Event\Feature\FeatureAvEvent;
 
 class FeatureAv extends BaseFeatureAv {
 

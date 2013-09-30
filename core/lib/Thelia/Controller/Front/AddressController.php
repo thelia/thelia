@@ -22,8 +22,8 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Front;
-use Thelia\Core\Event\AddressCreateOrUpdateEvent;
-use Thelia\Core\Event\AddressEvent;
+use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
+use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;

@@ -22,10 +22,10 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
-use Thelia\Core\Event\FolderCreateEvent;
-use Thelia\Core\Event\FolderDeleteEvent;
-use Thelia\Core\Event\FolderToggleVisibilityEvent;
-use Thelia\Core\Event\FolderUpdateEvent;
+use Thelia\Core\Event\Folder\FolderCreateEvent;
+use Thelia\Core\Event\Folder\FolderDeleteEvent;
+use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
+use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Form\FolderCreationForm;
@@ -150,7 +150,7 @@ class FolderController extends AbstractCrudController
     }
 
     /**
-     * @return FolderToggleVisibilityEvent|void
+     * @return \Thelia\Core\Event\Folder\FolderToggleVisibilityEvent|void
      */
     protected function createToggleVisibilityEvent()
     {
@@ -174,7 +174,7 @@ class FolderController extends AbstractCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param \Thelia\Core\Event\FolderEvent $event
+     * @param \Thelia\Core\Event\Folder\FolderEvent $event
      */
     protected function eventContainsObject($event)
     {
@@ -184,7 +184,7 @@ class FolderController extends AbstractCrudController
     /**
      * Get the created object from an event.
      *
-     * @param $event \Thelia\Core\Event\FolderEvent $event
+     * @param $event \Thelia\Core\Event\Folder\FolderEvent $event
      *
      * @return null|\Thelia\Model\Folder
      */
@@ -257,7 +257,7 @@ class FolderController extends AbstractCrudController
     }
 
     /**
-     * @param \Thelia\Core\Event\FolderUpdateEvent $updateEvent
+     * @param \Thelia\Core\Event\Folder\FolderUpdateEvent $updateEvent
      * @return Response|void
      */
     protected function performAdditionalUpdateAction($updateEvent)
@@ -275,7 +275,7 @@ class FolderController extends AbstractCrudController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param \Thelia\Core\Event\FolderDeleteEvent $deleteEvent the delete event
+     * @param \Thelia\Core\Event\Folder\FolderDeleteEvent $deleteEvent the delete event
      * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalDeleteAction($deleteEvent)

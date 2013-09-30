@@ -23,18 +23,18 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\FeatureDeleteEvent;
+use Thelia\Core\Event\Feature\FeatureDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\FeatureUpdateEvent;
-use Thelia\Core\Event\FeatureCreateEvent;
+use Thelia\Core\Event\Feature\FeatureUpdateEvent;
+use Thelia\Core\Event\Feature\FeatureCreateEvent;
 use Thelia\Model\FeatureQuery;
 use Thelia\Form\FeatureModificationForm;
 use Thelia\Form\FeatureCreationForm;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\FeatureAv;
 use Thelia\Model\FeatureAvQuery;
-use Thelia\Core\Event\FeatureAvUpdateEvent;
-use Thelia\Core\Event\FeatureEvent;
+use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
+use Thelia\Core\Event\Feature\FeatureEvent;
 
 /**
  * Manages features

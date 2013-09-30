@@ -30,15 +30,15 @@ use Thelia\Model\Attribute as AttributeModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\AttributeUpdateEvent;
-use Thelia\Core\Event\AttributeCreateEvent;
-use Thelia\Core\Event\AttributeDeleteEvent;
+use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
+use Thelia\Core\Event\Attribute\AttributeCreateEvent;
+use Thelia\Core\Event\Attribute\AttributeDeleteEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\CategoryEvent;
-use Thelia\Core\Event\AttributeEvent;
+use Thelia\Core\Event\Category\CategoryEvent;
+use Thelia\Core\Event\Attribute\AttributeEvent;
 use Thelia\Model\AttributeTemplate;
 use Thelia\Model\AttributeTemplateQuery;
 use Thelia\Model\TemplateQuery;

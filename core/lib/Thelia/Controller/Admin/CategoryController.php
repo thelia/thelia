@@ -24,19 +24,19 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\Response;
-use Thelia\Core\Event\CategoryDeleteEvent;
-use Thelia\Core\Event\ImageCreateOrUpdateEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\CategoryUpdateEvent;
-use Thelia\Core\Event\CategoryCreateEvent;
 use Thelia\Log\Tlog;
+use Thelia\Core\Event\Category\CategoryDeleteEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\Category\CategoryUpdateEvent;
+use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Model\CategoryQuery;
 use Thelia\Form\CategoryModificationForm;
 use Thelia\Form\CategoryCreationForm;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\CategoryToggleVisibilityEvent;
-use Thelia\Core\Event\CategoryDeleteContentEvent;
-use Thelia\Core\Event\CategoryAddContentEvent;
+use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
+use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
+use Thelia\Core\Event\Category\CategoryAddContentEvent;
+use Thelia\Model\CategoryAssociatedContent;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Propel\Runtime\ActiveQuery\Criteria;

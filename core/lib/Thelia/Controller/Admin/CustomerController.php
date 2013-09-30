@@ -24,8 +24,8 @@
 namespace Thelia\Controller\Admin;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\Form;
-use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
-use Thelia\Core\Event\CustomerEvent;
+use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CustomerModification;
 use Thelia\Form\Exception\FormValidationException;
@@ -151,7 +151,7 @@ class CustomerController extends BaseAdminController
 
     /**
      * @param $data
-     * @return CustomerCreateOrUpdateEvent
+     * @return \Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent
      */
     private function createEventInstance($data)
     {

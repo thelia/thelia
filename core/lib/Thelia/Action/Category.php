@@ -30,14 +30,14 @@ use Thelia\Model\Category as CategoryModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\CategoryUpdateEvent;
-use Thelia\Core\Event\CategoryCreateEvent;
-use Thelia\Core\Event\CategoryDeleteEvent;
+use Thelia\Core\Event\Category\CategoryUpdateEvent;
+use Thelia\Core\Event\Category\CategoryCreateEvent;
+use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\CategoryToggleVisibilityEvent;
-use Thelia\Core\Event\CategoryAddContentEvent;
-use Thelia\Core\Event\CategoryDeleteContentEvent;
+use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
+use Thelia\Core\Event\Category\CategoryAddContentEvent;
+use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
 use Thelia\Model\CategoryAssociatedContent;
 use Thelia\Model\CategoryAssociatedContentQuery;
 
@@ -46,7 +46,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new category entry
      *
-     * @param CategoryCreateEvent $event
+     * @param \Thelia\Core\Event\Category\CategoryCreateEvent $event
      */
     public function create(CategoryCreateEvent $event)
     {
@@ -69,7 +69,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Change a category
      *
-     * @param CategoryUpdateEvent $event
+     * @param \Thelia\Core\Event\Category\CategoryUpdateEvent $event
      */
     public function update(CategoryUpdateEvent $event)
     {
@@ -98,7 +98,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a category entry
      *
-     * @param CategoryDeleteEvent $event
+     * @param \Thelia\Core\Event\Category\CategoryDeleteEvent $event
      */
     public function delete(CategoryDeleteEvent $event)
     {

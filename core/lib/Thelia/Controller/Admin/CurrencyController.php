@@ -23,10 +23,10 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\CurrencyDeleteEvent;
+use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\CurrencyUpdateEvent;
-use Thelia\Core\Event\CurrencyCreateEvent;
+use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
+use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Form\CurrencyModificationForm;
 use Thelia\Form\CurrencyCreationForm;

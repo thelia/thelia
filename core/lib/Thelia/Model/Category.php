@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Core\Event\CategoryEvent;
+use Thelia\Core\Event\Category\CategoryEvent;
 use Thelia\Model\Base\Category as BaseCategory;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Tools\URL;
