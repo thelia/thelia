@@ -182,6 +182,9 @@ function createProduct($faker, $categories, $template, $attribute, $feature)
                     ->save();
             }
 
+            $productSaleElements = $product->getProductSaleElementss()->getFirst();
+            $productSaleElements->setIsDefault(1)->save();
+
             $brand = $data[11];
             $featurAv = \Thelia\Model\FeatureAvI18nQuery::create()
                 ->filterByLocale('en_US')
