@@ -30,9 +30,9 @@ use Thelia\Model\Currency as CurrencyModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\CurrencyUpdateEvent;
-use Thelia\Core\Event\CurrencyCreateEvent;
-use Thelia\Core\Event\CurrencyDeleteEvent;
+use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
+use Thelia\Core\Event\Currency\CurrencyCreateEvent;
+use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
 
@@ -41,7 +41,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new currencyuration entry
      *
-     * @param CurrencyCreateEvent $event
+     * @param \Thelia\Core\Event\Currency\CurrencyCreateEvent $event
      */
     public function create(CurrencyCreateEvent $event)
     {
@@ -65,7 +65,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Change a currency
      *
-     * @param CurrencyUpdateEvent $event
+     * @param \Thelia\Core\Event\Currency\CurrencyUpdateEvent $event
      */
     public function update(CurrencyUpdateEvent $event)
     {
@@ -118,7 +118,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a currencyuration entry
      *
-     * @param CurrencyDeleteEvent $event
+     * @param \Thelia\Core\Event\Currency\CurrencyDeleteEvent $event
      */
     public function delete(CurrencyDeleteEvent $event)
     {

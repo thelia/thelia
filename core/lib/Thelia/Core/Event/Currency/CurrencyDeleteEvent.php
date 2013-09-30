@@ -21,12 +21,13 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Currency;
 
-class CurrencyUpdateEvent extends CurrencyCreateEvent
+use Thelia\Core\Event\Currency\CurrencyEvent;
+
+class CurrencyDeleteEvent extends CurrencyEvent
 {
     protected $currency_id;
-    protected $is_default;
 
     public function __construct($currency_id)
     {
@@ -41,18 +42,6 @@ class CurrencyUpdateEvent extends CurrencyCreateEvent
     public function setCurrencyId($currency_id)
     {
         $this->currency_id = $currency_id;
-
-        return $this;
-    }
-
-    public function getIsDefault()
-    {
-        return $this->is_default;
-    }
-
-    public function setIsDefault($is_default)
-    {
-        $this->is_default = $is_default;
 
         return $this;
     }

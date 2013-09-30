@@ -21,31 +21,75 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
-use Thelia\Model\Currency;
+namespace Thelia\Core\Event\Currency;
 
-class CurrencyEvent extends ActionEvent
+use Thelia\Core\Event\Currency\CurrencyEvent;
+
+class CurrencyCreateEvent extends CurrencyEvent
 {
-    protected $currency = null;
+    protected $currency_name;
+    protected $locale;
+    protected $symbol;
+    protected $code;
+    protected $rate;
 
-    public function __construct(Currency $currency = null)
+    // Use currency_name to prevent conflict with Event::name property.
+    public function getCurrencyName()
     {
-        $this->currency = $currency;
+        return $this->currency_name;
     }
 
-    public function hasCurrency()
+    public function setCurrencyName($currency_name)
     {
-        return ! is_null($this->currency);
+        $this->currency_name = $currency_name;
+
+        return $this;
     }
 
-    public function getCurrency()
+    public function getLocale()
     {
-        return $this->currency;
+        return $this->locale;
     }
 
-    public function setCurrency($currency)
+    public function setLocale($locale)
     {
-        $this->currency = $currency;
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getSymbol()
+    {
+        return $this->symbol;
+    }
+
+    public function setSymbol($symbol)
+    {
+        $this->symbol = $symbol;
+
+        return $this;
+    }
+
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    public function setCode($code)
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getRate()
+    {
+        return $this->rate;
+    }
+
+    public function setRate($rate)
+    {
+        $this->rate = $rate;
 
         return $this;
     }

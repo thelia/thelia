@@ -32,7 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session;
 
-use Thelia\Core\Event\CurrencyEvent;
+use Thelia\Core\Event\Currency\CurrencyEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model;
 
