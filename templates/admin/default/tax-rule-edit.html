@@ -235,9 +235,7 @@
             .droppable(dropOptions)
             .sortable(sortOptions);
 
-            var sortOptionsGroup = {  };
-
-            $('.place .panel-body').sortable($.extend(sortOptions, sortOptionsGroup));
+            $('.place .panel-body').sortable(sortOptions);
 
             // let the gallery be droppable as well, accepting items from the trash
             $('.remove-from-group', $list)
