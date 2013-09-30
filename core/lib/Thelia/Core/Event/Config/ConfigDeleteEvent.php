@@ -21,86 +21,27 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Config;
 
-class ConfigCreateEvent extends ConfigEvent
+use Thelia\Core\Event\Config\ConfigEvent;
+
+class ConfigDeleteEvent extends ConfigEvent
 {
-    protected $event_name;
-    protected $value;
-    protected $locale;
-    protected $title;
-    protected $hidden;
-    protected $secured;
+    protected $config_id;
 
-    // Use event_name to prevent conflict with Event::name property.
-    public function getEventName()
+    public function __construct($config_id)
     {
-        return $this->event_name;
+        $this->setConfigId($config_id);
     }
 
-    public function setEventName($event_name)
+    public function getConfigId()
     {
-        $this->event_name = $event_name;
-
-        return $this;
+        return $this->config_id;
     }
 
-    public function getValue()
+    public function setConfigId($config_id)
     {
-        return $this->value;
-    }
-
-    public function setValue($value)
-    {
-        $this->value = $value;
-
-        return $this;
-    }
-
-    public function getLocale()
-    {
-        return $this->locale;
-    }
-
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-
-        return $this;
-    }
-
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    public function setTitle($title)
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
-    public function getHidden()
-    {
-        return $this->hidden;
-    }
-
-    public function setHidden($hidden)
-    {
-        $this->hidden = $hidden;
-
-        return $this;
-    }
-
-    public function getSecured()
-    {
-        return $this->secured;
-    }
-
-    public function setSecured($secured)
-    {
-        $this->secured = $secured;
+        $this->config_id = $config_id;
 
         return $this;
     }

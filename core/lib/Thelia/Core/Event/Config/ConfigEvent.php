@@ -21,25 +21,32 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Config;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Config;
 
-class ConfigDeleteEvent extends ConfigEvent
+class ConfigEvent extends ActionEvent
 {
-    protected $config_id;
+    protected $config = null;
 
-    public function __construct($config_id)
+    public function __construct(Config $config = null)
     {
-        $this->setConfigId($config_id);
+        $this->config = $config;
     }
 
-    public function getConfigId()
+    public function hasConfig()
     {
-        return $this->config_id;
+        return ! is_null($this->config);
     }
 
-    public function setConfigId($config_id)
+    public function getConfig()
     {
-        $this->config_id = $config_id;
+        return $this->config;
+    }
+
+    public function setConfig($config)
+    {
+        $this->config = $config;
 
         return $this;
     }

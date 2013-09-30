@@ -26,7 +26,7 @@ namespace Thelia\Model;
 use Thelia\Model\Base\Config as BaseConfig;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\ConfigEvent;
+use Thelia\Core\Event\Config\ConfigEvent;
 
 class Config extends BaseConfig {
 

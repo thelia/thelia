@@ -21,31 +21,88 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
-use Thelia\Model\Config;
+namespace Thelia\Core\Event\Config;
 
-class ConfigEvent extends ActionEvent
+use Thelia\Core\Event\Config\ConfigEvent;
+
+class ConfigCreateEvent extends ConfigEvent
 {
-    protected $config = null;
+    protected $event_name;
+    protected $value;
+    protected $locale;
+    protected $title;
+    protected $hidden;
+    protected $secured;
 
-    public function __construct(Config $config = null)
+    // Use event_name to prevent conflict with Event::name property.
+    public function getEventName()
     {
-        $this->config = $config;
+        return $this->event_name;
     }
 
-    public function hasConfig()
+    public function setEventName($event_name)
     {
-        return ! is_null($this->config);
+        $this->event_name = $event_name;
+
+        return $this;
     }
 
-    public function getConfig()
+    public function getValue()
     {
-        return $this->config;
+        return $this->value;
     }
 
-    public function setConfig($config)
+    public function setValue($value)
     {
-        $this->config = $config;
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getHidden()
+    {
+        return $this->hidden;
+    }
+
+    public function setHidden($hidden)
+    {
+        $this->hidden = $hidden;
+
+        return $this;
+    }
+
+    public function getSecured()
+    {
+        return $this->secured;
+    }
+
+    public function setSecured($secured)
+    {
+        $this->secured = $secured;
 
         return $this;
     }

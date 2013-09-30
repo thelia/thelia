@@ -23,10 +23,10 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ConfigDeleteEvent;
+use Thelia\Core\Event\Config\ConfigDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\ConfigUpdateEvent;
-use Thelia\Core\Event\ConfigCreateEvent;
+use Thelia\Core\Event\Config\ConfigUpdateEvent;
+use Thelia\Core\Event\Config\ConfigCreateEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Form\ConfigModificationForm;
 use Thelia\Form\ConfigCreationForm;

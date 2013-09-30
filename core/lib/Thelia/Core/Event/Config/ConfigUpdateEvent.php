@@ -21,7 +21,9 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Config;
+
+use Thelia\Core\Event\Config\ConfigCreateEvent;
 
 class ConfigUpdateEvent extends ConfigCreateEvent
 {
