@@ -23,10 +23,10 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\TemplateDeleteEvent;
+use Thelia\Core\Event\Template\TemplateDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\TemplateUpdateEvent;
-use Thelia\Core\Event\TemplateCreateEvent;
+use Thelia\Core\Event\Template\TemplateUpdateEvent;
+use Thelia\Core\Event\Template\TemplateCreateEvent;
 use Thelia\Model\TemplateQuery;
 use Thelia\Form\TemplateModificationForm;
 use Thelia\Form\TemplateCreationForm;
@@ -34,11 +34,11 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\TemplateAv;
 use Thelia\Model\TemplateAvQuery;
 use Thelia\Core\Event\TemplateAvUpdateEvent;
-use Thelia\Core\Event\TemplateEvent;
-use Thelia\Core\Event\TemplateDeleteAttributeEvent;
-use Thelia\Core\Event\TemplateAddAttributeEvent;
-use Thelia\Core\Event\TemplateAddFeatureEvent;
-use Thelia\Core\Event\TemplateDeleteFeatureEvent;
+use Thelia\Core\Event\Template\TemplateEvent;
+use Thelia\Core\Event\Template\TemplateDeleteAttributeEvent;
+use Thelia\Core\Event\Template\TemplateAddAttributeEvent;
+use Thelia\Core\Event\Template\TemplateAddFeatureEvent;
+use Thelia\Core\Event\Template\TemplateDeleteFeatureEvent;
 
 /**
  * Manages product templates

@@ -21,51 +21,36 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Template;
 
-class TemplateUpdateEvent extends TemplateCreateEvent
+use Thelia\Core\Event\Template\TemplateEvent;
+
+class TemplateCreateEvent extends TemplateEvent
 {
-    protected $template_id;
+    protected $template_name;
+    protected $locale;
 
-    protected $feature_list;
-    protected $attribute_list;
-
-    public function __construct($template_id)
+    public function getLocale()
     {
-        $this->setTemplateId($template_id);
+        return $this->locale;
     }
 
-    public function getTemplateId()
+    public function setLocale($locale)
     {
-        return $this->template_id;
-    }
-
-    public function setTemplateId($template_id)
-    {
-        $this->template_id = $template_id;
+        $this->locale = $locale;
 
         return $this;
     }
 
-    public function getFeatureList()
+    public function getTemplateName()
     {
-        return $this->feature_list;
+        return $this->template_name;
     }
 
-    public function setFeatureList($feature_list)
+    public function setTemplateName($template_name)
     {
-        $this->feature_list = $feature_list;
-        return $this;
-    }
+        $this->template_name = $template_name;
 
-    public function getAttributeList()
-    {
-        return $this->attribute_list;
-    }
-
-    public function setAttributeList($attribute_list)
-    {
-        $this->attribute_list = $attribute_list;
         return $this;
     }
 }

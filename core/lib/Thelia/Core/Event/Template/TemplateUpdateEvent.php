@@ -21,31 +21,53 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Template;
 
-use Thelia\Model\Template;
+use Thelia\Core\Event\Template\TemplateCreateEvent;
 
-class TemplateDeleteFeatureEvent extends TemplateEvent
+class TemplateUpdateEvent extends TemplateCreateEvent
 {
-    protected $feature_id;
+    protected $template_id;
 
-    public function __construct(Template $template, $feature_id)
+    protected $feature_list;
+    protected $attribute_list;
+
+    public function __construct($template_id)
     {
-
-        parent::__construct($template);
-
-        $this->feature_id = $feature_id;
+        $this->setTemplateId($template_id);
     }
 
-    public function getFeatureId()
+    public function getTemplateId()
     {
-        return $this->feature_id;
+        return $this->template_id;
     }
 
-    public function setFeatureId($feature_id)
+    public function setTemplateId($template_id)
     {
-        $this->feature_id = $feature_id;
+        $this->template_id = $template_id;
 
+        return $this;
+    }
+
+    public function getFeatureList()
+    {
+        return $this->feature_list;
+    }
+
+    public function setFeatureList($feature_list)
+    {
+        $this->feature_list = $feature_list;
+        return $this;
+    }
+
+    public function getAttributeList()
+    {
+        return $this->attribute_list;
+    }
+
+    public function setAttributeList($attribute_list)
+    {
+        $this->attribute_list = $attribute_list;
         return $this;
     }
 }

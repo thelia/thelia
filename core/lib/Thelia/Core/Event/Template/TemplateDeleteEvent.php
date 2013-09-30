@@ -21,33 +21,40 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Template;
 
-class TemplateCreateEvent extends TemplateEvent
+use Thelia\Core\Event\Template\TemplateEvent;
+
+class TemplateDeleteEvent extends TemplateEvent
 {
-    protected $template_name;
-    protected $locale;
+    protected $template_id;
+    protected $product_count;
 
-    public function getLocale()
+    public function __construct($template_id)
     {
-        return $this->locale;
+        $this->setTemplateId($template_id);
     }
 
-    public function setLocale($locale)
+    public function getTemplateId()
     {
-        $this->locale = $locale;
+        return $this->template_id;
+    }
+
+    public function setTemplateId($template_id)
+    {
+        $this->template_id = $template_id;
 
         return $this;
     }
 
-    public function getTemplateName()
+    public function getProductCount()
     {
-        return $this->template_name;
+        return $this->product_count;
     }
 
-    public function setTemplateName($template_name)
+    public function setProductCount($product_count)
     {
-        $this->template_name = $template_name;
+        $this->product_count = $product_count;
 
         return $this;
     }

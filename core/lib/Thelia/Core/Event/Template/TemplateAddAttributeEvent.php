@@ -21,39 +21,32 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\Template;
 
-class TemplateDeleteEvent extends TemplateEvent
+use Thelia\Core\Event\Template\TemplateEvent;
+use Thelia\Model\Template;
+class TemplateAddAttributeEvent extends TemplateEvent
 {
-    protected $template_id;
-    protected $product_count;
+    protected $attribute_id;
 
-    public function __construct($template_id)
+    public function __construct(Template $template, $attribute_id)
     {
-        $this->setTemplateId($template_id);
+
+        parent::__construct($template);
+
+        $this->attribute_id = $attribute_id;
     }
 
-    public function getTemplateId()
+    public function getAttributeId()
     {
-        return $this->template_id;
+        return $this->attribute_id;
     }
 
-    public function setTemplateId($template_id)
+    public function setAttributeId($attribute_id)
     {
-        $this->template_id = $template_id;
+        $this->attribute_id = $attribute_id;
 
         return $this;
     }
 
-    public function getProductCount()
-    {
-        return $this->product_count;
-    }
-
-    public function setProductCount($product_count)
-    {
-        $this->product_count = $product_count;
-
-        return $this;
-    }
 }

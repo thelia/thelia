@@ -30,24 +30,24 @@ use Thelia\Model\Template as TemplateModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\TemplateUpdateEvent;
-use Thelia\Core\Event\TemplateCreateEvent;
-use Thelia\Core\Event\TemplateDeleteEvent;
+use Thelia\Core\Event\Template\TemplateUpdateEvent;
+use Thelia\Core\Event\Template\TemplateCreateEvent;
+use Thelia\Core\Event\Template\TemplateDeleteEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\TemplateAv;
 use Thelia\Model\TemplateAvQuery;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\CategoryEvent;
-use Thelia\Core\Event\TemplateEvent;
+use Thelia\Core\Event\Template\TemplateEvent;
 use Thelia\Model\TemplateTemplate;
 use Thelia\Model\TemplateTemplateQuery;
 use Thelia\Model\ProductQuery;
-use Thelia\Core\Event\TemplateAddAttributeEvent;
-use Thelia\Core\Event\TemplateDeleteAttributeEvent;
+use Thelia\Core\Event\Template\TemplateAddAttributeEvent;
+use Thelia\Core\Event\Template\TemplateDeleteAttributeEvent;
 use Thelia\Model\AttributeTemplateQuery;
 use Thelia\Model\AttributeTemplate;
-use Thelia\Core\Event\TemplateDeleteFeatureEvent;
-use Thelia\Core\Event\TemplateAddFeatureEvent;
+use Thelia\Core\Event\Template\TemplateDeleteFeatureEvent;
+use Thelia\Core\Event\Template\TemplateAddFeatureEvent;
 use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Model\FeatureTemplate;
 
@@ -56,7 +56,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new template entry
      *
-     * @param TemplateCreateEvent $event
+     * @param \Thelia\Core\Event\Template\TemplateCreateEvent $event
      */
     public function create(TemplateCreateEvent $event)
     {
@@ -77,7 +77,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Change a product template
      *
-     * @param TemplateUpdateEvent $event
+     * @param \Thelia\Core\Event\Template\TemplateUpdateEvent $event
      */
     public function update(TemplateUpdateEvent $event)
     {
@@ -99,7 +99,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product template entry
      *
-     * @param TemplateDeleteEvent $event
+     * @param \Thelia\Core\Event\Template\TemplateDeleteEvent $event
      */
     public function delete(TemplateDeleteEvent $event)
     {
