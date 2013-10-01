@@ -106,7 +106,7 @@ class Category extends BaseCategory
     public function preDelete(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECATEGORY, new CategoryEvent($this));
-
+        $this->reorderBeforeDelete();
         return true;
     }
 

@@ -198,4 +198,11 @@ trait PositionManagementTrait {
             }
         }
     }
+
+    protected function reorderBeforeDelete()
+    {
+        $this->createQuery()
+            ->filterByParent($this->getParent())
+            ->update(array('Position' => '(position-1)'));
+    }
 }
