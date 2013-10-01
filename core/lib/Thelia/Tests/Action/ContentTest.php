@@ -24,11 +24,15 @@
 namespace Thelia\Tests\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Action\Content;
+use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
+use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Model\ContentFolder;
+use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
 
@@ -191,6 +195,53 @@ class ContentTest extends BaseAction
         $this->assertEquals(1, $updatedContent->getPosition(),sprintf("new position is 1, new position expected is %d for content %d", $updatedContent->getPosition(), $updatedContent->getId()));
     }
 
+    public function testAddFolderToContent()
+    {
+        $content = $this->getRandomContent();
+
+        do {
+            $folder = $this->getRandomFolder();
+
+            $test = ContentFolderQuery::create()
+                ->filterByContent($content)
+                ->filterByFolder($folder);
+        } while($test->count() > 0);
+
+        $event = new ContentAddFolderEvent($content, $folder->getId());
+
+        $contentAction = new Content($this->getContainer());
+        $contentAction->addFolder($event);
+
+        $testAddFolder = ContentFolderQuery::create()
+            ->filterByContent($content)
+            ->filterByFolder($folder)
+            ->findOne()
+        ;
+
+        $this->assertNotNull($testAddFolder);
+        $this->assertEquals($content->getId(), $testAddFolder->getContentId(), 'check if content id are equals');
+        $this->assertEquals($folder->getId(), $testAddFolder->getFolderId(), 'check if folder id are equals');
+
+        return $testAddFolder;
+    }
+
+    /**
+     * @depends testAddFolderToContent
+     */
+    public function testRemoveFolder(ContentFolder $association)
+    {
+        $event = new ContentRemoveFolderEvent($association->getContent(), $association->getFolder()->getId());
+
+        $contentAction = new Content($this->getContainer());
+        $contentAction->removeFolder($event);
+
+        $testAssociation = ContentFolderQuery::create()
+            ->filterByContent($association->getContent())
+            ->filterByFolder($association->getFolder())
+            ->findOne();
+
+        $this->assertNull($testAssociation);
+    }
     /**
      * @return \Thelia\Model\Content
      */
