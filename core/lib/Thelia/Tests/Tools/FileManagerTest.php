@@ -7,7 +7,7 @@
  * @author Guillaume MOREL <gmorel@openstudio.fr>
  */
 
-namespace Thelia\Tests\Type;
+namespace Thelia\Tests\Tools;
 
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
@@ -19,7 +19,7 @@ use Thelia\Tools\FileManager;
 /**
  * Class FileManagerTest
  *
- * @package Thelia\Tests\Type
+ * @package Thelia\Tests\Tools
  */
 class FileManagerTest extends \PHPUnit_Framework_TestCase
 {

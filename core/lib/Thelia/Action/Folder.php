@@ -97,6 +97,8 @@ class Folder extends BaseAction implements EventSubscriberInterface
             ->setVisible(!$folder->getVisible())
             ->save();
 
+        $event->setFolder($folder);
+
     }
 
     public function updatePosition(UpdatePositionEvent $event)

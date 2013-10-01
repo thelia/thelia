@@ -22,8 +22,10 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Action\Folder;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
+use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Model\FolderQuery;
 
@@ -35,6 +37,10 @@ use Thelia\Model\FolderQuery;
  */
 class FolderTest extends BaseAction
 {
+    /**
+     * test folder creation
+     * @covers Thelia\Action\Folder::create
+     */
     public function testCreateFolder()
     {
 
@@ -57,9 +63,15 @@ class FolderTest extends BaseAction
         $this->assertEquals(0, $folder->getParent());
     }
 
+    /**
+     * test update creation
+     * @covers Thelia\Action\Folder::update
+     */
     public function testUpdateFolder()
     {
-        $folder = FolderQuery::create()->findOne();
+        $folder = FolderQuery::create()
+            ->addAscendingOrderByColumn('RAND()')
+            ->findOne();
 
         if(null === $folder) {
             $this->fail('use fixtures before launching test, there is no folder in database');
@@ -90,5 +102,30 @@ class FolderTest extends BaseAction
         $this->assertEquals('update folder postscriptum', $updatedFolder->getPostscriptum());
         $this->assertEquals(0, $updatedFolder->getParent());
         $this->assertEquals($visible, $updatedFolder->getVisible());
+    }
+
+    /**
+     * test folder removal
+     * @covers Thelia\Action\Folder::delete
+     */
+    public function testDeleteFolder()
+    {
+        $folder = FolderQuery::create()
+            ->addAscendingOrderByColumn('RAND()')
+            ->findOne();
+
+        if(null === $folder) {
+            $this->fail('use fixtures before launching test, there is no folder in database');
+        }
+
+        $event = new FolderDeleteEvent($folder->getId());
+
+        $folderAction = new Folder($this->getContainer());
+        $folderAction->delete($event);
+
+        $deletedFolder = $event->getFolder();
+
+        $this->assertInstanceOf('Thelia\Model\Folder', $deletedFolder);
+        $this->assertTrue($deletedFolder->isDeleted());
     }
 }
