@@ -185,6 +185,27 @@ class FolderTest extends BaseAction
         $this->assertEquals($newPosition, $updatedFolder->getPosition(),sprintf("new position is %d, new position expected is %d for folder %d", $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
     }
 
+    public function testUpdatePositionWithSpecificPosition()
+    {
+        $folder = FolderQuery::create()
+            ->filterByPosition(1, Criteria::GREATER_THAN)
+            ->findOne();
+
+        if(null === $folder) {
+            $this->fail('use fixtures before launching test, there is no folder in database');
+        }
+
+        $event = new UpdatePositionEvent($folder->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, 1);
+
+        $folderAction = new Folder($this->getContainer());
+        $folderAction->updatePosition($event);
+
+        $updatedFolder = FolderQuery::create()->findPk($folder->getId());
+
+        $this->assertEquals(1, $updatedFolder->getPosition(),sprintf("new position is 1, new position expected is %d for folder %d", $updatedFolder->getPosition(), $updatedFolder->getId()));
+
+    }
+
     /**
      * @return \Thelia\Model\Folder
      */
