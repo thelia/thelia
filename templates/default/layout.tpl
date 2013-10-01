@@ -11,14 +11,14 @@
 Author: Christophe Laffont
 URL: http://www.thelia.net
 -->
-<!--[if lt IE 7 ]><html class="no-js oldie ie6" lang="fr"> <![endif]-->
-<!--[if IE 7 ]><html class="no-js oldie ie7" lang="fr"> <![endif]-->
-<!--[if IE 8 ]><html class="no-js oldie ie8" lang="fr"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--><html lang="fr" class="no-js"> <!--<![endif]-->
+<!--[if lt IE 7 ]><html class="no-js {lang attr="code"} oldie ie6" lang="{lang attr="code"}"> <![endif]-->
+<!--[if IE 7 ]><html class="no-js {lang attr="code"} oldie ie7" lang="{lang attr="code"}"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js {lang attr="code"} oldie ie8" lang="{lang attr="code"}"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="{lang attr="code"}" class="no-js {lang attr="code"}"> <!--<![endif]-->
 <head>
     <script>(function(H) { H.className=H.className.replace(/\bno-js\b/,'js') } )(document.documentElement);</script>
     <meta charset="utf-8">
-    <title>{block name="page-title"}Thelia - E-commerce plateform{/block}</title>
+    <title>{block name="page-title"}Thelia{/block}</title>
 
     <meta name="description" content="">
     <meta name="generator" content="THELIA V2">
@@ -38,7 +38,7 @@ URL: http://www.thelia.net
 <body class="{block name="body-class"}{/block}" itemscope itemtype="http://schema.org/WebPage">
 
 <!-- Accessibility -->
-<a class="sr-only" href="#content">Skip to content</a>
+<a class="sr-only" href="#content">{intl l="Skip to content"}</a>
 
 <div class="page" role="document">
 
@@ -50,7 +50,7 @@ URL: http://www.thelia.net
             <div class="navbar-header">
                 <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-main">
-                    <span class="sr-only">Toggle navigation</span>
+                    <span class="sr-only">{intl l="Toggle navigation"}</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -117,18 +117,18 @@ URL: http://www.thelia.net
 
                 <div class="search-container">
                     <form id="form-search" action="search.html" method="get" role="search" aria-labelledby="search-label">
-                        <label id="search-label" for="q">Search a product</label>
+                        <label id="search-label" for="q">{intl l="Search a product"}</label>
                         <div class="input-group">
-                            <input type="search" name="q" id="q" placeholder="Search..." class="form-control" aria-required="true" required pattern=". { 2,}" title="Minmimum 2 characters.">
+                            <input type="search" name="q" id="q" placeholder="{intl l="Search..."}" class="form-control" aria-required="true" required pattern=". { 2,}" title="{intl l="Minmimum 2 characters."}">
                             <div class="input-group-btn">
-                                <button type="submit" class="btn btn-search"><i class="icon-search"></i> <span>Search</span></button>
+                                <button type="submit" class="btn btn-search"><i class="icon-search"></i> <span>{intl l="Search"}</span></button>
                             </div>
                         </div>
                     </form>
                 </div>
 
                 <div class="language-switch" aria-labelledby="language-label">
-                    <span id="language-label" class="dropdown-label">Language:</span>
+                    <span id="language-label" class="dropdown-label">{intl l="Language:"}</span>
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="language.html">{lang attr="title"}</a>
                     <ul class="select dropdown-menu">
                         {loop type="lang" name="lang_available" exclude="{lang attr="id"}"}
@@ -138,7 +138,7 @@ URL: http://www.thelia.net
                 </div>
 
                 <div class="currency-switch" aria-labelledby="currency-label">
-                    <span id="currency-label" class="dropdown-label">{intl l="Currency"}:</span>
+                    <span id="currency-label" class="dropdown-label">{intl l="Currency:"}</span>
                     <a class="current dropdown-toggle" data-toggle="dropdown" href="currency.html">{currency attr="code"}</a>
                     <ul class="select dropdown-menu">
                         {loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
@@ -155,7 +155,7 @@ URL: http://www.thelia.net
 
 <main class="main-container" role="main">
     <div class="container">
-        {block name="breadcrumb"}{/block}
+        {block name="breadcrumb"}{include file="misc/breadcrumb.tpl"}{/block}
         {block name="main-content"}{/block}
     </div><!-- /.container -->
 </main><!-- /.main-container -->
@@ -235,50 +235,50 @@ URL: http://www.thelia.net
                             <ul role="presentation">
                                 <li>
                                     <a href="http://facebook.com" class="facebook" data-toggle="tooltip" data-placement="top" title="facebook" target="_blank">
-												<span class="icon-stack">
-													<span class="icon-circle icon-stack-base"></span>
-													<span class="icon-facebook icon-light"></span>
-												</span>
+                                        <span class="icon-stack">
+                                            <span class="icon-circle icon-stack-base"></span>
+                                            <span class="icon-facebook icon-light"></span>
+                                        </span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="http://twitter.com" class="twitter" data-toggle="tooltip" data-placement="top" title="twitter" target="_blank">
-												<span class="icon-stack">
-													<span class="icon-circle icon-stack-base"></span>
-													<span class="icon-twitter icon-light"></span>
-												</span>
+                                        <span class="icon-stack">
+                                            <span class="icon-circle icon-stack-base"></span>
+                                            <span class="icon-twitter icon-light"></span>
+                                        </span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="http://instagram.com" class="instagram" data-toggle="tooltip" data-placement="top" title="instagram" target="_blank">
-												<span class="icon-stack">
-													<span class="icon-circle icon-stack-base"></span>
-													<span class="icon-instagram icon-light"></span>
-												</span>
+                                        <span class="icon-stack">
+                                            <span class="icon-circle icon-stack-base"></span>
+                                            <span class="icon-instagram icon-light"></span>
+                                        </span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="http://google.com" class="google-plus" data-toggle="tooltip" data-placement="top" title="google+" target="_blank">
-												<span class="icon-stack">
-													<span class="icon-circle icon-stack-base"></span>
-													<span class="icon-google-plus icon-light"></span>
-												</span>
+                                        <span class="icon-stack">
+                                            <span class="icon-circle icon-stack-base"></span>
+                                            <span class="icon-google-plus icon-light"></span>
+                                        </span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="http://youtube.com" class="youtube" data-toggle="tooltip" data-placement="top" title="youtube" target="_blank">
-												<span class="icon-stack">
-													<span class="icon-circle icon-stack-base"></span>
-													<span class="icon-youtube icon-light"></span>
-												</span>
+                                        <span class="icon-stack">
+                                            <span class="icon-circle icon-stack-base"></span>
+                                            <span class="icon-youtube icon-light"></span>
+                                        </span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#rss" class="rss" data-toggle="tooltip" data-placement="top" title="rss" target="_blank">
-												<span class="icon-stack">
-													<span class="icon-circle icon-stack-base"></span>
-													<span class="icon-rss icon-light"></span>
-												</span>
+                                        <span class="icon-stack">
+                                            <span class="icon-circle icon-stack-base"></span>
+                                            <span class="icon-rss icon-light"></span>
+                                        </span>
                                     </a>
                                 </li>
                             </ul>
