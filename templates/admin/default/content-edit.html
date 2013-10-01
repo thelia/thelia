@@ -165,27 +165,28 @@
     </div>
 
 
-{* Delete related content confirmation dialog *}
+{* Delete category confirmation dialog *}
 
-    {capture "delete_content_dialog"}
-        <!-- <input type="hidden" name="category_id" value="{$category_id}" /> -->
-        <input type="hidden" name="content_id" id="content_delete_id" value="" />
-        <input type="hidden" name="folder_id" id="folder_delete_id" value="" />
+    {capture "delete_folder_dialog"}
+        <input type="hidden" name="content_id" value="{$content_id}" />
+        <input type="hidden" name="additional_folder_id" id="additional_folder_delete_id" value="" />
 
-        <input type="hidden" name="current_tab" value="details" />
+        <input type="hidden" name="current_tab" value="association" />
     {/capture}
 
     {include
     file = "includes/generic-confirm-dialog.html"
 
-    dialog_id       = "delete_content_dialog"
-    dialog_title    = {intl l="Remove related content"}
-    dialog_message  = {intl l="Do you really want to remove this related content ?"}
+    dialog_id       = "delete_folder_dialog"
+    dialog_title    = {intl l="Remove associated folder"}
+    dialog_message  = {intl l="Do you really want to remove the content from this folder ?"}
 
-form_action     = {url path='/admin/folders/related-content/delete'}
-form_content    = {$smarty.capture.delete_content_dialog nofilter}
+form_action     = {url path='/admin/content/folder/delete'}
+form_content    = {$smarty.capture.delete_folder_dialog nofilter}
 }
 {/block}
+
+
 
 {block name="javascript-initialization"}
     {javascripts file='assets/js/dropzone.js'}
@@ -214,6 +215,9 @@ form_content    = {$smarty.capture.delete_content_dialog nofilter}
             $('#tabbed-menu a[href="#{$current_tab}"]').tab('show')
             {/if}
 
+            $('a.delete-folder').click(function(e) {
+                $('#additional_folder_delete_id').val($(this).data('id'));
+            });
 
             // Set proper content ID in delete content from
             $('a.delete-content').click(function(ev) {

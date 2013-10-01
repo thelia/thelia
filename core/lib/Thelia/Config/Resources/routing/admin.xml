@@ -395,11 +395,11 @@
         <default key="_controller">Thelia\Controller\Admin\ContentController::deleteAction</default>
     </route>
 
-    <route id="admin.content.additional-folder.add" path="/admin/products/category/add">
+    <route id="admin.content.additional-folder.add" path="/admin/content/folder/add">
         <default key="_controller">Thelia\Controller\Admin\ContentController::addAdditionalFolderAction</default>
     </route>
 
-    <route id="admin.content.additional-folder.delete" path="/admin/products/category/delete">
+    <route id="admin.content.additional-folder.delete" path="/admin/content/folder/delete">
         <default key="_controller">Thelia\Controller\Admin\ContentController::removeAdditionalFolderAction</default>
     </route>
 
