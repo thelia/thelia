@@ -21,7 +21,7 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Tests\Action\DocumentTest;
+namespace Thelia\Tests\Action;
 
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Request;
