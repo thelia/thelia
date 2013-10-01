@@ -171,6 +171,26 @@ class ContentTest extends BaseAction
         $this->assertEquals($newPosition, $updatedContent->getPosition(),sprintf("new position is %d, new position expected is %d for content %d", $newPosition, $updatedContent->getPosition(), $updatedContent->getId()));
     }
 
+    public function testUpdatePositionWithSpecificPosition()
+    {
+        $content = ContentQuery::create()
+            ->filterByPosition(1, Criteria::GREATER_THAN)
+            ->findOne();
+
+        if (null === $content) {
+            $this->fail('use fixtures before launching test, there is no content in database');
+        }
+
+        $event = new UpdatePositionEvent($content->getId(), UpdatePositionEvent::POSITION_ABSOLUTE, 1);
+
+        $contentAction = new Content($this->getContainer());
+        $contentAction->updatePosition($event);
+
+        $updatedContent = ContentQuery::create()->findPk($content->getId());
+
+        $this->assertEquals(1, $updatedContent->getPosition(),sprintf("new position is 1, new position expected is %d for content %d", $updatedContent->getPosition(), $updatedContent->getId()));
+    }
+
     /**
      * @return \Thelia\Model\Content
      */
