@@ -26,6 +26,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Action\Folder;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
+use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Model\FolderQuery;
 
@@ -69,13 +70,9 @@ class FolderTest extends BaseAction
      */
     public function testUpdateFolder()
     {
-        $folder = FolderQuery::create()
-            ->addAscendingOrderByColumn('RAND()')
-            ->findOne();
+        $folder = $this->getRandomFolder();
 
-        if(null === $folder) {
-            $this->fail('use fixtures before launching test, there is no folder in database');
-        }
+
 
         $visible = !$folder->getVisible();
         $event = new FolderUpdateEvent($folder->getId());
@@ -110,13 +107,7 @@ class FolderTest extends BaseAction
      */
     public function testDeleteFolder()
     {
-        $folder = FolderQuery::create()
-            ->addAscendingOrderByColumn('RAND()')
-            ->findOne();
-
-        if(null === $folder) {
-            $this->fail('use fixtures before launching test, there is no folder in database');
-        }
+        $folder = $this->getRandomFolder();
 
         $event = new FolderDeleteEvent($folder->getId());
 
@@ -127,5 +118,37 @@ class FolderTest extends BaseAction
 
         $this->assertInstanceOf('Thelia\Model\Folder', $deletedFolder);
         $this->assertTrue($deletedFolder->isDeleted());
+    }
+
+    public function testToggleVisibility()
+    {
+        $folder = $this->getRandomFolder();
+        $visible = $folder->getVisible();
+
+        $event = new FolderToggleVisibilityEvent($folder);
+
+        $folderAction = new Folder($this->getContainer());
+        $folderAction->toggleVisibility($event);
+
+        $updatedFolder = $event->getFolder();
+
+        $this->assertInstanceOf('Thelia\Model\Folder', $updatedFolder);
+        $this->assertEquals(!$visible, $updatedFolder->getVisible());
+    }
+
+    /**
+     * @return \Thelia\Model\Folder
+     */
+    protected function getRandomFolder()
+    {
+        $folder = FolderQuery::create()
+            ->addAscendingOrderByColumn('RAND()')
+            ->findOne();
+
+        if(null === $folder) {
+            $this->fail('use fixtures before launching test, there is no folder in database');
+        }
+
+        return $folder;
     }
 }
