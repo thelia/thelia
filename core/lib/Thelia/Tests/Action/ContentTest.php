@@ -24,6 +24,7 @@
 namespace Thelia\Tests\Action;
 use Thelia\Action\Content;
 use Thelia\Core\Event\Content\ContentCreateEvent;
+use Thelia\Core\Event\Content\ContentDeleteEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
@@ -88,6 +89,22 @@ class ContentTest extends BaseAction
         $this->assertEquals('test update content description', $updatedContent->getDescription());
         $this->assertEquals('test update content postscriptum', $updatedContent->getPostscriptum());
         $this->assertEquals($folder->getId(), $updatedContent->getDefaultFolderId());
+    }
+
+    public function testDeleteContent()
+    {
+        $content = $this->getRandomContent();
+
+        $event = new ContentDeleteEvent($content->getId());
+
+        $contentAction = new Content($this->getContainer());
+        $contentAction->delete($event);
+
+        $deletedContent = $event->getContent();
+
+        $this->assertInstanceOf('Thelia\Model\Content', $deletedContent);
+        $this->assertTrue($deletedContent->isDeleted());
+
     }
 
     /**
