@@ -25,6 +25,7 @@ namespace Thelia\Tests\Action;
 use Thelia\Action\Content;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
+use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
@@ -105,6 +106,23 @@ class ContentTest extends BaseAction
         $this->assertInstanceOf('Thelia\Model\Content', $deletedContent);
         $this->assertTrue($deletedContent->isDeleted());
 
+    }
+
+    public function testContentToggleVisibility()
+    {
+        $content = $this->getRandomContent();
+
+        $visibility = $content->getVisible();
+
+        $event = new ContentToggleVisibilityEvent($content);
+
+        $contentAction = new Content($this->getContainer());
+        $contentAction->toggleVisibility($event);
+
+        $updatedContent = $event->getContent();
+
+        $this->assertInstanceOf('Thelia\Model\Content', $updatedContent);
+        $this->assertEquals(!$visibility, $updatedContent->getVisible());
     }
 
     /**

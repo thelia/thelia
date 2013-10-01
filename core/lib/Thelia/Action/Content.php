@@ -113,6 +113,8 @@ class Content extends BaseAction implements EventSubscriberInterface
             ->setVisible(!$content->getVisible())
             ->save();
 
+        $event->setContent($content);
+
     }
 
     public function delete(ContentDeleteEvent $event)
