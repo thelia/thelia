@@ -4,7 +4,7 @@
         <div class="col-md-6">
             <div class="well well-sm">
                 <div class="form-group">
-                    <form method="POST" action="{url path='/admin/products/category/add'}" id="related_content_form">
+                    <form method="POST" action="{url path='/admin/content/folder/add'}" id="related_content_form">
 
                         <p class="title title-without-tabs">{intl l='Additional categories'}</p>
                         <p>{intl l='A content could be attached to more than one folder. Select here the additional fodlers for this content.'}
@@ -22,7 +22,7 @@
                             {ifloop rel="folders"}
                         <div class="input-group">
 
-                            <select name="additional_category_id" id="accessory_category_id" class="form-control">
+                            <select name="additional_folder_id" id="additional_folder_id" class="form-control">
                                 <option value="">{intl l='Select a folder...'}</option>
                                 {loop name="folders" type="folder-tree" folder="0" exclude=$exclude_from_tree backend_context="1" lang="$edit_language_id"}
                                     <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_FOLDER==$ID}disabled="disabled"{/if}>

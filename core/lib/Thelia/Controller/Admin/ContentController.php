@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
@@ -58,6 +59,28 @@ class ContentController extends AbstractCrudController
             TheliaEvents::CONTENT_TOGGLE_VISIBILITY,
             TheliaEvents::CONTENT_UPDATE_POSITION
         );
+    }
+
+    public function addAdditionalFolderAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth('admin.content.update')) return $response;
+
+        $folder_id = intval($this->getRequest()->request->get('additional_folder_id'));
+
+        if ($folder_id > 0) {
+            $event = new ContentAddFolderEvent(
+                $this->getExistingObject(),
+                $folder_id
+            );
+
+            try {
+
+            } catch (\Exception $e) {
+                $this->errorPage($e);
+            }
+        }
+
     }
 
     /**

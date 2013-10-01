@@ -193,8 +193,9 @@ final class TheliaEvents
     const CONTENT_TOGGLE_VISIBILITY = "action.toggleContentVisibility";
     const CONTENT_UPDATE_POSITION   = "action.updateContentPosition";
 
-//    const FOLDER_ADD_CONTENT      = "action.categoryAddContent";
-//    const FOLDER_REMOVE_CONTENT   = "action.categoryRemoveContent";
+    const CONTENT_ADD_FOLDER      = "action.contentAddFolder";
+    const CONTENT_REMOVE_FOLDER   = "action.contentRemoveFolder";
+
 
     const BEFORE_CREATECONTENT = "action.before_createContent";
     const AFTER_CREATECONTENT	= "action.after_createContent";

@@ -24,6 +24,7 @@
 namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
@@ -613,7 +614,7 @@ class ProductController extends AbstractCrudController
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
 
-        $category_id = intval($this->getRequest()->get('additional_category_id'));
+        $category_id = intval($this->getRequest()->request->get('additional_category_id'));
 
         if ($category_id > 0) {
 

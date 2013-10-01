@@ -395,6 +395,14 @@
         <default key="_controller">Thelia\Controller\Admin\ContentController::deleteAction</default>
     </route>
 
+    <route id="admin.content.additional-folder.add" path="/admin/products/category/add">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::addAdditionalCategoryAction</default>
+    </route>
+
+    <route id="admin.content.additional-folder.delete" path="/admin/products/category/delete">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::deleteAdditionalCategoryAction</default>
+    </route>
+
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 
