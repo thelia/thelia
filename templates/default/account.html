@@ -4,6 +4,8 @@
     {check_auth context="front" roles="CUSTOMER" login_tpl="login"}
 {/block}
 
+{block name="body-class"}page-account{/block}
+
 {block name="breadcrumb"}
     <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
         <strong id="breadcrumb-label">{intl l="You are here"}: </strong>

@@ -35,7 +35,7 @@ URL: http://www.thelia.net
     {block name="stylesheet"}{/block}
 </head>
 
-<body class="page-home" itemscope itemtype="http://schema.org/WebPage">
+<body class="{block name="body-class"}{/block}" itemscope itemtype="http://schema.org/WebPage">
 
 <!-- Accessibility -->
 <a class="sr-only" href="#content">Skip to content</a>
