@@ -24,6 +24,8 @@
 namespace Thelia\Tests\Action;
 use Thelia\Action\Content;
 use Thelia\Core\Event\Content\ContentCreateEvent;
+use Thelia\Core\Event\Content\ContentUpdateEvent;
+use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
 
 
@@ -53,7 +55,55 @@ class ContentTest extends BaseAction
 
         $this->assertInstanceOf('Thelia\Model\Content', $createdContent);
         $this->assertEquals(1, $createdContent->getVisible());
+        $this->assertEquals('test create content', $createdContent->getTitle());
+        $this->assertEquals($folder->getId(), $createdContent->getDefaultFolderId());
 
+    }
+
+    public function testUpdateContent()
+    {
+        $content = $this->getRandomContent();
+        $folder = $this->getRandomFolder();
+
+        $event = new ContentUpdateEvent($content->getId());
+        $event
+            ->setVisible(1)
+            ->setLocale('en_US')
+            ->setTitle('test update content title')
+            ->setChapo('test update content short description')
+            ->setDescription('test update content description')
+            ->setPostscriptum('test update content postscriptum')
+            ->setDefaultFolder($folder->getId())
+        ;
+
+        $contentAction = new Content($this->getContainer());
+        $contentAction->update($event);
+
+        $updatedContent = $event->getContent();
+
+        $this->assertInstanceOf('Thelia\Model\Content', $updatedContent);
+        $this->assertEquals(1, $updatedContent->getVisible());
+        $this->assertEquals('test update content title', $updatedContent->getTitle());
+        $this->assertEquals('test update content short description', $updatedContent->getChapo());
+        $this->assertEquals('test update content description', $updatedContent->getDescription());
+        $this->assertEquals('test update content postscriptum', $updatedContent->getPostscriptum());
+        $this->assertEquals($folder->getId(), $updatedContent->getDefaultFolderId());
+    }
+
+    /**
+     * @return \Thelia\Model\Content
+     */
+    protected function getRandomContent()
+    {
+        $content = ContentQuery::create()
+            ->addAscendingOrderByColumn('RAND()')
+            ->findOne();
+
+        if (null === $content) {
+            $this->fail('use fixtures before launching test, there is no content in database');
+        }
+
+        return $content;
     }
 
     /**
