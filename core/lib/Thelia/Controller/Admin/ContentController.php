@@ -25,6 +25,7 @@ namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
+use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -61,6 +62,11 @@ class ContentController extends AbstractCrudController
         );
     }
 
+    /**
+     * controller adding content to additional folder
+     *
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     */
     public function addAdditionalFolderAction()
     {
         // Check current user authorization
@@ -75,12 +81,41 @@ class ContentController extends AbstractCrudController
             );
 
             try {
-
+                $this->dispatch(TheliaEvents::CONTENT_ADD_FOLDER, $event);
             } catch (\Exception $e) {
-                $this->errorPage($e);
+                return $this->errorPage($e);
             }
         }
 
+        $this->redirectToEditionTemplate();
+    }
+
+    /**
+     * controller removing additional folder to a content
+     *
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     */
+    public function removeAdditionalFolderAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth('admin.content.update')) return $response;
+
+        $folder_id = intval($this->getRequest()->request->get('additional_folder_id'));
+
+        if ($folder_id > 0) {
+            $event = new ContentRemoveFolderEvent(
+                $this->getExistingObject(),
+                $folder_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::CONTENT_REMOVE_FOLDER, $event);
+            } catch (\Exception $e) {
+                return $this->errorPage($e);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
     }
 
     /**

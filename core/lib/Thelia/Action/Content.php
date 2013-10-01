@@ -27,6 +27,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
+use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -127,6 +128,12 @@ class Content extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /**
+     *
+     * associate a folder to a content if the association already does not exists
+     *
+     * @param ContentAddFolderEvent $event
+     */
     public function addFolder(ContentAddFolderEvent $event)
     {
         if(ContentFolderQuery::create()
@@ -141,6 +148,18 @@ class Content extends BaseAction implements EventSubscriberInterface
                 ->setContent($event->getContent())
                 ->setDefaultFolder(false)
                 ->save();
+        }
+    }
+
+    public function removeFolder(ContentRemoveFolderEvent $event)
+    {
+        $contentFolder = ContentFolderQuery::create()
+            ->filterByContent($event->getContent())
+            ->filterByFolderId($event->getFolderId())
+            ->findOne();
+
+        if(null !== $contentFolder) {
+            $contentFolder->delete();
         }
     }
 
