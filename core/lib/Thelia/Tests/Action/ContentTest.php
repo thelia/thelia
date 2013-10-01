@@ -22,11 +22,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Action\Content;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
 
@@ -123,6 +125,50 @@ class ContentTest extends BaseAction
 
         $this->assertInstanceOf('Thelia\Model\Content', $updatedContent);
         $this->assertEquals(!$visibility, $updatedContent->getVisible());
+    }
+
+    public function testUpdatePositionUp()
+    {
+        $content = ContentQuery::create()
+            ->filterByPosition(1, Criteria::GREATER_THAN)
+            ->findOne();
+
+        if (null === $content) {
+            $this->fail('use fixtures before launching test, there is no content in database');
+        }
+
+        $newPosition = $content->getPosition()-1;
+
+        $event = new UpdatePositionEvent($content->getId(), UpdatePositionEvent::POSITION_UP);
+
+        $contentAction = new Content($this->getContainer());
+        $contentAction->updatePosition($event);
+
+        $updatedContent = ContentQuery::create()->findPk($content->getId());
+
+        $this->assertEquals($newPosition, $updatedContent->getPosition(),sprintf("new position is %d, new position expected is %d for content %d", $newPosition, $updatedContent->getPosition(), $updatedContent->getId()));
+    }
+
+    public function testUpdatePositionDown()
+    {
+        $content = ContentQuery::create()
+            ->filterByPosition(1)
+            ->findOne();
+
+        if (null === $content) {
+            $this->fail('use fixtures before launching test, there is no content in database');
+        }
+
+        $newPosition = $content->getPosition()+1;
+
+        $event = new UpdatePositionEvent($content->getId(), UpdatePositionEvent::POSITION_DOWN);
+
+        $contentAction = new Content($this->getContainer());
+        $contentAction->updatePosition($event);
+
+        $updatedContent = ContentQuery::create()->findPk($content->getId());
+
+        $this->assertEquals($newPosition, $updatedContent->getPosition(),sprintf("new position is %d, new position expected is %d for content %d", $newPosition, $updatedContent->getPosition(), $updatedContent->getId()));
     }
 
     /**
