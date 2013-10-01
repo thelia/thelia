@@ -28,6 +28,7 @@ use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\FolderQuery;
 
 
@@ -120,6 +121,10 @@ class FolderTest extends BaseAction
         $this->assertTrue($deletedFolder->isDeleted());
     }
 
+    /**
+     * test folder toggle visibility
+     * @covers Thelia\Action\Folder::toggleVisibility
+     */
     public function testToggleVisibility()
     {
         $folder = $this->getRandomFolder();
@@ -134,6 +139,50 @@ class FolderTest extends BaseAction
 
         $this->assertInstanceOf('Thelia\Model\Folder', $updatedFolder);
         $this->assertEquals(!$visible, $updatedFolder->getVisible());
+    }
+
+    public function testUpdatePositionUp()
+    {
+        $folder = FolderQuery::create()
+            ->filterByPosition(1, Criteria::GREATER_THAN)
+            ->findOne();
+
+        if(null === $folder) {
+            $this->fail('use fixtures before launching test, there is no folder in database');
+        }
+
+        $newPosition = $folder->getPosition()-1;
+
+        $event = new UpdatePositionEvent($folder->getId(), UpdatePositionEvent::POSITION_UP);
+
+        $folderAction = new Folder($this->getContainer());
+        $folderAction->updatePosition($event);
+
+        $updatedFolder = FolderQuery::create()->findPk($folder->getId());
+
+        $this->assertEquals($newPosition, $updatedFolder->getPosition(),sprintf("new position is %d, new position expected is %d for folder %d", $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
+    }
+
+    public function testUpdatePositionDown()
+    {
+        $folder = FolderQuery::create()
+            ->filterByPosition(1)
+            ->findOne();
+
+        if(null === $folder) {
+            $this->fail('use fixtures before launching test, there is no folder in database');
+        }
+
+        $newPosition = $folder->getPosition()+1;
+
+        $event = new UpdatePositionEvent($folder->getId(), UpdatePositionEvent::POSITION_DOWN);
+
+        $folderAction = new Folder($this->getContainer());
+        $folderAction->updatePosition($event);
+
+        $updatedFolder = FolderQuery::create()->findPk($folder->getId());
+
+        $this->assertEquals($newPosition, $updatedFolder->getPosition(),sprintf("new position is %d, new position expected is %d for folder %d", $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
     }
 
     /**
