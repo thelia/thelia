@@ -118,11 +118,11 @@
 
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Orders"} <span class="caret"></span></a>
 
-                                    <ul class="dropdown-menu config_menu" role="menu">
+                                    <ul class="dropdown-menu" role="menu">
 
                                         <li role="menuitem">
-                                            <a data-target="{url path='admin/orders'}" href="{url path='admin/orders'}">
-                                                {intl l="All orders"}
+                                            <a class="clearfix" data-target="{url path='admin/orders'}" href="{url path='admin/orders'}">
+                                                <span class="pull-left">{intl l="All orders"}</span>
                                                 <span class="label label-default pull-right">{count type="order" customer="*" backend_context="1"}</span>
                                             </a>
                                         </li>
@@ -130,8 +130,8 @@
                                         {loop name="order-status-list" type="order-status"}
                                             {assign "orderStatusLabel" "order_$CODE"}
                                             <li role="menuitem">
-                                                <a data-target="{url path='admin/orders/$LABEL'}" href="{url path="admin/orders" status=$ID}">
-                                                    {$TITLE}
+                                                <a class="clearfix" data-target="{url path='admin/orders/$LABEL'}" href="{url path="admin/orders" status=$ID}">
+                                                    <span class="pull-left">{$TITLE}</span>
                                                     <span class="label label-{#$orderStatusLabel#} pull-right">{count type="order" customer="*" backend_context="1" status=$ID}</span>
                                                 </a>
                                             </li>
