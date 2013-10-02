@@ -23,13 +23,13 @@
 
 namespace Thelia\Core\Event;
 
-
 /**
  * Class MailTransporterEvent
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class MailTransporterEvent extends ActionEvent {
+class MailTransporterEvent extends ActionEvent
+{
     /**
      * @var \Swift_Transport
      */

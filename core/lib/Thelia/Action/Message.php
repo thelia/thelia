@@ -30,16 +30,16 @@ use Thelia\Model\Message as MessageModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\MessageUpdateEvent;
-use Thelia\Core\Event\MessageCreateEvent;
-use Thelia\Core\Event\MessageDeleteEvent;
+use Thelia\Core\Event\Message\MessageUpdateEvent;
+use Thelia\Core\Event\Message\MessageCreateEvent;
+use Thelia\Core\Event\Message\MessageDeleteEvent;
 
 class Message extends BaseAction implements EventSubscriberInterface
 {
     /**
      * Create a new messageuration entry
      *
-     * @param MessageCreateEvent $event
+     * @param \Thelia\Core\Event\Message\MessageCreateEvent $event
      */
     public function create(MessageCreateEvent $event)
     {
@@ -64,7 +64,7 @@ class Message extends BaseAction implements EventSubscriberInterface
     /**
      * Change a message
      *
-     * @param MessageUpdateEvent $event
+     * @param \Thelia\Core\Event\Message\MessageUpdateEvent $event
      */
     public function modify(MessageUpdateEvent $event)
     {
@@ -94,7 +94,7 @@ class Message extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a messageuration entry
      *
-     * @param MessageDeleteEvent $event
+     * @param \Thelia\Core\Event\Message\MessageDeleteEvent $event
      */
     public function delete(MessageDeleteEvent $event)
     {

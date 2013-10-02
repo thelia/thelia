@@ -30,10 +30,9 @@ use Thelia\Model\AttributeAv as AttributeAvModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\AttributeAvUpdateEvent;
-use Thelia\Core\Event\AttributeAvCreateEvent;
-use Thelia\Core\Event\AttributeAvDeleteEvent;
-use Thelia\Model\ConfigQuery;
+use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
+use Thelia\Core\Event\Attribute\AttributeAvCreateEvent;
+use Thelia\Core\Event\Attribute\AttributeAvDeleteEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 
 class AttributeAv extends BaseAction implements EventSubscriberInterface
@@ -63,7 +62,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
     /**
      * Change a product attribute
      *
-     * @param AttributeAvUpdateEvent $event
+     * @param \Thelia\Core\Event\Attribute\AttributeAvUpdateEvent $event
      */
     public function update(AttributeAvUpdateEvent $event)
     {
@@ -112,21 +111,8 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getObjectId())) {
-
-            $attribute->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $attribute->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $attribute->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $attribute->movePositionDown();
-        }
+        return $this->genericUpdatePosition(AttributeAvQuery::create(), $event);
     }
-
 
     /**
      * {@inheritDoc}

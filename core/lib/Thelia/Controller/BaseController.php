@@ -286,7 +286,7 @@ class BaseController extends ContainerAware
      */
     protected function checkXmlHttpRequest()
     {
-        if(false === $this->getRequest()->isXmlHttpRequest() && false === $this->isDebug()) {
+        if (false === $this->getRequest()->isXmlHttpRequest() && false === $this->isDebug()) {
             $this->accessDenied();
         }
     }
@@ -300,6 +300,7 @@ class BaseController extends ContainerAware
     public function getMailer()
     {
         $mailer = $this->container->get('mailer');
+
         return $mailer->getSwiftMailer();
     }
 }

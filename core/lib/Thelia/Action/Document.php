@@ -25,15 +25,15 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Thelia\Core\Event\DocumentEvent;
+use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
+use Thelia\Core\Event\Document\DocumentDeleteEvent;
+use Thelia\Core\Event\Document\DocumentEvent;
+use Thelia\Exception\ImageException;
 use Thelia\Model\ConfigQuery;
+use Thelia\Tools\FileManager;
 use Thelia\Tools\URL;
 
-use Imagine\Document\ImagineInterface;
-use Imagine\Document\DocumentInterface;
-use Imagine\Document\Box;
 use Imagine\Document\Color;
-use Imagine\Document\Point;
 use Thelia\Exception\DocumentException;
 use Thelia\Core\Event\TheliaEvents;
 
@@ -76,7 +76,8 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
     /**
      * @return string root of the document cache directory in web space
      */
-    protected function getCacheDirFromWebRoot() {
+    protected function getCacheDirFromWebRoot()
+    {
         return ConfigQuery::read('document_cache_dir_from_web_root', 'cache');
     }
 
@@ -88,45 +89,175 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
      *
      * This method updates the cache_file_path and file_url attributes of the event
      *
-     * @param  DocumentEvent $event
-     * @throws \InvalidArgumentException, DocumentException
+     * @param DocumentEvent $event Event
+     *
+     * @throws \Thelia\Exception\DocumentException
+     * @throws \InvalidArgumentException           , DocumentException
      */
     public function processDocument(DocumentEvent $event)
     {
         $subdir      = $event->getCacheSubdirectory();
-        $source_file = $event->getSourceFilepath();
+        $sourceFile = $event->getSourceFilepath();
 
-        if (null == $subdir || null == $source_file) {
+        if (null == $subdir || null == $sourceFile) {
             throw new \InvalidArgumentException("Cache sub-directory and source file path cannot be null");
         }
 
-        $originalDocumentPathInCache = $this->getCacheFilePath($subdir, $source_file, true);
+        $originalDocumentPathInCache = $this->getCacheFilePath($subdir, $sourceFile, true);
 
         if (! file_exists($originalDocumentPathInCache)) {
 
-            if (! file_exists($source_file)) {
-                throw new DocumentException(sprintf("Source document file %s does not exists.", $source_file));
+            if (! file_exists($sourceFile)) {
+                throw new DocumentException(sprintf("Source document file %s does not exists.", $sourceFile));
             }
 
             $mode = ConfigQuery::read('original_document_delivery_mode', 'symlink');
 
             if ($mode == 'symlink') {
-                if (false == symlink($source_file, $originalDocumentPathInCache)) {
-                     throw new DocumentException(sprintf("Failed to create symbolic link for %s in %s document cache directory", basename($source_file), $subdir));
+                if (false == symlink($sourceFile, $originalDocumentPathInCache)) {
+                     throw new DocumentException(sprintf("Failed to create symbolic link for %s in %s document cache directory", basename($sourceFile), $subdir));
                 }
-            } else {// mode = 'copy'
-                if (false == @copy($source_file, $originalDocumentPathInCache)) {
-                    throw new DocumentException(sprintf("Failed to copy %s in %s document cache directory", basename($source_file), $subdir));
+            } else {
+                // mode = 'copy'
+                if (false == @copy($sourceFile, $originalDocumentPathInCache)) {
+                    throw new DocumentException(sprintf("Failed to copy %s in %s document cache directory", basename($sourceFile), $subdir));
                 }
             }
         }
 
         // Compute the document URL
-        $document_url = $this->getCacheFileURL($subdir, basename($originalDocumentPathInCache));
+        $documentUrl = $this->getCacheFileURL($subdir, basename($originalDocumentPathInCache));
 
         // Update the event with file path and file URL
-        $event->setDocumentPath($originalDocumentPathInCache);
-        $event->setDocumentUrl(URL::getInstance()->absoluteUrl($document_url, null, URL::PATH_TO_FILE));
+        $event->setDocumentPath($documentUrl);
+        $event->setDocumentUrl(URL::getInstance()->absoluteUrl($documentUrl, null, URL::PATH_TO_FILE));
+    }
+
+    /**
+     * Take care of saving document in the database and file storage
+     *
+     * @param \Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent $event Document event
+     *
+     * @throws \Thelia\Exception\ImageException
+     * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function saveDocument(DocumentCreateOrUpdateEvent $event)
+    {
+        $this->adminLogAppend(
+            $this->container->get('thelia.translator')->trans(
+                'Saving documents for %parentName% parent id %parentId% (%parentType%)',
+                array(
+                    '%parentName%' => $event->getParentName(),
+                    '%parentId%' => $event->getParentId(),
+                    '%parentType%' => $event->getDocumentType()
+                ),
+                'document'
+            )
+        );
+
+        $fileManager = new FileManager($this->container);
+        $model = $event->getModelDocument();
+
+        $nbModifiedLines = $model->save();
+
+        $event->setModelDocument($model);
+
+        if (!$nbModifiedLines) {
+            throw new ImageException(
+                sprintf(
+                    'Document "%s" with parent id %s (%s) failed to be saved',
+                    $event->getParentName(),
+                    $event->getParentId(),
+                    $event->getDocumentType()
+                )
+            );
+        }
+
+        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getDocumentType(), $event->getModelDocument(), $event->getUploadedFile(), FileManager::FILE_TYPE_DOCUMENTS);
+        $event->setUploadedFile($newUploadedFile);
+    }
+
+    /**
+     * Take care of updating document in the database and file storage
+     *
+     * @param \Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent $event Document event
+     *
+     * @throws \Thelia\Exception\ImageException
+     * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function updateDocument(DocumentCreateOrUpdateEvent $event)
+    {
+        $this->adminLogAppend(
+            $this->container->get('thelia.translator')->trans(
+                'Updating documents for %parentName% parent id %parentId% (%parentType%)',
+                array(
+                    '%parentName%' => $event->getParentName(),
+                    '%parentId%' => $event->getParentId(),
+                    '%parentType%' => $event->getDocumentType()
+                ),
+                'image'
+            )
+        );
+
+        if (null !== $event->getUploadedFile()) {
+            $event->getModelDocument()->setTitle($event->getUploadedFile()->getClientOriginalName());
+        }
+
+        $fileManager = new FileManager($this->container);
+        // Copy and save file
+        if ($event->getUploadedFile()) {
+            // Remove old picture file from file storage
+            $url = $fileManager->getUploadDir($event->getDocumentType(), FileManager::FILE_TYPE_DOCUMENTS) . '/' . $event->getOldModelDocument()->getFile();
+            unlink(str_replace('..', '', $url));
+
+            $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getDocumentType(), $event->getModelDocument(), $event->getUploadedFile(), FileManager::FILE_TYPE_DOCUMENTS);
+            $event->setUploadedFile($newUploadedFile);
+        }
+
+        // Update document modifications
+        $event->getModelDocument()->save();
+        $event->setModelDocument($event->getModelDocument());
+    }
+
+    /**
+     * Take care of deleting document in the database and file storage
+     *
+     * @param \Thelia\Core\Event\Document\DocumentDeleteEvent $event Image event
+     *
+     * @throws \Exception
+     * @todo refactor make all documents using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function deleteDocument(DocumentDeleteEvent $event)
+    {
+        $fileManager = new FileManager($this->container);
+
+        try {
+            $fileManager->deleteFile($event->getDocumentToDelete(), $event->getDocumentType(), FileManager::FILE_TYPE_DOCUMENTS);
+
+            $this->adminLogAppend(
+                $this->container->get('thelia.translator')->trans(
+                    'Deleting document for %id% with parent id %parentId%',
+                    array(
+                        '%id%' => $event->getDocumentToDelete()->getId(),
+                        '%parentId%' => $event->getDocumentToDelete()->getParentId(),
+                    ),
+                    'document'
+                )
+            );
+        } catch (\Exception $e) {
+            $this->adminLogAppend(
+                $this->container->get('thelia.translator')->trans(
+                    'Fail to delete document for %id% with parent id %parentId% (Exception : %e%)',
+                    array(
+                        '%id%' => $event->getDocumentToDelete()->getId(),
+                        '%parentId%' => $event->getDocumentToDelete()->getParentId(),
+                        '%e%' => $e->getMessage()
+                    ),
+                    'document'
+                )
+            );
+            throw $e;
+        }
     }
 
     public static function getSubscribedEvents()
@@ -134,6 +265,9 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         return array(
             TheliaEvents::DOCUMENT_PROCESS => array("processDocument", 128),
             TheliaEvents::DOCUMENT_CLEAR_CACHE => array("clearCache", 128),
+            TheliaEvents::DOCUMENT_DELETE => array("deleteDocument", 128),
+            TheliaEvents::DOCUMENT_SAVE => array("saveDocument", 128),
+            TheliaEvents::DOCUMENT_UPDATE => array("updateDocument", 128),
         );
     }
 }

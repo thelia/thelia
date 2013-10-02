@@ -24,8 +24,11 @@ namespace Thelia\TaxEngine;
 
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Country;
+use Thelia\Model\OrderProductTax;
 use Thelia\Model\Product;
+use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleQuery;
+use Thelia\Tools\I18n;
 
 /**
  * Class Calculator
@@ -68,14 +71,34 @@ class Calculator
         $this->product = $product;
         $this->country = $country;
 
-        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($product, $country);
+        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($product->getTaxRule(), $country);
 
         return $this;
     }
 
-    public function getTaxAmountFromUntaxedPrice($untaxedPrice)
+    public function loadTaxRule(TaxRule $taxRule, Country $country)
     {
-        return $this->getTaxedPrice($untaxedPrice) - $untaxedPrice;
+        $this->product = null;
+        $this->country = null;
+        $this->taxRulesCollection = null;
+
+        if($taxRule->getId() === null) {
+            throw new TaxEngineException('TaxRule id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_TAX_RULE);
+        }
+        if($country->getId() === null) {
+            throw new TaxEngineException('Country id is empty in Calculator::loadTaxRule', TaxEngineException::UNDEFINED_COUNTRY);
+        }
+
+        $this->country = $country;
+
+        $this->taxRulesCollection = $this->taxRuleQuery->getTaxCalculatorCollection($taxRule, $country);
+
+        return $this;
+    }
+
+    public function getTaxAmountFromUntaxedPrice($untaxedPrice, &$taxCollection = null)
+    {
+        return $this->getTaxedPrice($untaxedPrice, $taxCollection) - $untaxedPrice;
     }
 
     public function getTaxAmountFromTaxedPrice($taxedPrice)
@@ -83,7 +106,15 @@ class Calculator
         return $taxedPrice - $this->getUntaxedPrice($taxedPrice);
     }
 
-    public function getTaxedPrice($untaxedPrice)
+    /**
+     * @param      $untaxedPrice
+     * @param null $taxCollection returns OrderProductTaxCollection
+     * @param null $askedLocale
+     *
+     * @return int
+     * @throws \Thelia\Exception\TaxEngineException
+     */
+    public function getTaxedPrice($untaxedPrice, &$taxCollection = null, $askedLocale = null)
     {
         if(null === $this->taxRulesCollection) {
             throw new TaxEngineException('Tax rules collection is empty in Calculator::getTaxAmount', TaxEngineException::UNDEFINED_TAX_RULES_COLLECTION);
@@ -97,6 +128,9 @@ class Calculator
         $currentPosition = 1;
         $currentTax = 0;
 
+        if(null !== $taxCollection) {
+            $taxCollection = new OrderProductTaxCollection();
+        }
         foreach($this->taxRulesCollection as $taxRule) {
             $position = (int)$taxRule->getTaxRuleCountryPosition();
 
@@ -109,7 +143,17 @@ class Calculator
                 $currentPosition = $position;
             }
 
-            $currentTax += $taxType->calculate($taxedPrice);
+            $taxAmount = round($taxType->calculate($taxedPrice), 2);
+            $currentTax += $taxAmount;
+
+            if(null !== $taxCollection) {
+                $taxI18n = I18n::forceI18nRetrieving($askedLocale, 'Tax', $taxRule->getId());
+                $orderProductTax = new OrderProductTax();
+                $orderProductTax->setTitle($taxI18n->getTitle());
+                $orderProductTax->setDescription($taxI18n->getDescription());
+                $orderProductTax->setAmount($taxAmount);
+                $taxCollection->addTax($orderProductTax);
+            }
         }
 
         $taxedPrice += $currentTax;

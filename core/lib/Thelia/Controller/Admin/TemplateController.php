@@ -23,22 +23,19 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\TemplateDeleteEvent;
+use Thelia\Core\Event\Template\TemplateDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\TemplateUpdateEvent;
-use Thelia\Core\Event\TemplateCreateEvent;
+use Thelia\Core\Event\Template\TemplateUpdateEvent;
+use Thelia\Core\Event\Template\TemplateCreateEvent;
 use Thelia\Model\TemplateQuery;
 use Thelia\Form\TemplateModificationForm;
 use Thelia\Form\TemplateCreationForm;
-use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Model\TemplateAv;
-use Thelia\Model\TemplateAvQuery;
-use Thelia\Core\Event\TemplateAvUpdateEvent;
-use Thelia\Core\Event\TemplateEvent;
-use Thelia\Core\Event\TemplateDeleteAttributeEvent;
-use Thelia\Core\Event\TemplateAddAttributeEvent;
-use Thelia\Core\Event\TemplateAddFeatureEvent;
-use Thelia\Core\Event\TemplateDeleteFeatureEvent;
+use Thelia\Core\Event\Template\TemplateDeleteAttributeEvent;
+use Thelia\Core\Event\Template\TemplateAddAttributeEvent;
+use Thelia\Core\Event\Template\TemplateAddFeatureEvent;
+use Thelia\Core\Event\Template\TemplateDeleteFeatureEvent;
+use Thelia\Model\FeatureTemplateQuery;
+use Thelia\Model\AttributeTemplateQuery;
 
 /**
  * Manages product templates
@@ -100,7 +97,6 @@ class TemplateController extends AbstractCrudController
         ;
 
         // Add feature and attributes list
-
         return $changeEvent;
     }
 
@@ -197,22 +193,24 @@ class TemplateController extends AbstractCrudController
         return null;
     }
 
-    public function getAjaxFeaturesAction() {
+    public function getAjaxFeaturesAction()
+    {
         return $this->render(
                 'ajax/template-feature-list',
                 array('template_id' => $this->getRequest()->get('template_id'))
         );
     }
 
-    public function getAjaxAttributesAction() {
+    public function getAjaxAttributesAction()
+    {
         return $this->render(
                 'ajax/template-attribute-list',
                 array('template_id' => $this->getRequest()->get('template_id'))
         );
     }
 
-    public function addAttributeAction() {
-
+    public function addAttributeAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.template.attribute.add")) return $response;
 
@@ -235,8 +233,8 @@ class TemplateController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
-    public function deleteAttributeAction() {
-
+    public function deleteAttributeAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.template.attribute.delete")) return $response;
 
@@ -255,8 +253,23 @@ class TemplateController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
-    public function addFeatureAction() {
+    public function updateAttributePositionAction()
+    {
+        // Find attribute_template
+        $attributeTemplate = AttributeTemplateQuery::create()
+            ->filterByTemplateId($this->getRequest()->get('template_id', null))
+            ->filterByAttributeId($this->getRequest()->get('attribute_id', null))
+            ->findOne()
+        ;
 
+        return $this->genericUpdatePositionAction(
+                $attributeTemplate,
+                TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION
+        );
+    }
+
+    public function addFeatureAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.template.feature.add")) return $response;
 
@@ -279,8 +292,8 @@ class TemplateController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
-    public function deleteFeatureAction() {
-
+    public function deleteFeatureAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.configuration.template.feature.delete")) return $response;
 
@@ -299,4 +312,18 @@ class TemplateController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
+    public function updateFeaturePositionAction()
+    {
+        // Find feature_template
+        $featureTemplate = FeatureTemplateQuery::create()
+            ->filterByTemplateId($this->getRequest()->get('template_id', null))
+            ->filterByFeatureId($this->getRequest()->get('feature_id', null))
+            ->findOne()
+        ;
+
+        return $this->genericUpdatePositionAction(
+                $featureTemplate,
+                TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION
+        );
+    }
 }

@@ -85,14 +85,8 @@ abstract class Coupon implements ActiveRecordInterface
     protected $amount;
 
     /**
-     * The value for the is_used field.
-     * @var        int
-     */
-    protected $is_used;
-
-    /**
      * The value for the is_enabled field.
-     * @var        int
+     * @var        boolean
      */
     protected $is_enabled;
 
@@ -103,34 +97,40 @@ abstract class Coupon implements ActiveRecordInterface
     protected $expiration_date;
 
     /**
-     * The value for the serialized_rules field.
-     * @var        string
-     */
-    protected $serialized_rules;
-
-    /**
-     * The value for the is_cumulative field.
-     * @var        int
-     */
-    protected $is_cumulative;
-
-    /**
-     * The value for the is_removing_postage field.
-     * @var        int
-     */
-    protected $is_removing_postage;
-
-    /**
      * The value for the max_usage field.
      * @var        int
      */
     protected $max_usage;
 
     /**
+     * The value for the is_cumulative field.
+     * @var        boolean
+     */
+    protected $is_cumulative;
+
+    /**
+     * The value for the is_removing_postage field.
+     * @var        boolean
+     */
+    protected $is_removing_postage;
+
+    /**
      * The value for the is_available_on_special_offers field.
      * @var        boolean
      */
     protected $is_available_on_special_offers;
+
+    /**
+     * The value for the is_used field.
+     * @var        boolean
+     */
+    protected $is_used;
+
+    /**
+     * The value for the serialized_conditions field.
+     * @var        string
+     */
+    protected $serialized_conditions;
 
     /**
      * The value for the created_at field.
@@ -260,7 +260,7 @@ abstract class Coupon implements ActiveRecordInterface
      * be false, if the object was retrieved from storage or was created
      * and then saved.
      *
-     * @return true, if the object has never been persisted.
+     * @return boolean true, if the object has never been persisted.
      */
     public function isNew()
     {
@@ -318,8 +318,8 @@ abstract class Coupon implements ActiveRecordInterface
      * <code>obj</code> is an instance of <code>Coupon</code>, delegates to
      * <code>equals(Coupon)</code>.  Otherwise, returns <code>false</code>.
      *
-     * @param      obj The object to compare to.
-     * @return Whether equal to the object specified.
+     * @param  mixed   $obj The object to compare to.
+     * @return boolean Whether equal to the object specified.
      */
     public function equals($obj)
     {
@@ -358,8 +358,6 @@ abstract class Coupon implements ActiveRecordInterface
     /**
      * Get the associative array of the virtual columns in this object
      *
-     * @param string $name The virtual column name
-     *
      * @return array
      */
     public function getVirtualColumns()
@@ -370,6 +368,7 @@ abstract class Coupon implements ActiveRecordInterface
     /**
      * Checks the existence of a virtual column in this object
      *
+     * @param  string  $name The virtual column name
      * @return boolean
      */
     public function hasVirtualColumn($name)
@@ -380,7 +379,10 @@ abstract class Coupon implements ActiveRecordInterface
     /**
      * Get the value of a virtual column in this object
      *
+     * @param  string $name The virtual column name
      * @return mixed
+     *
+     * @throws PropelException
      */
     public function getVirtualColumn($name)
     {
@@ -437,7 +439,9 @@ abstract class Coupon implements ActiveRecordInterface
             $parser = AbstractParser::getParser($parser);
         }
 
-        return $this->fromArray($parser->toArray($data), TableMap::TYPE_PHPNAME);
+        $this->fromArray($parser->toArray($data), TableMap::TYPE_PHPNAME);
+
+        return $this;
     }
 
     /**
@@ -517,20 +521,9 @@ abstract class Coupon implements ActiveRecordInterface
     }
 
     /**
-     * Get the [is_used] column value.
-     *
-     * @return   int
-     */
-    public function getIsUsed()
-    {
-
-        return $this->is_used;
-    }
-
-    /**
      * Get the [is_enabled] column value.
      *
-     * @return   int
+     * @return   boolean
      */
     public function getIsEnabled()
     {
@@ -554,41 +547,8 @@ abstract class Coupon implements ActiveRecordInterface
         if ($format === null) {
             return $this->expiration_date;
         } else {
-            return $this->expiration_date !== null ? $this->expiration_date->format($format) : null;
+            return $this->expiration_date instanceof \DateTime ? $this->expiration_date->format($format) : null;
         }
-    }
-
-    /**
-     * Get the [serialized_rules] column value.
-     *
-     * @return   string
-     */
-    public function getSerializedRules()
-    {
-
-        return $this->serialized_rules;
-    }
-
-    /**
-     * Get the [is_cumulative] column value.
-     *
-     * @return   int
-     */
-    public function getIsCumulative()
-    {
-
-        return $this->is_cumulative;
-    }
-
-    /**
-     * Get the [is_removing_postage] column value.
-     *
-     * @return   int
-     */
-    public function getIsRemovingPostage()
-    {
-
-        return $this->is_removing_postage;
     }
 
     /**
@@ -603,6 +563,28 @@ abstract class Coupon implements ActiveRecordInterface
     }
 
     /**
+     * Get the [is_cumulative] column value.
+     *
+     * @return   boolean
+     */
+    public function getIsCumulative()
+    {
+
+        return $this->is_cumulative;
+    }
+
+    /**
+     * Get the [is_removing_postage] column value.
+     *
+     * @return   boolean
+     */
+    public function getIsRemovingPostage()
+    {
+
+        return $this->is_removing_postage;
+    }
+
+    /**
      * Get the [is_available_on_special_offers] column value.
      *
      * @return   boolean
@@ -611,6 +593,28 @@ abstract class Coupon implements ActiveRecordInterface
     {
 
         return $this->is_available_on_special_offers;
+    }
+
+    /**
+     * Get the [is_used] column value.
+     *
+     * @return   boolean
+     */
+    public function getIsUsed()
+    {
+
+        return $this->is_used;
+    }
+
+    /**
+     * Get the [serialized_conditions] column value.
+     *
+     * @return   string
+     */
+    public function getSerializedConditions()
+    {
+
+        return $this->serialized_conditions;
     }
 
     /**
@@ -629,7 +633,7 @@ abstract class Coupon implements ActiveRecordInterface
         if ($format === null) {
             return $this->created_at;
         } else {
-            return $this->created_at !== null ? $this->created_at->format($format) : null;
+            return $this->created_at instanceof \DateTime ? $this->created_at->format($format) : null;
         }
     }
 
@@ -649,7 +653,7 @@ abstract class Coupon implements ActiveRecordInterface
         if ($format === null) {
             return $this->updated_at;
         } else {
-            return $this->updated_at !== null ? $this->updated_at->format($format) : null;
+            return $this->updated_at instanceof \DateTime ? $this->updated_at->format($format) : null;
         }
     }
 
@@ -749,36 +753,23 @@ abstract class Coupon implements ActiveRecordInterface
     } // setAmount()
 
     /**
-     * Set the value of [is_used] column.
+     * Sets the value of the [is_enabled] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
-     */
-    public function setIsUsed($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->is_used !== $v) {
-            $this->is_used = $v;
-            $this->modifiedColumns[] = CouponTableMap::IS_USED;
-        }
-
-
-        return $this;
-    } // setIsUsed()
-
-    /**
-     * Set the value of [is_enabled] column.
-     *
-     * @param      int $v new value
+     * @param      boolean|integer|string $v The new value
      * @return   \Thelia\Model\Coupon The current object (for fluent API support)
      */
     public function setIsEnabled($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
         }
 
         if ($this->is_enabled !== $v) {
@@ -812,69 +803,6 @@ abstract class Coupon implements ActiveRecordInterface
     } // setExpirationDate()
 
     /**
-     * Set the value of [serialized_rules] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
-     */
-    public function setSerializedRules($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->serialized_rules !== $v) {
-            $this->serialized_rules = $v;
-            $this->modifiedColumns[] = CouponTableMap::SERIALIZED_RULES;
-        }
-
-
-        return $this;
-    } // setSerializedRules()
-
-    /**
-     * Set the value of [is_cumulative] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
-     */
-    public function setIsCumulative($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->is_cumulative !== $v) {
-            $this->is_cumulative = $v;
-            $this->modifiedColumns[] = CouponTableMap::IS_CUMULATIVE;
-        }
-
-
-        return $this;
-    } // setIsCumulative()
-
-    /**
-     * Set the value of [is_removing_postage] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
-     */
-    public function setIsRemovingPostage($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->is_removing_postage !== $v) {
-            $this->is_removing_postage = $v;
-            $this->modifiedColumns[] = CouponTableMap::IS_REMOVING_POSTAGE;
-        }
-
-
-        return $this;
-    } // setIsRemovingPostage()
-
-    /**
      * Set the value of [max_usage] column.
      *
      * @param      int $v new value
@@ -894,6 +822,64 @@ abstract class Coupon implements ActiveRecordInterface
 
         return $this;
     } // setMaxUsage()
+
+    /**
+     * Sets the value of the [is_cumulative] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
+     */
+    public function setIsCumulative($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_cumulative !== $v) {
+            $this->is_cumulative = $v;
+            $this->modifiedColumns[] = CouponTableMap::IS_CUMULATIVE;
+        }
+
+
+        return $this;
+    } // setIsCumulative()
+
+    /**
+     * Sets the value of the [is_removing_postage] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
+     */
+    public function setIsRemovingPostage($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_removing_postage !== $v) {
+            $this->is_removing_postage = $v;
+            $this->modifiedColumns[] = CouponTableMap::IS_REMOVING_POSTAGE;
+        }
+
+
+        return $this;
+    } // setIsRemovingPostage()
 
     /**
      * Sets the value of the [is_available_on_special_offers] column.
@@ -923,6 +909,56 @@ abstract class Coupon implements ActiveRecordInterface
 
         return $this;
     } // setIsAvailableOnSpecialOffers()
+
+    /**
+     * Sets the value of the [is_used] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
+     */
+    public function setIsUsed($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->is_used !== $v) {
+            $this->is_used = $v;
+            $this->modifiedColumns[] = CouponTableMap::IS_USED;
+        }
+
+
+        return $this;
+    } // setIsUsed()
+
+    /**
+     * Set the value of [serialized_conditions] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Coupon The current object (for fluent API support)
+     */
+    public function setSerializedConditions($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->serialized_conditions !== $v) {
+            $this->serialized_conditions = $v;
+            $this->modifiedColumns[] = CouponTableMap::SERIALIZED_CONDITIONS;
+        }
+
+
+        return $this;
+    } // setSerializedConditions()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -1040,32 +1076,32 @@ abstract class Coupon implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CouponTableMap::translateFieldName('Amount', TableMap::TYPE_PHPNAME, $indexType)];
             $this->amount = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CouponTableMap::translateFieldName('IsUsed', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->is_used = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CouponTableMap::translateFieldName('IsEnabled', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_enabled = (null !== $col) ? (boolean) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CouponTableMap::translateFieldName('IsEnabled', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->is_enabled = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CouponTableMap::translateFieldName('ExpirationDate', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CouponTableMap::translateFieldName('ExpirationDate', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->expiration_date = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CouponTableMap::translateFieldName('SerializedRules', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->serialized_rules = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CouponTableMap::translateFieldName('IsCumulative', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->is_cumulative = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : CouponTableMap::translateFieldName('IsRemovingPostage', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->is_removing_postage = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : CouponTableMap::translateFieldName('MaxUsage', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CouponTableMap::translateFieldName('MaxUsage', TableMap::TYPE_PHPNAME, $indexType)];
             $this->max_usage = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : CouponTableMap::translateFieldName('IsAvailableOnSpecialOffers', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CouponTableMap::translateFieldName('IsCumulative', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_cumulative = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CouponTableMap::translateFieldName('IsRemovingPostage', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_removing_postage = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : CouponTableMap::translateFieldName('IsAvailableOnSpecialOffers', TableMap::TYPE_PHPNAME, $indexType)];
             $this->is_available_on_special_offers = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : CouponTableMap::translateFieldName('IsUsed', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_used = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : CouponTableMap::translateFieldName('SerializedConditions', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->serialized_conditions = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : CouponTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
@@ -1368,17 +1404,14 @@ abstract class Coupon implements ActiveRecordInterface
         if ($this->isColumnModified(CouponTableMap::AMOUNT)) {
             $modifiedColumns[':p' . $index++]  = 'AMOUNT';
         }
-        if ($this->isColumnModified(CouponTableMap::IS_USED)) {
-            $modifiedColumns[':p' . $index++]  = 'IS_USED';
-        }
         if ($this->isColumnModified(CouponTableMap::IS_ENABLED)) {
             $modifiedColumns[':p' . $index++]  = 'IS_ENABLED';
         }
         if ($this->isColumnModified(CouponTableMap::EXPIRATION_DATE)) {
             $modifiedColumns[':p' . $index++]  = 'EXPIRATION_DATE';
         }
-        if ($this->isColumnModified(CouponTableMap::SERIALIZED_RULES)) {
-            $modifiedColumns[':p' . $index++]  = 'SERIALIZED_RULES';
+        if ($this->isColumnModified(CouponTableMap::MAX_USAGE)) {
+            $modifiedColumns[':p' . $index++]  = 'MAX_USAGE';
         }
         if ($this->isColumnModified(CouponTableMap::IS_CUMULATIVE)) {
             $modifiedColumns[':p' . $index++]  = 'IS_CUMULATIVE';
@@ -1386,11 +1419,14 @@ abstract class Coupon implements ActiveRecordInterface
         if ($this->isColumnModified(CouponTableMap::IS_REMOVING_POSTAGE)) {
             $modifiedColumns[':p' . $index++]  = 'IS_REMOVING_POSTAGE';
         }
-        if ($this->isColumnModified(CouponTableMap::MAX_USAGE)) {
-            $modifiedColumns[':p' . $index++]  = 'MAX_USAGE';
-        }
         if ($this->isColumnModified(CouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS)) {
             $modifiedColumns[':p' . $index++]  = 'IS_AVAILABLE_ON_SPECIAL_OFFERS';
+        }
+        if ($this->isColumnModified(CouponTableMap::IS_USED)) {
+            $modifiedColumns[':p' . $index++]  = 'IS_USED';
+        }
+        if ($this->isColumnModified(CouponTableMap::SERIALIZED_CONDITIONS)) {
+            $modifiedColumns[':p' . $index++]  = 'SERIALIZED_CONDITIONS';
         }
         if ($this->isColumnModified(CouponTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -1424,29 +1460,29 @@ abstract class Coupon implements ActiveRecordInterface
                     case 'AMOUNT':
                         $stmt->bindValue($identifier, $this->amount, PDO::PARAM_STR);
                         break;
-                    case 'IS_USED':
-                        $stmt->bindValue($identifier, $this->is_used, PDO::PARAM_INT);
-                        break;
                     case 'IS_ENABLED':
-                        $stmt->bindValue($identifier, $this->is_enabled, PDO::PARAM_INT);
+                        $stmt->bindValue($identifier, (int) $this->is_enabled, PDO::PARAM_INT);
                         break;
                     case 'EXPIRATION_DATE':
                         $stmt->bindValue($identifier, $this->expiration_date ? $this->expiration_date->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case 'SERIALIZED_RULES':
-                        $stmt->bindValue($identifier, $this->serialized_rules, PDO::PARAM_STR);
-                        break;
-                    case 'IS_CUMULATIVE':
-                        $stmt->bindValue($identifier, $this->is_cumulative, PDO::PARAM_INT);
-                        break;
-                    case 'IS_REMOVING_POSTAGE':
-                        $stmt->bindValue($identifier, $this->is_removing_postage, PDO::PARAM_INT);
-                        break;
                     case 'MAX_USAGE':
                         $stmt->bindValue($identifier, $this->max_usage, PDO::PARAM_INT);
                         break;
+                    case 'IS_CUMULATIVE':
+                        $stmt->bindValue($identifier, (int) $this->is_cumulative, PDO::PARAM_INT);
+                        break;
+                    case 'IS_REMOVING_POSTAGE':
+                        $stmt->bindValue($identifier, (int) $this->is_removing_postage, PDO::PARAM_INT);
+                        break;
                     case 'IS_AVAILABLE_ON_SPECIAL_OFFERS':
                         $stmt->bindValue($identifier, (int) $this->is_available_on_special_offers, PDO::PARAM_INT);
+                        break;
+                    case 'IS_USED':
+                        $stmt->bindValue($identifier, (int) $this->is_used, PDO::PARAM_INT);
+                        break;
+                    case 'SERIALIZED_CONDITIONS':
+                        $stmt->bindValue($identifier, $this->serialized_conditions, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1532,28 +1568,28 @@ abstract class Coupon implements ActiveRecordInterface
                 return $this->getAmount();
                 break;
             case 4:
-                return $this->getIsUsed();
-                break;
-            case 5:
                 return $this->getIsEnabled();
                 break;
-            case 6:
+            case 5:
                 return $this->getExpirationDate();
                 break;
-            case 7:
-                return $this->getSerializedRules();
-                break;
-            case 8:
-                return $this->getIsCumulative();
-                break;
-            case 9:
-                return $this->getIsRemovingPostage();
-                break;
-            case 10:
+            case 6:
                 return $this->getMaxUsage();
                 break;
-            case 11:
+            case 7:
+                return $this->getIsCumulative();
+                break;
+            case 8:
+                return $this->getIsRemovingPostage();
+                break;
+            case 9:
                 return $this->getIsAvailableOnSpecialOffers();
+                break;
+            case 10:
+                return $this->getIsUsed();
+                break;
+            case 11:
+                return $this->getSerializedConditions();
                 break;
             case 12:
                 return $this->getCreatedAt();
@@ -1597,21 +1633,20 @@ abstract class Coupon implements ActiveRecordInterface
             $keys[1] => $this->getCode(),
             $keys[2] => $this->getType(),
             $keys[3] => $this->getAmount(),
-            $keys[4] => $this->getIsUsed(),
-            $keys[5] => $this->getIsEnabled(),
-            $keys[6] => $this->getExpirationDate(),
-            $keys[7] => $this->getSerializedRules(),
-            $keys[8] => $this->getIsCumulative(),
-            $keys[9] => $this->getIsRemovingPostage(),
-            $keys[10] => $this->getMaxUsage(),
-            $keys[11] => $this->getIsAvailableOnSpecialOffers(),
+            $keys[4] => $this->getIsEnabled(),
+            $keys[5] => $this->getExpirationDate(),
+            $keys[6] => $this->getMaxUsage(),
+            $keys[7] => $this->getIsCumulative(),
+            $keys[8] => $this->getIsRemovingPostage(),
+            $keys[9] => $this->getIsAvailableOnSpecialOffers(),
+            $keys[10] => $this->getIsUsed(),
+            $keys[11] => $this->getSerializedConditions(),
             $keys[12] => $this->getCreatedAt(),
             $keys[13] => $this->getUpdatedAt(),
             $keys[14] => $this->getVersion(),
         );
         $virtualColumns = $this->virtualColumns;
-        foreach($virtualColumns as $key => $virtualColumn)
-        {
+        foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
@@ -1669,28 +1704,28 @@ abstract class Coupon implements ActiveRecordInterface
                 $this->setAmount($value);
                 break;
             case 4:
-                $this->setIsUsed($value);
-                break;
-            case 5:
                 $this->setIsEnabled($value);
                 break;
-            case 6:
+            case 5:
                 $this->setExpirationDate($value);
                 break;
-            case 7:
-                $this->setSerializedRules($value);
-                break;
-            case 8:
-                $this->setIsCumulative($value);
-                break;
-            case 9:
-                $this->setIsRemovingPostage($value);
-                break;
-            case 10:
+            case 6:
                 $this->setMaxUsage($value);
                 break;
-            case 11:
+            case 7:
+                $this->setIsCumulative($value);
+                break;
+            case 8:
+                $this->setIsRemovingPostage($value);
+                break;
+            case 9:
                 $this->setIsAvailableOnSpecialOffers($value);
+                break;
+            case 10:
+                $this->setIsUsed($value);
+                break;
+            case 11:
+                $this->setSerializedConditions($value);
                 break;
             case 12:
                 $this->setCreatedAt($value);
@@ -1729,14 +1764,14 @@ abstract class Coupon implements ActiveRecordInterface
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setType($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setAmount($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setIsUsed($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setIsEnabled($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setExpirationDate($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setSerializedRules($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setIsCumulative($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setIsRemovingPostage($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setMaxUsage($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setIsAvailableOnSpecialOffers($arr[$keys[11]]);
+        if (array_key_exists($keys[4], $arr)) $this->setIsEnabled($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setExpirationDate($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setMaxUsage($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setIsCumulative($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setIsRemovingPostage($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setIsAvailableOnSpecialOffers($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setIsUsed($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setSerializedConditions($arr[$keys[11]]);
         if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
         if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
         if (array_key_exists($keys[14], $arr)) $this->setVersion($arr[$keys[14]]);
@@ -1755,14 +1790,14 @@ abstract class Coupon implements ActiveRecordInterface
         if ($this->isColumnModified(CouponTableMap::CODE)) $criteria->add(CouponTableMap::CODE, $this->code);
         if ($this->isColumnModified(CouponTableMap::TYPE)) $criteria->add(CouponTableMap::TYPE, $this->type);
         if ($this->isColumnModified(CouponTableMap::AMOUNT)) $criteria->add(CouponTableMap::AMOUNT, $this->amount);
-        if ($this->isColumnModified(CouponTableMap::IS_USED)) $criteria->add(CouponTableMap::IS_USED, $this->is_used);
         if ($this->isColumnModified(CouponTableMap::IS_ENABLED)) $criteria->add(CouponTableMap::IS_ENABLED, $this->is_enabled);
         if ($this->isColumnModified(CouponTableMap::EXPIRATION_DATE)) $criteria->add(CouponTableMap::EXPIRATION_DATE, $this->expiration_date);
-        if ($this->isColumnModified(CouponTableMap::SERIALIZED_RULES)) $criteria->add(CouponTableMap::SERIALIZED_RULES, $this->serialized_rules);
+        if ($this->isColumnModified(CouponTableMap::MAX_USAGE)) $criteria->add(CouponTableMap::MAX_USAGE, $this->max_usage);
         if ($this->isColumnModified(CouponTableMap::IS_CUMULATIVE)) $criteria->add(CouponTableMap::IS_CUMULATIVE, $this->is_cumulative);
         if ($this->isColumnModified(CouponTableMap::IS_REMOVING_POSTAGE)) $criteria->add(CouponTableMap::IS_REMOVING_POSTAGE, $this->is_removing_postage);
-        if ($this->isColumnModified(CouponTableMap::MAX_USAGE)) $criteria->add(CouponTableMap::MAX_USAGE, $this->max_usage);
         if ($this->isColumnModified(CouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS)) $criteria->add(CouponTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS, $this->is_available_on_special_offers);
+        if ($this->isColumnModified(CouponTableMap::IS_USED)) $criteria->add(CouponTableMap::IS_USED, $this->is_used);
+        if ($this->isColumnModified(CouponTableMap::SERIALIZED_CONDITIONS)) $criteria->add(CouponTableMap::SERIALIZED_CONDITIONS, $this->serialized_conditions);
         if ($this->isColumnModified(CouponTableMap::CREATED_AT)) $criteria->add(CouponTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CouponTableMap::UPDATED_AT)) $criteria->add(CouponTableMap::UPDATED_AT, $this->updated_at);
         if ($this->isColumnModified(CouponTableMap::VERSION)) $criteria->add(CouponTableMap::VERSION, $this->version);
@@ -1832,14 +1867,14 @@ abstract class Coupon implements ActiveRecordInterface
         $copyObj->setCode($this->getCode());
         $copyObj->setType($this->getType());
         $copyObj->setAmount($this->getAmount());
-        $copyObj->setIsUsed($this->getIsUsed());
         $copyObj->setIsEnabled($this->getIsEnabled());
         $copyObj->setExpirationDate($this->getExpirationDate());
-        $copyObj->setSerializedRules($this->getSerializedRules());
+        $copyObj->setMaxUsage($this->getMaxUsage());
         $copyObj->setIsCumulative($this->getIsCumulative());
         $copyObj->setIsRemovingPostage($this->getIsRemovingPostage());
-        $copyObj->setMaxUsage($this->getMaxUsage());
         $copyObj->setIsAvailableOnSpecialOffers($this->getIsAvailableOnSpecialOffers());
+        $copyObj->setIsUsed($this->getIsUsed());
+        $copyObj->setSerializedConditions($this->getSerializedConditions());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setVersion($this->getVersion());
@@ -2365,14 +2400,14 @@ abstract class Coupon implements ActiveRecordInterface
         $this->code = null;
         $this->type = null;
         $this->amount = null;
-        $this->is_used = null;
         $this->is_enabled = null;
         $this->expiration_date = null;
-        $this->serialized_rules = null;
+        $this->max_usage = null;
         $this->is_cumulative = null;
         $this->is_removing_postage = null;
-        $this->max_usage = null;
         $this->is_available_on_special_offers = null;
+        $this->is_used = null;
+        $this->serialized_conditions = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->version = null;
@@ -2669,14 +2704,14 @@ abstract class Coupon implements ActiveRecordInterface
         $version->setCode($this->getCode());
         $version->setType($this->getType());
         $version->setAmount($this->getAmount());
-        $version->setIsUsed($this->getIsUsed());
         $version->setIsEnabled($this->getIsEnabled());
         $version->setExpirationDate($this->getExpirationDate());
-        $version->setSerializedRules($this->getSerializedRules());
+        $version->setMaxUsage($this->getMaxUsage());
         $version->setIsCumulative($this->getIsCumulative());
         $version->setIsRemovingPostage($this->getIsRemovingPostage());
-        $version->setMaxUsage($this->getMaxUsage());
         $version->setIsAvailableOnSpecialOffers($this->getIsAvailableOnSpecialOffers());
+        $version->setIsUsed($this->getIsUsed());
+        $version->setSerializedConditions($this->getSerializedConditions());
         $version->setCreatedAt($this->getCreatedAt());
         $version->setUpdatedAt($this->getUpdatedAt());
         $version->setVersion($this->getVersion());
@@ -2721,14 +2756,14 @@ abstract class Coupon implements ActiveRecordInterface
         $this->setCode($version->getCode());
         $this->setType($version->getType());
         $this->setAmount($version->getAmount());
-        $this->setIsUsed($version->getIsUsed());
         $this->setIsEnabled($version->getIsEnabled());
         $this->setExpirationDate($version->getExpirationDate());
-        $this->setSerializedRules($version->getSerializedRules());
+        $this->setMaxUsage($version->getMaxUsage());
         $this->setIsCumulative($version->getIsCumulative());
         $this->setIsRemovingPostage($version->getIsRemovingPostage());
-        $this->setMaxUsage($version->getMaxUsage());
         $this->setIsAvailableOnSpecialOffers($version->getIsAvailableOnSpecialOffers());
+        $this->setIsUsed($version->getIsUsed());
+        $this->setSerializedConditions($version->getSerializedConditions());
         $this->setCreatedAt($version->getCreatedAt());
         $this->setUpdatedAt($version->getUpdatedAt());
         $this->setVersion($version->getVersion());

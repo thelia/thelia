@@ -24,12 +24,14 @@ use Thelia\Model\Map\AttributeTemplateTableMap;
  * @method     ChildAttributeTemplateQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildAttributeTemplateQuery orderByAttributeId($order = Criteria::ASC) Order by the attribute_id column
  * @method     ChildAttributeTemplateQuery orderByTemplateId($order = Criteria::ASC) Order by the template_id column
+ * @method     ChildAttributeTemplateQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildAttributeTemplateQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAttributeTemplateQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildAttributeTemplateQuery groupById() Group by the id column
  * @method     ChildAttributeTemplateQuery groupByAttributeId() Group by the attribute_id column
  * @method     ChildAttributeTemplateQuery groupByTemplateId() Group by the template_id column
+ * @method     ChildAttributeTemplateQuery groupByPosition() Group by the position column
  * @method     ChildAttributeTemplateQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAttributeTemplateQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -51,12 +53,14 @@ use Thelia\Model\Map\AttributeTemplateTableMap;
  * @method     ChildAttributeTemplate findOneById(int $id) Return the first ChildAttributeTemplate filtered by the id column
  * @method     ChildAttributeTemplate findOneByAttributeId(int $attribute_id) Return the first ChildAttributeTemplate filtered by the attribute_id column
  * @method     ChildAttributeTemplate findOneByTemplateId(int $template_id) Return the first ChildAttributeTemplate filtered by the template_id column
+ * @method     ChildAttributeTemplate findOneByPosition(int $position) Return the first ChildAttributeTemplate filtered by the position column
  * @method     ChildAttributeTemplate findOneByCreatedAt(string $created_at) Return the first ChildAttributeTemplate filtered by the created_at column
  * @method     ChildAttributeTemplate findOneByUpdatedAt(string $updated_at) Return the first ChildAttributeTemplate filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildAttributeTemplate objects filtered by the id column
  * @method     array findByAttributeId(int $attribute_id) Return ChildAttributeTemplate objects filtered by the attribute_id column
  * @method     array findByTemplateId(int $template_id) Return ChildAttributeTemplate objects filtered by the template_id column
+ * @method     array findByPosition(int $position) Return ChildAttributeTemplate objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildAttributeTemplate objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildAttributeTemplate objects filtered by the updated_at column
  *
@@ -147,7 +151,7 @@ abstract class AttributeTemplateQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, ATTRIBUTE_ID, TEMPLATE_ID, CREATED_AT, UPDATED_AT FROM attribute_template WHERE ID = :p0';
+        $sql = 'SELECT ID, ATTRIBUTE_ID, TEMPLATE_ID, POSITION, CREATED_AT, UPDATED_AT FROM attribute_template WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -361,6 +365,47 @@ abstract class AttributeTemplateQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AttributeTemplateTableMap::TEMPLATE_ID, $templateId, $comparison);
+    }
+
+    /**
+     * Filter the query on the position column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPosition(1234); // WHERE position = 1234
+     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
+     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * </code>
+     *
+     * @param     mixed $position The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAttributeTemplateQuery The current query, for fluid interface
+     */
+    public function filterByPosition($position = null, $comparison = null)
+    {
+        if (is_array($position)) {
+            $useMinMax = false;
+            if (isset($position['min'])) {
+                $this->addUsingAlias(AttributeTemplateTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($position['max'])) {
+                $this->addUsingAlias(AttributeTemplateTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AttributeTemplateTableMap::POSITION, $position, $comparison);
     }
 
     /**

@@ -126,7 +126,8 @@ trait PositionManagementTrait {
                 $result->setDispatcher($this->getDispatcher())->setPosition($my_position)->save();
 
                 $cnx->commit();
-            } catch (Exception $e) {
+            }
+            catch (Exception $e) {
                 $cnx->rollback();
             }
         }
@@ -179,7 +180,10 @@ trait PositionManagementTrait {
 
             try {
                 foreach ($results as $result) {
-                    $result->setDispatcher($this->getDispatcher())->setPosition($result->getPosition() + $delta)->save($cnx);
+
+                    $objNewPosition = $result->getPosition() + $delta;
+
+                    $result->setDispatcher($this->getDispatcher())->setPosition($objNewPosition)->save($cnx);
                 }
 
                 $this
@@ -188,9 +192,26 @@ trait PositionManagementTrait {
                 ;
 
                 $cnx->commit();
-            } catch (Exception $e) {
+            }
+            catch (Exception $e) {
                 $cnx->rollback();
             }
         }
+    }
+
+    protected function reorderBeforeDelete()
+    {
+        // Find DATABASE_NAME constant
+        $mapClassName = self::TABLE_MAP;
+
+        $sql = sprintf("UPDATE `%s` SET position=(position-1) WHERE parent=:parent AND position>:position", $mapClassName::TABLE_NAME);
+
+        $con = Propel::getConnection($mapClassName::DATABASE_NAME);
+        $statement = $con->prepare($sql);
+
+        $statement->execute(array(
+            ':parent' => $this->getParent(),
+            ':position' => $this->getPosition()
+        ));
     }
 }

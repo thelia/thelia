@@ -64,9 +64,21 @@
                                     </thead>
 
                                     <tbody>
-                                    {loop name="customer_list" type="customer" current="false" visible="*" last_order="1" backend_context="1" page={$customer_page} limit={$display_customer}}
+                                    {loop name="customer_list" type="customer" current="false" visible="*" backend_context="1" page={$customer_page} limit={$display_customer}}
+                                        {assign "lastOrderDate" ''}
+                                        {assign "lastOrderAmount" ''}
+                                        {assign "lastOrderCurrency" ''}
+
+                                        {loop type="order" name="last-order" customer=$ID order="create-date-reverse" limit="1"}
+                                            {assign "lastOrderDate" "{format_date date=$CREATE_DATE}"}
+                                            {assign "lastOrderAmount" "{format_number number=$TOTAL_TAXED_AMOUNT}"}
+                                            {loop type="currency" name="order-currency" id=$CURRENCY}
+                                                {assign "lastOrderCurrency" $SYMBOL}
+                                            {/loop}
+                                        {/loop}
+
                                         <tr>
-                                            <td><a href="{url path="/admin/customer/update/{$ID}" }">{$REF}</a></td>
+                                            <td><a href="{url path="/admin/customer/update/{$ID}"}">{$REF}</a></td>
 
                                             <td>
                                                 {$COMPANY}
@@ -79,11 +91,11 @@
                                             {module_include location='customer_list_row'}
 
                                             <td>
-                                                {format_date date=$LASTORDER_DATE}
+                                                {$lastOrderDate}
                                             </td>
 
                                             <td>
-                                                {format_number number=$LASTORDER_AMOUNT}
+                                                {$lastOrderCurrency} {$lastOrderAmount}
                                             </td>
                                             <td>
                                                 <div class="btn-group">

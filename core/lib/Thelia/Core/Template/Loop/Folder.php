@@ -31,6 +31,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -55,6 +56,7 @@ class Folder extends BaseI18nLoop
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntTypeArgument('parent'),
+            Argument::createIntTypeArgument('content'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
@@ -105,6 +107,16 @@ class Folder extends BaseI18nLoop
 
         if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
+        $content = $this->getContent();
+
+        if (null !== $content) {
+            $obj = ContentQuery::create()->findPk($content);
+
+            if($obj) {
+                $search->filterByContent($obj, Criteria::IN);
+            }
         }
 
         $visible = $this->getVisible();
@@ -162,7 +174,8 @@ class Folder extends BaseI18nLoop
                 ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("PARENT", $folder->getParent())
                 ->set("URL", $folder->getUrl($locale))
-                ->set("CONTENT_COUNT", $folder->countChild())
+                ->set("CHILD_COUNT", $folder->countChild())
+                ->set("CONTENT_COUNT", $folder->countAllContents())
                 ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
                 ->set("POSITION", $folder->getPosition())
             ;

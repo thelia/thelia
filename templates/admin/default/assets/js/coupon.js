@@ -1,5 +1,17 @@
 $(function($){
 
+    // Manage how coupon and conditions are saved
+    $.couponManager = {};
+    // Condition to be saved
+    $.couponManager.conditionToSave = {};
+    $.couponManager.conditionToSave.serviceId = false;
+    $.couponManager.conditionToSave.operators = {};
+    $.couponManager.conditionToSave.values = {};
+    // Conditions payload to save
+    $.couponManager.conditionsToSave = [];
+    // Condition being updated id
+    $.couponManager.conditionToUpdateId = false;
+
     // Clean array from deleteValue (undefined) keys
     Array.prototype.clean = function(deleteValue) {
         for (var i = 0; i < this.length; i++) {
@@ -11,110 +23,112 @@ $(function($){
         return this;
     };
 
-    // Remove 1 Rule then Save Rules AJAX
-    couponManager.removeRuleAjax = function(id) {
-        // Delete rule in temporary array
-        delete couponManager.rulesToSave[id];
-        couponManager.rulesToSave.clean(undefined);
+    // Remove 1 Condition then Save Conditions AJAX
+    $.couponManager.removeConditionAjax = function(id) {
+        // Delete condition in temporary array
+        delete $.couponManager.conditionsToSave[id];
+        $.couponManager.conditionsToSave.clean(undefined);
 
         // Save
-        couponManager.saveRuleAjax();
+        $.couponManager.saveConditionAjax();
     };
 
-    // Add 1 Rule / or update the temporary Rules array then Save Rules via AJAX
-    couponManager.createOrUpdateRuleAjax = function() {
-        var id = couponManager.ruleToUpdateId;
+    // Add 1 Condition / or update the temporary Conditions array then Save Conditions via AJAX
+    $.couponManager.createOrUpdateConditionAjax = function() {
+        var id = $.couponManager.conditionToUpdateId;
         // If create
         if(!id) {
-            couponManager.rulesToSave.push(couponManager.ruleToSave);
+            $.couponManager.conditionsToSave.push($.couponManager.conditionToSave);
         } else { // else update
-            couponManager.rulesToSave[id] = couponManager.ruleToSave;
+            $.couponManager.conditionsToSave[id] = $.couponManager.conditionToSave;
             // reset edit mode to off
-            couponManager.ruleToUpdateId = false;
+            $.couponManager.conditionToUpdateId = false;
         }
 
         // Save
-        couponManager.saveRuleAjax();
+        $.couponManager.saveConditionAjax();
     };
 
-    // Set rule inputs to allow editing
-    couponManager.updateRuleSelectAjax = function(id) {
-        couponManager.ruleToUpdateId = id;
-        couponManager.ruleToSave = couponManager.rulesToSave[id];
+    // Set condition inputs to allow editing
+    $.couponManager.updateConditionSelectAjax = function(id) {
+        $.couponManager.conditionToUpdateId = id;
+        $.couponManager.conditionToSave = $.couponManager.conditionsToSave[id];
 
-        // Set the rule selector
+        // Set the condition selector
         $("#category-rule option").filter(function() {
-            return $(this).val() == couponManager.ruleToSave.serviceId;
+            return $(this).val() == $.couponManager.conditionToSave.serviceId;
         }).prop('selected', true);
 
-        // Force rule input refresh
-        couponManager.loadRuleInputs(couponManager.ruleToSave.serviceId, function() {
-            couponManager.fillInRuleInputs();
+        // Force condition input refresh
+        $.couponManager.loadConditionInputs($.couponManager.conditionToSave.serviceId, function() {
+            $.couponManager.fillInConditionInputs();
         });
     };
 
-    // Fill in rule inputs
-    couponManager.fillInRuleInputs = function() {
+    // Fill in condition inputs
+    $.couponManager.fillInConditionInputs = function() {
         var operatorId = null;
         var valueId = null;
         var idName = null;
 
-        var id = couponManager.ruleToUpdateId;
+        var id = $.couponManager.conditionToUpdateId;
         if(id) {
-            couponManager.ruleToSave = couponManager.rulesToSave[id];
+            $.couponManager.conditionToSave = $.couponManager.conditionsToSave[id];
         }
 
-        for (idName in couponManager.ruleToSave.operators) {
+        for (idName in $.couponManager.conditionToSave.operators) {
             // Setting idName operator select
             operatorId = idName + '-operator';
-            $('#' + operatorId).val(couponManager.ruleToSave.operators[idName]);
+            $('#' + operatorId).val($.couponManager.conditionToSave.operators[idName]);
 
             // Setting idName value input
             valueId = idName + '-value';
-            $('#' + valueId).val(couponManager.ruleToSave.values[idName]);
+            $('#' + valueId).val($.couponManager.conditionToSave.values[idName]);
         }
     };
 
-    // Save rules on click
-    couponManager.onClickSaveRule = function() {
+    // Save conditions on click
+    $.couponManager.onClickSaveCondition = function() {
         $('#constraint-save-btn').on('click', function () {
-            if($('#category-rule').val() == 'thelia.constraint.rule.available_for_everyone') {
-                // @todo translate + modal
-                var r= confirm("Do you really want to set this coupon available to everyone ?");
+            if($('#category-rule').val() == 'thelia.condition.match_for_everyone') {
+//                // @todo translate message + put it in modal
+                var r = confirm("Do you really want to set this coupon available to everyone ?");
                 if (r == true) {
-                    couponManager.createOrUpdateRuleAjax();
+                    $.couponManager.createOrUpdateConditionAjax();
                 }
+            } else {
+                $.couponManager.createOrUpdateConditionAjax();
             }
 
         });
     };
-    couponManager.onClickSaveRule();
+    $.couponManager.onClickSaveCondition();
 
-    // Remove rule on click
-    couponManager.onClickDeleteRule = function() {
+    // Remove condition on click
+    $.couponManager.onClickDeleteCondition = function() {
         $('.constraint-delete-btn').on('click', function (e) {
             e.preventDefault();
             var $this = $(this);
-            couponManager.removeRuleAjax($this.attr('data-int'));
+            $.couponManager.removeConditionAjax($this.attr('data-int'));
         });
     };
-    couponManager.onClickDeleteRule();
+    $.couponManager.onClickDeleteCondition();
 
-    // Update rule on click
-    couponManager.onClickUpdateRule = function() {
-        $('.constraint-update-btn').on('click', function (e) {
+    // Update condition on click
+    $.couponManager.onClickUpdateCondition = function() {
+        $('.condition-update-btn').on('click', function (e) {
             e.preventDefault();
             var $this = $(this);
-            couponManager.updateRuleSelectAjax($this.attr('data-int'));
+            $.couponManager.updateConditionSelectAjax($this.attr('data-int'));
 
             // Hide row being updated
             $this.parent().parent().remove();
         });
     };
-    couponManager.onClickUpdateRule();
+    $.couponManager.onClickUpdateCondition();
 
     // Reload effect inputs when changing effect
-    couponManager.onEffectChange = function() {
+    $.couponManager.onEffectChange = function() {
         var optionSelected = $("option:selected", this);
         $('#effectToolTip').html(optionSelected.attr("data-description"));
         $('#effect').on('change', function () {
@@ -122,51 +136,47 @@ $(function($){
             $('#effectToolTip').html(optionSelected.attr("data-description"));
         });
     };
-    couponManager.onEffectChange();
+    $.couponManager.onEffectChange();
 
-    // Reload rule inputs when changing effect
-    couponManager.onRuleChange = function() {
+    // Reload condition inputs when changing effect
+    $.couponManager.onConditionChange = function() {
         $('#category-rule').on('change', function () {
-            couponManager.loadRuleInputs($(this).val(), function() {});
+            $.couponManager.loadConditionInputs($(this).val(), function() {});
         });
     };
-    couponManager.onRuleChange();
+    $.couponManager.onConditionChange();
 
-    // Fill in ready to be saved rule array
+    // Fill in ready to be saved condition array
     // var onInputsChange = function()
     // In AJAX response
 
     // Set max usage to unlimited or not
-    couponManager.onUsageUnlimitedChange = function() {
-        if (!$('#max-usage').parent().hasClass('has-error')) {
-            $('#max-usage').hide().attr('value', '-1');
+    $.couponManager.onUsageUnlimitedChange = function() {
+        var isUnlimited = $('#is-unlimited');
+        if ($('#max-usage').val() == -1) {
+            isUnlimited.prop('checked', true);
+            $('#max-usage').hide();
             $('#max-usage-label').hide();
+        } else {
+            $isUnlimited.prop('checked', false);
+            $('#max-usage').show();
+            $('#max-usage-label').show();
         }
-        $('#is-unlimited').change(function(){
+
+        isUnlimited.change(function(){
             var $this = $(this);
             if ($this.is(':checked')) {
-                $('#max-usage').hide().attr('value', '-1');
+                $('#max-usage').hide().val('-1');
                 $('#max-usage-label').hide();
             } else {
-                $('#max-usage').show().val('').attr('value', '');
+                $('#max-usage').show().val('');
                 $('#max-usage-label').show();
             }
         });
     };
-    couponManager.onUsageUnlimitedChange();
+    $.couponManager.onUsageUnlimitedChange();
 
 });
 
-// Rule to save
 
-var couponManager = {};
-// Rule to be saved
-couponManager.ruleToSave = {};
-couponManager.ruleToSave.serviceId = false;
-couponManager.ruleToSave.operators = {};
-couponManager.ruleToSave.values = {};
-// Rules payload to save
-couponManager.rulesToSave = [];
-// Rule being updated id
-couponManager.ruleToUpdateId = false;
 

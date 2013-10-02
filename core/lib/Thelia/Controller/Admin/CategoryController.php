@@ -23,18 +23,18 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\CategoryDeleteEvent;
+use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\CategoryUpdateEvent;
-use Thelia\Core\Event\CategoryCreateEvent;
+use Thelia\Core\Event\Category\CategoryUpdateEvent;
+use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Model\CategoryQuery;
 use Thelia\Form\CategoryModificationForm;
 use Thelia\Form\CategoryCreationForm;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\CategoryToggleVisibilityEvent;
-use Thelia\Core\Event\CategoryDeleteContentEvent;
-use Thelia\Core\Event\CategoryAddContentEvent;
-use Thelia\Model\CategoryAssociatedContent;
+use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
+use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
+use Thelia\Core\Event\Category\CategoryAddContentEvent;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -47,7 +47,8 @@ use Thelia\Model\CategoryAssociatedContentQuery;
  */
 class CategoryController extends AbstractCrudController
 {
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct(
             'category',
             'manual',
@@ -66,15 +67,18 @@ class CategoryController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm() {
+    protected function getCreationForm()
+    {
         return new CategoryCreationForm($this->getRequest());
     }
 
-    protected function getUpdateForm() {
+    protected function getUpdateForm()
+    {
         return new CategoryModificationForm($this->getRequest());
     }
 
-    protected function getCreationEvent($formData) {
+    protected function getCreationEvent($formData)
+    {
         $createEvent = new CategoryCreateEvent();
 
         $createEvent
@@ -87,7 +91,8 @@ class CategoryController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData) {
+    protected function getUpdateEvent($formData)
+    {
         $changeEvent = new CategoryUpdateEvent($formData['id']);
 
         // Create and dispatch the change event
@@ -105,8 +110,8 @@ class CategoryController extends AbstractCrudController
         return $changeEvent;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue) {
-
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    {
         return new UpdatePositionEvent(
                 $this->getRequest()->get('category_id', null),
                 $positionChangeMode,
@@ -114,16 +119,18 @@ class CategoryController extends AbstractCrudController
         );
     }
 
-    protected function getDeleteEvent() {
+    protected function getDeleteEvent()
+    {
         return new CategoryDeleteEvent($this->getRequest()->get('category_id', 0));
     }
 
-    protected function eventContainsObject($event) {
+    protected function eventContainsObject($event)
+    {
         return $event->hasCategory();
     }
 
-    protected function hydrateObjectForm($object) {
-
+    protected function hydrateObjectForm($object)
+    {
         // Prepare the data that will hydrate the form
         $data = array(
             'id'           => $object->getId(),
@@ -141,21 +148,25 @@ class CategoryController extends AbstractCrudController
         return new CategoryModificationForm($this->getRequest(), "form", $data);
     }
 
-    protected function getObjectFromEvent($event) {
+    protected function getObjectFromEvent($event)
+    {
         return $event->hasCategory() ? $event->getCategory() : null;
     }
 
-    protected function getExistingObject() {
+    protected function getExistingObject()
+    {
         return CategoryQuery::create()
         ->joinWithI18n($this->getCurrentEditionLocale())
         ->findOneById($this->getRequest()->get('category_id', 0));
     }
 
-    protected function getObjectLabel($object) {
+    protected function getObjectLabel($object)
+    {
         return $object->getTitle();
     }
 
-    protected function getObjectId($object) {
+    protected function getObjectId($object)
+    {
         return $object->getId();
     }
 
@@ -168,8 +179,8 @@ class CategoryController extends AbstractCrudController
         );
     }
 
-    protected function renderListTemplate($currentOrder) {
-
+    protected function renderListTemplate($currentOrder)
+    {
         // Get product order
         $product_order = $this->getListOrderFromSession('product', 'product_order', 'manual');
 
@@ -181,19 +192,21 @@ class CategoryController extends AbstractCrudController
         ));
     }
 
-    protected function redirectToListTemplate() {
+    protected function redirectToListTemplate()
+    {
         $this->redirectToRoute(
                 'admin.categories.default',
                 array('category_id' => $this->getRequest()->get('category_id', 0))
         );
     }
 
-    protected function renderEditionTemplate() {
-
+    protected function renderEditionTemplate()
+    {
         return $this->render('category-edit', $this->getEditionArguments());
     }
 
-    protected function redirectToEditionTemplate() {
+    protected function redirectToEditionTemplate()
+    {
         $this->redirectToRoute("admin.categories.update", $this->getEditionArguments());
     }
 
@@ -255,8 +268,8 @@ class CategoryController extends AbstractCrudController
         return null;
     }
 
-    public function getAvailableRelatedContentAction($categoryId, $folderId) {
-
+    public function getAvailableRelatedContentAction($categoryId, $folderId)
+    {
         $result = array();
 
         $folders = FolderQuery::create()->filterById($folderId)->find();
@@ -271,7 +284,7 @@ class CategoryController extends AbstractCrudController
                 ;
 
             if ($list !== null) {
-                foreach($list as $item) {
+                foreach ($list as $item) {
                     $result[] = array('id' => $item->getId(), 'title' => $item->getTitle());
                 }
             }
@@ -280,8 +293,8 @@ class CategoryController extends AbstractCrudController
         return $this->jsonResponse(json_encode($result));
     }
 
-    public function addRelatedContentAction() {
-
+    public function addRelatedContentAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
 
@@ -296,8 +309,7 @@ class CategoryController extends AbstractCrudController
 
             try {
                 $this->dispatch(TheliaEvents::CATEGORY_ADD_CONTENT, $event);
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -306,8 +318,41 @@ class CategoryController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
-    public function deleteRelatedContentAction() {
+    /**
+     * Add category pictures
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function addRelatedPictureAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.categories.update")) {
+            return $response;
+        }
 
+//        $content_id = intval($this->getRequest()->get('content_id'));
+//
+//        if ($content_id > 0) {
+//
+//            $event = new CategoryAddContentEvent(
+//                $this->getExistingObject(),
+//                $content_id
+//            );
+//
+//            try {
+//                $this->dispatch(TheliaEvents::CATEGORY_ADD_CONTENT, $event);
+//            }
+//            catch (\Exception $ex) {
+//                // Any error
+//                return $this->errorPage($ex);
+//            }
+//        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    public function deleteRelatedContentAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.categories.update")) return $response;
 
@@ -322,8 +367,7 @@ class CategoryController extends AbstractCrudController
 
             try {
                 $this->dispatch(TheliaEvents::CATEGORY_REMOVE_CONTENT, $event);
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -331,4 +375,5 @@ class CategoryController extends AbstractCrudController
 
         $this->redirectToEditionTemplate();
     }
+
 }

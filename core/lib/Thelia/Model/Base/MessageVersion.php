@@ -172,7 +172,7 @@ abstract class MessageVersion implements ActiveRecordInterface
      * be false, if the object was retrieved from storage or was created
      * and then saved.
      *
-     * @return true, if the object has never been persisted.
+     * @return boolean true, if the object has never been persisted.
      */
     public function isNew()
     {
@@ -230,8 +230,8 @@ abstract class MessageVersion implements ActiveRecordInterface
      * <code>obj</code> is an instance of <code>MessageVersion</code>, delegates to
      * <code>equals(MessageVersion)</code>.  Otherwise, returns <code>false</code>.
      *
-     * @param      obj The object to compare to.
-     * @return Whether equal to the object specified.
+     * @param  mixed   $obj The object to compare to.
+     * @return boolean Whether equal to the object specified.
      */
     public function equals($obj)
     {
@@ -270,8 +270,6 @@ abstract class MessageVersion implements ActiveRecordInterface
     /**
      * Get the associative array of the virtual columns in this object
      *
-     * @param string $name The virtual column name
-     *
      * @return array
      */
     public function getVirtualColumns()
@@ -282,6 +280,7 @@ abstract class MessageVersion implements ActiveRecordInterface
     /**
      * Checks the existence of a virtual column in this object
      *
+     * @param  string  $name The virtual column name
      * @return boolean
      */
     public function hasVirtualColumn($name)
@@ -292,7 +291,10 @@ abstract class MessageVersion implements ActiveRecordInterface
     /**
      * Get the value of a virtual column in this object
      *
+     * @param  string $name The virtual column name
      * @return mixed
+     *
+     * @throws PropelException
      */
     public function getVirtualColumn($name)
     {
@@ -349,7 +351,9 @@ abstract class MessageVersion implements ActiveRecordInterface
             $parser = AbstractParser::getParser($parser);
         }
 
-        return $this->fromArray($parser->toArray($data), TableMap::TYPE_PHPNAME);
+        $this->fromArray($parser->toArray($data), TableMap::TYPE_PHPNAME);
+
+        return $this;
     }
 
     /**
@@ -433,7 +437,7 @@ abstract class MessageVersion implements ActiveRecordInterface
         if ($format === null) {
             return $this->created_at;
         } else {
-            return $this->created_at !== null ? $this->created_at->format($format) : null;
+            return $this->created_at instanceof \DateTime ? $this->created_at->format($format) : null;
         }
     }
 
@@ -453,7 +457,7 @@ abstract class MessageVersion implements ActiveRecordInterface
         if ($format === null) {
             return $this->updated_at;
         } else {
-            return $this->updated_at !== null ? $this->updated_at->format($format) : null;
+            return $this->updated_at instanceof \DateTime ? $this->updated_at->format($format) : null;
         }
     }
 
@@ -484,7 +488,7 @@ abstract class MessageVersion implements ActiveRecordInterface
         if ($format === null) {
             return $this->version_created_at;
         } else {
-            return $this->version_created_at !== null ? $this->version_created_at->format($format) : null;
+            return $this->version_created_at instanceof \DateTime ? $this->version_created_at->format($format) : null;
         }
     }
 
@@ -1150,8 +1154,7 @@ abstract class MessageVersion implements ActiveRecordInterface
             $keys[7] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
-        foreach($virtualColumns as $key => $virtualColumn)
-        {
+        foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 

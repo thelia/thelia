@@ -25,7 +25,9 @@
 namespace Thelia\Module;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\Map\ModuleImageTableMap;
+use Thelia\Model\ModuleI18n;
 use Thelia\Tools\Image;
 use Thelia\Exception\ModuleException;
 use Thelia\Model\Module;
@@ -49,12 +51,12 @@ abstract class BaseModule extends ContainerAware
     public function activate()
     {
         $moduleModel = $this->getModuleModel();
-        if($moduleModel->getActivate() == self::IS_NOT_ACTIVATED) {
+        if ($moduleModel->getActivate() == self::IS_NOT_ACTIVATED) {
             $moduleModel->setActivate(self::IS_ACTIVATED);
             $moduleModel->save();
             try {
                 $this->afterActivation();
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
                 $moduleModel->save();
                 throw $e;
@@ -76,11 +78,32 @@ abstract class BaseModule extends ContainerAware
         return $this->container;
     }
 
+    public function setTitle(Module $module, $titles)
+    {
+        if (is_array($titles)) {
+            foreach ($titles as $locale => $title) {
+                $moduleI18n = ModuleI18nQuery::create()->filterById($module->getId())->filterByLocale($locale)->findOne();
+                if (null === $moduleI18n) {
+                    $moduleI18n = new ModuleI18n();
+                    $moduleI18n
+                        ->setId($module->getId())
+                        ->setLocale($locale)
+                        ->setTitle($title)
+                    ;
+                    $moduleI18n->save();
+                } else {
+                    $moduleI18n->setTitle($title);
+                    $moduleI18n->save();
+                }
+            }
+        }
+    }
+
     public function deployImageFolder(Module $module, $folderPath)
     {
         try {
             $directoryBrowser = new \DirectoryIterator($folderPath);
-        } catch(\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException $e) {
             throw $e;
         }
 
@@ -90,7 +113,7 @@ abstract class BaseModule extends ContainerAware
 
         /* browse the directory */
         $imagePosition = 1;
-        foreach($directoryBrowser as $directoryContent) {
+        foreach ($directoryBrowser as $directoryContent) {
             /* is it a file ? */
             if ($directoryContent->isFile()) {
 
@@ -98,7 +121,7 @@ abstract class BaseModule extends ContainerAware
                 $filePath = $directoryContent->getPathName();
 
                 /* is it a picture ? */
-                if( Image::isImage($filePath) ) {
+                if ( Image::isImage($filePath) ) {
 
                     $con->beginTransaction();
 
@@ -111,7 +134,7 @@ abstract class BaseModule extends ContainerAware
                     $imageFileName = sprintf("%s-%d-%s", $module->getCode(), $image->getId(), $fileName);
 
                     $increment = 0;
-                    while(file_exists($imageDirectory . '/' . $imageFileName)) {
+                    while (file_exists($imageDirectory . '/' . $imageFileName)) {
                         $imageFileName = sprintf("%s-%d-%d-%s", $module->getCode(), $image->getId(), $increment, $fileName);
                         $increment++;
                     }
@@ -119,13 +142,13 @@ abstract class BaseModule extends ContainerAware
                     $imagePath = sprintf('%s/%s', $imageDirectory, $imageFileName);
 
                     if (! is_dir($imageDirectory)) {
-                        if(! @mkdir($imageDirectory, 0777, true)) {
+                        if (! @mkdir($imageDirectory, 0777, true)) {
                             $con->rollBack();
                             throw new ModuleException(sprintf("Cannot create directory : %s", $imageDirectory), ModuleException::CODE_NOT_FOUND);
                         }
                     }
 
-                    if(! @copy($filePath, $imagePath)) {
+                    if (! @copy($filePath, $imagePath)) {
                         $con->rollBack();
                         throw new ModuleException(sprintf("Cannot copy file : %s to : %s", $filePath, $imagePath), ModuleException::CODE_NOT_FOUND);
                     }
@@ -148,7 +171,7 @@ abstract class BaseModule extends ContainerAware
     {
         $moduleModel = ModuleQuery::create()->findOneByCode($this->getCode());
 
-        if(null === $moduleModel) {
+        if (null === $moduleModel) {
             throw new ModuleException(sprintf("Module Code `%s` not found", $this->getCode()), ModuleException::CODE_NOT_FOUND);
         }
 

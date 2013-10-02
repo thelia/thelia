@@ -25,8 +25,11 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Thelia\Core\Event\ImageEvent;
+use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
+use Thelia\Core\Event\Image\ImageDeleteEvent;
+use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Model\ConfigQuery;
+use Thelia\Tools\FileManager;
 use Thelia\Tools\URL;
 
 use Imagine\Image\ImagineInterface;
@@ -39,10 +42,10 @@ use Thelia\Core\Event\TheliaEvents;
 
 /**
  *
- * Image management actions. This class handles image processing an caching.
+ * Image management actions. This class handles image processing and caching.
  *
- * Basically, images are stored outside the web space (by default in local/media/images),
- * and cached in the web space (by default in web/local/images).
+ * Basically, images are stored outside of the web space (by default in local/media/images),
+ * and cached inside the web space (by default in web/local/images).
  *
  * In the images caches directory, a subdirectory for images categories (eg. product, category, folder, etc.) is
  * automatically created, and the cached image is created here. Plugin may use their own subdirectory as required.
@@ -81,7 +84,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     /**
      * @return string root of the image cache directory in web space
      */
-    protected function getCacheDirFromWebRoot() {
+    protected function getCacheDirFromWebRoot()
+    {
         return ConfigQuery::read('image_cache_dir_from_web_root', 'cache');
     }
 
@@ -94,8 +98,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      *
      * This method updates the cache_file_path and file_url attributes of the event
      *
-     * @param  ImageEvent                 $event
-     * @throws \InvalidArgumentException, ImageException
+     * @param  \Thelia\Core\Event\Image\ImageEvent $event
+     * @throws \InvalidArgumentException,          ImageException
      */
     public function processImage(ImageEvent $event)
     {
@@ -229,7 +233,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         // Compute the image URL
         $processed_image_url = $this->getCacheFileURL($subdir, basename($cacheFilePath));
 
-        // compute the full resulution image path in cache
+        // compute the full resolution image path in cache
         $original_image_url = $this->getCacheFileURL($subdir, basename($originalImagePathInCache));
 
         // Update the event with file path and file URL
@@ -238,6 +242,128 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
         $event->setFileUrl(URL::getInstance()->absoluteUrl($processed_image_url, null, URL::PATH_TO_FILE));
         $event->setOriginalFileUrl(URL::getInstance()->absoluteUrl($original_image_url, null, URL::PATH_TO_FILE));
+    }
+
+    /**
+     * Take care of saving image in the database and file storage
+     *
+     * @param \Thelia\Core\Event\Image\ImageCreateOrUpdateEvent $event Image event
+     *
+     * @throws \Thelia\Exception\ImageException
+     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function saveImage(ImageCreateOrUpdateEvent $event)
+    {
+        $this->adminLogAppend(
+            $this->container->get('thelia.translator')->trans(
+                'Saving images for %parentName% parent id %parentId% (%parentType%)',
+                array(
+                    '%parentName%' => $event->getParentName(),
+                    '%parentId%' => $event->getParentId(),
+                    '%parentType%' => $event->getImageType()
+                ),
+                'image'
+            )
+        );
+
+        $fileManager = new FileManager($this->container);
+        $model = $event->getModelImage();
+
+        $nbModifiedLines = $model->save();
+        $event->setModelImage($model);
+
+        if (!$nbModifiedLines) {
+            throw new ImageException(
+                sprintf(
+                    'Image "%s" with parent id %s (%s) failed to be saved',
+                    $event->getParentName(),
+                    $event->getParentId(),
+                    $event->getImageType()
+                )
+            );
+        }
+
+        $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile(), FileManager::FILE_TYPE_IMAGES);
+        $event->setUploadedFile($newUploadedFile);
+    }
+
+    /**
+     * Take care of updating image in the database and file storage
+     *
+     * @param ImageCreateOrUpdateEvent $event Image event
+     *
+     * @throws \Thelia\Exception\ImageException
+     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function updateImage(ImageCreateOrUpdateEvent $event)
+    {
+        $this->adminLogAppend(
+            $this->container->get('thelia.translator')->trans(
+                'Updating images for %parentName% parent id %parentId% (%parentType%)',
+                array(
+                    '%parentName%' => $event->getParentName(),
+                    '%parentId%' => $event->getParentId(),
+                    '%parentType%' => $event->getImageType()
+                ),
+                'image'
+            )
+        );
+
+        $fileManager = new FileManager($this->container);
+        // Copy and save file
+        if ($event->getUploadedFile()) {
+            // Remove old picture file from file storage
+            $url = $fileManager->getUploadDir($event->getImageType(), FileManager::FILE_TYPE_IMAGES) . '/' . $event->getOldModelImage()->getFile();
+            unlink(str_replace('..', '', $url));
+
+            $newUploadedFile = $fileManager->copyUploadedFile($event->getParentId(), $event->getImageType(), $event->getModelImage(), $event->getUploadedFile(), FileManager::FILE_TYPE_IMAGES);
+            $event->setUploadedFile($newUploadedFile);
+        }
+
+        // Update image modifications
+        $event->getModelImage()->save();
+        $event->setModelImage($event->getModelImage());
+    }
+
+    /**
+     * Take care of deleting image in the database and file storage
+     *
+     * @param ImageDeleteEvent $event Image event
+     *
+     * @throws \Exception
+     * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
+     */
+    public function deleteImage(ImageDeleteEvent $event)
+    {
+        $fileManager = new FileManager($this->container);
+
+        try {
+            $fileManager->deleteFile($event->getImageToDelete(), $event->getImageType(), FileManager::FILE_TYPE_IMAGES);
+
+            $this->adminLogAppend(
+                $this->container->get('thelia.translator')->trans(
+                    'Deleting image for %id% with parent id %parentId%',
+                    array(
+                        '%id%' => $event->getImageToDelete()->getId(),
+                        '%parentId%' => $event->getImageToDelete()->getParentId(),
+                    ),
+                    'image'
+                )
+            );
+        } catch (\Exception $e) {
+            $this->adminLogAppend(
+                $this->container->get('thelia.translator')->trans(
+                    'Fail to delete image for %id% with parent id %parentId% (Exception : %e%)',
+                    array(
+                        '%id%' => $event->getImageToDelete()->getId(),
+                        '%parentId%' => $event->getImageToDelete()->getParentId(),
+                        '%e%' => $e->getMessage()
+                    ),
+                    'image'
+                )
+            );
+            throw $e;
+        }
     }
 
     /**
@@ -362,6 +488,9 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         return array(
             TheliaEvents::IMAGE_PROCESS => array("processImage", 128),
             TheliaEvents::IMAGE_CLEAR_CACHE => array("clearCache", 128),
+            TheliaEvents::IMAGE_DELETE => array("deleteImage", 128),
+            TheliaEvents::IMAGE_SAVE => array("saveImage", 128),
+            TheliaEvents::IMAGE_UPDATE => array("updateImage", 128),
         );
     }
 }

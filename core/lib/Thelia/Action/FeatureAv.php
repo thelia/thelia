@@ -30,10 +30,9 @@ use Thelia\Model\FeatureAv as FeatureAvModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\FeatureAvUpdateEvent;
-use Thelia\Core\Event\FeatureAvCreateEvent;
-use Thelia\Core\Event\FeatureAvDeleteEvent;
-use Thelia\Model\ConfigQuery;
+use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
+use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
+use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 
 class FeatureAv extends BaseAction implements EventSubscriberInterface
@@ -112,21 +111,8 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if (null !== $feature = FeatureAvQuery::create()->findPk($event->getObjectId())) {
-
-            $feature->setDispatcher($this->getDispatcher());
-
-            $mode = $event->getMode();
-
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
-                return $feature->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
-                return $feature->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
-                return $feature->movePositionDown();
-        }
+        return $this->genericUpdatePosition(FeatureAvQuery::create(), $event);
     }
-
 
     /**
      * {@inheritDoc}

@@ -2,6 +2,8 @@
 
 namespace Thelia\Model;
 
+use Thelia\Core\Event\Folder\FolderEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Folder as BaseFolder;
 use Thelia\Tools\URL;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -44,8 +46,8 @@ class Folder extends BaseFolder
 
         foreach($children as $child)
         {
-            $contentsCount += ProductQuery::create()
-                ->filterByCategory($child)
+            $contentsCount += ContentQuery::create()
+                ->filterByFolder($child)
                 ->count();
         }
 
@@ -67,6 +69,37 @@ class Folder extends BaseFolder
     {
         $this->setPosition($this->getNextPosition());
 
+        $this->dispatchEvent(TheliaEvents::BEFORE_CREATEFOLDER, new FolderEvent($this));
+
         return true;
+    }
+
+    public function postInsert(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_CREATEFOLDER, new FolderEvent($this));
+    }
+
+    public function preUpdate(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_UPDATEFOLDER, new FolderEvent($this));
+
+        return true;
+    }
+
+    public function postUpdate(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_UPDATEFOLDER, new FolderEvent($this));
+    }
+
+    public function preDelete(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::BEFORE_DELETEFOLDER, new FolderEvent($this));
+        $this->reorderBeforeDelete();
+        return true;
+    }
+
+    public function postDelete(ConnectionInterface $con = null)
+    {
+        $this->dispatchEvent(TheliaEvents::AFTER_DELETEFOLDER, new FolderEvent($this));
     }
 }

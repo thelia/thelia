@@ -35,12 +35,11 @@ class ModuleController extends BaseAdminController
         if (null !== $response = $this->checkAuth("admin.module.view")) return $response;
         return $this->render("modules", array("display_module" => 20));
     }
-    
+
     public function updateAction($module_id)
     {
-
-    	return $this->render("module-edit", array(
-    		"module_id" => $module_id
-    	));
+        return $this->render("module-edit", array(
+            "module_id" => $module_id
+        ));
     }
 }

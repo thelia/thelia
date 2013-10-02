@@ -1,9 +1,12 @@
 <?php
-use Thelia\Constraint\ConstraintFactory;
-use Thelia\Constraint\Rule\AvailableForTotalAmountManager;
-use Thelia\Constraint\Rule\AvailableForXArticlesManager;
-use Thelia\Constraint\Rule\Operators;
-use Thelia\Coupon\CouponRuleCollection;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Condition\ConditionFactory;
+use Thelia\Condition\Implementation\MatchForEveryoneManager;
+use Thelia\Condition\Implementation\MatchForTotalAmountManager;
+use Thelia\Condition\Implementation\MatchForXArticlesManager;
+use Thelia\Condition\Operators;
+use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\ConditionCollection;
 
 
 require __DIR__ . '/../core/bootstrap.php';
@@ -141,7 +144,7 @@ try {
 
     $stmt->execute();
 
-    echo "Creating customer\n";
+    echo "Creating customers\n";
 
     //customer
     $customer = new Thelia\Model\Customer();
@@ -160,6 +163,24 @@ try {
         "test@thelia.net",
         "azerty"
     );
+    for ($j = 0; $j <= 3; $j++) {
+        $address = new Thelia\Model\Address();
+        $address->setLabel($faker->text(20))
+            ->setTitleId(rand(1,3))
+            ->setFirstname($faker->firstname)
+            ->setLastname($faker->lastname)
+            ->setAddress1($faker->streetAddress)
+            ->setAddress2($faker->streetAddress)
+            ->setAddress3($faker->streetAddress)
+            ->setCellphone($faker->phoneNumber)
+            ->setPhone($faker->phoneNumber)
+            ->setZipcode($faker->postcode)
+            ->setCity($faker->city)
+            ->setCountryId(64)
+            ->setCustomer($customer)
+            ->save()
+        ;
+    }
 
     for($i = 0; $i < 50; $i++) {
         $customer = new Thelia\Model\Customer();
@@ -273,7 +294,7 @@ try {
         ->save();
     }
 
-    echo "Creating folders and content\n";
+    echo "Creating folders and contents\n";
 
     //folders and contents
     $contentIdList = array();
@@ -404,6 +425,7 @@ try {
             $stock->setPromo($faker->randomNumber(0,1));
             $stock->setNewness($faker->randomNumber(0,1));
             $stock->setWeight($faker->randomFloat(2, 100,10000));
+            $stock->setIsDefault($i == 0);
             $stock->save();
 
             $productPrice = new \Thelia\Model\ProductPrice();
@@ -442,7 +464,7 @@ try {
                     $featureAvId[array_rand($featureAvId, 1)]
                 );
             } else { //no av
-                $featureProduct->setByDefault($faker->text(10));
+                $featureProduct->setFreeTextValue($faker->text(10));
             }
 
             $featureProduct->save();
@@ -618,9 +640,11 @@ function setI18n($faker, &$object, $fields = array('Title' => 20, 'Description' 
 /**
  * Generate Coupon fixtures
  */
-function generateCouponFixtures($thelia)
+function generateCouponFixtures(\Thelia\Core\Thelia $thelia)
 {
+    /** @var $container ContainerInterface Service Container */
     $container = $thelia->getContainer();
+    /** @var AdapterInterface $adapter */
     $adapter = $container->get('thelia.adapter');
 
     // Coupons
@@ -639,55 +663,46 @@ Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentes
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
     $coupon1->setAmount(10.00);
-    $coupon1->setIsUsed(1);
-    $coupon1->setIsEnabled(1);
+    $coupon1->setIsUsed(true);
+    $coupon1->setIsEnabled(true);
     $date = new \DateTime();
-    $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
+    $coupon1->setExpirationDate($date->setTimestamp(strtotime("today + 3 months")));
 
-    $rule1 = new AvailableForTotalAmountManager($adapter);
+    $condition1 = new MatchForTotalAmountManager($adapter);
     $operators = array(
-        AvailableForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
-        AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
+        MatchForTotalAmountManager::INPUT1 => Operators::SUPERIOR,
+        MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
     );
     $values = array(
-        AvailableForTotalAmountManager::INPUT1 => 40.00,
-        AvailableForTotalAmountManager::INPUT2 => 'EUR'
+        MatchForTotalAmountManager::INPUT1 => 40.00,
+        MatchForTotalAmountManager::INPUT2 => 'EUR'
     );
-    $rule1->setValidatorsFromForm($operators, $values);
+    $condition1->setValidatorsFromForm($operators, $values);
 
-    $rule2 = new AvailableForTotalAmountManager($adapter);
+    $condition2 = new MatchForTotalAmountManager($adapter);
     $operators = array(
-        AvailableForTotalAmountManager::INPUT1 => Operators::INFERIOR,
-        AvailableForTotalAmountManager::INPUT2 => Operators::EQUAL
+        MatchForTotalAmountManager::INPUT1 => Operators::INFERIOR,
+        MatchForTotalAmountManager::INPUT2 => Operators::EQUAL
     );
     $values = array(
-        AvailableForTotalAmountManager::INPUT1 => 400.00,
-        AvailableForTotalAmountManager::INPUT2 => 'EUR'
+        MatchForTotalAmountManager::INPUT1 => 400.00,
+        MatchForTotalAmountManager::INPUT2 => 'EUR'
     );
-    $rule2->setValidatorsFromForm($operators, $values);
+    $condition2->setValidatorsFromForm($operators, $values);
 
-    $rules = new CouponRuleCollection();
-    $rules->add($rule1);
-    $rules->add($rule2);
+    $conditions = new ConditionCollection();
+    $conditions->add($condition1);
+    $conditions->add($condition2);
+    /** @var ConditionFactory $conditionFactory */
+    $conditionFactory = $container->get('thelia.condition.factory');
 
-    /** @var ConstraintFactory $constraintFactory */
-    $constraintFactory = $container->get('thelia.constraint.factory');
-
-    $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
-    $coupon1->setSerializedRules($serializedRules);
-
+    $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
+    $coupon1->setSerializedConditions($serializedConditions);
     $coupon1->setMaxUsage(40);
-    $coupon1->setIsCumulative(1);
-    $coupon1->setIsRemovingPostage(0);
-    $coupon1->setIsAvailableOnSpecialOffers(1);
-
+    $coupon1->setIsCumulative(true);
+    $coupon1->setIsRemovingPostage(false);
+    $coupon1->setIsAvailableOnSpecialOffers(true);
     $coupon1->save();
-
-
-
-
-
-
 
 
     // Coupons
@@ -706,33 +721,70 @@ Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentes
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
     $coupon2->setAmount(10.00);
-    $coupon2->setIsUsed(1);
-    $coupon2->setIsEnabled(1);
+    $coupon2->setIsUsed(true);
+    $coupon2->setIsEnabled(true);
     $date = new \DateTime();
-    $coupon2->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
+    $coupon2->setExpirationDate($date->setTimestamp(strtotime("today + 1 months")));
 
-    $rule1 = new AvailableForXArticlesManager($adapter);
+    $condition1 = new MatchForXArticlesManager($adapter);
     $operators = array(
-        AvailableForXArticlesManager::INPUT1 => Operators::SUPERIOR,
+        MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR,
     );
     $values = array(
-        AvailableForXArticlesManager::INPUT1 => 4,
+        MatchForXArticlesManager::INPUT1 => 4,
     );
-    $rule1->setValidatorsFromForm($operators, $values);
+    $condition1->setValidatorsFromForm($operators, $values);
+    $conditions = new ConditionCollection();
+    $conditions->add($condition1);
 
-    $rules = new CouponRuleCollection();
-    $rules->add($rule1);
+    /** @var ConditionFactory $conditionFactory */
+    $conditionFactory = $container->get('thelia.condition.factory');
 
-    /** @var ConstraintFactory $constraintFactory */
-    $constraintFactory = $container->get('thelia.constraint.factory');
-
-    $serializedRules = $constraintFactory->serializeCouponRuleCollection($rules);
-    $coupon2->setSerializedRules($serializedRules);
-
+    $serializedConditions = $conditionFactory->serializeConditionCollection($conditions);
+    $coupon2->setSerializedConditions($serializedConditions);
     $coupon2->setMaxUsage(-1);
-    $coupon2->setIsCumulative(0);
-    $coupon2->setIsRemovingPostage(1);
-    $coupon2->setIsAvailableOnSpecialOffers(1);
-
+    $coupon2->setIsCumulative(false);
+    $coupon2->setIsRemovingPostage(true);
+    $coupon2->setIsAvailableOnSpecialOffers(true);
     $coupon2->save();
+
+
+    // Coupons
+    $coupon3 = new Thelia\Model\Coupon();
+    $coupon3->setCode('OLD');
+    $coupon3->setType('thelia.coupon.type.remove_x_percent');
+    $coupon3->setTitle('Old coupon');
+    $coupon3->setShortDescription('Coupon for Springbreak removing 10% if you have more than 4 articles in your cart');
+    $coupon3->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras at luctus tellus. Integer turpis mauris, aliquet vitae risus tristique, pellentesque vestibulum urna. Vestibulum sodales laoreet lectus dictum suscipit. Praesent vulputate, sem id varius condimentum, quam magna tempor elit, quis venenatis ligula nulla eget libero. Cras egestas euismod tellus, id pharetra leo suscipit quis. Donec lacinia ac lacus et ultricies. Nunc in porttitor neque. Proin at quam congue, consectetur orci sed, congue nulla. Nulla eleifend nunc ligula, nec pharetra elit tempus quis. Vivamus vel mauris sed est dictum blandit. Maecenas blandit dapibus velit ut sollicitudin. In in euismod mauris, consequat viverra magna. Cras velit velit, sollicitudin commodo tortor gravida, tempus varius nulla.
+
+Donec rhoncus leo mauris, id porttitor ante luctus tempus. Curabitur quis augue feugiat, ullamcorper mauris ac, interdum mi. Quisque aliquam lorem vitae felis lobortis, id interdum turpis mattis. Vestibulum diam massa, ornare congue blandit quis, facilisis at nisl. In tortor metus, venenatis non arcu nec, sollicitudin ornare nisl. Nunc erat risus, varius nec urna at, iaculis lacinia elit. Aenean ut felis tempus, tincidunt odio non, sagittis nisl. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec vitae hendrerit elit. Nunc sit amet gravida risus, euismod lobortis massa. Nam a erat mauris. Nam a malesuada lorem. Nulla id accumsan dolor, sed rhoncus tellus. Quisque dictum felis sed leo auctor, at volutpat lectus viverra. Morbi rutrum, est ac aliquam imperdiet, nibh sem sagittis justo, ac mattis magna lacus eu nulla.
+
+Duis interdum lectus nulla, nec pellentesque sapien condimentum at. Suspendisse potenti. Sed eu purus tellus. Nunc quis rhoncus metus. Fusce vitae tellus enim. Interdum et malesuada fames ac ante ipsum primis in faucibus. Etiam tempor porttitor erat vitae iaculis. Sed est elit, consequat non ornare vitae, vehicula eget lectus. Etiam consequat sapien mauris, eget consectetur magna imperdiet eget. Nunc sollicitudin luctus velit, in commodo nulla adipiscing fermentum. Fusce nisi sapien, posuere vitae metus sit amet, facilisis sollicitudin dui. Fusce ultricies auctor enim sit amet iaculis. Morbi at vestibulum enim, eget adipiscing eros.
+
+Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentesque elit erat, lacinia sed semper ac, sagittis vel elit. Nam eu convallis est. Curabitur rhoncus odio vitae consectetur pellentesque. Nam vitae arcu nec ante scelerisque dignissim vel nec neque. Suspendisse augue nulla, mollis eget dui et, tempor facilisis erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ac diam ipsum. Donec convallis dui ultricies velit auctor, non lobortis nulla ultrices. Morbi vitae dignissim ante, sit amet lobortis tortor. Nunc dapibus condimentum augue, in molestie neque congue non.
+
+Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
+    $coupon3->setAmount(10.00);
+    $coupon3->setIsUsed(false);
+    $coupon3->setIsEnabled(false);
+    $date = new \DateTime();
+    $coupon3->setExpirationDate($date->setTimestamp(strtotime("today + 2 months")));
+
+    $condition1 = new MatchForEveryoneManager($adapter);
+    $operators = array();
+    $values = array();
+    $condition1->setValidatorsFromForm($operators, $values);
+    $conditions = new ConditionCollection();
+    $conditions->add($condition1);
+
+    /** @var ConditionFactory $constraintCondition */
+    $constraintCondition = $container->get('thelia.condition.factory');
+
+    $serializedConditions = $constraintCondition->serializeConditionCollection($conditions);
+    $coupon3->setSerializedConditions($serializedConditions);
+    $coupon3->setMaxUsage(-1);
+    $coupon3->setIsCumulative(true);
+    $coupon3->setIsRemovingPostage(false);
+    $coupon3->setIsAvailableOnSpecialOffers(false);
+    $coupon3->save();
 }

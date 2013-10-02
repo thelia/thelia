@@ -24,7 +24,6 @@
 namespace Thelia\Tests\Rewriting;
 use Thelia\Model\Content;
 
-
 /**
  * Class ContentRewritingTest
  * @package Thelia\Tests\Rewriting
@@ -36,7 +35,7 @@ class ContentRewritingTest extends BaseRewritingObject
     /**
      * @return \Thelia\Model\Content
      */
-    function getObject()
+    public function getObject()
     {
         return new Content();
     }

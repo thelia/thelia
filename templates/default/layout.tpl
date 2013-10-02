@@ -66,8 +66,31 @@ URL: http://www.thelia.net
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="Main Navigation">
                 <ul class="nav navbar-nav navbar-categories">
+<<<<<<< HEAD
                     <li><a href="{url path="/"}" class="home">{intl l="Home"}</a></li>
                     {loop type="category" name="category.navigation" parent="0" limit="3"}
+=======
+                    <li class="active"><a href="{url path="/"}" class="home" tabindex="-1">Home</a></li>
+{*                    <li class="dropdown">
+                        <a href="" data-toggle="dropdown" class="dropdown-toggle">Pages</a>
+                        <ul class="dropdown-menu list-subnav" role="menu">
+                            <li class="active"><a href="index.html" tabindex="-1">Index</a></li>
+                            <li><a href="category.html">Category Grid</a></li>
+                            <li><a href="category-list.html">Category List</a></li>
+                            <li><a href="account.html">Account</a></li>
+                            <li><a href="login.html">Login</a></li>
+                            <li><a href="password.html">Forgot Password</a></li>
+                            <li><a href="register.html">Register</a></li>
+                            <li><a href="cart.html">Cart</a></li>
+                            <li><a href="cart-step2.html">Cart (Step 2)</a></li>
+                            <li><a href="cart-step3.html">Cart (Step 3)</a></li>
+                            <li><a href="cart-step4.html">Cart (Step 4)</a></li>
+                            <li><a href="product-details.html">Product details</a></li>
+                            <li><a href="address.html">New address</a></li>
+                        </ul>
+                    </li>*}
+                    {loop type="category" name="category.navigation" parent="0"}
+>>>>>>> master
                         <li><a href="{$URL}">{$TITLE}</a></li>
                     {/loop}
                 </ul>
@@ -77,13 +100,23 @@ URL: http://www.thelia.net
                         <li><a href="{url path="/customer/account"}" class="account">{intl l="My Account"}</a></li>
                     {/loop}
 
+<<<<<<< HEAD
                     {elseloop rel="customer_info_block" rel="customer_info_block"}
                         <li><a href="{url path="/register"}" class="register">{intl l="Register"}!</a></li>
                         <li><a href="{url path="/login"}" class="login">{intl l="Log In!"}</a></li>
+=======
+                    {elseloop rel="customer_info_block"}
+                    <li><a href="{url path="/register"}" class="register">{intl l="Register"}!</a></li>
+                    <li><a href="{url path="/login"}" class="login">{intl l="Log In!"}</a></li>
+>>>>>>> master
                     {/elseloop}
 
                     <li class="dropdown">
+<<<<<<< HEAD
                         <a href="{url path="/cart"}" class="cart" data-toggle="dropdown">
+=======
+                        <a href="{url path="/cart"}" class="dropdown-toggle cart" {*data-toggle="dropdown"*}>
+>>>>>>> master
                             Cart <span class="badge">{cart attr="count_item"}</span>
                         </a>
                     </li>
@@ -302,10 +335,10 @@ URL: http://www.thelia.net
                                     </address>
                                 </li>
                                 <li class="contact-phone">
-                                    <span class="tel" itemprop="telephone">+33 09 08 07 06 05</span>
+                                    <span class="tel" itemprop="telephone">+33 04 44 05 31 00</span>
                                 </li>
                                 <li class="contact-email">
-                                    <a href="mailto:demo@thelia.net" class="email" itemprop="email">demo@thelia.net</a>
+                                    <a href="mailto:demo@thelia.net" class="email" itemprop="email">info@thelia.net</a>
                                 </li>
                             </ul>
                         </div>

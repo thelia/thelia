@@ -47,10 +47,9 @@ class PropelCollector extends DataCollector implements Renderable, LoggerInterfa
 
     public function __construct(LoggerInterface $alternativeLogger = null)
     {
-        $serviceContainer = Propel::getServiceContainer();
-        $serviceContainer->setLogger('defaultLogger', $this);
+        $con = Propel::getServiceContainer()->getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
+        $con->setLogger($this);
 
-        $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
         $con->setLogMethods(array(
             'exec',
             'query',

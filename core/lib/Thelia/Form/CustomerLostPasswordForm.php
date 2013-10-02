@@ -35,8 +35,8 @@ use Thelia\Model\CustomerQuery;
  * @package Thelia\Form
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CustomerLostPasswordForm extends BaseForm {
-
+class CustomerLostPasswordForm extends BaseForm
+{
     /**
      *
      * in this function you add all the fields you need for your Form.

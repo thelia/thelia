@@ -138,9 +138,9 @@ class Product extends BaseI18nLoop
     public function exec(&$pagination)
     {
         $currencyId = $this->getCurrency();
-        if(null !== $currencyId) {
+        if (null !== $currencyId) {
             $currency = CurrencyQuery::create()->findOneById($currencyId);
-            if(null === $currency) {
+            if (null === $currency) {
                 throw new \InvalidArgumentException('Cannot found currency id: `' . $currency . '` in product_sale_elements loop');
             }
         } else {
@@ -610,7 +610,7 @@ class Product extends BaseI18nLoop
                 $taxedPrice = $product->getTaxedPrice(
                     $taxCountry
                 );
-            } catch(TaxEngineException $e) {
+            } catch (TaxEngineException $e) {
                 $taxedPrice = null;
             }
 
@@ -650,6 +650,7 @@ class Product extends BaseI18nLoop
                 ->set("IS_NEW"           , $product->getVirtualColumn('main_product_is_new'))
                 ->set("POSITION"         , $product->getPosition())
                 ->set("VISIBLE"          , $product->getVisible() ? "1" : "0")
+                ->set("TEMPLATE"         , $product->getTemplateId())
                 ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
                 ->set("HAS_NEXT"         , $next != null ? 1 : 0)
                 ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)

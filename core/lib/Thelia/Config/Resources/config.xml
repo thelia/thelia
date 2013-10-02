@@ -21,7 +21,12 @@
         <loop class="Thelia\Core\Template\Loop\FeatureAvailability" name="feature-availability"/>
         <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature_value"/>
         <loop class="Thelia\Core\Template\Loop\Folder" name="folder"/>
+        <loop class="Thelia\Core\Template\Loop\FolderPath" name="folder-path"/>
+        <loop class="Thelia\Core\Template\Loop\Module" name="module"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
+        <loop class="Thelia\Core\Template\Loop\OrderAddress" name="order_address"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProduct" name="order_product"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProductAttributeCombination" name="order_product_attribute_combination"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
         <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
         <loop class="Thelia\Core\Template\Loop\Payment" name="payment"/>
@@ -34,6 +39,7 @@
         <loop class="Thelia\Core\Template\Loop\FolderTree" name="folder-tree"/>
         <loop class="Thelia\Core\Template\Loop\Cart" name="cart"/>
         <loop class="Thelia\Core\Template\Loop\Image" name="image"/>
+        <loop class="Thelia\Core\Template\Loop\Document" name="document"/>
         <loop class="Thelia\Core\Template\Loop\Config" name="config"/>
         <loop class="Thelia\Core\Template\Loop\Coupon" name="coupon"/>
         <loop class="Thelia\Core\Template\Loop\Message" name="message"/>
@@ -57,23 +63,32 @@
 
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
         <form name="thelia.admin.category.modification" class="Thelia\Form\CategoryModificationForm"/>
+        <form name="thelia.admin.category.image.modification" class="Thelia\Form\CategoryImageModification"/>
+        <form name="thelia.admin.category.document.modification" class="Thelia\Form\CategoryDocumentModification"/>
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
         <form name="thelia.admin.product.modification" class="Thelia\Form\ProductModificationForm"/>
+        <form name="thelia.admin.product.details.modification" class="Thelia\Form\ProductDetailsModificationForm"/>
+        <form name="thelia.admin.product.image.modification" class="Thelia\Form\ProductImageModification"/>
+        <form name="thelia.admin.product.document.modification" class="Thelia\Form\ProductDocumentModification"/>
 
-        <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
         <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
 
         <form name="thelia.admin.folder.creation" class="Thelia\Form\FolderCreationForm"/>
         <form name="thelia.admin.folder.modification" class="Thelia\Form\FolderModificationForm"/>
+        <form name="thelia.admin.folder.image.modification" class="Thelia\Form\FolderImageModification"/>
+        <form name="thelia.admin.folder.document.modification" class="Thelia\Form\FolderDocumentModification"/>
 
         <form name="thelia.admin.content.creation" class="Thelia\Form\ContentCreationForm"/>
         <form name="thelia.admin.content.modification" class="Thelia\Form\ContentModificationForm"/>
+        <form name="thelia.admin.content.image.modification" class="Thelia\Form\ContentImageModification"/>
+        <form name="thelia.admin.content.document.modification" class="Thelia\Form\ContentDocumentModification"/>
 
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
 
         <form name="thelia.order.delivery" class="Thelia\Form\OrderDelivery"/>
         <form name="thelia.order.payment" class="Thelia\Form\OrderPayment"/>
+        <form name="thelia.order.update.address" class="Thelia\Form\OrderUpdateAddress"/>
 
         <form name="thelia.admin.config.creation" class="Thelia\Form\ConfigCreationForm"/>
         <form name="thelia.admin.config.modification" class="Thelia\Form\ConfigModificationForm"/>
@@ -198,6 +213,10 @@
             </call>
        </service>
 
+        <service id="smarty.plugin.type" class="Thelia\Core\Template\Smarty\Plugins\Type" scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+        </service>
+
         <service id="smart.plugin.form" class="Thelia\Core\Template\Smarty\Plugins\Form" scope="request">
             <tag name="thelia.parser.register_plugin"/>
 
@@ -242,6 +261,11 @@
             <argument type="service" id="thelia.securityContext" />
         </service>
 
+        <service id="smarty.plugin.flashMessage" class="Thelia\Core\Template\Smarty\Plugins\FlashMessage" scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="request" />
+        </service>
+
 
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">
             <argument type="service" id="event_dispatcher" />
@@ -256,7 +280,7 @@
         <service id="kernel" synthetic="true" />
 
         <!-- Coupon module -->
-        <service id="thelia.adapter" class="Thelia\Coupon\CouponBaseAdapter">
+        <service id="thelia.adapter" class="Thelia\Coupon\BaseAdapter">
             <argument type="service" id="service_container" />
         </service>
         <service id="thelia.coupon.manager" class="Thelia\Coupon\CouponManager">
@@ -266,24 +290,6 @@
             <argument type="service" id="service_container" />
         </service>
 
-        <service id="thelia.constraint.factory" class="Thelia\Constraint\ConstraintFactory">
-            <argument type="service" id="service_container" />
-        </service>
-        <service id="thelia.constraint.validator" class="Thelia\Constraint\ConstraintValidator">
-        </service>
-        <service id="thelia.constraint.rule.available_for_everyone" class="Thelia\Constraint\Rule\AvailableForEveryoneManager">
-            <argument type="service" id="thelia.adapter" />
-            <tag name="thelia.coupon.addRule"/>
-        </service>
-        <service id="thelia.constraint.rule.available_for_x_articles" class="Thelia\Constraint\Rule\AvailableForXArticlesManager">
-            <argument type="service" id="thelia.adapter" />
-            <tag name="thelia.coupon.addRule"/>
-        </service>
-        <service id="thelia.constraint.rule.available_for_total_amount" class="Thelia\Constraint\Rule\AvailableForTotalAmountManager">
-            <argument type="service" id="thelia.adapter" />
-            <tag name="thelia.coupon.addRule"/>
-        </service>
-
         <service id="thelia.coupon.type.remove_x_amount" class="Thelia\Coupon\Type\RemoveXAmountManager">
             <argument type="service" id="thelia.adapter" />
             <tag name="thelia.coupon.addCoupon"/>
@@ -291,6 +297,26 @@
         <service id="thelia.coupon.type.remove_x_percent" class="Thelia\Coupon\Type\RemoveXPercentManager">
             <argument type="service" id="thelia.adapter" />
             <tag name="thelia.coupon.addCoupon"/>
+        </service>
+
+
+        <!-- Condition module -->
+        <service id="thelia.condition.factory" class="Thelia\Condition\ConditionFactory">
+            <argument type="service" id="service_container" />
+        </service>
+        <service id="thelia.condition.validator" class="Thelia\Condition\ConditionEvaluator">
+        </service>
+        <service id="thelia.condition.match_for_everyone" class="Thelia\Condition\Implementation\MatchForEveryoneManager">
+            <argument type="service" id="thelia.adapter" />
+            <tag name="thelia.coupon.addCondition"/>
+        </service>
+        <service id="thelia.condition.match_for_x_articles" class="Thelia\Condition\Implementation\MatchForXArticlesManager">
+            <argument type="service" id="thelia.adapter" />
+            <tag name="thelia.coupon.addCondition"/>
+        </service>
+        <service id="thelia.condition.match_for_total_amount" class="Thelia\Condition\Implementation\MatchForTotalAmountManager">
+            <argument type="service" id="thelia.adapter" />
+            <tag name="thelia.coupon.addCondition"/>
         </service>
 
         <service id="mailer" class="Thelia\Mailer\MailerFactory">

@@ -1,0 +1,36 @@
+{*
+A generic document upload form
+
+Parameters:
+    documentType    = Document type (category, product, folder, content, module)
+    parentId        = Document parent id, ex: category id
+
+*}
+
+<div class="document-manager" >
+    <form action="{url path="/admin/document/type/$documentType/$parentId/save-ajax"}" class="dropzone" id="documents-dropzone" enctype="multipart/form-data">
+        <div class="fallback">
+            <input name="file" type="file" />
+            <button type="submit" class="btn btn-info btn-upload"><span class="glyphicon glyphicon-send"></span> {intl l="Send files"}</button>
+        </div>
+
+        <div class="btn-browse hide">
+            {intl l="Drop files to upload"}
+            <span>Or</span>
+            <button type="button" class="btn btn-info btn-upload"><span class="glyphicon glyphicon-upload"></span> {intl l="Browse files"}</button>
+        </div>
+
+
+    </form>
+
+    <div class="existing-document">
+        {include file='includes/document-upload-list-ajax.html'}
+    </div>
+
+</div>
+
+<script>
+    var documentDropZoneUrl = "{url path="/admin/document/type/$documentType/$parentId/save-ajax"}";
+    var documentListUrl = "{url path="/admin/document/type/$documentType/$parentId/list-ajax"}";
+    var documentListErrorMessage = "{intl l='Can\'t load documents, please refresh this page.'}";
+</script>

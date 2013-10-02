@@ -4,6 +4,9 @@
     {check_auth roles="ADMIN" permissions="{block name="check-permissions"}{/block}" login_tpl="/admin/login"}
 {/block}
 
+{* -- Define some stuff for Smarty ----------------------------------------- *}
+{config_load file='variables.conf'}
+
 <!DOCTYPE html>
 <html lang="{$lang_code}">
 <head>
@@ -53,7 +56,7 @@
 		        <div class="row">
 		            <div class="col-md-12 clearfix">
 		      		    <div class="version-info pull-left">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
-                        
+
                         <div class="clearfix pull-right hidden-xs">
                             <div class="btn-group pull-right">
                                 <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
@@ -71,7 +74,7 @@
 		            </div>
 
 		    		{module_include location='inside_topbar'}
-		            
+
 		        </div>
 
 		    </div>
@@ -86,7 +89,7 @@
 		<nav class="navbar navbar-default" role="navigation">
 
             <div class="container">
-                
+
                 <div class="row">
         			<div class="navbar-header">
         				<button type="button" class="btn navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -111,26 +114,30 @@
                             {/loop}
 
                             {loop name="menu-auth-order" type="auth" roles="ADMIN" permissions="admin.orders.view"}
-                            <li class="dropdown {if $admin_current_location == 'customer'}active{/if}" id="orders_menu">
+                                <li class="dropdown {if $admin_current_location == 'order'}active{/if}" id="orders_menu">
 
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Orders"} <span class="caret"></span></a>
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Orders"} <span class="caret"></span></a>
 
-                                 <ul class="dropdown-menu config_menu" role="menu">
+                                    <ul class="dropdown-menu config_menu" role="menu">
 
-                                    <li role="menuitem"><a data-target="{url path='admin/orders'}" href="{url path='admin/orders'}">
-                                        {intl l="All orders"}
-                                        <span class="badge">{count type="order"}</span></a>
-                                    </li>
+                                        <li role="menuitem">
+                                            <a data-target="{url path='admin/orders'}" href="{url path='admin/orders'}">
+                                                {intl l="All orders"}
+                                                <span class="label label-default pull-right">{count type="order" customer="*" backend_context="1"}</span>
+                                            </a>
+                                        </li>
 
-                                    {loop name="order-status-list" type="order-status"}
-                                    <li role="menuitem">
-                                        <a data-target="{url path='admin/orders/$LABEL'}" href="{url path='admin/orders/$LABEL'}">
-                                            {$LABEL} <span class="badge">{count type="order" status="{$ID}"}</span>
-                                        </a>
-                                    </li>
-                                    {/loop}
-                                </ul>
-                            </li>
+                                        {loop name="order-status-list" type="order-status"}
+                                            {assign "orderStatusLabel" "order_$CODE"}
+                                            <li role="menuitem">
+                                                <a data-target="{url path='admin/orders/$LABEL'}" href="{url path="admin/orders" status=$ID}">
+                                                    {$TITLE}
+                                                    <span class="label label-{#$orderStatusLabel#} pull-right">{count type="order" customer="*" backend_context="1" status=$ID}</span>
+                                                </a>
+                                            </li>
+                                        {/loop}
+                                    </ul>
+                                </li>
                             {/loop}
 
                             {loop name="menu-auth-catalog" type="auth" roles="ADMIN" permissions="admin.catalog.view"}
@@ -147,7 +154,7 @@
 
                             {loop name="menu-auth-coupon" type="auth" roles="ADMIN" permissions="admin.coupon.view"}
                             <li class="{if $admin_current_location == 'coupon'}active{/if}" id="coupon_menu">
-                                <a href="{url path='/admin/coupon/'}">{intl l="Coupons"}</a>
+                                <a href="{url path='/admin/coupon'}">{intl l="Coupons"}</a>
                             </li>
                             {/loop}
 
@@ -221,8 +228,16 @@
 	{* -- Javascript section ------------------------------------------------ *}
 
 	{block name="before-javascript-include"}{/block}
+    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script>
+        if (typeof jQuery == 'undefined') {
+            {javascripts file='assets/js/libs/jquery.js'}
+            document.write(unescape("%3Cscript src='{$asset_url}' %3E%3C/script%3E"));
+            {/javascripts}
+        }
+    </script>
 
-	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+
 
     {debugbar_renderjs}
     {debugbar_renderresult}

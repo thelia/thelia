@@ -24,12 +24,19 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProductQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildOrderProductQuery orderByOrderId($order = Criteria::ASC) Order by the order_id column
  * @method     ChildOrderProductQuery orderByProductRef($order = Criteria::ASC) Order by the product_ref column
+ * @method     ChildOrderProductQuery orderByProductSaleElementsRef($order = Criteria::ASC) Order by the product_sale_elements_ref column
  * @method     ChildOrderProductQuery orderByTitle($order = Criteria::ASC) Order by the title column
- * @method     ChildOrderProductQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method     ChildOrderProductQuery orderByChapo($order = Criteria::ASC) Order by the chapo column
+ * @method     ChildOrderProductQuery orderByDescription($order = Criteria::ASC) Order by the description column
+ * @method     ChildOrderProductQuery orderByPostscriptum($order = Criteria::ASC) Order by the postscriptum column
  * @method     ChildOrderProductQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
  * @method     ChildOrderProductQuery orderByPrice($order = Criteria::ASC) Order by the price column
- * @method     ChildOrderProductQuery orderByTax($order = Criteria::ASC) Order by the tax column
+ * @method     ChildOrderProductQuery orderByPromoPrice($order = Criteria::ASC) Order by the promo_price column
+ * @method     ChildOrderProductQuery orderByWasNew($order = Criteria::ASC) Order by the was_new column
+ * @method     ChildOrderProductQuery orderByWasInPromo($order = Criteria::ASC) Order by the was_in_promo column
+ * @method     ChildOrderProductQuery orderByWeight($order = Criteria::ASC) Order by the weight column
+ * @method     ChildOrderProductQuery orderByTaxRuleTitle($order = Criteria::ASC) Order by the tax_rule_title column
+ * @method     ChildOrderProductQuery orderByTaxRuleDescription($order = Criteria::ASC) Order by the tax_rule_description column
  * @method     ChildOrderProductQuery orderByParent($order = Criteria::ASC) Order by the parent column
  * @method     ChildOrderProductQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildOrderProductQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -37,12 +44,19 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProductQuery groupById() Group by the id column
  * @method     ChildOrderProductQuery groupByOrderId() Group by the order_id column
  * @method     ChildOrderProductQuery groupByProductRef() Group by the product_ref column
+ * @method     ChildOrderProductQuery groupByProductSaleElementsRef() Group by the product_sale_elements_ref column
  * @method     ChildOrderProductQuery groupByTitle() Group by the title column
- * @method     ChildOrderProductQuery groupByDescription() Group by the description column
  * @method     ChildOrderProductQuery groupByChapo() Group by the chapo column
+ * @method     ChildOrderProductQuery groupByDescription() Group by the description column
+ * @method     ChildOrderProductQuery groupByPostscriptum() Group by the postscriptum column
  * @method     ChildOrderProductQuery groupByQuantity() Group by the quantity column
  * @method     ChildOrderProductQuery groupByPrice() Group by the price column
- * @method     ChildOrderProductQuery groupByTax() Group by the tax column
+ * @method     ChildOrderProductQuery groupByPromoPrice() Group by the promo_price column
+ * @method     ChildOrderProductQuery groupByWasNew() Group by the was_new column
+ * @method     ChildOrderProductQuery groupByWasInPromo() Group by the was_in_promo column
+ * @method     ChildOrderProductQuery groupByWeight() Group by the weight column
+ * @method     ChildOrderProductQuery groupByTaxRuleTitle() Group by the tax_rule_title column
+ * @method     ChildOrderProductQuery groupByTaxRuleDescription() Group by the tax_rule_description column
  * @method     ChildOrderProductQuery groupByParent() Group by the parent column
  * @method     ChildOrderProductQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildOrderProductQuery groupByUpdatedAt() Group by the updated_at column
@@ -55,9 +69,13 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProductQuery rightJoinOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Order relation
  * @method     ChildOrderProductQuery innerJoinOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the Order relation
  *
- * @method     ChildOrderProductQuery leftJoinOrderFeature($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderFeature relation
- * @method     ChildOrderProductQuery rightJoinOrderFeature($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderFeature relation
- * @method     ChildOrderProductQuery innerJoinOrderFeature($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderFeature relation
+ * @method     ChildOrderProductQuery leftJoinOrderProductAttributeCombination($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderProductAttributeCombination relation
+ * @method     ChildOrderProductQuery rightJoinOrderProductAttributeCombination($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderProductAttributeCombination relation
+ * @method     ChildOrderProductQuery innerJoinOrderProductAttributeCombination($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderProductAttributeCombination relation
+ *
+ * @method     ChildOrderProductQuery leftJoinOrderProductTax($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderProductTax relation
+ * @method     ChildOrderProductQuery rightJoinOrderProductTax($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderProductTax relation
+ * @method     ChildOrderProductQuery innerJoinOrderProductTax($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderProductTax relation
  *
  * @method     ChildOrderProduct findOne(ConnectionInterface $con = null) Return the first ChildOrderProduct matching the query
  * @method     ChildOrderProduct findOneOrCreate(ConnectionInterface $con = null) Return the first ChildOrderProduct matching the query, or a new ChildOrderProduct object populated from the query conditions when no match is found
@@ -65,12 +83,19 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProduct findOneById(int $id) Return the first ChildOrderProduct filtered by the id column
  * @method     ChildOrderProduct findOneByOrderId(int $order_id) Return the first ChildOrderProduct filtered by the order_id column
  * @method     ChildOrderProduct findOneByProductRef(string $product_ref) Return the first ChildOrderProduct filtered by the product_ref column
+ * @method     ChildOrderProduct findOneByProductSaleElementsRef(string $product_sale_elements_ref) Return the first ChildOrderProduct filtered by the product_sale_elements_ref column
  * @method     ChildOrderProduct findOneByTitle(string $title) Return the first ChildOrderProduct filtered by the title column
- * @method     ChildOrderProduct findOneByDescription(string $description) Return the first ChildOrderProduct filtered by the description column
  * @method     ChildOrderProduct findOneByChapo(string $chapo) Return the first ChildOrderProduct filtered by the chapo column
+ * @method     ChildOrderProduct findOneByDescription(string $description) Return the first ChildOrderProduct filtered by the description column
+ * @method     ChildOrderProduct findOneByPostscriptum(string $postscriptum) Return the first ChildOrderProduct filtered by the postscriptum column
  * @method     ChildOrderProduct findOneByQuantity(double $quantity) Return the first ChildOrderProduct filtered by the quantity column
  * @method     ChildOrderProduct findOneByPrice(double $price) Return the first ChildOrderProduct filtered by the price column
- * @method     ChildOrderProduct findOneByTax(double $tax) Return the first ChildOrderProduct filtered by the tax column
+ * @method     ChildOrderProduct findOneByPromoPrice(string $promo_price) Return the first ChildOrderProduct filtered by the promo_price column
+ * @method     ChildOrderProduct findOneByWasNew(int $was_new) Return the first ChildOrderProduct filtered by the was_new column
+ * @method     ChildOrderProduct findOneByWasInPromo(int $was_in_promo) Return the first ChildOrderProduct filtered by the was_in_promo column
+ * @method     ChildOrderProduct findOneByWeight(string $weight) Return the first ChildOrderProduct filtered by the weight column
+ * @method     ChildOrderProduct findOneByTaxRuleTitle(string $tax_rule_title) Return the first ChildOrderProduct filtered by the tax_rule_title column
+ * @method     ChildOrderProduct findOneByTaxRuleDescription(string $tax_rule_description) Return the first ChildOrderProduct filtered by the tax_rule_description column
  * @method     ChildOrderProduct findOneByParent(int $parent) Return the first ChildOrderProduct filtered by the parent column
  * @method     ChildOrderProduct findOneByCreatedAt(string $created_at) Return the first ChildOrderProduct filtered by the created_at column
  * @method     ChildOrderProduct findOneByUpdatedAt(string $updated_at) Return the first ChildOrderProduct filtered by the updated_at column
@@ -78,12 +103,19 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     array findById(int $id) Return ChildOrderProduct objects filtered by the id column
  * @method     array findByOrderId(int $order_id) Return ChildOrderProduct objects filtered by the order_id column
  * @method     array findByProductRef(string $product_ref) Return ChildOrderProduct objects filtered by the product_ref column
+ * @method     array findByProductSaleElementsRef(string $product_sale_elements_ref) Return ChildOrderProduct objects filtered by the product_sale_elements_ref column
  * @method     array findByTitle(string $title) Return ChildOrderProduct objects filtered by the title column
- * @method     array findByDescription(string $description) Return ChildOrderProduct objects filtered by the description column
  * @method     array findByChapo(string $chapo) Return ChildOrderProduct objects filtered by the chapo column
+ * @method     array findByDescription(string $description) Return ChildOrderProduct objects filtered by the description column
+ * @method     array findByPostscriptum(string $postscriptum) Return ChildOrderProduct objects filtered by the postscriptum column
  * @method     array findByQuantity(double $quantity) Return ChildOrderProduct objects filtered by the quantity column
  * @method     array findByPrice(double $price) Return ChildOrderProduct objects filtered by the price column
- * @method     array findByTax(double $tax) Return ChildOrderProduct objects filtered by the tax column
+ * @method     array findByPromoPrice(string $promo_price) Return ChildOrderProduct objects filtered by the promo_price column
+ * @method     array findByWasNew(int $was_new) Return ChildOrderProduct objects filtered by the was_new column
+ * @method     array findByWasInPromo(int $was_in_promo) Return ChildOrderProduct objects filtered by the was_in_promo column
+ * @method     array findByWeight(string $weight) Return ChildOrderProduct objects filtered by the weight column
+ * @method     array findByTaxRuleTitle(string $tax_rule_title) Return ChildOrderProduct objects filtered by the tax_rule_title column
+ * @method     array findByTaxRuleDescription(string $tax_rule_description) Return ChildOrderProduct objects filtered by the tax_rule_description column
  * @method     array findByParent(int $parent) Return ChildOrderProduct objects filtered by the parent column
  * @method     array findByCreatedAt(string $created_at) Return ChildOrderProduct objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildOrderProduct objects filtered by the updated_at column
@@ -175,7 +207,7 @@ abstract class OrderProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, ORDER_ID, PRODUCT_REF, TITLE, DESCRIPTION, CHAPO, QUANTITY, PRICE, TAX, PARENT, CREATED_AT, UPDATED_AT FROM order_product WHERE ID = :p0';
+        $sql = 'SELECT ID, ORDER_ID, PRODUCT_REF, PRODUCT_SALE_ELEMENTS_REF, TITLE, CHAPO, DESCRIPTION, POSTSCRIPTUM, QUANTITY, PRICE, PROMO_PRICE, WAS_NEW, WAS_IN_PROMO, WEIGHT, TAX_RULE_TITLE, TAX_RULE_DESCRIPTION, PARENT, CREATED_AT, UPDATED_AT FROM order_product WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -378,6 +410,35 @@ abstract class OrderProductQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the product_sale_elements_ref column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByProductSaleElementsRef('fooValue');   // WHERE product_sale_elements_ref = 'fooValue'
+     * $query->filterByProductSaleElementsRef('%fooValue%'); // WHERE product_sale_elements_ref LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $productSaleElementsRef The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function filterByProductSaleElementsRef($productSaleElementsRef = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($productSaleElementsRef)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $productSaleElementsRef)) {
+                $productSaleElementsRef = str_replace('*', '%', $productSaleElementsRef);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF, $productSaleElementsRef, $comparison);
+    }
+
+    /**
      * Filter the query on the title column
      *
      * Example usage:
@@ -404,6 +465,35 @@ abstract class OrderProductQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderProductTableMap::TITLE, $title, $comparison);
+    }
+
+    /**
+     * Filter the query on the chapo column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByChapo('fooValue');   // WHERE chapo = 'fooValue'
+     * $query->filterByChapo('%fooValue%'); // WHERE chapo LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $chapo The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function filterByChapo($chapo = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($chapo)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $chapo)) {
+                $chapo = str_replace('*', '%', $chapo);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductTableMap::CHAPO, $chapo, $comparison);
     }
 
     /**
@@ -436,32 +526,32 @@ abstract class OrderProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the chapo column
+     * Filter the query on the postscriptum column
      *
      * Example usage:
      * <code>
-     * $query->filterByChapo('fooValue');   // WHERE chapo = 'fooValue'
-     * $query->filterByChapo('%fooValue%'); // WHERE chapo LIKE '%fooValue%'
+     * $query->filterByPostscriptum('fooValue');   // WHERE postscriptum = 'fooValue'
+     * $query->filterByPostscriptum('%fooValue%'); // WHERE postscriptum LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $chapo The value to use as filter.
+     * @param     string $postscriptum The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderProductQuery The current query, for fluid interface
      */
-    public function filterByChapo($chapo = null, $comparison = null)
+    public function filterByPostscriptum($postscriptum = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($chapo)) {
+            if (is_array($postscriptum)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $chapo)) {
-                $chapo = str_replace('*', '%', $chapo);
+            } elseif (preg_match('/[\%\*]/', $postscriptum)) {
+                $postscriptum = str_replace('*', '%', $postscriptum);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(OrderProductTableMap::CHAPO, $chapo, $comparison);
+        return $this->addUsingAlias(OrderProductTableMap::POSTSCRIPTUM, $postscriptum, $comparison);
     }
 
     /**
@@ -547,16 +637,45 @@ abstract class OrderProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the tax column
+     * Filter the query on the promo_price column
      *
      * Example usage:
      * <code>
-     * $query->filterByTax(1234); // WHERE tax = 1234
-     * $query->filterByTax(array(12, 34)); // WHERE tax IN (12, 34)
-     * $query->filterByTax(array('min' => 12)); // WHERE tax > 12
+     * $query->filterByPromoPrice('fooValue');   // WHERE promo_price = 'fooValue'
+     * $query->filterByPromoPrice('%fooValue%'); // WHERE promo_price LIKE '%fooValue%'
      * </code>
      *
-     * @param     mixed $tax The value to use as filter.
+     * @param     string $promoPrice The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function filterByPromoPrice($promoPrice = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($promoPrice)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $promoPrice)) {
+                $promoPrice = str_replace('*', '%', $promoPrice);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductTableMap::PROMO_PRICE, $promoPrice, $comparison);
+    }
+
+    /**
+     * Filter the query on the was_new column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByWasNew(1234); // WHERE was_new = 1234
+     * $query->filterByWasNew(array(12, 34)); // WHERE was_new IN (12, 34)
+     * $query->filterByWasNew(array('min' => 12)); // WHERE was_new > 12
+     * </code>
+     *
+     * @param     mixed $wasNew The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -564,16 +683,16 @@ abstract class OrderProductQuery extends ModelCriteria
      *
      * @return ChildOrderProductQuery The current query, for fluid interface
      */
-    public function filterByTax($tax = null, $comparison = null)
+    public function filterByWasNew($wasNew = null, $comparison = null)
     {
-        if (is_array($tax)) {
+        if (is_array($wasNew)) {
             $useMinMax = false;
-            if (isset($tax['min'])) {
-                $this->addUsingAlias(OrderProductTableMap::TAX, $tax['min'], Criteria::GREATER_EQUAL);
+            if (isset($wasNew['min'])) {
+                $this->addUsingAlias(OrderProductTableMap::WAS_NEW, $wasNew['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($tax['max'])) {
-                $this->addUsingAlias(OrderProductTableMap::TAX, $tax['max'], Criteria::LESS_EQUAL);
+            if (isset($wasNew['max'])) {
+                $this->addUsingAlias(OrderProductTableMap::WAS_NEW, $wasNew['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -584,7 +703,135 @@ abstract class OrderProductQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(OrderProductTableMap::TAX, $tax, $comparison);
+        return $this->addUsingAlias(OrderProductTableMap::WAS_NEW, $wasNew, $comparison);
+    }
+
+    /**
+     * Filter the query on the was_in_promo column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByWasInPromo(1234); // WHERE was_in_promo = 1234
+     * $query->filterByWasInPromo(array(12, 34)); // WHERE was_in_promo IN (12, 34)
+     * $query->filterByWasInPromo(array('min' => 12)); // WHERE was_in_promo > 12
+     * </code>
+     *
+     * @param     mixed $wasInPromo The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function filterByWasInPromo($wasInPromo = null, $comparison = null)
+    {
+        if (is_array($wasInPromo)) {
+            $useMinMax = false;
+            if (isset($wasInPromo['min'])) {
+                $this->addUsingAlias(OrderProductTableMap::WAS_IN_PROMO, $wasInPromo['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($wasInPromo['max'])) {
+                $this->addUsingAlias(OrderProductTableMap::WAS_IN_PROMO, $wasInPromo['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductTableMap::WAS_IN_PROMO, $wasInPromo, $comparison);
+    }
+
+    /**
+     * Filter the query on the weight column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByWeight('fooValue');   // WHERE weight = 'fooValue'
+     * $query->filterByWeight('%fooValue%'); // WHERE weight LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $weight The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function filterByWeight($weight = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($weight)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $weight)) {
+                $weight = str_replace('*', '%', $weight);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductTableMap::WEIGHT, $weight, $comparison);
+    }
+
+    /**
+     * Filter the query on the tax_rule_title column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByTaxRuleTitle('fooValue');   // WHERE tax_rule_title = 'fooValue'
+     * $query->filterByTaxRuleTitle('%fooValue%'); // WHERE tax_rule_title LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $taxRuleTitle The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function filterByTaxRuleTitle($taxRuleTitle = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($taxRuleTitle)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $taxRuleTitle)) {
+                $taxRuleTitle = str_replace('*', '%', $taxRuleTitle);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductTableMap::TAX_RULE_TITLE, $taxRuleTitle, $comparison);
+    }
+
+    /**
+     * Filter the query on the tax_rule_description column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByTaxRuleDescription('fooValue');   // WHERE tax_rule_description = 'fooValue'
+     * $query->filterByTaxRuleDescription('%fooValue%'); // WHERE tax_rule_description LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $taxRuleDescription The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function filterByTaxRuleDescription($taxRuleDescription = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($taxRuleDescription)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $taxRuleDescription)) {
+                $taxRuleDescription = str_replace('*', '%', $taxRuleDescription);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductTableMap::TAX_RULE_DESCRIPTION, $taxRuleDescription, $comparison);
     }
 
     /**
@@ -790,40 +1037,40 @@ abstract class OrderProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\OrderFeature object
+     * Filter the query by a related \Thelia\Model\OrderProductAttributeCombination object
      *
-     * @param \Thelia\Model\OrderFeature|ObjectCollection $orderFeature  the related object to use as filter
+     * @param \Thelia\Model\OrderProductAttributeCombination|ObjectCollection $orderProductAttributeCombination  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildOrderProductQuery The current query, for fluid interface
      */
-    public function filterByOrderFeature($orderFeature, $comparison = null)
+    public function filterByOrderProductAttributeCombination($orderProductAttributeCombination, $comparison = null)
     {
-        if ($orderFeature instanceof \Thelia\Model\OrderFeature) {
+        if ($orderProductAttributeCombination instanceof \Thelia\Model\OrderProductAttributeCombination) {
             return $this
-                ->addUsingAlias(OrderProductTableMap::ID, $orderFeature->getOrderProductId(), $comparison);
-        } elseif ($orderFeature instanceof ObjectCollection) {
+                ->addUsingAlias(OrderProductTableMap::ID, $orderProductAttributeCombination->getOrderProductId(), $comparison);
+        } elseif ($orderProductAttributeCombination instanceof ObjectCollection) {
             return $this
-                ->useOrderFeatureQuery()
-                ->filterByPrimaryKeys($orderFeature->getPrimaryKeys())
+                ->useOrderProductAttributeCombinationQuery()
+                ->filterByPrimaryKeys($orderProductAttributeCombination->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByOrderFeature() only accepts arguments of type \Thelia\Model\OrderFeature or Collection');
+            throw new PropelException('filterByOrderProductAttributeCombination() only accepts arguments of type \Thelia\Model\OrderProductAttributeCombination or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the OrderFeature relation
+     * Adds a JOIN clause to the query using the OrderProductAttributeCombination relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildOrderProductQuery The current query, for fluid interface
      */
-    public function joinOrderFeature($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinOrderProductAttributeCombination($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('OrderFeature');
+        $relationMap = $tableMap->getRelation('OrderProductAttributeCombination');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -838,14 +1085,14 @@ abstract class OrderProductQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'OrderFeature');
+            $this->addJoinObject($join, 'OrderProductAttributeCombination');
         }
 
         return $this;
     }
 
     /**
-     * Use the OrderFeature relation OrderFeature object
+     * Use the OrderProductAttributeCombination relation OrderProductAttributeCombination object
      *
      * @see useQuery()
      *
@@ -853,13 +1100,86 @@ abstract class OrderProductQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\OrderFeatureQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\OrderProductAttributeCombinationQuery A secondary query class using the current class as primary query
      */
-    public function useOrderFeatureQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useOrderProductAttributeCombinationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinOrderFeature($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'OrderFeature', '\Thelia\Model\OrderFeatureQuery');
+            ->joinOrderProductAttributeCombination($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderProductAttributeCombination', '\Thelia\Model\OrderProductAttributeCombinationQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\OrderProductTax object
+     *
+     * @param \Thelia\Model\OrderProductTax|ObjectCollection $orderProductTax  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function filterByOrderProductTax($orderProductTax, $comparison = null)
+    {
+        if ($orderProductTax instanceof \Thelia\Model\OrderProductTax) {
+            return $this
+                ->addUsingAlias(OrderProductTableMap::ID, $orderProductTax->getOrderProductId(), $comparison);
+        } elseif ($orderProductTax instanceof ObjectCollection) {
+            return $this
+                ->useOrderProductTaxQuery()
+                ->filterByPrimaryKeys($orderProductTax->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByOrderProductTax() only accepts arguments of type \Thelia\Model\OrderProductTax or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the OrderProductTax relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function joinOrderProductTax($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('OrderProductTax');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'OrderProductTax');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the OrderProductTax relation OrderProductTax object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\OrderProductTaxQuery A secondary query class using the current class as primary query
+     */
+    public function useOrderProductTaxQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinOrderProductTax($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderProductTax', '\Thelia\Model\OrderProductTaxQuery');
     }
 
     /**

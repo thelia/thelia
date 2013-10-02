@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "a40be01c82e68ba0c446dc204d2667da",
+    "hash": "097481390dc87b3482d895b3b6a65479",
     "packages": [
         {
             "name": "imagine/imagine",
@@ -214,12 +214,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/propelorm/Propel2.git",
-                "reference": "58a25ded43c3d04313cad2b738342d307988b1b5"
+                "reference": "fb9a10939abdd6efea7a066f0ef28f82ad06e435"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/58a25ded43c3d04313cad2b738342d307988b1b5",
-                "reference": "58a25ded43c3d04313cad2b738342d307988b1b5",
+                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/fb9a10939abdd6efea7a066f0ef28f82ad06e435",
+                "reference": "fb9a10939abdd6efea7a066f0ef28f82ad06e435",
                 "shasum": ""
             },
             "require": {
@@ -266,7 +266,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2013-09-01 13:29:51"
+            "time": "2013-09-30 08:26:26"
         },
         {
             "name": "psr/log",
@@ -845,17 +845,17 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v2.3.4",
+            "version": "v2.3.5",
             "target-dir": "Symfony/Component/Finder",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Finder.git",
-                "reference": "4a0fee5b86f5bbd9dfdc11ec124eba2915737ce1"
+                "reference": "a175521f680b178e63c5d0ab87c6b046c0990c3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Finder/zipball/4a0fee5b86f5bbd9dfdc11ec124eba2915737ce1",
-                "reference": "4a0fee5b86f5bbd9dfdc11ec124eba2915737ce1",
+                "url": "https://api.github.com/repos/symfony/Finder/zipball/a175521f680b178e63c5d0ab87c6b046c0990c3f",
+                "reference": "a175521f680b178e63c5d0ab87c6b046c0990c3f",
                 "shasum": ""
             },
             "require": {
@@ -888,7 +888,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "http://symfony.com",
-            "time": "2013-08-13 20:18:00"
+            "time": "2013-09-19 09:45:20"
         },
         {
             "name": "symfony/form",
@@ -1455,6 +1455,53 @@
             "description": "Symfony Routing Component",
             "homepage": "http://symfony.com",
             "time": "2013-08-23 14:06:02"
+        },
+        {
+            "name": "symfony/serializer",
+            "version": "v2.3.4",
+            "target-dir": "Symfony/Component/Serializer",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/Serializer.git",
+                "reference": "457ba76395955926a67ea692957b0872dead5278"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/Serializer/zipball/457ba76395955926a67ea692957b0872dead5278",
+                "reference": "457ba76395955926a67ea692957b0872dead5278",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\Serializer\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Serializer Component",
+            "homepage": "http://symfony.com",
+            "time": "2013-07-21 12:12:18"
         },
         {
             "name": "symfony/translation",

@@ -25,11 +25,11 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
-use Thelia\Core\Event\CustomerEvent;
+use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Customer as CustomerModel;
-use Thelia\Core\Event\CustomerLoginEvent;
+use Thelia\Core\Event\Customer\CustomerLoginEvent;
 
 /**
  *

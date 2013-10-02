@@ -5,10 +5,10 @@ Thelia
 ------
 [![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia)
 
-Thelia is an open source tool for creating e-business websites and managing online content. This software is published under GPL.
+[Thelia](http://thelia.net) is an open source tool for creating e-business websites and managing online content. This software is published under GPL.
 
 Here is the current developping next major version. You can download this version for testing or see the code.
-Here is the most recent developed code for the next major version (v2). You can download this version for testing or having a look on the code (or anything you wish, respecting GPL).
+Here is the most recent developed code for the next major version (v2). You can download this version for testing or having a look on the code (or anything you wish, respecting GPL). See http://thelia.net/v2 web site for more information.
 
 Most part of the code can possibly change, a large part will be refactor soon, graphical setup does not exist yet.
 
@@ -35,10 +35,10 @@ Installation
 ------------
 
 ``` bash
-$ git clone --recursive https://github.com/thelia/thelia.git
+$ git clone https://github.com/thelia/thelia.git
 $ cd thelia
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar install --optimize-autoloader
+$ php composer.phar install --prefer-dist --optimize-autoloader
 ```
 
 Finish the installation using cli tools :

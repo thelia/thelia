@@ -48,17 +48,16 @@ class UrlGenerator extends AbstractSmartyPlugin
     public function generateUrlFunction($params, &$smarty)
     {
         // the path to process
-        $path = $this->getParam($params, 'path', null);
-        $file = $this->getParam($params, 'file', null);
+        $path  = $this->getParam($params, 'path', null);
+        $file  = $this->getParam($params, 'file', null); // Do not invoke index.php in URL (get a static file in web space
+        $noamp = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
 
         if ($file !== null) {
             $path = $file;
             $mode = URL::PATH_TO_FILE;
-        }
-        else if ($path !== null) {
+        } elseif ($path !== null) {
             $mode = URL::WITH_INDEX_PAGE;
-        }
-        else {
+        } else {
             throw \InvalidArgumentException(Translator::getInstance()->trans("Please specify either 'path' or 'file' parameter in {url} function."));
         }
 
@@ -66,12 +65,13 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         $url = URL::getInstance()->absoluteUrl(
                 $path,
-                $this->getArgsFromParam($params, array('path', 'file', 'target')),
+                $this->getArgsFromParam($params, array('noamp', 'path', 'file', 'target')),
                 $mode
         );
 
-        if ($target != null) $url .= '#'.$target;
+        if ($noamp == null) $url = str_replace('&', '&amp;', $url);
 
+        if ($target != null) $url .= '#'.$target;
         return $url;
      }
 
@@ -186,7 +186,8 @@ class UrlGenerator extends AbstractSmartyPlugin
 
     protected function getCurrentUrl()
     {
-        return URL::getInstance()->retrieveCurrent($this->request)->toString();
+        //return URL::getInstance()->retrieveCurrent($this->request)->toString();
+        return $this->request->getUri();
     }
 
     protected function getReturnToUrl()

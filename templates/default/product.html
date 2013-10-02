@@ -4,12 +4,15 @@
 
 {block name="breadcrumb"}
     <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">You are here: </strong>
+        <strong id="breadcrumb-label">{intl l="You are here"}: </strong>
         <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="index.php" itemprop="url"><span itemprop="title">Home</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="category.php" itemprop="url"><span itemprop="title">Category 1</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="category.php" itemprop="url"><span itemprop="title">Category 1.2</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">Product name</span></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
+            {loop type="product" name="product_breadcrumb" id="{product attr="id"}"}
+                {loop name="category_path" type="category-path" category="{$DEFAULT_CATEGORY}"}
+                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{$URL}" itemprop="url"><span itemprop="title">{$TITLE}</span></a></li>
+                {/loop}
+                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{$TITLE}</span></li>
+            {/loop}
         </ul>
     </nav><!-- /.nav-breadcrumb -->
 {/block}
@@ -25,11 +28,11 @@
                     <meta itemprop="brand" content="{$TITLE}">
                 {/loop}
             {/loop}
-
-            <!--
-                activate this meta tag if you have isbn feature for exemple
-                <meta itemprop="productID" content="isbn:925872">
-            -->
+            {loop name="brand.feature" type="feature" product=$ID title="isbn"}
+                {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+                    <meta itemprop="productID" content="isbn:{$TITLE}">
+                {/loop}
+            {/loop}
 
             <section id="product-gallery">
                 <figure class="product-image">
@@ -57,10 +60,10 @@
                         <div class="item">
                             <ul>
 
-                                {loop name="image.carouselsup" type="image" product="{$ID}"  width="560" height="445" resize_mode="crop" offset="5"}
+                                {loop name="image.carouselsup" type="image" product="{$ID}"  width="560" height="445" resize_mode="borders" offset="5"}
                                     <li>
                                         <a href="{$IMAGE_URL}" class="thumbnail">
-                                            {loop type="image" name="image.thumbssup" id="{$ID}" product="$OBJECT_ID" width="118" height="85" resize_mode="crop"}
+                                            {loop type="image" name="image.thumbssup" id="{$ID}" product="$OBJECT_ID" width="118" height="85" resize_mode="borders"}
                                                 <img src="{$IMAGE_URL}" alt="{$TITLE}">
                                             {/loop}
                                         </a>
@@ -92,7 +95,9 @@
                     <div class="availability"><span class="availibity-label">{intl l="Availability"}: </span><span itemprop="availability" href="http://schema.org/InStock" class="in-stock">In stock</span></div>
 
                     <div class="price-container">
-                        <meta itemprop="category" content="Category1">
+                        {loop type="category" name="category_tag" id=$DEFAULT_CATEGORY}
+                            <meta itemprop="category" content="{$TITLE}">
+                        {/loop}
                         <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
                         <meta itemprop="priceCurrency" content="{currency attr="symbol"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
                         <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
@@ -110,7 +115,7 @@
                             <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                         {/loop}
                         {else}
-                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}</span></span>
+                            <span class="regular-price"><span itemprop="price" class="price">{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}</span></span>
                         {/if}
                     </div>
                 </div>
@@ -195,7 +200,17 @@
                         <p>{$DESCRIPTION}</p>
                     </div>
                     <div class="tab-pane" id="additional" role="tabpanel" aria-labelledby="tab2">
-                        <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit. Keytar helvetica VHS salvia yr, vero magna velit sapiente labore stumptown. Vegan fanny pack odio cillum wes anderson 8-bit, sustainable jean shorts beard ut DIY ethical culpa terry richardson biodiesel. Art party scenester stumptown, tumblr butcher vero sint qui sapiente accusamus tattooed echo park.</p>
+                        {ifloop rel="feature_value_info"}
+                        <ul>
+                        {loop name="feature_info" type="feature" product="{$ID}"}
+                            <li> <strong>{$TITLE}</strong> :
+                            {loop name="feature_value_info" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
+                                {$TITLE}
+                            {/loop}
+                            </li>
+                        {/loop}
+                        </ul>
+                        {/ifloop}
                     </div>
                 </div>
             </section>

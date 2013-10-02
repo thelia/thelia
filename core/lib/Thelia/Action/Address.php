@@ -25,8 +25,8 @@ namespace Thelia\Action;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\AddressCreateOrUpdateEvent;
-use Thelia\Core\Event\AddressEvent;
+use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
+use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Address as AddressModel;
 use Thelia\Model\Map\AddressTableMap;
@@ -86,14 +86,14 @@ class Address extends BaseAction implements EventSubscriberInterface
                 ->save()
             ;
 
-            if($event->getIsDefault()) {
+            if ($event->getIsDefault()) {
                 $addressModel->makeItDefault();
             }
 
             $event->setAddress($addressModel);
             $con->commit();
 
-        } catch(PropelException $e) {
+        } catch (PropelException $e) {
             $con->rollback();
             throw $e;
         }

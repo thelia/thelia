@@ -21,13 +21,19 @@ class TaxRuleQuery extends BaseTaxRuleQuery
 {
     const ALIAS_FOR_TAX_RULE_COUNTRY_POSITION = 'taxRuleCountryPosition';
 
-    public function getTaxCalculatorCollection(Product $product, Country $country)
+    /**
+     * @param TaxRule $taxRule
+     * @param Country $country
+     *
+     * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
+     */
+    public function getTaxCalculatorCollection(TaxRule $taxRule, Country $country)
     {
         $search = TaxQuery::create()
             ->filterByTaxRuleCountry(
                 TaxRuleCountryQuery::create()
                     ->filterByCountry($country, Criteria::EQUAL)
-                    ->filterByTaxRuleId($product->getTaxRuleId())
+                    ->filterByTaxRuleId($taxRule->getId())
                     ->orderByPosition()
                     ->find()
             )

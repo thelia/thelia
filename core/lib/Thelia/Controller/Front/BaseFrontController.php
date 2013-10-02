@@ -24,6 +24,8 @@ namespace Thelia\Controller\Front;
 
 use Symfony\Component\Routing\Router;
 use Thelia\Controller\BaseController;
+use Thelia\Model\AddressQuery;
+use Thelia\Model\ModuleQuery;
 use Thelia\Tools\URL;
 
 class BaseFrontController extends BaseController
@@ -53,7 +55,7 @@ class BaseFrontController extends BaseController
 
     public function checkAuth()
     {
-        if($this->getSecurityContext()->hasCustomerUser() === false) {
+        if ($this->getSecurityContext()->hasCustomerUser() === false) {
             $this->redirectToRoute("customer.login.view");
         }
     }
@@ -61,7 +63,7 @@ class BaseFrontController extends BaseController
     protected function checkCartNotEmpty()
     {
         $cart = $this->getSession()->getCart();
-        if($cart===null || $cart->countCartItems() == 0) {
+        if ($cart===null || $cart->countCartItems() == 0) {
             $this->redirectToRoute("cart.view");
         }
     }
@@ -69,7 +71,7 @@ class BaseFrontController extends BaseController
     protected function checkValidDelivery()
     {
         $order = $this->getSession()->getOrder();
-        if(null === $order || null === $order->chosenDeliveryAddress || null === $order->getDeliveryModuleId()) {
+        if (null === $order || null === $order->chosenDeliveryAddress || null === $order->getDeliveryModuleId() || null === AddressQuery::create()->findPk($order->chosenDeliveryAddress) || null === ModuleQuery::create()->findPk($order->getDeliveryModuleId())) {
             $this->redirectToRoute("order.delivery");
         }
     }
@@ -77,7 +79,7 @@ class BaseFrontController extends BaseController
     protected function checkValidInvoice()
     {
         $order = $this->getSession()->getOrder();
-        if(null === $order || null === $order->chosenInvoiceAddress || null === $order->getPaymentModuleId()) {
+        if (null === $order || null === $order->chosenInvoiceAddress || null === $order->getPaymentModuleId() || null === AddressQuery::create()->findPk($order->chosenInvoiceAddress) || null === ModuleQuery::create()->findPk($order->getPaymentModuleId())) {
             $this->redirectToRoute("order.invoice");
         }
     }

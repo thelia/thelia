@@ -14,6 +14,7 @@
 @import "bootstrap-switch.less";
 @import "bootstrap-select.less";
 @import "jqplot.less";
+@import "dropzone.less";
 
 // -- Base styling ------------------------------------------------------------
 
@@ -192,6 +193,11 @@
     padding: 1em;
     margin-bottom: 20px;
 
+    .select-fixed-width {
+      width: 120px;
+    }
+
+
     // The block title
     .title {
         color: #5A6876;
@@ -223,6 +229,14 @@
 
     .inner-actions {
         margin-top: 0.5em;
+    }
+}
+
+.tab-content {
+    // Center loading indicator
+    .loading {
+        margin: 8em auto;
+        text-align: center;
     }
 }
 
@@ -275,81 +289,33 @@
 .loading{
   background: url("@{imgDir}/ajax-loader.gif") no-repeat;
   height: 30px;
-  width: 30px;
+  display: inline-block;
+  line-height: 30px;
+  padding-left: 40px;
+  width: auto;
 }
 
-// -- Drag & drop --
-.take{
-    
-    .draggable{
-        border: 2px dashed @gray-light;
-        margin-bottom: 10px;
-        padding: 10px;
 
-        &:last-child{
-            margin-bottom: 0;
-        }       
-    }
-    
-    .over{
-        .drop-message{
-            border-color: @brand-primary;
-            color: @brand-primary;
-        }
+.existing-image .col-sm-6{
+    position: relative;
+    margin-bottom: 30px;
+
+    .btn-group{
+        position: absolute;
+        bottom: 5px;
+        right: 20px;
     }
 
-}
-
-.place{    
-    
-    .over{
-        .drop-message{
-            border-color: @brand-primary;
-            color: @brand-primary;
-        }
-    }
-
-    .panel-body{
-        
-        .draggable, .drag{
-            margin: 5px 0;
-            padding: 10px;            
-            border: 1px dashed @gray-light;
-        }
-
-        .drop-group{
-            padding: 10px;
-            border: 2px dashed @gray-light;
-            margin-bottom: 10px;
-
-            &:last-child{
-                margin-bottom: 0;
-            }
-        }
-
-    }
-
-}
-
-.take, .place{
-    
-    .drop-message{
-        width: 50%;
-        margin: 10px auto;
-        padding: 10px;
-        color: @gray;
-        border: 2px dashed @gray;
-        text-align: center;
-        .opacity(0.5);
-
-        .glyphicon{
-            display: block;
-            font-size: @font-size-large;
-            margin-bottom: 10px;
-        }
-    }
-
-    .ui-draggable-dragging{
-        z-index: 100;
+    .loading{
+        position: absolute;
+        bottom: 5px;
+        right: 20px;
+        display: block;
+        line-height: 1;
+        padding: 0;
+        margin: 0 auto;
+        z-index: 2;
+        width: 30px;
+        height: 30px;
     }
 }

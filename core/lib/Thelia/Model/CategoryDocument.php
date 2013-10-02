@@ -25,4 +25,28 @@ class CategoryDocument extends BaseCategoryDocument
 
         return true;
     }
+
+    /**
+     * Set Document parent id
+     *
+     * @param int $parentId parent id
+     *
+     * @return $this
+     */
+    public function setParentId($parentId)
+    {
+        $this->setCategoryId($parentId);
+
+        return $this;
+    }
+
+    /**
+     * Get Document parent id
+     *
+     * @return int parent id
+     */
+    public function getParentId()
+    {
+        return $this->getCategoryId();
+    }
 }

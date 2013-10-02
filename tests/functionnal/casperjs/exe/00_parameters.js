@@ -9,8 +9,11 @@ var thelia2_login_coupon_update_url = thelia2_base_url + 'admin/coupon/update/1'
 
 
 
-//var findMyId = /([0-9]+)$/;
-//var currentId;
+var thelia2_category_image_list_url = thelia2_base_url + 'admin/categories/update?category_id=1';
+var thelia2_product_image_list_url = thelia2_base_url + 'admin/products/update?product_id=1';
+var thelia2_folder_image_list_url = thelia2_base_url + 'admin/folders/update/1';
+var thelia2_content_image_list_url = thelia2_base_url + 'admin/content/update/1';
+
 
 casper.test.comment('Variables are set');
 

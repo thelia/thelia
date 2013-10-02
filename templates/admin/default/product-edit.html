@@ -6,6 +6,7 @@
 
 {block name="main-content"}
 <div class="catalog edit-product">
+
 	<div id="wrapper" class="container">
 
         {include file="includes/catalog-breadcrumb.html" editing_category="false" editing_product="true"}
@@ -40,353 +41,73 @@
 	                <div class="col-md-12">
 
 						<ul class="nav nav-tabs" id="tabbed-menu">
-		                    <li {if $current_tab == 'general'}class="active"{/if}><a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
-		                    <li {if $current_tab == 'details'}class="active"{/if}><a href="#details" data-toggle="tab">{intl l="Details"}</a></li>
-		                    <li {if $current_tab == 'images'}class="active"{/if}><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
-		                    <li {if $current_tab == 'documents'}class="active"{/if}><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
-		                    <li {if $current_tab == 'modules'}class="active"{/if}><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
+		                    <li>
+		                          <a href="#general"
+		                             {* data-href="{url path='/admin/products/general/tab' product_id=$product_id}" *}
+		                             data-toggle="tab">{intl l="General"}</a>
+		                    </li>
+
+                            <li>
+                                <a href="#details" data-toggle="tab">{intl l="Details"}</a>
+                            </li>
+
+                            <li><a href="#attributes"
+                                   data-href="{url path='/admin/products/attributes/tab' product_id=$product_id}"
+                                   data-toggle="tab">{intl l="Attributes &amp; Features"}</a>
+                            </li>
+
+                            <li>
+                                <a href="#related"
+                                   data-href="{url path='/admin/products/related/tab' folder_id=$folder_id accessory_category_id=$accessory_category_id product_id=$product_id}"
+                                   data-toggle="tab">{intl l="Associations"}</a>
+                            </li>
+
+		                    <li>
+                                <a href="#images"
+                                   data-toggle="tab"
+                                   data-href="{url path="/admin/image/type/product/{$product_id}/form-ajax"}"
+                                   data-callback="$.imageUploadManager.initImageDropZone">
+                                    {intl l="Images"}
+                                </a>
+                            </li>
+		                    <li>
+                                <a href="#documents"
+                                   data-toggle="tab"
+                                   data-href="{url path="/admin/document/type/product/{$product_id}/form-ajax"}"
+                                   data-callback="$.documentUploadManager.initDocumentDropZone">
+                                    {intl l="Documents"}
+                                </a>
+		                    <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
 		 				</ul>
 
 		                <div class="tab-content">
 
-		                    <div class="tab-pane fade {if $current_tab == 'general'}active in{/if}" id="general">
-
-			                    <div class="form-container">
-
-				                    {form name="thelia.admin.product.modification"}
-				                    <form method="POST" action="{url path='/admin/products/save'}" {form_enctype form=$form} class="clearfix">
-
-	                                    {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/products' product_id=$product_id}"}
-
-			                            {* Be sure to get the product ID, even if the form could not be validated *}
-			                            <input type="hidden" name="product_id" value="{$product_id}" />
-
-                                        <input type="hidden" name="current_tab" value="general" />
-
-			                            {form_hidden_fields form=$form}
-
-			                            {form_field form=$form field='success_url'}
-			                                <input type="hidden" name="{$name}" value="{url path='/admin/product' product_id={$product_d}}" />
-			                            {/form_field}
-
-			                            {form_field form=$form field='locale'}
-			                                <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
-			                            {/form_field}
-
-			                            {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-
-                                        <div class="form-group">
-                                            <label for="product_ref" class="control-label">
-                                                {intl l='Product reference'} :
-                                            </label>
-
-                                            <div class="well well-sm">{$REF}</div>
-                                        </div>
-
-	                                    {include file="includes/standard-description-form-fields.html"}
-
-                                        {form_field form=$form field='url'}
-                                            <div class="form-group {if $error}has-error{/if}">
-                                                <label for="{$label_attr.for}" class="control-label">
-                                                    {intl l="{$label}"} :
-                                                </label>
-
-                                                <input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Rewritten URL'}" placeholder="{intl l='Rewriten URL'}" class="form-control">
-                                             </div>
-                                        {/form_field}
-
-						                <div class="row">
-						                    <div class="col-md-6">
-
-		                                        {form_field form=$form field='default_category'}
-		                                            <div class="form-group {if $error}has-error{/if}">
-
-		                                                <label for="{$label_attr.for}" class="control-label">
-		                                                    {intl l="{$label}"} :
-		                                                </label>
-
-		                                                <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-		                                                      <option value="0">{intl l="Top level"}</option>
-
-		                                                      {loop name="cat-parent" type="category-tree" category="0" visible="*" product="0"}
-		                                                           <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY == $ID}selected="selected"{/if} {if $product_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
-		                                                      {/loop}
-
-		                                                </select>
-		                                                <span class="help-block">{intl l='You can attach this product to more categories in the details tab.'}</span>
-		                                             </div>
-		                                        {/form_field}
-
-						                    </div>
-
-                                            <div class="col-md-6">
-									            {form_field form=$form field='visible'}
-									                <div class="form-group {if $error}has-error{/if}">
-									                    <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
-									                    <div class="checkbox">
-									                        <label>
-									                            <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
-									                            {$label}
-									                        </label>
-									                    </div>
-									                </div>
-									            {/form_field}
-                                            </div>
-						                </div>
-
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="control-group">
-                                                    <lablel>&nbsp;</lablel>
-                                                    <div class="controls">
-                                                        <p>{intl l='Product created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
-                                                    </div>
-                                                 </div>
-                                            </div>
-                                        </div>
-
-            	                    </form>
-				                    {/form}
-			                    </div>
+		                    <div class="tab-pane fade" id="general">
+                                {include file="includes/product-general-tab.html"}
 		                    </div>
 
-		                    <div class="tab-pane fade {if $current_tab == 'details'}active in{/if}" id="details">
-		                        <div class="form-container">
+                            <div class="tab-pane fade" id="details">
+                                {include file="includes/product-details-tab.html"}
+                            </div>
 
-                                    {include
-                                        file="includes/inner-form-toolbar.html"
-                                        hide_submit_buttons=true
-                                        close_url="{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
-                                    }
+                            <div class="tab-pane fade" id="attributes">
+                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                            </div>
 
-		                            {* -- Begin related content management -- *}
-
-			                        <div class="col-md-6">
-										<div class="form-group">
-										    <form action="{url path='/admin/products/related-content/add'}" id="related_content_form">
-
-	 											<p class="title title-without-tabs">{intl l='Related content'}</p>
-												<p>{intl l='You can attach here some content to this product'}</p>
-
-										        <input type="hidden" name="product_id" value="{$product_id}" />
-										        <input type="hidden" name="current_tab" value="details" />
-
-										        {ifloop rel="folders"}
-								                <div class="form-group">
-								                    <select name="folder_id" id="folder_id" class="form-control">
-								                        <option value="">Select a folder...</option>
-								                        {loop name="folders" type="folder-tree" folder="0" backend_context="1" lang="$edit_language_id"}
-								                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
-								                        {/loop}
-								                    </select>
-
-                                                    <span class="help-block">{intl l='Select a folder to get its content'}</span>
-								                </div>
-
-								                <div id="content_selector" class="hide">
-								                    <div class="input-group">
-								                        <select required="required" name="content_id" id="content_id" class="form-control">
-								                            <option value="">Select a folder content...</option>
-								                        </select>
-								                        <span class="input-group-btn" id="content_add_button">
-								                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
-								                        </span>
-								                    </div>
-
-								                    <span class="help-block">{intl l='Select a content and click (+) to add it to this product'}</span>
-								                </div>
-
-                                                <div id="content_selector_empty" class="hide">
-                                                   <div class="alert alert-info">
-                                                       {intl l="No available content for this folder"}
-                                                   </div>
-                                                </div>
-										        {/ifloop}
-
-										        {elseloop rel="folders"}
-										            <div class="alert alert-info">{intl l="No folders found"}</div>
-										        {/elseloop}
-
-										    </form>
-										</div>
-
-										<table class="table table-striped table-condensed table-left-aligned">
-										    <thead>
-										        <tr>
-										            <th>{intl l='ID'}</th>
-
-										            <th>{intl l='Content title'}</th>
-
-										            {module_include location='product_contents_table_header'}
-
-										            <th class="actions">{intl l="Actions"}</th>
-										        </tr>
-										    </thead>
-
-										    <tbody>
-										        {loop name="assigned_contents" type="associated_content" product="$product_id" backend_context="1" lang="$edit_language_id"}
-										        <tr>
-										            <td>{$ID}</td>
-
-										            <td>
-										                {$TITLE}
-										            </td>
-
-										            {module_include location='product_contents_table_row'}
-
-										            <td class="actions">
-										                <div class="btn-group">
-										                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.product.content.delete"}
-										                       <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$ID}" data-toggle="modal">
-										                        <span class="glyphicon glyphicon-trash"></span>
-										                       </a>
-										                    {/loop}
-										                </div>
-										            </td>
-										        </tr>
-										         {/loop}
-
-										         {elseloop rel="assigned_contents"}
-										             <tr>
-										                 <td colspan="3">
-										                     <div class="alert alert-info">
-										                         {intl l="This product contains no contents"}
-										                     </div>
-										                 </td>
-										             </tr>
-										         {/elseloop}
-										    </tbody>
-										</table>
-				                    </div>
-
-				                    {* -- End related content management ---- *}
-
-				                    {* -- Begin accessories management ------ *}
-
-									<div class="col-md-6">
-                                        <div class="form-group">
-                                            <form action="{url path='/admin/products/accessory/add'}" id="accessory_form">
-
-                                                <p class="title title-without-tabs">{intl l='Product accessories'}</p>
-                                                <p>{intl l='Define here this product\'s accessories'}</p>
-
-                                                <input type="hidden" name="product_id" value="{$product_id}" />
-                                                <input type="hidden" name="current_tab" value="details" />
-
-                                                {ifloop rel="categories"}
-                                                <div class="form-group">
-                                                    <select name="accessory_category_id" id="accessory_category_id" class="form-control">
-                                                        <option value="">Select a category...</option>
-                                                        {loop name="categories" type="category-tree" category="0" backend_context="1" lang="$edit_language_id"}
-                                                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
-                                                        {/loop}
-                                                    </select>
-
-                                                    <span class="help-block">{intl l='Select a category to get its products'}</span>
-                                                </div>
-
-                                                <div id="accessory_selector" class="hide">
-                                                    <div class="input-group">
-                                                        <select required="required" name="accessory_id" id="accessory_id" class="form-control">
-                                                            <option value="">Select a product...</option>
-                                                        </select>
-                                                        <span class="input-group-btn" id="accessory_add_button">
-                                                           <button class="btn btn-default btn-primary action-btn" type="submit"><span class="glyphicon glyphicon-plus-sign"></span></button>
-                                                        </span>
-                                                    </div>
-
-                                                    <span class="help-block">{intl l='Select a product and click (+) to add it as an accessory'}</span>
-                                                </div>
-
-                                                <div id="accessory_selector_empty" class="hide">
-                                                   <div class="alert alert-info">
-                                                       {intl l="No available product in this category"}
-                                                   </div>
-                                                </div>
-
-                                                {/ifloop}
-
-                                                {elseloop rel="categories"}
-                                                    <div class="alert alert-info">{intl l="No categories found"}</div>
-                                                {/elseloop}
-
-                                            </form>
-                                        </div>
-
-                                        <table class="table table-striped table-condensed table-left-aligned">
-                                            <thead>
-                                                <tr>
-                                                    <th>{intl l='ID'}</th>
-
-                                                    <th>{intl l='Accessory title'}</th>
-
-                                                    <th class="text-center">{intl l='Position'}</th>
-
-                                                    {module_include location='product_accessories_table_header'}
-
-                                                    <th class="actions">{intl l="Actions"}</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                {loop name="assigned_accessories" order="accessory" type="accessory" product="$product_id" backend_context="1" lang="$edit_language_id"}
-                                                <tr>
-                                                    <td>{$ID}</td>
-
-                                                    <td>
-                                                        {$TITLE}
-                                                    </td>
-
-						                             <td class="text-center">
-						                             {admin_position_block
-						                                 permission="admin.products.edit"
-						                                 path={url path='/admin/products/update-accessory-position' product_id=$ID}
-						                                 url_parameter="accessory_id"
-						                                 in_place_edit_class="accessoryPositionChange"
-						                                 position=$POSITION
-						                                 id=$ID
-						                              }
-						                             </td>
-
-                                                    {module_include location='product_accessories_table_row'}
-
-                                                    <td class="actions">
-                                                        <div class="btn-group">
-                                                            {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.product.accessory.delete"}
-                                                               <a class="btn btn-default btn-xs delete-accessory" title="{intl l='Delete this accessory'}" href="#delete_accessory_dialog" data-id="{$ID}" data-toggle="modal">
-                                                                <span class="glyphicon glyphicon-trash"></span>
-                                                               </a>
-                                                            {/loop}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                 {/loop}
-
-                                                 {elseloop rel="assigned_accessories"}
-                                                     <tr>
-                                                         <td colspan="4">
-                                                             <div class="alert alert-info">
-                                                                 {intl l="This product contains no accessories"}
-                                                             </div>
-                                                         </td>
-                                                     </tr>
-                                                 {/elseloop}
-                                            </tbody>
-                                        </table>
-									</div>
-
-                                    {* -- End accessories management -------- *}
-
-			                    </div>
+		                    <div class="tab-pane fade" id="related">
+		                        <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
 		                    </div>
 
-		                    <div class="tab-pane fade {if $current_tab == 'images'}active in{/if}" id="images">
+		                    <div class="tab-pane fade" id="images">
+		                        <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
 		                    </div>
 
-		                    <div class="tab-pane fade {if $current_tab == 'documents'}active in{/if}" id="documents">
+		                    <div class="tab-pane fade" id="documents">
+                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
 		                    </div>
 
-		                    <div class="tab-pane fade {if $current_tab == 'modules'}active in{/if}" id="modules">
+		                    <div class="tab-pane fade" id="modules">
+                                <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
 		                    </div>
 		                 </div>
                     </div>
@@ -397,53 +118,25 @@
 	</div>
 </div>
 
-
-{* Delete related content confirmation dialog *}
-
-{capture "delete_content_dialog"}
-    <input type="hidden" name="product_id" value="{$product_id}" />
-    <input type="hidden" name="content_id" id="content_delete_id" value="" />
-    <input type="hidden" name="folder_id" id="folder_delete_id" value="" />
-
-    <input type="hidden" name="current_tab" value="details" />
-{/capture}
-
-{include
-    file = "includes/generic-confirm-dialog.html"
-
-    dialog_id       = "delete_content_dialog"
-    dialog_title    = {intl l="Remove related content"}
-    dialog_message  = {intl l="Do you really want to remove this related content from the product ?"}
-
-    form_action     = {url path='/admin/products/related-content/delete'}
-    form_content    = {$smarty.capture.delete_content_dialog nofilter}
-}
-
-{* Delete accessory confirmation dialog *}
-
-{capture "delete_accessory_dialog"}
-    <input type="hidden" name="product_id" value="{$product_id}" />
-    <input type="hidden" name="accessory_id" id="accessory_delete_id" value="" />
-    <input type="hidden" name="accessory_category_id" id="accessory_category_delete_id" value="" />
-
-    <input type="hidden" name="current_tab" value="details" />
-{/capture}
-
-{include
-    file = "includes/generic-confirm-dialog.html"
-
-    dialog_id       = "delete_accessory_dialog"
-    dialog_title    = {intl l="Remove an accessory"}
-    dialog_message  = {intl l="Do you really want to remove this accessory from the product ?"}
-
-    form_action     = {url path='/admin/products/accessory/delete'}
-    form_content    = {$smarty.capture.delete_accessory_dialog nofilter}
-}
 {/block}
 
 {block name="javascript-initialization"}
 
-{javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+    {javascripts file='assets/js/dropzone.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/image-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/document-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+
+{javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
     <script src="{$asset_url}"></script>
 {/javascripts}
 
@@ -470,130 +163,114 @@
 <script>
 $(function() {
 
-    $('.use_default_rewriten_url').click(function(ev) {
-    	alert("Not functionnal");
-
-    	ev.preventDefault();
+    // Atomatic ajax tab load, if data-href is defined.
+    $('.nav-tabs a[data-href]').on('shown.bs.tab', function(ev) {
+        var $this = $(this);
+        $($this.attr('href')).load($this.data('href'), function(ev) {
+            eval($this.data('callback') + '();');
+        });
     });
 
-    // Set proper content ID in delete content from
-    $('a.delete-content').click(function(ev) {
-        $('#content_delete_id').val($(this).data('id'));
-        $('#folder_delete_id').val($('#folder_id').val());
-    });
+    // Load active tab
+    $('.nav-tabs a[href="#{$current_tab}"]').trigger("click");
 
-    // Set proper content ID in accessory delete from
-    $('a.delete-accessory').click(function(ev) {
-        $('#accessory_delete_id').val($(this).data('id'));
-        $('#accessory_category_delete_id').val($('#accessory_category_id').val());
-    });
+    // -- Product details management tab ---------------------------------------
 
+	// Load value on attribute selection
+	$('#attribute_id').change(function(event) {
+	    var val = $(this).val();
 
-    // Load content on folder selection
-    $('#folder_id').change(function(event) {
-    	var val = $(this).val();
-
-    	if (val != "") {
+	    if (val != "") {
 	        $.ajax({
-	             url      : '{url path="/admin/product/$product_id/available-related-content/"}' + $(this).val() + '.xml',
+	             url      : '{url path="/admin/product/$product_id/attribute-values/"}' + $(this).val() + '.xml',
 	             type     : 'get',
 	             dataType : 'json',
 	             success  : function(json) {
-	                 $('#content_id :not(:first-child)').remove();
+	                 $('#attribute_value_id :not(:first-child)').remove();
 
 	                 var have_content = false;
 
 	                 $.each(json, function(idx, value) {
-	                     $('#content_id').append($('<option>').text(value.title).attr('value', value.id));
+	                     $('#attribute_value_id').append($('<option>').text(value.title).attr('value', value.id));
 
 	                     have_content = true; // Lame...
 	                 });
 
-                     if (have_content) {
-                         $('#content_selector_empty').addClass('hide');
-                         $('#content_selector').removeClass('hide');
-                     }
-                     else {
-                         $('#content_selector_empty').removeClass('hide');
-                         $('#content_selector').addClass('hide');
-                     }
+	                 if (have_content) {
+	                     $('#attribute_value_selector_empty').addClass('hide');
+	                     $('#attribute_value_selector').removeClass('hide');
+	                 }
+	                 else {
+	                     $('#attribute_value_selector_empty').removeClass('hide');
+	                     $('#attribute_value_selector').addClass('hide');
+	                 }
 
-                 }
-            });
-        }
-        else {
-            $('#content_selector_empty').addClass('hide');
-            $('#content_selector').addClass('hide');
-        }
+	             }
+	        });
+	    }
+	    else {
+	        $('#attribute_value_selector_empty').addClass('hide');
+	        $('#attribute_value_selector').addClass('hide');
+	    }
+	});
+
+    // Add selected value to the combination
+    $('.add-value-to-combination').click(function(event) {
+
+    	// Hide error message
+    	$('#combination_attributes_error').text('').addClass('hide');
+
+    	// Select all elements
+    	$('#combination_attributes option').prop('selected', 'selected');
+
+        $.ajax({
+            url      : '{url path="/admin/product/$product_id/add-attribute-value-to-combination/"}'
+                            + $('#attribute_value_id').val()
+                            + '/'
+                            + $('#combination_attributes').val()
+                            + '.xml',
+            type     : 'get',
+            dataType : 'json',
+            success  : function(json) {
+                $('#combination_attributes option').remove();
+
+                var have_content = false;
+
+                $.each(json, function(idx, value) {
+                	if (idx != 'error')
+                	    $('#combination_attributes').append($('<option>').text(value.title).attr('value', value.id));
+                });
+
+                if (json.error)
+                    $('#combination_attributes_error').text(json.error).removeClass('hide');
+
+                $('#attribute_id').val('').change();
+            }
+       });
+
+    	event.preventDefault();
     });
 
-    // Load content on folder selection
-    $('#accessory_category_id').change(function(event) {
-        var val = $(this).val();
+    // Remove selected value from combination
+    $('.remove-value-from-combination').click(function() {
 
-        if (val != "") {
-            $.ajax({
-                 url      : '{url path="/admin/product/$product_id/available-accessories/"}' + $(this).val() + '.xml',
-                 type     : 'get',
-                 dataType : 'json',
-                 success  : function(json) {
-                     $('#accessory_id :not(:first-child)').remove();
+    	$('#combination_attributes option:selected').remove();
 
-                     var have_content = false;
-
-                     $.each(json, function(idx, value) {
-                         $('#accessory_id').append($('<option>').text(value.title).attr('value', value.id));
-
-                         have_content = true; // Lame...
-                     });
-
-                     if (have_content) {
-                         $('#accessory_selector_empty').addClass('hide');
-                         $('#accessory_selector').removeClass('hide');
-                     }
-                     else {
-                         $('#accessory_selector_empty').removeClass('hide');
-                         $('#accessory_selector').addClass('hide');
-                     }
-
-                 }
-            });
-        }
-        else {
-            $('#accessory_selector_empty').addClass('hide');
-            $('#accessory_selector').addClass('hide');
-        }
+    	event.preventDefault();
     });
 
-    {* Inline editing of accessory position using bootstrap-editable *}
-
-    $('.accessoryPositionChange').editable({
-        type        : 'text',
-        title       : '{intl l="Enter new accessory position"}',
-        mode        : 'popup',
-        inputclass  : 'input-mini',
-        placement   : 'left',
-        success     : function(response, newValue) {
-            // The URL template
-            var url = "{url path='admin/product/update-accessory-position/' accessory_id='__ID__' product_id=$product_id position='__POS__'}";
-
-            // Perform subtitutions
-            url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);
-
-            // Reload the page
-            location.href = url;
-        }
+    // Set proper category ID in combination delete from
+    $('a.combination-delete').click(function(ev) {
+        $('#combination_delete_id').val($(this).data('id'));
     });
 
-    // Initialize folder (id={$folder_id}) select value
-    {if $folder_id != 0}
-        $('#folder_id').val("{$folder_id}").change();
-    {/if}
+    // In create combination dialog, select all element of conbination list
+    $('#combination_creation_dialog_ok').click(function() {
+    	$('#combination_attributes option').prop('selected', 'selected');
+    });
 
-    // Initialize folder (id={$folder_id}) select value
-    {if $accessory_category_id != 0}
-        $('#accessory_category_id').val("{$accessory_category_id}").change();
-    {/if}
 });
 </script>
+
+
 {/block}

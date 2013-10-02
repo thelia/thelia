@@ -60,10 +60,10 @@ class Argument
     {
         $x = $value === null;
 
-        if($value === null) {
+        if ($value === null) {
             $this->value = null;
         } else {
-            if(false === $value) {
+            if (false === $value) {
                 /* (string) $value = "" */
                 $this->value = 0;
             } else {

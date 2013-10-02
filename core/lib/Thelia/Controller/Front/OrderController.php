@@ -23,8 +23,9 @@
 namespace Thelia\Controller\Front;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Event\OrderEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Form\OrderDelivery;
@@ -32,9 +33,10 @@ use Thelia\Form\OrderPayment;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
-use Thelia\Model\CountryQuery;
+use Thelia\Model\Base\OrderQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
+use Thelia\Tools\URL;
 
 /**
  * Class OrderController
@@ -66,7 +68,7 @@ class OrderController extends BaseFrontController
 
             /* check that the delivery address belongs to the current customer */
             $deliveryAddress = AddressQuery::create()->findPk($deliveryAddressId);
-            if($deliveryAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
+            if ($deliveryAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
                 throw new \Exception("Delivery address does not belong to the current customer");
             }
 
@@ -78,11 +80,8 @@ class OrderController extends BaseFrontController
                 throw new \Exception("Delivery module cannot be use with selected delivery address");
             }
 
-            /* try to get postage amount */
+            /* get postage amount */
             $moduleReflection = new \ReflectionClass($deliveryModule->getFullNamespace());
-            if ($moduleReflection->isSubclassOf("Thelia\Module\DeliveryModuleInterface") === false) {
-                throw new \RuntimeException(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $deliveryModule->getCode()));
-            }
             $moduleInstance = $moduleReflection->newInstance();
             $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
 
@@ -139,7 +138,7 @@ class OrderController extends BaseFrontController
 
             /* check that the invoice address belongs to the current customer */
             $invoiceAddress = AddressQuery::create()->findPk($invoiceAddressId);
-            if($invoiceAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
+            if ($invoiceAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
                 throw new \Exception("Invoice address does not belong to the current customer");
             }
 
@@ -190,6 +189,36 @@ class OrderController extends BaseFrontController
         $orderEvent = $this->getOrderEvent();
 
         $this->getDispatcher()->dispatch(TheliaEvents::ORDER_PAY, $orderEvent);
+
+        $placedOrder = $orderEvent->getPlacedOrder();
+
+        if (null !== $placedOrder && null !== $placedOrder->getId()) {
+            /* order has been placed */
+            $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute('order.placed', array('order_id' => $orderEvent->getPlacedOrder()->getId()))));
+        } else {
+            /* order has not been placed */
+            $this->redirectToRoute("cart.view");
+        }
+    }
+
+    public function orderPlaced($order_id)
+    {
+        /* check if the placed order matched the customer */
+        $placedOrder = OrderQuery::create()->findPk(
+            $this->getRequest()->attributes->get('order_id')
+        );
+
+        if (null === $placedOrder) {
+            throw new TheliaProcessException("No placed order", TheliaProcessException::NO_PLACED_ORDER, $placedOrder);
+        }
+
+        $customer = $this->getSecurityContext()->getCustomerUser();
+
+        if (null === $customer || $placedOrder->getCustomerId() !== $customer->getId()) {
+            throw new TheliaProcessException("Received placed order id does not belong to the current customer", TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER, $placedOrder);
+        }
+
+        $this->getParserContext()->set("placed_order_id", $placedOrder->getId());
     }
 
     protected function getOrderEvent()

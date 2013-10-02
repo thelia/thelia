@@ -23,10 +23,7 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Core\Event\CachedFileEvent;
-use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
 /**
@@ -50,7 +47,7 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * @return string root of the file cache directory in web space
      */
-    protected abstract function getCacheDirFromWebRoot();
+    abstract protected function getCacheDirFromWebRoot();
 
     /**
      * Clear the file cache. Is a subdirectory is specified, only this directory is cleared.
@@ -104,9 +101,9 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * Return the full path of the cached file
      *
-     * @param  string  $subdir             the subdirectory related to cache base
-     * @param  string  $filename           the filename
-     * @param  string  $hashed_options     a hash of transformation options, or null if no transformations have been applied
+     * @param  string  $subdir                the subdirectory related to cache base
+     * @param  string  $filename              the filename
+     * @param  string  $hashed_options        a hash of transformation options, or null if no transformations have been applied
      * @param  boolean $forceOriginalDocument if true, the original file path in the cache dir is returned.
      * @return string  the cache directory path relative to Web Root
      */

@@ -56,7 +56,7 @@ class ReloadDatabaseCommand extends BaseModuleGenerate
 
         $tables = $connection->query("SHOW TABLES");
         $connection->query("SET FOREIGN_KEY_CHECKS = 0");
-        foreach($tables as $table) {
+        foreach ($tables as $table) {
             $connection->query(sprintf("DROP TABLE `%s`", $table[0]));
         }
         $connection->query("SET FOREIGN_KEY_CHECKS = 1");

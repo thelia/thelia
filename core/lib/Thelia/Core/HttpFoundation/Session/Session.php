@@ -51,33 +51,16 @@ class Session extends BaseSession
     public function getLang($forceDefault = true)
     {
         $lang = $this->get("thelia.current.lang");
-        if(null === $lang && $forceDefault)
-        {
+        if (null === $lang && $forceDefault) {
             $lang = Lang::getDefaultLanguage();
         }
+
         return $lang;
     }
 
     public function setLang(Lang $lang)
     {
         $this->set("thelia.current.lang", $lang);
-
-        return $this;
-    }
-
-    public function getAdminEditionLang()
-    {
-        $lang = $this->get('thelia.admin.edition.lang');
-
-        if (null === $lang) {
-            $lang =  Lang::getDefaultLanguage();
-        }
-        return $lang;
-    }
-
-    public function setAdminEditionLang($langId)
-    {
-        $this->set('thelia.admin.edition.lang', $langId);
 
         return $this;
     }
@@ -91,11 +74,49 @@ class Session extends BaseSession
     {
         $currency = $this->get("thelia.current.currency");
 
-        if(null === $currency && $forceDefault)
-        {
+        if (null === $currency && $forceDefault) {
             $currency = Currency::getDefaultCurrency();
         }
+
         return $currency;
+    }
+
+    // -- Admin lang and currency ----------------------------------------------
+
+    public function getAdminEditionCurrency()
+    {
+        $currency = $this->get('thelia.admin.edition.currency', null);
+
+        if (null === $currency) {
+            $currency =  Currency::getDefaultCurrency();
+        }
+
+        return $currency;
+    }
+
+    public function setAdminEditionCurrency($currencyId)
+    {
+        $this->set('thelia.admin.edition.currency', $currencyId);
+
+        return $this;
+    }
+
+    public function getAdminEditionLang()
+    {
+        $lang = $this->get('thelia.admin.edition.lang');
+
+        if (null === $lang) {
+            $lang =  Lang::getDefaultLanguage();
+        }
+
+        return $lang;
+    }
+
+    public function setAdminEditionLang($lang)
+    {
+        $this->set('thelia.admin.edition.lang', $lang);
+
+        return $this;
     }
 
     // -- Customer user --------------------------------------------------------
@@ -167,7 +188,7 @@ class Session extends BaseSession
         $cart = null;
         if ($cart_id) {
             $cart = CartQuery::create()->findPk($cart_id);
-            if($cart) {
+            if ($cart) {
                 try {
                     $this->verifyValidCart($cart);
                 } catch (InvalidCartException $e) {
@@ -210,7 +231,6 @@ class Session extends BaseSession
 
     // -- Order ------------------------------------------------------------------
 
-
     public function setOrder(Order $order)
     {
         $this->set("thelia.order", $order);
@@ -225,7 +245,6 @@ class Session extends BaseSession
     {
         return $this->get("thelia.order");
     }
-
 
     /**
      * Set consumed coupons by the Customer

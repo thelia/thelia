@@ -234,7 +234,9 @@ class Content extends BaseI18nLoop
                 ->set("DESCRIPTION", $content->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $content->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $content->getPosition())
+                ->set("DEFAULT_FOLDER", $content->getDefaultFolderId())
                 ->set("URL", $content->getUrl($locale))
+                ->set("VISIBLE", $content->getVisible())
             ;
 
             $loopResult->addRow($loopResultRow);

@@ -331,7 +331,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url path='/admin/configuration/currencies/update-position' currency_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp='1' path='/admin/configuration/currencies/update-position' currency_id='__ID__' position='__POS__'}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id'))

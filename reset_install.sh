@@ -9,6 +9,9 @@ read test
 echo -e "\n\033[01;34m[INFO] Clearing caches\033[00m\n"
 php Thelia cache:clear
 
+echo -e "\n\033[01;34m[INFO] Self-updating Composer\033[00m\n"
+composer self-update
+
 echo -e "\n\033[01;34m[INFO] Downloading vendors\033[00m\n"
 composer install --prefer-dist --optimize-autoloader
 

@@ -42,6 +42,7 @@ use Thelia\Log\Tlog;
 use Symfony\Component\Routing\Router;
 use Thelia\Model\Admin;
 use Thelia\Core\Security\Token\CookieTokenProvider;
+use Thelia\Model\CurrencyQuery;
 
 class BaseAdminController extends BaseController
 {
@@ -251,6 +252,23 @@ class BaseAdminController extends BaseController
     }
 
     /**
+     * Get the current edition currency ID, checking if a change was requested in the current request.
+     */
+    protected function getCurrentEditionCurrency()
+    {
+        // Return the new language if a change is required.
+        if (null !== $edit_currency_id = $this->getRequest()->get('edit_currency_id', null)) {
+
+            if (null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
+                return $edit_currency;
+            }
+        }
+
+        // Otherwise return the lang stored in session.
+        return $this->getSession()->getAdminEditionCurrency();
+    }
+
+    /**
      * Get the current edition lang ID, checking if a change was requested in the current request.
      */
     protected function getCurrentEditionLang()
@@ -275,20 +293,19 @@ class BaseAdminController extends BaseController
         return $this->getCurrentEditionLang()->getLocale();
     }
 
-
     /**
      * Return the current list order identifier for a given object name,
      * updating in using the current request.
      *
-     * @param unknown $objectName the object name (e.g. 'attribute', 'message')
+     * @param unknown $objectName           the object name (e.g. 'attribute', 'message')
      * @param unknown $requestParameterName the name of the request parameter that defines the list order
-     * @param unknown $defaultListOrder the default order to use, if none is defined
-     * @param string $updateSession if true, the session will be updated with the current order.
+     * @param unknown $defaultListOrder     the default order to use, if none is defined
+     * @param string  $updateSession        if true, the session will be updated with the current order.
      *
      * @return String the current liste order.
      */
-    protected function getListOrderFromSession($objectName, $requestParameterName, $defaultListOrder, $updateSession = true) {
-
+    protected function getListOrderFromSession($objectName, $requestParameterName, $defaultListOrder, $updateSession = true)
+    {
         $order = $defaultListOrder;
 
         $orderSessionIdentifier = sprintf("admin.%s.currentListOrder", $objectName);
@@ -300,7 +317,6 @@ class BaseAdminController extends BaseController
         );
 
         if ($updateSession) $this->getSession()->set($orderSessionIdentifier, $order);
-
         return $order;
     }
 
@@ -335,8 +351,8 @@ class BaseAdminController extends BaseController
     /** Clear the remember me cookie.
      *
      */
-    protected function clearRememberMeCookie() {
-
+    protected function clearRememberMeCookie()
+    {
         $ctp = new CookieTokenProvider();
 
         $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
@@ -376,6 +392,9 @@ class BaseAdminController extends BaseController
         // Find the current edit language ID
         $edition_language = $this->getCurrentEditionLang();
 
+        // Find the current edit currency ID
+        $edition_currency = $this->getCurrentEditionCurrency();
+
         // Prepare common template variables
         $args = array_merge($args, array(
             'locale'               => $session->getLang()->getLocale(),
@@ -385,11 +404,16 @@ class BaseAdminController extends BaseController
             'edit_language_id'     => $edition_language->getId(),
             'edit_language_locale' => $edition_language->getLocale(),
 
+            'edit_currency_id'     => $edition_currency->getId(),
+
             'current_url'          => $this->getRequest()->getUri()
         ));
 
-        // Update the current edition language in session
-        $this->getSession()->setAdminEditionLang($edition_language);
+        // Update the current edition language & currency in session
+        $this->getSession()
+            ->setAdminEditionLang($edition_language)
+            ->setAdminEditionCurrency($edition_currency)
+        ;
 
         // Render the template.
         try {

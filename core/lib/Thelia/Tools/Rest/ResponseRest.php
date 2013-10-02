@@ -26,7 +26,7 @@ class ResponseRest extends Response
      * Constructor.
      *
      * @param array   $data    Array to be serialized
-     * @param string  $format  serialization format, xml or json available
+     * @param string  $format  serialization format, text, xml or json available
      * @param integer $status  The response status code
      * @param array   $headers An array of response headers
      *
@@ -38,14 +38,22 @@ class ResponseRest extends Response
     {
         parent::__construct('', $status, $headers);
 
-        $this->format = $format;
-        $serializer = $this->getSerializer();
+        if ($format == 'text') {
+            if (isset($data)) {
+                $this->setContent($data);
+            }
 
-        if (isset($data)) {
-            $this->setContent($serializer->serialize($data, $this->format));
+            $this->headers->set('Content-Type', 'text/plain');
+        } else {
+            $this->format = $format;
+            $serializer = $this->getSerializer();
+
+            if (isset($data)) {
+                $this->setContent($serializer->serialize($data, $this->format));
+            }
+
+            $this->headers->set('Content-Type', 'application/' . $this->format);
         }
-
-        $this->headers->set('Content-Type', 'application/' . $this->format);
     }
 
     /**

@@ -30,24 +30,17 @@ use Thelia\Model\Template as TemplateModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\TemplateUpdateEvent;
-use Thelia\Core\Event\TemplateCreateEvent;
-use Thelia\Core\Event\TemplateDeleteEvent;
-use Thelia\Model\ConfigQuery;
-use Thelia\Model\TemplateAv;
-use Thelia\Model\TemplateAvQuery;
+use Thelia\Core\Event\Template\TemplateUpdateEvent;
+use Thelia\Core\Event\Template\TemplateCreateEvent;
+use Thelia\Core\Event\Template\TemplateDeleteEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\CategoryEvent;
-use Thelia\Core\Event\TemplateEvent;
-use Thelia\Model\TemplateTemplate;
-use Thelia\Model\TemplateTemplateQuery;
 use Thelia\Model\ProductQuery;
-use Thelia\Core\Event\TemplateAddAttributeEvent;
-use Thelia\Core\Event\TemplateDeleteAttributeEvent;
+use Thelia\Core\Event\Template\TemplateAddAttributeEvent;
+use Thelia\Core\Event\Template\TemplateDeleteAttributeEvent;
 use Thelia\Model\AttributeTemplateQuery;
 use Thelia\Model\AttributeTemplate;
-use Thelia\Core\Event\TemplateDeleteFeatureEvent;
-use Thelia\Core\Event\TemplateAddFeatureEvent;
+use Thelia\Core\Event\Template\TemplateDeleteFeatureEvent;
+use Thelia\Core\Event\Template\TemplateAddFeatureEvent;
 use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Model\FeatureTemplate;
 
@@ -56,7 +49,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Create a new template entry
      *
-     * @param TemplateCreateEvent $event
+     * @param \Thelia\Core\Event\Template\TemplateCreateEvent $event
      */
     public function create(TemplateCreateEvent $event)
     {
@@ -77,7 +70,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Change a product template
      *
-     * @param TemplateUpdateEvent $event
+     * @param \Thelia\Core\Event\Template\TemplateUpdateEvent $event
      */
     public function update(TemplateUpdateEvent $event)
     {
@@ -99,7 +92,7 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product template entry
      *
-     * @param TemplateDeleteEvent $event
+     * @param \Thelia\Core\Event\Template\TemplateDeleteEvent $event
      */
     public function delete(TemplateDeleteEvent $event)
     {
@@ -121,8 +114,8 @@ class Template extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function addAttribute(TemplateAddAttributeEvent $event) {
-
+    public function addAttribute(TemplateAddAttributeEvent $event)
+    {
         if (null === AttributeTemplateQuery::create()->filterByAttributeId($event->getAttributeId())->filterByTemplate($event->getTemplate())->findOne()) {
 
             $attribute_template = new AttributeTemplate();
@@ -135,8 +128,28 @@ class Template extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function deleteAttribute(TemplateDeleteAttributeEvent $event) {
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param CategoryChangePositionEvent $event
+     */
+    public function updateAttributePosition(UpdatePositionEvent $event)
+    {
+        return $this->genericUpdatePosition(AttributeTemplateQuery::create(), $event);
+    }
 
+    /**
+     * Changes position, selecting absolute ou relative change.
+     *
+     * @param CategoryChangePositionEvent $event
+     */
+    public function updateFeaturePosition(UpdatePositionEvent $event)
+    {
+        return $this->genericUpdatePosition(FeatureTemplateQuery::create(), $event);
+    }
+
+    public function deleteAttribute(TemplateDeleteAttributeEvent $event)
+    {
         $attribute_template = AttributeTemplateQuery::create()
             ->filterByAttributeId($event->getAttributeId())
             ->filterByTemplate($event->getTemplate())->findOne()
@@ -145,8 +158,8 @@ class Template extends BaseAction implements EventSubscriberInterface
         if ($attribute_template !== null) $attribute_template->delete();
     }
 
-    public function addFeature(TemplateAddFeatureEvent $event) {
-
+    public function addFeature(TemplateAddFeatureEvent $event)
+    {
         if (null === FeatureTemplateQuery::create()->filterByFeatureId($event->getFeatureId())->filterByTemplate($event->getTemplate())->findOne()) {
 
             $feature_template = new FeatureTemplate();
@@ -159,8 +172,8 @@ class Template extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function deleteFeature(TemplateDeleteFeatureEvent $event) {
-
+    public function deleteFeature(TemplateDeleteFeatureEvent $event)
+    {
         $feature_template = FeatureTemplateQuery::create()
             ->filterByFeatureId($event->getFeatureId())
             ->filterByTemplate($event->getTemplate())->findOne()
@@ -184,6 +197,9 @@ class Template extends BaseAction implements EventSubscriberInterface
 
             TheliaEvents::TEMPLATE_ADD_FEATURE    => array("addFeature", 128),
             TheliaEvents::TEMPLATE_DELETE_FEATURE => array("deleteFeature", 128),
+
+            TheliaEvents::TEMPLATE_CHANGE_ATTRIBUTE_POSITION => array('updateAttributePosition', 128),
+            TheliaEvents::TEMPLATE_CHANGE_FEATURE_POSITION   => array('updateFeaturePosition', 128),
 
         );
     }
