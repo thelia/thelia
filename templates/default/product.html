@@ -1,21 +1,19 @@
 {extends file="layout.tpl"}
 
+{* Body Class *}
 {block name="body-class"}page-product{/block}
 
-{block name="breadcrumb"}
-    <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">{intl l="You are here"}: </strong>
-        <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
-            {loop type="product" name="product_breadcrumb" id="{product attr="id"}"}
-                {loop name="category_path" type="category-path" category="{$DEFAULT_CATEGORY}"}
-                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{$URL}" itemprop="url"><span itemprop="title">{$TITLE}</span></a></li>
-                {/loop}
-                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{$TITLE}</span></li>
-            {/loop}
-        </ul>
-    </nav><!-- /.nav-breadcrumb -->
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$sBreadcrumb = []}
+    {loop type="product" name="product_breadcrumb" id="{product attr="id"}"}
+        {loop name="category_path" type="category-path" category="{$DEFAULT_CATEGORY}"}
+            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+        {/loop}
+        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+    {/loop}
 {/block}
+
 
 {block name="main-content"}
     <div class="main">

@@ -23,7 +23,7 @@ URL: http://www.thelia.net
     <meta charset="utf-8">
 
     {* Page Title *}
-    <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.name} | {/foreach}{/if}Thelia{/strip}{/block}</title>
+    <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title} | {/foreach}{/if}Thelia{/strip}{/block}</title>
 
     {* Meta Tags *}
     <meta name="description" content="">

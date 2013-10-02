@@ -6,8 +6,8 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = [
-        ['name' => {intl l="Cart"}, 'link'=>{url path="/cart"}],
-        ['name' => {intl l="Secure Payment"}, 'link'=>{url path="/order/pay"}]
+        ['title' => {intl l="Cart"}, 'url'=>{url path="/cart"}],
+        ['title' => {intl l="Secure Payment"}, 'url'=>{url path="/order/pay"}]
     ]}
 {/block}
 

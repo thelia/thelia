@@ -4,11 +4,11 @@
         <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
 
         {foreach $breadcrumbs as $breadcrumb}
-        {if $breadcrumb.name}
+        {if $breadcrumb.title}
             {if $breadcrumb@last}
-                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{$breadcrumb.name}</span></li>
+                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{$breadcrumb.title}</span></li>
             {else}
-                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{if $breadcrumb.link}{$breadcrumb.link}{else}#{/if}"  title="{$breadcrumb.name}" itemprop="url"><span itemprop="title">{$breadcrumb.name}</span></a></li>
+                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{$breadcrumb.url|default:'#' nofilter}"  title="{$breadcrumb.title}" itemprop="url"><span itemprop="title">{$breadcrumb.title}</span></a></li>
             {/if}
         {/if}
         {/foreach}

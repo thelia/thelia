@@ -1,22 +1,16 @@
 {extends file='layout.tpl'}
 
-{block name="breadcrumb"}
-    <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">You are here: </strong>
-        <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
-            {loop name="category_path" type="category-path" category="{category attr="id"}"}
-            {if $ID == {category attr="id"}}
-                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active">
-                    <span itemprop="title">{$TITLE}</span>
-                </li>
-            {else}
-                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{$URL}"  itemprop="url"><span itemprop="title">{$TITLE}</span></a></li>
-            {/if}
-            {/loop}
-        </ul>
-    </nav><!-- /.nav-breadcrumb -->
+{* Body Class *}
+{block name="body-class"}page-category{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$sBreadcrumb = []}
+    {loop name="category_path" type="category-path" category="{category attr="id"}"}
+        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
+    {/loop}
 {/block}
+
 
 {block name="main-content"}
     <div class="main layout-col-2-left">
