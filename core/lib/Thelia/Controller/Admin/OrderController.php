@@ -226,7 +226,7 @@ class OrderController extends BaseAdminController
             }
 
         } catch (\Exception $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during generating invoice pdf for order id : %d', $order_id));
+            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during generating invoice pdf for order id : %d with message "%s"', $order_id, $e->getMessage()));
 
         }
 

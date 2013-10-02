@@ -3,30 +3,31 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "39e5fa13bfa3de21f03854c90a076713",
+    "hash": "852879ecc2e39e5cf283a3b1c5051a8e",
     "packages": [
         {
-            "name": "dompdf/dompdf",
-            "version": "dev-master",
+            "name": "ensepar/html2pdf",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/dompdf/dompdf.git",
-                "reference": "3a8a09240159ac084f0c4b607eb12ca83ddbe318"
+                "url": "https://github.com/OwlyCode/html2pdf.git",
+                "reference": "b53a27430cc35b29bbe2faaa55ed4a7d5c156cd3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/3a8a09240159ac084f0c4b607eb12ca83ddbe318",
-                "reference": "3a8a09240159ac084f0c4b607eb12ca83ddbe318",
+                "url": "https://api.github.com/repos/OwlyCode/html2pdf/zipball/b53a27430cc35b29bbe2faaa55ed4a7d5c156cd3",
+                "reference": "b53a27430cc35b29bbe2faaa55ed4a7d5c156cd3",
                 "shasum": ""
             },
             "require": {
-                "phenx/php-font-lib": "0.2.*"
+                "ensepar/tcpdf": "5.0.003",
+                "php": ">=5.2"
             },
             "type": "library",
             "autoload": {
-                "classmap": [
-                    "include/"
-                ]
+                "psr-0": {
+                    "HTML2PDF": "."
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -34,17 +35,79 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien Ménager",
-                    "email": "fabien.menager@gmail.com"
+                    "name": "Spipu",
+                    "homepage": "http://sourceforge.net/users/spipu",
+                    "role": "Developer"
                 },
                 {
-                    "name": "Brian Sweeney",
-                    "email": "eclecticgeek@gmail.com"
+                    "name": "OwlyCode",
+                    "homepage": "http://www.github.com/OwlyCode",
+                    "role": "Developer"
                 }
             ],
-            "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
-            "homepage": "https://github.com/dompdf/dompdf",
-            "time": "2013-09-04 20:59:58"
+            "description": "Unofficial fork of 'html2pdf' with Composer support. (Fixed composer dependency problem)",
+            "homepage": "https://github.com/jwronsky/html2pdf",
+            "keywords": [
+                "html",
+                "html2pdf",
+                "pdf"
+            ],
+            "time": "2013-09-13 12:23:43"
+        },
+        {
+            "name": "ensepar/tcpdf",
+            "version": "5.0.003",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/OwlyCode/tcpdf.git",
+                "reference": "ae578409e9454fdf6c794cce6f063b0c95bfa518"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/OwlyCode/tcpdf/zipball/ae578409e9454fdf6c794cce6f063b0c95bfa518",
+                "reference": "ae578409e9454fdf6c794cce6f063b0c95bfa518",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "fonts",
+                    "config/lang",
+                    "config",
+                    "2dbarcodes.php",
+                    "barcodes.php",
+                    "htmlcolors.php",
+                    "qrcode.php",
+                    "tcpdf.php",
+                    "unicode_data.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPLv3"
+            ],
+            "authors": [
+                {
+                    "name": "Nicola Asuni",
+                    "email": "info@tecnick.com",
+                    "homepage": "http://nicolaasuni.tecnick.com"
+                },
+                {
+                    "name": "Tristan Maindron",
+                    "email": "tmaindron@gmail.com",
+                    "homepage": "http://www.github.com/OwlyCode"
+                }
+            ],
+            "description": "TCPDF is a PHP class for generating PDF documents.",
+            "homepage": "http://www.tcpdf.org/",
+            "keywords": [
+                "TCPDF",
+                "pdf"
+            ],
+            "time": "2013-09-12 17:00:40"
         },
         {
             "name": "imagine/imagine",
@@ -248,40 +311,6 @@
             "description": "lessphp is a compiler for LESS written in PHP.",
             "homepage": "http://leafo.net/lessphp/",
             "time": "2013-08-09 17:09:19"
-        },
-        {
-            "name": "phenx/php-font-lib",
-            "version": "0.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/PhenX/php-font-lib.git",
-                "reference": "42a1ca6d19f14076911a118705b771c3a5a8b179"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/PhenX/php-font-lib/zipball/42a1ca6d19f14076911a118705b771c3a5a8b179",
-                "reference": "42a1ca6d19f14076911a118705b771c3a5a8b179",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "classes/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Ménager",
-                    "email": "fabien.menager@gmail.com"
-                }
-            ],
-            "description": "A library to read, parse, export and make subsets of different types of font files.",
-            "homepage": "https://github.com/PhenX/php-font-lib",
-            "time": "2013-02-22 23:30:49"
         },
         {
             "name": "propel/propel",
@@ -1839,6 +1868,40 @@
             "time": "2013-09-11 13:01:19"
         },
         {
+            "name": "phenx/php-font-lib",
+            "version": "0.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PhenX/php-font-lib.git",
+                "reference": "42a1ca6d19f14076911a118705b771c3a5a8b179"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PhenX/php-font-lib/zipball/42a1ca6d19f14076911a118705b771c3a5a8b179",
+                "reference": "42a1ca6d19f14076911a118705b771c3a5a8b179",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "classes/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Ménager",
+                    "email": "fabien.menager@gmail.com"
+                }
+            ],
+            "description": "A library to read, parse, export and make subsets of different types of font files.",
+            "homepage": "https://github.com/PhenX/php-font-lib",
+            "time": "2013-02-22 23:30:49"
+        },
+        {
             "name": "phpunit/php-code-coverage",
             "version": "1.2.12",
             "source": {
@@ -2218,7 +2281,6 @@
         "ptachoire/cssembed": 20,
         "simplepie/simplepie": 20,
         "imagine/imagine": 20,
-        "dompdf/dompdf": 20,
         "fzaninotto/faker": 20,
         "maximebf/debugbar": 20
     },

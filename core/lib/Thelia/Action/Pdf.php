@@ -37,13 +37,13 @@ class Pdf extends BaseAction implements EventSubscriberInterface
 
     public function generatePdf(PdfEvent $event)
     {
-        require_once THELIA_ROOT . '/core/vendor/dompdf/dompdf/dompdf_config.inc.php';
 
-        $domPdf = new \DOMPDF();
-        $domPdf->load_html($event->getContent());
-        $domPdf->render();
+        $html2pdf = new \HTML2PDF('P', 'A4', 'fr', true, 'UTF-8', array(0,0,0,0));
 
-        $event->setPdf($domPdf->output());
+        $html2pdf->pdf->SetDisplayMode('real');
+
+        $html2pdf->writeHTML($event->getContent());
+        $event->setPdf($html2pdf->output(null, 'S'));
     }
 
     /**
