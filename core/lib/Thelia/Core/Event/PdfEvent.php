@@ -65,4 +65,9 @@ class PdfEvent extends ActionEvent
     {
         return $this->pdf;
     }
+
+    public function hasPdf()
+    {
+        return null !== $this->pdf;
+    }
 }

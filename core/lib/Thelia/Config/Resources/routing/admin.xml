@@ -150,6 +150,11 @@
         <default key="_controller">Thelia\Controller\Admin\OrderController::updateAddress</default>
     </route>
 
+    <route id="admin.order.pdf.invoice" path="/admin/order/pdf/invoice/{order_id}">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::generateInvoicePdf</default>
+        <requirement key="order_id">\d+</requirement>
+    </route>
+
     <!-- end order management -->
 
     <!-- Categories management -->

@@ -23,10 +23,13 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\OrderUpdateAddress;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Base\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
@@ -192,5 +195,43 @@ class OrderController extends BaseAdminController
         $params["tab"] = $this->getRequest()->get("tab", 'bill');
 
         $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", $params)));
+    }
+
+    public function generateInvoicePdf($order_id)
+    {
+        if (null !== $response = $this->checkAuth("admin.order.update")) return $response;
+
+
+        $html = $this->renderRaw(
+            ConfigQuery::read('pdf_invoice_file', 'invoice'),
+            array(
+                'order_id' => $order_id
+            ),
+            ConfigQuery::read('pdf_template', 'pdf')
+        );
+
+        $order = OrderQuery::create()->findPk($order_id);
+
+        try {
+            $pdfEvent = new PdfEvent($html);
+
+            $this->dispatch(TheliaEvents::GENERATE_PDF, $pdfEvent);
+
+            if($pdfEvent->hasPdf()) {
+                return Response::create($pdfEvent->getPdf(), 200,
+                    array(
+                        'Content-type' => "application/pdf",
+                        'Content-Disposition' => sprintf('Attachment;filename=%s.pdf', $order->getRef()),
+                    ));
+            }
+
+        } catch (\Exception $e) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during generating invoice pdf for order id : %d', $order_id));
+
+        }
+
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", array(
+            'order_id' => $order_id
+        ))));
     }
 }

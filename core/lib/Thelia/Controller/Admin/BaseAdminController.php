@@ -187,12 +187,12 @@ class BaseAdminController extends BaseController
     /**
      * @return a ParserInterface instance parser
      */
-    protected function getParser()
+    protected function getParser($template = null)
     {
         $parser = $this->container->get("thelia.parser");
 
         // Define the template thant shoud be used
-        $parser->setTemplate(ConfigQuery::read('base_admin_template', 'admin/default'));
+        $parser->setTemplate($template ?: ConfigQuery::read('base_admin_template', 'admin/default'));
 
         return $parser;
     }
@@ -378,10 +378,12 @@ class BaseAdminController extends BaseController
      * Render the given template, and returns the result as a string.
      *
      * @param $templateName the complete template name, with extension
-     * @param  array                                      $args the template arguments
+     * @param  array $args the template arguments
+     * @param null $templateDir
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function renderRaw($templateName, $args = array())
+    protected function renderRaw($templateName, $args = array(), $templateDir = null)
     {
 
         // Add the template standard extension
@@ -417,7 +419,7 @@ class BaseAdminController extends BaseController
 
         // Render the template.
         try {
-            $data = $this->getParser()->render($templateName, $args);
+            $data = $this->getParser($templateDir)->render($templateName, $args);
 
             return $data;
         } catch (AuthenticationException $ex) {

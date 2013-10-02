@@ -41,6 +41,7 @@ class Pdf extends BaseAction implements EventSubscriberInterface
 
         $domPdf = new \DOMPDF();
         $domPdf->load_html($event->getContent());
+        $domPdf->render();
 
         $event->setPdf($domPdf->output());
     }
@@ -67,7 +68,7 @@ class Pdf extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        array(
+        return array(
             TheliaEvents::GENERATE_PDF => array("generatePdf", 128)
         );
     }
