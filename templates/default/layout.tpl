@@ -11,23 +11,28 @@
 Author: Christophe Laffont
 URL: http://www.thelia.net
 -->
-<!--[if lt IE 7 ]><html class="no-js {lang attr="code"} oldie ie6" lang="{lang attr="code"}"> <![endif]-->
-<!--[if IE 7 ]><html class="no-js {lang attr="code"} oldie ie7" lang="{lang attr="code"}"> <![endif]-->
-<!--[if IE 8 ]><html class="no-js {lang attr="code"} oldie ie8" lang="{lang attr="code"}"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--><html lang="{lang attr="code"}" class="no-js {lang attr="code"}"> <!--<![endif]-->
+{* paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither *}
+<!--[if lt IE 7 ]><html class="no-js oldie ie6" lang="{lang attr="code"}"> <![endif]-->
+<!--[if IE 7 ]><html class="no-js oldie ie7" lang="{lang attr="code"}"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js oldie ie8" lang="{lang attr="code"}"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="{lang attr="code"}" class="no-js"> <!--<![endif]-->
 <head>
+    {* Test if javascript is enabled *}
     <script>(function(H) { H.className=H.className.replace(/\bno-js\b/,'js') } )(document.documentElement);</script>
-    <meta charset="utf-8">
-    <title>{block name="page-title"}Thelia{/block}</title>
 
+    <meta charset="utf-8">
+
+    {* Page Title *}
+    <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.name} | {/foreach}{/if}Thelia{/strip}{/block}</title>
+
+    {* Meta Tags *}
     <meta name="description" content="">
-    <meta name="generator" content="THELIA V2">
+    <meta name="generator" content="{intl l='Thelia V%ver' ver="{$THELIA_VERSION}"}">
     <meta name="robots" content="index,follow">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
     {block name="meta"}{/block}
 
-    <!-- StyleSheet -->
+    {* Stylesheets *}
     {stylesheets file='assets/less/styles.less' filters='less,cssembed'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
@@ -61,41 +66,24 @@ URL: http://www.thelia.net
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="Main Navigation">
                 <ul class="nav navbar-nav navbar-categories">
-                    <li class="active"><a href="{url path="/"}" class="home" tabindex="-1">Home</a></li>
-                    <li class="dropdown">
-                        <a href="" data-toggle="dropdown" class="dropdown-toggle">Pages</a>
-                        <ul class="dropdown-menu list-subnav" role="menu">
-                            <li class="active"><a href="index.html" tabindex="-1">Index</a></li>
-                            <li><a href="category.html">Category Grid</a></li>
-                            <li><a href="category-list.html">Category List</a></li>
-                            <li><a href="account.html">Account</a></li>
-                            <li><a href="login.html">Login</a></li>
-                            <li><a href="password.html">Forgot Password</a></li>
-                            <li><a href="register.html">Register</a></li>
-                            <li><a href="cart.html">Cart</a></li>
-                            <li><a href="cart-step2.html">Cart (Step 2)</a></li>
-                            <li><a href="cart-step3.html">Cart (Step 3)</a></li>
-                            <li><a href="cart-step4.html">Cart (Step 4)</a></li>
-                            <li><a href="product-details.html">Product details</a></li>
-                            <li><a href="address.html">New address</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="{url path="/"}" class="home">{intl l="Home"}</a></li>
                     {loop type="category" name="category.navigation" parent="0" limit="3"}
                         <li><a href="{$URL}">{$TITLE}</a></li>
                     {/loop}
                 </ul>
                 <ul class="nav navbar-nav navbar-cart navbar-right">
                     {loop type="auth" name="customer_info_block" roles="CUSTOMER" context="front"}
-                        <li><a href="{url path="/logout"}" class="register">{intl l="Log out!"}</a></li>
-                        <li><a href="{url path="/customer/account"}" class="login">{intl l="My Account"}</a></li>
+                        <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
+                        <li><a href="{url path="/customer/account"}" class="account">{intl l="My Account"}</a></li>
                     {/loop}
 
                     {elseloop rel="customer_info_block" rel="customer_info_block"}
-                    <li><a href="{url path="/register"}" class="register">{intl l="Register"}!</a></li>
-                    <li><a href="{url path="/login"}" class="login">{intl l="Log In!"}</a></li>
+                        <li><a href="{url path="/register"}" class="register">{intl l="Register"}!</a></li>
+                        <li><a href="{url path="/login"}" class="login">{intl l="Log In!"}</a></li>
                     {/elseloop}
+
                     <li class="dropdown">
-                        <a href="{url path="/cart"}" class="dropdown-toggle cart" data-toggle="dropdown">
+                        <a href="{url path="/cart"}" class="cart" data-toggle="dropdown">
                             Cart <span class="badge">{cart attr="count_item"}</span>
                         </a>
                     </li>
@@ -408,6 +396,7 @@ URL: http://www.thelia.net
 {debugbar_renderjs}
 {debugbar_renderresult}
 
+{* HTML5 shim, for IE6-8 support of HTML5 elements *}
 <!--[if lt IE 9]>
 <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->

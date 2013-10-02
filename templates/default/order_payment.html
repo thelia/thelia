@@ -1,17 +1,16 @@
 {extends file="layout.tpl"}
 
+{* Body Class *}
 {block name="body-class"}page-order-payment{/block}
 
-{block name="breadcrumb"}
-    <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">You are here: </strong>
-        <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">Home</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/cart"}" itemprop="url"><span itemprop="title">Cart</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">Secure Payment</span></li>
-        </ul>
-    </nav><!-- /.nav-breadcrumb -->
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['name' => {intl l="Cart"}, 'link'=>{url path="/cart"}],
+        ['name' => {intl l="Secure Payment"}, 'link'=>{url path="/order/pay"}]
+    ]}
 {/block}
+
 
 {block name="main-content"}
     <div class="main">

@@ -1,7 +1,7 @@
 <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
     <strong id="breadcrumb-label">{intl l="You are here:"}</strong>
     <ul class="breadcrumb" itemprop="breadcrumb">
-        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/login"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
+        <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
 
         {foreach $breadcrumbs as $breadcrumb}
         {if $breadcrumb.name}

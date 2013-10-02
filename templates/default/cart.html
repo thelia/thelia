@@ -1,16 +1,14 @@
 {extends file="layout.tpl"}
 
-{block name="breadcrumb"}
-    <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">You are here: </strong>
-        <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">Home</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">Cart</span></li>
-        </ul>
-    </nav><!-- /.nav-breadcrumb -->
-{/block}
-
+{* Body Class *}
 {block name="body-class"}page-cart{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['name' => {intl l="Cart"}, 'link'=>{url path="/cart"}]
+    ]}
+{/block}
 
 {block name="main-content"}
     <div class="main">

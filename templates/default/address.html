@@ -4,17 +4,15 @@
     {check_auth context="front" roles="CUSTOMER" login_tpl="login"}
 {/block}
 
+{* Body Class *}
 {block name="body-class"}page-address{/block}
 
-{block name="breadcrumb"}
-    <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">You are here: </strong>
-        <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="index.php" itemprop="url"><span itemprop="title">Home</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="index.php" itemprop="url"><span itemprop="title">Account</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{intl l="Address"}</span></li>
-        </ul>
-    </nav><!-- /.nav-breadcrumb -->
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['name' => {intl l="Account"}, 'link'=>{url path="/account"}],
+        ['name' => {intl l="Address"}, 'link'=>{url path="/address"}]
+    ]}
 {/block}
 
 {block name="main-content"}

@@ -1,20 +1,17 @@
 {extends file="layout.tpl"}
 
+* Body Class *}
 {block name="body-class"}page-login{/block}
 
-{block name="breadcrumb"}
-    <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">{intl l="You are here"}: </strong>
-        <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{intl l="Login"}</span></li>
-        </ul>
-    </nav><!-- /.nav-breadcrumb -->
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['name' => {intl l="Login"}, 'link'=>{url path="/login"}]
+    ]}
 {/block}
 
+
 {block name="main-content"}
-
-
     <div class="main">
         <article class="col-main" role="main" aria-labelledby="main-label">
             <h1 id="main-label" class="page-header">{intl l="Login"}</h1>
