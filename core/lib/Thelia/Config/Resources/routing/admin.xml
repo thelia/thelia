@@ -123,9 +123,9 @@
 
     <!-- end Customer rule management -->
 
-    <!-- Order rule management -->
+    <!-- order management -->
 
-    <route id="admin.order" path="/admin/order">
+    <route id="admin.order.list" path="/admin/orders">
         <default key="_controller">Thelia\Controller\Admin\OrderController::indexAction</default>
     </route>
 
@@ -134,7 +134,23 @@
         <requirement key="order_id">\d+</requirement>
     </route>
 
-    <!-- end Customer rule management -->
+    <route id="admin.order.list.update.status" path="/admin/order/update/status">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::updateStatus</default>
+    </route>
+
+    <route id="admin.order.update.status" path="/admin/order/update/{order_id}/status">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::updateStatus</default>
+    </route>
+
+    <route id="admin.order.update.deliveryRef" path="/admin/order/update/{order_id}/delivery-ref">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::updateDeliveryRef</default>
+    </route>
+
+    <route id="admin.order.update.address" path="/admin/order/update/{order_id}/address">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::updateAddress</default>
+    </route>
+
+    <!-- end order management -->
 
     <!-- Categories management -->
 
@@ -367,29 +383,54 @@
         <default key="_controller">Thelia\Controller\Admin\ContentController::processUpdateAction</default>
     </route>
 
+    <route id="admin.content.update-position" path="/admin/content/update-position">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::updatePositionAction</default>
+    </route>
+
+    <route id="admin.content.toggle-online" path="/admin/content/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::setToggleVisibilityAction</default>
+    </route>
+
+    <route id="admin.content.delete" path="/admin/content/delete">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::deleteAction</default>
+    </route>
+
+    <route id="admin.content.additional-folder.add" path="/admin/content/folder/add">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::addAdditionalFolderAction</default>
+    </route>
+
+    <route id="admin.content.additional-folder.delete" path="/admin/content/folder/delete">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::removeAdditionalFolderAction</default>
+    </route>
+
 
     <!-- Route to the Coupon controller (process Coupon browsing) -->
 
-    <route id="admin.coupon.list" path="/admin/coupon/">
+    <route id="admin.coupon.list" path="/admin/coupon">
         <default key="_controller">Thelia\Controller\Admin\CouponController::browseAction</default>
     </route>
-    <route id="admin.coupon.create" path="/admin/coupon/create/">
+    <route id="admin.coupon.create" path="/admin/coupon/create">
         <default key="_controller">Thelia\Controller\Admin\CouponController::createAction</default>
     </route>
-    <route id="admin.coupon.update" path="/admin/coupon/update/{couponId}/">
+    <route id="admin.coupon.update" path="/admin/coupon/update/{couponId}">
         <default key="_controller">Thelia\Controller\Admin\CouponController::updateAction</default>
+        <requirement key="couponId">\d+</requirement>
     </route>
-    <route id="admin.coupon.read" path="/admin/coupon/read/{couponId}/">
+    <route id="admin.coupon.read" path="/admin/coupon/read/{couponId}">
         <default key="_controller">Thelia\Controller\Admin\CouponController::readAction</default>
+        <requirement key="couponId">\d+</requirement>
     </route>
-    <route id="admin.coupon.rule.input" path="/admin/coupon/rule/{ruleId}/">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::getRuleInputAction</default>
+    <route id="admin.coupon.condition.input" path="/admin/coupon/condition/{conditionId}">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::getConditionInputAction</default>
+        <requirement key="conditionId">.*</requirement>
     </route>
-    <route id="admin.coupon.rule.update" path="/admin/coupon/{couponId}/rule/update/">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::updateRulesAction</default>
+    <route id="admin.coupon.condition.update" path="/admin/coupon/{couponId}/condition/update">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::updateConditionsAction</default>
+        <requirement key="couponId">\d+</requirement>
     </route>
-    <route id="admin.coupon.consume" path="/admin/coupon/consume/{couponCode}/">
+    <route id="admin.coupon.consume" path="/admin/coupon/consume/{couponCode}">
         <default key="_controller">Thelia\Controller\Admin\CouponController::consumeAction</default>
+        <requirement key="couponCode">.*</requirement>
     </route>
 
     <!-- Routes to the Config (system variables) controller -->

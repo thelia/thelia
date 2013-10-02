@@ -8,7 +8,7 @@
     <nav>
         <ul class="breadcrumb">
             <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
-            <li><a href="{url path='admin/coupon/'}">{intl l='Coupon'}</a></li>
+            <li><a href="{url path='admin/coupon'}">{intl l='Coupon'}</a></li>
             <li>{intl l='Browse'}</li>
         </ul>
     </nav>
@@ -31,7 +31,7 @@
     	    			<tr>
     	    				<th>{block name="coupon-label-code"}{intl l='Code'}{/block}</th>
     	    				<th>{block name="coupon-label-title"}{intl l='Title'}{/block}</th>
-    	    				<th>{block name="coupon-label-expiration-date"}{intl l='Expiration date'}{/block}</th>
+    	    				<th>{block name="coupon-label-expiration-date"}{intl l='Days before expiration'}{/block}</th>
     	    				<th>{block name="coupon-label-usage-left"}{intl l='Usage left'}{/block}</th>
     	    				<th class="sorter-false filter-false">{block name="coupon-label-action"}{/block}</th>
     	    			</tr>
@@ -39,13 +39,29 @@
     	    		<tbody>
                         {loop type="coupon" name="list_coupon" is_enabled="1" backend_context="true"}
                             <tr>
-                                <td>{block name="coupon-code"}<a href="{$urlReadCoupon|replace:'couponId':$ID}">{$CODE}</a>{/block}</td>
+                                <td>{block name="coupon-code"}<a href="{$urlReadCoupon|replace:'0':$ID}">{$CODE}</a>{/block}</td>
                                 <td>{block name="coupon-title"}{$TITLE}{/block}</td>
-                                <td>{block name="coupon-expiration-date"}{$EXPIRATION_DATE}{/block}</td>
-                                <td>{block name="coupon-usage-left"}{$USAGE_LEFT}{/block}</td>
+                                <td>{block name="coupon-expiration-date"}{$DAY_LEFT_BEFORE_EXPIRATION}{/block}</td>
+                                <td>
+                                    {block name="coupon-usage-left"}
+                                        {if $USAGE_LEFT == -1}
+                                            <span class="label label-success">
+                                                {intl l="Unlimited"}
+                                            </span>
+                                        {elseif $USAGE_LEFT}
+                                            <span class="label label-success">
+                                                {$USAGE_LEFT}
+                                            </span>
+                                        {else}
+                                            <span class="label label-warning">
+                                                0
+                                            </span>
+                                        {/if}
+                                    {/block}
+                                </td>
                                 <td>
                                     {block name="coupon-action"}
-                                        <a href="{$urlEditCoupon|replace:'couponId':$ID}" class="btn btn-default btn-primary btn-medium">
+                                        <a href="{$urlEditCoupon|replace:'0':$ID}" class="btn btn-default btn-primary btn-medium">
                                             <span class="glyphicon glyphicon-edit"></span> {intl l='Edit'}
                                         </a>
                                     {/block}
@@ -80,7 +96,23 @@
                                 <td>{block name="coupon-code"}<a href="{$urlReadCoupon|replace:'couponId':$ID}">{$CODE}</a>{/block}</td>
                                 <td>{block name="coupon-title"}{$TITLE}{/block}</td>
                                 <td>{block name="coupon-expiration-date"}{$EXPIRATION_DATE}{/block}</td>
-                                <td>{block name="coupon-usage-left"}{$USAGE_LEFT}{/block}</td>
+                                <td>
+                                    {block name="coupon-usage-left"}
+                                        {if $USAGE_LEFT == -1}
+                                            <span class="label label-success">
+                                                {intl l="Unlimited"}
+                                            </span>
+                                        {elseif $USAGE_LEFT}
+                                            <span class="label label-success">
+                                                    {$USAGE_LEFT}
+                                            </span>
+                                        {else}
+                                            <span class="label label-warning">
+                                                    0
+                                            </span>
+                                        {/if}
+                                    {/block}
+                                </td>
                                 <td>
                                     {block name="coupon-action"}
                                     <a href="{$urlEditCoupon|replace:'couponId':$ID}" class="btn btn-default btn-primary btn-medium">

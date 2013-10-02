@@ -293,20 +293,19 @@ class BaseAdminController extends BaseController
         return $this->getCurrentEditionLang()->getLocale();
     }
 
-
     /**
      * Return the current list order identifier for a given object name,
      * updating in using the current request.
      *
-     * @param unknown $objectName the object name (e.g. 'attribute', 'message')
+     * @param unknown $objectName           the object name (e.g. 'attribute', 'message')
      * @param unknown $requestParameterName the name of the request parameter that defines the list order
-     * @param unknown $defaultListOrder the default order to use, if none is defined
-     * @param string $updateSession if true, the session will be updated with the current order.
+     * @param unknown $defaultListOrder     the default order to use, if none is defined
+     * @param string  $updateSession        if true, the session will be updated with the current order.
      *
      * @return String the current liste order.
      */
-    protected function getListOrderFromSession($objectName, $requestParameterName, $defaultListOrder, $updateSession = true) {
-
+    protected function getListOrderFromSession($objectName, $requestParameterName, $defaultListOrder, $updateSession = true)
+    {
         $order = $defaultListOrder;
 
         $orderSessionIdentifier = sprintf("admin.%s.currentListOrder", $objectName);
@@ -318,7 +317,6 @@ class BaseAdminController extends BaseController
         );
 
         if ($updateSession) $this->getSession()->set($orderSessionIdentifier, $order);
-
         return $order;
     }
 
@@ -353,8 +351,8 @@ class BaseAdminController extends BaseController
     /** Clear the remember me cookie.
      *
      */
-    protected function clearRememberMeCookie() {
-
+    protected function clearRememberMeCookie()
+    {
         $ctp = new CookieTokenProvider();
 
         $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');

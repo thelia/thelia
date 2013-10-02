@@ -162,14 +162,14 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
     public function countryDataAccess($params, $smarty)
     {
-        if(array_key_exists('defaultCountry', self::$dataAccessCache)) {
+        if (array_key_exists('defaultCountry', self::$dataAccessCache)) {
             $defaultCountry = self::$dataAccessCache['defaultCountry'];
         } else {
             $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
             self::$dataAccessCache['defaultCountry'] = $defaultCountry;
         }
 
-        switch($params["attr"]) {
+        switch ($params["attr"]) {
             case "default":
                 return $defaultCountry->getId();
         }
@@ -177,7 +177,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
     public function cartDataAccess($params, $smarty)
     {
-        if(array_key_exists('currentCountry', self::$dataAccessCache)) {
+        if (array_key_exists('currentCountry', self::$dataAccessCache)) {
             $currentCountry = self::$dataAccessCache['currentCountry'];
         } else {
             $currentCountry = CountryQuery::create()->findOneById(64); // @TODO : make it magic
@@ -186,7 +186,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         $cart = $this->getCart($this->request);
         $result = "";
-        switch($params["attr"]) {
+        switch ($params["attr"]) {
             case "count_item":
                 $result = $cart->getCartItems()->count();
                 break;
@@ -205,7 +205,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         $order = $this->request->getSession()->getOrder();
         $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
-        switch($attribute) {
+        switch ($attribute) {
             case 'postage':
                 return $order->getPostage();
             case 'delivery_address':
@@ -246,7 +246,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      */
     protected function dataAccessWithI18n($objectLabel, $params, ModelCriteria $search, $columns = array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'), $foreignTable = null, $foreignKey = 'ID')
     {
-        if(array_key_exists('data_' . $objectLabel, self::$dataAccessCache)) {
+        if (array_key_exists('data_' . $objectLabel, self::$dataAccessCache)) {
             $data = self::$dataAccessCache['data_' . $objectLabel];
         } else {
             $lang = $this->getNormalizedParam($params, array('lang'));
@@ -332,7 +332,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-
         return array(
             new SmartyPluginDescriptor('function', 'admin', $this, 'adminDataAccess'),
             new SmartyPluginDescriptor('function', 'customer', $this, 'customerDataAccess'),

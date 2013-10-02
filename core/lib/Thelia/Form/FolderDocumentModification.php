@@ -22,10 +22,7 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-
-use Thelia\Core\Translation\Translator;
 use Thelia\Form\Image\DocumentModification;
-use Thelia\Form\Image\ImageModification;
 
 /**
  * Created by JetBrains PhpStorm.

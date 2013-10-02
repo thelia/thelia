@@ -23,8 +23,6 @@
 
 namespace Thelia\Tests\Rewriting;
 use Thelia\Model\Product;
-use Thelia\Model\ProductQuery;
-
 
 /**
  * Class ProductRewriteTest
@@ -37,7 +35,7 @@ class ProductRewriteTest extends BaseRewritingObject
     /**
      * @return mixed an instance of Product, Folder, Content or Category Model
      */
-    function getObject()
+    public function getObject()
     {
         return new Product();
     }

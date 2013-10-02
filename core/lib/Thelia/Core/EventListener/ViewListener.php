@@ -100,7 +100,7 @@ class ViewListener implements EventSubscriberInterface
             // Redirect to the login template
             Redirect::exec($this->container->get('thelia.url.manager')->viewUrl($ex->getLoginTemplate()));
         } catch (OrderException $e) {
-            switch($e->getCode()) {
+            switch ($e->getCode()) {
                 case OrderException::CART_EMPTY:
                     // Redirect to the cart template
                     Redirect::exec($this->container->get('router.chainRequest')->generate($e->cartRoute, $e->arguments, Router::ABSOLUTE_URL));

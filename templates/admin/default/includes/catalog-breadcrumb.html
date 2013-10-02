@@ -1,8 +1,8 @@
 {* Breadcrumb for categories browsing and editing *}
 
 <ul class="breadcrumb">
-	<li><a href="{url path='admin/home'}">Home</a></li>
-	<li><a href="{url path='admin/catalog'}">Catalog</a></li>
+	<li><a href="{url path='admin/home'}">{intl l="Home"}</a></li>
+	<li><a href="{url path='admin/catalog'}">{intl l="Catalog"}</a></li>
 
 	{ifloop rel="category_path"}
 		{loop name="category_path" type="category-path" visible="*" category=$category_id}

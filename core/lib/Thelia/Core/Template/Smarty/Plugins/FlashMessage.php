@@ -22,13 +22,9 @@
 /*************************************************************************************/
 namespace Thelia\Core\Template\Smarty\Plugins;
 
-use Symfony\Component\Form\FormView;
-use Thelia\Form\BaseForm;
-use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
-use Thelia\Core\Template\ParserContext;
 
 /**
  * Created by JetBrains PhpStorm.

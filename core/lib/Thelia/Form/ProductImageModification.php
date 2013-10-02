@@ -22,8 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-
-use Thelia\Core\Translation\Translator;
 use Thelia\Form\Image\ImageModification;
 
 /**

@@ -117,22 +117,22 @@
     <!-- order management process -->
     <route id="order.delivery.process" path="/order/delivery" methods="post">
         <default key="_controller">Thelia\Controller\Front\OrderController::deliver</default>
-        <default key="_view">order_delivery</default>
+        <default key="_view">order-delivery</default>
     </route>
 
     <route id="order.delivery" path="/order/delivery">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">order_delivery</default>
+        <default key="_view">order-delivery</default>
     </route>
 
     <route id="order.invoice.process" path="/order/invoice" methods="post">
         <default key="_controller">Thelia\Controller\Front\OrderController::invoice</default>
-        <default key="_view">order_invoice</default>
+        <default key="_view">order-invoice</default>
     </route>
 
     <route id="order.invoice" path="/order/invoice">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">order_invoice</default>
+        <default key="_view">order-invoice</default>
     </route>
 
     <route id="order.payment.process" path="/order/pay">
@@ -141,7 +141,7 @@
 
     <route id="order.placed" path="/order/placed/{order_id}">
         <default key="_controller">Thelia\Controller\Front\OrderController::orderPlaced</default>
-        <default key="_view">order_placed</default>
+        <default key="_view">order-placed</default>
     </route>
     <!-- end order management process -->
 

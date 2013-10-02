@@ -40,7 +40,7 @@ class ModuleActivateCommandTest extends \PHPUnit_Framework_TestCase
     {
         $module = ModuleQuery::create()->findOne();
 
-        if(null !== $module) {
+        if (null !== $module) {
             $application = new Application($this->getKernel());
 
             $module->setActivate(BaseModule::IS_NOT_ACTIVATED);
@@ -70,9 +70,8 @@ class ModuleActivateCommandTest extends \PHPUnit_Framework_TestCase
     {
         $testedModule = ModuleQuery::create()->findOneByCode('Letshopethismoduledoesnotexists');
 
-        if(null == $testedModule) {
+        if (null == $testedModule) {
             $application = new Application($this->getKernel());
-
 
             $moduleActivate = new ModuleActivateCommand();
             $moduleActivate->setContainer($this->getContainer());

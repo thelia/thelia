@@ -236,6 +236,7 @@ class Content extends BaseI18nLoop
                 ->set("POSITION", $content->getPosition())
                 ->set("DEFAULT_FOLDER", $content->getDefaultFolderId())
                 ->set("URL", $content->getUrl($locale))
+                ->set("VISIBLE", $content->getVisible())
             ;
 
             $loopResult->addRow($loopResultRow);

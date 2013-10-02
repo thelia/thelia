@@ -20,15 +20,15 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\HttpKernel\Exceptions;
+namespace Thelia\Core\HttpKernel\Exception;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as BaseNotFountHttpException;
 /**
  * Class NotFountHttpException
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class NotFountHttpException extends BaseNotFountHttpException {
-
+class NotFountHttpException extends BaseNotFountHttpException
+{
     protected $adminContext = false;
 
     public function __construct($message = null, \Exception $previous = null, $code = 0, $adminContext = false)

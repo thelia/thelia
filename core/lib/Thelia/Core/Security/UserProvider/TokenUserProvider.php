@@ -23,10 +23,9 @@
 
 namespace Thelia\Core\Security\UserProvider;
 
-use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Security\Token\TokenProvider;
 
 abstract class TokenUserProvider extends TokenProvider implements UserProviderInterface
 {
-    public abstract function getUser($key);
+    abstract public function getUser($key);
 }

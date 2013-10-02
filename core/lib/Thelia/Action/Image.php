@@ -23,19 +23,12 @@
 
 namespace Thelia\Action;
 
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Thelia\Core\Event\ImageCreateOrUpdateEvent;
-use Thelia\Core\Event\ImagesCreateOrUpdateEvent;
-use Thelia\Core\Event\ImageDeleteEvent;
-use Thelia\Core\Event\ImageEvent;
-use Thelia\Model\CategoryImage;
+use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
+use Thelia\Core\Event\Image\ImageDeleteEvent;
+use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\ContentImage;
-use Thelia\Model\FolderImage;
-use Thelia\Model\ProductImage;
 use Thelia\Tools\FileManager;
 use Thelia\Tools\URL;
 
@@ -88,12 +81,11 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     const EXACT_RATIO_WITH_CROP = 2;
     const KEEP_IMAGE_RATIO = 3;
 
-
-
     /**
      * @return string root of the image cache directory in web space
      */
-    protected function getCacheDirFromWebRoot() {
+    protected function getCacheDirFromWebRoot()
+    {
         return ConfigQuery::read('image_cache_dir_from_web_root', 'cache');
     }
 
@@ -106,8 +98,8 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      *
      * This method updates the cache_file_path and file_url attributes of the event
      *
-     * @param  ImageEvent                 $event
-     * @throws \InvalidArgumentException, ImageException
+     * @param  \Thelia\Core\Event\Image\ImageEvent $event
+     * @throws \InvalidArgumentException,          ImageException
      */
     public function processImage(ImageEvent $event)
     {
@@ -241,7 +233,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         // Compute the image URL
         $processed_image_url = $this->getCacheFileURL($subdir, basename($cacheFilePath));
 
-        // compute the full resulution image path in cache
+        // compute the full resolution image path in cache
         $original_image_url = $this->getCacheFileURL($subdir, basename($originalImagePathInCache));
 
         // Update the event with file path and file URL
@@ -255,7 +247,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     /**
      * Take care of saving image in the database and file storage
      *
-     * @param ImageCreateOrUpdateEvent $event Image event
+     * @param \Thelia\Core\Event\Image\ImageCreateOrUpdateEvent $event Image event
      *
      * @throws \Thelia\Exception\ImageException
      * @todo refactor make all pictures using propel inheritance and factorise image behaviour into one single clean action
@@ -358,7 +350,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     'image'
                 )
             );
-        } catch(\Exception $e){
+        } catch (\Exception $e) {
             $this->adminLogAppend(
                 $this->container->get('thelia.translator')->trans(
                     'Fail to delete image for %id% with parent id %parentId% (Exception : %e%)',

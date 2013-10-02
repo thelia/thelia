@@ -70,14 +70,8 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
         // Si on n'est pas en mode debug, activer le cache, avec une lifetime de 15mn, et en vérifiant que les templates sources n'ont pas été modifiés.
-        if ($debug === false) {
-            $this->caching        = Smarty::CACHING_LIFETIME_CURRENT;
-            $this->cache_lifetime = 300;
-            $this->compile_check  = true;
-        } else {
-            $this->caching       = Smarty::CACHING_OFF;
-            $this->force_compile = true;
-        }
+        $this->caching       = Smarty::CACHING_OFF;
+        $this->force_compile = true;
 
         // The default HTTP status
         $this->status = 200;
@@ -105,6 +99,10 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->template = $template_path_from_template_base;
 
         $this->setTemplateDir(THELIA_TEMPLATE_DIR.$this->template);
+
+        $config_dir = THELIA_TEMPLATE_DIR.$this->template.'/configs';
+
+        $this->setConfigDir($config_dir);
     }
 
     public function getTemplate()

@@ -15,10 +15,6 @@ var thelia2_folder_image_list_url = thelia2_base_url + 'admin/folders/update/1';
 var thelia2_content_image_list_url = thelia2_base_url + 'admin/content/update/1';
 
 
-
-//var findMyId = /([0-9]+)$/;
-//var currentId;
-
 casper.test.comment('Variables are set');
 
 casper.test.done(0);

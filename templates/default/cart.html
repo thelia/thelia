@@ -2,10 +2,10 @@
 
 {block name="breadcrumb"}
     <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">You are here: </strong>
+        <strong id="breadcrumb-label">{intl l="You are here"} : </strong>
         <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">Home</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">Cart</span></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
+            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{intl l="Cart"}</span></li>
         </ul>
     </nav><!-- /.nav-breadcrumb -->
 {/block}
@@ -14,13 +14,13 @@
     <div class="main">
         <article id="cart" class="col-main" role="main" aria-labelledby="main-label">
 
-            <h1 id="main-label" class="page-header">Your Cart</h1>
+            <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
 
             <div class="btn-group checkout-progress">
-                <a href="#" role="button" class="btn btn-step active"><span class="step-nb">1</span> <span class="step-label">Your Cart</span></a>
-                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">2</span> <span class="step-label">Billing and delivery</span></a>
-                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">3</span> <span class="step-label">Check my order</span></a>
-                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">Secure payment</span></a>
+                <a href="#" role="button" class="btn btn-step active"><span class="step-nb">1</span> <span class="step-label">{intl l="Your Cart"}</span></a>
+                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">2</span> <span class="step-label">{intl l="Billing and delivery"}</span></a>
+                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">3</span> <span class="step-label">{intl l="Check my order"}</span></a>
+                <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">{intl l="Secure payment"}</span></a>
             </div>
 
             <table class="table table-cart">
@@ -35,20 +35,20 @@
                 <tr>
                     <th class="image">&nbsp;</th>
                     <th class="product">
-                        <span class="hidden-xs">Product Name</span>
-                        <span class="visible-xs">Name</span>
+                        <span class="hidden-xs">{intl l="Product Name"}</span>
+                        <span class="visible-xs">{intl l="Name"}</span>
                     </th>
                     <th class="unitprice">
-                        <span class="hidden-xs">Unit Price</span>
-                        <span class="visible-xs">Price</span>
+                        <span class="hidden-xs">{intl l="Unit Price"}</span>
+                        <span class="visible-xs">{intl l="Price"}</span>
                     </th>
                     <th class="qty">
-                        <span class="hidden-xs">Quantity</span>
-                        <span class="visible-xs">Qty</span>
+                        <span class="hidden-xs">{intl l="Quantity"}</span>
+                        <span class="visible-xs">{intl l="Qty"}</span>
                     </th>
                     <th class="subprice">
-                        <span class="hidden-xs">Total <abbr title="Tax Inclusive">TTC</abbr></span>
-                        <span class="visible-xs">Total</span>
+                        <span class="hidden-xs">{intl l="Total"} <abbr title="{intl l="Tax Inclusive"}">{intl l="TTC"}</abbr></span>
+                        <span class="visible-xs">{intl l="Total"}</span>
                     </th>
                 </tr>
                 </thead>
@@ -75,9 +75,9 @@
                             </a></h3>
                         <div class="product-options">
                             <dl class="dl-horizontal">
-                                <dt>Available :</dt>
-                                <dd>In Stock</dd>
-                                <dt>No.</dt>
+                                <dt>{intl l="Available"} :</dt>
+                                <dd>{intl l="In Stock"}</dd>
+                                <dt>{intl l="No."}</dt>
                                 <dd>{$REF}</dd>
                                 {*<dt>Select Size</dt>
                                 <dd>Large</dd>
@@ -87,13 +87,13 @@
                                 <dd>Option 1</dd>*}
                             </dl>
                         </div>
-                        <a href="{url path="/cart/delete/{$ITEM_ID}"}" class="btn btn-remove">Remove</a>
+                        <a href="{url path="/cart/delete/{$ITEM_ID}"}" class="btn btn-remove">{intl l="Remove"}</a>
                     </td>
                     <td class="unitprice">
                         {if $IS_PROMO == 1}
                             {assign "real_price" $PROMO_TAXED_PRICE}
                             <div class="special-price"><span class="price">{currency attr="symbol"} {$PROMO_TAXED_PRICE}</span></div>
-                            <small class="old-price">instead of <span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></small>
+                            <small class="old-price">{intl l="instead of"} <span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></small>
                         {else}
                             {assign "real_price" $TAXED_PRICE}
                             <div class="special-price"><span class="price">{currency attr="symbol"} {$TAXED_PRICE}</span></div>
@@ -122,7 +122,7 @@
                 <tfoot>
                 <tr >
                     <td colspan="3" class="empty">&nbsp;</td>
-                    <th class="total">Total <abbr title="Tax Inclusive">TTC</abbr></th>
+                    <th class="total">{intl l="Total"} <abbr title="{intl l="Tax Inclusive"}">{intl l="TTC"}</abbr></th>
                     <td class="total">
                         <div class="total-price">
                             <span class="price">{currency attr="symbol"} {cart attr="total_taxed_price"}</span>
@@ -132,14 +132,14 @@
                 </tfoot>
             </table>
 
-            <a href="{navigate to="index"}" role="button" class="btn btn-continue-shopping"><span>Continue Shopping</span></a>
-            <a href="{url path="/order/delivery"}" class="btn btn-checkout">Proceed checkout</a>
+            <a href="{navigate to="index"}" role="button" class="btn btn-continue-shopping"><span>{intl l="Continue Shopping"}</span></a>
+            <a href="{url path="/order/delivery"}" class="btn btn-checkout">{intl l="Proceed checkout"}</a>
 
         </article>
 
         <aside id="products-upsell" role="complementary" aria-labelledby="products-upsell-label">
             <div class="products-heading">
-                <h3 id="products-upsell-label">Upsell Products</h3>
+                <h3 id="products-upsell-label">{intl l="Upsell Products"}</h3>
             </div>
 
             <div class="products-content">

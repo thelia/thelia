@@ -22,10 +22,10 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
-use Thelia\Core\Event\FolderCreateEvent;
-use Thelia\Core\Event\FolderDeleteEvent;
-use Thelia\Core\Event\FolderToggleVisibilityEvent;
-use Thelia\Core\Event\FolderUpdateEvent;
+use Thelia\Core\Event\Folder\FolderCreateEvent;
+use Thelia\Core\Event\Folder\FolderDeleteEvent;
+use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
+use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Form\FolderCreationForm;
@@ -81,8 +81,8 @@ class FolderController extends AbstractCrudController
      *
      * @param \Thelia\Model\Folder $object
      */
-    protected function hydrateObjectForm($object) {
-
+    protected function hydrateObjectForm($object)
+    {
         // Prepare the data that will hydrate the form
         $data = array(
             'id'           => $object->getId(),
@@ -150,7 +150,7 @@ class FolderController extends AbstractCrudController
     }
 
     /**
-     * @return FolderToggleVisibilityEvent|void
+     * @return \Thelia\Core\Event\Folder\FolderToggleVisibilityEvent|void
      */
     protected function createToggleVisibilityEvent()
     {
@@ -162,8 +162,8 @@ class FolderController extends AbstractCrudController
      * @param $positionValue
      * @return UpdatePositionEvent|void
      */
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue) {
-
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    {
         return new UpdatePositionEvent(
             $this->getRequest()->get('folder_id', null),
             $positionChangeMode,
@@ -174,7 +174,7 @@ class FolderController extends AbstractCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param \Thelia\Core\Event\FolderEvent $event
+     * @param \Thelia\Core\Event\Folder\FolderEvent $event
      */
     protected function eventContainsObject($event)
     {
@@ -184,7 +184,7 @@ class FolderController extends AbstractCrudController
     /**
      * Get the created object from an event.
      *
-     * @param $event \Thelia\Core\Event\FolderEvent $event
+     * @param $event \Thelia\Core\Event\Folder\FolderEvent $event
      *
      * @return null|\Thelia\Model\Folder
      */
@@ -196,7 +196,8 @@ class FolderController extends AbstractCrudController
     /**
      * Load an existing object from the database
      */
-    protected function getExistingObject() {
+    protected function getExistingObject()
+    {
         return FolderQuery::create()
             ->joinWithI18n($this->getCurrentEditionLocale())
             ->findOneById($this->getRequest()->get('folder_id', 0));
@@ -207,7 +208,8 @@ class FolderController extends AbstractCrudController
      *
      * @param unknown $object
      */
-    protected function getObjectLabel($object) {
+    protected function getObjectLabel($object)
+    {
         return $object->getTitle();
     }
 
@@ -226,8 +228,8 @@ class FolderController extends AbstractCrudController
      *
      * @param unknown $currentOrder, if any, null otherwise.
      */
-    protected function renderListTemplate($currentOrder) {
-
+    protected function renderListTemplate($currentOrder)
+    {
         // Get content order
         $content_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
 
@@ -239,12 +241,11 @@ class FolderController extends AbstractCrudController
             ));
     }
 
-
     /**
      * Render the edition template
      */
-    protected function renderEditionTemplate() {
-
+    protected function renderEditionTemplate()
+    {
         return $this->render('folder-edit', $this->getEditionArguments());
     }
 
@@ -257,7 +258,7 @@ class FolderController extends AbstractCrudController
     }
 
     /**
-     * @param \Thelia\Core\Event\FolderUpdateEvent $updateEvent
+     * @param  \Thelia\Core\Event\Folder\FolderUpdateEvent $updateEvent
      * @return Response|void
      */
     protected function performAdditionalUpdateAction($updateEvent)
@@ -275,8 +276,8 @@ class FolderController extends AbstractCrudController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param \Thelia\Core\Event\FolderDeleteEvent $deleteEvent the delete event
-     * @return Response a response, or null to continue normal processing
+     * @param  \Thelia\Core\Event\Folder\FolderDeleteEvent $deleteEvent the delete event
+     * @return Response                                    a response, or null to continue normal processing
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {

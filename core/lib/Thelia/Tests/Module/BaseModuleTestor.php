@@ -23,7 +23,6 @@
 
 namespace Thelia\Tests\Module;
 
-
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
@@ -50,4 +49,3 @@ abstract class BaseModuleTestor extends \PHPUnit_Framework_TestCase
         $this->instance = $this->getTestedInstance();
     }
 }
-

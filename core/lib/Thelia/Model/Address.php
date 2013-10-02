@@ -4,7 +4,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Event\AddressEvent;
+use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Address as BaseAddress;
 use Thelia\Model\AddressQuery;

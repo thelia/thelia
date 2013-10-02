@@ -5,7 +5,7 @@ namespace Thelia\Model;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
-use Thelia\Core\Event\OrderEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Base\OrderProductTaxQuery;
@@ -26,6 +26,8 @@ class Order extends BaseOrder
      */
     public function preInsert(ConnectionInterface $con = null)
     {
+        $this->setRef($this->generateRef());
+
         $this->dispatchEvent(TheliaEvents::ORDER_BEFORE_CREATE, new OrderEvent($this));
 
         return true;
@@ -37,6 +39,12 @@ class Order extends BaseOrder
     public function postInsert(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::ORDER_AFTER_CREATE, new OrderEvent($this));
+    }
+
+    public function generateRef()
+    {
+        /* order addresses are unique */
+        return uniqid('ORD', true);
     }
 
     /**
@@ -54,9 +62,15 @@ class Order extends BaseOrder
         /* browse all products */
         $orderProductIds = array();
         foreach($this->getOrderProducts() as $orderProduct) {
-            $taxAmount = OrderProductTaxQuery::create()
-                ->withColumn('SUM(' . OrderProductTaxTableMap::AMOUNT . ')', 'total_tax')
-                ->filterByOrderProductId($orderProduct->getId(), Criteria::EQUAL)
+            $taxAmountQuery = OrderProductTaxQuery::create();
+
+            if($orderProduct->getWasInPromo() == 1) {
+                $taxAmountQuery->withColumn('SUM(' . OrderProductTaxTableMap::PROMO_AMOUNT . ')', 'total_tax');
+            } else {
+                $taxAmountQuery->withColumn('SUM(' . OrderProductTaxTableMap::AMOUNT . ')', 'total_tax');
+            }
+
+            $taxAmount = $taxAmountQuery->filterByOrderProductId($orderProduct->getId(), Criteria::EQUAL)
                 ->findOne();
             $amount += ($orderProduct->getWasInPromo() == 1 ? $orderProduct->getPromoPrice() : $orderProduct->getPrice()) * $orderProduct->getQuantity();
             $tax += round($taxAmount->getVirtualColumn('total_tax'), 2) * $orderProduct->getQuantity();

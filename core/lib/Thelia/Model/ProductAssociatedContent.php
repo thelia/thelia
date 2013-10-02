@@ -4,7 +4,7 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\ProductAssociatedContent as BaseProductAssociatedContent;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\ProductAssociatedContentEvent;
+use Thelia\Core\Event\Product\ProductAssociatedContentEvent;
 use Thelia\Core\Event\TheliaEvents;
 
 class ProductAssociatedContent extends BaseProductAssociatedContent {

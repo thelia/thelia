@@ -42,7 +42,7 @@ class ModelType implements TypeInterface
     {
         $class = '\\Thelia\\Model\\' . $expectedModelActiveRecord;
 
-        if(!(class_exists($class) && new $class instanceof ActiveRecordInterface)) {
+        if (!(class_exists($class) && new $class instanceof ActiveRecordInterface)) {
             throw new TypeException('MODEL NOT FOUND', TypeException::MODEL_NOT_FOUND);
         }
 

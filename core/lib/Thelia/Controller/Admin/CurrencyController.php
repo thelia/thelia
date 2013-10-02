@@ -23,10 +23,10 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\CurrencyDeleteEvent;
+use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\CurrencyUpdateEvent;
-use Thelia\Core\Event\CurrencyCreateEvent;
+use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
+use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Form\CurrencyModificationForm;
 use Thelia\Form\CurrencyCreationForm;
@@ -39,7 +39,8 @@ use Thelia\Core\Event\UpdatePositionEvent;
  */
 class CurrencyController extends AbstractCrudController
 {
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct(
             'currency',
             'manual',
@@ -58,15 +59,18 @@ class CurrencyController extends AbstractCrudController
         );
     }
 
-    protected function getCreationForm() {
+    protected function getCreationForm()
+    {
         return new CurrencyCreationForm($this->getRequest());
     }
 
-    protected function getUpdateForm() {
+    protected function getUpdateForm()
+    {
         return new CurrencyModificationForm($this->getRequest());
     }
 
-    protected function getCreationEvent($formData) {
+    protected function getCreationEvent($formData)
+    {
         $createEvent = new CurrencyCreateEvent();
 
         $createEvent
@@ -80,7 +84,8 @@ class CurrencyController extends AbstractCrudController
         return $createEvent;
     }
 
-    protected function getUpdateEvent($formData) {
+    protected function getUpdateEvent($formData)
+    {
         $changeEvent = new CurrencyUpdateEvent($formData['id']);
 
         // Create and dispatch the change event
@@ -95,8 +100,8 @@ class CurrencyController extends AbstractCrudController
         return $changeEvent;
     }
 
-    protected function createUpdatePositionEvent($positionChangeMode, $positionValue) {
-
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    {
         return new UpdatePositionEvent(
                 $this->getRequest()->get('currency_id', null),
                 $positionChangeMode,
@@ -104,16 +109,18 @@ class CurrencyController extends AbstractCrudController
         );
     }
 
-    protected function getDeleteEvent() {
+    protected function getDeleteEvent()
+    {
         return new CurrencyDeleteEvent($this->getRequest()->get('currency_id'));
     }
 
-    protected function eventContainsObject($event) {
+    protected function eventContainsObject($event)
+    {
         return $event->hasCurrency();
     }
 
-    protected function hydrateObjectForm($object) {
-
+    protected function hydrateObjectForm($object)
+    {
         // Prepare the data that will hydrate the form
         $data = array(
                 'id'     => $object->getId(),
@@ -128,43 +135,50 @@ class CurrencyController extends AbstractCrudController
         return new CurrencyModificationForm($this->getRequest(), "form", $data);
     }
 
-    protected function getObjectFromEvent($event) {
+    protected function getObjectFromEvent($event)
+    {
         return $event->hasCurrency() ? $event->getCurrency() : null;
     }
 
-    protected function getExistingObject() {
+    protected function getExistingObject()
+    {
         return CurrencyQuery::create()
         ->joinWithI18n($this->getCurrentEditionLocale())
         ->findOneById($this->getRequest()->get('currency_id'));
     }
 
-    protected function getObjectLabel($object) {
+    protected function getObjectLabel($object)
+    {
         return $object->getName();
     }
 
-    protected function getObjectId($object) {
+    protected function getObjectId($object)
+    {
         return $object->getId();
     }
 
-    protected function renderListTemplate($currentOrder) {
+    protected function renderListTemplate($currentOrder)
+    {
         return $this->render('currencies', array('order' => $currentOrder));
     }
 
-    protected function renderEditionTemplate() {
+    protected function renderEditionTemplate()
+    {
         return $this->render('currency-edit', array('currency_id' => $this->getRequest()->get('currency_id')));
     }
 
-    protected function redirectToEditionTemplate() {
+    protected function redirectToEditionTemplate()
+    {
         $this->redirectToRoute(
                 "admin.configuration.currencies.update",
                 array('currency_id' => $this->getRequest()->get('currency_id'))
         );
     }
 
-    protected function redirectToListTemplate() {
+    protected function redirectToListTemplate()
+    {
         $this->redirectToRoute('admin.configuration.currencies.default');
     }
-
 
     /**
      * Update currencies rates

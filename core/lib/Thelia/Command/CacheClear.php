@@ -73,10 +73,11 @@ class CacheClear extends ContainerAwareCommand
 
         try {
             $directoryBrowser = new \DirectoryIterator($dir);
-        } catch(\UnexpectedValueException $e) {
+        } catch (\UnexpectedValueException $e) {
             // throws same exception code for does not exist and permission denied ...
-            if(!file_exists($dir)) {
+            if (!file_exists($dir)) {
                 $output->writeln(sprintf("<info>%s cache dir already clear</info>", $dir));
+
                 return;
             }
 

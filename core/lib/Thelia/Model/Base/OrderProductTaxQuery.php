@@ -26,6 +26,7 @@ use Thelia\Model\Map\OrderProductTaxTableMap;
  * @method     ChildOrderProductTaxQuery orderByTitle($order = Criteria::ASC) Order by the title column
  * @method     ChildOrderProductTaxQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method     ChildOrderProductTaxQuery orderByAmount($order = Criteria::ASC) Order by the amount column
+ * @method     ChildOrderProductTaxQuery orderByPromoAmount($order = Criteria::ASC) Order by the promo_amount column
  * @method     ChildOrderProductTaxQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildOrderProductTaxQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -34,6 +35,7 @@ use Thelia\Model\Map\OrderProductTaxTableMap;
  * @method     ChildOrderProductTaxQuery groupByTitle() Group by the title column
  * @method     ChildOrderProductTaxQuery groupByDescription() Group by the description column
  * @method     ChildOrderProductTaxQuery groupByAmount() Group by the amount column
+ * @method     ChildOrderProductTaxQuery groupByPromoAmount() Group by the promo_amount column
  * @method     ChildOrderProductTaxQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildOrderProductTaxQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -53,6 +55,7 @@ use Thelia\Model\Map\OrderProductTaxTableMap;
  * @method     ChildOrderProductTax findOneByTitle(string $title) Return the first ChildOrderProductTax filtered by the title column
  * @method     ChildOrderProductTax findOneByDescription(string $description) Return the first ChildOrderProductTax filtered by the description column
  * @method     ChildOrderProductTax findOneByAmount(double $amount) Return the first ChildOrderProductTax filtered by the amount column
+ * @method     ChildOrderProductTax findOneByPromoAmount(double $promo_amount) Return the first ChildOrderProductTax filtered by the promo_amount column
  * @method     ChildOrderProductTax findOneByCreatedAt(string $created_at) Return the first ChildOrderProductTax filtered by the created_at column
  * @method     ChildOrderProductTax findOneByUpdatedAt(string $updated_at) Return the first ChildOrderProductTax filtered by the updated_at column
  *
@@ -61,6 +64,7 @@ use Thelia\Model\Map\OrderProductTaxTableMap;
  * @method     array findByTitle(string $title) Return ChildOrderProductTax objects filtered by the title column
  * @method     array findByDescription(string $description) Return ChildOrderProductTax objects filtered by the description column
  * @method     array findByAmount(double $amount) Return ChildOrderProductTax objects filtered by the amount column
+ * @method     array findByPromoAmount(double $promo_amount) Return ChildOrderProductTax objects filtered by the promo_amount column
  * @method     array findByCreatedAt(string $created_at) Return ChildOrderProductTax objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildOrderProductTax objects filtered by the updated_at column
  *
@@ -151,7 +155,7 @@ abstract class OrderProductTaxQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, ORDER_PRODUCT_ID, TITLE, DESCRIPTION, AMOUNT, CREATED_AT, UPDATED_AT FROM order_product_tax WHERE ID = :p0';
+        $sql = 'SELECT ID, ORDER_PRODUCT_ID, TITLE, DESCRIPTION, AMOUNT, PROMO_AMOUNT, CREATED_AT, UPDATED_AT FROM order_product_tax WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -421,6 +425,47 @@ abstract class OrderProductTaxQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderProductTaxTableMap::AMOUNT, $amount, $comparison);
+    }
+
+    /**
+     * Filter the query on the promo_amount column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPromoAmount(1234); // WHERE promo_amount = 1234
+     * $query->filterByPromoAmount(array(12, 34)); // WHERE promo_amount IN (12, 34)
+     * $query->filterByPromoAmount(array('min' => 12)); // WHERE promo_amount > 12
+     * </code>
+     *
+     * @param     mixed $promoAmount The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductTaxQuery The current query, for fluid interface
+     */
+    public function filterByPromoAmount($promoAmount = null, $comparison = null)
+    {
+        if (is_array($promoAmount)) {
+            $useMinMax = false;
+            if (isset($promoAmount['min'])) {
+                $this->addUsingAlias(OrderProductTaxTableMap::PROMO_AMOUNT, $promoAmount['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($promoAmount['max'])) {
+                $this->addUsingAlias(OrderProductTaxTableMap::PROMO_AMOUNT, $promoAmount['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductTaxTableMap::PROMO_AMOUNT, $promoAmount, $comparison);
     }
 
     /**

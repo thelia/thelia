@@ -55,11 +55,9 @@ class UrlGenerator extends AbstractSmartyPlugin
         if ($file !== null) {
             $path = $file;
             $mode = URL::PATH_TO_FILE;
-        }
-        else if ($path !== null) {
+        } elseif ($path !== null) {
             $mode = URL::WITH_INDEX_PAGE;
-        }
-        else {
+        } else {
             throw \InvalidArgumentException(Translator::getInstance()->trans("Please specify either 'path' or 'file' parameter in {url} function."));
         }
 
@@ -74,7 +72,6 @@ class UrlGenerator extends AbstractSmartyPlugin
         if ($noamp == null) $url = str_replace('&', '&amp;', $url);
 
         if ($target != null) $url .= '#'.$target;
-
         return $url;
      }
 

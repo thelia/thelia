@@ -23,40 +23,29 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\ProductDeleteEvent;
+use Thelia\Core\Event\Product\ProductAddCategoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\ProductUpdateEvent;
-use Thelia\Core\Event\ProductCreateEvent;
+use Thelia\Core\Event\Product\ProductUpdateEvent;
+use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Model\ProductQuery;
 use Thelia\Form\ProductModificationForm;
 use Thelia\Form\ProductCreationForm;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\ProductToggleVisibilityEvent;
-use Thelia\Core\Event\ProductDeleteContentEvent;
-use Thelia\Core\Event\ProductAddContentEvent;
-use Thelia\Model\ProductAssociatedContent;
+use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
+use Thelia\Core\Event\Product\ProductDeleteContentEvent;
+use Thelia\Core\Event\Product\ProductAddContentEvent;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\CategoryQuery;
-use Thelia\Core\Event\ProductAddAccessoryEvent;
-use Thelia\Core\Event\ProductDeleteAccessoryEvent;
-use Thelia\Core\Event\FeatureProductUpdateEvent;
-use Thelia\Model\FeatureQuery;
-use Thelia\Core\Event\FeatureProductDeleteEvent;
-use Thelia\Model\FeatureTemplateQuery;
-use Thelia\Core\Event\ProductSetTemplateEvent;
-use Thelia\Core\Event\ProductAddCategoryEvent;
-use Thelia\Core\Event\ProductDeleteCategoryEvent;
-use Thelia\Model\AttributeQuery;
-use Thelia\Model\AttributeAvQuery;
+
+use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
 use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\Model\AttributeCombination;
-use Thelia\Model\AttributeAv;
-use Thelia\Core\Event\ProductCreateCombinationEvent;
-use Thelia\Core\Event\ProductDeleteCombinationEvent;
 
 /**
  * Manages products
@@ -89,8 +78,8 @@ class ProductController extends AbstractCrudController
     /**
      * Attributes ajax tab loading
      */
-    public function loadAttributesAjaxTabAction() {
-
+    public function loadAttributesAjaxTabAction()
+    {
         return $this->render(
                 'ajax/product-attributes-tab',
                 array(
@@ -102,8 +91,8 @@ class ProductController extends AbstractCrudController
     /**
      * Related information ajax tab loading
      */
-    public function loadRelatedAjaxTabAction() {
-
+    public function loadRelatedAjaxTabAction()
+    {
         return $this->render(
                 'ajax/product-related-tab',
                 array(
@@ -242,7 +231,8 @@ class ProductController extends AbstractCrudController
         );
     }
 
-    protected function getCategoryId() {
+    protected function getCategoryId()
+    {
         // Trouver le category_id, soit depuis la reques, souit depuis le produit courant
         $category_id = $this->getRequest()->get('category_id', null);
 
@@ -353,7 +343,7 @@ class ProductController extends AbstractCrudController
                 ;
 
             if ($list !== null) {
-                foreach($list as $item) {
+                foreach ($list as $item) {
                     $result[] = array('id' => $item->getId(), 'title' => $item->getTitle());
                 }
             }
@@ -379,8 +369,7 @@ class ProductController extends AbstractCrudController
 
             try {
                 $this->dispatch(TheliaEvents::PRODUCT_ADD_CONTENT, $event);
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -406,8 +395,7 @@ class ProductController extends AbstractCrudController
 
             try {
                 $this->dispatch(TheliaEvents::PRODUCT_REMOVE_CONTENT, $event);
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -415,7 +403,6 @@ class ProductController extends AbstractCrudController
 
         $this->redirectToEditionTemplate();
     }
-
 
     // -- Accessories management ----------------------------------------------
 
@@ -435,7 +422,7 @@ class ProductController extends AbstractCrudController
             ;
 
             if ($list !== null) {
-                foreach($list as $item) {
+                foreach ($list as $item) {
                     $result[] = array('id' => $item->getId(), 'title' => $item->getTitle());
                 }
             }
@@ -460,8 +447,7 @@ class ProductController extends AbstractCrudController
 
             try {
                 $this->dispatch(TheliaEvents::PRODUCT_ADD_ACCESSORY, $event);
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -486,8 +472,7 @@ class ProductController extends AbstractCrudController
 
             try {
                 $this->dispatch(TheliaEvents::PRODUCT_REMOVE_ACCESSORY, $event);
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -527,7 +512,8 @@ class ProductController extends AbstractCrudController
      *
      * @param unknown $productId
      */
-    public function setProductTemplateAction($productId) {
+    public function setProductTemplateAction($productId)
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth('admin.products.update')) return $response;
 
@@ -549,8 +535,8 @@ class ProductController extends AbstractCrudController
     /**
      * Update product attributes and features
      */
-    public function updateAttributesAndFeaturesAction($productId) {
-
+    public function updateAttributesAndFeaturesAction($productId)
+    {
         $product = ProductQuery::create()->findPk($productId);
 
         if ($product != null) {
@@ -569,7 +555,7 @@ class ProductController extends AbstractCrudController
                 // Update all features values, starting with feature av. values
                 $featureValues = $this->getRequest()->get('feature_value', array());
 
-                foreach($featureValues as $featureId => $featureValueList) {
+                foreach ($featureValues as $featureId => $featureValueList) {
 
                     // Delete all features av. for this feature.
                     $event = new FeatureProductDeleteEvent($productId, $featureId);
@@ -577,7 +563,7 @@ class ProductController extends AbstractCrudController
                     $this->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $event);
 
                     // Add then all selected values
-                    foreach($featureValueList as $featureValue) {
+                    foreach ($featureValueList as $featureValue) {
                         $event = new FeatureProductUpdateEvent($productId, $featureId, $featureValue);
 
                         $this->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $event);
@@ -589,7 +575,7 @@ class ProductController extends AbstractCrudController
                 // Update then features text values
                 $featureTextValues = $this->getRequest()->get('feature_text_value', array());
 
-                foreach($featureTextValues as $featureId => $featureValue) {
+                foreach ($featureTextValues as $featureId => $featureValue) {
 
                     // considere empty text as empty feature value (e.g., we will delete it)
                     if (empty($featureValue)) continue;
@@ -602,7 +588,7 @@ class ProductController extends AbstractCrudController
                 }
 
                 // Delete features which don't have any values
-                foreach($allFeatures as $feature) {
+                foreach ($allFeatures as $feature) {
 
                     if (! in_array($feature->getId(), $updatedFeatures)) {
                         $event = new FeatureProductDeleteEvent($productId, $feature->getId());
@@ -623,12 +609,12 @@ class ProductController extends AbstractCrudController
         $this->redirectToListTemplate();
     }
 
-    public function addAdditionalCategoryAction() {
-
+    public function addAdditionalCategoryAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
 
-        $category_id = intval($this->getRequest()->get('additional_category_id'));
+        $category_id = intval($this->getRequest()->request->get('additional_category_id'));
 
         if ($category_id > 0) {
 
@@ -639,8 +625,7 @@ class ProductController extends AbstractCrudController
 
             try {
                 $this->dispatch(TheliaEvents::PRODUCT_ADD_CATEGORY, $event);
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -649,8 +634,8 @@ class ProductController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
-    public function deleteAdditionalCategoryAction() {
-
+    public function deleteAdditionalCategoryAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
 
@@ -665,8 +650,7 @@ class ProductController extends AbstractCrudController
 
             try {
                 $this->dispatch(TheliaEvents::PRODUCT_REMOVE_CATEGORY, $event);
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }
@@ -677,8 +661,8 @@ class ProductController extends AbstractCrudController
 
     // -- Product combination management ---------------------------------------
 
-    public function getAttributeValuesAction($productId, $attributeId) {
-
+    public function getAttributeValuesAction($productId, $attributeId)
+    {
         $result = array();
 
         // Get attribute for this product
@@ -693,7 +677,7 @@ class ProductController extends AbstractCrudController
             ;
 
             if ($values !== null) {
-                foreach($values as $value) {
+                foreach ($values as $value) {
                     $result[] = array('id' => $value->getId(), 'title' => $value->getTitle());
                 }
             }
@@ -702,8 +686,8 @@ class ProductController extends AbstractCrudController
         return $this->jsonResponse(json_encode($result));
     }
 
-    public function addAttributeValueToCombinationAction($productId, $attributeAvId, $combination) {
-
+    public function addAttributeValueToCombinationAction($productId, $attributeAvId, $combination)
+    {
         $result = array();
 
         // Get attribute for this product
@@ -747,8 +731,8 @@ class ProductController extends AbstractCrudController
     /**
      * A a new combination to a product
      */
-    public function addCombinationAction() {
-
+    public function addCombinationAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
 
@@ -760,8 +744,7 @@ class ProductController extends AbstractCrudController
 
         try {
             $this->dispatch(TheliaEvents::PRODUCT_ADD_COMBINATION, $event);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
@@ -773,8 +756,8 @@ class ProductController extends AbstractCrudController
     /**
      * A a new combination to a product
      */
-    public function deleteCombinationAction() {
-
+    public function deleteCombinationAction()
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
 
@@ -785,8 +768,7 @@ class ProductController extends AbstractCrudController
 
         try {
             $this->dispatch(TheliaEvents::PRODUCT_DELETE_COMBINATION, $event);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }

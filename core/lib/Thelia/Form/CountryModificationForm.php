@@ -42,7 +42,7 @@ class CountryModificationForm extends CurrencyCreationForm
                 "label_attr" => array(
                     "for" => "title"
                 )
-            ))            
+            ))
             ->add("short-description", "text", array(
                 "constraints" => array(
                     new NotBlank()
@@ -51,7 +51,7 @@ class CountryModificationForm extends CurrencyCreationForm
                 "label_attr" => array(
                     "for" => "short-description"
                 )
-            ))            
+            ))
             ->add("description", "text", array(
                 "constraints" => array(
                     new NotBlank()
@@ -60,7 +60,7 @@ class CountryModificationForm extends CurrencyCreationForm
                 "label_attr" => array(
                     "for" => "description"
                 )
-            ))            
+            ))
             ->add("area", "text", array(
                 "constraints" => array(
                     new NotBlank()
@@ -69,7 +69,7 @@ class CountryModificationForm extends CurrencyCreationForm
                 "label_attr" => array(
                     "for" => "area"
                 )
-            ))            
+            ))
             ->add("isocode", "text", array(
                 "constraints" => array(
                     new NotBlank()
@@ -78,7 +78,7 @@ class CountryModificationForm extends CurrencyCreationForm
                 "label_attr" => array(
                     "for" => "isocode"
                 )
-            ))            
+            ))
             ->add("isoalpha2", "text", array(
                 "constraints" => array(
                     new NotBlank()
@@ -87,7 +87,7 @@ class CountryModificationForm extends CurrencyCreationForm
                 "label_attr" => array(
                     "for" => "isoalpha2"
                 )
-            ))            
+            ))
             ->add("isoalpha3", "text", array(
                 "constraints" => array(
                     new NotBlank()

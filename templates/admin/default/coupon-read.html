@@ -8,7 +8,7 @@
         <nav>
             <ul class="breadcrumb">
                 <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
-                <li><a href="{url path='admin/coupon/'}">{intl l='Coupon'}</a></li>
+                <li><a href="{url path='admin/coupon'}">{intl l='Coupon'}</a></li>
                 <li>{$CODE}</li>
             </ul>
         </nav>
@@ -64,7 +64,11 @@
                             <tr>
                                 <td>{intl l='Usage left'}</td>
                                 <td>
-                                    {if $USAGE_LEFT}
+                                    {if $USAGE_LEFT == -1}
+                                        <span class="label label-success">
+                                            {intl l="Unlimited"}
+                                        </span>
+                                    {elseif $USAGE_LEFT}
                                         <span class="label label-success">
                                             {$USAGE_LEFT}
                                         </span>
@@ -118,11 +122,11 @@
                                 <td>{intl l='Application field'}</td>
                                 <td>
                                     <ul class="list-unstyled">
-                                        {foreach from=$APPLICATION_CONDITIONS item=rule name=rulesForeach}
-                                            {if !$smarty.foreach.rulesForeach.first}
+                                        {foreach from=$APPLICATION_CONDITIONS item=condition name=conditionsForeach}
+                                            {if !$smarty.foreach.conditionsForeach.first}
                                                 <li><span class="label label-info">{intl l='And'}</span></li>
                                             {/if}
-                                            <li>{$rule nofilter}</li>
+                                            <li>{$condition nofilter}</li>
                                         {/foreach}
                                     </ul>
                                 </td>

@@ -22,13 +22,17 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
+use Thelia\Core\Event\Content\ContentDeleteEvent;
+use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
+use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Form\ContentCreationForm;
 use Thelia\Form\ContentModificationForm;
 use Thelia\Model\ContentQuery;
-
 
 /**
  * Class ContentController
@@ -56,6 +60,62 @@ class ContentController extends AbstractCrudController
             TheliaEvents::CONTENT_TOGGLE_VISIBILITY,
             TheliaEvents::CONTENT_UPDATE_POSITION
         );
+    }
+
+    /**
+     * controller adding content to additional folder
+     *
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     */
+    public function addAdditionalFolderAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth('admin.content.update')) return $response;
+
+        $folder_id = intval($this->getRequest()->request->get('additional_folder_id'));
+
+        if ($folder_id > 0) {
+            $event = new ContentAddFolderEvent(
+                $this->getExistingObject(),
+                $folder_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::CONTENT_ADD_FOLDER, $event);
+            } catch (\Exception $e) {
+                return $this->errorPage($e);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
+    }
+
+    /**
+     * controller removing additional folder to a content
+     *
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     */
+    public function removeAdditionalFolderAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth('admin.content.update')) return $response;
+
+        $folder_id = intval($this->getRequest()->request->get('additional_folder_id'));
+
+        if ($folder_id > 0) {
+            $event = new ContentRemoveFolderEvent(
+                $this->getExistingObject(),
+                $folder_id
+            );
+
+            try {
+                $this->dispatch(TheliaEvents::CONTENT_REMOVE_FOLDER, $event);
+            } catch (\Exception $e) {
+                return $this->errorPage($e);
+            }
+        }
+
+        $this->redirectToEditionTemplate();
     }
 
     /**
@@ -143,7 +203,7 @@ class ContentController extends AbstractCrudController
      */
     protected function getDeleteEvent()
     {
-        // TODO: Implement getDeleteEvent() method.
+        return new ContentDeleteEvent($this->getRequest()->get('content_id'));
     }
 
     /**
@@ -209,10 +269,10 @@ class ContentController extends AbstractCrudController
     {
         $folderId = $this->getRequest()->get('folder_id', null);
 
-        if(null === $folderId) {
+        if (null === $folderId) {
             $content = $this->getExistingObject();
 
-            if($content) {
+            if ($content) {
                 $folderId = $content->getDefaultFolderId();
             }
         }
@@ -240,7 +300,8 @@ class ContentController extends AbstractCrudController
     {
         return array(
             'content_id' => $this->getRequest()->get('content_id', 0),
-            'current_tab' => $this->getRequest()->get('current_tab', 'general')
+            'current_tab' => $this->getRequest()->get('current_tab', 'general'),
+            'folder_id' => $this->getFolderId(),
         );
     }
 
@@ -272,7 +333,7 @@ class ContentController extends AbstractCrudController
     }
 
     /**
-     * @param \Thelia\Core\Event\Content\ContentUpdateEvent $updateEvent
+     * @param  \Thelia\Core\Event\Content\ContentUpdateEvent $updateEvent
      * @return Response|void
      */
     protected function performAdditionalUpdateAction($updateEvent)
@@ -285,5 +346,60 @@ class ContentController extends AbstractCrudController
                 array('parent' => $this->getFolderId())
             );
         }
+    }
+
+    /**
+     * Put in this method post object delete processing if required.
+     *
+     * @param  \Thelia\Core\Event\Content\ContentDeleteEvent $deleteEvent the delete event
+     * @return Response                                      a response, or null to continue normal processing
+     */
+    protected function performAdditionalDeleteAction($deleteEvent)
+    {
+        // Redirect to parent category list
+        $this->redirectToRoute(
+            'admin.folders.default',
+            array('parent' => $deleteEvent->getDefaultFolderId())
+        );
+    }
+
+    /**
+     * @param $event \Thelia\Core\Event\UpdatePositionEvent
+     * @return null|Response
+     */
+    protected function performAdditionalUpdatePositionAction($event)
+    {
+
+        if (null !== $content = ContentQuery::create()->findPk($event->getObjectId())) {
+            // Redirect to parent category list
+            $this->redirectToRoute(
+                'admin.folders.default',
+                array('parent' => $content->getDefaultFolderId())
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * @param $positionChangeMode
+     * @param $positionValue
+     * @return UpdatePositionEvent|void
+     */
+    protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
+    {
+        return new UpdatePositionEvent(
+            $this->getRequest()->get('content_id', null),
+            $positionChangeMode,
+            $positionValue
+        );
+    }
+
+    /**
+     * @return ContentToggleVisibilityEvent|void
+     */
+    protected function createToggleVisibilityEvent()
+    {
+        return new ContentToggleVisibilityEvent($this->getExistingObject());
     }
 }

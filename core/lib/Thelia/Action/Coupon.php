@@ -23,15 +23,16 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Constraint\ConstraintFactory;
+use Thelia\Condition\ConditionFactory;
+use Thelia\Condition\ConditionManagerInterface;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\CouponFactory;
 use Thelia\Coupon\CouponManager;
+use Thelia\Coupon\ConditionCollection;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as CouponModel;
 
@@ -73,19 +74,19 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Occurring when a Coupon rule is about to be updated
+     * Occurring when a Coupon condition is about to be updated
      *
      * @param CouponCreateOrUpdateEvent $event Event creation or update Coupon Rule
      */
-    public function updateRule(CouponCreateOrUpdateEvent $event)
+    public function updateCondition(CouponCreateOrUpdateEvent $event)
     {
         $coupon = $event->getCoupon();
 
-        $this->createOrUpdateRule($coupon, $event);
+        $this->createOrUpdateCondition($coupon, $event);
     }
 
     /**
-     * Occurring when a Coupon rule is about to be consumed
+     * Occurring when a Coupon condition is about to be consumed
      *
      * @param CouponConsumeEvent $event Event consuming Coupon
      */
@@ -137,11 +138,22 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     {
         $coupon->setDispatcher($this->getDispatcher());
 
+        // Set default condition if none found
+        /** @var ConditionManagerInterface $noConditionRule */
+        $noConditionRule = $this->container->get('thelia.condition.match_for_everyone');
+        /** @var ConditionFactory $conditionFactory */
+        $conditionFactory = $this->container->get('thelia.condition.factory');
+        $couponRuleCollection = new ConditionCollection();
+        $couponRuleCollection->add($noConditionRule);
+        $defaultSerializedRule = $conditionFactory->serializeConditionCollection(
+            $couponRuleCollection
+        );
+
         $coupon->createOrUpdate(
             $event->getCode(),
             $event->getTitle(),
             $event->getAmount(),
-            $event->getEffect(),
+            $event->getType(),
             $event->isRemovingPostage(),
             $event->getShortDescription(),
             $event->getDescription(),
@@ -150,6 +162,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $event->isAvailableOnSpecialOffers(),
             $event->isCumulative(),
             $event->getMaxUsage(),
+            $defaultSerializedRule,
             $event->getLocale()
         );
 
@@ -163,15 +176,15 @@ class Coupon extends BaseAction implements EventSubscriberInterface
      * @param CouponModel               $coupon Model to save
      * @param CouponCreateOrUpdateEvent $event  Event containing data
      */
-    protected function createOrUpdateRule(CouponModel $coupon, CouponCreateOrUpdateEvent $event)
+    protected function createOrUpdateCondition(CouponModel $coupon, CouponCreateOrUpdateEvent $event)
     {
         $coupon->setDispatcher($this->getDispatcher());
 
-        /** @var ConstraintFactory $constraintFactory */
-        $constraintFactory = $this->container->get('thelia.constraint.factory');
+        /** @var ConditionFactory $conditionFactory */
+        $conditionFactory = $this->container->get('thelia.condition.factory');
 
-        $coupon->createOrUpdateRules(
-            $constraintFactory->serializeCouponRuleCollection($event->getRules()),
+        $coupon->createOrUpdateConditions(
+            $conditionFactory->serializeConditionCollection($event->getConditions()),
             $event->getLocale()
         );
 
@@ -204,7 +217,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             TheliaEvents::COUPON_CREATE => array("create", 128),
             TheliaEvents::COUPON_UPDATE => array("update", 128),
             TheliaEvents::COUPON_CONSUME => array("consume", 128),
-            TheliaEvents::COUPON_RULE_UPDATE => array("updateRule", 128)
+            TheliaEvents::COUPON_CONDITION_UPDATE => array("updateCondition", 128)
         );
     }
 }

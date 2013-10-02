@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -300,7 +300,6 @@
     <column name="attribute_id" required="true" type="INTEGER" />
     <column name="template_id" required="true" type="INTEGER" />
     <column name="position" type="INTEGER" />
-    <column name="attribute_templatecol" size="45" type="VARCHAR" />
     <foreign-key foreignTable="attribute" name="fk_attribute_template_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_id" />
     </foreign-key>
@@ -643,7 +642,7 @@
     <column name="attribute_title" required="true" size="255" type="VARCHAR" />
     <column name="attribute_chapo" type="LONGVARCHAR" />
     <column name="attribute_description" type="CLOB" />
-    <column name="attribute_postscriptumn" type="LONGVARCHAR" />
+    <column name="attribute_postscriptum" type="LONGVARCHAR" />
     <column name="attribute_av_title" required="true" size="255" type="VARCHAR" />
     <column name="attribute_av_chapo" type="LONGVARCHAR" />
     <column name="attribute_av_description" type="CLOB" />
@@ -845,18 +844,18 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="45" type="VARCHAR" />
     <column name="type" required="true" size="255" type="VARCHAR" />
+    <column name="amount" required="true" type="FLOAT" />
     <column name="title" required="true" size="255" type="VARCHAR" />
+    <column name="is_enabled" required="true" type="BOOLEAN" />
     <column name="short_description" required="true" type="LONGVARCHAR" />
     <column name="description" required="true" type="CLOB" />
-    <column name="amount" required="true" type="FLOAT" />
-    <column name="is_used" required="true" type="TINYINT" />
-    <column name="is_enabled" required="true" type="TINYINT" />
     <column name="expiration_date" required="true" type="TIMESTAMP" />
-    <column name="serialized_rules" required="true" type="LONGVARCHAR" />
-    <column name="is_cumulative" required="true" type="TINYINT" />
-    <column name="is_removing_postage" required="true" type="TINYINT" />
     <column name="max_usage" required="true" type="INTEGER" />
+    <column name="is_cumulative" required="true" type="BOOLEAN" />
+    <column name="is_removing_postage" required="true" type="BOOLEAN" />
     <column name="is_available_on_special_offers" required="true" type="BOOLEAN" />
+    <column name="is_used" required="true" type="BOOLEAN" />
+    <column name="serialized_conditions" required="true" type="LONGVARCHAR" />
     <unique name="code_UNIQUE">
       <unique-column name="code" />
     </unique>
@@ -1247,6 +1246,7 @@
     <column name="title" required="true" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="amount" required="true" type="FLOAT" />
+    <column name="promo_amount" type="FLOAT" />
     <foreign-key foreignTable="order_product" name="fk_ order_product_tax_order_product_id0" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_product_id" />
     </foreign-key>

@@ -31,9 +31,7 @@ use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
-use Thelia\Core\Security\UserProvider\TokenProvider;
 use Symfony\Component\HttpFoundation\Cookie;
-use Thelia\Core\Security\UserProvider\CookieTokenProvider;
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
 
 class SessionController extends BaseAdminController
@@ -59,8 +57,7 @@ class SessionController extends BaseAdminController
 
                 // Render the home page
                 return $this->render("home");
-            }
-            catch (TokenAuthenticationException $ex) {
+            } catch (TokenAuthenticationException $ex) {
                 $this->adminLogAppend("Token based authentication failed.");
 
                 // Clear the cookie

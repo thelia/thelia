@@ -23,14 +23,13 @@
 
 namespace Thelia\Core\Event;
 
-
 /**
  * Class LostPasswordEvent
  * @package Thelia\Core\Event
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class LostPasswordEvent extends ActionEvent {
-
+class LostPasswordEvent extends ActionEvent
+{
     protected $email;
 
     public function __construct($email)
@@ -45,7 +44,5 @@ class LostPasswordEvent extends ActionEvent {
     {
         return $this->email;
     }
-
-
 
 }
