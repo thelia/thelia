@@ -597,4 +597,6 @@ final class TheliaEvents
      */
     const GENERATE_REWRITTENURL = 'action.generate_rewritenurl';
 
+    const GENERATE_PDF = 'thelia.generatePdf';
+
 }
