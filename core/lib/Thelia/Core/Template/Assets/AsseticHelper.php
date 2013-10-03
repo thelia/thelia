@@ -87,6 +87,10 @@ class AsseticHelper
                         $fm->set('cssimport', new Filter\CssImportFilter());
                         break;
 
+                    case 'compass':
+                        $fm->set('compass', new Filter\CompassFilter());
+                        break;
+
                     default :
                         throw new \InvalidArgumentException("Unsupported Assetic filter: '$filter_name'");
                         break;
