@@ -57,30 +57,7 @@ class CustomerController extends BaseAdminController
         ));
     }
 
-    public function deleteAddressAction()
-    {
-        if (null !== $response = $this->checkAuth("admin.customer.update")) return $response;
 
-        $address_id = $this->getRequest()->request->get('address_id');
-
-        try {
-            $address = AddressQuery::create()->findPk($address_id);
-
-            if (null === $address) {
-                throw new \InvalidArgumentException(sprintf('%d address does not exists', $address_id));
-            }
-
-            $addressEvent = new AddressEvent($address);
-
-            $this->dispatch(TheliaEvents::ADDRESS_DELETE, $addressEvent);
-
-            $this->adminLogAppend(sprintf("address %d for customer %d removal", $address_id, $address->getCustomerId()));
-        } catch(\Exception $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("error during address removal with message %s", $e->getMessage()));
-        }
-
-        $this->redirectToRoute('admin.customer.update.view', array(), array('customer_id' => $address->getCustomerId()));
-    }
 
     /**
      * update customer action

@@ -139,6 +139,11 @@ final class TheliaEvents
      */
     const ADDRESS_DELETE = "action.deleteAddress";
 
+    /**
+     * sent when an address is tag as default
+     */
+    const ADDRESS_DEFAULT = "action.defaultAddress";
+
     const BEFORE_CREATEADDRESS = "action.before_createAddress";
     const AFTER_CREATEADDRESS  = "action.after_createAddress";
 
