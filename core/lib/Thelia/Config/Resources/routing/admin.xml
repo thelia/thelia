@@ -380,7 +380,7 @@
     </route>
 
     <!-- content routes management -->
-    <route id="admin.folders.create" path="/admin/content/create">
+    <route id="admin.content.create" path="/admin/content/create">
         <default key="_controller">Thelia\Controller\Admin\ContentController::createAction</default>
     </route>
 
