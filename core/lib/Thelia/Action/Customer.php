@@ -111,15 +111,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $this->getSecurityContext()->clearCustomerUser();
     }
 
-    public function deleteAddress(CustomerAddressEvent $event)
-    {
-        $address = $event->getAddress();
-
-        $address->delete();
-
-        $event->setAddress($address);
-    }
-
     public function changePassword(ActionEvent $event)
     {
     // TODO
@@ -163,7 +154,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CUSTOMER_LOGOUT           => array('logout', 128),
             TheliaEvents::CUSTOMER_LOGIN            => array('login', 128),
             TheliaEvents::CUSTOMER_DELETEACCOUNT    => array('delete', 128),
-            TheliaEvents::CUSTOMER_ADDRESS_DELETE   => array('deleteAddress', 128)
         );
     }
 }

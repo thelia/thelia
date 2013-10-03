@@ -25,6 +25,7 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\Form;
+use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\Customer\CustomerAddressEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
@@ -69,18 +70,16 @@ class CustomerController extends BaseAdminController
                 throw new \InvalidArgumentException(sprintf('%d address does not exists', $address_id));
             }
 
-            $addressEvent = new CustomerAddressEvent($address);
+            $addressEvent = new AddressEvent($address);
 
-            $this->dispatch(TheliaEvents::CUSTOMER_ADDRESS_DELETE, $addressEvent);
+            $this->dispatch(TheliaEvents::ADDRESS_DELETE, $addressEvent);
 
             $this->adminLogAppend(sprintf("address %d for customer %d removal", $address_id, $address->getCustomerId()));
         } catch(\Exception $e) {
             \Thelia\Log\Tlog::getInstance()->error(sprintf("error during address removal with message %s", $e->getMessage()));
         }
 
-        return $this->render("customer-edit", array(
-            "customer_id" => $address->getCustomerId()
-        ));
+        $this->redirectToRoute('admin.customer.update.view', array(), array('customer_id' => $address->getCustomerId()));
     }
 
     /**
