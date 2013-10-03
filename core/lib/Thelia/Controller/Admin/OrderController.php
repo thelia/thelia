@@ -199,11 +199,21 @@ class OrderController extends BaseAdminController
 
     public function generateInvoicePdf($order_id)
     {
+        return $this->generatePdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
+    }
+
+    public function generateDeliveryPdf($order_id)
+    {
+        return $this->generatePdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
+    }
+
+    protected function generatePdf($order_id, $fileName)
+    {
         if (null !== $response = $this->checkAuth("admin.order.update")) return $response;
 
 
         $html = $this->renderRaw(
-            ConfigQuery::read('pdf_invoice_file', 'invoice'),
+            $fileName,
             array(
                 'order_id' => $order_id
             ),

@@ -59,7 +59,7 @@
             <td style="width:50%; padding: 0; border: none;" valign="bottom">
 
                 <div style="text-align: center; padding-bottom: 10mm;">
-                    <h1>#VARIABLE(nomsite)<!-- Vous pouvez remplacer #VARIABLE(nomsite) par le nom de votre entreprise --></h1>
+                    <h1>{config key="company_name"}</h1>
                     <p><!-- Insérer ici l'adresse de votre entreprise --></p>
                     <h2>{intl l="invoice"} {$INVOICE_REF}</h2>
                 </div>
@@ -73,7 +73,7 @@
 
                     <tr>
                         <td>{$REF}</td>
-                        <td>{loop type="customer" name="customer.invoice" id=$CUSTOMER}$REF{/loop}</td>
+                        <td>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</td>
                         <td>{format_date date=$INVOICE_DATE}</td>
                     </tr>
                 </table>
@@ -185,24 +185,12 @@
 
                     <tbody>
                     <tr>
-                        <th>::Mode de règlement::</th>
-                        <td>#PAIEMENTTITRE</td>
+                        <th>{intl l="Payment module"}</th>
+                        <td>{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</td>
                     </tr>
                     <tr>
-                        <th>::Mode de livraison::</th>
-                        <td>#TRANSPORTTITRE</td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <table style="width: 90%;">
-                    <col style="width: 100%; text-align: left;" />
-                    <tbody>
-                    <tr>
-                        <th>::Zone de correspondance::</th>
-                    </tr>
-                    <tr>
-                        <td style="height: 20mm;"></td>
+                        <th>{intl l="delivery module"}</th>
+                        <td>{loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}</td>
                     </tr>
                     </tbody>
                 </table>

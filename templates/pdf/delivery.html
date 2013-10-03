@@ -1,0 +1,193 @@
+<!--
+	THELIA - Modèle de bon de livraison
+
+	Pour plus d'information sur les possibilités de mise en page, merci de consulter
+	la documentation de html2pdf: http://html2pdf.fr/
+-->
+
+<style type="text/css">
+    <!--
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td,th {
+        padding: 1.5mm;
+        border: 0.2mm solid #333;
+    }
+
+    th {
+        background-color: #D83C46;
+        color: #fff;
+
+        text-align: center;
+        font-weight: normal;
+    }
+
+    td.total {
+        background-color: #ccc;
+        font-weight: bold;
+    }
+    -->
+</style>
+
+<page backtop="10mm" backleft="10mm" backright="10mm" backbottom="10mm">
+
+    <page_header>
+    </page_header>
+
+    <page_footer>
+        <table>
+            <col style="width: 80%; padding: 3mm; border: none; text-align: center;" />
+            <col style="width: 20%; padding: 3mm; border: none; text-align: right;" />
+            <tbody>
+            <tr>
+                <td><!-- Insérer ici les mentions légales --></td>
+                <td>{intl l="page"} [[page_cu]]/[[page_nb]]</td>
+            </tr>
+            </tbody>
+        </table>
+    </page_footer>
+
+{loop name="order.invoice" type="order" id=$order_id customer="*"}
+    {loop name="currency.order" type="currency" id=$CURRENCY}
+    {assign "orderCurrency" $SYMBOL}
+    {/loop}
+
+        <!-- En-tete du document -->
+        <table style="padding-bottom: 5mm;">
+
+            <col style="width:50%; padding: 0; border: none;" />
+            <col style="width:50%; padding: 0; border: none;" />
+
+            <tr>
+                <!-- A gauche: informations sur le BL -->
+
+                <td valign="bottom">
+
+                    <div style="text-align: center; padding-bottom: 5mm;">
+                        <h1 style="font-size: 5mm;">
+                            {config key="company_name"}
+                            <!-- Vous pouvez remplacer #VARIABLE(nomsite) par le nom de votre entreprise -->
+                        </h1>
+
+                        <!--
+                        <p> Vous pouvez insérer ici l'adresse de votre entreprise</p>
+                        -->
+
+                        <h2 style="font-size: 5mm;">{intl l='Delivery module'}<br />{$DELIVERY_REF}</h2>
+                    </div>
+
+                    <table style="width: 80%">
+                        <col style="width:50%;text-align: center;" />
+                        <col style="width:50%;text-align: center;" />
+
+                        <tr>
+                            <th>{intl l="invoice ref"}</th>
+                            <th>{intl l="invoice date"}</th>
+                        </tr>
+
+                        <tr>
+                            <td>{$REF}</td>
+                            <td>{format_date date=$INVOICE_DATE}</td>
+                        </tr>
+                    </table>
+
+                    <table style="width: 80%; margin-top: 3mm;">
+                        <col style="width:50%;text-align: center;" />
+                        <col style="width:50%;text-align: center;" />
+                        <tr>
+                            <th>{intl l="invoice"} </th>
+                            <th>{intl l="customer number"}</th>
+                        </tr>
+
+                        <tr>
+                            <td>{$INVOICE_REF}</td>
+                            <td>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</td>
+                        </tr>
+                    </table>
+                </td>
+
+                <!-- A droite: adresses de livraison et de facturation -->
+
+                <td valign="bottom">
+
+                    <table style="padding-bottom: 5mm;">
+                        <tr>
+                            <th style="width: 100%; text-align: left;">{intl l="delivery address"}</th>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                                {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
+                                {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
+                                {$ZIPCODE} {$COUNTRY}<br/>
+                                {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                                {/loop}
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table>
+                        <tr>
+                            <th style="width: 100%; text-align: left;">{intl l="invoice address"}</th>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
+                                {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
+                                {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
+                                {$ZIPCODE} {$COUNTRY}<br/>
+                                {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                                {/loop}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Liste des articles -->
+
+        <table>
+
+            <col style="width: 20%;" />
+            <col style="width: 65%;" />
+            <col style="width: 15%; text-align: right" />
+            <thead>
+            <tr>
+                <th style="text-align: center;">{intl l="Ref"}</th>
+                <th style="text-align: center;">{intl l="product"}</th>
+                <th style="text-align: center;">{intl l="Quantity"}</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {loop type="order_product" name="order-products" order=$ID}
+                <tr>
+                    <td>{$REF}</td>
+                    <td>{$TITLE}</td>
+                    <td>{$QUANTITY}</td>
+                </tr>
+            {/loop}
+            </tbody>
+        </table>
+
+        <!-- Mode de livraison -->
+
+        <table style="width: 100%; margin-top: 5mm;">
+            <col style="width: 20%;" />
+            <col style="width: 80%;" />
+            <tbody>
+            <tr>
+                <th>{intl l="delivery module"}</th>
+                <td>{loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}</td>
+            </tr>
+            </tbody>
+        </table>
+
+{/loop}
+</page>

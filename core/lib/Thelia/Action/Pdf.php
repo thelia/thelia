@@ -38,7 +38,7 @@ class Pdf extends BaseAction implements EventSubscriberInterface
     public function generatePdf(PdfEvent $event)
     {
 
-        $html2pdf = new \HTML2PDF('P', 'A4', 'fr', true, 'UTF-8', array(0,0,0,0));
+        $html2pdf = new \HTML2PDF($event->getOrientation(), $event->getFormat(), $event->getLang(), $event->getUnicode(), $event->getEncoding(), $event->getMarges());
 
         $html2pdf->pdf->SetDisplayMode('real');
 
