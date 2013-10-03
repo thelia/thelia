@@ -51,7 +51,7 @@ class BaseAdminController extends BaseController
     /**
      * Helper to append a message to the admin log.
      *
-     * @param unknown $message
+     * @param string $message
      */
     public function adminLogAppend($message)
     {

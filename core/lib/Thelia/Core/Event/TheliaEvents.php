@@ -77,6 +77,11 @@ final class TheliaEvents
     const CUSTOMER_DELETEACCOUNT = "action.deleteCustomer";
 
     /**
+     * sent on customer address removal
+     */
+    const CUSTOMER_ADDRESS_DELETE = "action.customer.deleteAddress";
+
+    /**
      * sent when a customer need a new password
      */
     const LOST_PASSWORD = "action.lostPassword";
