@@ -72,7 +72,7 @@ class AsseticHelper
                         break;
 
                     case 'sass' :
-                        $fm->set('less', new Filter\Sass\SassFilter());
+                        $fm->set('sass', new Filter\Sass\SassFilter());
                         break;
 
                     case 'cssembed' :
