@@ -99,6 +99,10 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->template = $template_path_from_template_base;
 
         $this->setTemplateDir(THELIA_TEMPLATE_DIR.$this->template);
+
+        $config_dir = THELIA_TEMPLATE_DIR.$this->template.'/configs';
+
+        $this->setConfigDir($config_dir);
     }
 
     public function getTemplate()

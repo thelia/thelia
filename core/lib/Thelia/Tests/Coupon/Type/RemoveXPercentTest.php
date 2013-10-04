@@ -158,7 +158,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0, $rule1, $rule2)));
+//        $coupon->setRules(new ConditionCollection(array($rule0, $rule1, $rule2)));
 //
 //        // Then
 //        $expected = 3;
@@ -169,7 +169,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //     * Test Coupon rule setter
 //     *
 //     * @covers Thelia\Coupon\type\RemoveXPercentManager::setRules
-//     * @expectedException \Thelia\Exception\InvalidRuleException
+//     * @expectedException \Thelia\Exception\InvalidConditionException
 //     *
 //     */
 //    public function testSetRulesInvalid()
@@ -188,7 +188,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0, $rule1, $rule2)));
+//        $coupon->setRules(new ConditionCollection(array($rule0, $rule1, $rule2)));
 //    }
 //
 //    /**
@@ -207,7 +207,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+//        $coupon->setRules(new ConditionCollection(array($rule0)));
 //
 //        // Then
 //        $expected = 24.50;
@@ -231,7 +231,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+//        $coupon->setRules(new ConditionCollection(array($rule0)));
 //
 //        // Then
 //        $expected = 24.50;
@@ -255,7 +255,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+//        $coupon->setRules(new ConditionCollection(array($rule0)));
 //
 //        // Then
 //        $expected = 24.50;
@@ -279,7 +279,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+//        $coupon->setRules(new ConditionCollection(array($rule0)));
 //
 //        // Then
 //        $expected = 24.50;
@@ -303,7 +303,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //        $coupon = $this->generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        // When
-//        $coupon->setRules(new CouponRuleCollection(array($rule0)));
+//        $coupon->setRules(new ConditionCollection(array($rule0)));
 //
 //        // Then
 //        $expected = 24.50;
@@ -322,7 +322,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //     * @param float                $amount                     Coupon discount
 //     * @param bool                 $isEnabled                  Is Coupon enabled
 //     * @param \DateTime            $expirationDate             Coupon expiration date
-//     * @param CouponRuleCollection $rules                      Coupon rules
+//     * @param ConditionCollection $rules                      Coupon rules
 //     * @param bool                 $isCumulative               If is cumulative
 //     * @param bool                 $isRemovingPostage          If is removing postage
 //     * @param bool                 $isAvailableOnSpecialOffers If is available on
@@ -407,7 +407,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //     */
 //    protected function generateValidRuleAvailableForTotalAmountOperatorTo($operator, $amount)
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $validators = array(
 //            AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
 //                $operator,
@@ -432,7 +432,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //    public function generateFakeAdapter($cartTotalPrice)
 //    {
 //        $stubCouponBaseAdapter = $this->getMock(
-//            'Thelia\Coupon\CouponBaseAdapter',
+//            'Thelia\Coupon\BaseAdapter',
 //            array(
 //                'getCartTotalPrice'
 //            ),

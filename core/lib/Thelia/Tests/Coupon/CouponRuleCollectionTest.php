@@ -33,7 +33,7 @@ use Thelia\Constraint\Rule\Operators;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test CouponRuleCollection Class
+ * Unit Test ConditionCollection Class
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
@@ -73,7 +73,7 @@ class CouponRuleCollectionTest extends \PHPUnit_Framework_TestCase
 ////                )
 ////            )
 ////        );
-////        $rules = new CouponRuleCollection(array($rule1, $rule2));
+////        $rules = new ConditionCollection(array($rule1, $rule2));
 ////
 ////        $serializedRules = base64_encode(serialize($rules));
 ////        $unserializedRules = unserialize(base64_decode($serializedRules));

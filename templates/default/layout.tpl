@@ -90,12 +90,12 @@ URL: http://www.thelia.net
                         <li><a href="{url path="/customer/account"}" class="login">{intl l="My Account"}</a></li>
                     {/loop}
 
-                    {elseloop rel="customer_info_block" rel="customer_info_block"}
+                    {elseloop rel="customer_info_block"}
                     <li><a href="{url path="/register"}" class="register">{intl l="Register"}!</a></li>
                     <li><a href="{url path="/login"}" class="login">{intl l="Log In!"}</a></li>
                     {/elseloop}
                     <li class="dropdown">
-                        <a href="{url path="/cart"}" class="dropdown-toggle cart" data-toggle="dropdown">
+                        <a href="{url path="/cart"}" class="dropdown-toggle cart" {*data-toggle="dropdown"*}>
                             Cart <span class="badge">{cart attr="count_item"}</span>
                         </a>
                     </li>

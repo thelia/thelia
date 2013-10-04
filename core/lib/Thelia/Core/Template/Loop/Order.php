@@ -53,11 +53,24 @@ class Order extends BaseLoop
                 'customer',
                 new TypeCollection(
                     new Type\IntType(),
-                    new Type\EnumType(array('current'))
+                    new Type\EnumType(array('current', '*'))
                 ),
                 'current'
             ),
-            Argument::createIntListTypeArgument('status')
+            new Argument(
+                'status',
+                new TypeCollection(
+                    new Type\IntListType(),
+                    new Type\EnumType(array('*'))
+                )
+            ),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new Type\EnumListType(array('create-date', 'create-date-reverse'))
+                ),
+                'create-date-reverse'
+            )
         );
     }
 
@@ -85,14 +98,27 @@ class Order extends BaseLoop
             } else {
                 $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
             }
-        } else {
+        } elseif ($customer !== '*') {
             $search->filterByCustomerId($customer, Criteria::EQUAL);
         }
 
         $status = $this->getStatus();
 
-        if (null !== $status) {
+        if (null !== $status && $status != '*') {
             $search->filterByStatusId($status, Criteria::IN);
+        }
+
+        $orderers = $this->getOrder();
+
+        foreach ($orderers as $orderer) {
+            switch ($orderer) {
+                case "create-date":
+                    $search->orderByCreatedAt(Criteria::ASC);
+                    break;
+                case "create-date-reverse":
+                    $search->orderByCreatedAt(Criteria::DESC);
+                    break;
+            }
         }
 
         $orders = $this->search($search, $pagination);

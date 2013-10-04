@@ -198,4 +198,20 @@ trait PositionManagementTrait {
             }
         }
     }
+
+    protected function reorderBeforeDelete()
+    {
+        // Find DATABASE_NAME constant
+        $mapClassName = self::TABLE_MAP;
+
+        $sql = sprintf("UPDATE `%s` SET position=(position-1) WHERE parent=:parent AND position>:position", $mapClassName::TABLE_NAME);
+
+        $con = Propel::getConnection($mapClassName::DATABASE_NAME);
+        $statement = $con->prepare($sql);
+
+        $statement->execute(array(
+            ':parent' => $this->getParent(),
+            ':position' => $this->getPosition()
+        ));
+    }
 }

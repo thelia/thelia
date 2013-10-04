@@ -23,10 +23,10 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\AttributeAvDeleteEvent;
+use Thelia\Core\Event\Attribute\AttributeAvDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\AttributeAvUpdateEvent;
-use Thelia\Core\Event\AttributeAvCreateEvent;
+use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
+use Thelia\Core\Event\Attribute\AttributeAvCreateEvent;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Form\AttributeAvModificationForm;
 use Thelia\Form\AttributeAvCreationForm;

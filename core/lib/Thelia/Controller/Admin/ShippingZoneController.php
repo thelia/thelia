@@ -35,12 +35,11 @@ class ShippingZoneController extends BaseAdminController
         if (null !== $response = $this->checkAuth("admin.shipping-zones.view")) return $response;
         return $this->render("shipping-zones", array("display_shipping_zone" => 20));
     }
-    
+
     public function updateAction($shipping_zones_id)
     {
-
-    	return $this->render("shipping-zones-edit", array(
-    		"shipping_zones_id" => $shipping_zones_id
-    	));
+        return $this->render("shipping-zones-edit", array(
+            "shipping_zones_id" => $shipping_zones_id
+        ));
     }
 }

@@ -29,16 +29,16 @@ use Thelia\Model\Config as ConfigModel;
 
 use Thelia\Core\Event\TheliaEvents;
 
-use Thelia\Core\Event\ConfigUpdateEvent;
-use Thelia\Core\Event\ConfigCreateEvent;
-use Thelia\Core\Event\ConfigDeleteEvent;
+use Thelia\Core\Event\Config\ConfigUpdateEvent;
+use Thelia\Core\Event\Config\ConfigCreateEvent;
+use Thelia\Core\Event\Config\ConfigDeleteEvent;
 
 class Config extends BaseAction implements EventSubscriberInterface
 {
     /**
      * Create a new configuration entry
      *
-     * @param ConfigCreateEvent $event
+     * @param \Thelia\Core\Event\Config\ConfigCreateEvent $event
      */
     public function create(ConfigCreateEvent $event)
     {
@@ -54,7 +54,7 @@ class Config extends BaseAction implements EventSubscriberInterface
     /**
      * Change a configuration entry value
      *
-     * @param ConfigUpdateEvent $event
+     * @param \Thelia\Core\Event\Config\ConfigUpdateEvent $event
      */
     public function setValue(ConfigUpdateEvent $event)
     {
@@ -74,7 +74,7 @@ class Config extends BaseAction implements EventSubscriberInterface
     /**
      * Change a configuration entry
      *
-     * @param ConfigUpdateEvent $event
+     * @param \Thelia\Core\Event\Config\ConfigUpdateEvent $event
      */
     public function modify(ConfigUpdateEvent $event)
     {
@@ -94,7 +94,7 @@ class Config extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a configuration entry
      *
-     * @param ConfigDeleteEvent $event
+     * @param \Thelia\Core\Event\Config\ConfigDeleteEvent $event
      */
     public function delete(ConfigDeleteEvent $event)
     {

@@ -25,7 +25,6 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\ToggleVisibilityEvent;
 
 /**
  * An abstract CRUD controller for Thelia ADMIN, to manage basic CRUD operations on a givent object.
@@ -53,14 +52,13 @@ abstract class AbstractCrudController extends BaseAdminController
     protected $visibilityToggleEventIdentifier;
     protected $changePositionEventIdentifier;
 
-
     /**
      * @param string $objectName the lower case object name. Example. "message"
      *
-     * @param string $defaultListOrder the default object list order, or null if list is not sortable. Example: manual
+     * @param string $defaultListOrder          the default object list order, or null if list is not sortable. Example: manual
      * @param string $orderRequestParameterName Name of the request parameter that set the list order (null if list is not sortable)
      *
-     * @param string $viewPermissionIdentifier the 'view' permission identifier. Example: "admin.configuration.message.view"
+     * @param string $viewPermissionIdentifier   the 'view' permission identifier. Example: "admin.configuration.message.view"
      * @param string $createPermissionIdentifier the 'create' permission identifier. Example: "admin.configuration.message.create"
      * @param string $updatePermissionIdentifier the 'update' permission identifier. Example: "admin.configuration.message.update"
      * @param string $deletePermissionIdentifier the 'delete' permission identifier. Example: "admin.configuration.message.delete"
@@ -70,7 +68,7 @@ abstract class AbstractCrudController extends BaseAdminController
      * @param string $deleteEventIdentifier the dispatched delete TheliaEvent identifier. Example: TheliaEvents::MESSAGE_DELETE
      *
      * @param string $visibilityToggleEventIdentifier the dispatched visibility toggle TheliaEvent identifier, or null if the object has no visible options. Example: TheliaEvents::MESSAGE_TOGGLE_VISIBILITY
-     * @param string $changePositionEventIdentifier the dispatched position change TheliaEvent identifier, or null if the object has no position. Example: TheliaEvents::MESSAGE_UPDATE_POSITION
+     * @param string $changePositionEventIdentifier   the dispatched position change TheliaEvent identifier, or null if the object has no position. Example: TheliaEvents::MESSAGE_UPDATE_POSITION
      */
     public function __construct(
             $objectName,
@@ -109,94 +107,93 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Return the creation form for this object
      */
-    protected abstract function getCreationForm();
+    abstract protected function getCreationForm();
 
     /**
      * Return the update form for this object
      */
-    protected abstract function getUpdateForm();
+    abstract protected function getUpdateForm();
 
     /**
      * Hydrate the update form for this object, before passing it to the update template
      *
      * @param unknown $object
      */
-    protected abstract function hydrateObjectForm($object);
+    abstract protected function hydrateObjectForm($object);
 
     /**
      * Creates the creation event with the provided form data
      *
      * @param unknown $formData
      */
-    protected abstract function getCreationEvent($formData);
+    abstract protected function getCreationEvent($formData);
 
     /**
      * Creates the update event with the provided form data
      *
      * @param unknown $formData
      */
-    protected abstract function getUpdateEvent($formData);
+    abstract protected function getUpdateEvent($formData);
 
     /**
      * Creates the delete event with the provided form data
      */
-    protected abstract function getDeleteEvent();
+    abstract protected function getDeleteEvent();
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param unknown $event
      */
-    protected abstract function eventContainsObject($event);
+    abstract protected function eventContainsObject($event);
 
     /**
      * Get the created object from an event.
      *
      * @param unknown $createEvent
      */
-    protected abstract function getObjectFromEvent($event);
+    abstract protected function getObjectFromEvent($event);
 
     /**
      * Load an existing object from the database
      */
-    protected abstract function getExistingObject();
+    abstract protected function getExistingObject();
 
     /**
      * Returns the object label form the object event (name, title, etc.)
      *
      * @param unknown $object
      */
-    protected abstract function getObjectLabel($object);
+    abstract protected function getObjectLabel($object);
 
     /**
      * Returns the object ID from the object
      *
      * @param unknown $object
      */
-    protected abstract function getObjectId($object);
+    abstract protected function getObjectId($object);
 
     /**
      * Render the main list template
      *
      * @param unknown $currentOrder, if any, null otherwise.
      */
-    protected abstract function renderListTemplate($currentOrder);
+    abstract protected function renderListTemplate($currentOrder);
 
     /**
      * Render the edition template
      */
-    protected abstract function renderEditionTemplate();
+    abstract protected function renderEditionTemplate();
 
     /**
      * Redirect to the edition template
      */
-    protected abstract function redirectToEditionTemplate();
+    abstract protected function redirectToEditionTemplate();
 
     /**
      * Redirect to the list template
      */
-    protected abstract function redirectToListTemplate();
-
+    abstract protected function redirectToListTemplate();
 
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
@@ -211,7 +208,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param unknown $createEvent the create event
+     * @param  unknown  $createEvent the create event
      * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalCreateAction($createEvent)
@@ -222,7 +219,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Put in this method post object update processing if required.
      *
-     * @param unknown $updateEvent the update event
+     * @param  unknown  $updateEvent the update event
      * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalUpdateAction($updateEvent)
@@ -233,7 +230,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param unknown $deleteEvent the delete event
+     * @param  unknown  $deleteEvent the delete event
      * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalDeleteAction($deleteEvent)
@@ -244,7 +241,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Put in this method post object position change processing if required.
      *
-     * @param unknown $deleteEvent the delete event
+     * @param  unknown  $deleteEvent the delete event
      * @return Response a response, or null to continue normal processing
      */
     protected function performAdditionalUpdatePositionAction($positionChangeEvent)
@@ -282,7 +279,6 @@ abstract class AbstractCrudController extends BaseAdminController
     public function defaultAction()
     {
         if (null !== $response = $this->checkAuth($this->viewPermissionIdentifier)) return $response;
-
         return $this->renderList();
     }
 
@@ -323,22 +319,19 @@ abstract class AbstractCrudController extends BaseAdminController
 
             $response = $this->performAdditionalCreateAction($createEvent);
 
-            if ($response == null)  {
+            if ($response == null) {
                 // Substitute _ID_ in the URL with the ID of the created object
                 $successUrl = str_replace('_ID_', $this->getObjectId($createdObject), $creationForm->getSuccessUrl());
 
                 // Redirect to the success URL
                 $this->redirect($successUrl);
-            }
-            else {
+            } else {
                 return $response;
             }
-        }
-        catch (FormValidationException $ex) {
+        } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -423,16 +416,13 @@ abstract class AbstractCrudController extends BaseAdminController
 
                 // Redirect to the success URL
                 $this->redirect($changeForm->getSuccessUrl());
-            }
-            else {
+            } else {
                 return $response;
             }
-        }
-        catch (FormValidationException $ex) {
+        } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any other error
             $error_msg = $ex->getMessage();
         }
@@ -469,8 +459,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $event = $this->createUpdatePositionEvent($mode, $position);
 
             $this->dispatch($this->changePositionEventIdentifier, $event);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
@@ -479,14 +468,13 @@ abstract class AbstractCrudController extends BaseAdminController
 
         if ($response == null) {
             $this->redirectToListTemplate();
-        }
-        else {
+        } else {
             return $response;
         }
     }
 
-    protected function genericUpdatePositionAction($object, $eventName, $doFinalRedirect = true) {
-
+    protected function genericUpdatePositionAction($object, $eventName, $doFinalRedirect = true)
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
 
@@ -507,8 +495,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $event = new UpdatePositionEvent($object->getId(), $mode, $position);
 
                 $this->dispatch($eventName, $event);
-            }
-            catch (\Exception $ex) {
+            } catch (\Exception $ex) {
                 // Any error
                 return $this->errorPage($ex);
             }

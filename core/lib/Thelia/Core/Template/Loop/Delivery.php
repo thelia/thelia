@@ -57,9 +57,9 @@ class Delivery extends BaseSpecificModule
         $search->filterByType(BaseModule::DELIVERY_MODULE_TYPE, Criteria::EQUAL);
 
         $countryId = $this->getCountry();
-        if(null !== $countryId) {
+        if (null !== $countryId) {
             $country = CountryQuery::create()->findPk($countryId);
-            if(null === $country) {
+            if (null === $country) {
                 throw new \InvalidArgumentException('Cannot found country id: `' . $countryId . '` in delivery loop');
             }
         } else {

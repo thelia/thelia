@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Content;
 
-
 /**
  * Class ContentCreateEvent
  * @package Thelia\Core\Event\Content
@@ -76,9 +75,6 @@ class ContentCreateEvent extends ContentEvent
         return $this->default_folder;
     }
 
-
-
-
     /**
      * @param mixed $visible
      *
@@ -118,7 +114,5 @@ class ContentCreateEvent extends ContentEvent
     {
         return $this->title;
     }
-
-
 
 }

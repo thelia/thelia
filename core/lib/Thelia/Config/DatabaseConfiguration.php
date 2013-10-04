@@ -60,7 +60,7 @@ class DatabaseConfiguration implements ConfigurationInterface
                             ->cannotBeEmpty()
                         ->end()
                         ->scalarNode("classname")
-                            ->defaultValue("\Propel\Runtime\Connection\PropelPDO")
+                            ->defaultValue("\Propel\Runtime\Connection\ConnectionWrapper")
                         ->end()
                     ->end()
                 ->end()

@@ -23,7 +23,6 @@
 
 namespace Thelia\Tests\Rewriting;
 
-
 /**
  * Class BaseRewritingObject
  * @package Thelia\Tests\Rewriting
@@ -35,7 +34,7 @@ abstract class BaseRewritingObject extends \PHPUnit_Framework_TestCase
     /**
      * @return mixed an instance of Product, Folder, Content or Category Model
      */
-    abstract function getObject();
+    abstract public function getObject();
 
     /**
      * @covers Thelia\Model\Tools\UrlRewritingTrait::generateRewrittenUrl

@@ -23,13 +23,12 @@
 
 namespace Thelia\Core\Security\UserProvider;
 
-use Thelia\Action\Customer;
 use Thelia\Model\CustomerQuery;
 
 class CustomerTokenUserProvider extends TokenUserProvider
 {
-    public function getUser($dataArray) {
-
+    public function getUser($dataArray)
+    {
         return CustomerQuery::create()
             ->filterByEmail($dataArray['username'])
             ->filterByRememberMeSerial($dataArray['serial'])

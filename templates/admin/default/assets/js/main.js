@@ -54,23 +54,36 @@
 
         // -- Confirm Box --
         if($('[data-toggle="confirm"]').length){
-            $('[data-toggle="confirm"]').click(function(e){		
+            $('[data-toggle="confirm"]').click(function(e){
 
-                var $link = $(this);
-                var modal = $(this).data('target');		
+                var $this = $(this);
+                var $modal = $($this.data('target'));
 
-                $(modal).modal('show');
+                $modal.modal('show');
 
-                $(modal).on('shown', function () {
-                    $('[data-confirm]').attr('href', $link.attr('href'));
+                $modal.on('shown', function () {
+                    if($this.data('script')){
+
+                        $('[data-confirm]').click(function(){
+
+                            eval($this.data('script'));
+
+                            $modal.modal('hide');
+                            return false;
+                        });
+
+                    }
+                    else{
+                        $('[data-confirm]').attr('href', $this.attr('href'));
+                    }
                 });
 
-                if($(modal).is(':hidden')){
+                if($modal.is(':hidden')){
                     e.preventDefault();
                 }
 
             });
-        }           
+        }
 
         // -- Mini browser --
         miniBrowser = function (root, url){

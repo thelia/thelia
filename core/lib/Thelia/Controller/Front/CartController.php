@@ -24,7 +24,7 @@ namespace Thelia\Controller\Front;
 
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Event\CartEvent;
+use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Form\CartAdd;
@@ -102,7 +102,7 @@ class CartController extends BaseFrontController
     /**
      * use Thelia\Cart\CartTrait for searching current cart or create a new one
      *
-     * @return CartEvent
+     * @return \Thelia\Core\Event\Cart\CartEvent
      */
     protected function getCartEvent()
     {

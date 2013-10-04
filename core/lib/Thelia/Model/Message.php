@@ -5,7 +5,7 @@ namespace Thelia\Model;
 use Thelia\Model\Base\Message as BaseMessage;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\MessageEvent;
+use Thelia\Core\Event\Message\MessageEvent;
 
 class Message extends BaseMessage {
 

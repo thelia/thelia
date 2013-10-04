@@ -38,10 +38,11 @@ class FloatToFloatArrayType implements TypeInterface
     public function isValid($value)
     {
         if(!is_array($value))
+
             return false;
 
-        foreach($value as $key => $value) {
-            if( filter_var($key, FILTER_VALIDATE_FLOAT) === false || filter_var($value, FILTER_VALIDATE_FLOAT) === false ) {
+        foreach ($value as $key => $value) {
+            if ( filter_var($key, FILTER_VALIDATE_FLOAT) === false || filter_var($value, FILTER_VALIDATE_FLOAT) === false ) {
                 return false;
             }
         }

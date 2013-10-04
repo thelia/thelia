@@ -3,7 +3,7 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\OrderEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\OrderProduct as BaseOrderProduct;
 

@@ -23,7 +23,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Coupon\Type\CouponAbstract;
 use Thelia\Exception\MissingAdapterException;
 

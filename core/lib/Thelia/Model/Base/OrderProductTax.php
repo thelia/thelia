@@ -87,6 +87,12 @@ abstract class OrderProductTax implements ActiveRecordInterface
     protected $amount;
 
     /**
+     * The value for the promo_amount field.
+     * @var        double
+     */
+    protected $promo_amount;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -153,7 +159,7 @@ abstract class OrderProductTax implements ActiveRecordInterface
      * be false, if the object was retrieved from storage or was created
      * and then saved.
      *
-     * @return true, if the object has never been persisted.
+     * @return boolean true, if the object has never been persisted.
      */
     public function isNew()
     {
@@ -211,8 +217,8 @@ abstract class OrderProductTax implements ActiveRecordInterface
      * <code>obj</code> is an instance of <code>OrderProductTax</code>, delegates to
      * <code>equals(OrderProductTax)</code>.  Otherwise, returns <code>false</code>.
      *
-     * @param      obj The object to compare to.
-     * @return Whether equal to the object specified.
+     * @param  mixed   $obj The object to compare to.
+     * @return boolean Whether equal to the object specified.
      */
     public function equals($obj)
     {
@@ -251,8 +257,6 @@ abstract class OrderProductTax implements ActiveRecordInterface
     /**
      * Get the associative array of the virtual columns in this object
      *
-     * @param string $name The virtual column name
-     *
      * @return array
      */
     public function getVirtualColumns()
@@ -263,6 +267,7 @@ abstract class OrderProductTax implements ActiveRecordInterface
     /**
      * Checks the existence of a virtual column in this object
      *
+     * @param  string  $name The virtual column name
      * @return boolean
      */
     public function hasVirtualColumn($name)
@@ -273,7 +278,10 @@ abstract class OrderProductTax implements ActiveRecordInterface
     /**
      * Get the value of a virtual column in this object
      *
+     * @param  string $name The virtual column name
      * @return mixed
+     *
+     * @throws PropelException
      */
     public function getVirtualColumn($name)
     {
@@ -330,7 +338,9 @@ abstract class OrderProductTax implements ActiveRecordInterface
             $parser = AbstractParser::getParser($parser);
         }
 
-        return $this->fromArray($parser->toArray($data), TableMap::TYPE_PHPNAME);
+        $this->fromArray($parser->toArray($data), TableMap::TYPE_PHPNAME);
+
+        return $this;
     }
 
     /**
@@ -421,6 +431,17 @@ abstract class OrderProductTax implements ActiveRecordInterface
     }
 
     /**
+     * Get the [promo_amount] column value.
+     *
+     * @return   double
+     */
+    public function getPromoAmount()
+    {
+
+        return $this->promo_amount;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -436,7 +457,7 @@ abstract class OrderProductTax implements ActiveRecordInterface
         if ($format === null) {
             return $this->created_at;
         } else {
-            return $this->created_at !== null ? $this->created_at->format($format) : null;
+            return $this->created_at instanceof \DateTime ? $this->created_at->format($format) : null;
         }
     }
 
@@ -456,7 +477,7 @@ abstract class OrderProductTax implements ActiveRecordInterface
         if ($format === null) {
             return $this->updated_at;
         } else {
-            return $this->updated_at !== null ? $this->updated_at->format($format) : null;
+            return $this->updated_at instanceof \DateTime ? $this->updated_at->format($format) : null;
         }
     }
 
@@ -570,6 +591,27 @@ abstract class OrderProductTax implements ActiveRecordInterface
     } // setAmount()
 
     /**
+     * Set the value of [promo_amount] column.
+     *
+     * @param      double $v new value
+     * @return   \Thelia\Model\OrderProductTax The current object (for fluent API support)
+     */
+    public function setPromoAmount($v)
+    {
+        if ($v !== null) {
+            $v = (double) $v;
+        }
+
+        if ($this->promo_amount !== $v) {
+            $this->promo_amount = $v;
+            $this->modifiedColumns[] = OrderProductTaxTableMap::PROMO_AMOUNT;
+        }
+
+
+        return $this;
+    } // setPromoAmount()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -663,13 +705,16 @@ abstract class OrderProductTax implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OrderProductTaxTableMap::translateFieldName('Amount', TableMap::TYPE_PHPNAME, $indexType)];
             $this->amount = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderProductTaxTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderProductTaxTableMap::translateFieldName('PromoAmount', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->promo_amount = (null !== $col) ? (double) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OrderProductTaxTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OrderProductTaxTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : OrderProductTaxTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -682,7 +727,7 @@ abstract class OrderProductTax implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = OrderProductTaxTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = OrderProductTaxTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\OrderProductTax object", 0, $e);
@@ -933,6 +978,9 @@ abstract class OrderProductTax implements ActiveRecordInterface
         if ($this->isColumnModified(OrderProductTaxTableMap::AMOUNT)) {
             $modifiedColumns[':p' . $index++]  = 'AMOUNT';
         }
+        if ($this->isColumnModified(OrderProductTaxTableMap::PROMO_AMOUNT)) {
+            $modifiedColumns[':p' . $index++]  = 'PROMO_AMOUNT';
+        }
         if ($this->isColumnModified(OrderProductTaxTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -964,6 +1012,9 @@ abstract class OrderProductTax implements ActiveRecordInterface
                         break;
                     case 'AMOUNT':
                         $stmt->bindValue($identifier, $this->amount, PDO::PARAM_STR);
+                        break;
+                    case 'PROMO_AMOUNT':
+                        $stmt->bindValue($identifier, $this->promo_amount, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1049,9 +1100,12 @@ abstract class OrderProductTax implements ActiveRecordInterface
                 return $this->getAmount();
                 break;
             case 5:
-                return $this->getCreatedAt();
+                return $this->getPromoAmount();
                 break;
             case 6:
+                return $this->getCreatedAt();
+                break;
+            case 7:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1088,12 +1142,12 @@ abstract class OrderProductTax implements ActiveRecordInterface
             $keys[2] => $this->getTitle(),
             $keys[3] => $this->getDescription(),
             $keys[4] => $this->getAmount(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[5] => $this->getPromoAmount(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
-        foreach($virtualColumns as $key => $virtualColumn)
-        {
+        foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
@@ -1151,9 +1205,12 @@ abstract class OrderProductTax implements ActiveRecordInterface
                 $this->setAmount($value);
                 break;
             case 5:
-                $this->setCreatedAt($value);
+                $this->setPromoAmount($value);
                 break;
             case 6:
+                $this->setCreatedAt($value);
+                break;
+            case 7:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1185,8 +1242,9 @@ abstract class OrderProductTax implements ActiveRecordInterface
         if (array_key_exists($keys[2], $arr)) $this->setTitle($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setAmount($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[5], $arr)) $this->setPromoAmount($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
     }
 
     /**
@@ -1203,6 +1261,7 @@ abstract class OrderProductTax implements ActiveRecordInterface
         if ($this->isColumnModified(OrderProductTaxTableMap::TITLE)) $criteria->add(OrderProductTaxTableMap::TITLE, $this->title);
         if ($this->isColumnModified(OrderProductTaxTableMap::DESCRIPTION)) $criteria->add(OrderProductTaxTableMap::DESCRIPTION, $this->description);
         if ($this->isColumnModified(OrderProductTaxTableMap::AMOUNT)) $criteria->add(OrderProductTaxTableMap::AMOUNT, $this->amount);
+        if ($this->isColumnModified(OrderProductTaxTableMap::PROMO_AMOUNT)) $criteria->add(OrderProductTaxTableMap::PROMO_AMOUNT, $this->promo_amount);
         if ($this->isColumnModified(OrderProductTaxTableMap::CREATED_AT)) $criteria->add(OrderProductTaxTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(OrderProductTaxTableMap::UPDATED_AT)) $criteria->add(OrderProductTaxTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1272,6 +1331,7 @@ abstract class OrderProductTax implements ActiveRecordInterface
         $copyObj->setTitle($this->getTitle());
         $copyObj->setDescription($this->getDescription());
         $copyObj->setAmount($this->getAmount());
+        $copyObj->setPromoAmount($this->getPromoAmount());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1363,6 +1423,7 @@ abstract class OrderProductTax implements ActiveRecordInterface
         $this->title = null;
         $this->description = null;
         $this->amount = null;
+        $this->promo_amount = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

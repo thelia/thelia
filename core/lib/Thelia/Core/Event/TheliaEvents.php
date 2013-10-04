@@ -193,8 +193,9 @@ final class TheliaEvents
     const CONTENT_TOGGLE_VISIBILITY = "action.toggleContentVisibility";
     const CONTENT_UPDATE_POSITION   = "action.updateContentPosition";
 
-//    const FOLDER_ADD_CONTENT      = "action.categoryAddContent";
-//    const FOLDER_REMOVE_CONTENT   = "action.categoryRemoveContent";
+    const CONTENT_ADD_FOLDER      = "action.contentAddFolder";
+    const CONTENT_REMOVE_FOLDER   = "action.contentRemoveFolder";
+
 
     const BEFORE_CREATECONTENT = "action.before_createContent";
     const AFTER_CREATECONTENT	= "action.after_createContent";
@@ -324,6 +325,10 @@ final class TheliaEvents
     const ORDER_AFTER_CREATE = "action.order.afterCreate";
     const ORDER_BEFORE_PAYMENT = "action.order.beforePayment";
 
+    const ORDER_UPDATE_STATUS = "action.order.updateStatus";
+    const ORDER_UPDATE_DELIVERY_REF = "action.order.updateDeliveryRef";
+    const ORDER_UPDATE_ADDRESS = "action.order.updateAddress";
+
     const ORDER_PRODUCT_BEFORE_CREATE = "action.orderProduct.beforeCreate";
     const ORDER_PRODUCT_AFTER_CREATE = "action.orderProduct.afterCreate";
 
@@ -423,19 +428,19 @@ final class TheliaEvents
     const AFTER_CONSUME_COUPON 	= "action.after_consume_coupon";
 
     /**
-     * Sent when attempting to update Coupon Rule
+     * Sent when attempting to update Coupon Condition
      */
-    const COUPON_RULE_UPDATE 	= "action.update_coupon_rule";
+    const COUPON_CONDITION_UPDATE 	= "action.update_coupon_condition";
 
     /**
-     * Sent just before an attempt to update a Coupon Rule
+     * Sent just before an attempt to update a Coupon Condition
      */
-    const BEFORE_COUPON_RULE_UPDATE 	= "action.before_update_coupon_rule";
+    const BEFORE_COUPON_CONDITION_UPDATE 	= "action.before_update_coupon_condition";
 
     /**
-     * Sent just after an attempt to update a Coupon Rule
+     * Sent just after an attempt to update a Coupon Condition
      */
-    const AFTER_COUPON_RULE_UPDATE 	= "action.after_update_coupon_rule";
+    const AFTER_COUPON_CONDITION_UPDATE 	= "action.after_update_coupon_condition";
 
     // -- Configuration management ---------------------------------------------
 
@@ -566,7 +571,6 @@ final class TheliaEvents
     const BEFORE_DELETEATTRIBUTE_AV = "action.before_deleteAttributeAv";
     const AFTER_DELETEATTRIBUTE_AV  = "action.after_deleteAttributeAv";
 
-
     // -- Features values management ----------------------------------------
 
     const FEATURE_AV_CREATE          = "action.createFeatureAv";
@@ -592,5 +596,7 @@ final class TheliaEvents
      * sent when Thelia try to generate a rewriten url
      */
     const GENERATE_REWRITTENURL = 'action.generate_rewritenurl';
+
+    const GENERATE_PDF = 'thelia.generatePdf';
 
 }

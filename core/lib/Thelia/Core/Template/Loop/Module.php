@@ -103,7 +103,7 @@ class Module extends BaseI18nLoop
 
         $active = $this->getActive();
 
-        if($active !== Type\BooleanOrBothType::ANY) {
+        if ($active !== Type\BooleanOrBothType::ANY) {
             $search->filterByActivate($active ? 1 : 0, Criteria::EQUAL);
         }
 

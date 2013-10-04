@@ -3,15 +3,14 @@
  * Created by JetBrains PhpStorm.
  * Date: 9/18/13
  * Time: 8:47 PM
- * 
+ *
  * @author Guillaume MOREL <gmorel@openstudio.fr>
  */
 
-namespace Thelia\Tests\Type;
+namespace Thelia\Tests\Tools;
 
-
-use Thelia\Core\Event\DocumentCreateOrUpdateEvent;
-use Thelia\Core\Event\ImageCreateOrUpdateEvent;
+use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
+use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\ImageException;
 use Thelia\Model\Admin;
@@ -20,11 +19,10 @@ use Thelia\Tools\FileManager;
 /**
  * Class FileManagerTest
  *
- * @package Thelia\Tests\Type
+ * @package Thelia\Tests\Tools
  */
-class FileManagerTest extends \PHPUnit_Framework_TestCase {
-
-
+class FileManagerTest extends \PHPUnit_Framework_TestCase
+{
     /**
      * @covers Thelia\Tools\FileManager::copyUploadedFile
      */
@@ -51,8 +49,6 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $stubSecurity->expects($this->any())
             ->method('getAdminUser')
             ->will($this->returnValue(new Admin()));
-
-
 
         // Create a map of arguments to return values.
         $map = array(
@@ -105,7 +101,6 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(1, $actual);
     }
 
-
     /**
      * @covers Thelia\Tools\FileManager::copyUploadedFile
      * @expectedException \Thelia\Exception\ImageException
@@ -133,8 +128,6 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $stubSecurity->expects($this->any())
             ->method('getAdminUser')
             ->will($this->returnValue(new Admin()));
-
-
 
         // Create a map of arguments to return values.
         $map = array(
@@ -745,7 +738,6 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(false, $actual);
     }
 
-
     /**
      * @covers Thelia\Tools\FileManager::getFormId
      */
@@ -799,7 +791,6 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
             ->method('getClientOriginalName')
             ->will($this->returnValue('or1-g_n?al*/&é"filen@me#'));
 
-
         $fileManager = new FileManager($stubContainer);
 
         $expected = 'or1-g_nalfilenme-1.yml';
@@ -826,7 +817,6 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $stubUploadedFile->expects($this->any())
             ->method('getClientOriginalName')
             ->will($this->returnValue('or1-g_n?al*/&é"filen@me#'));
-
 
         $fileManager = new FileManager($stubContainer);
 
@@ -864,7 +854,6 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($actual);
 
     }
-
 
     /**
      * @covers Thelia\Tools\FileManager::getAvailableTypes

@@ -72,7 +72,7 @@ class AsseticHelper
                         break;
 
                     case 'sass' :
-                        $fm->set('less', new Filter\Sass\SassFilter());
+                        $fm->set('sass', new Filter\Sass\SassFilter());
                         break;
 
                     case 'cssembed' :
@@ -85,6 +85,10 @@ class AsseticHelper
 
                     case 'cssimport':
                         $fm->set('cssimport', new Filter\CssImportFilter());
+                        break;
+
+                    case 'compass':
+                        $fm->set('compass', new Filter\CompassFilter());
                         break;
 
                     default :

@@ -55,6 +55,47 @@ class Content extends BaseContent
         return $this;
     }
 
+
+    public function updateDefaultFolder($defaultFolderId)
+    {
+        // Allow uncategorized content (NULL instead of 0, to bypass delete cascade constraint)
+        if ($defaultFolderId <= 0) {
+            $defaultFolderId = NULL;
+        }
+
+        if ($defaultFolderId == $this->getDefaultFolderId()) {
+            return;
+        }
+
+        ContentFolderQuery::create()
+            ->filterByContentId($this->getId())
+            ->update(array('DefaultFolder' => 0));
+
+        $contentFolder = ContentFolderQuery::create()
+            ->filterByContentId($this->getId())
+            ->filterByFolderId($defaultFolderId)
+            ->findOne();
+
+        if (null === $contentFolder) {
+            $contentFolder = new ContentFolder();
+
+            $contentFolder->setContentId($this->getId())
+                ->setFolderId($defaultFolderId);
+        }
+
+        $contentFolder->setDefaultFolder(true)
+            ->save();
+
+    }
+
+    /**
+     * Create a new content.
+     *
+     * Here pre and post insert event are fired
+     *
+     * @param $defaultFolderId
+     * @throws \Exception
+     */
     public function create($defaultFolderId)
     {
         $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);

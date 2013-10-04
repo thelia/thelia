@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Core\Event\FolderEvent;
+use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Folder as BaseFolder;
 use Thelia\Tools\URL;
@@ -94,7 +94,7 @@ class Folder extends BaseFolder
     public function preDelete(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETEFOLDER, new FolderEvent($this));
-
+        $this->reorderBeforeDelete();
         return true;
     }
 

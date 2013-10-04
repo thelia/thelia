@@ -3,8 +3,112 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "097481390dc87b3482d895b3b6a65479",
+    "hash": "852879ecc2e39e5cf283a3b1c5051a8e",
     "packages": [
+        {
+            "name": "ensepar/html2pdf",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/OwlyCode/html2pdf.git",
+                "reference": "b53a27430cc35b29bbe2faaa55ed4a7d5c156cd3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/OwlyCode/html2pdf/zipball/b53a27430cc35b29bbe2faaa55ed4a7d5c156cd3",
+                "reference": "b53a27430cc35b29bbe2faaa55ed4a7d5c156cd3",
+                "shasum": ""
+            },
+            "require": {
+                "ensepar/tcpdf": "5.0.003",
+                "php": ">=5.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "HTML2PDF": "."
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Spipu",
+                    "homepage": "http://sourceforge.net/users/spipu",
+                    "role": "Developer"
+                },
+                {
+                    "name": "OwlyCode",
+                    "homepage": "http://www.github.com/OwlyCode",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Unofficial fork of 'html2pdf' with Composer support. (Fixed composer dependency problem)",
+            "homepage": "https://github.com/jwronsky/html2pdf",
+            "keywords": [
+                "html",
+                "html2pdf",
+                "pdf"
+            ],
+            "time": "2013-09-13 12:23:43"
+        },
+        {
+            "name": "ensepar/tcpdf",
+            "version": "5.0.003",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/OwlyCode/tcpdf.git",
+                "reference": "ae578409e9454fdf6c794cce6f063b0c95bfa518"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/OwlyCode/tcpdf/zipball/ae578409e9454fdf6c794cce6f063b0c95bfa518",
+                "reference": "ae578409e9454fdf6c794cce6f063b0c95bfa518",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "fonts",
+                    "config/lang",
+                    "config",
+                    "2dbarcodes.php",
+                    "barcodes.php",
+                    "htmlcolors.php",
+                    "qrcode.php",
+                    "tcpdf.php",
+                    "unicode_data.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPLv3"
+            ],
+            "authors": [
+                {
+                    "name": "Nicola Asuni",
+                    "email": "info@tecnick.com",
+                    "homepage": "http://nicolaasuni.tecnick.com"
+                },
+                {
+                    "name": "Tristan Maindron",
+                    "email": "tmaindron@gmail.com",
+                    "homepage": "http://www.github.com/OwlyCode"
+                }
+            ],
+            "description": "TCPDF is a PHP class for generating PDF documents.",
+            "homepage": "http://www.tcpdf.org/",
+            "keywords": [
+                "TCPDF",
+                "pdf"
+            ],
+            "time": "2013-09-12 17:00:40"
+        },
         {
             "name": "imagine/imagine",
             "version": "dev-master",
@@ -214,12 +318,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/propelorm/Propel2.git",
-                "reference": "58a25ded43c3d04313cad2b738342d307988b1b5"
+                "reference": "fb9a10939abdd6efea7a066f0ef28f82ad06e435"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/58a25ded43c3d04313cad2b738342d307988b1b5",
-                "reference": "58a25ded43c3d04313cad2b738342d307988b1b5",
+                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/fb9a10939abdd6efea7a066f0ef28f82ad06e435",
+                "reference": "fb9a10939abdd6efea7a066f0ef28f82ad06e435",
                 "shasum": ""
             },
             "require": {
@@ -266,7 +370,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2013-09-01 13:29:51"
+            "time": "2013-09-30 08:26:26"
         },
         {
             "name": "psr/log",
@@ -845,17 +949,17 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v2.3.4",
+            "version": "v2.3.5",
             "target-dir": "Symfony/Component/Finder",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Finder.git",
-                "reference": "4a0fee5b86f5bbd9dfdc11ec124eba2915737ce1"
+                "reference": "a175521f680b178e63c5d0ab87c6b046c0990c3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Finder/zipball/4a0fee5b86f5bbd9dfdc11ec124eba2915737ce1",
-                "reference": "4a0fee5b86f5bbd9dfdc11ec124eba2915737ce1",
+                "url": "https://api.github.com/repos/symfony/Finder/zipball/a175521f680b178e63c5d0ab87c6b046c0990c3f",
+                "reference": "a175521f680b178e63c5d0ab87c6b046c0990c3f",
                 "shasum": ""
             },
             "require": {
@@ -888,7 +992,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "http://symfony.com",
-            "time": "2013-08-13 20:18:00"
+            "time": "2013-09-19 09:45:20"
         },
         {
             "name": "symfony/form",
@@ -1764,17 +1868,51 @@
             "time": "2013-09-11 13:01:19"
         },
         {
+            "name": "phenx/php-font-lib",
+            "version": "0.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PhenX/php-font-lib.git",
+                "reference": "42a1ca6d19f14076911a118705b771c3a5a8b179"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PhenX/php-font-lib/zipball/42a1ca6d19f14076911a118705b771c3a5a8b179",
+                "reference": "42a1ca6d19f14076911a118705b771c3a5a8b179",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "classes/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Ménager",
+                    "email": "fabien.menager@gmail.com"
+                }
+            ],
+            "description": "A library to read, parse, export and make subsets of different types of font files.",
+            "homepage": "https://github.com/PhenX/php-font-lib",
+            "time": "2013-02-22 23:30:49"
+        },
+        {
             "name": "phpunit/php-code-coverage",
             "version": "1.2.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "0e9958c459d675fb497d8dc5001c91d335734e48"
+                "reference": "1.2.12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/0e9958c459d675fb497d8dc5001c91d335734e48",
-                "reference": "0e9958c459d675fb497d8dc5001c91d335734e48",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/1.2.12",
+                "reference": "1.2.12",
                 "shasum": ""
             },
             "require": {
@@ -1963,12 +2101,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-token-stream.git",
-                "reference": "31babf400e5b5868573bf49a000a3519d3978233"
+                "reference": "1.2.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/31babf400e5b5868573bf49a000a3519d3978233",
-                "reference": "31babf400e5b5868573bf49a000a3519d3978233",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/1.2.0",
+                "reference": "1.2.0",
                 "shasum": ""
             },
             "require": {
@@ -2013,12 +2151,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "af7b77ccb5c64458bdfca95665d29558d1df7d08"
+                "reference": "3.7.24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/af7b77ccb5c64458bdfca95665d29558d1df7d08",
-                "reference": "af7b77ccb5c64458bdfca95665d29558d1df7d08",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/3.7.24",
+                "reference": "3.7.24",
                 "shasum": ""
             },
             "require": {

@@ -25,7 +25,6 @@ namespace Thelia\Core\Event\Content;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Content;
 
-
 /**
  * Class ContentEvent
  * @package Thelia\Core\Event\Content
@@ -38,7 +37,7 @@ class ContentEvent extends ActionEvent
      */
     protected $content;
 
-    function __construct(Content $content = null)
+    public function __construct(Content $content = null)
     {
         $this->content = $content;
     }

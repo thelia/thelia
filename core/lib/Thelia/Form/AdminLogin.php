@@ -51,7 +51,7 @@ class AdminLogin extends BaseForm
                 )
             ))
             ->add("remember_me", "checkbox", array(
-                    'value' => 'yes',                    
+                    'value' => 'yes',
                     "label" => Translator::getInstance()->trans("Remember me ?"),
                     "label_attr" => array(
                         "for" => "remember_me"

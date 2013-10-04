@@ -25,12 +25,9 @@ namespace Thelia\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOException;
 
-use Thelia\Command\ContainerAwareCommand;
 use Thelia\Model\ModuleQuery;
 
 /**
@@ -62,7 +59,7 @@ class ModuleActivateCommand extends BaseModuleGenerate
 
         $module = ModuleQuery::create()->findOneByCode($moduleCode);
 
-        if(null === $module) {
+        if (null === $module) {
             throw new \RuntimeException(sprintf("module %s not found", $moduleCode));
         }
 
@@ -74,7 +71,7 @@ class ModuleActivateCommand extends BaseModuleGenerate
             $moduleInstance = $moduleReflection->newInstance();
 
             $moduleInstance->activate();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             throw new \RuntimeException(sprintf("Activation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()));
         }
 

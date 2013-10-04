@@ -6,8 +6,8 @@ use Thelia\Core\Security\User\UserInterface;
 
 class TokenProvider
 {
-    public function encodeKey(UserInterface $user) {
-
+    public function encodeKey(UserInterface $user)
+    {
         // Always set a new token in the user environment
         $user->setToken(uniqid());
 
@@ -15,7 +15,8 @@ class TokenProvider
                 array($user->getUsername(), $user->getToken(), $user->getSerial())));
     }
 
-    public function decodeKey($key) {
+    public function decodeKey($key)
+    {
         $data = unserialize(base64_decode($key));
 
         return array(

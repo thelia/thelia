@@ -168,8 +168,7 @@ $val = $value[$key];
 $this->assignFieldValues($template, $name, $val, $formFieldView->vars);
 }
 }
-}
-else {
+} else {
 $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVars["value"], $formFieldView->vars);
 }
 */
@@ -204,7 +203,7 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
     {
         $instance = $this->getInstanceFromParams($params);
 
-        $formView = $instance->getForm();
+        $formView = $instance->getView();
 
         if ($formView->vars["multipart"]) {
             return sprintf('%s="%s"',"enctype", "multipart/form-data");

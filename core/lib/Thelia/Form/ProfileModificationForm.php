@@ -35,7 +35,6 @@ use Thelia\Model\ConfigQuery;
 class ProfileModificationForm extends BaseForm
 {
 
-
     protected function buildForm()
     {
 

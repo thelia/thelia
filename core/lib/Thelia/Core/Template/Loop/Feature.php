@@ -31,11 +31,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\CategoryQuery;
 use Thelia\Model\FeatureI18nQuery;
-use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\FeatureQuery;
-use Thelia\Model\Map\ProductCategoryTableMap;
 use Thelia\Model\ProductQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -124,7 +121,7 @@ class Feature extends BaseI18nLoop
                 // Create template array
                 if ($template == null) $template = array();
 
-                foreach($products as $product) {
+                foreach ($products as $product) {
                     $tpl_id = $product->getTemplateId();
 
                     if (! is_null($tpl_id)) $template[] = $tpl_id;
@@ -164,7 +161,7 @@ class Feature extends BaseI18nLoop
                 ->select('id')
                 ->find();
 
-            if($features) {
+            if ($features) {
                 $search->filterById(
                     $features,
                     Criteria::IN
@@ -203,7 +200,6 @@ class Feature extends BaseI18nLoop
             }
 
         }
-
 
         /* perform search */
         $features = $this->search($search, $pagination);

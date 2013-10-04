@@ -22,9 +22,11 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action;
+
 use Thelia\Action\Address;
-use Thelia\Core\Event\AddressCreateOrUpdateEvent;
+use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Model\Base\CustomerQuery;
+use Thelia\Tests\Action\BaseAction;
 
 /**
  *
@@ -34,19 +36,8 @@ use Thelia\Model\Base\CustomerQuery;
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class AddressTest extends \PHPUnit_Framework_TestCase
+class AddressTest extends BaseAction
 {
-
-    public function getContainer()
-    {
-        $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
-
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-
-        $container->set("event_dispatcher", $dispatcher);
-
-        return $container;
-    }
 
     public function testCreatedAddress()
     {

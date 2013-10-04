@@ -29,7 +29,7 @@ use Thelia\Model\Customer;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\CartEvent;
+use Thelia\Core\Event\Cart\CartEvent;
 
 /**
  * managed cart

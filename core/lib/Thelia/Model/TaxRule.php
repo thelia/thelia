@@ -11,16 +11,23 @@ class TaxRule extends BaseTaxRule
     /**
      * @param Country $country
      * @param         $untaxedAmount
+     * @param         $untaxedPromoAmount
      * @param null    $askedLocale
      *
      * @return OrderProductTaxCollection
      */
-    public function getTaxDetail(Country $country, $untaxedAmount, $askedLocale = null)
+    public function getTaxDetail(Country $country, $untaxedAmount, $untaxedPromoAmount, $askedLocale = null)
     {
         $taxCalculator = new Calculator();
 
         $taxCollection = new OrderProductTaxCollection();
         $taxCalculator->loadTaxRule($this, $country)->getTaxedPrice($untaxedAmount, $taxCollection, $askedLocale);
+        $promoTaxCollection = new OrderProductTaxCollection();
+        $taxCalculator->loadTaxRule($this, $country)->getTaxedPrice($untaxedPromoAmount, $promoTaxCollection, $askedLocale);
+
+        foreach($taxCollection as $index => $tax) {
+            $tax->setPromoAmount($promoTaxCollection->getKey($index)->getAmount());
+        }
 
         return $taxCollection;
     }

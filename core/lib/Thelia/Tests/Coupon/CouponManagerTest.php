@@ -88,7 +88,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        /** @var CouponInterface $coupon */
 //        $coupon = self::generateValidCoupon();
 //
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter(array($coupon), $cartTotalPrice, $checkoutTotalPrice);
 //
 //        $couponManager = new CouponManager($stubCouponBaseAdapter);
@@ -108,7 +108,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testGetDiscountTwoCoupon()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $cartTotalPrice = 100.00;
 //        $checkoutTotalPrice = 120.00;
 //
@@ -124,11 +124,11 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //                )
 //            )
 //        );
-//        $rules = new CouponRuleCollection(array($rule1));
+//        $rules = new ConditionCollection(array($rule1));
 //        /** @var CouponInterface $coupon2 */
 //        $coupon2 = $this->generateValidCoupon('XMAS2', null, null, null, 15.00, null, null, $rules);
 //
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter(array($coupon1, $coupon2), $cartTotalPrice, $checkoutTotalPrice);
 //
 //        $couponManager = new CouponManager($stubCouponBaseAdapter);
@@ -148,7 +148,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testGetDiscountAlwaysInferiorToPrice()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $cartTotalPrice = 21.00;
 //        $checkoutTotalPrice = 26.00;
 //
@@ -162,11 +162,11 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //                )
 //            )
 //        );
-//        $rules = new CouponRuleCollection(array($rule1));
+//        $rules = new ConditionCollection(array($rule1));
 //        /** @var CouponInterface $coupon */
 //        $coupon = $this->generateValidCoupon('XMAS2', null, null, null, 30.00, null, null, $rules);
 //
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter(array($coupon), $cartTotalPrice, $checkoutTotalPrice);
 //
 //        $couponManager = new CouponManager($stubCouponBaseAdapter);
@@ -185,7 +185,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testIsCouponRemovingPostage()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $cartTotalPrice = 21.00;
 //        $checkoutTotalPrice = 27.00;
 //
@@ -199,11 +199,11 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //                )
 //            )
 //        );
-//        $rules = new CouponRuleCollection(array($rule1));
+//        $rules = new ConditionCollection(array($rule1));
 //        /** @var CouponInterface $coupon */
 //        $coupon = $this->generateValidCoupon('XMAS2', null, null, null, 30.00, null, null, $rules, null, true);
 //
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter(array($coupon), $cartTotalPrice, $checkoutTotalPrice);
 //
 //        $couponManager = new CouponManager($stubCouponBaseAdapter);
@@ -231,7 +231,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //
 //        $coupons = array($couponCumulative1);
 //
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
 //
 //        // When
@@ -264,7 +264,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        $couponCumulative1 = $this->generateValidCoupon(null, null, null, null, null, null, null, null, true);
 //
 //        $coupons = array($couponCumulative1);
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
 //
 //        // When
@@ -299,7 +299,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, null, null, true);
 //
 //        $coupons = array($couponCumulative1, $couponCumulative2);
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
 //
 //        // When
@@ -334,7 +334,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, null, null, false);
 //
 //        $coupons = array($couponCumulative1, $couponCumulative2);
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
 //
 //        // When
@@ -369,7 +369,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, null, null, true);
 //
 //        $coupons = array($couponCumulative1, $couponCumulative2);
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
 //
 //        // When
@@ -404,7 +404,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, null, null, false);
 //
 //        $coupons = array($couponCumulative1, $couponCumulative2);
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
 //
 //        // When
@@ -437,7 +437,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        $couponCumulative1 = $this->generateValidCoupon('XMAS1', null, null, null, null, null, new \DateTime(), null, true);
 //
 //        $coupons = array($couponCumulative1);
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
 //
 //        // When
@@ -472,7 +472,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, new \DateTime(), null, true);
 //
 //        $coupons = array($couponCumulative1, $couponCumulative2);
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
 //
 //        // When
@@ -507,7 +507,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, null, null, true);
 //
 //        $coupons = array($couponCumulative1, $couponCumulative2);
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
 //
 //        // When
@@ -542,7 +542,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        $couponCumulative2 = $this->generateValidCoupon('XMAS2', null, null, null, null, null, new \DateTime(), null, true);
 //
 //        $coupons = array($couponCumulative1, $couponCumulative2);
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
 //
 //        // When
@@ -581,7 +581,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        $couponCumulative4 = $this->generateValidCoupon('XMAS4', null, null, null, null, null, null, null, true);
 //
 //        $coupons = array($couponCumulative1, $couponCumulative2, $couponCumulative3, $couponCumulative4);
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
 //
 //        // When
@@ -620,7 +620,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        $couponCumulative4 = $this->generateValidCoupon('XMAS4', null, null, null, null, null, null, null, false);
 //
 //        $coupons = array($couponCumulative1, $couponCumulative2, $couponCumulative3, $couponCumulative4);
-//        /** @var CouponAdapterInterface $stubCouponBaseAdapter */
+//        /** @var AdapterInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->generateFakeAdapter($coupons, $cartTotalPrice, $checkoutTotalPrice);
 //
 //        // When
@@ -641,11 +641,11 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //    /**
 //     * Generate valid CouponRuleInterfaces
 //     *
-//     * @return array Array of CouponRuleInterface
+//     * @return array Array of ConditionManagerInterface
 //     */
 //    public static function generateValidRules()
 //    {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        $rule1 = new AvailableForTotalAmount(
 //            $adapter, array(
 //                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
@@ -666,7 +666,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //                )
 //            )
 //        );
-//        $rules = new CouponRuleCollection(array($rule1, $rule2));
+//        $rules = new ConditionCollection(array($rule1, $rule2));
 //
 //        return $rules;
 //    }
@@ -692,7 +692,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //    public function generateFakeAdapter(array $coupons, $cartTotalPrice, $checkoutTotalPrice, $postagePrice = 6.00)
 //    {
 //        $stubCouponBaseAdapter = $this->getMock(
-//            'Thelia\Coupon\CouponBaseAdapter',
+//            'Thelia\Coupon\BaseAdapter',
 //            array(
 //                'getCurrentCoupons',
 //                'getCartTotalPrice',
@@ -734,7 +734,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //     * @param float                $amount                     Coupon discount
 //     * @param bool                 $isEnabled                  Is Coupon enabled
 //     * @param \DateTime            $expirationDate             Coupon expiration date
-//     * @param CouponRuleCollection $rules                      Coupon rules
+//     * @param ConditionCollection $rules                      Coupon rules
 //     * @param bool                 $isCumulative               If is cumulative
 //     * @param bool                 $isRemovingPostage          If is removing postage
 //     * @param bool                 $isAvailableOnSpecialOffers If is available on
@@ -758,7 +758,7 @@ class CouponManagerTest extends \PHPUnit_Framework_TestCase
 //        $isAvailableOnSpecialOffers = null,
 //        $maxUsage = null
 //    ) {
-//        $adapter = new CouponBaseAdapter();
+//        $adapter = new BaseAdapter();
 //        if ($code === null) {
 //            $code = self::VALID_CODE;
 //        }

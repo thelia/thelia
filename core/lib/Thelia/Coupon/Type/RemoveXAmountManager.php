@@ -23,7 +23,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Constraint\ConstraintManager;
 use Thelia\Coupon\Type\CouponAbstract;
 
 /**

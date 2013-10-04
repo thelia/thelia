@@ -25,14 +25,14 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     ChildCouponVersionQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method     ChildCouponVersionQuery orderByType($order = Criteria::ASC) Order by the type column
  * @method     ChildCouponVersionQuery orderByAmount($order = Criteria::ASC) Order by the amount column
- * @method     ChildCouponVersionQuery orderByIsUsed($order = Criteria::ASC) Order by the is_used column
  * @method     ChildCouponVersionQuery orderByIsEnabled($order = Criteria::ASC) Order by the is_enabled column
  * @method     ChildCouponVersionQuery orderByExpirationDate($order = Criteria::ASC) Order by the expiration_date column
- * @method     ChildCouponVersionQuery orderBySerializedRules($order = Criteria::ASC) Order by the serialized_rules column
+ * @method     ChildCouponVersionQuery orderByMaxUsage($order = Criteria::ASC) Order by the max_usage column
  * @method     ChildCouponVersionQuery orderByIsCumulative($order = Criteria::ASC) Order by the is_cumulative column
  * @method     ChildCouponVersionQuery orderByIsRemovingPostage($order = Criteria::ASC) Order by the is_removing_postage column
- * @method     ChildCouponVersionQuery orderByMaxUsage($order = Criteria::ASC) Order by the max_usage column
  * @method     ChildCouponVersionQuery orderByIsAvailableOnSpecialOffers($order = Criteria::ASC) Order by the is_available_on_special_offers column
+ * @method     ChildCouponVersionQuery orderByIsUsed($order = Criteria::ASC) Order by the is_used column
+ * @method     ChildCouponVersionQuery orderBySerializedConditions($order = Criteria::ASC) Order by the serialized_conditions column
  * @method     ChildCouponVersionQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCouponVersionQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method     ChildCouponVersionQuery orderByVersion($order = Criteria::ASC) Order by the version column
@@ -41,14 +41,14 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     ChildCouponVersionQuery groupByCode() Group by the code column
  * @method     ChildCouponVersionQuery groupByType() Group by the type column
  * @method     ChildCouponVersionQuery groupByAmount() Group by the amount column
- * @method     ChildCouponVersionQuery groupByIsUsed() Group by the is_used column
  * @method     ChildCouponVersionQuery groupByIsEnabled() Group by the is_enabled column
  * @method     ChildCouponVersionQuery groupByExpirationDate() Group by the expiration_date column
- * @method     ChildCouponVersionQuery groupBySerializedRules() Group by the serialized_rules column
+ * @method     ChildCouponVersionQuery groupByMaxUsage() Group by the max_usage column
  * @method     ChildCouponVersionQuery groupByIsCumulative() Group by the is_cumulative column
  * @method     ChildCouponVersionQuery groupByIsRemovingPostage() Group by the is_removing_postage column
- * @method     ChildCouponVersionQuery groupByMaxUsage() Group by the max_usage column
  * @method     ChildCouponVersionQuery groupByIsAvailableOnSpecialOffers() Group by the is_available_on_special_offers column
+ * @method     ChildCouponVersionQuery groupByIsUsed() Group by the is_used column
+ * @method     ChildCouponVersionQuery groupBySerializedConditions() Group by the serialized_conditions column
  * @method     ChildCouponVersionQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCouponVersionQuery groupByUpdatedAt() Group by the updated_at column
  * @method     ChildCouponVersionQuery groupByVersion() Group by the version column
@@ -68,14 +68,14 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     ChildCouponVersion findOneByCode(string $code) Return the first ChildCouponVersion filtered by the code column
  * @method     ChildCouponVersion findOneByType(string $type) Return the first ChildCouponVersion filtered by the type column
  * @method     ChildCouponVersion findOneByAmount(double $amount) Return the first ChildCouponVersion filtered by the amount column
- * @method     ChildCouponVersion findOneByIsUsed(int $is_used) Return the first ChildCouponVersion filtered by the is_used column
- * @method     ChildCouponVersion findOneByIsEnabled(int $is_enabled) Return the first ChildCouponVersion filtered by the is_enabled column
+ * @method     ChildCouponVersion findOneByIsEnabled(boolean $is_enabled) Return the first ChildCouponVersion filtered by the is_enabled column
  * @method     ChildCouponVersion findOneByExpirationDate(string $expiration_date) Return the first ChildCouponVersion filtered by the expiration_date column
- * @method     ChildCouponVersion findOneBySerializedRules(string $serialized_rules) Return the first ChildCouponVersion filtered by the serialized_rules column
- * @method     ChildCouponVersion findOneByIsCumulative(int $is_cumulative) Return the first ChildCouponVersion filtered by the is_cumulative column
- * @method     ChildCouponVersion findOneByIsRemovingPostage(int $is_removing_postage) Return the first ChildCouponVersion filtered by the is_removing_postage column
  * @method     ChildCouponVersion findOneByMaxUsage(int $max_usage) Return the first ChildCouponVersion filtered by the max_usage column
+ * @method     ChildCouponVersion findOneByIsCumulative(boolean $is_cumulative) Return the first ChildCouponVersion filtered by the is_cumulative column
+ * @method     ChildCouponVersion findOneByIsRemovingPostage(boolean $is_removing_postage) Return the first ChildCouponVersion filtered by the is_removing_postage column
  * @method     ChildCouponVersion findOneByIsAvailableOnSpecialOffers(boolean $is_available_on_special_offers) Return the first ChildCouponVersion filtered by the is_available_on_special_offers column
+ * @method     ChildCouponVersion findOneByIsUsed(boolean $is_used) Return the first ChildCouponVersion filtered by the is_used column
+ * @method     ChildCouponVersion findOneBySerializedConditions(string $serialized_conditions) Return the first ChildCouponVersion filtered by the serialized_conditions column
  * @method     ChildCouponVersion findOneByCreatedAt(string $created_at) Return the first ChildCouponVersion filtered by the created_at column
  * @method     ChildCouponVersion findOneByUpdatedAt(string $updated_at) Return the first ChildCouponVersion filtered by the updated_at column
  * @method     ChildCouponVersion findOneByVersion(int $version) Return the first ChildCouponVersion filtered by the version column
@@ -84,14 +84,14 @@ use Thelia\Model\Map\CouponVersionTableMap;
  * @method     array findByCode(string $code) Return ChildCouponVersion objects filtered by the code column
  * @method     array findByType(string $type) Return ChildCouponVersion objects filtered by the type column
  * @method     array findByAmount(double $amount) Return ChildCouponVersion objects filtered by the amount column
- * @method     array findByIsUsed(int $is_used) Return ChildCouponVersion objects filtered by the is_used column
- * @method     array findByIsEnabled(int $is_enabled) Return ChildCouponVersion objects filtered by the is_enabled column
+ * @method     array findByIsEnabled(boolean $is_enabled) Return ChildCouponVersion objects filtered by the is_enabled column
  * @method     array findByExpirationDate(string $expiration_date) Return ChildCouponVersion objects filtered by the expiration_date column
- * @method     array findBySerializedRules(string $serialized_rules) Return ChildCouponVersion objects filtered by the serialized_rules column
- * @method     array findByIsCumulative(int $is_cumulative) Return ChildCouponVersion objects filtered by the is_cumulative column
- * @method     array findByIsRemovingPostage(int $is_removing_postage) Return ChildCouponVersion objects filtered by the is_removing_postage column
  * @method     array findByMaxUsage(int $max_usage) Return ChildCouponVersion objects filtered by the max_usage column
+ * @method     array findByIsCumulative(boolean $is_cumulative) Return ChildCouponVersion objects filtered by the is_cumulative column
+ * @method     array findByIsRemovingPostage(boolean $is_removing_postage) Return ChildCouponVersion objects filtered by the is_removing_postage column
  * @method     array findByIsAvailableOnSpecialOffers(boolean $is_available_on_special_offers) Return ChildCouponVersion objects filtered by the is_available_on_special_offers column
+ * @method     array findByIsUsed(boolean $is_used) Return ChildCouponVersion objects filtered by the is_used column
+ * @method     array findBySerializedConditions(string $serialized_conditions) Return ChildCouponVersion objects filtered by the serialized_conditions column
  * @method     array findByCreatedAt(string $created_at) Return ChildCouponVersion objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCouponVersion objects filtered by the updated_at column
  * @method     array findByVersion(int $version) Return ChildCouponVersion objects filtered by the version column
@@ -183,7 +183,7 @@ abstract class CouponVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, TYPE, AMOUNT, IS_USED, IS_ENABLED, EXPIRATION_DATE, SERIALIZED_RULES, IS_CUMULATIVE, IS_REMOVING_POSTAGE, MAX_USAGE, IS_AVAILABLE_ON_SPECIAL_OFFERS, CREATED_AT, UPDATED_AT, VERSION FROM coupon_version WHERE ID = :p0 AND VERSION = :p1';
+        $sql = 'SELECT ID, CODE, TYPE, AMOUNT, IS_ENABLED, EXPIRATION_DATE, MAX_USAGE, IS_CUMULATIVE, IS_REMOVING_POSTAGE, IS_AVAILABLE_ON_SPECIAL_OFFERS, IS_USED, SERIALIZED_CONDITIONS, CREATED_AT, UPDATED_AT, VERSION FROM coupon_version WHERE ID = :p0 AND VERSION = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -427,82 +427,27 @@ abstract class CouponVersionQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the is_used column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByIsUsed(1234); // WHERE is_used = 1234
-     * $query->filterByIsUsed(array(12, 34)); // WHERE is_used IN (12, 34)
-     * $query->filterByIsUsed(array('min' => 12)); // WHERE is_used > 12
-     * </code>
-     *
-     * @param     mixed $isUsed The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponVersionQuery The current query, for fluid interface
-     */
-    public function filterByIsUsed($isUsed = null, $comparison = null)
-    {
-        if (is_array($isUsed)) {
-            $useMinMax = false;
-            if (isset($isUsed['min'])) {
-                $this->addUsingAlias(CouponVersionTableMap::IS_USED, $isUsed['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($isUsed['max'])) {
-                $this->addUsingAlias(CouponVersionTableMap::IS_USED, $isUsed['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(CouponVersionTableMap::IS_USED, $isUsed, $comparison);
-    }
-
-    /**
      * Filter the query on the is_enabled column
      *
      * Example usage:
      * <code>
-     * $query->filterByIsEnabled(1234); // WHERE is_enabled = 1234
-     * $query->filterByIsEnabled(array(12, 34)); // WHERE is_enabled IN (12, 34)
-     * $query->filterByIsEnabled(array('min' => 12)); // WHERE is_enabled > 12
+     * $query->filterByIsEnabled(true); // WHERE is_enabled = true
+     * $query->filterByIsEnabled('yes'); // WHERE is_enabled = true
      * </code>
      *
-     * @param     mixed $isEnabled The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     boolean|string $isEnabled The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCouponVersionQuery The current query, for fluid interface
      */
     public function filterByIsEnabled($isEnabled = null, $comparison = null)
     {
-        if (is_array($isEnabled)) {
-            $useMinMax = false;
-            if (isset($isEnabled['min'])) {
-                $this->addUsingAlias(CouponVersionTableMap::IS_ENABLED, $isEnabled['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($isEnabled['max'])) {
-                $this->addUsingAlias(CouponVersionTableMap::IS_ENABLED, $isEnabled['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
+        if (is_string($isEnabled)) {
+            $is_enabled = in_array(strtolower($isEnabled), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
         }
 
         return $this->addUsingAlias(CouponVersionTableMap::IS_ENABLED, $isEnabled, $comparison);
@@ -552,117 +497,6 @@ abstract class CouponVersionQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the serialized_rules column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterBySerializedRules('fooValue');   // WHERE serialized_rules = 'fooValue'
-     * $query->filterBySerializedRules('%fooValue%'); // WHERE serialized_rules LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $serializedRules The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponVersionQuery The current query, for fluid interface
-     */
-    public function filterBySerializedRules($serializedRules = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($serializedRules)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $serializedRules)) {
-                $serializedRules = str_replace('*', '%', $serializedRules);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CouponVersionTableMap::SERIALIZED_RULES, $serializedRules, $comparison);
-    }
-
-    /**
-     * Filter the query on the is_cumulative column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByIsCumulative(1234); // WHERE is_cumulative = 1234
-     * $query->filterByIsCumulative(array(12, 34)); // WHERE is_cumulative IN (12, 34)
-     * $query->filterByIsCumulative(array('min' => 12)); // WHERE is_cumulative > 12
-     * </code>
-     *
-     * @param     mixed $isCumulative The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponVersionQuery The current query, for fluid interface
-     */
-    public function filterByIsCumulative($isCumulative = null, $comparison = null)
-    {
-        if (is_array($isCumulative)) {
-            $useMinMax = false;
-            if (isset($isCumulative['min'])) {
-                $this->addUsingAlias(CouponVersionTableMap::IS_CUMULATIVE, $isCumulative['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($isCumulative['max'])) {
-                $this->addUsingAlias(CouponVersionTableMap::IS_CUMULATIVE, $isCumulative['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(CouponVersionTableMap::IS_CUMULATIVE, $isCumulative, $comparison);
-    }
-
-    /**
-     * Filter the query on the is_removing_postage column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByIsRemovingPostage(1234); // WHERE is_removing_postage = 1234
-     * $query->filterByIsRemovingPostage(array(12, 34)); // WHERE is_removing_postage IN (12, 34)
-     * $query->filterByIsRemovingPostage(array('min' => 12)); // WHERE is_removing_postage > 12
-     * </code>
-     *
-     * @param     mixed $isRemovingPostage The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCouponVersionQuery The current query, for fluid interface
-     */
-    public function filterByIsRemovingPostage($isRemovingPostage = null, $comparison = null)
-    {
-        if (is_array($isRemovingPostage)) {
-            $useMinMax = false;
-            if (isset($isRemovingPostage['min'])) {
-                $this->addUsingAlias(CouponVersionTableMap::IS_REMOVING_POSTAGE, $isRemovingPostage['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($isRemovingPostage['max'])) {
-                $this->addUsingAlias(CouponVersionTableMap::IS_REMOVING_POSTAGE, $isRemovingPostage['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(CouponVersionTableMap::IS_REMOVING_POSTAGE, $isRemovingPostage, $comparison);
-    }
-
-    /**
      * Filter the query on the max_usage column
      *
      * Example usage:
@@ -704,6 +538,60 @@ abstract class CouponVersionQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the is_cumulative column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByIsCumulative(true); // WHERE is_cumulative = true
+     * $query->filterByIsCumulative('yes'); // WHERE is_cumulative = true
+     * </code>
+     *
+     * @param     boolean|string $isCumulative The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCouponVersionQuery The current query, for fluid interface
+     */
+    public function filterByIsCumulative($isCumulative = null, $comparison = null)
+    {
+        if (is_string($isCumulative)) {
+            $is_cumulative = in_array(strtolower($isCumulative), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(CouponVersionTableMap::IS_CUMULATIVE, $isCumulative, $comparison);
+    }
+
+    /**
+     * Filter the query on the is_removing_postage column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByIsRemovingPostage(true); // WHERE is_removing_postage = true
+     * $query->filterByIsRemovingPostage('yes'); // WHERE is_removing_postage = true
+     * </code>
+     *
+     * @param     boolean|string $isRemovingPostage The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCouponVersionQuery The current query, for fluid interface
+     */
+    public function filterByIsRemovingPostage($isRemovingPostage = null, $comparison = null)
+    {
+        if (is_string($isRemovingPostage)) {
+            $is_removing_postage = in_array(strtolower($isRemovingPostage), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(CouponVersionTableMap::IS_REMOVING_POSTAGE, $isRemovingPostage, $comparison);
+    }
+
+    /**
      * Filter the query on the is_available_on_special_offers column
      *
      * Example usage:
@@ -728,6 +616,62 @@ abstract class CouponVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CouponVersionTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS, $isAvailableOnSpecialOffers, $comparison);
+    }
+
+    /**
+     * Filter the query on the is_used column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByIsUsed(true); // WHERE is_used = true
+     * $query->filterByIsUsed('yes'); // WHERE is_used = true
+     * </code>
+     *
+     * @param     boolean|string $isUsed The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCouponVersionQuery The current query, for fluid interface
+     */
+    public function filterByIsUsed($isUsed = null, $comparison = null)
+    {
+        if (is_string($isUsed)) {
+            $is_used = in_array(strtolower($isUsed), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(CouponVersionTableMap::IS_USED, $isUsed, $comparison);
+    }
+
+    /**
+     * Filter the query on the serialized_conditions column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterBySerializedConditions('fooValue');   // WHERE serialized_conditions = 'fooValue'
+     * $query->filterBySerializedConditions('%fooValue%'); // WHERE serialized_conditions LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $serializedConditions The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCouponVersionQuery The current query, for fluid interface
+     */
+    public function filterBySerializedConditions($serializedConditions = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($serializedConditions)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $serializedConditions)) {
+                $serializedConditions = str_replace('*', '%', $serializedConditions);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CouponVersionTableMap::SERIALIZED_CONDITIONS, $serializedConditions, $comparison);
     }
 
     /**
