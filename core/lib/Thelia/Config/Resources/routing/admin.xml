@@ -142,6 +142,11 @@
         <requirement key="address_id">\d+</requirement>
     </route>
 
+    <route id="admin.address.save" path="/admin/address/save/{address_id}">
+        <default key="_controller">Thelia\Controller\Admin\AddressController::processUpdateAction</default>
+        <requirement key="address_id">\d+</requirement>
+    </route>
+
     <!-- end address management -->
 
     <!-- order management -->

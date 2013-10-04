@@ -60,31 +60,6 @@ class AddressController extends AbstractCrudController
         );
     }
 
-/*    public function deleteAddressAction()
-    {
-        if (null !== $response = $this->checkAuth("admin.customer.update")) return $response;
-
-        $address_id = $this->getRequest()->request->get('address_id');
-
-        try {
-            $address = AddressQuery::create()->findPk($address_id);
-
-            if (null === $address) {
-                throw new \InvalidArgumentException(sprintf('%d address does not exists', $address_id));
-            }
-
-            $addressEvent = new AddressEvent($address);
-
-            $this->dispatch(TheliaEvents::ADDRESS_DELETE, $addressEvent);
-
-            $this->adminLogAppend(sprintf("address %d for customer %d removal", $address_id, $address->getCustomerId()));
-        } catch(\Exception $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("error during address removal with message %s", $e->getMessage()));
-        }
-
-        $this->redirectToRoute('admin.customer.update.view', array(), array('customer_id' => $address->getCustomerId()));
-    }*/
-
     public function useAddressAction()
     {
         if (null !== $response = $this->checkAuth("admin.customer.update")) return $response;
@@ -159,7 +134,13 @@ class AddressController extends AbstractCrudController
      */
     protected function getCreationEvent($formData)
     {
-        return $this->getCreateOrUpdateEvent($formData);
+        $event = $this->getCreateOrUpdateEvent($formData);
+
+        $customer = CustomerQuery::create()->findPk($this->getRequest()->get("customer_id"));
+
+        $event->setCustomer($customer);
+
+        return $event;
     }
 
     /**
@@ -169,7 +150,9 @@ class AddressController extends AbstractCrudController
      */
     protected function getUpdateEvent($formData)
     {
-        return $this->getCreateOrUpdateEvent($formData);
+        $event =  $this->getCreateOrUpdateEvent($formData);
+
+        $event->setAddress($this->getExistingObject());
     }
 
     protected function getCreateOrUpdateEvent($formData)
@@ -191,9 +174,7 @@ class AddressController extends AbstractCrudController
             $formData["is_default"]
         );
 
-        $customer = CustomerQuery::create()->findPk($this->getRequest()->get("customer_id"));
 
-        $event->setCustomer($customer);
 
         return $event;
 
@@ -281,7 +262,8 @@ class AddressController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        // TODO: Implement redirectToEditionTemplate() method.
+        $address = $this->getExistingObject();
+        $this->redirectToRoute('admin.customer.update.view', array(), array('customer_id' => $address->getCustomerId()));
     }
 
     /**
@@ -312,7 +294,11 @@ class AddressController extends AbstractCrudController
      */
     protected function performAdditionalCreateAction($createEvent)
     {
-        $address = $createEvent->getAddress();
-        $this->redirectToRoute('admin.customer.update.view', array(), array('customer_id' => $address->getCustomerId()));
+        $this->redirectToEditionTemplate();
+    }
+
+    protected function performAdditionalUpdateAction($event)
+    {
+        $this->redirectToEditionTemplate();
     }
 }
