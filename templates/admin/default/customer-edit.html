@@ -390,16 +390,19 @@
 
                 $("a.customer-update-address").click(function(e){
                     var baseUrl = "{url path="/admin/address/update/"}";
-                    //$('body').html('<div class="loading" ></div>');
+                    $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
                     $.ajax({
                         method: 'get',
                         url: baseUrl+$(this).data('id')
                     }).done(function(data){
-                        //$(".loading").remove();
+                        $("#loading-event").remove();
                         $("#address-update-modal").html(data);
                         $("#edit_address_dialog").modal("show");
                     });
+                });
 
+                $(document).on("hidden.bs.modal", "#edit_address_dialog", function(ev){
+                    $("#edit_address_dialog").remove();
                 });
             });
         })(jQuery);
