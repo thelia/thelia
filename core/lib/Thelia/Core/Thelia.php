@@ -64,6 +64,7 @@ class Thelia extends Kernel
         if ($this->debug) {
             ini_set('display_errors', 1);
         }
+        ini_set('display_errors', 1);
         $this->initPropel();
     }
 
