@@ -8,7 +8,7 @@ env:
   - DB_USER=root
 
 before_script:
-  - echo "post_max_size = 20M" >> `php --ini | grep "Loaded Configuration" | sed -e "/^post_max_size/d"`
+  - phpenv config-add travis.php.ini
   - composer self-update
   - composer install --prefer-dist --dev
   - sh -c "mysql -u$DB_USER -e 'SET FOREIGN_KEY_CHECKS = 0; DROP DATABASE IF EXISTS thelia;SET FOREIGN_KEY_CHECKS = 1;'; fi"
