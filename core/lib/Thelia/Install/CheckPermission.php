@@ -45,6 +45,7 @@ class CheckPermission extends BaseInstall
     const DIR_LOG  =            'log';
     const DIR_CACHE =           'cache';
     const DIR_WEB =             'web';
+    const DIR_SESSION =         'local/session';
 
     /** @var array Directory needed to be writable */
     protected $directoriesToBeWritable = array(
@@ -52,6 +53,7 @@ class CheckPermission extends BaseInstall
         self::DIR_LOG,
         self::DIR_CACHE,
         self::DIR_WEB,
+        self::DIR_SESSION,
     );
 
     /** @var array Minimum server configuration necessary */
@@ -187,9 +189,9 @@ class CheckPermission extends BaseInstall
     {
         if ($this->translator !== null) {
             if ($isValid) {
-                $sentence = 'Your directory <strong>%directory%</strong> is writable';
+                $sentence = 'Your directory %directory% is writable';
             } else {
-                $sentence = 'Your directory <strong>%directory%</strong> is not writable';
+                $sentence = 'Your directory %directory% is not writable';
             }
 
             $translatedText = $this->translator->trans(
