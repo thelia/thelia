@@ -56,7 +56,7 @@ class CheckPermission extends BaseInstall
 
     /** @var array Minimum server configuration necessary */
     protected $minServerConfigurationNecessary = array(
-        'memory_limit' => 134217728,
+        'memory_limit' => 157286400,
         'post_max_size' => 20971520,
         'upload_max_filesize' => 2097152
     );
@@ -216,7 +216,7 @@ class CheckPermission extends BaseInstall
     protected function getI18nDirectoryHint($directory)
     {
         if ($this->translator !== null) {
-            $sentence = '<span class="label label-primary">chmod 777 %directory%</span> on your server with admin rights could help';
+            $sentence = 'chmod 777 %directory% on your server with admin rights could help';
             $translatedText = $this->translator->trans(
                 $sentence,
                 array(
@@ -246,9 +246,9 @@ class CheckPermission extends BaseInstall
     protected function getI18nConfigText($key, $expectedValue, $currentValue, $isValid)
     {
         if ($isValid) {
-            $sentence = 'Your <span class="label label-primary">%key%</span> server configuration (currently %currentValue%) is well enough to run Thelia2 (%expectedValue% needed)';
+            $sentence = 'Your %key% server configuration (currently %currentValue%) is well enough to run Thelia2 (%expectedValue% needed)';
         } else {
-            $sentence = 'Your <span class="label label-primary">%key%</span> server configuration (currently %currentValue%) is not sufficient enough in order to run Thelia2 (%expectedValue% needed)';
+            $sentence = 'Your %key% server configuration (currently %currentValue%) is not sufficient enough in order to run Thelia2 (%expectedValue% needed)';
         }
 
         $translatedText = $this->translator->trans(
@@ -271,7 +271,7 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nConfigHint()
     {
-        $sentence = 'Modifying this value on your server <span class="label label-primary">php.ini</span> file with admin rights could help';
+        $sentence = 'Modifying this value on your server php.ini file with admin rights could help';
         $translatedText = $this->translator->trans(
             $sentence,
             array(),
@@ -294,9 +294,9 @@ class CheckPermission extends BaseInstall
     {
         if ($this->translator !== null) {
             if ($isValid) {
-                $sentence = 'Your PHP version <span class="label label-primary">%currentValue%</span> is well enough to run Thelia2 (%expectedValue% needed)';
+                $sentence = 'Your PHP version %currentValue% is well enough to run Thelia2 (%expectedValue% needed)';
             } else {
-                $sentence = 'Your PHP version <span class="label label-primary">%currentValue%</span> is not sufficient enough to run Thelia2 (%expectedValue% needed)';
+                $sentence = 'Your PHP version %currentValue% is not sufficient enough to run Thelia2 (%expectedValue% needed)';
             }
 
             $translatedText = $this->translator->trans(
@@ -342,6 +342,10 @@ class CheckPermission extends BaseInstall
     protected function verifyServerMemoryValues($key, $necessaryValueInBytes)
     {
         $serverValueInBytes = $this->returnBytes(ini_get($key));
+
+        if($serverValueInBytes == -1) {
+            return true;
+        }
 
         return ($serverValueInBytes >= $necessaryValueInBytes);
     }
