@@ -71,7 +71,9 @@
             <argument type="service" id="event_dispatcher"/>
         </service>
 
-
+        <service id="thelia.response.listener" class="Thelia\Core\EventListener\ResponseListener">
+            <tag name="kernel.event_subscriber"/>
+        </service>
     </services>
 
 </config>

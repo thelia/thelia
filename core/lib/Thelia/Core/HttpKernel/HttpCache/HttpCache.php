@@ -23,17 +23,20 @@
 
 namespace Thelia\Core\HttpKernel\HttpCache;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
 /**
  * Class HttpCache
  * @package Thelia\Core\HttpKernel\HttpCache
  * @author manuel raynaud <mraynaud@openstudio.fr>
  */
-class HttpCache extends BaseHttpCache
+class HttpCache extends BaseHttpCache implements HttpKernelInterface
 {
 
     public function __construct(HttpKernelInterface $kernel, $options = array())
@@ -47,6 +50,22 @@ class HttpCache extends BaseHttpCache
                 $options
             )
         );
+    }
+
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+    {
+        if (!($request instanceof \Thelia\Core\HttpFoundation\Request)) {
+            $request = TheliaRequest::create(
+                $request->getUri(),
+                $request->getMethod(),
+                $request->getMethod() == 'GET' ? $request->query->all() : $request->request->all(),
+                $request->cookies->all(),
+                $request->files->all(),
+                $request->server->all(),
+                $request->getContent()
+            );
+        }
+        return parent::handle($request, $type, $catch);
     }
 
 }

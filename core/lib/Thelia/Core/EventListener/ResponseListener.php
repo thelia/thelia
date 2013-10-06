@@ -21,64 +21,56 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Command;
+namespace Thelia\Core\EventListener;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
-use Thelia\Model\ModuleQuery;
 
 /**
- * activates a module
- *
- * Class ModuleActivateCommand
- * @package Thelia\Command
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
+ * Class ResponseListener
+ * @package Thelia\Core\EventListener
+ * @author manuel raynaud <mraynaud@openstudio.fr>
  */
-class ModuleActivateCommand extends BaseModuleGenerate
+class ResponseListener implements EventSubscriberInterface
 {
-    protected function configure()
+
+    public function onResponse(FilterResponseEvent $event)
     {
-        $this
-            ->setName("module:activate")
-            ->setDescription("Activates a module")
-            ->addArgument(
-                "module" ,
-                InputArgument::REQUIRED,
-                "module to activate"
-            )
-        ;
+        $request = $event->getRequest();
+
+        if($request->headers->has('Surrogate-Capability'))
+        {
+            $response = $event->getResponse();
+            $response->headers->set('Surrogate-Control', 'content="ESI/1.0"');
+            $event->setResponse($response);
+        }
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    /**
+     * Returns an array of event names this subscriber wants to listen to.
+     *
+     * The array keys are event names and the value can be:
+     *
+     *  * The method name to call (priority defaults to 0)
+     *  * An array composed of the method name to call and the priority
+     *  * An array of arrays composed of the method names to call and respective
+     *    priorities, or 0 if unset
+     *
+     * For instance:
+     *
+     *  * array('eventName' => 'methodName')
+     *  * array('eventName' => array('methodName', $priority))
+     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
+     *
+     * @return array The event names to listen to
+     *
+     * @api
+     */
+    public static function getSubscribedEvents()
     {
-        $moduleCode = $this->formatModuleName($input->getArgument("module"));
-
-        $module = ModuleQuery::create()->findOneByCode($moduleCode);
-
-        if (null === $module) {
-            throw new \RuntimeException(sprintf("module %s not found", $moduleCode));
-        }
-
-        try {
-            $moduleReflection = new \ReflectionClass($module->getFullNamespace());
-
-            $moduleInstance = $moduleReflection->newInstance();
-
-            $moduleInstance->activate();
-        } catch (\Exception $e) {
-            throw new \RuntimeException(sprintf("Activation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()));
-        }
-
-        //impossible to change output class in CommandTester...
-        if (method_exists($output, "renderBlock")) {
-            $output->renderBlock(array(
-                '',
-                sprintf("Activation succeed for module %s", $moduleCode),
-                ''
-            ), "bg=green;fg=black");
-        }
+        return array(
+            KernelEvents::RESPONSE => array('onResponse', 0)
+        );
     }
 }
