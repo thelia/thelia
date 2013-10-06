@@ -64,8 +64,6 @@ class ModuleActivateCommand extends BaseModuleGenerate
         }
 
         try {
-            new \TheliaDebugBar\TheliaDebugBar();
-
             $moduleReflection = new \ReflectionClass($module->getFullNamespace());
 
             $moduleInstance = $moduleReflection->newInstance();

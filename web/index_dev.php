@@ -46,9 +46,10 @@ if ( false === in_array($request->getClientIp(), $trustedIp)) {
     $response = Response::create('Forbidden', 403)->send();
     $thelia->terminate($request, $response);
 } else {
-    //$thelia = new HttpCache($thelia);
-    $response = $thelia->handle($request)->prepare($request)->send();
-    $thelia->terminate($request, $response);
+    $thelia = new HttpCache($thelia);
+    $response = $thelia->handle($request)->send();
+    //$thelia->terminate($request, $response);
+
 }
 
 

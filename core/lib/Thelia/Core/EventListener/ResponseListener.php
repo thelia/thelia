@@ -21,51 +21,56 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\HttpKernel\HttpCache;
+namespace Thelia\Core\EventListener;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\HttpCache\Esi;
-use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
-use Symfony\Component\HttpKernel\HttpCache\Store;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-
-use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
 /**
- * Class HttpCache
- * @package Thelia\Core\HttpKernel\HttpCache
+ * Class ResponseListener
+ * @package Thelia\Core\EventListener
  * @author manuel raynaud <mraynaud@openstudio.fr>
  */
-class HttpCache extends BaseHttpCache implements HttpKernelInterface
+class ResponseListener implements EventSubscriberInterface
 {
 
-    public function __construct(HttpKernelInterface $kernel, $options = array())
+    public function onResponse(FilterResponseEvent $event)
     {
-        parent::__construct(
-            $kernel,
-            new Store($kernel->getCacheDir().'/http_cache'),
-            new Esi(),
-            array_merge(
-                array('debug' => $kernel->isDebug()),
-                $options
-            )
+        $request = $event->getRequest();
+
+        if($request->headers->has('Surrogate-Capability'))
+        {
+            $response = $event->getResponse();
+            $response->headers->set('Surrogate-Control', 'content="ESI/1.0"');
+            $event->setResponse($response);
+        }
+    }
+
+    /**
+     * Returns an array of event names this subscriber wants to listen to.
+     *
+     * The array keys are event names and the value can be:
+     *
+     *  * The method name to call (priority defaults to 0)
+     *  * An array composed of the method name to call and the priority
+     *  * An array of arrays composed of the method names to call and respective
+     *    priorities, or 0 if unset
+     *
+     * For instance:
+     *
+     *  * array('eventName' => 'methodName')
+     *  * array('eventName' => array('methodName', $priority))
+     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
+     *
+     * @return array The event names to listen to
+     *
+     * @api
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::RESPONSE => array('onResponse', 0)
         );
     }
-
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
-    {
-        if (!($request instanceof \Thelia\Core\HttpFoundation\Request)) {
-            $request = TheliaRequest::create(
-                $request->getUri(),
-                $request->getMethod(),
-                $request->getMethod() == 'GET' ? $request->query->all() : $request->request->all(),
-                $request->cookies->all(),
-                $request->files->all(),
-                $request->server->all(),
-                $request->getContent()
-            );
-        }
-        return parent::handle($request, $type, $catch);
-    }
-
 }
