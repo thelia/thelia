@@ -14,7 +14,6 @@ coverage
 .buildpath
 .project
 .settings/
-local/cache/*
 local/media/documents/*
 local/media/images/*
 web/assets/*
