@@ -153,6 +153,8 @@ class AddressController extends AbstractCrudController
         $event =  $this->getCreateOrUpdateEvent($formData);
 
         $event->setAddress($this->getExistingObject());
+
+        return $event;
     }
 
     protected function getCreateOrUpdateEvent($formData)

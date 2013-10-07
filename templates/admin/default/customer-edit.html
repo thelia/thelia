@@ -44,7 +44,7 @@
         						        	{/form_field}
 
         					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-
+                                            {loop name="address" type="address" customer="$customer_id" backend_context="1" default="true"}
                                             <div class="col-md-6">
                                                 <p class="title title-without-tabs">{intl l="Customer informations"}</p>
 
@@ -74,7 +74,7 @@
                                                     </div>
                                                 {/form_field}
 
-                                                {loop name="address" type="address" customer="$customer_id" backend_context="1" default="true"}
+
 
                                                     <p class="title title-without-tabs">{intl l="Default address"}</p>
 
