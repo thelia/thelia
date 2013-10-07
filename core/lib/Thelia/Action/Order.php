@@ -197,6 +197,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $taxRuleI18n = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'TaxRule', $product->getTaxRuleId());
 
             $taxDetail = $product->getTaxRule()->getTaxDetail(
+                $product,
                 $taxCountry,
                 $cartItem->getPrice(),
                 $cartItem->getPromoPrice(),

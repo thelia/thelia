@@ -26,6 +26,7 @@ use Thelia\Exception\TaxEngineException;
 use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\Product;
 use Thelia\Type\FloatType;
+use Thelia\Type\ModelValidIdType;
 
 /**
  *
@@ -34,11 +35,6 @@ use Thelia\Type\FloatType;
  */
 class FeatureFixAmountTaxType extends BaseTaxType
 {
-    public function calculate($untaxedPrice)
-    {
-        return $this->getRequirement("amount");
-    }
-
     public function pricePercentRetriever()
     {
         return 0;
@@ -46,7 +42,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
 
     public function fixAmountRetriever(Product $product)
     {
-        $featureId = $this->getRequirement("featureId");
+        $featureId = $this->getRequirement("feature");
 
         $query = FeatureProductQuery::create()
             ->filterByProduct($product)
@@ -66,7 +62,7 @@ class FeatureFixAmountTaxType extends BaseTaxType
     public function getRequirementsList()
     {
         return array(
-            'featureId' => new ModelType('Feature'),
+            'feature' => new ModelValidIdType('Feature'),
         );
     }
 }
