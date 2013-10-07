@@ -19,16 +19,16 @@
             <form id="form-login" action="{url path="/customer/login"}" method="post" role="form" {form_enctype form=$form}>
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
                 {form_field form=$form field='success_url'}
-                    <input type="hidden" name="{$name}" value="{navigate to="return_to"}" /> {* the url the user is redirected to on login success *}
+                    <input type="hidden" name="{$name}" value="{navigate to="return_to"}"> {* the url the user is redirected to on login success *}
                 {/form_field}
 
                 {form_field form=$form field='error_message'}
-                    <input type="hidden" name="{$name}" value="{intl l="missing or invalid data"}" /> {* the url the user is redirected to on login success *}
+                    <input type="hidden" name="{$name}" value="{intl l="missing or invalid data"}"> {* the url the user is redirected to on login success *}
                 {/form_field}
                 {form_hidden_fields form=$form}
                 <fieldset>
                     {form_field form=$form field="email"}
-                        <div class="form-group group-email {if $error}has-error{/if} ">
+                        <div class="form-group group-email{if $error} has-error{/if}">
                             <label for="{$label_attr.for}">{$label}</label>
                             <div class="control-input">
                             <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" {$attr}  aria-required="true" autofocus required>
@@ -52,7 +52,7 @@
                             </label>
                         </div>
                         {form_field form=$form field="password"}
-                        <div class="form-group group-password {if $error}has-error{/if} ">
+                        <div class="form-group group-password{if $error} has-error{/if}">
                             <label for="{$label_attr.for}" class="sr-only">{$label}</label>
                             <div class="control-input">
                             <input type="password" name="{$name}" id="{$label_attr.for}" class="form-control" autocomplete="off">
@@ -66,7 +66,7 @@
                 </fieldset>
 
                 <div class="group-btn">
-                    <a href="{url path="/password"}" class="forgot-password">{intl l="Forgot your Password ?"}</a>
+                    <a href="{url path="/password"}" data-toggle="confirmation" class="forgot-password">{intl l="Forgot your Password?"}</a>
                     <button type="submit" class="btn btn-login">{intl l="Next"}</button>
                 </div>
             </form>

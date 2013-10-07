@@ -60,13 +60,13 @@ URL: http://www.thelia.net
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Thelia</a>
+                <a class="navbar-brand" href="{navigate to="index"}">Thelia</a>
             </div>
 
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
-            <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="Main Navigation">
+            <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="{intl l="Main Navigation"}">
                 <ul class="nav navbar-nav navbar-categories">
-                    <li><a href="{url path="/"}" class="home">{intl l="Home"}</a></li>
+                    <li><a href="{navigate to="index"}" class="home">{intl l="Home"}</a></li>
                     {loop type="category" name="category.navigation" parent="0"}
                         <li><a href="{$URL}">{$TITLE}</a></li>
                     {/loop}
@@ -77,7 +77,7 @@ URL: http://www.thelia.net
                         <li><a href="{url path="/customer/account"}" class="account">{intl l="My Account"}</a></li>
                     {/loop}
                     {elseloop rel="customer_info_block"}
-                    <li><a href="{url path="/register"}" class="register">{intl l="Register"}!</a></li>
+                    <li><a href="{url path="/register"}" class="register">{intl l="Register!"}</a></li>
                     <li><a href="{url path="/login"}" class="login">{intl l="Log In!"}</a></li>
                     {/elseloop}
                     <li class="dropdown">
@@ -94,7 +94,7 @@ URL: http://www.thelia.net
     <header class="container" role="banner">
         <div class="header">
             <h1 class="logo">
-                <a href="{url path="/"}" class="Thelia * Since 2006 *">
+                <a href="{navigate to="index"}" class="{intl l="Thelia * Since 2006 *"}">
                     {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="Thelia">{/images}
                 </a>
             </h1>
@@ -102,10 +102,10 @@ URL: http://www.thelia.net
             <div class="language-container">
 
                 <div class="search-container">
-                    <form id="form-search" action="search.html" method="get" role="search" aria-labelledby="search-label">
+                    <form id="form-search" action="{url path="/search"}" method="get" role="search" aria-labelledby="search-label">
                         <label id="search-label" for="q">{intl l="Search a product"}</label>
                         <div class="input-group">
-                            <input type="search" name="q" id="q" placeholder="{intl l="Search..."}" class="form-control" aria-required="true" required pattern=". { 2,}" title="{intl l="Minmimum 2 characters."}">
+                            <input type="search" name="q" id="q" placeholder="{intl l="Search..."}" class="form-control" autocomplete="off" aria-required="true" required pattern=".{ldelim}2,{rdelim}" title="{intl l="Minmimum 2 characters."}">
                             <div class="input-group-btn">
                                 <button type="submit" class="btn btn-search"><i class="icon-search"></i> <span>{intl l="Search"}</span></button>
                             </div>
@@ -115,7 +115,7 @@ URL: http://www.thelia.net
 
                 <div class="language-switch" aria-labelledby="language-label">
                     <span id="language-label" class="dropdown-label">{intl l="Language:"}</span>
-                    <a class="current dropdown-toggle" data-toggle="dropdown" href="language.html">{lang attr="title"}</a>
+                    <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/language"}">{lang attr="title"}</a>
                     <ul class="select dropdown-menu">
                         {loop type="lang" name="lang_available" exclude="{lang attr="id"}"}
                             <li><a href="?lang={$CODE}">{$TITLE}</a></li>
@@ -125,7 +125,7 @@ URL: http://www.thelia.net
 
                 <div class="currency-switch" aria-labelledby="currency-label">
                     <span id="currency-label" class="dropdown-label">{intl l="Currency:"}</span>
-                    <a class="current dropdown-toggle" data-toggle="dropdown" href="currency.html">{currency attr="code"}</a>
+                    <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/currency"}">{currency attr="code"}</a>
                     <ul class="select dropdown-menu">
                         {loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
                             <li><a href="?currency={$ISOCODE}">{$SYMBOL} - {$NAME}</a></li>
@@ -272,15 +272,15 @@ URL: http://www.thelia.net
                     </section>
 
                     <section class="block block-newsletter">
-                        <div class="block-heading"><h3 class="block-title">Newsletter</h3></div>
+                        <div class="block-heading"><h3 class="block-title">{intl l="Newsletter"}</h3></div>
                         <div class="block-content">
-                            <p id="newletter-describe">Sign up to receive our latest news.</p>
-                            <form id="form-newsletter" action="" method="post" role="form">
+                            <p id="newletter-describe">{intl l="Sign up to receive our latest news."}</p>
+                            <form id="form-newsletter" action="{url path="/newsletter"}" method="post" role="form">
                                 <div class="form-group">
-                                    <label for="email">Email address</label>
-                                    <input type="email" name="email" id="email" class="form-control" placeholder="Your email address" aria-describedby="newletter-describe" aria-required="true" required autocomplete="off">
+                                    <label for="email">{intl l="Email address"}</label>
+                                    <input type="email" name="email" id="email" class="form-control" placeholder="{intl l="Your email address"}" aria-describedby="newletter-describe" aria-required="true" required autocomplete="off">
                                 </div>
-                                <button type="submit" class="btn btn-subscribe">Subscribe</button>
+                                <button type="submit" class="btn btn-subscribe">{intl l="Subscribe"}</button>
                             </form>
                         </div>
                     </section>
@@ -348,60 +348,27 @@ URL: http://www.thelia.net
     }
 </script>
 
-<!-- Bootstrap -->
-{javascripts file='assets/js/bootstrap/affix.js'}
+{javascripts file='assets/js/bootstrap/bootstrap.js'}
     <script src="{$asset_url}"></script>
 {/javascripts}
-{javascripts file='assets/js/bootstrap/tooltip.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-{javascripts file='assets/js/bootstrap/popover.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-{javascripts file='assets/js/bootstrap/tab.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-{javascripts file='assets/js/bootstrap/scrollspy.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-{javascripts file='assets/js/bootstrap/transition.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-{javascripts file='assets/js/bootstrap/alert.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-{javascripts file='assets/js/bootstrap/button.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-{javascripts file='assets/js/bootstrap/carousel.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-{javascripts file='assets/js/bootstrap/collapse.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-{javascripts file='assets/js/bootstrap/dropdown.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-{javascripts file='assets/js/bootstrap/modal.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
+
+{block name="after-javascript-include"}{/block}
+
+{block name="javascript-initialization"}{/block}
 
 <!-- Custom scripts -->
 {javascripts file='assets/js/script.js'}
     <script src="{$asset_url}"></script>
 {/javascripts}
 
-{debugbar_renderjs}
-{debugbar_renderresult}
 
 {* HTML5 shim, for IE6-8 support of HTML5 elements *}
 <!--[if lt IE 9]>
 <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
 
-{block name="after-javascript-include"}{/block}
-
-{block name="javascript-initialization"}{/block}
+{debugbar_renderjs}
+{debugbar_renderresult}
 
 </body>
 </html>

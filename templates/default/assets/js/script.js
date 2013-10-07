@@ -1,11 +1,18 @@
 /* JQUERY PREVENT CONFLICT */
 (function($) {
 
-
     /*	------------------------------------------------------------------
      onLoad Function -------------------------------------------------- */
     $(document).ready(function(){
 
+        // Loader
+        var $loader = $('<div class="loader"></div>');
+        $('body').append($loader);
+
+        // Display loader if we do ajax call
+        $(document)
+            .ajaxStart(function() { $loader.show(); })
+            .ajaxStop(function(){ $loader.hide(); });
 
         // Main Navigation Hover
         $('.nav-main')
@@ -30,6 +37,29 @@
             selector: '[data-toggle=tooltip]'
         });
 
+        // Confirm Dialog
+        $(document).on('click.confirm', '[data-toggle="confirm"]', function (e) {
+            var $this   = $(this),
+                href    = $this.attr('href'),
+                title   = $this.attr('data-confirm-title') ? $this.attr('data-confirm-title') : 'Are you sure?';
+
+                bootbox.confirm(title, function(confirm) {
+                    if(confirm){
+                        if(href){
+                            window.location.href = href;
+                        } else {
+                            // If forms
+                            var $form = $this.closest("form");
+                            if($form.size() > 0){
+                                $form.submit();
+                            }
+                        }
+                    }
+                });
+
+            return false;
+        });
+
         // Toolbar
         var $category_products = $('#category-products');
         if($category_products.size() > 0){
@@ -40,7 +70,9 @@
                 if( ($(this).hasClass('btn-grid') && $parent.hasClass('grid')) || ($(this).hasClass('btn-list') && $parent.hasClass('list')))
                     return;
 
-                $parent.toggleClass('grid').toggleClass('list');
+                // Add loader effect
+                $loader.show();
+                setTimeout(function(){ $parent.toggleClass('grid').toggleClass('list'); $loader.hide(); }, 400);
 
                 return false;
             });
@@ -89,6 +121,7 @@
 
             $form
                 .on('change.filter', ':checkbox', function(){
+                    $loader.show();
                     $form.submit();
                 })
                 .find('.group-btn > .btn').addClass('sr-only');

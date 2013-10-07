@@ -39,10 +39,10 @@
                                     <address class="adr">
                                         <span class="street-address">{$ADDRESS1}</span><br>
                                         {if $ADDRESS2 != ""}
-                                            <span class="street-address">{$ADDRESS2}</span><br>
+                                            <span class="extended-address">{$ADDRESS2}</span><br>
                                         {/if}
                                         {if $ADDRESS3 != ""}
-                                            <span class="street-address">{$ADDRESS3}</span><br>
+                                            <span class="extended-address">{$ADDRESS3}</span><br>
                                         {/if}
                                         <span class="postal-code">{$ZIPCODE}</span>
                                         <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
@@ -55,11 +55,11 @@
                                     {if $PHONE != ""}
                                         <span class="tel">{$PHONE}</span>
                                     {/if}
-                                    <span class="email"><a href="mailto:{$EMAIL}">{$EMAIL}</a></span>
+                                    <span class="email">{mailto address="{$EMAIL}" encode="hex"}</span>
                                 </li>
                                 <li class="group-btn">
-                                    <a href="#" class="btn btn-change-account"><i class="icon-pencil"></i> Change my account informations</a>
-                                    <a href="#" class="btn btn-change-password"><i class="icon-lock"></i> Change my password</a>
+                                    <a href="{url path="/account/update/{$ID}"}" class="btn btn-change-account"><i class="icon-pencil"></i> {intl l="Change my account informations"}</a>
+                                    <a href="{url path="/account/password/{$ID}"}" class="btn btn-change-password"><i class="icon-lock"></i> {intl l="Change my password"}</a>
                                 </li>
                             </ul>
                             {/loop}
@@ -116,9 +116,9 @@
                                     </td>
                                     <td>
                                         <div class="group-btn">
-                                            <a href="{url path="/address/update/{$ID}"}" class="btn btn-edit-address" data-toggle="tooltip" title="Edit this address"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
+                                            <a href="{url path="/address/update/{$ID}"}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
                                             {if $DEFAULT != 1}
-                                                <a href="{url path="/address/delete/{$ID}"}" class="btn btn-remove-address remove-address" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
+                                                <a href="{url path="/address/delete/s{$ID}"}" class="btn btn-remove-address" data-toggle="popover" title="Do you really want to delete this address ?" data-content="And here's some amazing content. It's very engaging. right?" title="{intl l="Remove this address"}" ><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
                                             {/if}
                                         </div>
                                     </td>
@@ -164,7 +164,7 @@
                             </table>
                             {elseloop rel="customer.orders"}
                             <div class="orders-warning">
-                                <strong>{intl l="Warning"}!</strong> {intl l="You don't have orders yet"}
+                                <strong>{intl l="Warning"}!</strong> {intl l="You don't have orders yet."}
                             </div>
                             {/elseloop}
                         </div>
@@ -174,38 +174,6 @@
         </article>
 
     </div><!-- /.layout -->
-
-    <div class="modal fade" id="address-delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h3>{intl l="Delete address"}</h3>
-                </div>
-                <div class="modal-body">
-                    {intl l="Do you really want to delete this address ?"}
-                </div>
-                    <div class="modal-footer">
-                        <a href="#" type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {intl l="No"}</a>
-                        <a href="#" id="address-delete-link" type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Yes"}</a>
-                    </div>
-            </div>
-        </div>
-    </div>
-
 {/block}
 
-{block name="after-javascript-include"}
-
-    <script type="text/javascript">
-        $(document).ready(function(){
-            $(".remove-address").click(function(e){
-                e.preventDefault();
-                $("#address-delete-link").attr("href", $(this).attr("href"));
-                $('#address-delete-modal').modal('show');
-            })
-        })
-    </script>
-
-{/block}
+{block name="after-javascript-include"}{/block}
