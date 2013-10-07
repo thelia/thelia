@@ -29,6 +29,7 @@ use Thelia\Core\Event\Country\CountryDeleteEvent;
 use Thelia\Core\Event\Country\CountryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Country as CountryModel;
+use Thelia\Model\CountryQuery;
 
 
 /**
@@ -62,7 +63,11 @@ class Country extends BaseAction implements EventSubscriberInterface
 
     public function delete(CountryDeleteEvent $event)
     {
+        if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
+            $country->delete();
 
+            $event->setCountry($country);
+        }
     }
 
 

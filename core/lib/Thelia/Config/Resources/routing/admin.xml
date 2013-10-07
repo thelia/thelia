@@ -420,6 +420,10 @@
         <requirement key="country_id">\d+</requirement>
     </route>
 
+    <route id="admin.configuration.countries.delete" path="/admin/configuration/countries/delete">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::deleteAction</default>
+    </route>
+
     <!-- content routes management -->
     <route id="admin.content.create" path="/admin/content/create">
         <default key="_controller">Thelia\Controller\Admin\ContentController::createAction</default>

@@ -216,10 +216,17 @@
         <script src="{$asset_url}"></script>
 
         <script>
-            // Toogle switch on input radio
-            $('.switch-radio').on('switch-change', function () {
-                $('.switch-radio').bootstrapSwitch('toggleRadioState');
+            $(document).ready(function(){
+                // Toogle switch on input radio
+                $('.switch-radio').on('switch-change', function () {
+                    $('.switch-radio').bootstrapSwitch('toggleRadioState');
+                });
+
+                $('.country-delete').click(function(ev){
+                    $('#country_delete_id').val($(this).data('id'));
+                });
             });
+
         </script>
     {/javascripts}
 
