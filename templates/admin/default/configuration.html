@@ -58,6 +58,13 @@
 		                    </tr>
 	                        {/loop}
 
+                            {loop type="auth" name="pcc6" roles="ADMIN" permissions="admin.configuration.taxe-rules"}
+                            <tr>
+                                <td><a href="{url path='/admin/configuration/taxes_rules'}">{intl l='Taxes rules'}</a></td>
+                                <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/taxes_rules'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                            </tr>
+                            {/loop}
+
 		                    {module_include location='catalog_configuration_bottom'}
 			            </table>
 			        </div>
