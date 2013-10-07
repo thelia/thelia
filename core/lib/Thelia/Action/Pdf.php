@@ -22,108 +22,28 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
-
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Core\Event\Customer\CustomerAddressEvent;
-use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
-use Thelia\Core\Event\Customer\CustomerEvent;
+use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Customer as CustomerModel;
-use Thelia\Core\Event\Customer\CustomerLoginEvent;
+
 
 /**
- *
- * customer class where all actions are managed
- *
- * Class Customer
+ * Class Pdf
  * @package Thelia\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Customer extends BaseAction implements EventSubscriberInterface
+class Pdf extends BaseAction implements EventSubscriberInterface
 {
 
-    public function create(CustomerCreateOrUpdateEvent $event)
+    public function generatePdf(PdfEvent $event)
     {
 
-        $customer = new CustomerModel();
+        $html2pdf = new \HTML2PDF($event->getOrientation(), $event->getFormat(), $event->getLang(), $event->getUnicode(), $event->getEncoding(), $event->getMarges());
 
-        $this->createOrUpdateCustomer($customer, $event);
+        $html2pdf->pdf->SetDisplayMode('real');
 
-    }
-
-    public function modify(CustomerCreateOrUpdateEvent $event)
-    {
-
-        $customer = $event->getCustomer();
-
-        $this->createOrUpdateCustomer($customer, $event);
-
-    }
-
-    public function delete(CustomerEvent $event)
-    {
-        $customer = $event->getCustomer();
-
-        $customer->delete();
-    }
-
-    private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event)
-    {
-        $customer->setDispatcher($this->getDispatcher());
-
-        $customer->createOrUpdate(
-            $event->getTitle(),
-            $event->getFirstname(),
-            $event->getLastname(),
-            $event->getAddress1(),
-            $event->getAddress2(),
-            $event->getAddress3(),
-            $event->getPhone(),
-            $event->getCellphone(),
-            $event->getZipcode(),
-            $event->getCity(),
-            $event->getCountry(),
-            $event->getEmail(),
-            $event->getPassword(),
-            $event->getLang(),
-            $event->getReseller(),
-            $event->getSponsor(),
-            $event->getDiscount(),
-            $event->getCompany()
-        );
-
-        $event->setCustomer($customer);
-    }
-
-    public function login(CustomerLoginEvent $event)
-    {
-        $this->getSecurityContext()->setCustomerUser($event->getCustomer());
-    }
-
-    /**
-     * Perform user logout. The user is redirected to the provided view, if any.
-     *
-     * @param ActionEvent $event
-     */
-    public function logout(ActionEvent $event)
-    {
-        $this->getSecurityContext()->clearCustomerUser();
-    }
-
-    public function changePassword(ActionEvent $event)
-    {
-    // TODO
-    }
-
-    /**
-     * Return the security context
-     *
-     * @return Thelia\Core\Security\SecurityContext
-     */
-    protected function getSecurityContext()
-    {
-        return $this->container->get('thelia.securityContext');
+        $html2pdf->writeHTML($event->getContent());
+        $event->setPdf($html2pdf->output(null, 'S'));
     }
 
     /**
@@ -149,11 +69,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::CUSTOMER_CREATEACCOUNT    => array('create', 128),
-            TheliaEvents::CUSTOMER_UPDATEACCOUNT    => array('modify', 128),
-            TheliaEvents::CUSTOMER_LOGOUT           => array('logout', 128),
-            TheliaEvents::CUSTOMER_LOGIN            => array('login', 128),
-            TheliaEvents::CUSTOMER_DELETEACCOUNT    => array('delete', 128),
+            TheliaEvents::GENERATE_PDF => array("generatePdf", 128)
         );
     }
 }

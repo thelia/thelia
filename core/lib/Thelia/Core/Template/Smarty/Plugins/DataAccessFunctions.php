@@ -30,6 +30,7 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\CountryQuery;
@@ -234,6 +235,17 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         return $this->dataAccess("Lang", $params, $this->request->getSession()->getLang());
     }
 
+    public function ConfigDataAccess($params, $smarty)
+    {
+        if(false === array_key_exists("key", $params)) {
+            return null;
+        }
+
+        $key = $params['key'];
+
+        return ConfigQuery::read($key);
+    }
+
     /**
      * @param               $objectLabel
      * @param               $params
@@ -344,6 +356,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'lang', $this, 'langDataAccess'),
             new SmartyPluginDescriptor('function', 'cart', $this, 'cartDataAccess'),
             new SmartyPluginDescriptor('function', 'order', $this, 'orderDataAccess'),
+            new SmartyPluginDescriptor('function', 'config', $this, 'ConfigDataAccess'),
         );
     }
 
