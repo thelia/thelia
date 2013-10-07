@@ -54,8 +54,8 @@
                                                 <td>{$ID}</td>
                                                 <td>{$TITLE}</td>                                            
                                                 <td>
-                                                    <div class="make-switch switch-small switch-radio" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
-                                                        <input class="change-default" type="radio" name="" value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}/>
+                                                    <div class="make-switch switch-small switch-radio change-default-toggle" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                        <input class="change-default-toggle" type="radio" name="by_default" value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}/>
                                                     </div>
                                                 </td>
                                                 <td>                                                
@@ -224,6 +224,17 @@
 
                 $('.country-delete').click(function(ev){
                     $('#country_delete_id').val($(this).data('id'));
+                });
+
+                $('.change-default-toggle').on('switch-change', function(e, data){
+                    if(data.value) {
+                        $.ajax({
+                            url : "{url path='/admin/configuration/country/toggleDefault'}",
+                            data : {
+                                country_id: $(this).data('id')
+                            }
+                        });
+                    }
                 });
             });
 
