@@ -22,31 +22,185 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\TheliaEvents;
 
 /**
  * Class CustomerController
  * @package Thelia\Controller\Admin
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CountryController extends BaseAdminController
+class CountryController extends AbstractCrudController
 {
-    public function indexAction()
+
+    /**
+     * @param string $objectName the lower case object name. Example. "message"
+     *
+     * @param string $defaultListOrder          the default object list order, or null if list is not sortable. Example: manual
+     * @param string $orderRequestParameterName Name of the request parameter that set the list order (null if list is not sortable)
+     *
+     * @param string $viewPermissionIdentifier   the 'view' permission identifier. Example: "admin.configuration.message.view"
+     * @param string $createPermissionIdentifier the 'create' permission identifier. Example: "admin.configuration.message.create"
+     * @param string $updatePermissionIdentifier the 'update' permission identifier. Example: "admin.configuration.message.update"
+     * @param string $deletePermissionIdentifier the 'delete' permission identifier. Example: "admin.configuration.message.delete"
+     *
+     * @param string $createEventIdentifier the dispatched create TheliaEvent identifier. Example: TheliaEvents::MESSAGE_CREATE
+     * @param string $updateEventIdentifier the dispatched update TheliaEvent identifier. Example: TheliaEvents::MESSAGE_UPDATE
+     * @param string $deleteEventIdentifier the dispatched delete TheliaEvent identifier. Example: TheliaEvents::MESSAGE_DELETE
+     *
+     * @param string $visibilityToggleEventIdentifier the dispatched visibility toggle TheliaEvent identifier, or null if the object has no visible options. Example: TheliaEvents::MESSAGE_TOGGLE_VISIBILITY
+     * @param string $changePositionEventIdentifier   the dispatched position change TheliaEvent identifier, or null if the object has no position. Example: TheliaEvents::MESSAGE_UPDATE_POSITION
+     */
+    public function __construct()
     {
-        if (null !== $response = $this->checkAuth("admin.country.view")) return $response;
+        parent::__construct(
+            'country',
+            'manual',
+            'country_order',
+
+            'admin.country.default',
+            'admin.country.create',
+            'admin.country.update',
+            'admin.country.delete',
+
+            TheliaEvents::COUNTRY_CREATE,
+            TheliaEvents::COUNTRY_UPDATE,
+            TheliaEvents::COUNTRY_DELETE
+        );
+    }
+
+    /**
+     * Return the creation form for this object
+     */
+    protected function getCreationForm()
+    {
+        // TODO: Implement getCreationForm() method.
+    }
+
+    /**
+     * Return the update form for this object
+     */
+    protected function getUpdateForm()
+    {
+        // TODO: Implement getUpdateForm() method.
+    }
+
+    /**
+     * Hydrate the update form for this object, before passing it to the update template
+     *
+     * @param unknown $object
+     */
+    protected function hydrateObjectForm($object)
+    {
+        // TODO: Implement hydrateObjectForm() method.
+    }
+
+    /**
+     * Creates the creation event with the provided form data
+     *
+     * @param unknown $formData
+     */
+    protected function getCreationEvent($formData)
+    {
+        // TODO: Implement getCreationEvent() method.
+    }
+
+    /**
+     * Creates the update event with the provided form data
+     *
+     * @param unknown $formData
+     */
+    protected function getUpdateEvent($formData)
+    {
+        // TODO: Implement getUpdateEvent() method.
+    }
+
+    /**
+     * Creates the delete event with the provided form data
+     */
+    protected function getDeleteEvent()
+    {
+        // TODO: Implement getDeleteEvent() method.
+    }
+
+    /**
+     * Return true if the event contains the object, e.g. the action has updated the object in the event.
+     *
+     * @param unknown $event
+     */
+    protected function eventContainsObject($event)
+    {
+        // TODO: Implement eventContainsObject() method.
+    }
+
+    /**
+     * Get the created object from an event.
+     *
+     * @param unknown $createEvent
+     */
+    protected function getObjectFromEvent($event)
+    {
+        // TODO: Implement getObjectFromEvent() method.
+    }
+
+    /**
+     * Load an existing object from the database
+     */
+    protected function getExistingObject()
+    {
+        // TODO: Implement getExistingObject() method.
+    }
+
+    /**
+     * Returns the object label form the object event (name, title, etc.)
+     *
+     * @param unknown $object
+     */
+    protected function getObjectLabel($object)
+    {
+        // TODO: Implement getObjectLabel() method.
+    }
+
+    /**
+     * Returns the object ID from the object
+     *
+     * @param unknown $object
+     */
+    protected function getObjectId($object)
+    {
+        // TODO: Implement getObjectId() method.
+    }
+
+    /**
+     * Render the main list template
+     *
+     * @param unknown $currentOrder, if any, null otherwise.
+     */
+    protected function renderListTemplate($currentOrder)
+    {
         return $this->render("countries", array("display_country" => 20));
     }
 
     /**
-     * update country action
-     *
-     * @param $country_id
-     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     * Render the edition template
      */
-    public function updateAction($country_id)
+    protected function renderEditionTemplate()
     {
-        return $this->render("country-edit", array(
-            "country_id" => $country_id
-        ));
+        // TODO: Implement renderEditionTemplate() method.
     }
 
+    /**
+     * Redirect to the edition template
+     */
+    protected function redirectToEditionTemplate()
+    {
+        // TODO: Implement redirectToEditionTemplate() method.
+    }
+
+    /**
+     * Redirect to the list template
+     */
+    protected function redirectToListTemplate()
+    {
+        // TODO: Implement redirectToListTemplate() method.
+    }
 }

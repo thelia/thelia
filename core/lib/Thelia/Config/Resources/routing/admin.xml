@@ -405,6 +405,21 @@
         <default key="_controller">Thelia\Controller\Admin\FolderController::updatePositionAction</default>
     </route>
 
+    <!-- Countries routes management -->
+
+    <route id="admin.configuration.countries.default" path="/admin/configuration/countries">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.create" path="/admin/configuration/countries/create">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.update.view" path="/admin/configuration/countries/update/{country_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::updateAction</default>
+        <requirement key="country_id">\d+</requirement>
+    </route>
+
     <!-- content routes management -->
     <route id="admin.content.create" path="/admin/content/create">
         <default key="_controller">Thelia\Controller\Admin\ContentController::createAction</default>
@@ -668,20 +683,7 @@
 
     <!-- end attribute and feature routes  management -->
 
-    <!-- Countries routes management -->
 
-    <route id="admin.configuration.countries.default" path="/admin/configuration/countries">
-        <default key="_controller">Thelia\Controller\Admin\CountryController::indexAction</default>
-    </route>
-
-    <route id="admin.configuration.countries.create" path="/admin/configuration/countries/create">
-        <default key="_controller">Thelia\Controller\Admin\CountryController::createAction</default>
-    </route>
-
-    <route id="admin.configuration.countries.update.view" path="/admin/configuration/countries/update/{country_id}" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\CountryController::updateAction</default>
-        <requirement key="country_id">\d+</requirement>
-    </route>
 
     <!-- end countries routes management -->
 
