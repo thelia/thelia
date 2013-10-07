@@ -27,7 +27,7 @@ URL: http://www.thelia.net
 
     {* Meta Tags *}
     <meta name="description" content="">
-    <meta name="generator" content="{intl l='Thelia V%ver' ver="{$THELIA_VERSION}"}">
+    <meta name="generator" content="{intl l='Thelia V2'}">
     <meta name="robots" content="index,follow">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     {block name="meta"}{/block}
@@ -350,7 +350,11 @@ URL: http://www.thelia.net
 
 {javascripts file='assets/js/bootstrap/bootstrap.js'}
     <script src="{$asset_url}"></script>
-{/javascripts}
+{/javascripts}'}
+
+{javascripts file='assets/js/plugins/bootbox/bootbox.js'}
+    <script src="{$asset_url}"></script>
+{/javascripts}'}
 
 {block name="after-javascript-include"}{/block}
 
