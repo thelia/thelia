@@ -43,6 +43,8 @@ class TaxEngineException extends \RuntimeException
 
     const BAD_AMOUNT_FORMAT = 601;
 
+    const FEATURE_BAD_EXPECTED_VALUE = 701;
+
     public function __construct($message, $code = null, $previous = null)
     {
         if ($code === null) {

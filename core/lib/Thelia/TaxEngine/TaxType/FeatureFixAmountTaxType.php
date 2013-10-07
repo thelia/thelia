@@ -22,6 +22,9 @@
 /*************************************************************************************/
 namespace Thelia\TaxEngine\TaxType;
 
+use Thelia\Exception\TaxEngineException;
+use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\Product;
 use Thelia\Type\FloatType;
 
 /**
@@ -29,7 +32,7 @@ use Thelia\Type\FloatType;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class FixAmountTaxType extends BaseTaxType
+class FeatureFixAmountTaxType extends BaseTaxType
 {
     public function calculate($untaxedPrice)
     {
@@ -41,15 +44,29 @@ class FixAmountTaxType extends BaseTaxType
         return 0;
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    public function fixAmountRetriever(Product $product)
     {
-        return $this->getRequirement("amount");
+        $featureId = $this->getRequirement("featureId");
+
+        $query = FeatureProductQuery::create()
+            ->filterByProduct($product)
+            ->filterByFeatureId($featureId)
+            ->findOne();
+
+        $taxAmount = $query->getFreeTextValue();
+
+        $testInt = new FloatType();
+        if(!$testInt->isValid($taxAmount)) {
+            throw new TaxEngineException('Feature value does not match FLOAT format', TaxEngineException::FEATURE_BAD_EXPECTED_VALUE);
+        }
+
+        return $taxAmount;
     }
 
     public function getRequirementsList()
     {
         return array(
-            'amount' => new FloatType(),
+            'featureId' => new ModelType('Feature'),
         );
     }
 }

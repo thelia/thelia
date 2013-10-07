@@ -42,7 +42,7 @@ class featureSlicePercentTaxType extends  BaseTaxType
 
     }
 
-    public function fixAmountRetriever()
+    public function fixAmountRetriever(\Thelia\Model\Product $product)
     {
 
     }

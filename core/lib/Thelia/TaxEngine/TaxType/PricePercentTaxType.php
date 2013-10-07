@@ -41,7 +41,7 @@ class PricePercentTaxType extends BaseTaxType
         return ($this->getRequirement("percent") * 0.01);
     }
 
-    public function fixAmountRetriever()
+    public function fixAmountRetriever(\Thelia\Model\Product $product)
     {
         return 0;
     }

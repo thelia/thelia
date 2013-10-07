@@ -23,6 +23,7 @@
 namespace Thelia\TaxEngine\TaxType;
 
 use Thelia\Exception\TaxEngineException;
+use Thelia\Model\Product;
 use Thelia\Type\TypeInterface;
 
 /**
@@ -38,7 +39,7 @@ abstract class BaseTaxType
 
     public abstract function pricePercentRetriever();
 
-    public abstract function fixAmountRetriever();
+    public abstract function fixAmountRetriever(Product $product);
 
     public abstract function getRequirementsList();
 

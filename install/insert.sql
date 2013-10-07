@@ -1149,25 +1149,37 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 
 INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `updated_at`)
   VALUES
-  (1, 'PricePercentTaxType', 'eyJwZXJjZW50IjoxOS42fQ==', NOW(), NOW());
+  (1, 'PricePercentTaxType', 'eyJwZXJjZW50IjoxOS42fQ==', NOW(), NOW()),
+  (2, 'PricePercentTaxType', 'eyJwZXJjZW50Ijo1LjV9', NOW(), NOW()),
+  (3, 'FeatureFixAmountTaxType', 'eyJmZWF0dXJlIjowfQ==', NOW(), NOW());
 
 INSERT INTO `tax_i18n` (`id`, `locale`, `title`)
   VALUES
   (1, 'fr_FR', 'TVA française à 19.6%'),
-  (1, 'en_US', 'French 19.6% VAT');
+  (1, 'en_US', 'French 19.6% VAT'),
+  (2, 'fr_FR', 'TVA française à 5.5%'),
+  (2, 'en_US', 'French 5.5% VAT'),
+  (3, 'fr_FR', 'Ecotaxe UE'),
+  (3, 'en_US', 'EU ecotax');
 
 INSERT INTO  `tax_rule` (`id`, `is_default`, `created_at`, `updated_at`)
   VALUES
-  (1, 1, NOW(), NOW());
+  (1, 1, NOW(), NOW()),
+  (2, 0, NOW(), NOW());
 
 INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`)
   VALUES
-  (1, 'fr_FR', 'TVA française à 19.6%'),
-  (1, 'en_US', 'French 19.6% VAT');
+  (1, 'fr_FR', 'TVA française à 19.6% avec ecotaxe'),
+  (1, 'en_US', 'French 19.6% VAT plus ecotax'),
+  (2, 'fr_FR', 'TVA française à 5.5% avec ecotaxe'),
+  (2, 'en_US', 'French 5.5% VAT plus ecotax');
 
 INSERT INTO  `tax_rule_country` (`tax_rule_id`, `country_id`, `tax_id`, `position`, `created_at`, `updated_at`)
   VALUES
-  (1, 64, 1, 1, NOW(), NOW());
+  (1, 64, 3, 1, NOW(), NOW()),
+  (1, 64, 1, 2, NOW(), NOW()),
+  (2, 64, 3, 1, NOW(), NOW()),
+  (2, 64, 2, 2, NOW(), NOW());
 
 INSERT INTO `order_status`(`id`, `code`, `created_at`, `updated_at`) VALUES
 (1, 'not_paid', NOW(), NOW()),

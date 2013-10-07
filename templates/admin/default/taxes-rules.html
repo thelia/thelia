@@ -40,21 +40,27 @@
                                 </tr>
                             </thead>
                             <tbody>
+
+                                {loop type="tax-rule" name="taxes-rules"}
+
                                 <tr>
-                                    <td>Eco taxe</td>
-                                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur, aperiam, voluptatibus odio numquam adipisci!</td>
+                                    <td>{$TITLE}</td>
+                                    <td>{$DESCRIPTION}</td>
                                     <td>
                                         <div class="btn-group">
                                             {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes-rules.change"}
                                                 <a class="btn btn-default btn-xs" title="{intl l='Change this tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/{$ID}"}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
-                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes-rules.delete"}
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes-rules.change"}
                                                 <a class="btn btn-default btn-xs" title="{intl l='Delete this tax rule'}" href="#tax_rule_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                             {/loop}
                                         </div>
                                     </td>
-                                </tr>                                
+                                </tr>
+
+                                {/loop}
+
                             </tbody>                            
                         </table>
                     </div>
