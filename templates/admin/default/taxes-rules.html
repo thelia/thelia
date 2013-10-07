@@ -49,7 +49,7 @@
                                     <td>
                                         <div class="btn-group">
                                             {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes-rules.change"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Change this tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/{$ID}"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Change this tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/$ID/{country ask="default" attr="isoalpha3"}"}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes-rules.change"}

@@ -779,11 +779,11 @@
 
     <!-- taxe rules management -->
 
-    <route id="admin.configuration.taxes-rules.default" path="/admin/configuration/taxes_rules">
+    <route id="admin.configuration.taxes-rules.list" path="/admin/configuration/taxes_rules">
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::defaultAction</default>
     </route>
 
-    <route id="admin.configuration.taxes-rules.update" path="/admin/configuration/taxes_rules/update/{tax_rule_id}" methods="get">
+    <route id="admin.configuration.taxes-rules.update" path="/admin/configuration/taxes_rules/update/{tax_rule_id}/{country_isoalpha3}" methods="get">
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::updateAction</default>
         <requirement key="tax_rule_id">\d+</requirement>
     </route>

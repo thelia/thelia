@@ -23,23 +23,154 @@
 
 namespace Thelia\Controller\Admin;
 
-/**
- * Class TaxRuleController
- * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class TaxRuleController extends BaseAdminController
+use Thelia\Core\Event\Tax\TaxRuleEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Form\TaxRuleCreationForm;
+use Thelia\Form\TaxRuleModificationForm;
+use Thelia\Model\CountryQuery;
+use Thelia\Model\TaxRuleQuery;
+
+class TaxRuleController extends AbstractCrudController
 {
-    public function defaultAction()
+    public function __construct()
     {
-        if (null !== $response = $this->checkAuth("admin.taxes-rules.view")) return $response;
-        return $this->render("taxes-rules", array("display_taxes_rules" => 20));
+        parent::__construct(
+            'taxrule',
+            'manual',
+            'order',
+
+            'admin.configuration.taxrule.view',
+            'admin.configuration.taxrule.create',
+            'admin.configuration.taxrule.update',
+            'admin.configuration.taxrule.delete',
+
+            TheliaEvents::TAX_RULE_CREATE,
+            TheliaEvents::TAX_RULE_UPDATE,
+            TheliaEvents::TAX_RULE_DELETE
+        );
     }
 
-    public function updateAction($tax_rule_id){
-        return $this->render("tax-rule-edit", array(
-            "tax_rule_id" => $tax_rule_id
-        ));
+    protected function getCreationForm()
+    {
+        return new TaxRuleCreationForm($this->getRequest());
+    }
+
+    protected function getUpdateForm()
+    {
+        return new TaxRuleModificationForm($this->getRequest());
+    }
+
+    protected function getCreationEvent($formData)
+    {
+        $event = new TaxRuleEvent();
+
+        /* @todo fill event */
+
+        return $event;
+    }
+
+    protected function getUpdateEvent($formData)
+    {
+        $event = new TaxRuleEvent();
+
+        /* @todo fill event */
+
+        return $event;
+    }
+
+    protected function getDeleteEvent()
+    {
+        $event = new TaxRuleEvent();
+
+        /* @todo fill event */
+
+        return $event;
+    }
+
+    protected function eventContainsObject($event)
+    {
+        return $event->hasTaxRule();
+    }
+
+    protected function hydrateObjectForm($object)
+    {
+        $data = array(
+            'id'           => $object->getId(),
+            'locale'       => $object->getLocale(),
+            'title'        => $object->getTitle(),
+            'description'  => $object->getDescription(),
+        );
+
+        // Setup the object form
+        return new TaxRuleModificationForm($this->getRequest(), "form", $data);
+    }
+
+    protected function getObjectFromEvent($event)
+    {
+        return $event->hasTaxRule() ? $event->getTaxRule() : null;
+    }
+
+    protected function getExistingObject()
+    {
+        return TaxRuleQuery::create()
+            ->joinWithI18n($this->getCurrentEditionLocale())
+            ->findOneById($this->getRequest()->get('tax_rule_id'));
+    }
+
+    protected function getObjectLabel($object)
+    {
+        return $object->getTitle();
+    }
+
+    protected function getObjectId($object)
+    {
+        return $object->getId();
+    }
+
+    protected function getViewArguments()
+    {
+        return array(
+            'tax_rule_id' => $this->getRequest()->get('tax_rule_id'),
+            'country_isoalpha3' => $this->getRequest()->get('country_isoalpha3'),
+        );
+    }
+
+    protected function renderListTemplate($currentOrder)
+    {
+        // We always return to the feature edition form
+        return $this->render(
+            'taxes-rules',
+            array()
+        );
+    }
+
+    protected function renderEditionTemplate()
+    {
+        /* check the country exists */
+        $country = CountryQuery::create()->findOneByIsoalpha3($this->getRequest()->get('country_isoalpha3'));
+        if(null === $country) {
+            $this->redirectToListTemplate();
+        }
+
+        // We always return to the feature edition form
+        return $this->render('tax-rule-edit', $this->getViewArguments());
+    }
+
+    protected function redirectToEditionTemplate()
+    {
+        // We always return to the feature edition form
+        $this->redirectToRoute(
+            "admin.configuration.taxes-rules.update",
+            $this->getViewArguments()
+        );
+    }
+
+    protected function redirectToListTemplate()
+    {
+        $this->redirectToRoute(
+            "admin.configuration.taxes-rules.list",
+            array()
+        );
     }
 
 }

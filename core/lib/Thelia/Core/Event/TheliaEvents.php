@@ -503,6 +503,13 @@ final class TheliaEvents
 
     const CHANGE_DEFAULT_CURRENCY = 'action.changeDefaultCurrency';
 
+    // -- Tax Rules management ---------------------------------------------
+
+    const TAX_RULE_CREATE          = "action.createTaxRule";
+    const TAX_RULE_UPDATE          = "action.updateTaxRule";
+    const TAX_RULE_DELETE          = "action.deleteTaxRule";
+    const TAX_RULE_SET_DEFAULT     = "action.setDefaultTaxRule";
+
     // -- Product templates management -----------------------------------------
 
     const TEMPLATE_CREATE          = "action.createTemplate";
