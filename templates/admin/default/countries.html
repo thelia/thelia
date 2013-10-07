@@ -71,7 +71,7 @@
                                                 <td class="actions">
                                                     <div class="btn-group">
                                                         {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.countries.change"}
-                                                            <a class="btn btn-default btn-xs country-change" title="{intl l='Change this country'}" href="{url path="/admin/configuration/countries/update/{$ID}"}">
+                                                            <a class="btn btn-default btn-xs country-change" title="{intl l='Change this country'}" href="{url path="/admin/configuration/country/update/{$ID}"}">
                                                                 <span class="glyphicon glyphicon-edit"></span>
                                                             </a>
                                                         {/loop}
@@ -121,7 +121,7 @@
 
             {form_field form=$form field='success_url'}
                {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-               <input type="hidden" name="{$name}" value="{url path='/admin/country/update' country_id='_ID_'}" />
+               <input type="hidden" name="{$name}" value="{url path='/admin/configuration/country/update/_ID_'}" />
             {/form_field}
 
             {form_field form=$form field='title'}
@@ -160,6 +160,12 @@
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Alpha code 3'}">
                 </div>
             {/form_field}
+            {loop type="lang" name="default-lang" default_only="1"}
+                <input type="hidden" name="edit_language_id" value="{$ID}" />
+                {form_field form=$form field='locale'}
+                    <input type="hidden" name="{$name}" value="{$LOCALE}" />
+                {/form_field}
+            {/loop}
 
             {module_include location='country_create_form'}
 

@@ -28,6 +28,8 @@ use Thelia\Core\Translation\Translator;
 
 class CountryModificationForm extends CountryCreationForm
 {
+    use StandardDescriptionFieldsTrait;
+
     protected function buildForm()
     {
         parent::buildForm(true);
@@ -35,6 +37,9 @@ class CountryModificationForm extends CountryCreationForm
         $this->formBuilder
             ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
         ;
+
+        // Add standard description fields, excluding title and locale, which a re defined in parent class
+        $this->addStandardDescFields(array('title', 'locale'));
     }
 
     public function getName()

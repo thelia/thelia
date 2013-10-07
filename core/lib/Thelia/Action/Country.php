@@ -22,11 +22,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
 use Thelia\Core\Event\Country\CountryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Country as CountryModel;
 
 
 /**
@@ -39,6 +41,17 @@ class Country extends BaseAction implements EventSubscriberInterface
 
     public function create(CountryCreateEvent $event)
     {
+        $country = new CountryModel();
+
+        $country
+            ->setIsocode($event->getIsocode())
+            ->setIsoalpha2($event->getIsoAlpha2())
+            ->setIsoalpha3($event->getIsoAlpha3())
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->save();
+
+        $event->setCountry($country);
 
     }
 

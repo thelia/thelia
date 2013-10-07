@@ -415,7 +415,7 @@
         <default key="_controller">Thelia\Controller\Admin\CountryController::createAction</default>
     </route>
 
-    <route id="admin.configuration.countries.update" path="/admin/configuration/countries/update/{country_id}" methods="get">
+    <route id="admin.configuration.countries.update" path="/admin/configuration/country/update/{country_id}">
         <default key="_controller">Thelia\Controller\Admin\CountryController::updateAction</default>
         <requirement key="country_id">\d+</requirement>
     </route>

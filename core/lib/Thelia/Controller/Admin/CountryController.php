@@ -93,11 +93,20 @@ class CountryController extends AbstractCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template
      *
-     * @param unknown $object
+     * @param \Thelia\Model\Country $object
      */
     protected function hydrateObjectForm($object)
     {
-        // TODO: Implement hydrateObjectForm() method.
+        $data = array(
+            'id' => $object->getId(),
+            'locale' => $object->getLocale(),
+            'title' => $object->getTitle(),
+            'isocode' => $object->getIsocode(),
+            'isoalpha2' => $object->getIsoalpha2(),
+            'isoalpha3' => $object->getIsoalpha3(),
+        );
+
+        return new CountryModificationForm($this->getRequest(), 'form', $data);
     }
 
     /**
