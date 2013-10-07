@@ -38,7 +38,7 @@ class CountryEvent extends ActionEvent
      */
     protected $country;
 
-    function __construct(Country $country)
+    function __construct(Country $country = null)
     {
         $this->country = $country;
     }

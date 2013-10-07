@@ -22,7 +22,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\Country\CountryCreateEvent;
+use Thelia\Core\Event\Country\CountryDeleteEvent;
+use Thelia\Core\Event\Country\CountryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Form\CountryCreationForm;
+use Thelia\Form\CountryModificationForm;
+use Thelia\Model\CountryQuery;
 
 /**
  * Class CustomerController
@@ -73,7 +79,7 @@ class CountryController extends AbstractCrudController
      */
     protected function getCreationForm()
     {
-        // TODO: Implement getCreationForm() method.
+        return new CountryCreationForm($this->getRequest());
     }
 
     /**
@@ -81,7 +87,7 @@ class CountryController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        // TODO: Implement getUpdateForm() method.
+        return new CountryModificationForm($this->getRequest());
     }
 
     /**
@@ -101,7 +107,9 @@ class CountryController extends AbstractCrudController
      */
     protected function getCreationEvent($formData)
     {
-        // TODO: Implement getCreationEvent() method.
+        $event = new CountryCreateEvent();
+
+        return $this->hydrateEvent($event, $formData);
     }
 
     /**
@@ -111,7 +119,23 @@ class CountryController extends AbstractCrudController
      */
     protected function getUpdateEvent($formData)
     {
-        // TODO: Implement getUpdateEvent() method.
+        $event = new CountryUpdateEvent();
+
+        return $this->hydrateEvent($event, $formData);
+    }
+
+    protected function hydrateEvent($event, $formData)
+    {
+        $event
+            ->setLocale($formData['locale'])
+            ->setTitle($formData['title'])
+            ->setIsocode($formData['isocode'])
+            ->setIsoAlpha2($formData['isoalpha2'])
+            ->setIsoAlpha3($formData['isoalpha3'])
+            ->setArea($formData['area'])
+        ;
+
+        return $event;
     }
 
     /**
@@ -119,7 +143,7 @@ class CountryController extends AbstractCrudController
      */
     protected function getDeleteEvent()
     {
-        // TODO: Implement getDeleteEvent() method.
+        return new CountryDeleteEvent($this->getRequest()->get('country_id'));
     }
 
     /**
@@ -129,7 +153,7 @@ class CountryController extends AbstractCrudController
      */
     protected function eventContainsObject($event)
     {
-        // TODO: Implement eventContainsObject() method.
+        return $event->hasCountry();
     }
 
     /**
@@ -139,7 +163,7 @@ class CountryController extends AbstractCrudController
      */
     protected function getObjectFromEvent($event)
     {
-        // TODO: Implement getObjectFromEvent() method.
+        return $event->getCountry();
     }
 
     /**
@@ -147,27 +171,29 @@ class CountryController extends AbstractCrudController
      */
     protected function getExistingObject()
     {
-        // TODO: Implement getExistingObject() method.
+        return CountryQuery::create()
+            ->joinWithI18n($this->getCurrentEditionLocale())
+            ->findPk($this->getRequest()->get('country_id', 0));
     }
 
     /**
      * Returns the object label form the object event (name, title, etc.)
      *
-     * @param unknown $object
+     * @param \Thelia\Model\Country $object
      */
     protected function getObjectLabel($object)
     {
-        // TODO: Implement getObjectLabel() method.
+        return $object->getTitle();
     }
 
     /**
      * Returns the object ID from the object
      *
-     * @param unknown $object
+     * @param \Thelia\Model\Country $object
      */
     protected function getObjectId($object)
     {
-        // TODO: Implement getObjectId() method.
+        return $object->getId();
     }
 
     /**
@@ -185,7 +211,14 @@ class CountryController extends AbstractCrudController
      */
     protected function renderEditionTemplate()
     {
-        // TODO: Implement renderEditionTemplate() method.
+        return $this->render('country-edit', $this->getEditionArgument());
+    }
+
+    protected function getEditionArgument()
+    {
+        return array(
+            'country_id'  => $this->getRequest()->get('country_id', 0)
+        );
     }
 
     /**
@@ -193,7 +226,7 @@ class CountryController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        // TODO: Implement redirectToEditionTemplate() method.
+        $this->redirectToRoute('admin.configuration.countries.update', array(), $this->getRequest()->get('country_id', 0));
     }
 
     /**
@@ -201,6 +234,6 @@ class CountryController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        // TODO: Implement redirectToListTemplate() method.
+        $this->redirectToRoute('admin.configuration.countries.default');
     }
 }
