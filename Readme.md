@@ -16,6 +16,16 @@ Requirements
 ------------
 
 * php 5.4
+    * Required extensions :
+        * PDO_Mysql
+        * mcrypt
+        * intl
+        * gd
+        * curl
+    * safe_mode off
+    * memory_limit at least 150M, preferably 256.
+    * post_max_size 20M
+    * upload_max_filesize 2M
 * apache 2
 * mysql 5
 
