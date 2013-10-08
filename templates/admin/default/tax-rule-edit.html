@@ -7,6 +7,7 @@
 {block name="main-content"}
 
 {assign oder_tab {$smarty.get.tab|default:"data"}}
+{assign asked_country {$smarty.get.country|default:{country ask="default" attr="isoalpha3"}}}
 
 <div class="taxes-rules edit-taxes-rules">
 
@@ -19,7 +20,7 @@
             <li>{intl l='Editing tax rule'}</li>
         </ul>
 
-        {loop type="tax-rule" name="tax-rule" id=$tax_rule_id}
+        {loop type="tax-rule" name="tax-rule" id=$tax_rule_id backend_context="1" lang=$edit_language_id}
 
         <div class="row">
             <div class="col-md-12 general-block-decorator clearfix">
@@ -32,16 +33,67 @@
                 <div class="tab-content">
                     <div class="tab-pane fade {if $oder_tab == 'data'}active in{/if}" id="data">
 
-                        TODO
+                        <div class="form-container">
+
                         {form name="thelia.admin.taxrule.modification"}
 
-                            <form method="POST" action="{url path="/admin/configuration/taxes_rules/update/$tax_rule_id/$country_isoalpha3"}" {form_enctype form=$form} >
+                        <form method="POST" action="{url path="/admin/configuration/taxes_rules/save"}" {form_enctype form=$form} >
 
+                            {include
+                                file = "includes/inner-form-toolbar.html"
+                                hide_submit_buttons = false
 
+                                page_url  = {url path="/admin/configuration/taxes_rules/update/$tax_rule_id" tab=data}
+                                close_url = {url path="/admin/configuration/taxes_rules"}
+                            }
+
+                            {* Be sure to get the product ID, even if the form could not be validated *}
+                            <input type="hidden" name="tax_rule_id" value="{$ID}" />
+
+                            {form_hidden_fields form=$form}
+
+                            {form_field form=$form field='success_url'}
+                                <input type="hidden" name="{$name}" value="{url path="/admin/configuration/taxes_rules"}" />
+                            {/form_field}
+
+                            {form_field form=$form field='locale'}
+                                <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+                            {/form_field}
+
+                            {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                            {form_field form=$form field='title'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+                                <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$TITLE}{/if}{/if}">
+                            </div>
+                            {/form_field}
+
+                            {form_field form=$form field='description'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="{$label_attr.for}" class="control-label">
+                                    {intl l=$label} :
+                                    <span class="label-help-block">{intl l="The detailed description."}</span>
+                                </label>
+
+                                <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$DESCRIPTION}{/if}{/if}</textarea>
+                            </div>
+                            {/form_field}
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="control-group">
+                                        <label>&nbsp;</label>
+                                        <div class="controls">
+                                            <p>{intl l='Tax rule created on %date_create. Last modification: %date_change' date_create={format_date date=$CREATE_DATE} date_change={format_date date=$UPDATE_DATE}}</p>
+                                        </div>
+                                     </div>
+                                </div>
+                            </div>
 
                             </form>
-
-                        {/form}
+                            {/form}
+                        </div>
 
                     </div>
 
@@ -55,7 +107,7 @@
                             <label for="" class="label-control">{intl l="Choose a country"} :</label>
                             <select id="country-selector" data-toggle="selectpicker">
                                 {loop type="country" name="country-list"}
-                                    <option value="{$ID}" {if $ISOALPHA3 == $country_isoalpha3}selected="selected"{/if}>{$TITLE}</option>
+                                    <option value="{$ID}" {if $ISOALPHA3 == $asked_country}selected="selected"{/if}>{$TITLE}</option>
                                 {/loop}
                             </select>
                         </div>

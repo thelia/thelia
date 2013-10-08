@@ -71,9 +71,14 @@ class TaxRuleController extends AbstractCrudController
 
     protected function getUpdateEvent($formData)
     {
-        $event = new TaxRuleEvent();
+        $event = new TaxRuleEvent(
+            TaxRuleQuery::create()->findPk($formData['id'])
+        );
 
-        /* @todo fill event */
+        $event->setLocale($formData['locale']);
+        $event->setId($formData['id']);
+        $event->setTitle($formData['title']);
+        $event->setDescription($formData['description']);
 
         return $event;
     }
@@ -82,7 +87,9 @@ class TaxRuleController extends AbstractCrudController
     {
         $event = new TaxRuleEvent();
 
-        /* @todo fill event */
+        $event->setId(
+            $this->getRequest()->get('tax_rule_id', 0)
+        );
 
         return $event;
     }
@@ -130,8 +137,15 @@ class TaxRuleController extends AbstractCrudController
     protected function getViewArguments()
     {
         return array(
+            'tab' => $this->getRequest()->get('tab', 'data'),
+            'country' => $this->getRequest()->get('country', CountryQuery::create()->findOneByByDefault(1)->getIsoalpha3()),
+        );
+    }
+
+    protected function getRouteArguments()
+    {
+        return array(
             'tax_rule_id' => $this->getRequest()->get('tax_rule_id'),
-            'country_isoalpha3' => $this->getRequest()->get('country_isoalpha3'),
         );
     }
 
@@ -146,14 +160,8 @@ class TaxRuleController extends AbstractCrudController
 
     protected function renderEditionTemplate()
     {
-        /* check the country exists */
-        $country = CountryQuery::create()->findOneByIsoalpha3($this->getRequest()->get('country_isoalpha3'));
-        if(null === $country) {
-            $this->redirectToListTemplate();
-        }
-
         // We always return to the feature edition form
-        return $this->render('tax-rule-edit', $this->getViewArguments());
+        return $this->render('tax-rule-edit', array_merge($this->getViewArguments(), $this->getRouteArguments()));
     }
 
     protected function redirectToEditionTemplate()
@@ -161,15 +169,15 @@ class TaxRuleController extends AbstractCrudController
         // We always return to the feature edition form
         $this->redirectToRoute(
             "admin.configuration.taxes-rules.update",
-            $this->getViewArguments()
+            $this->getViewArguments(),
+            $this->getRouteArguments()
         );
     }
 
     protected function redirectToListTemplate()
     {
         $this->redirectToRoute(
-            "admin.configuration.taxes-rules.list",
-            array()
+            "admin.configuration.taxes-rules.list"
         );
     }
 

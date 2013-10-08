@@ -783,9 +783,17 @@
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::defaultAction</default>
     </route>
 
-    <route id="admin.configuration.taxes-rules.update" path="/admin/configuration/taxes_rules/update/{tax_rule_id}/{country_isoalpha3}" methods="get">
+    <route id="admin.configuration.taxes-rules.update" path="/admin/configuration/taxes_rules/update/{tax_rule_id}">
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::updateAction</default>
         <requirement key="tax_rule_id">\d+</requirement>
+    </route>
+
+    <route id="admin.categories.save" path="/admin/configuration/taxes_rules/save">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.categories.save" path="/admin/configuration/taxes_rules/delete">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::deleteAction</default>
     </route>
 
     <!-- end tax rules management -->

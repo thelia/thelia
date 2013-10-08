@@ -49,11 +49,11 @@
                                     <td>
                                         <div class="btn-group">
                                             {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes-rules.change"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Change this tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/$ID/{country ask="default" attr="isoalpha3"}"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Change this tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes-rules.change"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this tax rule'}" href="#tax_rule_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                <a class="btn btn-default btn-xs js-delete-tax-rule" title="{intl l='Delete this tax rule'}" href="#tax_rule_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                             {/loop}
                                         </div>
                                     </td>
@@ -92,5 +92,15 @@
     form_action         = {url path='/admin/configuration/taxes_rules/delete'}
     form_content        = {$smarty.capture.tax_rule_delete_dialog nofilter}
 }
+
+{/block}
+
+{block name="javascript-initialization"}
+
+    <script type="text/javascript">
+        $(".js-delete-tax-rule").click(function(e){
+            $('#tax_rule_delete_id').val($(this).data('id'))
+        });
+    </script>
 
 {/block}

@@ -23,21 +23,50 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Model\TaxRuleQuery;
 
-class TaxRuleModificationForm extends FeatureCreationForm
+class TaxRuleModificationForm extends TaxRuleCreationForm
 {
     use StandardDescriptionFieldsTrait;
 
     protected function buildForm()
     {
+        parent::buildForm(true);
+
         $this->formBuilder
             ->add("id", "hidden", array(
+                    "required" => true,
                     "constraints" => array(
-                        new GreaterThan(
-                            array('value' => 0)
+                        new Constraints\NotBlank(),
+                        new Constraints\Callback(
+                            array(
+                                "methods" => array(
+                                    array($this, "verifyTaxRuleId"),
+                                ),
+                            )
+                        ),
+                    )
+            ))
+            ->add("tab", "text", array(
+                "constraints" => array(
+                    new Constraints\Choice(
+                        array(
+                            'choices' => array('data', 'taxes'),
                         )
                     )
+                ),
+            ))
+            ->add("country", "text", array(
+                "constraints" => array(
+                    new Constraints\Callback(
+                        array(
+                            "methods" => array(
+                                array($this, "verifyCountry"),
+                            ),
+                        )
+                    ),
+                )
             ))
         ;
 
@@ -48,5 +77,15 @@ class TaxRuleModificationForm extends FeatureCreationForm
     public function getName()
     {
         return "thelia_tax_rule_modification";
+    }
+
+    public function verifyTaxRuleId($value, ExecutionContextInterface $context)
+    {
+        $taxRule = TaxRuleQuery::create()
+            ->findPk($value);
+
+        if (null === $taxRule) {
+            $context->addViolation("Tax rule ID not found");
+        }
     }
 }

@@ -25,36 +25,42 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\CountryQuery;
 
 class TaxRuleCreationForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm($change_mode = false)
     {
         $this->formBuilder
-            ->add("title"   , "text"  , array(
+            ->add("locale", "text", array(
+                "constraints" => array(new NotBlank())
+            ))
+            ->add("country", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new Constraints\Callback(
+                        array(
+                            "methods" => array(
+                                array($this, "verifyCountry"),
+                            ),
+                        )
+                    ),
                 ),
-                "label" => Translator::getInstance()->trans("Title *"),
-                "label_attr" => array(
-                    "for" => "title"
-                ))
-            )
-            ->add("locale" , "text"  , array(
-                "constraints" => array(
-                    new NotBlank()
-                ))
-            )
-            ->add("feature_id", "hidden", array(
-                "constraints" => array(
-                        new NotBlank()
-                ))
-            )
+            ))
         ;
     }
 
     public function getName()
     {
         return "thelia_tax_rule_creation";
+    }
+
+    public function verifyCountry($value, ExecutionContextInterface $context)
+    {
+        $country = CountryQuery::create()
+            ->findOneByIsoalpha3($value);
+
+        if (null === $country) {
+            $context->addViolation("Country ISOALPHA3 not found");
+        }
     }
 }
