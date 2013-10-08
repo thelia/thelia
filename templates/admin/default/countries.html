@@ -208,6 +208,23 @@
         form_content        = {$smarty.capture.delete_dialog nofilter}
     }
 
+<div class="modal fade" id="toggle-default-failed" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content alert alert-block alert-danger ">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h2>{intl l="Error"}</h2>
+            </div>
+            <div class="modal-body">
+                <strong>{intl l="Impossible to change default country. Please contact your administrator or try later"}</strong>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
 {/block}
 
 {block name="javascript-initialization"}
@@ -233,6 +250,8 @@
                             data : {
                                 country_id: $(this).data('id')
                             }
+                        }).fail(function(){
+                            $('#toggle-default-failed').modal('show');
                         });
                     }
                 });
