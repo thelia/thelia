@@ -219,7 +219,7 @@ final class TheliaEvents
     const COUNTRY_CREATE            = "action.createCountry";
     const COUNTRY_UPDATE            = "action.updateCountry";
     const COUNTRY_DELETE            = "action.deleteCountry";
-    const COUNTRY_TOGGLE_VISIBILITY = "action.toggleCountryVisibility";
+    const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
     //const COUNTRY_UPDATE_POSITION   = "action.updateFolderPosition";
 
 

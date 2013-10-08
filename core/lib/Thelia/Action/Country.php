@@ -26,6 +26,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
+use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
 use Thelia\Core\Event\Country\CountryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Country as CountryModel;
@@ -70,6 +71,16 @@ class Country extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function toggleDefault(CountryToggleDefaultEvent $event)
+    {
+        if( null !== $country = CountryQuery::create()->findPk($event->getCountryId()))
+        {
+            $country->toggleDefault();
+
+            $event->setCountry($country);
+        }
+    }
+
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -94,9 +105,10 @@ class Country extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::COUNTRY_CREATE => array('create', 128),
-            TheliaEvents::COUNTRY_UPDATE => array('update', 128),
-            TheliaEvents::COUNTRY_DELETE => array('delete', 128),
+            TheliaEvents::COUNTRY_CREATE            => array('create', 128),
+            TheliaEvents::COUNTRY_UPDATE            => array('update', 128),
+            TheliaEvents::COUNTRY_DELETE            => array('delete', 128),
+            TheliaEvents::COUNTRY_TOGGLE_DEFAULT    => array('toggleDefault', 128)
         );
     }
 }

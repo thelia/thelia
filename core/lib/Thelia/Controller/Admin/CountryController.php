@@ -24,6 +24,7 @@
 namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
+use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
 use Thelia\Core\Event\Country\CountryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CountryCreationForm;
@@ -244,5 +245,26 @@ class CountryController extends AbstractCrudController
     protected function redirectToListTemplate()
     {
         $this->redirectToRoute('admin.configuration.countries.default');
+    }
+
+    public function toggleDefaultAction()
+    {
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        $content = null;
+        if (null !== $country_id = $this->getRequest()->get('country_id')) {
+            $toogleDefaultEvent = new CountryToggleDefaultEvent($country_id);
+            try {
+                $this->dispatch(TheliaEvents::COUNTRY_TOGGLE_DEFAULT, $toogleDefaultEvent);
+
+                if($toogleDefaultEvent->hasCountry()) {
+                    return $this->nullResponse();
+                }
+            } catch (\Exception $ex) {
+                $content = $ex->getMessage();
+            }
+
+        }
+
+        return $this->nullResponse($content, 500);
     }
 }

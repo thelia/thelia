@@ -11,6 +11,17 @@ class Country extends BaseCountry
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
+    public function toggleDefault()
+    {
+        CountryQuery::create()
+            ->filterByByDefault(1)
+            ->update(array('ByDefault' => 0));
+
+        $this
+            ->setByDefault(1)
+            ->save();
+    }
+
     public function preInsert(ConnectionInterface $con = null)
     {
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECOUNTRY, new CountryEvent($this));

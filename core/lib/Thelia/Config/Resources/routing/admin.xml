@@ -424,6 +424,10 @@
         <default key="_controller">Thelia\Controller\Admin\CountryController::deleteAction</default>
     </route>
 
+    <route id="admin.configuration.toggle-default" path="/admin/configuration/country/toggleDefault">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::toggleDefaultAction</default>
+    </route>
+
     <!-- content routes management -->
     <route id="admin.content.create" path="/admin/content/create">
         <default key="_controller">Thelia\Controller\Admin\ContentController::createAction</default>
