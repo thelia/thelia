@@ -13,6 +13,19 @@
       }
     }
   }
+
+  tbody {
+    tr.active, tr {
+      td.td-unstyled {
+        background-color: white;
+        border-top: none;
+        border-right: 1px solid @table-border-color;
+      }
+      td.last {
+        border-bottom: 1px solid @table-border-color;
+      }
+    }
+  }
   
 }
 
@@ -54,10 +67,6 @@ tfoot{
 			text-transform: none;
 		}
 	}
-
-	// td, th {
-	// 	text-align: center;
-	// }
 
 	td.object-title, th.object-title {
 		text-align: left;

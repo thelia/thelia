@@ -23,12 +23,11 @@
 
 namespace Thelia\Action;
 
-use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\OrderEvent;
+use Thelia\Core\Event\Order\OrderAddressEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Exception\OrderException;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\OrderProductAttributeCombination;
@@ -38,7 +37,6 @@ use Thelia\Model\OrderStatus;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderStatusQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Tools\I18n;
 
 /**
@@ -50,7 +48,7 @@ use Thelia\Tools\I18n;
 class Order extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setDeliveryAddress(OrderEvent $event)
     {
@@ -62,7 +60,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setDeliveryModule(OrderEvent $event)
     {
@@ -75,7 +73,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setInvoiceAddress(OrderEvent $event)
     {
@@ -87,7 +85,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function setPaymentModule(OrderEvent $event)
     {
@@ -99,7 +97,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function create(OrderEvent $event)
     {
@@ -176,7 +174,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         /* fulfill order_products and decrease stock */
 
-        foreach($cartItems as $cartItem) {
+        foreach ($cartItems as $cartItem) {
             $product = $cartItem->getProduct();
 
             /* get translation */
@@ -185,7 +183,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $pse = $cartItem->getProductSaleElements();
 
             /* check still in stock */
-            if($cartItem->getQuantity() > $pse->getQuantity()) {
+            if ($cartItem->getQuantity() > $pse->getQuantity()) {
                 throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
             }
 
@@ -200,7 +198,8 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             $taxDetail = $product->getTaxRule()->getTaxDetail(
                 $taxCountry,
-                $cartItem->getPromo() == 1 ? $cartItem->getPromoPrice() : $cartItem->getPrice(),
+                $cartItem->getPrice(),
+                $cartItem->getPromoPrice(),
                 $this->getSession()->getLang()->getLocale()
             );
 
@@ -226,13 +225,13 @@ class Order extends BaseAction implements EventSubscriberInterface
             $orderProduct->save($con);
 
             /* fulfill order_product_tax */
-            foreach($taxDetail as $tax) {
+            foreach ($taxDetail as $tax) {
                 $tax->setOrderProductId($orderProduct->getId());
                 $tax->save($con);
             }
 
             /* fulfill order_attribute_combination and decrease stock */
-            foreach($pse->getAttributeCombinations() as $attributeCombination) {
+            foreach ($pse->getAttributeCombinations() as $attributeCombination) {
                 $attribute = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'Attribute', $attributeCombination->getAttributeId());
                 $attributeAv = I18n::forceI18nRetrieving($this->getSession()->getLang()->getLocale(), 'AttributeAv', $attributeCombination->getAttributeAvId());
 
@@ -242,7 +241,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                     ->setAttributeTitle($attribute->getTitle())
                     ->setAttributeChapo($attribute->getChapo())
                     ->setAttributeDescription($attribute->getDescription())
-                    ->setAttributePostscriptumn($attribute->getPostscriptum())
+                    ->setAttributePostscriptum($attribute->getPostscriptum())
                     ->setAttributeAvTitle($attributeAv->getTitle())
                     ->setAttributeAvChapo($attributeAv->getChapo())
                     ->setAttributeAvDescription($attributeAv->getDescription())
@@ -279,11 +278,62 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\OrderEvent $event
+     * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
     public function sendOrderEmail(OrderEvent $event)
     {
         /* @todo */
+    }
+
+    /**
+     * @param OrderEvent $event
+     */
+    public function updateStatus(OrderEvent $event)
+    {
+        $order = $event->getOrder();
+
+        $order->setStatusId($event->getStatus());
+        $order->save();
+
+        $event->setOrder($order);
+    }
+
+    /**
+     * @param OrderEvent $event
+     */
+    public function updateDeliveryRef(OrderEvent $event)
+    {
+        $order = $event->getOrder();
+
+        $order->setDeliveryRef($event->getDeliveryRef());
+        $order->save();
+
+        $event->setOrder($order);
+    }
+
+    /**
+     * @param OrderAddressEvent $event
+     */
+    public function updateAddress(OrderAddressEvent $event)
+    {
+        $orderAddress = $event->getOrderAddress();
+
+        $orderAddress
+            ->setCustomerTitleId($event->getTitle())
+            ->setCompany($event->getCompany())
+            ->setFirstname($event->getFirstname())
+            ->setLastname($event->getLastname())
+            ->setAddress1($event->getAddress1())
+            ->setAddress2($event->getAddress2())
+            ->setAddress3($event->getAddress3())
+            ->setZipcode($event->getZipcode())
+            ->setCity($event->getCity())
+            ->setCountryId($event->getCountry())
+            ->setPhone($event->getPhone())
+        ;
+        $orderAddress->save();
+
+        $event->setOrderAddress($orderAddress);
     }
 
     /**
@@ -315,6 +365,9 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => array("setPaymentModule", 128),
             TheliaEvents::ORDER_PAY => array("create", 128),
             TheliaEvents::ORDER_BEFORE_PAYMENT => array("sendOrderEmail", 128),
+            TheliaEvents::ORDER_UPDATE_STATUS => array("updateStatus", 128),
+            TheliaEvents::ORDER_UPDATE_DELIVERY_REF => array("updateDeliveryRef", 128),
+            TheliaEvents::ORDER_UPDATE_ADDRESS => array("updateAddress", 128),
         );
     }
 

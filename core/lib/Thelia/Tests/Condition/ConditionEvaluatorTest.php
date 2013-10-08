@@ -23,7 +23,6 @@
 
 namespace Thelia\Condition\Implementation;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\AdapterInterface;

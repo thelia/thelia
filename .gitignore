@@ -14,7 +14,6 @@ coverage
 .buildpath
 .project
 .settings/
-local/cache/*
 local/media/documents/*
 local/media/images/*
 web/assets/*
@@ -25,3 +24,5 @@ xhprof/
 phpunit.phar
 .DS_Store
 phpmyadmin
+templates/default-esi
+local/modules/TemplateEsiModule

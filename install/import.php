@@ -41,14 +41,14 @@ $con->beginTransaction();
 try {
     $stmt = $con->prepare("SET foreign_key_checks = 0");
     $stmt->execute();
-    clearTables();
+    clearTables($con);
     $stmt = $con->prepare("SET foreign_key_checks = 1");
     $stmt->execute();
 
 
-    $categories = createCategories();
-    $color = createColors();
-    $brand = createBrand();
+    $categories = createCategories($con);
+    $color = createColors($con);
+    $brand = createBrand($con);
 
     echo "creating templates\n";
     $template = new \Thelia\Model\Template();
@@ -57,24 +57,24 @@ try {
             ->setName('template de démo')
         ->setLocale('en_US')
             ->setName('demo template')
-        ->save();
+        ->save($con);
 
     $at = new Thelia\Model\AttributeTemplate();
 
     $at
         ->setTemplate($template)
         ->setAttribute($color)
-        ->save();
+        ->save($con);
 
     $ft = new Thelia\Model\FeatureTemplate();
 
     $ft
         ->setTemplate($template)
         ->setFeature($brand)
-        ->save();
+        ->save($con);
     echo "end creating templates\n";
 
-    createProduct($faker, $categories, $template, $color, $brand);
+    createProduct($faker, $categories, $template, $color, $brand, $con);
 
 
 
@@ -84,7 +84,7 @@ try {
     $con->rollBack();
 }
 
-function createProduct($faker, $categories, $template, $attribute, $feature)
+function createProduct($faker, $categories, $template, $attribute, $feature, $con)
 {
     echo "start creating products\n";
     $fileSystem = new \Symfony\Component\Filesystem\Filesystem();
@@ -121,11 +121,11 @@ function createProduct($faker, $categories, $template, $attribute, $feature)
                     ->setChapo($data[3])
                     ->setDescription($data[5])
                     ->setPostscriptum($data[7])
-            ->save();
+            ->save($con);
 
             $productCategories = $product->getProductCategories()->getFirst();
             $productCategories->setDefaultCategory(true)
-                ->save();
+                ->save($con);
 
             // Set the position
             $product->setPosition($product->getNextPosition())->save();
@@ -139,7 +139,7 @@ function createProduct($faker, $categories, $template, $attribute, $feature)
                 $productImage
                     ->setProduct($product)
                     ->setFile($image)
-                    ->save();
+                    ->save($con);
                 $fileSystem->copy(THELIA_ROOT . 'install/import/images/'.$image, THELIA_ROOT . 'local/media/images/product/'.$image, true);
             }
 
@@ -160,39 +160,42 @@ function createProduct($faker, $categories, $template, $attribute, $feature)
 
                 $stock->setNewness($faker->randomNumber(0,1));
                 $stock->setWeight($faker->randomFloat(2, 100,10000));
-                $stock->save();
+                $stock->save($con);
 
                 $productPrice = new \Thelia\Model\ProductPrice();
                 $productPrice->setProductSaleElements($stock);
                 $productPrice->setCurrencyId(1);
                 $productPrice->setPrice($data[8]);
                 $productPrice->setPromoPrice($data[9]);
-                $productPrice->save();
+                $productPrice->save($con);
 
                 $attributeAv = \Thelia\Model\AttributeAvI18nQuery::create()
                     ->filterByLocale('en_US')
                     ->filterByTitle($pse)
-                    ->findOne();
+                    ->findOne($con);
 
                 $attributeCombination = new \Thelia\Model\AttributeCombination();
                 $attributeCombination
                     ->setAttributeId($attribute->getId())
                     ->setAttributeAvId($attributeAv->getId())
                     ->setProductSaleElements($stock)
-                    ->save();
+                    ->save($con);
             }
+
+            $productSaleElements = $product->getProductSaleElementss()->getFirst();
+            $productSaleElements->setIsDefault(1)->save($con);
 
             $brand = $data[11];
             $featurAv = \Thelia\Model\FeatureAvI18nQuery::create()
                 ->filterByLocale('en_US')
                 ->filterByTitle($brand)
-                ->findOne();
+                ->findOne($con);
 
             $featureProduct = new Thelia\Model\FeatureProduct();
             $featureProduct->setProduct($product)
                 ->setFeatureId($feature->getId())
                 ->setFeatureAvId($featurAv->getId())
-                ->save()
+                ->save($con)
             ;
 
 
@@ -202,7 +205,7 @@ function createProduct($faker, $categories, $template, $attribute, $feature)
     echo "end creating products\n";
 }
 
-function createBrand()
+function createBrand($con)
 {
     echo "start creating brands feature\n";
     if (($handle = fopen(THELIA_ROOT . '/install/import/brand.csv', "r")) !== FALSE) {
@@ -226,7 +229,7 @@ function createBrand()
             $feature->addFeatureAv($featureAv);
 
         }
-        $feature->save();
+        $feature->save($con);
         fclose($handle);
     }
     echo "brands feature created successfully\n";
@@ -234,7 +237,7 @@ function createBrand()
     return $feature;
 }
 
-function createCategories()
+function createCategories($con)
 {
     echo "start creating categories\n";
     $categories = array();
@@ -252,7 +255,7 @@ function createCategories()
                     ->setTitle(trim($data[0]))
                 ->setLocale('en_US')
                     ->setTitle(trim($data[1]))
-                ->save();
+                ->save($con);
             $categories[trim($data[1])] = $category;
         }
         fclose($handle);
@@ -261,7 +264,7 @@ function createCategories()
     return $categories;
 }
 
-function createColors()
+function createColors($con)
 {
     echo "start creating colors attributes\n";
     if (($handle = fopen(THELIA_ROOT . '/install/import/colors.csv', "r")) !== FALSE) {
@@ -286,91 +289,91 @@ function createColors()
 
             $attribute->addAttributeAv($attributeAv);
         }
-        $attribute->save();
+        $attribute->save($con);
         fclose($handle);
     }
     echo "colors attributes created with success\n";
     return $attribute;
 }
 
-function clearTables()
+function clearTables($con)
 {
     $productAssociatedContent = Thelia\Model\ProductAssociatedContentQuery::create()
-        ->find();
-    $productAssociatedContent->delete();
+        ->find($con);
+    $productAssociatedContent->delete($con);
 
     $categoryAssociatedContent = Thelia\Model\CategoryAssociatedContentQuery::create()
-        ->find();
-    $categoryAssociatedContent->delete();
+        ->find($con);
+    $categoryAssociatedContent->delete($con);
 
     $featureProduct = Thelia\Model\FeatureProductQuery::create()
-        ->find();
-    $featureProduct->delete();
+        ->find($con);
+    $featureProduct->delete($con);
 
     $attributeCombination = Thelia\Model\AttributeCombinationQuery::create()
-        ->find();
-    $attributeCombination->delete();
+        ->find($con);
+    $attributeCombination->delete($con);
 
     $feature = Thelia\Model\FeatureQuery::create()
-        ->find();
-    $feature->delete();
+        ->find($con);
+    $feature->delete($con);
 
     $feature = Thelia\Model\FeatureI18nQuery::create()
-        ->find();
-    $feature->delete();
+        ->find($con);
+    $feature->delete($con);
 
     $featureAv = Thelia\Model\FeatureAvQuery::create()
-        ->find();
-    $featureAv->delete();
+        ->find($con);
+    $featureAv->delete($con);
 
     $featureAv = Thelia\Model\FeatureAvI18nQuery::create()
-        ->find();
-    $featureAv->delete();
+        ->find($con);
+    $featureAv->delete($con);
 
     $attribute = Thelia\Model\AttributeQuery::create()
-        ->find();
-    $attribute->delete();
+        ->find($con);
+    $attribute->delete($con);
 
     $attribute = Thelia\Model\AttributeI18nQuery::create()
-        ->find();
-    $attribute->delete();
+        ->find($con);
+    $attribute->delete($con);
 
     $attributeAv = Thelia\Model\AttributeAvQuery::create()
-        ->find();
-    $attributeAv->delete();
+        ->find($con);
+    $attributeAv->delete($con);
 
     $attributeAv = Thelia\Model\AttributeAvI18nQuery::create()
-        ->find();
-    $attributeAv->delete();
+        ->find($con);
+    $attributeAv->delete($con);
 
     $category = Thelia\Model\CategoryQuery::create()
-        ->find();
-    $category->delete();
+        ->find($con);
+    $category->delete($con);
 
     $category = Thelia\Model\CategoryI18nQuery::create()
-        ->find();
-    $category->delete();
+        ->find($con);
+    $category->delete($con);
 
     $product = Thelia\Model\ProductQuery::create()
-        ->find();
-    $product->delete();
+        ->find($con);
+    $product->delete($con);
 
     $product = Thelia\Model\ProductI18nQuery::create()
-        ->find();
-    $product->delete();
+        ->find($con);
+    $product->delete($con);
 
 
     $accessory = Thelia\Model\AccessoryQuery::create()
-        ->find();
-    $accessory->delete();
+        ->find($con);
+    $accessory->delete($con);
 
     $stock = \Thelia\Model\ProductSaleElementsQuery::create()
-        ->find();
-    $stock->delete();
+        ->find($con);
+    $stock->delete($con);
 
     $productPrice = \Thelia\Model\ProductPriceQuery::create()
-        ->find();
-    $productPrice->delete();
+        ->find($con);
+    $productPrice->delete($con);
 
-    \Thelia\Model\ProductImageQuery::create()->find()->delete();
+    \Thelia\Model\ProductImageQuery::create()->find($con)->delete($con);
 }

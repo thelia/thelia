@@ -37,7 +37,6 @@ use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as MCoupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Type;
-use Thelia\Type\BooleanOrBothType;
 
 /**
  * Created by JetBrains PhpStorm.

@@ -25,8 +25,8 @@ namespace Thelia\Action;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\AddressCreateOrUpdateEvent;
-use Thelia\Core\Event\AddressEvent;
+use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
+use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Address as AddressModel;
 use Thelia\Model\Map\AddressTableMap;
@@ -60,6 +60,13 @@ class Address extends BaseAction implements EventSubscriberInterface
         $address->delete();
     }
 
+    public function useDefault(AddressEvent $event)
+    {
+        $address = $event->getAddress();
+
+        $address->makeItDefault();
+    }
+
     protected function createOrUpdate(AddressModel $addressModel, AddressCreateOrUpdateEvent $event)
     {
         $addressModel->setDispatcher($this->getDispatcher());
@@ -86,14 +93,14 @@ class Address extends BaseAction implements EventSubscriberInterface
                 ->save()
             ;
 
-            if($event->getIsDefault()) {
+            if ($event->getIsDefault()) {
                 $addressModel->makeItDefault();
             }
 
             $event->setAddress($addressModel);
             $con->commit();
 
-        } catch(PropelException $e) {
+        } catch (PropelException $e) {
             $con->rollback();
             throw $e;
         }
@@ -125,7 +132,8 @@ class Address extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::ADDRESS_CREATE => array("create", 128),
             TheliaEvents::ADDRESS_UPDATE => array("update", 128),
-            TheliaEvents::ADDRESS_DELETE => array("delete", 128)
+            TheliaEvents::ADDRESS_DELETE => array("delete", 128),
+            TheliaEvents::ADDRESS_DEFAULT => array('useDefault', 128),
         );
     }
 }

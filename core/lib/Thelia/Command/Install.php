@@ -28,6 +28,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Command\ContainerAwareCommand;
+use Thelia\Install\CheckPermission;
 use Thelia\Install\Database;
 
 /**
@@ -82,6 +83,9 @@ class Install extends ContainerAwareCommand
             '',
             'Welcome to Thelia install process',
             'You need information about your database configuration (host, username, password, database name, etc)',
+            '',
+            '<info>Caution : You are installing Thelia in cli mode, we verify some information, but this information are only available for the cli php sapi</info>',
+            '<info>This informations can be different in your apache or cgi php.ini files</info>',
             ''
         ));
 
@@ -136,40 +140,35 @@ class Install extends ContainerAwareCommand
             "Checking some permissions"
         ));
 
-        $confDir = THELIA_ROOT . "local/config";
-        $cacheDir = THELIA_ROOT . "cache";
-        $logDir = THELIA_ROOT . "log";
+        $permissions = new CheckPermission(false, $this->getContainer()->get('thelia.translator'));
+        $isValid = $permissions->exec();
 
-        $conf   = is_writable($confDir);
-        $cache  = is_writable($cacheDir);
-        $log    = is_writable($logDir);
+        foreach($permissions->getValidationMessages() as $item => $data) {
+            if($data['status']) {
+                $output->writeln(array(
+                    sprintf("<info>%s ...</info> %s",
+                        $data['text'],
+                        "<info>Ok</info>")
+                    )
+                );
+            } else {
+                $output->writeln(array(
+                    sprintf("<error>%s </error>%s",
+                        $data['text'],
+                        sprintf("<error>%s</error>", $data["hint"])
+                    )
+                ));
+            }
 
-        $output->writeln(array(
-           sprintf(
-               "<info>config directory(%s)...</info> %s",
-               $confDir,
-               $conf ? "<info>Ok</info>" : "<error>Fail</error>"
-           ),
-           sprintf(
-               "<info>cache directory(%s)...</info> %s"
-               ,$cacheDir,
-               $cache ? "<info>Ok</info>" : "<error>Fail</error>"
-           ),
-           sprintf(
-               "<info>log directory(%s)...</info> %s",
-               $logDir,
-               $log ? "<info>Ok</info>" : "<error>Fail</error>"
-           ),
-        ));
-
-        if ($conf === false || $cache === false || $log === false) {
-           $output->writeln(array(
-              "",
-              "<error>Please put correct permission and reload install process</error>"
-           ));
-            exit;
         }
 
+        if(false === $isValid) {
+            $output->writeln(array(
+                "",
+                "<error>Please put correct permissions and reload install process</error>"
+            ));
+            exit;
+        }
     }
 
     /**

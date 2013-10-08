@@ -35,10 +35,9 @@ class ShippingConfigurationController extends BaseAdminController
         if (null !== $response = $this->checkAuth("admin.shipping-configuration.view")) return $response;
         return $this->render("shipping-configuration", array("display_shipping_configuration" => 20));
     }
-    
+
     public function updateAction($shipping_configuration_id)
     {
-
         return $this->render("shipping-configuration-edit", array(
             "shipping_configuration_id" => $shipping_configuration_id
         ));

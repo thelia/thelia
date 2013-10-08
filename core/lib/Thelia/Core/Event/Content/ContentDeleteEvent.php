@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Content;
 
-
 /**
  * Class ContentDeleteEvent
  * @package Thelia\Core\Event\Content
@@ -35,7 +34,7 @@ class ContentDeleteEvent extends ContentEvent
 
     protected $folder_id;
 
-    function __construct($content_id)
+    public function __construct($content_id)
     {
         $this->content_id = $content_id;
     }
@@ -69,6 +68,5 @@ class ContentDeleteEvent extends ContentEvent
     {
         return $this->folder_id;
     }
-
 
 }

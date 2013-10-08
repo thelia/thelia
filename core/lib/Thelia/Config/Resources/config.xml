@@ -21,8 +21,12 @@
         <loop class="Thelia\Core\Template\Loop\FeatureAvailability" name="feature-availability"/>
         <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature_value"/>
         <loop class="Thelia\Core\Template\Loop\Folder" name="folder"/>
+        <loop class="Thelia\Core\Template\Loop\FolderPath" name="folder-path"/>
         <loop class="Thelia\Core\Template\Loop\Module" name="module"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
+        <loop class="Thelia\Core\Template\Loop\OrderAddress" name="order_address"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProduct" name="order_product"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProductAttributeCombination" name="order_product_attribute_combination"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
         <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
         <loop class="Thelia\Core\Template\Loop\Payment" name="payment"/>
@@ -84,6 +88,7 @@
 
         <form name="thelia.order.delivery" class="Thelia\Form\OrderDelivery"/>
         <form name="thelia.order.payment" class="Thelia\Form\OrderPayment"/>
+        <form name="thelia.order.update.address" class="Thelia\Form\OrderUpdateAddress"/>
 
         <form name="thelia.admin.config.creation" class="Thelia\Form\ConfigCreationForm"/>
         <form name="thelia.admin.config.modification" class="Thelia\Form\ConfigModificationForm"/>
@@ -203,6 +208,10 @@
                 <argument>%thelia.parser.loops%</argument>
             </call>
        </service>
+
+        <service id="smarty.plugin.type" class="Thelia\Core\Template\Smarty\Plugins\Type" scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+        </service>
 
         <service id="smart.plugin.form" class="Thelia\Core\Template\Smarty\Plugins\Form" scope="request">
             <tag name="thelia.parser.register_plugin"/>

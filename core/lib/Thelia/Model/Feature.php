@@ -5,7 +5,7 @@ namespace Thelia\Model;
 use Thelia\Model\Base\Feature as BaseFeature;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\FeatureEvent;
+use Thelia\Core\Event\Feature\FeatureEvent;
 
 class Feature extends BaseFeature {
 
@@ -20,7 +20,7 @@ class Feature extends BaseFeature {
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEFEATURE, new FeatureEvent($this));
 
         // Set the current position for the new object
-        $this->setPosition($this->getNextPosition());
+        //$this->setPosition($this->getNextPosition());
 
         return true;
     }

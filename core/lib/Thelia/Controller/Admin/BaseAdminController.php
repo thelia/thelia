@@ -51,7 +51,7 @@ class BaseAdminController extends BaseController
     /**
      * Helper to append a message to the admin log.
      *
-     * @param unknown $message
+     * @param string $message
      */
     public function adminLogAppend($message)
     {
@@ -187,12 +187,12 @@ class BaseAdminController extends BaseController
     /**
      * @return a ParserInterface instance parser
      */
-    protected function getParser()
+    protected function getParser($template = null)
     {
         $parser = $this->container->get("thelia.parser");
 
         // Define the template thant shoud be used
-        $parser->setTemplate(ConfigQuery::read('base_admin_template', 'admin/default'));
+        $parser->setTemplate($template ?: ConfigQuery::read('base_admin_template', 'admin/default'));
 
         return $parser;
     }
@@ -246,9 +246,9 @@ class BaseAdminController extends BaseController
      * @param unknown $routeId       the route ID, as found in Config/Resources/routing/admin.xml
      * @param unknown $urlParameters the URL parametrs, as a var/value pair array
      */
-    public function redirectToRoute($routeId, $urlParameters = array())
+    public function redirectToRoute($routeId, $urlParameters = array(), $routeParameters = array())
     {
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId), $urlParameters));
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters), $urlParameters));
     }
 
     /**
@@ -293,20 +293,19 @@ class BaseAdminController extends BaseController
         return $this->getCurrentEditionLang()->getLocale();
     }
 
-
     /**
      * Return the current list order identifier for a given object name,
      * updating in using the current request.
      *
-     * @param unknown $objectName the object name (e.g. 'attribute', 'message')
+     * @param unknown $objectName           the object name (e.g. 'attribute', 'message')
      * @param unknown $requestParameterName the name of the request parameter that defines the list order
-     * @param unknown $defaultListOrder the default order to use, if none is defined
-     * @param string $updateSession if true, the session will be updated with the current order.
+     * @param unknown $defaultListOrder     the default order to use, if none is defined
+     * @param string  $updateSession        if true, the session will be updated with the current order.
      *
      * @return String the current liste order.
      */
-    protected function getListOrderFromSession($objectName, $requestParameterName, $defaultListOrder, $updateSession = true) {
-
+    protected function getListOrderFromSession($objectName, $requestParameterName, $defaultListOrder, $updateSession = true)
+    {
         $order = $defaultListOrder;
 
         $orderSessionIdentifier = sprintf("admin.%s.currentListOrder", $objectName);
@@ -318,7 +317,6 @@ class BaseAdminController extends BaseController
         );
 
         if ($updateSession) $this->getSession()->set($orderSessionIdentifier, $order);
-
         return $order;
     }
 
@@ -353,8 +351,8 @@ class BaseAdminController extends BaseController
     /** Clear the remember me cookie.
      *
      */
-    protected function clearRememberMeCookie() {
-
+    protected function clearRememberMeCookie()
+    {
         $ctp = new CookieTokenProvider();
 
         $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
@@ -380,10 +378,12 @@ class BaseAdminController extends BaseController
      * Render the given template, and returns the result as a string.
      *
      * @param $templateName the complete template name, with extension
-     * @param  array                                      $args the template arguments
+     * @param  array $args the template arguments
+     * @param null $templateDir
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function renderRaw($templateName, $args = array())
+    protected function renderRaw($templateName, $args = array(), $templateDir = null)
     {
 
         // Add the template standard extension
@@ -419,7 +419,7 @@ class BaseAdminController extends BaseController
 
         // Render the template.
         try {
-            $data = $this->getParser()->render($templateName, $args);
+            $data = $this->getParser($templateDir)->render($templateName, $args);
 
             return $data;
         } catch (AuthenticationException $ex) {

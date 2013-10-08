@@ -93,7 +93,7 @@ DROP TABLE IF EXISTS `country`;
 
 CREATE TABLE `country`
 (
-    `id` INTEGER NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `area_id` INTEGER,
     `isocode` VARCHAR(4) NOT NULL,
     `isoalpha2` VARCHAR(2),

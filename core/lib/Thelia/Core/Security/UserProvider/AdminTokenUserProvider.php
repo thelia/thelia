@@ -23,13 +23,12 @@
 
 namespace Thelia\Core\Security\UserProvider;
 
-use Thelia\Model\Admin;
 use Thelia\Model\AdminQuery;
 
 class AdminTokenUserProvider extends TokenUserProvider
 {
-    public function getUser($dataArray) {
-
+    public function getUser($dataArray)
+    {
         return AdminQuery::create()
             ->filterByLogin($dataArray['username'])
             ->filterByRememberMeSerial($dataArray['serial'])

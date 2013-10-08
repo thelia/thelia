@@ -23,8 +23,6 @@
 
 namespace Thelia\Module;
 
-use Thelia\Model\Country;
-
 interface PaymentModuleInterface extends BaseModuleInterface
 {
     /**

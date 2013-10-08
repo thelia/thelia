@@ -91,6 +91,7 @@ class URL
 
             $schemeAuthority = "$scheme://$host"."$port";
         }
+
         return $schemeAuthority.$this->requestContext->getBaseUrl();
     }
 
@@ -240,7 +241,7 @@ class URL
          } else {
              $allParametersWithoutView = $request->query->all();
              $view = $request->attributes->get('_view');
-             if(isset($allOtherParameters['view'])) {
+             if (isset($allOtherParameters['view'])) {
                  unset($allOtherParameters['view']);
              }
              $this->retriever->rewrittenUrl = null;

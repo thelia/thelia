@@ -38,16 +38,19 @@ class CountryCreationForm extends BaseForm
                 "label_attr" => array(
                     "for" => "title"
                 )
-            ))            
-            ->add("area", "text", array(
+            ))
+            ->add("locale", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => Translator::getInstance()->trans("Country area *"),
+                "label_attr" => array("for" => "locale_create")
+            ))
+            ->add("area", "text", array(
+                "label" => Translator::getInstance()->trans("Country area"),
                 "label_attr" => array(
                     "for" => "area"
                 )
-            ))            
+            ))
             ->add("isocode", "text", array(
                 "constraints" => array(
                     new NotBlank()
@@ -56,7 +59,7 @@ class CountryCreationForm extends BaseForm
                 "label_attr" => array(
                     "for" => "isocode"
                 )
-            ))            
+            ))
             ->add("isoalpha2", "text", array(
                 "constraints" => array(
                     new NotBlank()
@@ -65,7 +68,7 @@ class CountryCreationForm extends BaseForm
                 "label_attr" => array(
                     "for" => "isoalpha2"
                 )
-            ))            
+            ))
             ->add("isoalpha3", "text", array(
                 "constraints" => array(
                     new NotBlank()
@@ -74,7 +77,7 @@ class CountryCreationForm extends BaseForm
                 "label_attr" => array(
                     "for" => "isoalpha3"
                 )
-            ))            
+            ))
         ;
     }
 

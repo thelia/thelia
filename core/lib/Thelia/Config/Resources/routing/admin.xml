@@ -123,9 +123,35 @@
 
     <!-- end Customer rule management -->
 
-    <!-- Order rule management -->
+    <!-- address management -->
 
-    <route id="admin.order" path="/admin/order">
+    <route id="admin.address.delete" path="/admin/address/delete" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\AddressController::deleteAction</default>
+    </route>
+
+    <route id="admin.address.makeItDefault" path="/admin/address/use" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\AddressController::useAddressAction</default>
+    </route>
+
+    <route id="admin.address.create" path="/admin/address/create" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\AddressController::createAction</default>
+    </route>
+
+    <route id="admin.address.update.view" path="/admin/address/update/{address_id}">
+        <default key="_controller">Thelia\Controller\Admin\AddressController::updateAction</default>
+        <requirement key="address_id">\d+</requirement>
+    </route>
+
+    <route id="admin.address.save" path="/admin/address/save/{address_id}">
+        <default key="_controller">Thelia\Controller\Admin\AddressController::processUpdateAction</default>
+        <requirement key="address_id">\d+</requirement>
+    </route>
+
+    <!-- end address management -->
+
+    <!-- order management -->
+
+    <route id="admin.order.list" path="/admin/orders">
         <default key="_controller">Thelia\Controller\Admin\OrderController::indexAction</default>
     </route>
 
@@ -134,7 +160,33 @@
         <requirement key="order_id">\d+</requirement>
     </route>
 
-    <!-- end Customer rule management -->
+    <route id="admin.order.list.update.status" path="/admin/order/update/status">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::updateStatus</default>
+    </route>
+
+    <route id="admin.order.update.status" path="/admin/order/update/{order_id}/status">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::updateStatus</default>
+    </route>
+
+    <route id="admin.order.update.deliveryRef" path="/admin/order/update/{order_id}/delivery-ref">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::updateDeliveryRef</default>
+    </route>
+
+    <route id="admin.order.update.address" path="/admin/order/update/{order_id}/address">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::updateAddress</default>
+    </route>
+
+    <route id="admin.order.pdf.invoice" path="/admin/order/pdf/invoice/{order_id}">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::generateInvoicePdf</default>
+        <requirement key="order_id">\d+</requirement>
+    </route>
+
+    <route id="admin.order.pdf.invoice" path="/admin/order/pdf/delivery/{order_id}">
+        <default key="_controller">Thelia\Controller\Admin\OrderController::generateDeliveryPdf</default>
+        <requirement key="order_id">\d+</requirement>
+    </route>
+
+    <!-- end order management -->
 
     <!-- Categories management -->
 
@@ -353,8 +405,31 @@
         <default key="_controller">Thelia\Controller\Admin\FolderController::updatePositionAction</default>
     </route>
 
+    <!-- Countries routes management -->
+
+    <route id="admin.configuration.countries.default" path="/admin/configuration/countries">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.create" path="/admin/configuration/countries/create">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.update" path="/admin/configuration/country/update/{country_id}">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::updateAction</default>
+        <requirement key="country_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.countries.delete" path="/admin/configuration/countries/delete">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.toggle-default" path="/admin/configuration/country/toggleDefault">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::toggleDefaultAction</default>
+    </route>
+
     <!-- content routes management -->
-    <route id="admin.folders.create" path="/admin/content/create">
+    <route id="admin.content.create" path="/admin/content/create">
         <default key="_controller">Thelia\Controller\Admin\ContentController::createAction</default>
     </route>
 
@@ -377,6 +452,14 @@
 
     <route id="admin.content.delete" path="/admin/content/delete">
         <default key="_controller">Thelia\Controller\Admin\ContentController::deleteAction</default>
+    </route>
+
+    <route id="admin.content.additional-folder.add" path="/admin/content/folder/add">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::addAdditionalFolderAction</default>
+    </route>
+
+    <route id="admin.content.additional-folder.delete" path="/admin/content/folder/delete">
+        <default key="_controller">Thelia\Controller\Admin\ContentController::removeAdditionalFolderAction</default>
     </route>
 
 
@@ -608,20 +691,7 @@
 
     <!-- end attribute and feature routes  management -->
 
-    <!-- Countries routes management -->
 
-    <route id="admin.configuration.countries.default" path="/admin/configuration/countries">
-        <default key="_controller">Thelia\Controller\Admin\CountryController::indexAction</default>
-    </route>
-
-    <route id="admin.configuration.countries.create" path="/admin/configuration/countries/create">
-        <default key="_controller">Thelia\Controller\Admin\CountryController::createAction</default>
-    </route>
-
-    <route id="admin.configuration.countries.update.view" path="/admin/configuration/countries/update/{country_id}" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\CountryController::updateAction</default>
-        <requirement key="country_id">\d+</requirement>
-    </route>
 
     <!-- end countries routes management -->
 

@@ -26,7 +26,6 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\AdapterInterface;
-use Thelia\Exception\InvalidConditionValueException;
 use Thelia\Model\Currency;
 
 /**
@@ -104,7 +103,6 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
         $actual =$isValid;
         $this->assertEquals($expected, $actual);
     }
-
 
     /**
      * Check if condition is always matching

@@ -25,11 +25,12 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
-use Thelia\Core\Event\CustomerEvent;
+use Thelia\Core\Event\Customer\CustomerAddressEvent;
+use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Customer as CustomerModel;
-use Thelia\Core\Event\CustomerLoginEvent;
+use Thelia\Core\Event\Customer\CustomerLoginEvent;
 
 /**
  *
@@ -148,11 +149,11 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::CUSTOMER_CREATEACCOUNT => array("create", 128),
-            TheliaEvents::CUSTOMER_UPDATEACCOUNT => array("modify", 128),
-            TheliaEvents::CUSTOMER_LOGOUT        => array("logout", 128),
-            TheliaEvents::CUSTOMER_LOGIN         => array("login" , 128),
-            TheliaEvents::CUSTOMER_DELETEACCOUNT => array("delete", 128),
+            TheliaEvents::CUSTOMER_CREATEACCOUNT    => array('create', 128),
+            TheliaEvents::CUSTOMER_UPDATEACCOUNT    => array('modify', 128),
+            TheliaEvents::CUSTOMER_LOGOUT           => array('logout', 128),
+            TheliaEvents::CUSTOMER_LOGIN            => array('login', 128),
+            TheliaEvents::CUSTOMER_DELETEACCOUNT    => array('delete', 128),
         );
     }
 }

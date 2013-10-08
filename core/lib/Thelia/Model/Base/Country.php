@@ -216,7 +216,7 @@ abstract class Country implements ActiveRecordInterface
      * be false, if the object was retrieved from storage or was created
      * and then saved.
      *
-     * @return true, if the object has never been persisted.
+     * @return boolean true, if the object has never been persisted.
      */
     public function isNew()
     {
@@ -274,8 +274,8 @@ abstract class Country implements ActiveRecordInterface
      * <code>obj</code> is an instance of <code>Country</code>, delegates to
      * <code>equals(Country)</code>.  Otherwise, returns <code>false</code>.
      *
-     * @param      obj The object to compare to.
-     * @return Whether equal to the object specified.
+     * @param  mixed   $obj The object to compare to.
+     * @return boolean Whether equal to the object specified.
      */
     public function equals($obj)
     {
@@ -314,8 +314,6 @@ abstract class Country implements ActiveRecordInterface
     /**
      * Get the associative array of the virtual columns in this object
      *
-     * @param string $name The virtual column name
-     *
      * @return array
      */
     public function getVirtualColumns()
@@ -326,6 +324,7 @@ abstract class Country implements ActiveRecordInterface
     /**
      * Checks the existence of a virtual column in this object
      *
+     * @param  string  $name The virtual column name
      * @return boolean
      */
     public function hasVirtualColumn($name)
@@ -336,7 +335,10 @@ abstract class Country implements ActiveRecordInterface
     /**
      * Get the value of a virtual column in this object
      *
+     * @param  string $name The virtual column name
      * @return mixed
+     *
+     * @throws PropelException
      */
     public function getVirtualColumn($name)
     {
@@ -393,7 +395,9 @@ abstract class Country implements ActiveRecordInterface
             $parser = AbstractParser::getParser($parser);
         }
 
-        return $this->fromArray($parser->toArray($data), TableMap::TYPE_PHPNAME);
+        $this->fromArray($parser->toArray($data), TableMap::TYPE_PHPNAME);
+
+        return $this;
     }
 
     /**
@@ -510,7 +514,7 @@ abstract class Country implements ActiveRecordInterface
         if ($format === null) {
             return $this->created_at;
         } else {
-            return $this->created_at !== null ? $this->created_at->format($format) : null;
+            return $this->created_at instanceof \DateTime ? $this->created_at->format($format) : null;
         }
     }
 
@@ -530,7 +534,7 @@ abstract class Country implements ActiveRecordInterface
         if ($format === null) {
             return $this->updated_at;
         } else {
-            return $this->updated_at !== null ? $this->updated_at->format($format) : null;
+            return $this->updated_at instanceof \DateTime ? $this->updated_at->format($format) : null;
         }
     }
 
@@ -1067,6 +1071,10 @@ abstract class Country implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
+        $this->modifiedColumns[] = CountryTableMap::ID;
+        if (null !== $this->id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CountryTableMap::ID . ')');
+        }
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(CountryTableMap::ID)) {
@@ -1135,6 +1143,13 @@ abstract class Country implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
+
+        try {
+            $pk = $con->lastInsertId();
+        } catch (Exception $e) {
+            throw new PropelException('Unable to get autoincrement id.', 0, $e);
+        }
+        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -1246,8 +1261,7 @@ abstract class Country implements ActiveRecordInterface
             $keys[7] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
-        foreach($virtualColumns as $key => $virtualColumn)
-        {
+        foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
@@ -1436,7 +1450,6 @@ abstract class Country implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setId($this->getId());
         $copyObj->setAreaId($this->getAreaId());
         $copyObj->setIsocode($this->getIsocode());
         $copyObj->setIsoalpha2($this->getIsoalpha2());
@@ -1472,6 +1485,7 @@ abstract class Country implements ActiveRecordInterface
 
         if ($makeNew) {
             $copyObj->setNew(true);
+            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 

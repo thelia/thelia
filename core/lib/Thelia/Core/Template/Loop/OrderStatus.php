@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -23,33 +23,77 @@
 
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Core\Template\Element\BaseLoop;
+use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Model\OrderStatusQuery;
+
 /**
  *
- * @package Thelia\Core\Template\Loop
+ * OrderStatus loop
  *
- * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * Class OrderStatus
+ * @package Thelia\Core\Template\Loop
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class OrderStatus extends BaseLoop
+class OrderStatus extends BaseI18nLoop
 {
-    public function getArgDefinitions()
+    public $timestampable = true;
+
+    /**
+     * @return ArgumentCollection
+     */
+    protected function getArgDefinitions()
     {
-        return new ArgumentCollection();
+        return new ArgumentCollection(
+            Argument::createIntListTypeArgument('id')
+        );
     }
 
     /**
-     *
+     * @param $pagination
      *
      * @return \Thelia\Core\Template\Element\LoopResult
      */
     public function exec(&$pagination)
     {
-        // TODO : a coder !
-        return new LoopResult();
+        $search = OrderStatusQuery::create();
+
+        /* manage translations */
+        $locale = $this->configureI18nProcessing($search);
+
+        $id = $this->getId();
+
+        if (null !== $id) {
+            $search->filterById($id, Criteria::IN);
+        }
+
+        /* perform search */
+        $orderStatusList = $this->search($search, $pagination);
+
+        $loopResult = new LoopResult($orderStatusList);
+
+        foreach ($orderStatusList as $orderStatus) {
+            $loopResultRow = new LoopResultRow($loopResult, $orderStatus, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow->set("ID", $orderStatus->getId())
+                ->set("IS_TRANSLATED",$orderStatus->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
+                ->set("CODE", $orderStatus->getCode())
+                ->set("TITLE", $orderStatus->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $orderStatus->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $orderStatus->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $orderStatus->getVirtualColumn('i18n_POSTSCRIPTUM'))
+            ;
+
+            $loopResult->addRow($loopResultRow);
+        }
+
+        return $loopResult;
     }
 }

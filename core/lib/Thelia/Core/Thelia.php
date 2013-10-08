@@ -87,7 +87,6 @@ class Thelia extends Kernel
             $con->useDebug(true);
         }
 
-
     }
 
     /**

@@ -23,24 +23,22 @@
 
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\FolderCreateEvent;
-use Thelia\Core\Event\FolderDeleteEvent;
-use Thelia\Core\Event\FolderToggleVisibilityEvent;
-use Thelia\Core\Event\FolderUpdateEvent;
+use Thelia\Core\Event\Folder\FolderCreateEvent;
+use Thelia\Core\Event\Folder\FolderDeleteEvent;
+use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
+use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Folder as FolderModel;
-
 
 /**
  * Class Folder
  * @package Thelia\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Folder extends BaseAction implements EventSubscriberInterface {
-
-
+class Folder extends BaseAction implements EventSubscriberInterface
+{
     public function update(FolderUpdateEvent $event)
     {
 
@@ -99,15 +97,16 @@ class Folder extends BaseAction implements EventSubscriberInterface {
             ->setVisible(!$folder->getVisible())
             ->save();
 
+        $event->setFolder($folder);
+
     }
 
     public function updatePosition(UpdatePositionEvent $event)
     {
-        if(null !== $folder = FolderQuery::create()->findPk($event->getObjectId())) {
+        if (null !== $folder = FolderQuery::create()->findPk($event->getObjectId())) {
             $folder->setDispatcher($this->getDispatcher());
 
-            switch($event->getMode())
-            {
+            switch ($event->getMode()) {
                 case UpdatePositionEvent::POSITION_ABSOLUTE:
                     $folder->changeAbsolutePosition($event->getPosition());
                     break;

@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Content;
 
-
 /**
  * Class ContentUpdateEvent
  * @package Thelia\Core\Event\Content
@@ -39,7 +38,7 @@ class ContentUpdateEvent extends ContentCreateEvent
 
     protected $url;
 
-    function __construct($content_id)
+    public function __construct($content_id)
     {
         $this->content_id = $content_id;
     }
@@ -143,8 +142,5 @@ class ContentUpdateEvent extends ContentCreateEvent
     {
         return $this->url;
     }
-
-
-
 
 }

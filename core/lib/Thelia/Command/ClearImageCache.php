@@ -27,7 +27,7 @@ use Thelia\Command\ContainerAwareCommand;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Thelia\Core\Event\ImageEvent;
+use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\Console\Input\InputArgument;
 use Thelia\Core\Event\TheliaEvents;

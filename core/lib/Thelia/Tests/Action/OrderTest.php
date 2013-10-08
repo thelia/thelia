@@ -25,12 +25,16 @@ namespace Thelia\Tests\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Thelia\Core\Event\OrderEvent;
+use Thelia\Core\Event\Order\OrderAddressEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Base\OrderAddressQuery;
 use Thelia\Model\Base\OrderProductQuery;
+use Thelia\Model\Base\OrderQuery;
+use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Cart;
@@ -62,7 +66,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
     protected $orderAction;
 
     /**
-     * @var OrderEvent $orderEvent
+     * @var \Thelia\Core\Event\Order\OrderEvent $orderEvent
      */
     protected $orderEvent;
 
@@ -103,7 +107,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         /* load customer */
         $this->customer = $this->loadCustomer();
-        if(null === $this->customer) {
+        if (null === $this->customer) {
             return;
         }
 
@@ -115,7 +119,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
     public function loadCustomer()
     {
         $customer = CustomerQuery::create()->findOne();
-        if(null === $customer) {
+        if (null === $customer) {
             return null;
         }
 
@@ -137,7 +141,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         /* add 3 items */
         $productList = array();
-        for($i=0; $i<3; $i++) {
+        for ($i=0; $i<3; $i++) {
             $pse = ProductSaleElementsQuery::create()
                 ->filterByProduct(
                     ProductQuery::create()
@@ -159,7 +163,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 ->setCart($cart)
                 ->setProduct($pse->getProduct())
                 ->setProductSaleElements($pse)
-                ->setQuantity($i)
+                ->setQuantity($i+1)
                 ->setPrice($pse->getPrice())
                 ->setPromoPrice($pse->getPromoPrice())
                 ->setPromo($pse->getPromo())
@@ -233,8 +237,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->filterByActivate(1)
             ->findOne();
 
-        if(null === $deliveryModule) {
-            return;
+        if (null === $deliveryModule) {
+            throw new \Exception('No Delivery Module fixture found');
         }
 
         $paymentModule = ModuleQuery::create()
@@ -242,8 +246,8 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             ->filterByActivate(1)
             ->findOne();
 
-        if(null === $paymentModule) {
-            return;
+        if (null === $paymentModule) {
+            throw new \Exception('No Payment Module fixture found');
         }
 
         $this->orderEvent->getOrder()->chosenDeliveryAddress = $validDeliveryAddress->getId();
@@ -254,7 +258,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         /* memorize current stocks */
         $itemsStock = array();
-        foreach($this->cartItems as $index => $cartItem) {
+        foreach ($this->cartItems as $index => $cartItem) {
             $itemsStock[$index] = $cartItem->getProductSaleElements()->getQuantity();
         }
 
@@ -314,7 +318,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->container->get('request')->getSession()->getLang()->getId(), $placedOrder->getLangId(), 'lang does not  match');
 
         /* check ordered product */
-        foreach($this->cartItems as $index => $cartItem) {
+        foreach ($this->cartItems as $index => $cartItem) {
             $orderProduct = OrderProductQuery::create()
                 ->filterByOrderId($placedOrder->getId())
                 ->filterByProductRef($cartItem->getProduct()->getRef())
@@ -343,11 +347,105 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
             /* check tax */
             $orderProductTaxList = $orderProduct->getOrderProductTaxes();
-            foreach($cartItem->getProduct()->getTaxRule()->getTaxDetail($validDeliveryAddress->getCountry(), $cartItem->getPromo() == 1 ? $cartItem->getPromoPrice() : $cartItem->getPrice()) as $index => $tax) {
+            foreach ($cartItem->getProduct()->getTaxRule()->getTaxDetail($validDeliveryAddress->getCountry(), $cartItem->getPrice(), $cartItem->getPromoPrice()) as $index => $tax) {
                 $orderProductTax = $orderProductTaxList[$index];
                 $this->assertEquals($tax->getAmount(), $orderProductTax->getAmount());
+                $this->assertEquals($tax->getPromoAmount(), $orderProductTax->getPromoAmount());
             }
         }
 
+        return $placedOrder;
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param OrderModel $order
+     */
+    public function testUpdateStatus(OrderModel $order)
+    {
+        $newStatus = $order->getStatusId() == 5 ? 1 : 5;
+        $this->orderEvent->setStatus($newStatus);
+        $this->orderEvent->setOrder($order);
+
+        $this->orderAction->updateStatus($this->orderEvent);
+
+        $this->assertEquals(
+            $newStatus,
+            $this->orderEvent->getOrder()->getStatusId()
+        );
+        $this->assertEquals(
+            $newStatus,
+            OrderQuery::create()->findPk($order->getId())->getStatusId()
+        );
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param OrderModel $order
+     */
+    public function testUpdateDeliveryRef(OrderModel $order)
+    {
+        $deliveryRef = uniqid('DELREF');
+        $this->orderEvent->setDeliveryRef($deliveryRef);
+        $this->orderEvent->setOrder($order);
+
+        $this->orderAction->updateDeliveryRef($this->orderEvent);
+
+        $this->assertEquals(
+            $deliveryRef,
+            $this->orderEvent->getOrder()->getDeliveryRef()
+        );
+        $this->assertEquals(
+            $deliveryRef,
+            OrderQuery::create()->findPk($order->getId())->getDeliveryRef()
+        );
+    }
+
+    /**
+     * @depends testCreate
+     *
+     * @param OrderModel $order
+     */
+    public function testUpdateAddress(OrderModel $order)
+    {
+        $deliveryRef = uniqid('DELREF');
+        $orderAddress = OrderAddressQuery::create()->findPk($order->getDeliveryOrderAddressId());
+        $title = $orderAddress->getCustomerTitleId() == 3 ? 1 : 3;
+        $country = $orderAddress->getCountryId() == 64 ? 1 : 64;
+        $orderAddressEvent = new OrderAddressEvent(
+            $title, 'B', 'C', 'D', 'E', 'F', 'G', 'H', $country, 'J', 'K'
+        );
+        $orderAddressEvent->setOrderAddress($orderAddress);
+        $orderAddressEvent->setOrder($order);
+
+        $this->orderAction->updateAddress($orderAddressEvent);
+
+        $newOrderAddress = OrderAddressQuery::create()->findPk($orderAddress->getId());
+
+        $this->assertEquals($title, $orderAddressEvent->getOrderAddress()->getCustomerTitleId());
+        $this->assertEquals('B', $orderAddressEvent->getOrderAddress()->getFirstname());
+        $this->assertEquals('C', $orderAddressEvent->getOrderAddress()->getLastname());
+        $this->assertEquals('D', $orderAddressEvent->getOrderAddress()->getAddress1());
+        $this->assertEquals('E', $orderAddressEvent->getOrderAddress()->getAddress2());
+        $this->assertEquals('F', $orderAddressEvent->getOrderAddress()->getAddress3());
+        $this->assertEquals('G', $orderAddressEvent->getOrderAddress()->getZipcode());
+        $this->assertEquals('H', $orderAddressEvent->getOrderAddress()->getCity());
+        $this->assertEquals($country, $orderAddressEvent->getOrderAddress()->getCountryId());
+        $this->assertEquals('J', $orderAddressEvent->getOrderAddress()->getPhone());
+        $this->assertEquals('K', $orderAddressEvent->getOrderAddress()->getCompany());
+
+        $this->assertEquals($title, $newOrderAddress->getCustomerTitleId());
+        $this->assertEquals('B', $newOrderAddress->getFirstname());
+        $this->assertEquals('C', $newOrderAddress->getLastname());
+        $this->assertEquals('D', $newOrderAddress->getAddress1());
+        $this->assertEquals('E', $newOrderAddress->getAddress2());
+        $this->assertEquals('F', $newOrderAddress->getAddress3());
+        $this->assertEquals('G', $newOrderAddress->getZipcode());
+        $this->assertEquals('H', $newOrderAddress->getCity());
+        $this->assertEquals($country, $newOrderAddress->getCountryId());
+        $this->assertEquals('J', $newOrderAddress->getPhone());
+        $this->assertEquals('K', $newOrderAddress->getCompany());
     }
 }

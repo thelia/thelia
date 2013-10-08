@@ -77,6 +77,11 @@ final class TheliaEvents
     const CUSTOMER_DELETEACCOUNT = "action.deleteCustomer";
 
     /**
+     * sent on customer address removal
+     */
+    const CUSTOMER_ADDRESS_DELETE = "action.customer.deleteAddress";
+
+    /**
      * sent when a customer need a new password
      */
     const LOST_PASSWORD = "action.lostPassword";
@@ -134,6 +139,11 @@ final class TheliaEvents
      */
     const ADDRESS_DELETE = "action.deleteAddress";
 
+    /**
+     * sent when an address is tag as default
+     */
+    const ADDRESS_DEFAULT = "action.defaultAddress";
+
     const BEFORE_CREATEADDRESS = "action.before_createAddress";
     const AFTER_CREATEADDRESS  = "action.after_createAddress";
 
@@ -173,8 +183,6 @@ final class TheliaEvents
     const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
     const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
 
-//    const FOLDER_ADD_CONTENT      = "action.categoryAddContent";
-//    const FOLDER_REMOVE_CONTENT   = "action.categoryRemoveContent";
 
     const BEFORE_CREATEFOLDER = "action.before_createFolder";
     const AFTER_CREATEFOLDER 	= "action.after_createFolder";
@@ -193,8 +201,9 @@ final class TheliaEvents
     const CONTENT_TOGGLE_VISIBILITY = "action.toggleContentVisibility";
     const CONTENT_UPDATE_POSITION   = "action.updateContentPosition";
 
-//    const FOLDER_ADD_CONTENT      = "action.categoryAddContent";
-//    const FOLDER_REMOVE_CONTENT   = "action.categoryRemoveContent";
+    const CONTENT_ADD_FOLDER      = "action.contentAddFolder";
+    const CONTENT_REMOVE_FOLDER   = "action.contentRemoveFolder";
+
 
     const BEFORE_CREATECONTENT = "action.before_createContent";
     const AFTER_CREATECONTENT	= "action.after_createContent";
@@ -204,6 +213,24 @@ final class TheliaEvents
 
     const BEFORE_UPDATECONTENT = "action.before_updateContent";
     const AFTER_UPDATECONTENT 	= "action.after_updateContent";
+
+    // -- country management -----------------------------------------------
+
+    const COUNTRY_CREATE            = "action.createCountry";
+    const COUNTRY_UPDATE            = "action.updateCountry";
+    const COUNTRY_DELETE            = "action.deleteCountry";
+    const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
+    //const COUNTRY_UPDATE_POSITION   = "action.updateFolderPosition";
+
+
+    const BEFORE_CREATECOUNTRY = "action.before_createCountry";
+    const AFTER_CREATECOUNTRY 	= "action.after_createCountry";
+
+    const BEFORE_DELETECOUNTRY = "action.before_deleteCountry";
+    const AFTER_DELETECOUNTRY 	= "action.after_deleteCountry";
+
+    const BEFORE_UPDATECOUNTRY = "action.before_updateCountry";
+    const AFTER_UPDATECOUNTRY 	= "action.after_updateCountry";
 
     // -- Categories Associated Content ----------------------------------------
 
@@ -323,6 +350,10 @@ final class TheliaEvents
     const ORDER_BEFORE_CREATE = "action.order.beforeCreate";
     const ORDER_AFTER_CREATE = "action.order.afterCreate";
     const ORDER_BEFORE_PAYMENT = "action.order.beforePayment";
+
+    const ORDER_UPDATE_STATUS = "action.order.updateStatus";
+    const ORDER_UPDATE_DELIVERY_REF = "action.order.updateDeliveryRef";
+    const ORDER_UPDATE_ADDRESS = "action.order.updateAddress";
 
     const ORDER_PRODUCT_BEFORE_CREATE = "action.orderProduct.beforeCreate";
     const ORDER_PRODUCT_AFTER_CREATE = "action.orderProduct.afterCreate";
@@ -566,7 +597,6 @@ final class TheliaEvents
     const BEFORE_DELETEATTRIBUTE_AV = "action.before_deleteAttributeAv";
     const AFTER_DELETEATTRIBUTE_AV  = "action.after_deleteAttributeAv";
 
-
     // -- Features values management ----------------------------------------
 
     const FEATURE_AV_CREATE          = "action.createFeatureAv";
@@ -592,5 +622,7 @@ final class TheliaEvents
      * sent when Thelia try to generate a rewriten url
      */
     const GENERATE_REWRITTENURL = 'action.generate_rewritenurl';
+
+    const GENERATE_PDF = 'thelia.generatePdf';
 
 }

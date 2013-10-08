@@ -25,7 +25,7 @@ namespace Thelia\Controller\Front;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Event\OrderEvent;
+use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Form\OrderDelivery;
@@ -34,7 +34,6 @@ use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Base\OrderQuery;
-use Thelia\Model\CountryQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
@@ -69,7 +68,7 @@ class OrderController extends BaseFrontController
 
             /* check that the delivery address belongs to the current customer */
             $deliveryAddress = AddressQuery::create()->findPk($deliveryAddressId);
-            if($deliveryAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
+            if ($deliveryAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
                 throw new \Exception("Delivery address does not belong to the current customer");
             }
 
@@ -139,7 +138,7 @@ class OrderController extends BaseFrontController
 
             /* check that the invoice address belongs to the current customer */
             $invoiceAddress = AddressQuery::create()->findPk($invoiceAddressId);
-            if($invoiceAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
+            if ($invoiceAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
                 throw new \Exception("Invoice address does not belong to the current customer");
             }
 
@@ -193,7 +192,7 @@ class OrderController extends BaseFrontController
 
         $placedOrder = $orderEvent->getPlacedOrder();
 
-        if(null !== $placedOrder && null !== $placedOrder->getId()) {
+        if (null !== $placedOrder && null !== $placedOrder->getId()) {
             /* order has been placed */
             $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute('order.placed', array('order_id' => $orderEvent->getPlacedOrder()->getId()))));
         } else {
@@ -209,13 +208,13 @@ class OrderController extends BaseFrontController
             $this->getRequest()->attributes->get('order_id')
         );
 
-        if(null === $placedOrder) {
+        if (null === $placedOrder) {
             throw new TheliaProcessException("No placed order", TheliaProcessException::NO_PLACED_ORDER, $placedOrder);
         }
 
         $customer = $this->getSecurityContext()->getCustomerUser();
 
-        if(null === $customer || $placedOrder->getCustomerId() !== $customer->getId()) {
+        if (null === $customer || $placedOrder->getCustomerId() !== $customer->getId()) {
             throw new TheliaProcessException("Received placed order id does not belong to the current customer", TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER, $placedOrder);
         }
 

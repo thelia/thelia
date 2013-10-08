@@ -33,7 +33,8 @@ use Thelia\Form\StandardDescriptionFieldsTrait;
  * @package Thelia\Form
  * @author manuel raynaud <mraynaud@openstudio.fr>
  */
-class ContentModificationForm extends ContentCreationForm {
+class ContentModificationForm extends ContentCreationForm
+{
     use StandardDescriptionFieldsTrait;
 
     protected function buildForm()

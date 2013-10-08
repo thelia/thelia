@@ -30,7 +30,6 @@ use Thelia\Condition\ConditionManagerInterface;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Translation\Translator;
 use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\ConditionCollection;
 use Thelia\Coupon\Type\CouponInterface;
@@ -294,7 +293,6 @@ class CouponController extends BaseAdminController
             )
         );
     }
-
 
     /**
      * Manage Coupons read display
@@ -621,7 +619,5 @@ class CouponController extends BaseAdminController
 //            return false;
 //        }
 //    }
-
-
 
 }

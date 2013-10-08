@@ -25,8 +25,6 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\Translation\Translator;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
@@ -69,7 +67,7 @@ class OrderDelivery extends BaseForm
         $address = AddressQuery::create()
             ->findPk($value);
 
-        if(null === $address) {
+        if (null === $address) {
             $context->addViolation("Address ID not found");
         }
     }
@@ -82,7 +80,7 @@ class OrderDelivery extends BaseForm
             ->filterById($value)
             ->findOne();
 
-        if(null === $module) {
+        if (null === $module) {
             $context->addViolation("Delivery module ID not found");
         }
 

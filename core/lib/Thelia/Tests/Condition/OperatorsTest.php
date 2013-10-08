@@ -103,12 +103,10 @@ class OperatorsTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    function callbackI18n()
+    public function callbackI18n()
     {
         $args = func_get_args();
 
         return $args[0];
     }
 }
-
-
