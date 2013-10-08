@@ -51,7 +51,7 @@ class BaseAdminController extends BaseController
     /**
      * Helper to append a message to the admin log.
      *
-     * @param unknown $message
+     * @param string $message
      */
     public function adminLogAppend($message)
     {
@@ -246,9 +246,9 @@ class BaseAdminController extends BaseController
      * @param unknown $routeId       the route ID, as found in Config/Resources/routing/admin.xml
      * @param unknown $urlParameters the URL parametrs, as a var/value pair array
      */
-    public function redirectToRoute($routeId, $urlParameters = array())
+    public function redirectToRoute($routeId, $urlParameters = array(), $routeParameters = array())
     {
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId), $urlParameters));
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters), $urlParameters));
     }
 
     /**

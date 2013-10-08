@@ -62,24 +62,6 @@ URL: http://www.thelia.net
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="Main Navigation">
                 <ul class="nav navbar-nav navbar-categories">
                     <li class="active"><a href="{url path="/"}" class="home" tabindex="-1">Home</a></li>
-{*                    <li class="dropdown">
-                        <a href="" data-toggle="dropdown" class="dropdown-toggle">Pages</a>
-                        <ul class="dropdown-menu list-subnav" role="menu">
-                            <li class="active"><a href="index.html" tabindex="-1">Index</a></li>
-                            <li><a href="category.html">Category Grid</a></li>
-                            <li><a href="category-list.html">Category List</a></li>
-                            <li><a href="account.html">Account</a></li>
-                            <li><a href="login.html">Login</a></li>
-                            <li><a href="password.html">Forgot Password</a></li>
-                            <li><a href="register.html">Register</a></li>
-                            <li><a href="cart.html">Cart</a></li>
-                            <li><a href="cart-step2.html">Cart (Step 2)</a></li>
-                            <li><a href="cart-step3.html">Cart (Step 3)</a></li>
-                            <li><a href="cart-step4.html">Cart (Step 4)</a></li>
-                            <li><a href="product-details.html">Product details</a></li>
-                            <li><a href="address.html">New address</a></li>
-                        </ul>
-                    </li>*}
                     {loop type="category" name="category.navigation" parent="0"}
                         <li><a href="{$URL}">{$TITLE}</a></li>
                     {/loop}

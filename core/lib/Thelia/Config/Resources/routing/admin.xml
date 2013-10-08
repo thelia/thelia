@@ -123,6 +123,32 @@
 
     <!-- end Customer rule management -->
 
+    <!-- address management -->
+
+    <route id="admin.address.delete" path="/admin/address/delete" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\AddressController::deleteAction</default>
+    </route>
+
+    <route id="admin.address.makeItDefault" path="/admin/address/use" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\AddressController::useAddressAction</default>
+    </route>
+
+    <route id="admin.address.create" path="/admin/address/create" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\AddressController::createAction</default>
+    </route>
+
+    <route id="admin.address.update.view" path="/admin/address/update/{address_id}">
+        <default key="_controller">Thelia\Controller\Admin\AddressController::updateAction</default>
+        <requirement key="address_id">\d+</requirement>
+    </route>
+
+    <route id="admin.address.save" path="/admin/address/save/{address_id}">
+        <default key="_controller">Thelia\Controller\Admin\AddressController::processUpdateAction</default>
+        <requirement key="address_id">\d+</requirement>
+    </route>
+
+    <!-- end address management -->
+
     <!-- order management -->
 
     <route id="admin.order.list" path="/admin/orders">

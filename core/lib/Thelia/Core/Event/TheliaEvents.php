@@ -77,6 +77,11 @@ final class TheliaEvents
     const CUSTOMER_DELETEACCOUNT = "action.deleteCustomer";
 
     /**
+     * sent on customer address removal
+     */
+    const CUSTOMER_ADDRESS_DELETE = "action.customer.deleteAddress";
+
+    /**
      * sent when a customer need a new password
      */
     const LOST_PASSWORD = "action.lostPassword";
@@ -133,6 +138,11 @@ final class TheliaEvents
      * sent on address removal
      */
     const ADDRESS_DELETE = "action.deleteAddress";
+
+    /**
+     * sent when an address is tag as default
+     */
+    const ADDRESS_DEFAULT = "action.defaultAddress";
 
     const BEFORE_CREATEADDRESS = "action.before_createAddress";
     const AFTER_CREATEADDRESS  = "action.after_createAddress";

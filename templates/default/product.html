@@ -26,7 +26,7 @@
                     <meta itemprop="brand" content="{$TITLE}">
                 {/loop}
             {/loop}
-            {loop name="brand.feature" type="feature" product=$ID title="isbn"}
+            {loop name="isbn.feature" type="feature" product=$ID title="isbn"}
                 {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
                     <meta itemprop="productID" content="isbn:{$TITLE}">
                 {/loop}
