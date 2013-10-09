@@ -212,14 +212,14 @@ class SmartyParser extends Smarty implements ParserInterface
         $templateDir = realpath(THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/");
 
         if (strpos($pathFileName, $templateDir) !== 0) {
-            throw new ResourceNotFoundException(sprintf("'%s' view does not exists", $file));
+            throw new ResourceNotFoundException(sprintf("'%s' view does not exists", htmlspecialchars($file)));
         }
 
         if (!file_exists($fileName)) {
             $fileName .= ".html";
 
             if (!file_exists($fileName)) {
-                throw new ResourceNotFoundException(sprintf("'%s' file not found in %s template", $file, $this->template));
+                throw new ResourceNotFoundException(sprintf("'%s' file not found in %s template", htmlspecialchars($file), $this->template));
             }
         }
 
