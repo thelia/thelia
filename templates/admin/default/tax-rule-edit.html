@@ -208,6 +208,9 @@
     {capture "confirmation_dialog"}
         
         <form action="" method="post">
+            <input type="hidden" name="tax_rule_id" value="{$tax_rule_id}">
+            <input id="tax_list" type="hidden" name="tax_list">
+            <p>{intl l="Tax rule taxes will be update for the following countries :"}</p>
             <div class="form-group">
                 <select name="" id="" data-toggle="selectpicker" multiple>
                     {loop type="country" name="country-list"}
@@ -223,10 +226,10 @@
         file = "includes/generic-create-dialog.html"
 
         dialog_id    = "confirmation_dialog"
-        dialog_title = {intl l="Create a new tax rule"}
+        dialog_title = {intl l="Edit tax rule taxes"}
         dialog_body  = {$smarty.capture.confirmation_dialog nofilter}
 
-        dialog_ok_label     = {intl l="Create this tax rule"}
+        dialog_ok_label     = {intl l="Edit tax rule taxes"}
 
         form_action        = {url path='/admin/categories/create'}
 
@@ -276,6 +279,7 @@
                 });
 
                 console.log(taxesRules);
+                $('#tax_list').val(JSON.stringify(taxesRules));
             });
 
             // Default options for draggable
@@ -324,7 +328,8 @@
                             .sortable(sortOptions);
                         }
                     }
-                    $("<div></div>").addClass('drag').text( ui.draggable.text() ).appendTo( $drop );
+
+                    $("<div></div>").addClass('drag').attr('data-id', ui.draggable.data('id')).text( ui.draggable.text()).appendTo( $drop );
                      ui.draggable.remove();
                 }
             };
@@ -347,8 +352,7 @@
                 accept: "#panel .drag",
                 hoverClass: 'over',
                 drop: function( event, ui ) {
-
-                    $("<div></div>").addClass('draggable').text( ui.draggable.text() ).draggable(dragOptions).appendTo(  $list.find('.panel-body') );
+                    $("<div></div>").addClass('draggable').text( ui.draggable.text() ).attr('data-id', ui.draggable.data('id')).draggable(dragOptions).appendTo(  $list.find('.panel-body') );
                     ui.draggable.remove();
 
                 }
