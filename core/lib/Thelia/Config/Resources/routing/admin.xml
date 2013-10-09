@@ -788,11 +788,11 @@
         <requirement key="tax_rule_id">\d+</requirement>
     </route>
 
-    <route id="admin.categories.save" path="/admin/configuration/taxes_rules/save">
+    <route id="admin.configuration.taxes-rules.save" path="/admin/configuration/taxes_rules/save">
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::processUpdateAction</default>
     </route>
 
-    <route id="admin.categories.save" path="/admin/configuration/taxes_rules/delete">
+    <route id="admin.configuration.taxes-rules.delete" path="/admin/configuration/taxes_rules/delete">
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::deleteAction</default>
     </route>
 

@@ -71,7 +71,7 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
         ;
 
         // Add standard description fields
-        $this->addStandardDescFields();
+        $this->addStandardDescFields(array('postscriptum', 'chapo', 'locale'));
     }
 
     public function getName()
