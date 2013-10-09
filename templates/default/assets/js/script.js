@@ -3,7 +3,7 @@
 
     /*	------------------------------------------------------------------
      onLoad Function -------------------------------------------------- */
-    $(document).ready(function(){
+    $(document).ready(function(){ alert(1);
 
         // Loader
         var $loader = $('<div class="loader"></div>');

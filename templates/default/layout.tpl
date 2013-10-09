@@ -23,7 +23,7 @@ URL: http://www.thelia.net
     <meta charset="utf-8">
 
     {* Page Title *}
-    <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title} | {/foreach}{/if}Thelia{/strip}{/block}</title>
+    <title>{block name="page-title"}{strip}{if $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title} | {/foreach}{/if}{config key="company_name"}{/strip}{/block}</title>
 
     {* Meta Tags *}
     <meta name="description" content="">
@@ -32,10 +32,14 @@ URL: http://www.thelia.net
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     {block name="meta"}{/block}
 
-    <!-- StyleSheet -->
+    {* Stylesheets *}
     {stylesheets file='assets/less/styles.less' filters='less,cssembed,cssrewrite'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
+
+
+    <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css"-->
+
     {debugbar_rendercss}
     {block name="stylesheet"}{/block}
 </head>
@@ -60,17 +64,11 @@ URL: http://www.thelia.net
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{navigate to="index"}">Thelia</a>
+                <a class="navbar-brand" href="{navigate to="index"}">{config key="company_name"}</a>
             </div>
 
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="{intl l="Main Navigation"}">
-                <ul class="nav navbar-nav navbar-categories">
-                    <li><a href="{navigate to="index"}" class="home">{intl l="Home"}</a></li>
-                    {loop type="category" name="category.navigation" parent="0"}
-                        <li><a href="{$URL}">{$TITLE}</a></li>
-                    {/loop}
-                </ul>
                 <ul class="nav navbar-nav navbar-cart navbar-right">
                     {loop type="auth" name="customer_info_block" roles="CUSTOMER" context="front"}
                         <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
@@ -78,13 +76,94 @@ URL: http://www.thelia.net
                     {/loop}
                     {elseloop rel="customer_info_block"}
                     <li><a href="{url path="/register"}" class="register">{intl l="Register!"}</a></li>
-                    <li><a href="{url path="/login"}" class="login">{intl l="Log In!"}</a></li>
-                    {/elseloop}
                     <li class="dropdown">
-                        <a href="{url path="/cart"}" class="cart" data-toggle="dropdown">
+                        <a href="{url path="/login"}" class="login">{intl l="Log In!"}</a>
+                        <div class="dropdown-menu">
+                            <form id="form-login-mini" action="login.php" method="post" role="form">
+                                <div class="form-group group-email-mini">
+                                    <label for="email-mini">Email address:</label>
+                                    <input type="email" name="email" id="email-mini" class="form-control" value="" aria-required="true" required>
+                                </div>
+                                <div class="form-group group-email">
+                                    <label for="password-mini">Password</label>
+                                    <input type="password" name="password" id="password-mini" class="form-control" value="" aria-required="true" required>
+                                </div>
+                                <div class="group-btn">
+                                    <button type="submit" class="btn btn-login-mini">Sign In</button>
+                                    <a href="register.php" class="btn btn-register-mini">Register</a>
+                                </div>
+                            </form>
+                        </div>
+                    </li>
+                    {/elseloop}
+                    <li class="dropdown cart-not-empty">
+                        <a href="{url path="/cart"}" rel="nofollow" class="cart">
                             Cart <span class="badge">{cart attr="count_item"}</span>
                         </a>
+                        <div class="dropdown-menu cart-content">
+                            <p>You have no items in your shopping cart.</p>
+                        </div>
+                        <div class="dropdown-menu cart-content">
+                            <form id="form-cart-mini" action="cart-step2.php" method="post" role="form">
+                                <table class="table table-cart-mini">
+                                    <colgroup>
+                                        <col width="70">
+                                        <col>
+                                        <col width="100">
+                                    </colgroup>
+                                    <tbody>
+                                        <tr>
+                                            <td class="image">
+                                                <a href="product-details.php" class="thumbnail"><img src="img/product/1/118x85.png" alt="Product #1"></a>
+                                            </td>
+                                            <td class="product">
+                                                <h3 class="name" style="margin:0"><a href="product-details.php">
+                                                    Product #1
+                                                </a></h3>
+                                                <a href="?item=1&amp;qty=0" class="btn btn-remove" data-tip="tooltip" data-title="Delete" data-original-title=""><i class="icon-trash"></i> <span>Remove</span></a>
+                                            </td>
+                                            <td class="unitprice text-center">
+                                                <span class=="qty">2</span> X <span class="price" style="font-size:1em;">$50.00</span></div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="image">
+                                                <a href="product-details.php" class="thumbnail"><img src="img/product/1/118x85.png" alt="Product #2"></a>
+                                            </td>
+                                            <td class="product">
+                                                <h3 class="name" style="margin:0"><a href="product-details.php">
+                                                    Product with very long name #2
+                                                </a></h3>
+                                                <a href="?item=1&amp;qty=0" class="btn btn-remove" data-tip="tooltip" data-title="Delete" data-original-title=""><i class="icon-trash"></i> <span>Remove</span></a>
+                                            </td>
+                                            <td class="unitprice text-center">
+                                                <span class=="qty">2</span> X <span class="price" style="font-size:1em;">$50.00</span></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr >
+                                            <td colspan="2" class="empty">
+                                                <a href="cart.php" role="button" class="btn btn-default btn-sm"><span>View Cart</span></a>
+                                                <button type="submit" name="checkout" class="btn btn-warning btn-sm"><span>Checkout</span></button>
+                                            </td>
+                                            <td class="total">
+                                                <div class="total-price">
+                                                    <span class="price">$200.00</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </form>
+                        </div>
                     </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-categories">
+                    <li><a href="{navigate to="index"}" class="home">{intl l="Home"}</a></li>
+                    {loop type="category" name="category.navigation" parent="0"}
+                        <li><a href="{$URL}">{$TITLE}</a></li>
+                    {/loop}
                 </ul>
             </nav>
         </div>
@@ -94,8 +173,8 @@ URL: http://www.thelia.net
     <header class="container" role="banner">
         <div class="header">
             <h1 class="logo">
-                <a href="{navigate to="index"}" class="{intl l="Thelia * Since 2006 *"}">
-                    {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="Thelia">{/images}
+                <a href="{navigate to="index"}" title="{config key="company_name"}">
+                    {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="{config key="company_name"}">{/images}
                 </a>
             </h1>
 
@@ -290,7 +369,7 @@ URL: http://www.thelia.net
                     <section class="block block-contact" itemscope itemtype="http://schema.org/Organization">
                         <div class="block-heading"><h3 class="block-title">Contact Us</h3></div>
                         <div class="block-content">
-                            <meta itemprop="name" content="Thelia V2">
+                            <meta itemprop="name" content="{config key="company_name"}">
                             <ul>
                                 <li class="contact-address">
                                     <address class="adr" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
@@ -350,11 +429,11 @@ URL: http://www.thelia.net
 
 {javascripts file='assets/js/bootstrap/bootstrap.js'}
     <script src="{$asset_url}"></script>
-{/javascripts}'}
+{/javascripts}
 
 {javascripts file='assets/js/plugins/bootbox/bootbox.js'}
     <script src="{$asset_url}"></script>
-{/javascripts}'}
+{/javascripts}
 
 {block name="after-javascript-include"}{/block}
 

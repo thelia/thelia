@@ -1,9 +1,11 @@
 // Body padding required with the fixed navbar (By default, the navbar is 50px high.)
+/*
 body { padding-top: 80px; }
 
 .navbar {
     .navbar-fixed-top;
 }
+*/
 
 .page-header {
     border: none;
@@ -64,25 +66,36 @@ label { font-weight: 600; }
             }
         }
         > a.cart {
-            background-color: @brand-primary;
-            color: #fff;
-
-            > .badge {
-                background-color: #fff;
-                color: @brand-primary;
-            }
-
             &:hover,
             &:focus {
+                > .badge {
+                    background-color: #fff;
+                    color: @brand-primary;
+                }
+            }
+        }
+        &.cart-not-empty {
+            > a.cart {
                 background-color: @brand-primary;
                 color: #fff;
-            }
 
-            &:before {
-                .icon(@shopping-cart);
-                color: #fff;
-                font-size: 24px; line-height: 0;
-                margin-right: .4em;
+                > .badge {
+                    background-color: #fff;
+                    color: @brand-primary;
+                }
+
+                &:hover,
+                &:focus {
+                    background-color: @brand-primary;
+                    color: #fff;
+                }
+
+                &:before {
+                    .icon(@shopping-cart);
+                    color: #fff;
+                    font-size: 24px; line-height: 0;
+                    margin-right: .4em;
+                }
             }
         }
     }
@@ -151,7 +164,7 @@ header {
 
 
 /* Custom button */
-.btn-primary {
+.page .btn-primary {
     border-left: 3px solid lighten(@brand-primary, 20%);
     .border-radius(0);
     color: #fff;
@@ -410,6 +423,7 @@ td.product,
             @media (min-width: @screen-desktop) {
                 .product-image { padding-bottom: 40px; }
                 .product-info {
+                    .transition(height 300ms linear);
                     position: absolute;
                     bottom: 0;
                     width: 100%; height: 50px;
@@ -419,7 +433,6 @@ td.product,
                     &:focus {
                         cursor: pointer;
                         height: 140px;
-                        .transition(height 300ms linear);
                     }
                 }
             }
@@ -1124,7 +1137,6 @@ td.product,
         > tr {
             > td {
                 &.price,
-                &.unitprice,
                 &.qty,
                 &.subprice { padding: 35px 10px; }
             }
