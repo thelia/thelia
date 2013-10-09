@@ -32,8 +32,8 @@ URL: http://www.thelia.net
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     {block name="meta"}{/block}
 
-    {* Stylesheets *}
-    {stylesheets file='assets/less/styles.less' filters='less,cssembed'}
+    <!-- StyleSheet -->
+    {stylesheets file='assets/less/styles.less' filters='less,cssembed,cssrewrite'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
     {debugbar_rendercss}

@@ -167,7 +167,7 @@ class CountryTableMap extends TableMap
         $this->setPhpName('Country');
         $this->setClassName('\\Thelia\\Model\\Country');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('AREA_ID', 'AreaId', 'INTEGER', 'area', 'ID', false, null, null);
@@ -464,6 +464,10 @@ class CountryTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from Country object
+        }
+
+        if ($criteria->containsKey(CountryTableMap::ID) && $criteria->keyContainsValue(CountryTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CountryTableMap::ID.')');
         }
 
 

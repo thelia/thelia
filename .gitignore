@@ -24,3 +24,5 @@ xhprof/
 phpunit.phar
 .DS_Store
 phpmyadmin
+templates/default-esi
+local/modules/TemplateEsiModule

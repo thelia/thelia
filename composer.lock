@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "852879ecc2e39e5cf283a3b1c5051a8e",
+    "hash": "9c5ea1a9fd0f8ba533c41ff3676e0970",
     "packages": [
         {
             "name": "ensepar/html2pdf",
@@ -507,11 +507,11 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v3.1.14",
+            "version": "v3.1.15",
             "source": {
                 "type": "svn",
                 "url": "http://smarty-php.googlecode.com/svn",
-                "reference": "/tags/v3.1.14/@4752"
+                "reference": "/tags/v3.1.15/@4782"
             },
             "require": {
                 "php": ">=5.2"
@@ -547,7 +547,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2013-07-02 16:38:47"
+            "time": "2013-10-01 21:08:54"
         },
         {
             "name": "swiftmailer/swiftmailer",

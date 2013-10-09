@@ -92,13 +92,13 @@
                                                                 {form_field form=$form field='title'}
                                                                     <div class="form-group {if $error}has-error{/if}">
                                                                         <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Country title'}">
+                                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$TITLE}" title="{intl l="{$label}"}" placeholder="{intl l='Country title'}">
                                                                     </div>
                                                                 {/form_field}
-                                                                {form_field form=$form field='short-description'}
+                                                                {form_field form=$form field='chapo'}
                                                                     <div class="form-group {if $error}has-error{/if}">
                                                                         <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                                        <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Country short description'}"></textarea>
+                                                                        <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l=""}" placeholder="{intl l='Country short description'}"></textarea>
                                                                     </div>
                                                                 {/form_field}
                                                                 {form_field form=$form field='description'}

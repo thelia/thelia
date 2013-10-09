@@ -183,8 +183,6 @@ final class TheliaEvents
     const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
     const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
 
-//    const FOLDER_ADD_CONTENT      = "action.categoryAddContent";
-//    const FOLDER_REMOVE_CONTENT   = "action.categoryRemoveContent";
 
     const BEFORE_CREATEFOLDER = "action.before_createFolder";
     const AFTER_CREATEFOLDER 	= "action.after_createFolder";
@@ -215,6 +213,24 @@ final class TheliaEvents
 
     const BEFORE_UPDATECONTENT = "action.before_updateContent";
     const AFTER_UPDATECONTENT 	= "action.after_updateContent";
+
+    // -- country management -----------------------------------------------
+
+    const COUNTRY_CREATE            = "action.createCountry";
+    const COUNTRY_UPDATE            = "action.updateCountry";
+    const COUNTRY_DELETE            = "action.deleteCountry";
+    const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
+    //const COUNTRY_UPDATE_POSITION   = "action.updateFolderPosition";
+
+
+    const BEFORE_CREATECOUNTRY = "action.before_createCountry";
+    const AFTER_CREATECOUNTRY 	= "action.after_createCountry";
+
+    const BEFORE_DELETECOUNTRY = "action.before_deleteCountry";
+    const AFTER_DELETECOUNTRY 	= "action.after_deleteCountry";
+
+    const BEFORE_UPDATECOUNTRY = "action.before_updateCountry";
+    const AFTER_UPDATECOUNTRY 	= "action.after_updateCountry";
 
     // -- Categories Associated Content ----------------------------------------
 
