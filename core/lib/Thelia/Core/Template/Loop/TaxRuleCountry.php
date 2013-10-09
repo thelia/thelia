@@ -76,20 +76,12 @@ class TaxRuleCountry extends BaseI18nLoop
         $country = $this->getCountry();
         $taxes = $this->getTaxes();
 
-        if((null === $country && null === $taxes) || (null !== $country && null !== $taxes)) {
+        if((null === $country && null === $taxes)) {
             throw new \InvalidArgumentException('You must provide either `country` or `taxes` parameter in tax-rule-country loop');
         }
 
-        if(null !== $country) {
-            $search->filterByCountryId($country);
-
-            /* manage tax translation */
-            $this->configureI18nProcessing(
-                $search,
-                array('TITLE', 'DESCRIPTION'),
-                TaxTableMap::TABLE_NAME,
-                'TAX_ID'
-            );
+        if((null === $country && null !== $taxes)) {
+            throw new \InvalidArgumentException('You must provide `country` parameter with `taxes` parameter in tax-rule-country loop');
         }
 
         if(null !== $taxes) {
@@ -103,7 +95,7 @@ class TaxRuleCountry extends BaseI18nLoop
             $originalCountryJoin->setJoinType(Criteria::LEFT_JOIN);
 
             $search->addJoinObject($originalCountryJoin, 's_to_o');
-            $search->where('`origin`.`COUNTRY_ID`' . Criteria::EQUAL . '?', 64, \PDO::PARAM_INT);
+            $search->where('`origin`.`COUNTRY_ID`' . Criteria::EQUAL . '?', $country, \PDO::PARAM_INT);
 
             $search->having('COUNT(*)=?', count($taxes), \PDO::PARAM_INT);
 
@@ -113,6 +105,16 @@ class TaxRuleCountry extends BaseI18nLoop
                 array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
                 CountryTableMap::TABLE_NAME,
                 'COUNTRY_ID'
+            );
+        } elseif(null !== $country) {
+            $search->filterByCountryId($country);
+
+            /* manage tax translation */
+            $this->configureI18nProcessing(
+                $search,
+                array('TITLE', 'DESCRIPTION'),
+                TaxTableMap::TABLE_NAME,
+                'TAX_ID'
             );
         }
 
@@ -130,7 +132,16 @@ class TaxRuleCountry extends BaseI18nLoop
 
             $loopResultRow = new LoopResultRow($loopResult, $taxRuleCountry, $this->versionable, $this->timestampable, $this->countable);
 
-            if(null !== $country) {
+            if(null !== $taxes) {
+                $loopResultRow
+                    ->set("TAX_RULE"            , $taxRuleCountry->getTaxRuleId())
+                    ->set("COUNTRY"             , $taxRuleCountry->getCountryId())
+                    ->set("COUNTRY_TITLE"               , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_TITLE'))
+                    ->set("COUNTRY_CHAPO"               , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                    ->set("COUNTRY_DESCRIPTION"         , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                    ->set("COUNTRY_POSTSCRIPTUM"         , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
+                ;
+            }elseif(null !== $country) {
                 $loopResultRow
                     ->set("TAX_RULE"            , $taxRuleCountry->getTaxRuleId())
                     ->set("COUNTRY"             , $taxRuleCountry->getCountryId())
@@ -141,16 +152,7 @@ class TaxRuleCountry extends BaseI18nLoop
                 ;
             }
 
-            if(null !== $taxes) {
-                $loopResultRow
-                    ->set("TAX_RULE"            , $taxRuleCountry->getTaxRuleId())
-                    ->set("COUNTRY"             , $taxRuleCountry->getCountryId())
-                    ->set("COUNTRY_TITLE"               , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_TITLE'))
-                    ->set("COUNTRY_CHAPO"               , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_CHAPO'))
-                    ->set("COUNTRY_DESCRIPTION"         , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
-                    ->set("COUNTRY_POSTSCRIPTUM"         , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
-                ;
-            }
+
 
             $loopResult->addRow($loopResultRow);
         }

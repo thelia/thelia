@@ -105,17 +105,23 @@
 
                         <div class="form-group">
                             <label for="" class="label-control">{intl l="Choose a country"} :</label>
-                            <select id="country-selector" data-toggle="selectpicker">
-                                {loop type="country" name="country-list"}
-                                    <option value="{$ID}" {if $ID == $asked_country}selected="selected"{/if}>{$TITLE}</option>
-                                {/loop}
-                            </select>
+                            <form id="country-selector-form" action="{url path="/admin/configuration/taxes_rules/update/$tax_rule_id"}" method="GET">
+                                <input type="hidden" name="tab" value="taxes">
+                                <select id="country-selector" name="country" data-toggle="selectpicker">
+                                    {loop type="country" name="country-list"}
+                                        <option value="{$ID}" {if $ID == $asked_country}selected="selected"{/if}>{$TITLE}</option>
+                                    {/loop}
+                                </select>
+                            </form>
                         </div>
 
                         <p><strong>{intl l="Countries that have the same tax rule"} :<strong></p>
                         <p class="lead">
 
-                            {loop type="tax-rule-country" name="same-country-list" tax_rule=$ID taxes="1,2,3"}
+                            {$matchedCountries.first=$asked_country}
+
+                            {loop type="tax-rule-country" name="same-country-list" tax_rule=$ID taxes="1,2,3" country=$asked_country}
+                                {$matchedCountries[]=$COUNTRY}
                                 <span class="label label-info">{$COUNTRY_TITLE}</span>
                             {/loop}
 
@@ -204,9 +210,9 @@
         <form action="" method="post">
             <div class="form-group">
                 <select name="" id="" data-toggle="selectpicker" multiple>
-                    <option value="1">France</option>
-                    <option value="2">England</option>
-                    <option value="3">Spain</option>
+                    {loop type="country" name="country-list"}
+                        <option value="{$ID}" {if in_array($ID, $matchedCountries)}selected="selected"{/if}>{$TITLE}</option>
+                    {/loop}
                 </select>
             </div>
         </form>
@@ -240,10 +246,15 @@
     {/javascripts}
 
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-    {literal}
+
     <script>
         $(function() {
 
+            $('#country-selector').change(function(e) {
+                $('#country-selector-form').submit();
+            });
+
+{literal}
             // Cache jQuery Objects
             var $group = $('#panel');
             var $list = $('#panel-list');
@@ -342,8 +353,10 @@
 
                 }
             });
+{/literal}
+
         });
+
     </script>
-    {/literal}
 
 {/block}
