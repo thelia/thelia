@@ -7,7 +7,7 @@
 {block name="main-content"}
 
 {assign oder_tab {$smarty.get.tab|default:"data"}}
-{assign asked_country {$smarty.get.country|default:{country ask="default" attr="isoalpha3"}}}
+{assign asked_country {$smarty.get.country|default:{country ask="default" attr="id"}}}
 
 <div class="taxes-rules edit-taxes-rules">
 
@@ -107,16 +107,21 @@
                             <label for="" class="label-control">{intl l="Choose a country"} :</label>
                             <select id="country-selector" data-toggle="selectpicker">
                                 {loop type="country" name="country-list"}
-                                    <option value="{$ID}" {if $ISOALPHA3 == $asked_country}selected="selected"{/if}>{$TITLE}</option>
+                                    <option value="{$ID}" {if $ID == $asked_country}selected="selected"{/if}>{$TITLE}</option>
                                 {/loop}
                             </select>
                         </div>
 
                         <p><strong>{intl l="Countries that have the same tax rule"} :<strong></p>
                         <p class="lead">
-                            <span class="label label-info">Italy</span>
-                            <span class="label label-info">England</span>
-                            <span class="label label-info">Japan</span>
+
+                            {loop type="tax-rule-country" name="same-country-list" tax_rule=$ID taxes="1,2,3"}
+                                <span class="label label-info">{$COUNTRY_TITLE}</span>
+                            {/loop}
+
+                            {elseloop rel="same-country-list"}
+                                <span class="label label-danger">{intl l="NONE"}</span>
+                            {/elseloop}
                         </p>
 
                         <div class="row">
@@ -124,16 +129,29 @@
 
                                 <div id="panel" class="panel panel-default place">
                                     <div class="panel-heading">
-                                        <h3 class="panel-title">Create a tax rule</h3>
+                                        <h3 class="panel-title">{intl l="Manage the tax rule taxes appliance order"}</h3>
                                     </div>
                                     <div class="panel-body">
-
+                                        {assign lastPosition 0}
+                                        {loop type="tax-rule-country" name="existing-tax-list" tax_rule=$ID country=$asked_country}
+                                            {if $POSITION != $lastPosition}
+                                                {assign lastPosition $POSITION}
+                                                {if $LOOP_COUNT > 1}
+                                        </div>
+                                                {/if}
                                         <div class="drop-group droppable add-to-group">
                                             <p class="drop-message">
                                                 <span class="glyphicon glyphicon-plus"></span>
                                                 <span class="message">{intl l="Add tax to this group"}</span>
                                             </p>
+                                            {/if}
+
+                                            <div class="drag" data-id="{$TAX}">{$TAX_TITLE} - {$POSITION}</div>
+
+                                            {if $LOOP_COUNT == $LOOP_TOTAL}
                                         </div>
+                                            {/if}
+                                        {/loop}
 
                                     </div>
                                     <div class="panel-footer droppable create-group">
@@ -151,14 +169,12 @@
 
                                 <div id="panel-list" class="panel panel-default take">
                                     <div class="panel-heading">
-                                        <h3 class="panel-title">List of taxes</h3>
+                                        <h3 class="panel-title">Available taxes</h3>
                                     </div>
                                     <div class="panel-body">
-                                        <div class="draggable">Cras justo odio</div>
-                                        <div class="draggable">Dapibus ac facilisis in</div>
-                                        <div class="draggable">Morbi leo risus</div>
-                                        <div class="draggable">Porta ac consectetur ac</div>
-                                        <div class="draggable">Vestibulum at eros</div>
+                                        {loop type="tax" name="tax-list" exclude_tax_rule=$ID country=$asked_country}
+                                            <div class="draggable" data-id="{$ID}">{$TITLE}</div>
+                                        {/loop}
                                     </div>
                                     <div class="panel-footer droppable remove-from-group">
                                         <p class="drop-message">
@@ -244,7 +260,7 @@
 
                     $('.drag', $this).each(function(j){
                         taxesRules[index][j] = [];
-                        taxesRules[index][j] = $(this).text();
+                        taxesRules[index][j] = $(this).data('id'); // retrieve with data
                     });
                 });
 
