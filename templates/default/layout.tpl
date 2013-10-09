@@ -184,7 +184,7 @@ URL: http://www.thelia.net
                     <form id="form-search" action="{url path="/search"}" method="get" role="search" aria-labelledby="search-label">
                         <label id="search-label" for="q">{intl l="Search a product"}</label>
                         <div class="input-group">
-                            <input type="search" name="q" id="q" placeholder="{intl l="Search..."}" class="form-control" autocomplete="off" aria-required="true" required pattern=".{ldelim}2,{rdelim}" title="{intl l="Minmimum 2 characters."}">
+                            <input type="search" name="q" id="q" placeholder="{intl l="Search..."}" class="form-control" autocomplete="off" aria-required="true" required pattern=".{ldelim}2,{rdelim}" title="{intl l="Minimum 2 characters."}">
                             <div class="input-group-btn">
                                 <button type="submit" class="btn btn-search"><i class="icon-search"></i> <span>{intl l="Search"}</span></button>
                             </div>
