@@ -232,6 +232,12 @@ final class TheliaEvents
     const BEFORE_UPDATECOUNTRY = "action.before_updateCountry";
     const AFTER_UPDATECOUNTRY 	= "action.after_updateCountry";
 
+    // -- SHIPPING CONFIGURATION MANAGEMENT
+
+    const SHIPPING_CREATE = 'action.createShipping';
+    const SHIPPING_UPDATE = 'action.updateShipping';
+    const SHIPPING_DELETE = 'action.deleteShipping';
+
     // -- Categories Associated Content ----------------------------------------
 
     const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT   = "action.before_createCategoryAssociatedContent";

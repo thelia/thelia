@@ -405,34 +405,6 @@
         <default key="_controller">Thelia\Controller\Admin\FolderController::updatePositionAction</default>
     </route>
 
-    <!-- Countries routes management -->
-
-    <route id="admin.configuration.countries.default" path="/admin/configuration/countries">
-        <default key="_controller">Thelia\Controller\Admin\CountryController::defaultAction</default>
-    </route>
-
-    <route id="admin.configuration.countries.create" path="/admin/configuration/countries/create">
-        <default key="_controller">Thelia\Controller\Admin\CountryController::createAction</default>
-    </route>
-
-    <route id="admin.configuration.countries.update" path="/admin/configuration/country/update/{country_id}">
-        <default key="_controller">Thelia\Controller\Admin\CountryController::updateAction</default>
-        <requirement key="country_id">\d+</requirement>
-    </route>
-
-    <route id="admin.configuration.countries.save" path="/admin/configuration/country/save/{country_id}">
-        <default key="_controller">Thelia\Controller\Admin\CountryController::processUpdateAction</default>
-        <requirement key="country_id">\d+</requirement>
-    </route>
-
-    <route id="admin.configuration.countries.delete" path="/admin/configuration/countries/delete">
-        <default key="_controller">Thelia\Controller\Admin\CountryController::deleteAction</default>
-    </route>
-
-    <route id="admin.configuration.countries.toggle-default" path="/admin/configuration/country/toggleDefault">
-        <default key="_controller">Thelia\Controller\Admin\CountryController::toggleDefaultAction</default>
-    </route>
-
     <!-- content routes management -->
     <route id="admin.content.create" path="/admin/content/create">
         <default key="_controller">Thelia\Controller\Admin\ContentController::createAction</default>
@@ -716,7 +688,7 @@
     <!-- Shipping zones routes management -->
 
     <route id="admin.configuration.shipping-configuration.default" path="/admin/configuration/shipping_configuration">
-        <default key="_controller">Thelia\Controller\Admin\ShippingConfigurationController::indexAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ShippingConfigurationController::defaultAction</default>
     </route>
 
     <route id="admin.configuration.shipping-configuration.update.view" path="/admin/configuration/shipping_configuration/update/{shipping_configuration_id}" methods="get">
@@ -726,6 +698,35 @@
 
     <!-- end shipping routes management -->
 
+    <!-- Countries routes management -->
+
+    <route id="admin.configuration.countries.default" path="/admin/configuration/countries">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.create" path="/admin/configuration/countries/create">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.update" path="/admin/configuration/country/update/{country_id}">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::updateAction</default>
+        <requirement key="country_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.countries.save" path="/admin/configuration/country/save/{country_id}">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::processUpdateAction</default>
+        <requirement key="country_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.countries.delete" path="/admin/configuration/countries/delete">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.countries.toggle-default" path="/admin/configuration/country/toggleDefault">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::toggleDefaultAction</default>
+    </route>
+
+    <!-- end countries routes management -->
 
     <!-- feature and features value management -->
 

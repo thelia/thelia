@@ -41,66 +41,24 @@
                             </thead>
 
                             <tbody>
+                                {loop name="area-list" type="area" backend_context="1"}
                                 <tr>
-                                   <td>France</td>                                   
+                                   <td><a href="{url path="/admin/configuration/shipping_configuration/update/$ID"}">{$NAME}</a></td>
 
                                     {module_include location='shipping_configuration_table_row'}
 
                                     <td>
-                                        {if ! $SECURED}
-                                            <div class="btn-group">
-                                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-configuration.change"}
-                                                   <a class="btn btn-default btn-xs shipping-configuration-change" title="{intl l='Change this shipping configuration'}" href="{url path="/admin/configuration/shipping_configuration/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
-                                                {/loop}
-                                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.shipping-configuration.delete"}
-                                                    <a class="btn btn-default btn-xs shipping-configuration-delete" title="{intl l='Delete this shipping configuration'}"  href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
-                                                {/loop}                                              
-                                            </div>
-                                        {else}
-                                            <i title="{intl l='This shipping configuration could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
-                                        {/if}
+                                        <div class="btn-group">
+                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-configuration.change"}
+                                               <a class="btn btn-default btn-xs shipping-configuration-change" title="{intl l='Change this shipping configuration'}" href="{url path="/admin/configuration/shipping_configuration/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                            {/loop}
+                                            {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.shipping-configuration.delete"}
+                                                <a class="btn btn-default btn-xs shipping-configuration-delete" title="{intl l='Delete this shipping configuration'}"  href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                            {/loop}
+                                        </div>
                                     </td>
                                 </tr>
-                                <tr>
-                                   <td>Outre-Mer DOM</td>                                   
-
-                                    {module_include location='shipping_configuration_table_row'}
-
-                                    <td>
-                                        {if ! $SECURED}
-                                            <div class="btn-group">
-                                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-configuration.change"}
-                                                   <a class="btn btn-default btn-xs shipping-configuration-change" title="{intl l='Change this shipping configuration'}" href="{url path="/admin/configuration/shipping_configuration/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
-                                                {/loop}
-                                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.shipping-configuration.delete"}
-                                                    <a class="btn btn-default btn-xs shipping-configuration-delete" title="{intl l='Delete this shipping configuration'}"  href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
-                                                {/loop}                                              
-                                            </div>
-                                        {else}
-                                            <i title="{intl l='This shipping configuration could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
-                                        {/if}
-                                    </td>
-                                </tr>
-                                <tr>
-                                   <td>Outre-Mer TOM</td>                                   
-
-                                    {module_include location='shipping_configuration_table_row'}
-
-                                    <td>
-                                        {if ! $SECURED}
-                                            <div class="btn-group">
-                                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-configuration.change"}
-                                                   <a class="btn btn-default btn-xs shipping-configuration-change" title="{intl l='Change this shipping configuration'}" href="{url path="/admin/configuration/shipping_configuration/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
-                                                {/loop}
-                                                {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.shipping-configuration.delete"}
-                                                    <a class="btn btn-default btn-xs shipping-configuration-delete" title="{intl l='Delete this shipping configuration'}"  href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
-                                                {/loop}                                              
-                                            </div>
-                                        {else}
-                                            <i title="{intl l='This shipping configuration could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
-                                        {/if}
-                                    </td>
-                                </tr>
+                                {/loop}
                             </tbody>
                         </table>
                     </div>
