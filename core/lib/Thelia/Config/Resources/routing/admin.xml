@@ -420,11 +420,16 @@
         <requirement key="country_id">\d+</requirement>
     </route>
 
+    <route id="admin.configuration.countries.save" path="/admin/configuration/country/save/{country_id}">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::processUpdateAction</default>
+        <requirement key="country_id">\d+</requirement>
+    </route>
+
     <route id="admin.configuration.countries.delete" path="/admin/configuration/countries/delete">
         <default key="_controller">Thelia\Controller\Admin\CountryController::deleteAction</default>
     </route>
 
-    <route id="admin.configuration.toggle-default" path="/admin/configuration/country/toggleDefault">
+    <route id="admin.configuration.countries.toggle-default" path="/admin/configuration/country/toggleDefault">
         <default key="_controller">Thelia\Controller\Admin\CountryController::toggleDefaultAction</default>
     </route>
 

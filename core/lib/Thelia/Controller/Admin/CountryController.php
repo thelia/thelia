@@ -129,7 +129,7 @@ class CountryController extends AbstractCrudController
      */
     protected function getUpdateEvent($formData)
     {
-        $event = new CountryUpdateEvent();
+        $event = new CountryUpdateEvent($formData['id']);
 
         return $this->hydrateEvent($event, $formData);
     }
@@ -139,6 +139,8 @@ class CountryController extends AbstractCrudController
         $event
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
+            ->setChapo($formData['chapo'])
+            ->setDescription($formData['description'])
             ->setIsocode($formData['isocode'])
             ->setIsoAlpha2($formData['isoalpha2'])
             ->setIsoAlpha3($formData['isoalpha3'])
@@ -236,7 +238,10 @@ class CountryController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute('admin.configuration.countries.update', array(), $this->getRequest()->get('country_id', 0));
+        $this->redirectToRoute('admin.configuration.countries.update', array(), array(
+                "country_id" => $this->getRequest()->get('country_id', 0)
+            )
+        );
     }
 
     /**
