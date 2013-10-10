@@ -28,7 +28,7 @@ URL: http://www.thelia.net
     {block name="meta"}{/block}
 
     <!-- StyleSheet -->
-    {stylesheets file='assets/less/styles.less' filters='less,cssembed'}
+    {stylesheets file='assets/less/styles.less' filters='less,cssembed,cssrewrite'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
     {debugbar_rendercss}
