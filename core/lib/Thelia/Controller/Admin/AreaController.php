@@ -25,11 +25,11 @@ namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\TheliaEvents;
 
 /**
- * Class ShippingConfigurationController
+ * Class AreaController
  * @package Thelia\Controller\Admin
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ShippingConfigurationController extends AbstractCrudController
+class AreaController extends AbstractCrudController
 {
 /*    public function indexAction()
     {
@@ -51,14 +51,14 @@ class ShippingConfigurationController extends AbstractCrudController
             null,
             null,
 
-            'admin.shipping.default',
-            'admin.shipping.create',
-            'admin.shipping.update',
-            'admin.shipping.delete',
+            'admin.area.default',
+            'admin.area.create',
+            'admin.area.update',
+            'admin.area.delete',
 
-            TheliaEvents::SHIPPING_CREATE,
-            TheliaEvents::SHIPPING_UPDATE,
-            TheliaEvents::SHIPPING_DELETE
+            TheliaEvents::AREA_CREATE,
+            TheliaEvents::AREA_UPDATE,
+            TheliaEvents::AREA_DELETE
         );
     }
 

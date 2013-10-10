@@ -21,28 +21,59 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Form\Shipping;
-use Symfony\Component\Validator\Constraints\GreaterThan;
+namespace Thelia\Form\Area;
+use Thelia\Core\Translation\Translator;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Form\BaseForm;
 
 
 /**
- * Class ShippingModificationForm
+ * Class AreaCreateForm
  * @package Thelia\Form\Shipping
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ShippingModificationForm extends ShippingCreateForm
+class AreaCreateForm extends BaseForm
 {
-    public function buildForm()
-    {
-        parent::buildForm();
 
+    /**
+     *
+     * in this function you add all the fields you need for your Form.
+     * Form this you have to call add method on $this->formBuilder attribute :
+     *
+     * $this->formBuilder->add("name", "text")
+     *   ->add("email", "email", array(
+     *           "attr" => array(
+     *               "class" => "field"
+     *           ),
+     *           "label" => "email",
+     *           "constraints" => array(
+     *               new \Symfony\Component\Validator\Constraints\NotBlank()
+     *           )
+     *       )
+     *   )
+     *   ->add('age', 'integer');
+     *
+     * @return null
+     */
+    protected function buildForm()
+    {
         $this->formBuilder
-            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
+            ->add('name', 'text', array(
+                'constraints' => array(
+                    new NotBlank()
+                ),
+                'label_attr' => array('for' => 'shipping_name'),
+                'label' => Translator::getInstance()->trans('shipping area name')
+            ))
+
         ;
     }
 
+    /**
+     * @return string the name of you form. This name must be unique
+     */
     public function getName()
     {
-        return 'thelia_shipping_modification';
+        return 'thelia_area_creation';
     }
 }

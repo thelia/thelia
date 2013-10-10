@@ -688,11 +688,11 @@
     <!-- Shipping zones routes management -->
 
     <route id="admin.configuration.shipping-configuration.default" path="/admin/configuration/shipping_configuration">
-        <default key="_controller">Thelia\Controller\Admin\ShippingConfigurationController::defaultAction</default>
+        <default key="_controller">Thelia\Controller\Admin\AreaController::defaultAction</default>
     </route>
 
     <route id="admin.configuration.shipping-configuration.update.view" path="/admin/configuration/shipping_configuration/update/{shipping_configuration_id}" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\ShippingConfigurationController::updateAction</default>
+        <default key="_controller">Thelia\Controller\Admin\AreaController::updateAction</default>
         <requirement key="shipping_configuration_id">\d+</requirement>
     </route>
 

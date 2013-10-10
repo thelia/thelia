@@ -234,9 +234,9 @@ final class TheliaEvents
 
     // -- SHIPPING CONFIGURATION MANAGEMENT
 
-    const SHIPPING_CREATE = 'action.createShipping';
-    const SHIPPING_UPDATE = 'action.updateShipping';
-    const SHIPPING_DELETE = 'action.deleteShipping';
+    const AREA_CREATE = 'action.createArea';
+    const AREA_UPDATE = 'action.updateArea';
+    const AREA_DELETE = 'action.deleteArea';
 
     // -- Categories Associated Content ----------------------------------------
 

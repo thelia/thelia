@@ -21,59 +21,46 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Form\Shipping;
-use Thelia\Core\Translation\Translator;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Form\BaseForm;
+namespace Thelia\Core\Event\Area;
+use Thelia\Core\Event\ActionEvent;
 
 
 /**
- * Class ShippingCreateForm
- * @package Thelia\Form\Shipping
+ * Class AreaEvent
+ * @package Thelia\Core\Event\Shipping
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ShippingCreateForm extends BaseForm
+class AreaEvent extends ActionEvent
 {
+    protected $area;
 
-    /**
-     *
-     * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
-     *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
-     *           "attr" => array(
-     *               "class" => "field"
-     *           ),
-     *           "label" => "email",
-     *           "constraints" => array(
-     *               new \Symfony\Component\Validator\Constraints\NotBlank()
-     *           )
-     *       )
-     *   )
-     *   ->add('age', 'integer');
-     *
-     * @return null
-     */
-    protected function buildForm()
+    public function __construct($area = null)
     {
-        $this->formBuilder
-            ->add('name', 'text', array(
-                'constraints' => array(
-                    new NotBlank()
-                ),
-                'label_attr' => array('for' => 'shipping_name'),
-                'label' => Translator::getInstance()->trans('shipping area name')
-            ))
-
-        ;
+        $this->area = $area;
     }
 
     /**
-     * @return string the name of you form. This name must be unique
+     * @param mixed $area
+     *
+     * @return $this
      */
-    public function getName()
+    public function setArea($area)
     {
-        return 'thelia_shipping_creation';
+        $this->area = $area;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getArea()
+    {
+        return $this->area;
+    }
+
+    public function hasArea()
+    {
+        return null !== $this->area;
     }
 }
