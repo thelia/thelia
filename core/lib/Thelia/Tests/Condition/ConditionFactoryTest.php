@@ -26,7 +26,7 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Operators;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Coupon\ConditionCollection;
 use Thelia\Model\CurrencyQuery;
 
@@ -61,7 +61,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -125,7 +125,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -187,7 +187,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -266,7 +266,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -331,7 +331,7 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();

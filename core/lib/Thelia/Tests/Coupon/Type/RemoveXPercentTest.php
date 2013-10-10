@@ -24,11 +24,6 @@
 namespace Thelia\Coupon;
 
 use PHPUnit_Framework_TestCase;
-use Thelia\Constraint\Rule\Operators;
-use Thelia\Constraint\Validator\PriceParam;
-use Thelia\Constraint\Validator\RuleValidator;
-use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Coupon\Type\RemoveXPercentManager;
 
 //require_once '../CouponManagerTest.php';
 
@@ -407,7 +402,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //     */
 //    protected function generateValidRuleAvailableForTotalAmountOperatorTo($operator, $amount)
 //    {
-//        $adapter = new BaseAdapter();
+//        $adapter = new BaseFacade();
 //        $validators = array(
 //            AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
 //                $operator,
@@ -432,7 +427,7 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
 //    public function generateFakeAdapter($cartTotalPrice)
 //    {
 //        $stubCouponBaseAdapter = $this->getMock(
-//            'Thelia\Coupon\BaseAdapter',
+//            'Thelia\Coupon\BaseFacade',
 //            array(
 //                'getCartTotalPrice'
 //            ),

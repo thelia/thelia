@@ -43,7 +43,7 @@ use Thelia\Model\Coupon;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-interface AdapterInterface
+interface FacadeInterface
 {
 
     /**

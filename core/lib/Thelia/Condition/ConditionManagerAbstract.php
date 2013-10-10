@@ -25,7 +25,7 @@ namespace Thelia\Condition;
 
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Exception\InvalidConditionValueException;
 use Thelia\Model\Currency;
 use Thelia\Type\FloatType;
@@ -60,7 +60,7 @@ abstract class ConditionManagerAbstract implements ConditionManagerInterface
 //    /** @var array Parameters to be validated */
 //    protected $paramsToValidate = array();
 
-    /** @var  AdapterInterface Provide necessary value from Thelia */
+    /** @var  FacadeInterface Provide necessary value from Thelia */
     protected $adapter = null;
 
     /** @var Translator Service Translator */
@@ -78,9 +78,9 @@ abstract class ConditionManagerAbstract implements ConditionManagerInterface
     /**
      * Constructor
      *
-     * @param AdapterInterface $adapter Service adapter
+     * @param FacadeInterface $adapter Service adapter
      */
-    public function __construct(AdapterInterface $adapter)
+    public function __construct(FacadeInterface $adapter)
     {
         $this->adapter = $adapter;
         $this->translator = $adapter->getTranslator();

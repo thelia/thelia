@@ -40,7 +40,7 @@ use Thelia\Coupon\Type\CouponInterface;
  */
 class CouponManager
 {
-    /** @var AdapterInterface Provides necessary value from Thelia */
+    /** @var FacadeInterface Provides necessary value from Thelia */
     protected $adapter = null;
 
     /** @var ContainerInterface Service Container */

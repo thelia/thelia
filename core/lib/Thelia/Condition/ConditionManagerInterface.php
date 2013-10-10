@@ -24,7 +24,7 @@
 namespace Thelia\Condition;
 
 use Thelia\Core\Translation\Translator;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -42,9 +42,9 @@ interface ConditionManagerInterface
     /**
      * Constructor
      *
-     * @param AdapterInterface $adapter Service adapter
+     * @param FacadeInterface $adapter Service adapter
      */
-    function __construct(AdapterInterface $adapter);
+    function __construct(FacadeInterface $adapter);
 
     /**
      * Get Rule Service id

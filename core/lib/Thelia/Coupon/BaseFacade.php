@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
+use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
@@ -47,7 +48,7 @@ use Thelia\Model\CurrencyQuery;
  * @todo implements
  *
  */
-class BaseAdapter implements AdapterInterface
+class BaseFacade implements FacadeInterface
 {
     use CartTrait {
         CartTrait::getCart as getCartFromTrait;
@@ -261,7 +262,7 @@ class BaseAdapter implements AdapterInterface
     /**
      * Return Constraint Validator
      *
-     * @return ConditionValidator
+     * @return ConditionEvaluator
      */
     public function getConditionEvaluator()
     {

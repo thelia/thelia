@@ -25,7 +25,7 @@ namespace Thelia\Condition\Implementation;
 
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\Currency;
 
 /**
@@ -41,7 +41,7 @@ use Thelia\Model\Currency;
  */
 class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var AdapterInterface $stubTheliaAdapter */
+    /** @var FacadeInterface $stubTheliaAdapter */
     protected $stubTheliaAdapter = null;
 
     /**
@@ -91,7 +91,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
     {
         $stubAdapter = $this->generateAdapterStub(399, 'EUR');
 
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $condition1 = new MatchForEveryoneManager($stubAdapter);
         $operators = array();
         $values = array();
@@ -114,7 +114,7 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
     {
         $stubAdapter = $this->generateAdapterStub(399, 'EUR');
 
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $condition1 = new MatchForEveryoneManager($stubAdapter);
 
         $isValid = $condition1->isMatching();

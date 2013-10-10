@@ -26,7 +26,7 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 use Thelia\Condition\SerializableCondition;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -59,12 +59,12 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputOperator()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
@@ -96,7 +96,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputValue()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -132,7 +132,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleInferior()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -168,7 +168,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleInferior()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -204,7 +204,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleInferiorEquals()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -240,7 +240,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleInferiorEquals2()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -276,7 +276,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleInferiorEquals()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -312,7 +312,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleEqual()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -348,7 +348,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleEqual()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -384,7 +384,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleSuperiorEquals()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -420,7 +420,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleSuperiorEquals2()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -456,7 +456,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleSuperiorEquals()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -492,7 +492,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleSuperior()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -528,7 +528,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleSuperior()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -558,7 +558,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSerializableRule()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -594,7 +594,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAvailableOperators()
     {
-        /** @var AdapterInterface $stubAdapter */
+        /** @var FacadeInterface $stubAdapter */
         $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
             ->disableOriginalConstructor()
             ->getMock();
@@ -632,7 +632,7 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 
 //    public function testGetValidators()
 //    {
-//        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+//        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
 //            ->disableOriginalConstructor()
 //            ->getMock();
 //

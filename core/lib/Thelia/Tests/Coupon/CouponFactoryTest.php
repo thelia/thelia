@@ -23,14 +23,6 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Constraint\Validator\PriceParam;
-use Thelia\Constraint\Validator\RuleValidator;
-use Thelia\Constraint\Rule\AvailableForTotalAmount;
-use Thelia\Constraint\Rule\Operators;
-use Thelia\Coupon\Type\CouponInterface;
-use Thelia\Exception\CouponExpiredException;
-use Thelia\Model\Coupon;
-
 require_once 'CouponManagerTest.php';
 
 /**
@@ -109,9 +101,9 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //            $isRemovingPostage
 //        );
 //
-//        /** @var AdapterInterface $stubCouponBaseAdapter */
+//        /** @var FacadeInterface $stubCouponBaseAdapter */
 //        $stubCouponBaseAdapter = $this->getMock(
-//            'Thelia\Coupon\BaseAdapter',
+//            'Thelia\Coupon\BaseFacade',
 //            array('findOneCouponByCode'),
 //            array()
 //        );
@@ -135,7 +127,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //        $date = new \DateTime();
 //        $date->setTimestamp(strtotime("today - 2 months"));
 //
-//        /** @var AdapterInterface $mockAdapter */
+//        /** @var FacadeInterface $mockAdapter */
 //        $mockAdapter = $this->generateCouponModelMock(null, null, null, null, null, null, null, null, $date);
 //        $couponFactory = new CouponFactory($mockAdapter);
 //        $coupon = $couponFactory->buildCouponFromCode('XMAS1');
@@ -151,7 +143,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //    {
 //        $date = new \DateTime();
 //
-//        /** @var AdapterInterface $mockAdapter */
+//        /** @var FacadeInterface $mockAdapter */
 //        $mockAdapter = $this->generateCouponModelMock(null, null, null, null, null, null, null, null, $date);
 //        $couponFactory = new CouponFactory($mockAdapter);
 //        $coupon = $couponFactory->buildCouponFromCode('XMAS1');
@@ -165,7 +157,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testBuildCouponFromCodeWithoutRule()
 //    {
-//        /** @var AdapterInterface $mockAdapter */
+//        /** @var FacadeInterface $mockAdapter */
 //        $mockAdapter = $this->generateCouponModelMock(null, null, null, null, null, null, null, null, null, new ConditionCollection(array()));
 //        $couponFactory = new CouponFactory($mockAdapter);
 //        $coupon = $couponFactory->buildCouponFromCode('XMAS1');
@@ -178,7 +170,7 @@ class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testBuildCouponFromCode()
 //    {
-//        /** @var AdapterInterface $mockAdapter */
+//        /** @var FacadeInterface $mockAdapter */
 //        $mockAdapter = $this->generateCouponModelMock();
 //        $couponFactory = new CouponFactory($mockAdapter);
 //        /** @var CouponInterface $coupon */

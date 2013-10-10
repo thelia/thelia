@@ -23,10 +23,6 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Constraint\Validator\PriceParam;
-use Thelia\Constraint\Validator\RuleValidator;
-use Thelia\Constraint\Rule\Operators;
-use Thelia\Coupon\Type\RemoveXAmountManager;
 
 //require_once '../CouponManagerTest.php';
 
@@ -153,7 +149,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //     */
 //    public function testGetEffect()
 //    {
-//        $adapter = new BaseAdapter();
+//        $adapter = new BaseFacade();
 //        $coupon = CouponManagerTest::generateValidCoupon(null, null, null, null, null, null, null, null, false, false);
 //
 //        $expected = 10;
@@ -228,7 +224,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //    public function testGetEffectIfTotalAmountInferiorTo400Valid()
 //    {
 //        // Given
-//        $adapter = new BaseAdapter();
+//        $adapter = new BaseFacade();
 //        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
 //            Operators::INFERIOR,
 //            400.00
@@ -253,7 +249,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //    public function testGetEffectIfTotalAmountInferiorOrEqualTo400Valid()
 //    {
 //        // Given
-//        $adapter = new BaseAdapter();
+//        $adapter = new BaseFacade();
 //        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
 //            Operators::INFERIOR_OR_EQUAL,
 //            400.00
@@ -278,7 +274,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //    public function testGetEffectIfTotalAmountEqualTo400Valid()
 //    {
 //        // Given
-//        $adapter = new BaseAdapter();
+//        $adapter = new BaseFacade();
 //        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
 //            Operators::EQUAL,
 //            400.00
@@ -303,7 +299,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //    public function testGetEffectIfTotalAmountSuperiorOrEqualTo400Valid()
 //    {
 //        // Given
-//        $adapter = new BaseAdapter();
+//        $adapter = new BaseFacade();
 //        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
 //            Operators::SUPERIOR_OR_EQUAL,
 //            400.00
@@ -328,7 +324,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //    public function testGetEffectIfTotalAmountSuperiorTo400Valid()
 //    {
 //        // Given
-//        $adapter = new BaseAdapter();
+//        $adapter = new BaseFacade();
 //        $rule0 = $this->generateValidRuleAvailableForTotalAmountOperatorTo(
 //            Operators::SUPERIOR,
 //            400.00
@@ -365,7 +361,7 @@ class RemoveXAmountTest extends \PHPUnit_Framework_TestCase
 //     */
 //    protected function generateValidRuleAvailableForTotalAmountOperatorTo($operator, $amount)
 //    {
-//        $adapter = new BaseAdapter();
+//        $adapter = new BaseFacade();
 //        $validators = array(
 //            AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
 //                $operator,

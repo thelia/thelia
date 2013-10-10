@@ -276,7 +276,7 @@
         <service id="kernel" synthetic="true" />
 
         <!-- Coupon module -->
-        <service id="thelia.adapter" class="Thelia\Coupon\BaseAdapter">
+        <service id="thelia.adapter" class="Thelia\Coupon\BaseFacade">
             <argument type="service" id="service_container" />
         </service>
         <service id="thelia.coupon.manager" class="Thelia\Coupon\CouponManager">

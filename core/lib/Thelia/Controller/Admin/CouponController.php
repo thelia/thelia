@@ -609,7 +609,7 @@ class CouponController extends BaseAdminController
 //     */
 //    protected function validateConditionsCreation($type, $operator, $values)
 //    {
-//        /** @var AdapterInterface $adapter */
+//        /** @var FacadeInterface $adapter */
 //        $adapter = $this->container->get('thelia.adapter');
 //        $validator = new PriceParam()
 //        try {

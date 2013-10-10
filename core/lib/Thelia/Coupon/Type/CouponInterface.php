@@ -23,7 +23,7 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Coupon\ConditionCollection;
 
 /**
@@ -209,7 +209,7 @@ interface CouponInterface
 
     /**
      * Check if the current Coupon is matching its conditions (Rules)
-     * Thelia variables are given by the AdapterInterface
+     * Thelia variables are given by the FacadeInterface
      *
      * @return bool
      */

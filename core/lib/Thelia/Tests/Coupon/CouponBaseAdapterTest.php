@@ -28,7 +28,7 @@ namespace Thelia\Coupon;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test BaseAdapter Class
+ * Unit Test BaseFacade Class
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
@@ -44,7 +44,7 @@ class CouponBaseAdapterTest extends \PHPUnit_Framework_TestCase
         );
     }
 //    /**
-//     * @var BaseAdapter
+//     * @var BaseFacade
 //     */
 //    protected $object;
 //
@@ -54,7 +54,7 @@ class CouponBaseAdapterTest extends \PHPUnit_Framework_TestCase
 //     */
 //    protected function setUp()
 //    {
-//        $this->object = new BaseAdapter;
+//        $this->object = new BaseFacade;
 //    }
 //
 //    /**
@@ -66,7 +66,7 @@ class CouponBaseAdapterTest extends \PHPUnit_Framework_TestCase
 //    }
 //
 //    /**
-//     * @covers Thelia\Coupon\BaseAdapter::getCart
+//     * @covers Thelia\Coupon\BaseFacade::getCart
 //     * @todo   Implement testGetCart().
 //     */
 //    public function testGetCart()
@@ -78,7 +78,7 @@ class CouponBaseAdapterTest extends \PHPUnit_Framework_TestCase
 //    }
 //
 //    /**
-//     * @covers Thelia\Coupon\BaseAdapter::getDeliveryAddress
+//     * @covers Thelia\Coupon\BaseFacade::getDeliveryAddress
 //     * @todo   Implement testGetDeliveryAddress().
 //     */
 //    public function testGetDeliveryAddress()
@@ -90,7 +90,7 @@ class CouponBaseAdapterTest extends \PHPUnit_Framework_TestCase
 //    }
 //
 //    /**
-//     * @covers Thelia\Coupon\BaseAdapter::getCustomer
+//     * @covers Thelia\Coupon\BaseFacade::getCustomer
 //     * @todo   Implement testGetCustomer().
 //     */
 //    public function testGetCustomer()

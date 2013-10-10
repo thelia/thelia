@@ -24,7 +24,7 @@
 namespace Thelia\Condition;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Coupon\ConditionCollection;
 
 
@@ -44,7 +44,7 @@ class ConditionFactory
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
-    /** @var  AdapterInterface Provide necessary value from Thelia */
+    /** @var  FacadeInterface Provide necessary value from Thelia */
     protected $adapter;
 
     /** @var array ConditionCollection to process*/
