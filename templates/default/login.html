@@ -16,7 +16,7 @@
         <article class="col-main" role="main" aria-labelledby="main-label">
             <h1 id="main-label" class="page-header">{intl l="Login"}</h1>
             {form name="thelia.customer.login"}
-            <form id="form-login" action="{url path="/customer/login"}" method="post" role="form" {form_enctype form=$form}>
+            <form id="form-login" action="{url path="/login"}" method="post" role="form" {form_enctype form=$form}>
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
                 {form_field form=$form field='success_url'}
                     <input type="hidden" name="{$name}" value="{navigate to="return_to"}"> {* the url the user is redirected to on login success *}
@@ -31,9 +31,10 @@
                         <div class="form-group group-email{if $error} has-error{/if}">
                             <label for="{$label_attr.for}">{$label}</label>
                             <div class="control-input">
-                            <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" {$attr}  aria-required="true" autofocus required>
+                            <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" {$attr} {if $required}aria-required="true" required{/if}{if $error} autofocus{/if}>
                             {if $error}
                                 <span class="help-block"><span class="icon-remove"></span> {$message}</span>
+                                {assign var="error_email" value="true"}
                             {/if}
                             </div>
                         </div>
@@ -43,7 +44,7 @@
                         <legend>{intl l="Do you have an account?"}</legend>
                         <div class="radio radio-account0" >
                             <label for="account0">
-                                <input type="radio" name="account" id="account0" data-toggle="password" value="0" > {intl l="No, I am a new customer."}
+                                <input type="radio" name="account" id="account0" data-toggle="password" value="0"> {intl l="No, I am a new customer."}
                             </label>
                         </div>
                         <div class="radio radio-account1">
@@ -55,7 +56,7 @@
                         <div class="form-group group-password{if $error} has-error{/if}">
                             <label for="{$label_attr.for}" class="sr-only">{$label}</label>
                             <div class="control-input">
-                            <input type="password" name="{$name}" id="{$label_attr.for}" class="form-control" autocomplete="off">
+                            <input type="password" name="{$name}" id="{$label_attr.for}" class="form-control" autocomplete="off"{if !isset($error_email) && $error } autofocus{/if}>
                             {if $error}
                                 <span class="help-block"><span class="icon-remove"></span> {$message}</span>
                             {/if}

@@ -33,12 +33,9 @@ URL: http://www.thelia.net
     {block name="meta"}{/block}
 
     {* Stylesheets *}
-    {stylesheets file='assets/less/styles.less' filters='less,cssembed,cssrewrite'}
+    {stylesheets file='assets/less/styles.less' filters='less,cssembed'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
-
-
-    <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css"-->
 
     {debugbar_rendercss}
     {block name="stylesheet"}{/block}
@@ -79,20 +76,27 @@ URL: http://www.thelia.net
                     <li class="dropdown">
                         <a href="{url path="/login"}" class="login">{intl l="Log In!"}</a>
                         <div class="dropdown-menu">
-                            <form id="form-login-mini" action="login.php" method="post" role="form">
-                                <div class="form-group group-email-mini">
-                                    <label for="email-mini">Email address:</label>
-                                    <input type="email" name="email" id="email-mini" class="form-control" value="" aria-required="true" required>
-                                </div>
+                            {form name="thelia.customer.login"}
+                            <form id="form-login-mini" action="{url path="/login"}" method="post" role="form" {form_enctype form=$form}>
+                                {form_hidden_fields form=$form}
+                                {form_field form=$form field="email"}
                                 <div class="form-group group-email">
-                                    <label for="password-mini">Password</label>
-                                    <input type="password" name="password" id="password-mini" class="form-control" value="" aria-required="true" required>
+                                    <label for="{$label_attr.for}-mini">{$label}</label>
+                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control"{if $required} aria-required="true" required{/if}>
                                 </div>
+                                {/form_field}
+                                {form_field form=$form field="password"}
+                                <div class="form-group group-password">
+                                    <label for="{$label_attr.for}-mini">Password</label>
+                                    <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control"{if $required} aria-required="true" required{/if}>
+                                </div>
+                                {/form_field}
                                 <div class="group-btn">
-                                    <button type="submit" class="btn btn-login-mini">Sign In</button>
-                                    <a href="register.php" class="btn btn-register-mini">Register</a>
+                                    <button type="submit" class="btn btn-login-mini">{intl l="Sign In"}</button>
+                                    <a href="{url path="/register"}" class="btn btn-register-mini">{intl l="Register"}</a>
                                 </div>
                             </form>
+                            {/form}
                         </div>
                     </li>
                     {/elseloop}
