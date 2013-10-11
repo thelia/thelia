@@ -116,8 +116,10 @@ class Country extends BaseI18nLoop
                 ->set("IS_DEFAULT", $country->getByDefault() === 1 ? "1" : "0")
                 ->set("ISOCODE", $country->getIsocode())
                 ->set("ISOALPHA2", $country->getIsoalpha2())
-                ->set("ISOALPHA3", $country->getIsoalpha3());
+                ->set("ISOALPHA3", $country->getIsoalpha3())
+                ->set('IS_DEFAULT', $country->getByDefault())
 
+            ;
             $loopResult->addRow($loopResultRow);
         }
 

@@ -58,9 +58,9 @@ class BaseController extends ContainerAware
     /**
      * Return an empty response (after an ajax request, for example)
      */
-    protected function nullResponse()
+    protected function nullResponse($status = 200)
     {
-        return new Response();
+        return new Response(null, $status);
     }
 
     /**

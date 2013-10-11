@@ -20,30 +20,54 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\GreaterThan;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
+namespace Thelia\Core\Event\Country;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Country;
 
-class CountryModificationForm extends CountryCreationForm
+
+/**
+ * Class CountryEvent
+ * @package Thelia\Core\Event\Country
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+class CountryEvent extends ActionEvent
 {
-    use StandardDescriptionFieldsTrait;
+    /*
+     * @var \Thelia\Model\Country
+     */
+    protected $country;
 
-    protected function buildForm()
+    function __construct(Country $country = null)
     {
-        parent::buildForm(true);
-
-        $this->formBuilder
-            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
-        ;
-
-        // Add standard description fields, excluding title and locale, which a re defined in parent class
-        $this->addStandardDescFields(array('title', 'locale'));
+        $this->country = $country;
     }
 
-    public function getName()
+    /**
+     * @param mixed $country
+     */
+    public function setCountry(Country $country)
     {
-        return "thelia_country_modification";
+        $this->country = $country;
+
+        return $this;
     }
+
+    /**
+     * @return null|\Thelia\Model\Country
+     */
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasCountry()
+    {
+        return null !== $this->country;
+    }
+
+
 }

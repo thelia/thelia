@@ -20,30 +20,41 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints\GreaterThan;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
+namespace Thelia\Core\Event\Country;
 
-class CountryModificationForm extends CountryCreationForm
+
+/**
+ * Class CountryDeleteEvent
+ * @package Thelia\Core\Event\Country
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+class CountryDeleteEvent extends CountryEvent
 {
-    use StandardDescriptionFieldsTrait;
+    /**
+     * @var int country id
+     */
+    protected $country_id;
 
-    protected function buildForm()
+    function __construct($country_id)
     {
-        parent::buildForm(true);
-
-        $this->formBuilder
-            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
-        ;
-
-        // Add standard description fields, excluding title and locale, which a re defined in parent class
-        $this->addStandardDescFields(array('title', 'locale'));
+        $this->country_id = $country_id;
     }
 
-    public function getName()
+    /**
+     * @param int $country_id
+     */
+    public function setCountryId($country_id)
     {
-        return "thelia_country_modification";
+        $this->country_id = $country_id;
     }
+
+    /**
+     * @return int
+     */
+    public function getCountryId()
+    {
+        return $this->country_id;
+    }
+
 }
