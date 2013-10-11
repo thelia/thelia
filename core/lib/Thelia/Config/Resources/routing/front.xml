@@ -9,6 +9,12 @@
         <default key="_view">index</default>
     </route>
 
+    <!-- Search routes -->
+    <route id="search" path="/search">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">search</default>
+    </route>
+
     <!-- Customer routes -->
     <route id="customer.create.view" path="/register">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
