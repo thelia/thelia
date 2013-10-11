@@ -22,7 +22,10 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\Area\AreaCreateEvent;
+use Thelia\Core\Event\Area\AreaUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Form\Area\AreaCreateForm;
 
 /**
  * Class AreaController
@@ -67,7 +70,7 @@ class AreaController extends AbstractCrudController
      */
     protected function getCreationForm()
     {
-        // TODO: Implement getCreationForm() method.
+        return new AreaCreateForm($this->getRequest());
     }
 
     /**
@@ -75,7 +78,7 @@ class AreaController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        // TODO: Implement getUpdateForm() method.
+        return new AreaCreateForm($this->getRequest());
     }
 
     /**
@@ -92,10 +95,14 @@ class AreaController extends AbstractCrudController
      * Creates the creation event with the provided form data
      *
      * @param unknown $formData
+     *
+     * @return \Thelia\Core\Event\Area\AreaCreateEvent
      */
     protected function getCreationEvent($formData)
     {
-        // TODO: Implement getCreationEvent() method.
+        $event = new AreaCreateEvent();
+
+        return $this->hydrateEvent($event, $formData);
     }
 
     /**
@@ -105,7 +112,16 @@ class AreaController extends AbstractCrudController
      */
     protected function getUpdateEvent($formData)
     {
-        // TODO: Implement getUpdateEvent() method.
+        $event = new AreaUpdateEvent();
+
+        return $this->hydrateEvent($event, $formData);
+    }
+
+    private function hydrateEvent($event, $formData)
+    {
+        $event->setName($formData['name']);
+
+        return $event;
     }
 
     /**
