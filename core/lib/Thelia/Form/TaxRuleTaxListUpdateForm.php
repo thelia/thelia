@@ -24,15 +24,19 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Model\CountryQuery;
+use Thelia\Model\TaxQuery;
 use Thelia\Model\TaxRuleQuery;
+use Thelia\Type\JsonType;
 
-class TaxRuleModificationForm extends TaxRuleCreationForm
+class TaxRuleTaxListUpdateForm extends BaseForm
 {
-    use StandardDescriptionFieldsTrait;
-
     protected function buildForm()
     {
-        parent::buildForm(true);
+        $countryList = array();
+        foreach(CountryQuery::create()->find() as $country) {
+            $countryList[$country->getId()] = $country->getId();
+        }
 
         $this->formBuilder
             ->add("id", "hidden", array(
@@ -48,35 +52,35 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
                         ),
                     )
             ))
-            ->add("tab", "text", array(
-                "constraints" => array(
-                    new Constraints\Choice(
-                        array(
-                            'choices' => array('data', 'taxes'),
-                        )
-                    )
+            ->add("tax_list", "hidden", array(
+                "required" => true,
+                "attr" => array(
+                    "id" => 'tax_list',
                 ),
-            ))
-            ->add("country", "text", array(
                 "constraints" => array(
                     new Constraints\Callback(
                         array(
                             "methods" => array(
-                                array($this, "verifyCountry"),
+                                array($this, "verifyTaxList"),
                             ),
                         )
                     ),
                 )
             ))
+            ->add("country_list", "choice", array(
+                "choices" => $countryList,
+                "required" => true,
+                "multiple" => true,
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                )
+            ))
         ;
-
-        // Add standard description fields
-        $this->addStandardDescFields(array('postscriptum', 'chapo', 'locale'));
     }
 
     public function getName()
     {
-        return "thelia_tax_rule_modification";
+        return "thelia_tax_rule_taxlistupdate";
     }
 
     public function verifyTaxRuleId($value, ExecutionContextInterface $context)
@@ -86,6 +90,38 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
 
         if (null === $taxRule) {
             $context->addViolation("Tax rule ID not found");
+        }
+    }
+
+    public function verifyTaxList($value, ExecutionContextInterface $context)
+    {
+        $jsonType = new JsonType();
+        if(!$jsonType->isValid($value)) {
+            $context->addViolation("Tax list is not valid JSON");
+        }
+
+        $taxList = json_decode($value, true);
+
+        /* check we have 2 level max */
+
+        foreach($taxList as $taxLevel1) {
+            if(is_array($taxLevel1)) {
+                foreach($taxLevel1 as $taxLevel2) {
+                    if(is_array($taxLevel2)) {
+                        $context->addViolation("Bad tax list JSON");
+                    } else {
+                        $taxModel = TaxQuery::create()->findPk($taxLevel2);
+                        if (null === $taxModel) {
+                            $context->addViolation("Tax ID not found in tax list JSON");
+                        }
+                    }
+                }
+            } else {
+                $taxModel = TaxQuery::create()->findPk($taxLevel1);
+                if (null === $taxModel) {
+                    $context->addViolation("Tax ID not found in tax list JSON");
+                }
+            }
         }
     }
 }

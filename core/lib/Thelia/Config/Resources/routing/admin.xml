@@ -792,6 +792,10 @@
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::processUpdateAction</default>
     </route>
 
+    <route id="admin.configuration.taxes-rules.saveTaxes" path="/admin/configuration/taxes_rules/saveTaxes">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::processUpdateTaxesAction</default>
+    </route>
+
     <route id="admin.configuration.taxes-rules.delete" path="/admin/configuration/taxes_rules/delete">
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::deleteAction</default>
     </route>

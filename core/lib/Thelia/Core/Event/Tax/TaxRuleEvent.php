@@ -33,6 +33,8 @@ class TaxRuleEvent extends ActionEvent
     protected $id;
     protected $title;
     protected $description;
+    protected $countryList;
+    protected $taxList;
 
     public function __construct(TaxRule $taxRule = null)
     {
@@ -95,4 +97,26 @@ class TaxRuleEvent extends ActionEvent
     {
         return $this->locale;
     }
+
+    public function setCountryList($countryList)
+    {
+        $this->countryList = $countryList;
+    }
+
+    public function getCountryList()
+    {
+        return $this->countryList;
+    }
+
+    public function setTaxList($taxList)
+    {
+        $this->taxList = $taxList;
+    }
+
+    public function getTaxList()
+    {
+        return $this->taxList;
+    }
+
+
 }

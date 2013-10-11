@@ -509,6 +509,7 @@ final class TheliaEvents
     const TAX_RULE_UPDATE          = "action.updateTaxRule";
     const TAX_RULE_DELETE          = "action.deleteTaxRule";
     const TAX_RULE_SET_DEFAULT     = "action.setDefaultTaxRule";
+    const TAX_RULE_TAXES_UPDATE     = "action.updateTaxesTaxRule";
 
     // -- Product templates management -----------------------------------------
 

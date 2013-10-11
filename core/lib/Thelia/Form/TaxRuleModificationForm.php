@@ -48,26 +48,6 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
                         ),
                     )
             ))
-            ->add("tab", "text", array(
-                "constraints" => array(
-                    new Constraints\Choice(
-                        array(
-                            'choices' => array('data', 'taxes'),
-                        )
-                    )
-                ),
-            ))
-            ->add("country", "text", array(
-                "constraints" => array(
-                    new Constraints\Callback(
-                        array(
-                            "methods" => array(
-                                array($this, "verifyCountry"),
-                            ),
-                        )
-                    ),
-                )
-            ))
         ;
 
         // Add standard description fields

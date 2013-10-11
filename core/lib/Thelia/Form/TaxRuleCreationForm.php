@@ -35,32 +35,11 @@ class TaxRuleCreationForm extends BaseForm
             ->add("locale", "text", array(
                 "constraints" => array(new NotBlank())
             ))
-            ->add("country", "text", array(
-                "constraints" => array(
-                    new Constraints\Callback(
-                        array(
-                            "methods" => array(
-                                array($this, "verifyCountry"),
-                            ),
-                        )
-                    ),
-                ),
-            ))
         ;
     }
 
     public function getName()
     {
         return "thelia_tax_rule_creation";
-    }
-
-    public function verifyCountry($value, ExecutionContextInterface $context)
-    {
-        $country = CountryQuery::create()
-            ->findOneByIsoalpha3($value);
-
-        if (null === $country) {
-            $context->addViolation("Country ISOALPHA3 not found");
-        }
     }
 }

@@ -6,7 +6,7 @@
 
 {block name="main-content"}
 
-{assign oder_tab {$smarty.get.tab|default:"data"}}
+{assign oder_tab {$smarty.get.tab|default:$smarty.post.tab|default:'data'}}
 {assign asked_country {$smarty.get.country|default:{country ask="default" attr="id"}}}
 
 <div class="taxes-rules edit-taxes-rules">
@@ -152,12 +152,22 @@
                                             </p>
                                             {/if}
 
-                                            <div class="drag" data-id="{$TAX}">{$TAX_TITLE} - {$POSITION}</div>
+                                            <div class="drag" data-id="{$TAX}">{$TAX_TITLE}</div>
 
                                             {if $LOOP_COUNT == $LOOP_TOTAL}
                                         </div>
                                             {/if}
                                         {/loop}
+
+                                        {elseloop rel="existing-tax-list"}
+                                        <div class="drop-group droppable add-to-group">
+                                            <p class="drop-message">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                                <span class="message">{intl l="Add tax to this group"}</span>
+                                            </p>
+                                        </div>
+
+                                        {/elseloop}
 
                                     </div>
                                     <div class="panel-footer droppable create-group">
@@ -168,7 +178,7 @@
                                     </div>
                                 </div>
 
-                                <a href="#confirmation_dialog" data-toggle="modal" id="apply-taxes-rules" class="btn btn-default btn-primary btn-block"><span class="glyphicon glyphicon-check"></span> {intl l="Apply"}</a>
+                                <a href="#tax_list_update_dialog" data-toggle="modal" id="apply-taxes-rules" class="btn btn-default btn-primary btn-block"><span class="glyphicon glyphicon-check"></span> {intl l="Apply"}</a>
 
                             </div>
                             <div class="col-md-6">
@@ -204,48 +214,64 @@
     </div>
     
     {* Confirmation dialog *}
+    {form name="thelia.admin.taxrule.taxlistupdate"}
 
-    {capture "confirmation_dialog"}
-        
-        <form action="" method="post">
+        {if $form_error_message}
+            {$taxUpdateError = true}
+        {else}
+            {$taxUpdateError = false}
+        {/if}
+
+        {* Capture the dialog body, to pass it to the generic dialog *}
+        {capture "tax_list_update_dialog"}
+
             <input type="hidden" name="tax_rule_id" value="{$tax_rule_id}">
-            <input id="tax_list" type="hidden" name="tax_list">
+            <input type="hidden" name="tab" value="taxes">
+
+            {form_hidden_fields form=$form}
+
+            {form_field form=$form field='country_list'}
+
             <p>{intl l="Tax rule taxes will be update for the following countries :"}</p>
             <div class="form-group">
-                <select name="" id="" data-toggle="selectpicker" multiple>
+                <select name="{$name}" data-toggle="selectpicker" multiple>
                     {loop type="country" name="country-list"}
-                        <option value="{$ID}" {if in_array($ID, $matchedCountries)}selected="selected"{/if}>{$TITLE}</option>
+                    <option value='{$ID}' {if (!$value AND in_array($ID, $matchedCountries)) OR ($value AND in_array($ID, $value))}selected="selected"{/if}>{$TITLE}</option>
                     {/loop}
                 </select>
             </div>
-        </form>
 
-    {/capture}
+            {/form_field}
 
-   {include
-        file = "includes/generic-create-dialog.html"
+        {/capture}
 
-        dialog_id    = "confirmation_dialog"
-        dialog_title = {intl l="Edit tax rule taxes"}
-        dialog_body  = {$smarty.capture.confirmation_dialog nofilter}
+        {include
+            file = "includes/generic-create-dialog.html"
 
-        dialog_ok_label     = {intl l="Edit tax rule taxes"}
+            dialog_id    = "tax_list_update_dialog"
+            dialog_title = {intl l="Update tax rule taxes"}
+            dialog_body  = {$smarty.capture.tax_list_update_dialog nofilter}
 
-        form_action        = {url path='/admin/categories/create'}
+            dialog_ok_label     = {intl l="Edit tax rule taxes"}
+            dialog_cancel_label = {intl l="Cancel"}
 
-        form_error_message = $form_error_message
-    }
+            form_action        = {url path="/admin/configuration/taxes_rules/saveTaxes"}
+            form_enctype       = {form_enctype form=$form}
+            form_error_message = $form_error_message
+        }
+
+    {/form}
 
 {/block}
 
 {block name="javascript-initialization"}
 
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
-        <script src="{$asset_url}"></script>
+        <script src='{$asset_url}'></script>
     {/javascripts}
 
     {javascripts file='assets/js/main.js'}
-        <script src="{$asset_url}"></script>
+        <script src='{$asset_url}'></script>
     {/javascripts}
 
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
@@ -253,11 +279,15 @@
     <script>
         $(function() {
 
+        {if $taxUpdateError == true}
+            $('#tax_list_update_dialog').modal();
+        {/if}
+
+{literal}
             $('#country-selector').change(function(e) {
                 $('#country-selector-form').submit();
             });
 
-{literal}
             // Cache jQuery Objects
             var $group = $('#panel');
             var $list = $('#panel-list');
@@ -294,7 +324,7 @@
             // Default options for sortabble
             var sortOptions = {
                 cursor: 'move',
-                items: 'div',
+                cancel: '.drop-message',
                 update: function( event, ui ){
                     // Check if we have an empty group
                     var $zone = $('.add-to-group', $group);
@@ -357,6 +387,7 @@
 
                 }
             });
+
 {/literal}
 
         });
