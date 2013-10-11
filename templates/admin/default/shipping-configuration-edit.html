@@ -28,23 +28,33 @@
                         <div class="col-md-4">
                             
                             
-
+                            {form name="thelia.admin.area.country"}
                             <form method="POST" action="">
-                                <label class="control-label" for="">{intl l="Country"}</label>
+                                {form_hidden_fields form=$form}
+
+                                {form_field form=$form field='success_url'}
+                                    <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_configuration/update/{$area_id}"}" >
+                                {/form_field}
+
+                                {form_field form=$form field='area_id'}
+                                    <input type="hidden" name="{$name}" value="{$area_id}">
+                                {/form_field}
+                                {form_field form=$form field='country_id'}
+                                <label class="control-label" for="{$label_attr.for}">{intl l="Country"}</label>
 
                                 <div class="input-group">                                                            
-                                    <select name="" id="" data-toggle="selectpicker">
-                                        <option value="1">France</option>
-                                        <option value="2">Monaco</option>
-                                        <option value="3">Nouvelle-Calédonie</option>
+                                    <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
+                                        {loop name="country-without-area" type="country" with_area="0"  backend_context="1" lang=$lang_id}
+                                        <option value="{$ID}">{$TITLE}</option>
+                                        {/loop}
                                     </select>
                                     <span class="input-group-btn">
                                         <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add this country"}</button>
                                     </span>
                                 </div>                                    
-                                
+                                {/form_field}
                             </form>
-                            
+                            {/form}
                         </div>
 
                         <div class="col-md-8">
@@ -57,38 +67,24 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {loop name="country-area" type="country" area=$area_id backend_context="1"}
                                         <tr>
-                                            <td>Wallis-et-Futuna</td>
+                                            <td>{$TITLE}</td>
                                             <td>
                                                 <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
                                                     <span class="glyphicon glyphicon-trash"></span>
                                                 </a>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>Polynésie française</td>
-                                            <td>
-                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-trash"></span>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>USA - Alabama</td>
-                                            <td>
-                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_zone_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-trash"></span>
-                                                </a>
-                                            </td>
-                                        </tr>
+                                        {/loop}
                                     </tbody>
                                     <tfoot>
                                         <tr class="active">
                                             <td colspan="2">
                                                 <form method="POST" action="">
-                                                    <label for="" class="control-label">{intl l="Freight"}</label>
+                                                    <label for="" class="control-label">{intl l="Postage"}</label>
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control" name="" id="" placeholder="Freight value">
+                                                        <input type="text" class="form-control" name="" id="" placeholder="Postage">
                                                         <span class="input-group-addon">&euro;</span>
                                                         <span class="input-group-btn">
                                                             <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span></button>
