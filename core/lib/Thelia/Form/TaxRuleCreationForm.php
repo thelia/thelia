@@ -20,33 +20,26 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\TaxEngine\TaxType;
+namespace Thelia\Form;
 
-use Thelia\Type\FloatToFloatArrayType;
-use Thelia\Type\ModelValidIdType;
+use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
+use Thelia\Model\CountryQuery;
 
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
-class featureSlicePercentTaxType extends  BaseTaxType
+class TaxRuleCreationForm extends BaseForm
 {
-    public function pricePercentRetriever()
+    protected function buildForm($change_mode = false)
     {
-
+        $this->formBuilder
+            ->add("locale", "text", array(
+                "constraints" => array(new NotBlank())
+            ))
+        ;
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    public function getName()
     {
-
-    }
-
-    public function getRequirementsList()
-    {
-        return array(
-            'featureId' => new ModelValidIdType('Currency'),
-            'slices' => new FloatToFloatArrayType(),
-        );
+        return "thelia_tax_rule_creation";
     }
 }

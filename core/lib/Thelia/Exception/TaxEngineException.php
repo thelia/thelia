@@ -40,8 +40,11 @@ class TaxEngineException extends \RuntimeException
     const UNDEFINED_REQUIREMENTS = 504;
     const UNDEFINED_REQUIREMENT_VALUE = 505;
     const UNDEFINED_TAX_RULE = 506;
+    const NO_TAX_IN_TAX_RULES_COLLECTION = 507;
 
     const BAD_AMOUNT_FORMAT = 601;
+
+    const FEATURE_BAD_EXPECTED_VALUE = 701;
 
     public function __construct($message, $code = null, $previous = null)
     {

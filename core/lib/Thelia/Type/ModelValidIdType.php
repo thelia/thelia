@@ -20,33 +20,51 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\TaxEngine\TaxType;
+namespace Thelia\Type;
 
-use Thelia\Type\FloatToFloatArrayType;
-use Thelia\Type\ModelValidIdType;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Exception\TypeException;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class featureSlicePercentTaxType extends  BaseTaxType
+class ModelValidIdType implements TypeInterface
 {
-    public function pricePercentRetriever()
-    {
+    protected $expectedModelActiveRecordQuery = null;
 
+    /**
+     * @param $expectedModelActiveRecord
+     * @throws TypeException
+     */
+    public function __construct($expectedModelActiveRecord)
+    {
+        $class = '\\Thelia\\Model\\' . $expectedModelActiveRecord . 'Query';
+
+        if (!(class_exists($class) || !new $class instanceof ModelCriteria)) {
+            throw new TypeException('MODEL NOT FOUND', TypeException::MODEL_NOT_FOUND);
+        }
+
+        $this->expectedModelActiveRecordQuery = $class;
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    public function getType()
     {
-
+        return 'Model valid Id type';
     }
 
-    public function getRequirementsList()
+    public function isValid($value)
     {
-        return array(
-            'featureId' => new ModelValidIdType('Currency'),
-            'slices' => new FloatToFloatArrayType(),
-        );
+        $queryClass = $this->expectedModelActiveRecordQuery;
+
+        return null !== $queryClass::create()->findPk($value);
+    }
+
+    public function getFormattedValue($value)
+    {
+        $queryClass = $this->expectedModelActiveRecordQuery;
+
+        return $this->isValid($value) ? $queryClass::create()->findPk($value) : null;
     }
 }

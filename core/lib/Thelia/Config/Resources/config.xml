@@ -45,7 +45,9 @@
         <loop class="Thelia\Core\Template\Loop\Message" name="message"/>
         <loop class="Thelia\Core\Template\Loop\Delivery" name="delivery"/>
         <loop class="Thelia\Core\Template\Loop\Template" name="template"/> <!--  This is product templates ;-) -->
+        <loop class="Thelia\Core\Template\Loop\Tax" name="tax"/>
         <loop class="Thelia\Core\Template\Loop\TaxRule" name="tax-rule"/>
+        <loop class="Thelia\Core\Template\Loop\TaxRuleCountry" name="tax-rule-country"/>
     </loops>
 
     <forms>
@@ -110,6 +112,9 @@
         <form name="thelia.admin.attributeav.creation" class="Thelia\Form\AttributeAvCreationForm"/>
 
         <form name="thelia.admin.featureav.creation" class="Thelia\Form\FeatureAvCreationForm"/>
+
+        <form name="thelia.admin.taxrule.modification" class="Thelia\Form\TaxRuleModificationForm"/>
+        <form name="thelia.admin.taxrule.taxlistupdate" class="Thelia\Form\TaxRuleTaxListUpdateForm"/>
 
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>
