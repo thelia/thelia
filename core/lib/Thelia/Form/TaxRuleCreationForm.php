@@ -29,6 +29,8 @@ use Thelia\Model\CountryQuery;
 
 class TaxRuleCreationForm extends BaseForm
 {
+    use StandardDescriptionFieldsTrait;
+
     protected function buildForm($change_mode = false)
     {
         $this->formBuilder
@@ -36,6 +38,8 @@ class TaxRuleCreationForm extends BaseForm
                 "constraints" => array(new NotBlank())
             ))
         ;
+
+        $this->addStandardDescFields(array('postscriptum', 'chapo', 'locale'));
     }
 
     public function getName()

@@ -65,7 +65,9 @@ class TaxRuleController extends AbstractCrudController
     {
         $event = new TaxRuleEvent();
 
-        /* @todo fill event */
+        $event->setLocale($formData['locale']);
+        $event->setTitle($formData['title']);
+        $event->setDescription($formData['description']);
 
         return $event;
     }
@@ -154,18 +156,18 @@ class TaxRuleController extends AbstractCrudController
         return $object->getId();
     }
 
-    protected function getViewArguments($country = null)
+    protected function getViewArguments($country = null, $tab = null)
     {
         return array(
-            'tab' => $this->getRequest()->get('tab', 'data'),
+            'tab' => $tab === null ? $this->getRequest()->get('tab', 'data') : $tab,
             'country' => $country === null ? $this->getRequest()->get('country', CountryQuery::create()->findOneByByDefault(1)->getId()) : $country,
         );
     }
 
-    protected function getRouteArguments()
+    protected function getRouteArguments($tax_rule_id = null)
     {
         return array(
-            'tax_rule_id' => $this->getRequest()->get('tax_rule_id'),
+            'tax_rule_id' => $tax_rule_id === null ? $this->getRequest()->get('tax_rule_id') : $tax_rule_id,
         );
     }
 
@@ -191,6 +193,21 @@ class TaxRuleController extends AbstractCrudController
             "admin.configuration.taxes-rules.update",
             $this->getViewArguments($country),
             $this->getRouteArguments()
+        );
+    }
+
+    /**
+     * Put in this method post object creation processing if required.
+     *
+     * @param  TaxRuleEvent  $createEvent the create event
+     * @return Response a response, or null to continue normal processing
+     */
+    protected function performAdditionalCreateAction($createEvent)
+    {
+        $this->redirectToRoute(
+            "admin.configuration.taxes-rules.update",
+            $this->getViewArguments(),
+            $this->getRouteArguments($createEvent->getTaxRule()->getId())
         );
     }
 

@@ -28,8 +28,6 @@ use Thelia\Model\TaxRuleQuery;
 
 class TaxRuleModificationForm extends TaxRuleCreationForm
 {
-    use StandardDescriptionFieldsTrait;
-
     protected function buildForm()
     {
         parent::buildForm(true);
@@ -49,9 +47,6 @@ class TaxRuleModificationForm extends TaxRuleCreationForm
                     )
             ))
         ;
-
-        // Add standard description fields
-        $this->addStandardDescFields(array('postscriptum', 'chapo', 'locale'));
     }
 
     public function getName()

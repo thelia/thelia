@@ -798,6 +798,10 @@
         <requirement key="tax_rule_id">\d+</requirement>
     </route>
 
+    <route id="admin.configuration.taxes-rules.add" path="/admin/configuration/taxes_rules/add">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::createAction</default>
+    </route>
+
     <route id="admin.configuration.taxes-rules.save" path="/admin/configuration/taxes_rules/save">
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::processUpdateAction</default>
     </route>

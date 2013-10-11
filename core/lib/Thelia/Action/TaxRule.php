@@ -39,31 +39,18 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
      */
     public function create(TaxRuleEvent $event)
     {
-        $product = new TaxRuleModel();
+        $taxRule = new TaxRuleModel();
 
-        $product
+        $taxRule
             ->setDispatcher($this->getDispatcher())
-
-            ->setRef($event->getRef())
-            ->setTitle($event->getTitle())
             ->setLocale($event->getLocale())
-            ->setVisible($event->getVisible())
-
-            // Set the default tax rule to this product
-            ->setTaxRule(TaxRuleQuery::create()->findOneByIsDefault(true))
-
-            //public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight) {
-
-            ->create(
-                    $event->getDefaultCategory(),
-                    $event->getBasePrice(),
-                    $event->getCurrencyId(),
-                    $event->getTaxRuleId(),
-                    $event->getBaseWeight()
-            );
+            ->setTitle($event->getTitle())
+            ->setDescription($event->getDescription())
          ;
 
-        $event->setTaxRule($product);
+        $taxRule->save();
+
+        $event->setTaxRule($taxRule);
     }
 
     /**
@@ -74,6 +61,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
 
             $taxRule
+                ->setDispatcher($this->getDispatcher())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())

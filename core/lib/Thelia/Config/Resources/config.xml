@@ -115,6 +115,7 @@
 
         <form name="thelia.admin.taxrule.modification" class="Thelia\Form\TaxRuleModificationForm"/>
         <form name="thelia.admin.taxrule.taxlistupdate" class="Thelia\Form\TaxRuleTaxListUpdateForm"/>
+        <form name="thelia.admin.taxrule.add" class="Thelia\Form\TaxRuleCreationForm"/>
 
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>

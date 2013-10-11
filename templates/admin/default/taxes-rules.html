@@ -27,7 +27,7 @@
                             <caption class="clearfix">
                                 {intl l="Taxes rules"}
                                 {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.taxes-rules.create"}
-                                    <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new tax rule'}" href="#creation_dialog" data-toggle="modal">
+                                    <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new tax rule'}" href="#tax_rule_create_dialog" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus"></span>
                                     </a>
                                 {/loop}
@@ -73,7 +73,64 @@
     </div>
 </div>
 
-{* -- Delete category confirmation dialog ----------------------------------- *}
+{* -- Add tax rule confirmation dialog ----------------------------------- *}
+{form name="thelia.admin.taxrule.add"}
+
+{if $form_error_message}
+    {$taxCreateError = true}
+{else}
+    {$taxCreateError = false}
+{/if}
+
+{* Capture the dialog body, to pass it to the generic dialog *}
+{capture "tax_rule_create_dialog"}
+
+    {form_hidden_fields form=$form}
+
+    {form_field form=$form field='locale'}
+        <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+    {/form_field}
+
+    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+    {form_field form=$form field='title'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$TITLE}{/if}{/if}">
+        </div>
+    {/form_field}
+
+    {form_field form=$form field='description'}
+        <div class="form-group {if $error}has-error{/if}">
+            <label for="{$label_attr.for}" class="control-label">
+                {intl l=$label} :
+                <span class="label-help-block">{intl l="The detailed description."}</span>
+            </label>
+
+            <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$DESCRIPTION}{/if}{/if}</textarea>
+        </div>
+    {/form_field}
+
+{/capture}
+
+    {include
+        file = "includes/generic-create-dialog.html"
+
+        dialog_id    = "tax_rule_create_dialog"
+        dialog_title = {intl l="Create a new tax rule"}
+        dialog_body  = {$smarty.capture.tax_rule_create_dialog nofilter}
+
+        dialog_ok_label     = {intl l="Create"}
+        dialog_cancel_label = {intl l="Cancel"}
+
+        form_action        = {url path="/admin/configuration/taxes_rules/add"}
+        form_enctype       = {form_enctype form=$form}
+        form_error_message = $form_error_message
+    }
+
+{/form}
+
+{* -- Delete tax rule confirmation dialog ----------------------------------- *}
 
 {capture "tax_rule_delete_dialog"}
     <input type="hidden" name="tax_rule_id" id="tax_rule_delete_id" value="" />
@@ -97,10 +154,15 @@
 
 {block name="javascript-initialization"}
 
-    <script type="text/javascript">
-        $(".js-delete-tax-rule").click(function(e){
-            $('#tax_rule_delete_id').val($(this).data('id'))
-        });
-    </script>
+<script type="text/javascript">
+
+{if $taxCreateError == true}
+    $('#tax_rule_create_dialog').modal();
+{/if}
+
+    $(".js-delete-tax-rule").click(function(e){
+        $('#tax_rule_delete_id').val($(this).data('id'))
+    });
+</script>
 
 {/block}
