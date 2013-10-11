@@ -31,10 +31,35 @@ namespace Thelia\Core\Event\Area;
  */
 class AreaDeleteEvent extends AreaEvent
 {
+    /**
+     * @var int area id
+     */
     protected $area_id;
 
     public function __construct($area_id)
     {
         $this->area_id = $area_id;
     }
+
+    /**
+     * @param null $area_id
+     *
+     * @return $this
+     */
+    public function setAreaId($area_id)
+    {
+        $this->area_id = $area_id;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getAreaId()
+    {
+        return $this->area_id;
+    }
+
+
 }

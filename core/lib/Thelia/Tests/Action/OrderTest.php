@@ -347,7 +347,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
             /* check tax */
             $orderProductTaxList = $orderProduct->getOrderProductTaxes();
-            foreach ($cartItem->getProduct()->getTaxRule()->getTaxDetail($validDeliveryAddress->getCountry(), $cartItem->getPrice(), $cartItem->getPromoPrice()) as $index => $tax) {
+            foreach ($cartItem->getProduct()->getTaxRule()->getTaxDetail($cartItem->getProduct(), $validDeliveryAddress->getCountry(), $cartItem->getPrice(), $cartItem->getPromoPrice()) as $index => $tax) {
                 $orderProductTax = $orderProductTaxList[$index];
                 $this->assertEquals($tax->getAmount(), $orderProductTax->getAmount());
                 $this->assertEquals($tax->getPromoAmount(), $orderProductTax->getPromoAmount());

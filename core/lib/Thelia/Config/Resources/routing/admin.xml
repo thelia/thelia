@@ -691,9 +691,9 @@
         <default key="_controller">Thelia\Controller\Admin\AreaController::defaultAction</default>
     </route>
 
-    <route id="admin.configuration.shipping-configuration.update.view" path="/admin/configuration/shipping_configuration/update/{shipping_configuration_id}" methods="get">
+    <route id="admin.configuration.shipping-configuration.update.view" path="/admin/configuration/shipping_configuration/update/{area_id}" methods="get">
         <default key="_controller">Thelia\Controller\Admin\AreaController::updateAction</default>
-        <requirement key="shipping_configuration_id">\d+</requirement>
+        <requirement key="area_id">\d+</requirement>
     </route>
 
     <!-- end shipping routes management -->
@@ -792,6 +792,31 @@
     </route>
 
     <!-- end Modules rule management -->
+
+    <!-- taxe rules management -->
+
+    <route id="admin.configuration.taxes-rules.list" path="/admin/configuration/taxes_rules">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.taxes-rules.update" path="/admin/configuration/taxes_rules/update/{tax_rule_id}">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::updateAction</default>
+        <requirement key="tax_rule_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.taxes-rules.save" path="/admin/configuration/taxes_rules/save">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.configuration.taxes-rules.saveTaxes" path="/admin/configuration/taxes_rules/saveTaxes">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::processUpdateTaxesAction</default>
+    </route>
+
+    <route id="admin.configuration.taxes-rules.delete" path="/admin/configuration/taxes_rules/delete">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::deleteAction</default>
+    </route>
+
+    <!-- end tax rules management -->
 
 
 	<!-- The default route, to display a template -->

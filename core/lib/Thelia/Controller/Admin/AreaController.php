@@ -22,10 +22,14 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+
 use Thelia\Core\Event\Area\AreaCreateEvent;
+use Thelia\Core\Event\Area\AreaDeleteEvent;
 use Thelia\Core\Event\Area\AreaUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\Area\AreaCreateForm;
+use Thelia\Form\Area\AreaModificationForm;
+use Thelia\Model\AreaQuery;
 
 /**
  * Class AreaController
@@ -34,18 +38,6 @@ use Thelia\Form\Area\AreaCreateForm;
  */
 class AreaController extends AbstractCrudController
 {
-/*    public function indexAction()
-    {
-        if (null !== $response = $this->checkAuth("admin.shipping-configuration.view")) return $response;
-        return $this->render("shipping-configuration", array("display_shipping_configuration" => 20));
-    }
-
-    public function updateAction($shipping_configuration_id)
-    {
-        return $this->render("shipping-configuration-edit", array(
-            "shipping_configuration_id" => $shipping_configuration_id
-        ));
-    }*/
 
     public function __construct()
     {
@@ -65,6 +57,11 @@ class AreaController extends AbstractCrudController
         );
     }
 
+    protected function getAreaId()
+    {
+        return $this->getRequest()->get('area_id', 0);
+    }
+
     /**
      * Return the creation form for this object
      */
@@ -78,7 +75,7 @@ class AreaController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        return new AreaCreateForm($this->getRequest());
+        return new AreaModificationForm($this->getRequest());
     }
 
     /**
@@ -88,7 +85,11 @@ class AreaController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
-        // TODO: Implement hydrateObjectForm() method.
+        $data = array(
+            'name' => $object->getName()
+        );
+
+        return new AreaModificationForm($this->getRequest(), 'form', $data);
     }
 
     /**
@@ -129,27 +130,27 @@ class AreaController extends AbstractCrudController
      */
     protected function getDeleteEvent()
     {
-        // TODO: Implement getDeleteEvent() method.
+        return new AreaDeleteEvent($this->getAreaId());
     }
 
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param unknown $event
+     * @param \Thelia\Core\Event\Area\AreaEvent $event
      */
     protected function eventContainsObject($event)
     {
-        // TODO: Implement eventContainsObject() method.
+        return $event->hasArea();
     }
 
     /**
      * Get the created object from an event.
      *
-     * @param unknown $createEvent
+     * @param \Thelia\Core\Event\Area\AreaEvent $event
      */
     protected function getObjectFromEvent($event)
     {
-        // TODO: Implement getObjectFromEvent() method.
+        return $event->getArea();
     }
 
     /**
@@ -157,27 +158,27 @@ class AreaController extends AbstractCrudController
      */
     protected function getExistingObject()
     {
-        // TODO: Implement getExistingObject() method.
+        return AreaQuery::create()->findPk($this->getAreaId());
     }
 
     /**
      * Returns the object label form the object event (name, title, etc.)
      *
-     * @param unknown $object
+     * @param \Thelia\Model\Area $object
      */
     protected function getObjectLabel($object)
     {
-        // TODO: Implement getObjectLabel() method.
+        return $object->getName();
     }
 
     /**
      * Returns the object ID from the object
      *
-     * @param unknown $object
+     * @param \Thelia\Model\Area $object
      */
     protected function getObjectId($object)
     {
-        // TODO: Implement getObjectId() method.
+        return $object->getId();
     }
 
     /**
@@ -195,7 +196,9 @@ class AreaController extends AbstractCrudController
      */
     protected function renderEditionTemplate()
     {
-        // TODO: Implement renderEditionTemplate() method.
+        return $this->render('shipping-configuration-edit',array(
+            'area_id' => $this->getAreaId()
+        ));
     }
 
     /**
@@ -203,7 +206,10 @@ class AreaController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        // TODO: Implement redirectToEditionTemplate() method.
+        $this->redirectToRoute('admin.configuration.shipping-configuration.update.view', array(), array(
+                "area_id" => $this->getAreaId()
+            )
+        );
     }
 
     /**
@@ -211,6 +217,6 @@ class AreaController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        return $this->render("shipping-configuration");
+        $this->redirectToRoute('admin.configuration.shipping-configuration.default');
     }
 }

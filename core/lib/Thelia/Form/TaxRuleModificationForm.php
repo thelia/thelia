@@ -20,33 +20,52 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\TaxEngine\TaxType;
+namespace Thelia\Form;
 
-use Thelia\Type\FloatToFloatArrayType;
-use Thelia\Type\ModelValidIdType;
+use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Model\TaxRuleQuery;
 
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
-class featureSlicePercentTaxType extends  BaseTaxType
+class TaxRuleModificationForm extends TaxRuleCreationForm
 {
-    public function pricePercentRetriever()
-    {
+    use StandardDescriptionFieldsTrait;
 
+    protected function buildForm()
+    {
+        parent::buildForm(true);
+
+        $this->formBuilder
+            ->add("id", "hidden", array(
+                    "required" => true,
+                    "constraints" => array(
+                        new Constraints\NotBlank(),
+                        new Constraints\Callback(
+                            array(
+                                "methods" => array(
+                                    array($this, "verifyTaxRuleId"),
+                                ),
+                            )
+                        ),
+                    )
+            ))
+        ;
+
+        // Add standard description fields
+        $this->addStandardDescFields(array('postscriptum', 'chapo', 'locale'));
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    public function getName()
     {
-
+        return "thelia_tax_rule_modification";
     }
 
-    public function getRequirementsList()
+    public function verifyTaxRuleId($value, ExecutionContextInterface $context)
     {
-        return array(
-            'featureId' => new ModelValidIdType('Currency'),
-            'slices' => new FloatToFloatArrayType(),
-        );
+        $taxRule = TaxRuleQuery::create()
+            ->findPk($value);
+
+        if (null === $taxRule) {
+            $context->addViolation("Tax rule ID not found");
+        }
     }
 }
