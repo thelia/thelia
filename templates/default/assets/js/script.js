@@ -3,7 +3,7 @@
 
     /*	------------------------------------------------------------------
      onLoad Function -------------------------------------------------- */
-    $(document).ready(function(){ alert(1);
+    $(document).ready(function(){
 
         // Loader
         var $loader = $('<div class="loader"></div>');
@@ -158,6 +158,78 @@
                 $label.filter('[for="' + $(this).attr('id') + '"]').addClass('active');
             }).filter(':has(:checked)').addClass('active');
         });
+
+
+        if($("body").is(".page-product")){
+
+            var $quantityInput  = $("#quantity");
+
+
+            var $btnAddToCart   = $(".btn_add_to_cart", $("#form-product-details"));
+
+            var $productMeta    = $("#stockInformations");
+
+            var $inStock        = $(".in",$productMeta);
+            var $outOfStock     = $(".out",$productMeta);
+
+            var $old_price_container    = $(".old-price", $("#product-details"));
+
+
+            // Switch Quantity in product page
+            $("select", $(".product-options")).change(function(){
+                var $select_quantity        = $(this).find(":selected").attr("data-quantity");
+                var $old_price              = $(this).find(":selected").attr("data-old-price");
+
+                var $best_price             = $(this).find(":selected").attr("data-price");
+
+                $quantityInput.attr("max", $select_quantity);
+
+                // Show Out Of Stock OR In Stock
+                if($select_quantity == 0){
+                    $btnAddToCart.attr("disabled", true);
+
+                    $productMeta.removeClass("in-stock");
+                    $productMeta.addClass("out-of-stock");
+
+                    $productMeta.attr("href", "http://schema.org/OutOfStock");
+
+                    $outOfStock.show();
+                    $inStock.hide();
+
+                }else{
+                    $btnAddToCart.attr("disabled", false);
+
+                    $productMeta.removeClass("out-of-stock");
+                    $productMeta.addClass("in-stock");
+
+                    $productMeta.attr("href", "http://schema.org/InStock");
+
+                    $inStock.show();
+                    $outOfStock.hide();
+                }
+
+                if(parseInt($quantityInput.val()) > parseInt($select_quantity)){
+                    $quantityInput.val($select_quantity);
+                }
+
+                if($old_price_container.size() > 0 ){
+                    $(".price", $old_price_container).html($old_price);
+                    $(".price", $(".special-price")).html($best_price);
+                }else{
+                    $(".price", $(".regular-price")).html($best_price);
+                }
+
+            }).change();
+
+            $quantityInput.focusout(function() {
+                $quantityInput.attr("max", $select_quantity);
+                if(parseInt($quantityInput.val()) > parseInt($select_quantity)){
+                    $quantityInput.val($select_quantity);
+                }
+            });
+        }
+
+
 
         $('#limit-top').change(function(e){
             window.location = $(this).val()
