@@ -8,12 +8,12 @@
 <div class="shipping-configuration edit-shipping-configuration">
 
     <div id="wrapper" class="container">
-
+        {loop name="area-edit" type="area" id=$area_id}
         <ul class="breadcrumb">
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l="Shipping configuration"}</a></li>
-            <li>{intl l='Editing shipping configuration "%name"' name="{$TITLE}"}</li>
+            <li>{intl l='Editing shipping configuration "%name"' name="{$NAME}"}</li>
         </ul>
 
         <div class="row">
@@ -21,7 +21,7 @@
                 <div class="general-block-decorator">
                     
                     <div class="col-md-12 title title-without-tabs">
-                        {intl l='Edit shipping configuration %title' title=$TITLE}
+                        {intl l='Edit shipping configuration %title' title=$NAME}
                     </div>
 
                     <div class="form-container clearfix">
@@ -29,7 +29,7 @@
                             
                             
                             {form name="thelia.admin.area.country"}
-                            <form method="POST" action="">
+                            <form method="POST" action="{url path="/admin/configuration/shipping_configuration/country/add"}">
                                 {form_hidden_fields form=$form}
 
                                 {form_field form=$form field='success_url'}
@@ -102,7 +102,15 @@
                 </div>
             </div>
         </div>
+        {/loop}
 
+        {elseloop rel="area-edit"}
+        <div class="row">
+            <div class="col-md-12">
+                {intl l="No area defined with this id"}
+            </div>
+        </div>
+        {/elseloop}
     </div>
 </div>  
 

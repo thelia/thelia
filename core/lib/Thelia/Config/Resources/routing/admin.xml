@@ -696,6 +696,10 @@
         <requirement key="area_id">\d+</requirement>
     </route>
 
+    <route id="admin.configuration.shipping-configuration.country.add" path="/admin/configuration/shipping_configuration/country/add" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\AreaController::addCountry</default>
+    </route>
+
     <!-- end shipping routes management -->
 
     <!-- Countries routes management -->
