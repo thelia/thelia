@@ -28,10 +28,12 @@ use Thelia\Core\Event\Area\AreaCreateEvent;
 use Thelia\Core\Event\Area\AreaDeleteEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\Area\AreaUpdateEvent;
+use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\Area\AreaCountryForm;
 use Thelia\Form\Area\AreaCreateForm;
 use Thelia\Form\Area\AreaModificationForm;
+use Thelia\Form\Area\AreaPostageForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AreaQuery;
 
@@ -251,10 +253,6 @@ class AreaController extends AbstractCrudController
                 $this->adminLogAppend(sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
             }
 
-            if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirectToEditionTemplate($this->getRequest());
-            }
-
             // Redirect to the success URL
             $this->redirect($areaCountryForm->getSuccessUrl());
 
@@ -283,5 +281,46 @@ class AreaController extends AbstractCrudController
         $this->dispatch(TheliaEvents::AREA_REMOVE_COUNTRY, $removeCountryEvent);
 
         $this->redirectToEditionTemplate();
+    }
+
+    public function updatePostageAction()
+    {
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+
+        $areaUpdateForm = new AreaPostageForm($this->getRequest());
+        $error_msg = null;
+
+        try {
+            $form = $this->validateForm($areaUpdateForm);
+
+            $event = new AreaUpdatePostageEvent($form->get('area_id')->getData());
+            $event->setPostage($form->get('postage')->getData());
+
+            $this->dispatch(TheliaEvents::AREA_POSTAGE_UPDATE, $event);
+
+            if (! $this->eventContainsObject($event))
+                throw new \LogicException(
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName)));
+
+            // Log object modification
+            if (null !== $changedObject = $this->getObjectFromEvent($event)) {
+                $this->adminLogAppend(sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+            }
+
+            // Redirect to the success URL
+            $this->redirect($areaUpdateForm->getSuccessUrl());
+        } catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext(
+            $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)), $error_msg, $areaUpdateForm);
+
+        // At this point, the form has errors, and should be redisplayed.
+        return $this->renderEditionTemplate();
     }
 }

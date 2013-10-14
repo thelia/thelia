@@ -240,6 +240,7 @@ final class TheliaEvents
 
     const AREA_ADD_COUNTRY = 'action.area.addCountry';
     const AREA_REMOVE_COUNTRY = 'action.area.removeCountry';
+    const AREA_POSTAGE_UPDATE = 'action.area.postageUpdate';
 
     // -- Categories Associated Content ----------------------------------------
 

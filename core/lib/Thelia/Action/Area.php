@@ -25,6 +25,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
+use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\AreaQuery;
 use Thelia\Model\CountryQuery;
@@ -57,6 +58,17 @@ class Area extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function updatePostage(AreaUpdatePostageEvent $event)
+    {
+        if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
+            $area
+                ->setPostage($event->getPostage())
+                ->save();
+
+            $event->setArea($area);
+        }
+    }
+
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -82,7 +94,8 @@ class Area extends BaseAction implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::AREA_ADD_COUNTRY => array('addCountry', 128),
-            TheliaEvents::AREA_REMOVE_COUNTRY => array('removeCountry', 128)
+            TheliaEvents::AREA_REMOVE_COUNTRY => array('removeCountry', 128),
+            TheliaEvents::AREA_POSTAGE_UPDATE => array('updatePostage', 128)
         );
     }
 }
