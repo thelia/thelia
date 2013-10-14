@@ -54,19 +54,19 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function generateAdapterStub($cartTotalPrice = 400, $checkoutCurrency = 'EUR')
     {
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
             ->will($this->returnValue($cartTotalPrice));
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
             ->will($this->returnValue($checkoutCurrency));
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
@@ -74,11 +74,11 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
         $currency1->setCode('EUR');
         $currency2 = new Currency();
         $currency2->setCode('USD');
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getAvailableCurrencies')
             ->will($this->returnValue(array($currency1, $currency2)));
 
-        return $stubAdapter;
+        return $stubFacade;
     }
 
     /**
@@ -89,10 +89,10 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidBackOfficeInputOperator()
     {
-        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
+        $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        /** @var FacadeInterface $stubAdapter */
-        $condition1 = new MatchForEveryoneManager($stubAdapter);
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForEveryoneManager($stubFacade);
         $operators = array();
         $values = array();
         $condition1->setValidatorsFromForm($operators, $values);
@@ -112,10 +112,10 @@ class MatchForEveryoneManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsMatching()
     {
-        $stubAdapter = $this->generateAdapterStub(399, 'EUR');
+        $stubFacade = $this->generateAdapterStub(399, 'EUR');
 
-        /** @var FacadeInterface $stubAdapter */
-        $condition1 = new MatchForEveryoneManager($stubAdapter);
+        /** @var FacadeInterface $stubFacade */
+        $condition1 = new MatchForEveryoneManager($stubFacade);
 
         $isValid = $condition1->isMatching();
 
