@@ -50,10 +50,10 @@
                                     <td>
                                         <div class="btn-group">
                                             {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-configuration.change"}
-                                               <a class="btn btn-default btn-xs shipping-configuration-change" title="{intl l='Change this shipping configuration'}" href="{url path="/admin/configuration/shipping_configuration/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                               <a class="btn btn-default btn-xs area-configuration-change" title="{intl l='Change this shipping configuration'}" href="{url path="/admin/configuration/shipping_configuration/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
                                             {/loop}
                                             {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.shipping-configuration.delete"}
-                                                <a class="btn btn-default btn-xs shipping-configuration-delete" title="{intl l='Delete this shipping configuration'}"  href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                <a class="btn btn-default btn-xs area-configuration-delete" title="{intl l='Delete this shipping configuration'}"  href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
                                             {/loop}
                                         </div>
                                     </td>
@@ -105,7 +105,7 @@
     {* Delete confirmation dialog *}
 
     {capture "delete_dialog"}
-        <input type="hidden" name="shipping_zones_id" id="shipping_configuration_delete_id" value="" />
+        <input type="hidden" name="area_id" id="shipping_configuration_delete_id" value="" />
 
         {module_include location='shipping_configuration_delete_form'}
 
@@ -121,4 +121,14 @@
         form_action         = {url path='/admin/configuration/shipping_configuration/delete'}
         form_content        = {$smarty.capture.delete_dialog nofilter}
     }
+{/block}
+
+{block name="javascript-initialization"}
+    <script>
+        $(document).ready(function(){
+            $(".area-configuration-delete").click(function(e){
+                $("#shipping_configuration_delete_id").val($(this).data("id"));
+            });
+        });
+    </script>
 {/block}
