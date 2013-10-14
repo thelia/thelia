@@ -193,31 +193,34 @@ class CustomerController extends BaseFrontController
 
                 $form = $this->validateForm($customerLoginForm, "post");
 
-                $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
+                try {
 
-                $customer = $authenticator->getAuthentifiedUser();
+                    $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
 
-                $this->processLogin($customer);
+                    $customer = $authenticator->getAuthentifiedUser();
 
-                $this->redirectSuccess($customerLoginForm);
+                    $this->processLogin($customer);
+
+                    $this->redirectSuccess($customerLoginForm);
+
+                } catch (UsernameNotFoundException $e) {
+                    $message = "1.Wrong email or password. Please try again";
+                } catch (WrongPasswordException $e) {
+                    $message = "2.Wrong email or password. Please try again";
+                } catch (AuthenticationException $e) {
+                    $message = "3.Wrong email or password. Please try again";
+                }
 
             } catch (FormValidationException $e) {
 
-                if ($request->request->has("account")) {
-                    $account = $request->request->get("account");
-                    $form = $customerLoginForm->getForm();
-                    if ($account == 0 && $form->get("email")->getData() !== null) {
-                        $this->redirectToRoute("customer.create.view", array("email" => $form->get("email")->getData()));
-                    }
+                // If User is a new customer
+                $form = $customerLoginForm->getForm();
+                if ($form->get('account')->getData() == 0 && !$form->get("email")->getErrors()) {
+                    $this->redirectToRoute("customer.create.view", array("email" => $form->get("email")->getData()));
+                } else {
+                    $message = sprintf("Please check your input: %s", $e->getMessage());
                 }
 
-                $message = sprintf("Please check your input: %s", $e->getMessage());
-            } catch (UsernameNotFoundException $e) {
-                $message = "Wrong email or password. Please try again";
-            } catch (WrongPasswordException $e) {
-                $message = "Wrong email or password. Please try again";
-            } catch (AuthenticationException $e) {
-                $message = "Wrong email or password. Please try again";
             } catch (\Exception $e) {
                 $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }

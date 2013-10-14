@@ -22,10 +22,18 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Base\CustomerQuery;
 
+/**
+ * Class CustomerLogin
+ * @package Thelia\Form
+ * @author  Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class CustomerLogin extends BaseForm
 {
     protected function buildForm()
@@ -33,8 +41,14 @@ class CustomerLogin extends BaseForm
         $this->formBuilder
             ->add("email", "email", array(
                 "constraints" => array(
-                    new NotBlank(),
-                    new Email()
+                    new Constraints\NotBlank(),
+                    new Constraints\Email(),
+                    new Constraints\Callback(array(
+                        "methods" => array(
+                            array($this,
+                                "verifyExistingEmail")
+                        )
+                    ))
                 ),
                 "label" => Translator::getInstance()->trans("Please enter your email address"),
                 "label_attr" => array(
@@ -42,18 +56,40 @@ class CustomerLogin extends BaseForm
                 ),
                 "required" => true
             ))
+            ->add("account", "choice", array(
+                "choices" => array(
+                    0 => Translator::getInstance()->trans("No, I am a new customer."),
+                    1 => Translator::getInstance()->trans("Yes, I have a password :")
+                ),
+                "label_attr" => array(
+                    "for" => "account"
+                ),
+                "data" => 0
+            ))
             ->add("password", "password", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new Constraints\NotBlank()
                 ),
                 "label" => Translator::getInstance()->trans("Please enter your password"),
                 "label_attr" => array(
                     "for" => "password"
                 ),
-                "required" => true
-            ))
-            ->add("remember_me", "checkbox")
-           ;
+                'required'    => false
+            ));
+    }
+
+    /**
+     * If the user select "I'am a new customer", we make sure is email address does not exit in the database.
+     */
+    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+        if ($data["account"] == 0) {
+            $customer = CustomerQuery::create()->findOneByEmail($value);
+            if ($customer) {
+                $context->addViolation("A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password.");
+            }
+        }
     }
 
     public function getName()
