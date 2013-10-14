@@ -21,100 +21,33 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Country;
+namespace Thelia\Core\Event\Area;
 
 
 /**
- * Class CountryUpdateEvent
- * @package Thelia\Core\Event\Country
+ * Class AreaCreateEvent
+ * @package Thelia\Core\Event\Area
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CountryUpdateEvent extends CountryCreateEvent
+class AreaCreateEvent extends AreaEvent
 {
-    protected $country_id;
-
-    protected $chapo;
-    protected $description;
-    protected $postscriptum;
-
-    function __construct($country_id)
-    {
-        $this->country_id = $country_id;
-    }
+    protected $name;
 
     /**
-     * @param mixed $chapo
+     * @param mixed $name
      */
-    public function setChapo($chapo)
+    public function setAreaName($name)
     {
-        $this->chapo = $chapo;
-
-        return $this;
+        $this->name = $name;
     }
 
     /**
      * @return mixed
      */
-    public function getChapo()
+    public function getAreaName()
     {
-        return $this->chapo;
+        return $this->name;
     }
-
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    /**
-     * @param mixed $postscriptum
-     */
-    public function setPostscriptum($postscriptum)
-    {
-        $this->postscriptum = $postscriptum;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPostscriptum()
-    {
-        return $this->postscriptum;
-    }
-
-    /**
-     * @param mixed $country_id
-     */
-    public function setCountryId($country_id)
-    {
-        $this->country_id = $country_id;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCountryId()
-    {
-        return $this->country_id;
-    }
-
-
 
 
 }

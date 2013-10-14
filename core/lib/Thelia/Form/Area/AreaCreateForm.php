@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia                                                                       */
+/*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,29 +17,63 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
+namespace Thelia\Form\Area;
+use Thelia\Core\Translation\Translator;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Form\BaseForm;
+
 
 /**
- * Class ShippingConfigurationController
- * @package Thelia\Controller\Admin
+ * Class AreaCreateForm
+ * @package Thelia\Form\Shipping
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ShippingConfigurationController extends BaseAdminController
+class AreaCreateForm extends BaseForm
 {
-    public function indexAction()
+
+    /**
+     *
+     * in this function you add all the fields you need for your Form.
+     * Form this you have to call add method on $this->formBuilder attribute :
+     *
+     * $this->formBuilder->add("name", "text")
+     *   ->add("email", "email", array(
+     *           "attr" => array(
+     *               "class" => "field"
+     *           ),
+     *           "label" => "email",
+     *           "constraints" => array(
+     *               new \Symfony\Component\Validator\Constraints\NotBlank()
+     *           )
+     *       )
+     *   )
+     *   ->add('age', 'integer');
+     *
+     * @return null
+     */
+    protected function buildForm()
     {
-        if (null !== $response = $this->checkAuth("admin.shipping-configuration.view")) return $response;
-        return $this->render("shipping-configuration", array("display_shipping_configuration" => 20));
+        $this->formBuilder
+            ->add('name', 'text', array(
+                'constraints' => array(
+                    new NotBlank()
+                ),
+                'label_attr' => array('for' => 'shipping_name'),
+                'label' => Translator::getInstance()->trans('shipping area name')
+            ))
+
+        ;
     }
 
-    public function updateAction($shipping_configuration_id)
+    /**
+     * @return string the name of you form. This name must be unique
+     */
+    public function getName()
     {
-        return $this->render("shipping-configuration-edit", array(
-            "shipping_configuration_id" => $shipping_configuration_id
-        ));
+        return 'thelia_area_creation';
     }
 }

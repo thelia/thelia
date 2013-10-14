@@ -21,33 +21,32 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Country;
+namespace Thelia\Core\Event\Area;
 
 
 /**
- * Class CountryUpdateEvent
- * @package Thelia\Core\Event\Country
+ * Class AreaUpdatePostageEvent
+ * @package Thelia\Core\Event\Area
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CountryUpdateEvent extends CountryCreateEvent
+class AreaUpdatePostageEvent extends AreaEvent
 {
-    protected $country_id;
+    protected $area_id;
+    protected $postage;
 
-    protected $chapo;
-    protected $description;
-    protected $postscriptum;
-
-    function __construct($country_id)
+    function __construct($area_id)
     {
-        $this->country_id = $country_id;
+        $this->area_id = $area_id;
     }
 
     /**
-     * @param mixed $chapo
+     * @param mixed $area_id
+     *
+     * @return $this
      */
-    public function setChapo($chapo)
+    public function setAreaId($area_id)
     {
-        $this->chapo = $chapo;
+        $this->area_id = $area_id;
 
         return $this;
     }
@@ -55,17 +54,19 @@ class CountryUpdateEvent extends CountryCreateEvent
     /**
      * @return mixed
      */
-    public function getChapo()
+    public function getAreaId()
     {
-        return $this->chapo;
+        return $this->area_id;
     }
 
     /**
-     * @param mixed $description
+     * @param mixed $postage
+     *
+     * @return $this
      */
-    public function setDescription($description)
+    public function setPostage($postage)
     {
-        $this->description = $description;
+        $this->postage = $postage;
 
         return $this;
     }
@@ -73,45 +74,9 @@ class CountryUpdateEvent extends CountryCreateEvent
     /**
      * @return mixed
      */
-    public function getDescription()
+    public function getPostage()
     {
-        return $this->description;
-    }
-
-    /**
-     * @param mixed $postscriptum
-     */
-    public function setPostscriptum($postscriptum)
-    {
-        $this->postscriptum = $postscriptum;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPostscriptum()
-    {
-        return $this->postscriptum;
-    }
-
-    /**
-     * @param mixed $country_id
-     */
-    public function setCountryId($country_id)
-    {
-        $this->country_id = $country_id;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCountryId()
-    {
-        return $this->country_id;
+        return $this->postage;
     }
 
 

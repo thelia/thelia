@@ -30,8 +30,8 @@
                                 <div class="col-md-12">
 
         						    {form name="thelia.admin.country.modification"}
-        						    	<form method="POST" action="{url path='/admin/configuration/countries/save'}" {form_enctype form=$form} class="clearfix">
-                                            
+        						    	<form method="POST" action="{url path="/admin/configuration/country/save/{$ID}"}" {form_enctype form=$form} class="clearfix">
+                                            {include file = "includes/inner-form-toolbar.html"}
                                             <div class="row">
             	                                <div class="col-md-12">
                                                     {* Be sure to get the country ID, even if the form could not be validated *}
@@ -40,8 +40,12 @@
                 						        	{form_hidden_fields form=$form}
 
                 						        	{form_field form=$form field='success_url'}
-                						        		<input type="hidden" name="{$name}" value="{url path='/admin/configuration/countries'}" />
-                						        	{/form_field}        			                        
+                						        		<input type="hidden" name="{$name}" value="{url path="/admin/configuration/country/update/{$ID}"}" />
+                						        	{/form_field}
+
+                                                    {form_field form=$form field='locale'}
+                                                        <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+                                                    {/form_field}
 
                 					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}        	                                
 
@@ -74,51 +78,26 @@
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Alpha code 3'}">
                                                         </div>
                                                     {/form_field}
-                                                </div>
-                                                
-                                                <div class="col-md-12 title title-without-tabs">
-                                                   {intl l="Translations"}
-                                                </div>
 
-                                                {loop type="lang" name="lang"}
-                                                    <div class="col-md-3">
-                                                        <div class="panel panel-default">
-                                                            <div class="panel-heading">
-                                                                <h3 class="panel-title">
-                                                                    <img src="{image file="assets/img/flags/{$CODE}.gif"}" alt="{intl l=$TITLE}"> {$TITLE}
-                                                                </h3>
-                                                            </div>
-                                                            <div class="panel-body">
-                                                                {form_field form=$form field='title'}
-                                                                    <div class="form-group {if $error}has-error{/if}">
-                                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$TITLE}" title="{intl l="{$label}"}" placeholder="{intl l='Country title'}">
-                                                                    </div>
-                                                                {/form_field}
-                                                                {form_field form=$form field='chapo'}
-                                                                    <div class="form-group {if $error}has-error{/if}">
-                                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                                        <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l=""}" placeholder="{intl l='Country short description'}"></textarea>
-                                                                    </div>
-                                                                {/form_field}
-                                                                {form_field form=$form field='description'}
-                                                                    <div class="form-group {if $error}has-error{/if}">
-                                                                        <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
-                                                                        <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Country description'}"></textarea>
-                                                                    </div>
-                                                                {/form_field}
-                                                            </div>
+                                                    {form_field form=$form field='title'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{intl l="{$label}"}" placeholder="{intl l='Country title'}">
                                                         </div>
-                                                    </div>
-                                                {/loop}
-                                                
-                                                <div class="col-md-12 text-right">
-                                                    <button type="submit" class="btn btn-default btn-primary" title="{intl l='Add a new country'}">
-                                                        {intl l="Save"}
-                                                        <span class="glyphicon glyphicon-ok"></span>
-                                                    </button>
+                                                    {/form_field}
+                                                    {form_field form=$form field='chapo'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l=""}" placeholder="{intl l='Country short description'}">{$value}</textarea>
+                                                        </div>
+                                                    {/form_field}
+                                                    {form_field form=$form field='description'}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                                                            <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Country description'}">{$value}</textarea>
+                                                        </div>
+                                                    {/form_field}
                                                 </div>
-                                            </div>
                                         </form>
         							{/form}
 

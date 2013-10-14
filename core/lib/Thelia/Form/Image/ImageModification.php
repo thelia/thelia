@@ -130,16 +130,6 @@ abstract class ImageModification extends BaseForm
                     )
                 )
             )
-            ->add(
-                'postscriptum',
-                'text',
-                array(
-                    'constraints' => array(),
-                    'label' => Translator::getInstance()->trans('Post Scriptum'),
-                    'label_attr' => array(
-                        'for' => 'postscriptum'
-                    )
-                )
-            );
+        ;
     }
 }

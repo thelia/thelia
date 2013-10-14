@@ -21,100 +21,29 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Country;
+namespace Thelia\Form\Area;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Thelia\Form\Area\AreaCreateForm;
 
 
 /**
- * Class CountryUpdateEvent
- * @package Thelia\Core\Event\Country
+ * Class AreaModificationForm
+ * @package Thelia\Form\Shipping
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CountryUpdateEvent extends CountryCreateEvent
+class AreaModificationForm extends AreaCreateForm
 {
-    protected $country_id;
-
-    protected $chapo;
-    protected $description;
-    protected $postscriptum;
-
-    function __construct($country_id)
+    public function buildForm()
     {
-        $this->country_id = $country_id;
+        parent::buildForm();
+
+        $this->formBuilder
+            ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
+        ;
     }
 
-    /**
-     * @param mixed $chapo
-     */
-    public function setChapo($chapo)
+    public function getName()
     {
-        $this->chapo = $chapo;
-
-        return $this;
+        return 'thelia_area_modification';
     }
-
-    /**
-     * @return mixed
-     */
-    public function getChapo()
-    {
-        return $this->chapo;
-    }
-
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    /**
-     * @param mixed $postscriptum
-     */
-    public function setPostscriptum($postscriptum)
-    {
-        $this->postscriptum = $postscriptum;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPostscriptum()
-    {
-        return $this->postscriptum;
-    }
-
-    /**
-     * @param mixed $country_id
-     */
-    public function setCountryId($country_id)
-    {
-        $this->country_id = $country_id;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCountryId()
-    {
-        return $this->country_id;
-    }
-
-
-
-
 }

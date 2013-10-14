@@ -22,75 +22,79 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
-
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\Country\CountryCreateEvent;
-use Thelia\Core\Event\Country\CountryDeleteEvent;
-use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
-use Thelia\Core\Event\Country\CountryUpdateEvent;
+use Thelia\Core\Event\Area\AreaAddCountryEvent;
+use Thelia\Core\Event\Area\AreaCreateEvent;
+use Thelia\Core\Event\Area\AreaDeleteEvent;
+use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
+use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Country as CountryModel;
+use Thelia\Model\AreaQuery;
 use Thelia\Model\CountryQuery;
+use Thelia\Action\BaseAction;
+use Thelia\Model\Area as AreaModel;
 
 
 /**
- * Class Country
+ * Class Area
  * @package Thelia\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Country extends BaseAction implements EventSubscriberInterface
+class Area extends BaseAction implements EventSubscriberInterface
 {
 
-    public function create(CountryCreateEvent $event)
-    {
-        $country = new CountryModel();
-
-        $country
-            ->setIsocode($event->getIsocode())
-            ->setIsoalpha2($event->getIsoAlpha2())
-            ->setIsoalpha3($event->getIsoAlpha3())
-            ->setLocale($event->getLocale())
-            ->setTitle($event->getTitle())
-            ->save();
-
-        $event->setCountry($country);
-
-    }
-
-    public function update(CountryUpdateEvent $event)
+    public function addCountry(AreaAddCountryEvent $event)
     {
         if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
-            $country
-                ->setIsocode($event->getIsocode())
-                ->setIsoalpha2($event->getIsoAlpha2())
-                ->setIsoalpha3($event->getIsoAlpha3())
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setChapo($event->getChapo())
-                ->setDescription($event->getDescription())
+            $country->setDispatcher($this->getDispatcher());
+            $country->setAreaId($event->getAreaId())
                 ->save();
 
-            $event->setCountry($country);
+            $event->setArea($country->getArea());
         }
     }
 
-    public function delete(CountryDeleteEvent $event)
+    public function removeCountry(AreaRemoveCountryEvent $event)
     {
         if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
-            $country->delete();
-
-            $event->setCountry($country);
+            $country->setDispatcher($this->getDispatcher());
+            $country->setAreaId(null)
+                ->save();
         }
     }
 
-    public function toggleDefault(CountryToggleDefaultEvent $event)
+    public function updatePostage(AreaUpdatePostageEvent $event)
     {
-        if( null !== $country = CountryQuery::create()->findPk($event->getCountryId()))
-        {
-            $country->toggleDefault();
+        if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
+            $area->setDispatcher($this->getDispatcher());
+            $area
+                ->setPostage($event->getPostage())
+                ->save();
 
-            $event->setCountry($country);
+            $event->setArea($area);
         }
+    }
+
+    public function delete(AreaDeleteEvent $event)
+    {
+        if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
+            $area->setDispatcher($this->getDispatcher());
+            $area->delete();
+
+            $event->setArea($area);
+        }
+    }
+
+    public function create(AreaCreateEvent $event)
+    {
+        $area = new AreaModel();
+
+        $area
+            ->setDispatcher($this->getDispatcher())
+            ->setName($event->getAreaName())
+            ->save();
+
+        $event->setArea($area);
     }
 
 
@@ -117,10 +121,11 @@ class Country extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::COUNTRY_CREATE            => array('create', 128),
-            TheliaEvents::COUNTRY_UPDATE            => array('update', 128),
-            TheliaEvents::COUNTRY_DELETE            => array('delete', 128),
-            TheliaEvents::COUNTRY_TOGGLE_DEFAULT    => array('toggleDefault', 128)
+            TheliaEvents::AREA_ADD_COUNTRY => array('addCountry', 128),
+            TheliaEvents::AREA_REMOVE_COUNTRY => array('removeCountry', 128),
+            TheliaEvents::AREA_POSTAGE_UPDATE => array('updatePostage', 128),
+            TheliaEvents::AREA_DELETE => array('delete', 128),
+            TheliaEvents::AREA_CREATE => array('create', 128)
         );
     }
 }

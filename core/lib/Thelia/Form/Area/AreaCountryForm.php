@@ -21,100 +21,69 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Country;
+namespace Thelia\Form\Area;
+
+use Thelia\Core\Translation\Translator;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Form\BaseForm;
 
 
 /**
- * Class CountryUpdateEvent
- * @package Thelia\Core\Event\Country
+ * Class AreaCountryForm
+ * @package Thelia\Form\Area
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CountryUpdateEvent extends CountryCreateEvent
+class AreaCountryForm extends BaseForm
 {
-    protected $country_id;
 
-    protected $chapo;
-    protected $description;
-    protected $postscriptum;
-
-    function __construct($country_id)
+    /**
+     *
+     * in this function you add all the fields you need for your Form.
+     * Form this you have to call add method on $this->formBuilder attribute :
+     *
+     * $this->formBuilder->add("name", "text")
+     *   ->add("email", "email", array(
+     *           "attr" => array(
+     *               "class" => "field"
+     *           ),
+     *           "label" => "email",
+     *           "constraints" => array(
+     *               new \Symfony\Component\Validator\Constraints\NotBlank()
+     *           )
+     *       )
+     *   )
+     *   ->add('age', 'integer');
+     *
+     * @return null
+     */
+    protected function buildForm()
     {
-        $this->country_id = $country_id;
+        $this->formBuilder
+            ->add('area_id', 'integer', array(
+                'constraints' => array(
+                    new GreaterThan(array('value' => 0)),
+                    new NotBlank()
+                )
+
+            ))
+            ->add('country_id', 'integer', array(
+                'constraints' => array(
+                    new GreaterThan(array('value' => 0)),
+                    new NotBlank()
+                ),
+                'label_attr' => array(
+                    'for' => 'area_country'
+                ),
+                'label' => Translator::getInstance()->trans('Country')
+            ));
     }
 
     /**
-     * @param mixed $chapo
+     * @return string the name of you form. This name must be unique
      */
-    public function setChapo($chapo)
+    public function getName()
     {
-        $this->chapo = $chapo;
-
-        return $this;
+        return 'thelia_area_country';
     }
-
-    /**
-     * @return mixed
-     */
-    public function getChapo()
-    {
-        return $this->chapo;
-    }
-
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    /**
-     * @param mixed $postscriptum
-     */
-    public function setPostscriptum($postscriptum)
-    {
-        $this->postscriptum = $postscriptum;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPostscriptum()
-    {
-        return $this->postscriptum;
-    }
-
-    /**
-     * @param mixed $country_id
-     */
-    public function setCountryId($country_id)
-    {
-        $this->country_id = $country_id;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCountryId()
-    {
-        return $this->country_id;
-    }
-
-
-
-
 }

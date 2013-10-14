@@ -22,77 +22,45 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
-
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\Country\CountryCreateEvent;
-use Thelia\Core\Event\Country\CountryDeleteEvent;
-use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
-use Thelia\Core\Event\Country\CountryUpdateEvent;
+use Thelia\Core\Event\ShippingZone\ShippingZoneAddAreaEvent;
+use Thelia\Core\Event\ShippingZone\ShippingZoneRemoveAreaEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Country as CountryModel;
-use Thelia\Model\CountryQuery;
+use Thelia\Model\AreaDeliveryModule;
+use Thelia\Model\AreaDeliveryModuleQuery;
 
 
 /**
- * Class Country
+ * Class ShippingZone
  * @package Thelia\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Country extends BaseAction implements EventSubscriberInterface
+class ShippingZone extends BaseAction implements EventSubscriberInterface
 {
 
-    public function create(CountryCreateEvent $event)
+    public function addArea(ShippingZoneAddAreaEvent $event)
     {
-        $country = new CountryModel();
+        $areaDelivery = new AreaDeliveryModule();
 
-        $country
-            ->setIsocode($event->getIsocode())
-            ->setIsoalpha2($event->getIsoAlpha2())
-            ->setIsoalpha3($event->getIsoAlpha3())
-            ->setLocale($event->getLocale())
-            ->setTitle($event->getTitle())
+        $areaDelivery
+            ->setAreaId($event->getAreaId())
+            ->setDeliveryModuleId($event->getShoppingZoneId())
             ->save();
-
-        $event->setCountry($country);
-
     }
 
-    public function update(CountryUpdateEvent $event)
+    public function removeArea(ShippingZoneRemoveAreaEvent $event)
     {
-        if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
-            $country
-                ->setIsocode($event->getIsocode())
-                ->setIsoalpha2($event->getIsoAlpha2())
-                ->setIsoalpha3($event->getIsoAlpha3())
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setChapo($event->getChapo())
-                ->setDescription($event->getDescription())
-                ->save();
+        $areaDelivery = AreaDeliveryModuleQuery::create()
+            ->filterByAreaId($event->getAreaId())
+            ->filterByDeliveryModuleId($event->getShoppingZoneId())
+            ->findOne();
 
-            $event->setCountry($country);
+        if($areaDelivery) {
+            $areaDelivery->delete();
+        } else {
+            throw new \RuntimeException(sprintf('areaDeliveryModule not found with area_id = %d and delivery_module_id = %d', $event->getAreaId(), $event->getShoppingZoneId()));
         }
     }
-
-    public function delete(CountryDeleteEvent $event)
-    {
-        if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
-            $country->delete();
-
-            $event->setCountry($country);
-        }
-    }
-
-    public function toggleDefault(CountryToggleDefaultEvent $event)
-    {
-        if( null !== $country = CountryQuery::create()->findPk($event->getCountryId()))
-        {
-            $country->toggleDefault();
-
-            $event->setCountry($country);
-        }
-    }
-
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -117,10 +85,8 @@ class Country extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::COUNTRY_CREATE            => array('create', 128),
-            TheliaEvents::COUNTRY_UPDATE            => array('update', 128),
-            TheliaEvents::COUNTRY_DELETE            => array('delete', 128),
-            TheliaEvents::COUNTRY_TOGGLE_DEFAULT    => array('toggleDefault', 128)
+            TheliaEvents::SHIPPING_ZONE_ADD_AREA => array('addArea', 128),
+            TheliaEvents::SHIPPING_ZONE_REMOVE_AREA => array('removeArea', 128),
         );
     }
 }
