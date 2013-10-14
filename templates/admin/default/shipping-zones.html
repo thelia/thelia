@@ -36,57 +36,21 @@
                             </thead>
 
                             <tbody>
+                                {loop type="delivery" name="delivery.list" backend_context="1"}
                                 <tr>
-                                   <td>So Colissimo</td>                                   
+                                   <td><a href="{url path="/admin/configuration/shipping_zones/update/$ID"}">{$TITLE}</a></td>
 
                                     {module_include location='shipping_zones_table_row'}
 
                                     <td>
-                                        {if ! $SECURED}
-                                            <div class="btn-group">
-                                               {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-zones.change"}
-                                                   <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
-                                               {/loop}                                               
-                                            </div>
-                                        {else}
-                                            <i title="{intl l='This shipping zone could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
-                                        {/if}
+                                        <div class="btn-group">
+                                           {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-zones.change"}
+                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                           {/loop}
+                                        </div>
                                     </td>
-                                </tr>                           
-                                <tr>
-                                   <td>Chronopost</td>                                   
-
-                                    {module_include location='shipping_zones_table_row'}
-
-                                    <td>
-                                        {if ! $SECURED}
-                                            <div class="btn-group">
-                                               {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-zones.change"}
-                                                   <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
-                                               {/loop}                                               
-                                            </div>
-                                        {else}
-                                            <i title="{intl l='This shipping zone could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
-                                        {/if}
-                                    </td>
-                                </tr>                           
-                                <tr>
-                                   <td>Kiala</td>                                   
-
-                                    {module_include location='shipping_zones_table_row'}
-
-                                    <td>
-                                        {if ! $SECURED}
-    	                                    <div class="btn-group">
-                                               {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-zones.change"}
-                                                   <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
-                                               {/loop}                                               
-    	                                    </div>
-    	                                {else}
-    	                                    <i title="{intl l='This shipping zone could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
-                                        {/if}
-                                    </td>
-                                </tr>	                        
+                                </tr>
+                                {/loop}
                             </tbody>
                         </table>
                     </div>
@@ -98,24 +62,4 @@
 
     </div>
 </div>
-
-    {* Delete confirmation dialog *}
-
-    {capture "delete_dialog"}
-        <input type="hidden" name="shipping_zones_id" id="shipping_zones_delete_id" value="" />
-
-        {module_include location='shipping_zones_delete_form'}
-
-    {/capture}
-
-    {include
-        file = "includes/generic-confirm-dialog.html"
-
-        dialog_id       = "delete_dialog"
-        dialog_title    = {intl l="Delete shipping zone"}
-        dialog_message  = {intl l="Do you really want to delete this shipping zone ?"}
-
-        form_action         = {url path='/admin/configuration/shipping_zones/delete'}
-        form_content        = {$smarty.capture.delete_dialog nofilter}
-    }
 {/block}

@@ -32,11 +32,9 @@
 
                                 <div class="input-group">                                    
                                     <select name="" id="" data-toggle="selectpicker">
-                                        <option value="">1</option>
-                                        <option value="">2</option>
-                                        <option value="">3</option>
-                                        <option value="">4</option>
-                                        <option value="">5</option>
+                                        {loop name="area.module.not_associated" type="area" without_zone=$shipping_zones_id}
+                                        <option value="{$ID}">{$NAME}</option>
+                                        {/loop}
                                     </select>
                                     <span class="input-group-btn">
                                         <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add"}</button>
@@ -57,30 +55,16 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {loop type="area" name="area.module.associated" with_zone=$shipping_zones_id}
                                         <tr>
-                                            <td>France</td>
+                                            <td>{$NAME}</td>
                                             <td>
                                                 <a class="btn btn-default btn-xs" title="{intl l='Delete this zone'}"  href="#delete_zone_dialog" data-id="{$ID}" data-toggle="modal">
                                                     <span class="glyphicon glyphicon-trash"></span>
                                                 </a>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>Zone 1</td>
-                                            <td>
-                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this zone'}"  href="#delete_zone_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-trash"></span>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Zone 2</td>
-                                            <td>
-                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this zone'}"  href="#delete_zone_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-trash"></span>
-                                                </a>
-                                            </td>
-                                        </tr>
+                                        {/loop}
                                     </tbody>
                                 </table>
                             </div>

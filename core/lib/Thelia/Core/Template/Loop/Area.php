@@ -75,7 +75,9 @@ class Area extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id')
+            Argument::createIntListTypeArgument('id'),
+            Argument::createIntTypeArgument('with_zone'),
+            Argument::createIntTypeArgument('without_zone')
         );
     }
 
@@ -100,6 +102,24 @@ class Area extends BaseLoop
         if ($id) {
             $search->filterById($id, Criteria::IN);
         }
+
+        $withZone = $this->getWith_zone();
+
+        if ($withZone) {
+            $search->joinAreaDeliveryModule('with_zone')
+                ->where('`with_zone`.delivery_module_id '.Criteria::EQUAL.' ?', $withZone, \PDO::PARAM_INT);
+        }
+
+        $withoutZone = $this->getWithout_zone();
+
+        if($withoutZone)
+        {
+            $search->joinAreaDeliveryModule('without_zone', Criteria::LEFT_JOIN)
+                ->addJoinCondition('without_zone', 'delivery_module_id '.Criteria::EQUAL.' ?', $withoutZone, null, \PDO::PARAM_INT)
+                ->where('`without_zone`.delivery_module_id '.Criteria::ISNULL);
+        }
+
+        //echo $search->toString(); exit;
 
         $areas = $this->search($search, $pagination);
 
