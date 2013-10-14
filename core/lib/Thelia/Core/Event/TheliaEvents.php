@@ -242,6 +242,15 @@ final class TheliaEvents
     const AREA_REMOVE_COUNTRY = 'action.area.removeCountry';
     const AREA_POSTAGE_UPDATE = 'action.area.postageUpdate';
 
+    const BEFORE_CREATEAREA = 'action.before_createArea';
+    const AFTER_CREATEAREA = 'action.after_createArea';
+
+    const BEFORE_UPDATEAREA = 'action.before_updateArea';
+    const AFTER_UPDATEAREA = 'action.after_updateArea';
+
+    const BEFORE_DELETEAREA = 'action.before_deleteArea';
+    const AFTER_DELETEAREA = 'action.after_deleteArea';
+
     // -- Categories Associated Content ----------------------------------------
 
     const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT   = "action.before_createCategoryAssociatedContent";

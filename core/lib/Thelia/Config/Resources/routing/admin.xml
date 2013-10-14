@@ -696,6 +696,10 @@
         <requirement key="area_id">\d+</requirement>
     </route>
 
+    <route id="admin.configuration.shipping-configuration..delete" path="/admin/configuration/shipping_configuration/delete">
+        <default key="_controller">Thelia\Controller\Admin\AreaController::deleteAction</default>
+    </route>
+
     <route id="admin.configuration.shipping-configuration.update.postage" path="/admin/configuration/shipping_configuration/update_postage/{area_id}">
         <default key="_controller">Thelia\Controller\Admin\AreaController::updatePostageAction</default>
         <requirement key="area_id">\d+</requirement>

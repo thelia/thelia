@@ -24,6 +24,7 @@
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
+use Thelia\Core\Event\Area\AreaDeleteEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -43,6 +44,7 @@ class Area extends BaseAction implements EventSubscriberInterface
     public function addCountry(AreaAddCountryEvent $event)
     {
         if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
+            $country->setDispatcher($this->getDispatcher());
             $country->setAreaId($event->getAreaId())
                 ->save();
 
@@ -53,6 +55,7 @@ class Area extends BaseAction implements EventSubscriberInterface
     public function removeCountry(AreaRemoveCountryEvent $event)
     {
         if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
+            $country->setDispatcher($this->getDispatcher());
             $country->setAreaId(null)
                 ->save();
         }
@@ -61,9 +64,20 @@ class Area extends BaseAction implements EventSubscriberInterface
     public function updatePostage(AreaUpdatePostageEvent $event)
     {
         if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
+            $area->setDispatcher($this->getDispatcher());
             $area
                 ->setPostage($event->getPostage())
                 ->save();
+
+            $event->setArea($area);
+        }
+    }
+
+    public function delete(AreaDeleteEvent $event)
+    {
+        if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
+            $area->setDispatcher($this->getDispatcher());
+            $area->delete();
 
             $event->setArea($area);
         }
@@ -95,7 +109,8 @@ class Area extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::AREA_ADD_COUNTRY => array('addCountry', 128),
             TheliaEvents::AREA_REMOVE_COUNTRY => array('removeCountry', 128),
-            TheliaEvents::AREA_POSTAGE_UPDATE => array('updatePostage', 128)
+            TheliaEvents::AREA_POSTAGE_UPDATE => array('updatePostage', 128),
+            TheliaEvents::AREA_DELETE => array('delete', 128)
         );
     }
 }
