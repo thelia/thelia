@@ -683,6 +683,10 @@
         <requirement key="shipping_zones_id">\d+</requirement>
     </route>
 
+    <route id="admin.configuration.shipping-zones.area.add" path="/admin/configuration/shipping_zones/area/add">
+        <default key="_controller">Thelia\Controller\Admin\ShippingZoneController::addArea</default>
+    </route>
+
     <!-- end shipping routes management -->
 
     <!-- Shipping zones routes management -->

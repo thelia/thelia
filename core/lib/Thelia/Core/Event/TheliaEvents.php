@@ -232,7 +232,7 @@ final class TheliaEvents
     const BEFORE_UPDATECOUNTRY = "action.before_updateCountry";
     const AFTER_UPDATECOUNTRY 	= "action.after_updateCountry";
 
-    // -- SHIPPING CONFIGURATION MANAGEMENT
+    // -- AREA CONFIGURATION MANAGEMENT
 
     const AREA_CREATE = 'action.createArea';
     const AREA_UPDATE = 'action.updateArea';
@@ -250,6 +250,10 @@ final class TheliaEvents
 
     const BEFORE_DELETEAREA = 'action.before_deleteArea';
     const AFTER_DELETEAREA = 'action.after_deleteArea';
+
+    // -- SHIPPING ZONE MANAGEMENT
+
+    const SHIPPING_ZONE_ADD_AREA = 'action.shippingZone.addArea';
 
     // -- Categories Associated Content ----------------------------------------
 

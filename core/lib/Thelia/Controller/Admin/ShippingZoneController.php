@@ -22,6 +22,9 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\ShippingZone\ShippingZoneAddAreaEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Form\Exception\FormValidationException;
 
 /**
  * Class ShippingZoneController
@@ -30,6 +33,8 @@ namespace Thelia\Controller\Admin;
  */
 class ShippingZoneController extends BaseAdminController
 {
+    public $objectName = 'areaDeliveryModule';
+
     public function indexAction()
     {
         if (null !== $response = $this->checkAuth("admin.shipping-zones.view")) return $response;
@@ -38,9 +43,63 @@ class ShippingZoneController extends BaseAdminController
 
     public function updateAction($shipping_zones_id)
     {
+        if (null !== $response = $this->checkAuth("admin.shipping-zones.view")) return $response;
         return $this->render("shipping-zones-edit", array(
             "shipping_zones_id" => $shipping_zones_id
         ));
+    }
+
+    /**
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     */
+    public function addArea()
+    {
+        if (null !== $response = $this->checkAuth("admin.shipping-zones.update")) return $response;
+
+        $shippingAreaForm = new \Thelia\Form\ShippingZone\ShippingZoneAddArea($this->getRequest());
+        $error_msg = null;
+
+        try {
+            $form = $this->validateForm($shippingAreaForm);
+
+            $event = new ShippingZoneAddAreaEvent(
+                $form->get('area_id')->getData(),
+                $form->get('shipping_zone_id')->getData()
+            );
+
+            $this->dispatch(TheliaEvents::SHIPPING_ZONE_ADD_AREA, $event);
+
+            // Redirect to the success URL
+            $this->redirect($shippingAreaForm->getSuccessUrl());
+
+        } catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext(
+            $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)), $error_msg, $shippingAreaForm);
+
+        // At this point, the form has errors, and should be redisplayed.
+        return $this->renderEditionTemplate();
+    }
+
+    /**
+     * Render the edition template
+     */
+    protected function renderEditionTemplate()
+    {
+        return $this->render('admin.configuration.shipping-zones.update.view',array(
+            'shipping_zones_id' => $this->getShippingZoneId()
+        ));
+    }
+
+    protected function getShippingZoneId()
+    {
+        return $this->getRequest()->get('shipping_zone_id', 0);
     }
 
 

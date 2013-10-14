@@ -27,11 +27,11 @@
                     <div class="form-container clearfix">
                         <div class="col-md-4">
                             {form name="thelia.shopping_zone_area"}
-                            <form method="POST" action="">
+                            <form method="POST" action="{url path="/admin/configuration/shipping_zones/area/add"}">
                                 {form_hidden_fields form=$form}
 
                                 {form_field form=$form field='success_url'}
-                                    <input type="hidden" name="{$name}" value="{navigate to="return_to"}" /> {* the url the user is redirected to on login success *}
+                                    <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$shipping_zones_id}"}" /> {* the url the user is redirected to on login success *}
                                 {/form_field}
 
                                 {form_field form=$form field='shipping_zone_id'}

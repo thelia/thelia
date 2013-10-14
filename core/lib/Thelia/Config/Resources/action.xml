@@ -131,6 +131,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.shippingZone" class="Thelia\Action\ShippingZone">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 
 </config>
