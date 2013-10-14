@@ -10,6 +10,11 @@
     </route>
 
     <!-- Customer routes : Register -->
+    <route id="customer.create.process" path="/register" methods="post">
+        <default key="_controller">Thelia\Controller\Front\CustomerController::createAction</default>
+        <default key="_view">register</default>
+    </route>
+
     <route id="customer.create.view" path="/register">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">register</default>
@@ -34,11 +39,6 @@
     <route id="customer.account.view" path="/customer/account">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">account</default>
-    </route>
-
-    <route id="customer.create.process" path="/customer/create" methods="post">
-        <default key="_controller">Thelia\Controller\Front\CustomerController::createAction</default>
-        <default key="_view">register</default>
     </route>
 
 
