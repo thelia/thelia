@@ -20,36 +20,85 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\TaxEngine\TaxType;
 
-use Thelia\Type\FloatType;
+namespace Thelia\Action;
 
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
-class PricePercentTaxType extends BaseTaxType
+use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Tax\TaxEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Tax as TaxModel;
+use Thelia\Model\TaxQuery;
+
+class Tax extends BaseAction implements EventSubscriberInterface
 {
-    public function pricePercentRetriever()
+    /**
+     * @param TaxEvent $event
+     */
+    public function create(TaxEvent $event)
     {
-        return ($this->getRequirement("percent") * 0.01);
+        $tax = new TaxModel();
+
+        $tax
+            ->setDispatcher($this->getDispatcher())
+            ->setType($event->getType())
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setDescription($event->getDescription())
+         ;
+
+        $tax->save();
+
+        $event->setTax($tax);
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    /**
+     * @param TaxEvent $event
+     */
+    public function update(TaxEvent $event)
     {
-        return 0;
+        if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
+
+            $tax
+                ->setDispatcher($this->getDispatcher())
+                ->setType($event->getType())
+                ->setLocale($event->getLocale())
+                ->setTitle($event->getTitle())
+                ->setDescription($event->getDescription())
+                ->save()
+            ;
+
+
+
+            $event->setTax($tax);
+        }
     }
 
-    public function getRequirementsList()
+    /**
+     * @param TaxEvent $event
+     */
+    public function delete(TaxEvent $event)
+    {
+        if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
+
+            $tax
+                ->delete()
+            ;
+
+            $event->setTax($tax);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedEvents()
     {
         return array(
-            'percent' => new FloatType(),
-        );
-    }
+            TheliaEvents::TAX_CREATE            => array("create", 128),
+            TheliaEvents::TAX_UPDATE            => array("update", 128),
+            TheliaEvents::TAX_DELETE            => array("delete", 128),
 
-    public function getTitle()
-    {
-        return "Price % Tax";
+        );
     }
 }

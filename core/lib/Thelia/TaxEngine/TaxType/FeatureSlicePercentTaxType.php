@@ -49,4 +49,9 @@ class featureSlicePercentTaxType extends  BaseTaxType
             'slices' => new FloatToFloatArrayType(),
         );
     }
+
+    public function getTitle()
+    {
+        return "% slice Tax depending on a feature";
+    }
 }

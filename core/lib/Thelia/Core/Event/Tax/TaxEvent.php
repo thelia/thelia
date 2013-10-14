@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,39 +17,93 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\TaxEngine\TaxType;
 
-use Thelia\Type\FloatType;
+namespace Thelia\Core\Event\Tax;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Tax;
 
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
-class PricePercentTaxType extends BaseTaxType
+class TaxEvent extends ActionEvent
 {
-    public function pricePercentRetriever()
+    protected $tax = null;
+
+    protected $locale;
+    protected $id;
+    protected $title;
+    protected $description;
+    protected $type;
+
+    public function __construct(Tax $tax = null)
     {
-        return ($this->getRequirement("percent") * 0.01);
+        $this->tax = $tax;
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    public function hasTax()
     {
-        return 0;
+        return ! is_null($this->tax);
     }
 
-    public function getRequirementsList()
+    public function getTax()
     {
-        return array(
-            'percent' => new FloatType(),
-        );
+        return $this->tax;
+    }
+
+    public function setTax(Tax $tax)
+    {
+        $this->tax = $tax;
+
+        return $this;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
     }
 
     public function getTitle()
     {
-        return "Price % Tax";
+        return $this->title;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    public function getType()
+    {
+        return $this->type;
     }
 }

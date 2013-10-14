@@ -20,36 +20,52 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\TaxEngine\TaxType;
-
-use Thelia\Type\FloatType;
+namespace Thelia\TaxEngine;
 
 /**
- *
+ * Class TaxEngine
+ * @package Thelia\TaxEngine
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
-class PricePercentTaxType extends BaseTaxType
+class TaxEngine
 {
-    public function pricePercentRetriever()
+    static public function getInstance()
     {
-        return ($this->getRequirement("percent") * 0.01);
+        return new TaxEngine();
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    private function getTaxTypeDirectory()
     {
-        return 0;
+        return __DIR__ . "/TaxType";
     }
 
-    public function getRequirementsList()
+    public function getTaxTypeList()
     {
-        return array(
-            'percent' => new FloatType(),
-        );
-    }
+        $typeList = array();
 
-    public function getTitle()
-    {
-        return "Price % Tax";
+        try {
+            $directoryBrowser = new \DirectoryIterator($this->getTaxTypeDirectory($this->getTaxTypeDirectory()));
+        } catch (\UnexpectedValueException $e) {
+            return $typeList;
+        }
+
+        /* browse the directory */
+        foreach ($directoryBrowser as $directoryContent) {
+            /* is it a file ? */
+            if (!$directoryContent->isFile()) {
+                continue;
+            }
+
+            $fileName = $directoryContent->getFilename();
+            $className = substr($fileName, 0, (1+strlen($directoryContent->getExtension())) * -1);
+
+            if($className == "BaseTaxType") {
+                continue;
+            }
+
+            $typeList[] = $className;
+        }
+
+        return $typeList;
     }
 }

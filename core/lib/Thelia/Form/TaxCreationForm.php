@@ -20,36 +20,48 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\TaxEngine\TaxType;
+namespace Thelia\Form;
 
-use Thelia\Type\FloatType;
+use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
+use Thelia\TaxEngine\TaxEngine;
+use Thelia\TaxEngine\TaxType;
 
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
-class PricePercentTaxType extends BaseTaxType
+class TaxCreationForm extends BaseForm
 {
-    public function pricePercentRetriever()
+    use StandardDescriptionFieldsTrait;
+
+    protected function buildForm($change_mode = false)
     {
-        return ($this->getRequirement("percent") * 0.01);
+        $types = TaxEngine::getInstance()->getTaxTypeList();
+        $typeList = array();
+        foreach($types as $type) {
+            $classPath = "\\Thelia\\TaxEngine\\TaxType\\$type";
+            $instance = new $classPath();
+            $typeList[$type] = $instance->getTitle();
+        }
+
+        $this->formBuilder
+            ->add("locale", "text", array(
+                "constraints" => array(new NotBlank())
+            ))
+            ->add("type", "choice", array(
+                "choices" => $typeList,
+                "required" => true,
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                ),
+                "label" => Translator::getInstance()->trans("Type"),
+                "label_attr" => array("for" => "type_field"),
+            ))
+        ;
+
+        $this->addStandardDescFields(array('postscriptum', 'chapo', 'locale'));
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    public function getName()
     {
-        return 0;
-    }
-
-    public function getRequirementsList()
-    {
-        return array(
-            'percent' => new FloatType(),
-        );
-    }
-
-    public function getTitle()
-    {
-        return "Price % Tax";
+        return "thelia_tax_creation";
     }
 }

@@ -111,6 +111,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.tax" class="Thelia\Action\Tax">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.content" class="Thelia\Action\Content">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>

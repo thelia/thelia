@@ -20,36 +20,47 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\TaxEngine\TaxType;
+namespace Thelia\Form;
 
-use Thelia\Type\FloatType;
+use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Model\TaxQuery;
 
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
-class PricePercentTaxType extends BaseTaxType
+class TaxModificationForm extends TaxCreationForm
 {
-    public function pricePercentRetriever()
+    protected function buildForm()
     {
-        return ($this->getRequirement("percent") * 0.01);
+        parent::buildForm(true);
+
+        $this->formBuilder
+            ->add("id", "hidden", array(
+                    "required" => true,
+                    "constraints" => array(
+                        new Constraints\NotBlank(),
+                        new Constraints\Callback(
+                            array(
+                                "methods" => array(
+                                    array($this, "verifyTaxId"),
+                                ),
+                            )
+                        ),
+                    )
+            ))
+        ;
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    public function getName()
     {
-        return 0;
+        return "thelia_tax_modification";
     }
 
-    public function getRequirementsList()
+    public function verifyTaxId($value, ExecutionContextInterface $context)
     {
-        return array(
-            'percent' => new FloatType(),
-        );
-    }
+        $tax = TaxQuery::create()
+            ->findPk($value);
 
-    public function getTitle()
-    {
-        return "Price % Tax";
+        if (null === $tax) {
+            $context->addViolation("Tax ID not found");
+        }
     }
 }
