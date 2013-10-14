@@ -128,6 +128,7 @@
         <form name="thelia.admin.area.create" class="Thelia\Form\Area\AreaCreateForm"/>
         <form name="thelia.admin.area.modification" class="Thelia\Form\Area\AreaModificationForm"/>
         <form name="thelia.admin.area.country" class="Thelia\Form\Area\AreaCountryForm"/>
+        <form name="thelia.admin.area.postage" class="Thelia\Form\Area\AreaPostageForm"/>
 
     </forms>
 

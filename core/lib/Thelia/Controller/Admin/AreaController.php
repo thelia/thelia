@@ -26,6 +26,7 @@ namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaCreateEvent;
 use Thelia\Core\Event\Area\AreaDeleteEvent;
+use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\Area\AreaUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\Area\AreaCountryForm;
@@ -270,5 +271,17 @@ class AreaController extends AbstractCrudController
 
         // At this point, the form has errors, and should be redisplayed.
         return $this->renderEditionTemplate();
+    }
+
+    public function removeCountry()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        $request = $this->getRequest();
+        $removeCountryEvent = new AreaRemoveCountryEvent($request->request->get('areai_id', 0), $request->request->get('country_id', 0));
+
+        $this->dispatch(TheliaEvents::AREA_REMOVE_COUNTRY, $removeCountryEvent);
+
+        $this->redirectToEditionTemplate();
     }
 }

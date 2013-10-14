@@ -71,7 +71,7 @@
                                         <tr>
                                             <td>{$TITLE}</td>
                                             <td>
-                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
+                                                <a class="btn btn-default btn-xs btn-delete-country" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
                                                     <span class="glyphicon glyphicon-trash"></span>
                                                 </a>
                                             </td>
@@ -81,16 +81,29 @@
                                     <tfoot>
                                         <tr class="active">
                                             <td colspan="2">
-                                                <form method="POST" action="">
-                                                    <label for="" class="control-label">{intl l="Postage"}</label>
+                                                {form name="thelia.admin.area.postage"}
+                                                <form method="POST" action="{url path="/admin/configuration/shipping_configuration/update_postage/{$area_id}"}">
+                                                    {form_hidden_fields form=$form}
+
+                                                    {form_field form=$form field='success_url'}
+                                                        <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_configuration/update/{$area_id}"}" >
+                                                    {/form_field}
+
+                                                    {form_field form=$form field='area_id'}
+                                                        <input type="hidden" name="{$name}" value="{$area_id}">
+                                                    {/form_field}
+                                                    {form_field form=$form field='postage'}
+                                                    <label for="{$label_attr.for}" class="control-label">{$label}</label>
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control" name="" id="" placeholder="Postage">
+                                                        <input type="text" class="form-control" name="{$name}" value="{$value}" id="{$label_attr.for}" placeholder="Postage">
                                                         <span class="input-group-addon">&euro;</span>
                                                         <span class="input-group-btn">
                                                             <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span></button>
                                                         </span>
                                                     </div>
+                                                    {/form_field}
                                                 </form>
+                                                {/form}
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -117,7 +130,8 @@
     {* Delete related content confirmation dialog *}
 
     {capture "delete_country_dialog"}
-        
+        <input type="hidden" name="area_id" value="{$area_id}">
+        <input type="hidden" name="country_id" id="delete-country-id" value="">
     {/capture}
 
     {include
@@ -127,7 +141,7 @@
         dialog_title    = {intl l="Remove country"}
         dialog_message  = {intl l="Do you really want to remove this country ?"}
 
-        form_action     = {url path=''}
+        form_action     = {url path='/admin/configuration/shipping_configuration/country/remove'}
         form_content    = {$smarty.capture.delete_country_dialog nofilter}
     }  
 {/block}
@@ -139,4 +153,12 @@
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
         <script src="{$asset_url}"></script>        
     {/javascripts}
+
+    <script>
+        $(document).ready(function(){
+            $(".btn-delete-country").click(function(e){
+                $("#delete-country-id").val($(this).data("id"));
+            });
+        });
+    </script>
 {/block}

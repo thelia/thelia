@@ -237,7 +237,9 @@ final class TheliaEvents
     const AREA_CREATE = 'action.createArea';
     const AREA_UPDATE = 'action.updateArea';
     const AREA_DELETE = 'action.deleteArea';
+
     const AREA_ADD_COUNTRY = 'action.area.addCountry';
+    const AREA_REMOVE_COUNTRY = 'action.area.removeCountry';
 
     // -- Categories Associated Content ----------------------------------------
 

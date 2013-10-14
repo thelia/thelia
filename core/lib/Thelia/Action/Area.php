@@ -24,6 +24,7 @@
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
+use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\AreaQuery;
 use Thelia\Model\CountryQuery;
@@ -45,6 +46,14 @@ class Area extends BaseAction implements EventSubscriberInterface
                 ->save();
 
             $event->setArea($country->getArea());
+        }
+    }
+
+    public function removeCountry(AreaRemoveCountryEvent $event)
+    {
+        if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
+            $country->setAreaId(null)
+                ->save();
         }
     }
 
@@ -72,7 +81,8 @@ class Area extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::AREA_ADD_COUNTRY => array('addCountry', 128)
+            TheliaEvents::AREA_ADD_COUNTRY => array('addCountry', 128),
+            TheliaEvents::AREA_REMOVE_COUNTRY => array('removeCountry', 128)
         );
     }
 }
