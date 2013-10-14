@@ -24,8 +24,10 @@
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ShippingZone\ShippingZoneAddAreaEvent;
+use Thelia\Core\Event\ShippingZone\ShippingZoneRemoveAreaEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\AreaDeliveryModule;
+use Thelia\Model\AreaDeliveryModuleQuery;
 
 
 /**
@@ -44,6 +46,20 @@ class ShippingZone extends BaseAction implements EventSubscriberInterface
             ->setAreaId($event->getAreaId())
             ->setDeliveryModuleId($event->getShoppingZoneId())
             ->save();
+    }
+
+    public function removeArea(ShippingZoneRemoveAreaEvent $event)
+    {
+        $areaDelivery = AreaDeliveryModuleQuery::create()
+            ->filterByAreaId($event->getAreaId())
+            ->filterByDeliveryModuleId($event->getShoppingZoneId())
+            ->findOne();
+
+        if($areaDelivery) {
+            $areaDelivery->delete();
+        } else {
+            throw new \RuntimeException(sprintf('areaDeliveryModule not found with area_id = %d and delivery_module_id = %d', $event->getAreaId(), $event->getShoppingZoneId()));
+        }
     }
 
     /**
@@ -69,7 +85,8 @@ class ShippingZone extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::SHIPPING_ZONE_ADD_AREA => array('addArea', 128)
+            TheliaEvents::SHIPPING_ZONE_ADD_AREA => array('addArea', 128),
+            TheliaEvents::SHIPPING_ZONE_REMOVE_AREA => array('removeArea', 128),
         );
     }
 }

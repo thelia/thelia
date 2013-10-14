@@ -254,6 +254,7 @@ final class TheliaEvents
     // -- SHIPPING ZONE MANAGEMENT
 
     const SHIPPING_ZONE_ADD_AREA = 'action.shippingZone.addArea';
+    const SHIPPING_ZONE_REMOVE_AREA = 'action.shippingZone.removeArea';
 
     // -- Categories Associated Content ----------------------------------------
 
