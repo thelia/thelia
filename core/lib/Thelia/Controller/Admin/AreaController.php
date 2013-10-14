@@ -126,7 +126,7 @@ class AreaController extends AbstractCrudController
 
     private function hydrateEvent($event, $formData)
     {
-        $event->setName($formData['name']);
+        $event->setAreaName($formData['name']);
 
         return $event;
     }

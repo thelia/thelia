@@ -36,7 +36,7 @@ class AreaCreateEvent extends AreaEvent
     /**
      * @param mixed $name
      */
-    public function setName($name)
+    public function setAreaName($name)
     {
         $this->name = $name;
     }
@@ -44,7 +44,7 @@ class AreaCreateEvent extends AreaEvent
     /**
      * @return mixed
      */
-    public function getName()
+    public function getAreaName()
     {
         return $this->name;
     }
