@@ -87,6 +87,7 @@ class Product extends BaseI18nLoop
             Argument::createIntTypeArgument('depth', 1),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createIntTypeArgument('currency'),
+            Argument::createAnyTypeArgument('title'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -170,6 +171,17 @@ class Product extends BaseI18nLoop
         if (!is_null($ref)) {
             $search->filterByRef($ref, Criteria::IN);
         }
+
+
+        $title = $this->getTitle();
+
+        if(!is_null($title)){
+
+            $search->where(" CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+        }
+
+
+
 
         $category = $this->getCategory();
         $categoryDefault = $this->getCategoryDefault();
