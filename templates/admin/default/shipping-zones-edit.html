@@ -26,12 +26,22 @@
 
                     <div class="form-container clearfix">
                         <div class="col-md-4">
-                            
+                            {form name="thelia.shopping_zone_area"}
                             <form method="POST" action="">
-                                <label class="control-label" for="">{intl l="Zones"}</label>
+                                {form_hidden_fields form=$form}
 
+                                {form_field form=$form field='success_url'}
+                                    <input type="hidden" name="{$name}" value="{navigate to="return_to"}" /> {* the url the user is redirected to on login success *}
+                                {/form_field}
+
+                                {form_field form=$form field='shipping_zone_id'}
+                                <input type="hidden" name="{$name}" value="{$shipping_zones_id}" />
+                                {/form_field}
+
+                                {form_field form=$form field='area_id'}
+                                <label class="control-label" for="{$label_attr.for}">{$label}</label>
                                 <div class="input-group">                                    
-                                    <select name="" id="" data-toggle="selectpicker">
+                                    <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
                                         {loop name="area.module.not_associated" type="area" without_zone=$shipping_zones_id}
                                         <option value="{$ID}">{$NAME}</option>
                                         {/loop}
@@ -40,9 +50,9 @@
                                         <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add"}</button>
                                     </span>
                                 </div>                                    
-                                
+                                {/form_field}
                             </form>
-                            
+                            {/form}
                         </div>
 
                         <div class="col-md-8">

@@ -130,6 +130,7 @@
         <form name="thelia.admin.area.country" class="Thelia\Form\Area\AreaCountryForm"/>
         <form name="thelia.admin.area.postage" class="Thelia\Form\Area\AreaPostageForm"/>
 
+        <form name="thelia.shopping_zone_area" class="Thelia\Form\ShippingZone\ShippingZoneAddArea"/>
     </forms>
 
 
