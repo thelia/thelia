@@ -250,7 +250,7 @@ class AreaController extends AbstractCrudController
 
             // Log object modification
             if (null !== $changedObject = $this->getObjectFromEvent($event)) {
-                $this->adminLogAppend(sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+                $this->adminLogAppend(sprintf("%s %s (ID %s) modified, new country added", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
             }
 
             // Redirect to the success URL
@@ -304,7 +304,7 @@ class AreaController extends AbstractCrudController
 
             // Log object modification
             if (null !== $changedObject = $this->getObjectFromEvent($event)) {
-                $this->adminLogAppend(sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+                $this->adminLogAppend(sprintf("%s %s (ID %s) modified, country remove", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
             }
 
             // Redirect to the success URL
