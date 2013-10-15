@@ -89,17 +89,12 @@ class CustomerLogin extends BaseForm
             }
         }
 
-        $context->addViolation('toto');
-
-        $root = $context->getRoot();
-        $password = $root->get('password')->getPropertyPath();
-        $parent = $password->getParent();
         //$propertyPath =
         $context->getViolations()->add(new ConstraintViolation(
             'failed password',
             'toto',
             array(),
-            $root,
+            $context->getRoot(),
             'children[password].data',
             'propertyPath'
         ));
