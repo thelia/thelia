@@ -163,16 +163,16 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
     public function countryDataAccess($params, $smarty)
     {
-        if (array_key_exists('defaultCountry', self::$dataAccessCache)) {
-            $defaultCountry = self::$dataAccessCache['defaultCountry'];
-        } else {
-            $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
-            self::$dataAccessCache['defaultCountry'] = $defaultCountry;
-        }
-
-        switch ($params["attr"]) {
+        switch ($params["ask"]) {
             case "default":
-                return $defaultCountry->getId();
+                /*if (array_key_exists('defaultCountry', self::$dataAccessCache)) {
+                    $defaultCountry = self::$dataAccessCache['defaultCountry'];
+                } else {
+                    $defaultCountry = CountryQuery::create()->findOneByByDefault(1);
+                    self::$dataAccessCache['defaultCountry'] = $defaultCountry;
+                }*/
+                $defaultCountry = CountryQuery::create()->filterByByDefault(1)->limit(1);
+                return $this->dataAccessWithI18n("defaultCountry", $params, $defaultCountry);
         }
     }
 

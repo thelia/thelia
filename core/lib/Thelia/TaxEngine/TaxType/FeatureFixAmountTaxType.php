@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia                                                                       */
+/*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,29 +17,52 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\TaxEngine\TaxType;
 
-namespace Thelia\Controller\Admin;
+use Thelia\Exception\TaxEngineException;
+use Thelia\Model\FeatureProductQuery;
+use Thelia\Model\Product;
+use Thelia\Type\FloatType;
+use Thelia\Type\ModelValidIdType;
 
 /**
- * Class ShippingConfigurationController
- * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
  */
-class ShippingConfigurationController extends BaseAdminController
+class FeatureFixAmountTaxType extends BaseTaxType
 {
-    public function indexAction()
+    public function pricePercentRetriever()
     {
-        if (null !== $response = $this->checkAuth("admin.shipping-configuration.view")) return $response;
-        return $this->render("shipping-configuration", array("display_shipping_configuration" => 20));
+        return 0;
     }
 
-    public function updateAction($shipping_configuration_id)
+    public function fixAmountRetriever(Product $product)
     {
-        return $this->render("shipping-configuration-edit", array(
-            "shipping_configuration_id" => $shipping_configuration_id
-        ));
+        $featureId = $this->getRequirement("feature");
+
+        $query = FeatureProductQuery::create()
+            ->filterByProduct($product)
+            ->filterByFeatureId($featureId)
+            ->findOne();
+
+        $taxAmount = $query->getFreeTextValue();
+
+        $testInt = new FloatType();
+        if(!$testInt->isValid($taxAmount)) {
+            throw new TaxEngineException('Feature value does not match FLOAT format', TaxEngineException::FEATURE_BAD_EXPECTED_VALUE);
+        }
+
+        return $taxAmount;
+    }
+
+    public function getRequirementsList()
+    {
+        return array(
+            'feature' => new ModelValidIdType('Feature'),
+        );
     }
 }

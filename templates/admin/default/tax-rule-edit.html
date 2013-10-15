@@ -5,7 +5,11 @@
 {block name="check-permissions"}admin.configuration.taxes-rules.edit{/block}
 
 {block name="main-content"}
-<div class="taxes-rules edit-taxes-rules">
+
+    {assign oder_tab {$smarty.get.tab|default:$smarty.post.tab|default:'data'}}
+    {assign asked_country {$smarty.get.country|default:{country ask="default" attr="id"}}}
+
+    <div class="taxes-rules edit-taxes-rules">
 
     <div id="wrapper" class="container">
 
@@ -13,143 +17,276 @@
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/taxes_rules'}">{intl l="Taxes rules"}</a></li>
-            <li>{intl l='Editing tax rule "%name"' name="{$TITLE}"}</li>
+            <li>{intl l='Editing tax rule'}</li>
         </ul>
+
+        {loop type="tax-rule" name="tax-rule" id=$tax_rule_id backend_context="1" lang=$edit_language_id}
 
         <div class="row">
             <div class="col-md-12 general-block-decorator clearfix">
 
-                <div class="title title-without-tabs">
-                   {intl l="Edit tax rule $TITLE"}
-                </div>
+                <ul class="nav nav-tabs clearfix">
+                    <li {if $oder_tab == 'data'}class="active"{/if}><a href="#data" data-tab-name="cart" data-toggle="tab"><span class="glyphicon glyphicon-shopping-cart"></span> {intl l="Description"}</a></li>
+                    <li {if $oder_tab == 'taxes'}class="active"{/if}><a href="#taxes" data-tab-name="bill" data-toggle="tab"><span class="glyphicon glyphicon-list-alt"></span> {intl l="Taxes"}</a></li>
+                </ul>
 
-                <form action="" method="post">
+                <div class="tab-content">
+                    <div class="tab-pane fade {if $oder_tab == 'data'}active in{/if}" id="data">
 
-                    <div class="form-group">
-                        <label for="" class="label-control">{intl l="Choose a country"} :</label>
-                        <div class="input-group">
-                            <select name="" id="" data-toggle="selectpicker">
-                                <option value="">France</option>
-                                <option value="">Spanish</option>
-                            </select>
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span></button>
-                            </span>
+                        <div class="form-container">
+
+                            {form name="thelia.admin.taxrule.modification"}
+
+                                <form method="POST" action="{url path="/admin/configuration/taxes_rules/save"}" {form_enctype form=$form} >
+
+                                    {include
+                                    file = "includes/inner-form-toolbar.html"
+                                    hide_submit_buttons = false
+
+                                    page_url  = {url path="/admin/configuration/taxes_rules/update/$tax_rule_id" tab=data}
+                                    close_url = {url path="/admin/configuration/taxes_rules"}
+                                    }
+
+                                    {* Be sure to get the product ID, even if the form could not be validated *}
+                                    <input type="hidden" name="tax_rule_id" value="{$ID}" />
+
+                                    {form_hidden_fields form=$form}
+
+                                    {form_field form=$form field='success_url'}
+                                        <input type="hidden" name="{$name}" value="{url path="/admin/configuration/taxes_rules"}" />
+                                    {/form_field}
+
+                                    {form_field form=$form field='locale'}
+                                        <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+                                    {/form_field}
+
+                                    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                    {form_field form=$form field='title'}
+                                        <div class="form-group {if $error}has-error{/if}">
+                                            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+                                            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$TITLE}{/if}{/if}">
+                                        </div>
+                                    {/form_field}
+
+                                    {form_field form=$form field='description'}
+                                        <div class="form-group {if $error}has-error{/if}">
+                                            <label for="{$label_attr.for}" class="control-label">
+                                                {intl l=$label} :
+                                                <span class="label-help-block">{intl l="The detailed description."}</span>
+                                            </label>
+
+                                            <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$DESCRIPTION}{/if}{/if}</textarea>
+                                        </div>
+                                    {/form_field}
+
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="control-group">
+                                                <label>&nbsp;</label>
+                                                <div class="controls">
+                                                    <p>{intl l='Tax rule created on %date_create. Last modification: %date_change' date_create={format_date date=$CREATE_DATE} date_change={format_date date=$UPDATE_DATE}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                            {/form}
                         </div>
+
                     </div>
 
-                </form>
+                    <div class="tab-pane fade {if $oder_tab == 'taxes'}active in{/if}" id="taxes">
 
-                <p><strong>{intl l="Countries that have the same tax rule"} :<strong></p>
-                <p class="lead">
-                    <span class="label label-info">Italy</span>
-                    <span class="label label-info">England</span>
-                    <span class="label label-info">Japan</span>
-                </p>
+                        <div class="col-md-12 title title-without-tabs">
+                            {intl l="Manage taxes"}
+                        </div>
 
-                <div class="row">
-                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="" class="label-control">{intl l="Choose a country"} :</label>
+                            <form id="country-selector-form" action="{url path="/admin/configuration/taxes_rules/update/$tax_rule_id"}" method="GET">
+                                <input type="hidden" name="tab" value="taxes">
+                                <select id="country-selector" name="country" data-toggle="selectpicker">
+                                    {loop type="country" name="country-list"}
+                                        <option value="{$ID}" {if $ID == $asked_country}selected="selected"{/if}>{$TITLE}</option>
+                                    {/loop}
+                                </select>
+                            </form>
+                        </div>
 
-                        <div id="panel" class="panel panel-default place">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Create a tax rule</h3>
-                            </div>
-                            <div class="panel-body">
+                        <p><strong>{intl l="Countries that have the same tax rule"} :<strong></p>
+                        <p class="lead">
 
-                                <div class="drop-group droppable add-to-group">
+                            {$matchedCountries.first=$asked_country}
+
+                            {loop type="tax-rule-country" name="same-country-list" tax_rule=$ID taxes="1,2,3" country=$asked_country}
+                            {$matchedCountries[]=$COUNTRY}
+                                <span class="label label-info">{$COUNTRY_TITLE}</span>
+                            {/loop}
+
+                            {elseloop rel="same-country-list"}
+                                <span class="label label-danger">{intl l="NONE"}</span>
+                            {/elseloop}
+                        </p>
+
+                        <div class="row">
+                            <div class="col-md-6">
+
+                                <div id="panel" class="panel panel-default place">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">{intl l="Manage the tax rule taxes appliance order"}</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        {assign lastPosition 0}
+                                        {loop type="tax-rule-country" name="existing-tax-list" tax_rule=$ID country=$asked_country}
+                                        {if $POSITION != $lastPosition}
+                                        {assign lastPosition $POSITION}
+                                        {if $LOOP_COUNT > 1}
+                                    </div>
+                                    {/if}
+                                    <div class="drop-group droppable add-to-group">
+                                        <p class="drop-message">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                            <span class="message">{intl l="Add tax to this group"}</span>
+                                        </p>
+                                        {/if}
+
+                                        <div class="drag" data-id="{$TAX}">{$TAX_TITLE}</div>
+
+                                        {if $LOOP_COUNT == $LOOP_TOTAL}
+                                    </div>
+                                    {/if}
+                                    {/loop}
+
+                                    {elseloop rel="existing-tax-list"}
+                                        <div class="drop-group droppable add-to-group">
+                                            <p class="drop-message">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                                <span class="message">{intl l="Add tax to this group"}</span>
+                                            </p>
+                                        </div>
+
+                                    {/elseloop}
+
+                                </div>
+                                <div class="panel-footer droppable create-group">
                                     <p class="drop-message">
                                         <span class="glyphicon glyphicon-plus"></span>
-                                        <span class="message">{intl l="Add tax to this group"}</span>
+                                        <span class="message">{intl l="Drop tax here to create a tax group"}</span>
                                     </p>
                                 </div>
+                            </div>
 
-                            </div>
-                            <div class="panel-footer droppable create-group">
-                                <p class="drop-message">
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                    <span class="message">{intl l="Drop tax here to create a tax group"}</span>
-                                </p>
-                            </div>
+                            <a href="#tax_list_update_dialog" data-toggle="modal" id="apply-taxes-rules" class="btn btn-default btn-primary btn-block"><span class="glyphicon glyphicon-check"></span> {intl l="Apply"}</a>
+
                         </div>
+                        <div class="col-md-6">
 
-                        <a href="#confirmation_dialog" data-toggle="modal" id="apply-taxes-rules" class="btn btn-default btn-primary btn-block"><span class="glyphicon glyphicon-check"></span> {intl l="Apply"}</a>
+                            <div id="panel-list" class="panel panel-default take">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Available taxes</h3>
+                                </div>
+                                <div class="panel-body">
+                                    {loop type="tax" name="tax-list" exclude_tax_rule=$ID country=$asked_country}
+                                        <div class="draggable" data-id="{$ID}">{$TITLE}</div>
+                                    {/loop}
+                                </div>
+                                <div class="panel-footer droppable remove-from-group">
+                                    <p class="drop-message">
+                                        <span class="glyphicon glyphicon-minus"></span>
+                                        <span class="message">{intl l="Drop tax here to delete from group"}</span>
+                                    </p>
+                                </div>
+                            </div>
 
-                    </div>
-                    <div class="col-md-6">
-
-                        <div id="panel-list" class="panel panel-default take">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">List of taxes</h3>
-                            </div>
-                            <div class="panel-body">
-                                <div class="draggable">Cras justo odio</div>
-                                <div class="draggable">Dapibus ac facilisis in</div>
-                                <div class="draggable">Morbi leo risus</div>
-                                <div class="draggable">Porta ac consectetur ac</div>
-                                <div class="draggable">Vestibulum at eros</div>
-                            </div>
-                            <div class="panel-footer droppable remove-from-group">
-                                <p class="drop-message">
-                                    <span class="glyphicon glyphicon-minus"></span>
-                                    <span class="message">{intl l="Drop tax here to delete from group"}</span>
-                                </p>
-                            </div>
                         </div>
-
                     </div>
+
                 </div>
-
             </div>
+
         </div>
+    </div>
+
+    {/loop}
 
     </div>
-    
-    {* Confirmation dialog *}
 
-    {capture "confirmation_dialog"}
-        
-        <form action="" method="post">
+{* Confirmation dialog *}
+    {form name="thelia.admin.taxrule.taxlistupdate"}
+
+    {if $form_error_message}
+        {$taxUpdateError = true}
+    {else}
+        {$taxUpdateError = false}
+    {/if}
+
+    {* Capture the dialog body, to pass it to the generic dialog *}
+    {capture "tax_list_update_dialog"}
+
+        <input type="hidden" name="tax_rule_id" value="{$tax_rule_id}">
+        <input type="hidden" name="tab" value="taxes">
+
+        {form_hidden_fields form=$form}
+
+        {form_field form=$form field='country_list'}
+
+            <p>{intl l="Tax rule taxes will be update for the following countries :"}</p>
             <div class="form-group">
-                <select name="" id="" data-toggle="selectpicker" multiple>
-                    <option value="1">France</option>
-                    <option value="2">England</option>
-                    <option value="3">Spain</option>
+                <select name="{$name}" data-toggle="selectpicker" multiple>
+                    {loop type="country" name="country-list"}
+                        <option value='{$ID}' {if (!$value AND in_array($ID, $matchedCountries)) OR ($value AND in_array($ID, $value))}selected="selected"{/if}>{$TITLE}</option>
+                    {/loop}
                 </select>
             </div>
-        </form>
+
+        {/form_field}
 
     {/capture}
 
-   {include
+        {include
         file = "includes/generic-create-dialog.html"
 
-        dialog_id    = "confirmation_dialog"
-        dialog_title = {intl l="Create a new tax rule"}
-        dialog_body  = {$smarty.capture.confirmation_dialog nofilter}
+        dialog_id    = "tax_list_update_dialog"
+        dialog_title = {intl l="Update tax rule taxes"}
+        dialog_body  = {$smarty.capture.tax_list_update_dialog nofilter}
 
-        dialog_ok_label     = {intl l="Create this tax rule"}
+    dialog_ok_label     = {intl l="Edit tax rule taxes"}
+    dialog_cancel_label = {intl l="Cancel"}
 
-        form_action        = {url path='/admin/categories/create'}
-
-        form_error_message = $form_error_message
+    form_action        = {url path="/admin/configuration/taxes_rules/saveTaxes"}
+    form_enctype       = {form_enctype form=$form}
+    form_error_message = $form_error_message
     }
+
+    {/form}
 
 {/block}
 
 {block name="javascript-initialization"}
 
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
-        <script src="{$asset_url}"></script>
+        <script src='{$asset_url}'></script>
     {/javascripts}
 
     {javascripts file='assets/js/main.js'}
-        <script src="{$asset_url}"></script>
+        <script src='{$asset_url}'></script>
     {/javascripts}
 
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-    {literal}
+
     <script>
         $(function() {
+
+            {if $taxUpdateError == true}
+            $('#tax_list_update_dialog').modal();
+            {/if}
+
+            {literal}
+            $('#country-selector').change(function(e) {
+                $('#country-selector-form').submit();
+            });
 
             // Cache jQuery Objects
             var $group = $('#panel');
@@ -158,7 +295,7 @@
             // Build array of taxes rules
             $('#apply-taxes-rules').click(function(){
                 var taxesRules = [],
-                    index;
+                        index;
 
                 $('.drop-group', $group).each(function(i){
                     var $this = $(this);
@@ -167,11 +304,12 @@
 
                     $('.drag', $this).each(function(j){
                         taxesRules[index][j] = [];
-                        taxesRules[index][j] = $(this).text();
+                        taxesRules[index][j] = $(this).data('id'); // retrieve with data
                     });
                 });
 
                 console.log(taxesRules);
+                $('#tax_list').val(JSON.stringify(taxesRules));
             });
 
             // Default options for draggable
@@ -186,7 +324,7 @@
             // Default options for sortabble
             var sortOptions = {
                 cursor: 'move',
-                items: 'div',
+                cancel: '.drop-message',
                 update: function( event, ui ){
                     // Check if we have an empty group
                     var $zone = $('.add-to-group', $group);
@@ -216,12 +354,13 @@
 
                             // Make the new group droppable
                             $drop
-                            .droppable(dropOptions)
-                            .sortable(sortOptions);
+                                    .droppable(dropOptions)
+                                    .sortable(sortOptions);
                         }
                     }
-                    $("<div></div>").addClass('drag').text( ui.draggable.text() ).appendTo( $drop );
-                     ui.draggable.remove();
+
+                    $("<div></div>").addClass('drag').attr('data-id', ui.draggable.data('id')).text( ui.draggable.text()).appendTo( $drop );
+                    ui.draggable.remove();
                 }
             };
 
@@ -232,25 +371,27 @@
 
             // let the drop-group be droppable & sortable, accepting the tax items
             $('.droppable', $group)
-            .droppable(dropOptions)
-            .sortable(sortOptions);
+                    .droppable(dropOptions)
+                    .sortable(sortOptions);
 
             $('.place .panel-body').sortable(sortOptions);
 
             // let the gallery be droppable as well, accepting items from the trash
             $('.remove-from-group', $list)
-            .droppable({
-                accept: "#panel .drag",
-                hoverClass: 'over',
-                drop: function( event, ui ) {
+                    .droppable({
+                        accept: "#panel .drag",
+                        hoverClass: 'over',
+                        drop: function( event, ui ) {
+                            $("<div></div>").addClass('draggable').text( ui.draggable.text() ).attr('data-id', ui.draggable.data('id')).draggable(dragOptions).appendTo(  $list.find('.panel-body') );
+                            ui.draggable.remove();
 
-                    $("<div></div>").addClass('draggable').text( ui.draggable.text() ).draggable(dragOptions).appendTo(  $list.find('.panel-body') );
-                    ui.draggable.remove();
+                        }
+                    });
 
-                }
-            });
+            {/literal}
+
         });
+
     </script>
-    {/literal}
 
 {/block}

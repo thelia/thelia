@@ -8,12 +8,12 @@
 <div class="shipping-configuration edit-shipping-configuration">
 
     <div id="wrapper" class="container">
-
+        {loop name="area-edit" type="area" id=$area_id}
         <ul class="breadcrumb">
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l="Shipping configuration"}</a></li>
-            <li>{intl l='Editing shipping configuration "%name"' name="{$TITLE}"}</li>
+            <li>{intl l='Editing shipping configuration "%name"' name="{$NAME}"}</li>
         </ul>
 
         <div class="row">
@@ -21,30 +21,40 @@
                 <div class="general-block-decorator">
                     
                     <div class="col-md-12 title title-without-tabs">
-                        {intl l='Edit shipping configuration %title' title=$TITLE}
+                        {intl l='Edit shipping configuration %title' title=$NAME}
                     </div>
 
                     <div class="form-container clearfix">
                         <div class="col-md-4">
                             
                             
+                            {form name="thelia.admin.area.country"}
+                            <form method="POST" action="{url path="/admin/configuration/shipping_configuration/country/add"}">
+                                {form_hidden_fields form=$form}
 
-                            <form method="POST" action="">
-                                <label class="control-label" for="">{intl l="Country"}</label>
+                                {form_field form=$form field='success_url'}
+                                    <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_configuration/update/{$area_id}"}" >
+                                {/form_field}
+
+                                {form_field form=$form field='area_id'}
+                                    <input type="hidden" name="{$name}" value="{$area_id}">
+                                {/form_field}
+                                {form_field form=$form field='country_id'}
+                                <label class="control-label" for="{$label_attr.for}">{intl l="Country"}</label>
 
                                 <div class="input-group">                                                            
-                                    <select name="" id="" data-toggle="selectpicker">
-                                        <option value="1">France</option>
-                                        <option value="2">Monaco</option>
-                                        <option value="3">Nouvelle-Calédonie</option>
+                                    <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
+                                        {loop name="country-without-area" type="country" with_area="0"  backend_context="1" lang=$lang_id}
+                                        <option value="{$ID}">{$TITLE}</option>
+                                        {/loop}
                                     </select>
                                     <span class="input-group-btn">
                                         <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add this country"}</button>
                                     </span>
                                 </div>                                    
-                                
+                                {/form_field}
                             </form>
-                            
+                            {/form}
                         </div>
 
                         <div class="col-md-8">
@@ -57,44 +67,46 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {loop name="country-area" type="country" area=$area_id backend_context="1"}
                                         <tr>
-                                            <td>Wallis-et-Futuna</td>
+                                            <td>{$TITLE}</td>
                                             <td>
-                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
+                                                <a class="btn btn-default btn-xs btn-delete-country" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
                                                     <span class="glyphicon glyphicon-trash"></span>
                                                 </a>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>Polynésie française</td>
-                                            <td>
-                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_country_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-trash"></span>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>USA - Alabama</td>
-                                            <td>
-                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this country'}"  href="#delete_zone_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-trash"></span>
-                                                </a>
-                                            </td>
-                                        </tr>
+                                        {/loop}
                                     </tbody>
                                     <tfoot>
                                         <tr class="active">
                                             <td colspan="2">
-                                                <form method="POST" action="">
-                                                    <label for="" class="control-label">{intl l="Freight"}</label>
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" name="" id="" placeholder="Freight value">
+                                                {form name="thelia.admin.area.postage"}
+                                                <form method="POST" action="{url path="/admin/configuration/shipping_configuration/update_postage/{$area_id}"}">
+                                                    {form_hidden_fields form=$form}
+
+                                                    {form_field form=$form field='success_url'}
+                                                        <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_configuration/update/{$area_id}"}" >
+                                                    {/form_field}
+
+                                                    {form_field form=$form field='area_id'}
+                                                        <input type="hidden" name="{$name}" value="{$area_id}">
+                                                    {/form_field}
+                                                    {form_field form=$form field='postage'}
+                                                    <label for="{$label_attr.for}" class="control-label">{$label}</label>
+                                                    <div class="input-group {if $error}has-error{/if}">
+                                                        <input type="text" class="form-control" name="{$name}" value="{$POSTAGE}" id="{$label_attr.for}" placeholder="Postage">
                                                         <span class="input-group-addon">&euro;</span>
                                                         <span class="input-group-btn">
                                                             <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span></button>
                                                         </span>
+                                                        {if $error }
+                                                            <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                                        {/if}
                                                     </div>
+                                                    {/form_field}
                                                 </form>
+                                                {/form}
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -106,14 +118,23 @@
                 </div>
             </div>
         </div>
+        {/loop}
 
+        {elseloop rel="area-edit"}
+        <div class="row">
+            <div class="col-md-12">
+                {intl l="No area defined with this id"}
+            </div>
+        </div>
+        {/elseloop}
     </div>
 </div>  
 
     {* Delete related content confirmation dialog *}
 
     {capture "delete_country_dialog"}
-        
+        <input type="hidden" name="area_id" value="{$area_id}">
+        <input type="hidden" name="country_id" id="delete-country-id" value="">
     {/capture}
 
     {include
@@ -123,7 +144,7 @@
         dialog_title    = {intl l="Remove country"}
         dialog_message  = {intl l="Do you really want to remove this country ?"}
 
-        form_action     = {url path=''}
+        form_action     = {url path='/admin/configuration/shipping_configuration/country/remove'}
         form_content    = {$smarty.capture.delete_country_dialog nofilter}
     }  
 {/block}
@@ -135,4 +156,12 @@
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
         <script src="{$asset_url}"></script>        
     {/javascripts}
+
+    <script>
+        $(document).ready(function(){
+            $(".btn-delete-country").click(function(e){
+                $("#delete-country-id").val($(this).data("id"));
+            });
+        });
+    </script>
 {/block}

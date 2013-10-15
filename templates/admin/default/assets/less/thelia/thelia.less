@@ -326,3 +326,79 @@
         height: 30px;
     }
 }
+
+// -- Drag & drop --
+.take{
+    
+    .draggable{
+        border: 2px dashed @gray-light;
+        margin-bottom: 10px;
+        padding: 10px;
+
+        &:last-child{
+            margin-bottom: 0;
+        }       
+    }
+    
+    .over{
+        .drop-message{
+            border-color: @brand-primary;
+            color: @brand-primary;
+        }
+    }
+
+}
+
+.place{    
+    
+    .over{
+        .drop-message{
+            border-color: @brand-primary;
+            color: @brand-primary;
+        }
+    }
+
+    .panel-body{
+        
+        .draggable, .drag{
+            margin: 5px 0;
+            padding: 10px;            
+            border: 1px dashed @gray-light;
+        }
+
+        .drop-group{
+            padding: 10px;
+            border: 2px dashed @gray-light;
+            margin-bottom: 10px;
+
+            &:last-child{
+                margin-bottom: 0;
+            }
+        }
+
+    }
+
+}
+
+.take, .place{
+    
+    .drop-message{
+        width: 50%;
+        margin: 10px auto;
+        padding: 10px;
+        color: @gray;
+        border: 2px dashed @gray;
+        text-align: center;
+        .opacity(0.5);
+
+        .glyphicon{
+            display: block;
+            font-size: @font-size-large;
+            margin-bottom: 10px;
+        }
+    }
+
+    .ui-draggable-dragging{
+        z-index: 100;
+    }
+}

@@ -246,7 +246,7 @@ class BaseAdminController extends BaseController
      * @param unknown $routeId       the route ID, as found in Config/Resources/routing/admin.xml
      * @param unknown $urlParameters the URL parametrs, as a var/value pair array
      */
-    public function redirectToRoute($routeId, $urlParameters = array(), $routeParameters = array())
+    public function redirectToRoute($routeId, array $urlParameters = array(), array $routeParameters = array())
     {
         $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters), $urlParameters));
     }

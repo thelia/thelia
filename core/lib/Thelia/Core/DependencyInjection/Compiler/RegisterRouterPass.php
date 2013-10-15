@@ -58,6 +58,7 @@ class RegisterRouterPass implements CompilerPassInterface
             $priority = isset($attributes[0]["priority"]) ? $attributes[0]["priority"] : 0;
             $router = $container->getDefinition($id);
             $router->addMethodCall("setOption", array("matcher_cache_class", $container::camelize("ProjectUrlMatcher".$id)));
+            $router->addMethodCall("setOption", array("generator_cache_class", $container::camelize("ProjectUrlGenerator".$id)));
 
             $chainRouter->addMethodCall("add", array(new Reference($id), $priority));
 
@@ -76,7 +77,8 @@ class RegisterRouterPass implements CompilerPassInterface
                             array(
                                 "cache_dir" => $container->getParameter("kernel.cache_dir"),
                                 "debug" => $container->getParameter("kernel.debug"),
-                                "matcher_cache_class" => $container::camelize("ProjectUrlMatcher".$moduleCode)
+                                "matcher_cache_class" => $container::camelize("ProjectUrlMatcher".$moduleCode),
+                                "generator_cache_class" => $container::camelize("ProjectUrlGenerator".$moduleCode),
                             ),
                             new Reference("request.context")
                         )
