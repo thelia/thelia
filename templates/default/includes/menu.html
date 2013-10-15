@@ -12,7 +12,8 @@
             {/for}
 
             {if $CHILD_COUNT > 0 }
-            <li><a class="accordion-toggle" data-toggle="collapse" data-parent="#category" href="{$URL}#collapse{$ID}">{$TITLE} <span class="amount">({$CHILD_COUNT})</span></a>
+            <li>
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#category" href="{$URL}#collapse{$ID}">{$TITLE} <span class="amount">({$CHILD_COUNT})</span></a>
 
                 <ul id="collapse{$ID}" class="collapse">
                     {else}
@@ -22,6 +23,7 @@
                     {assign "previousLevel" $LEVEL}
                     {/loop}
                 </ul>
+            </li>
         </nav>
     </div>
 </section>
