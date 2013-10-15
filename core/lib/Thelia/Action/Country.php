@@ -59,7 +59,19 @@ class Country extends BaseAction implements EventSubscriberInterface
 
     public function update(CountryUpdateEvent $event)
     {
+        if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
+            $country
+                ->setIsocode($event->getIsocode())
+                ->setIsoalpha2($event->getIsoAlpha2())
+                ->setIsoalpha3($event->getIsoAlpha3())
+                ->setLocale($event->getLocale())
+                ->setTitle($event->getTitle())
+                ->setChapo($event->getChapo())
+                ->setDescription($event->getDescription())
+                ->save();
 
+            $event->setCountry($country);
+        }
     }
 
     public function delete(CountryDeleteEvent $event)

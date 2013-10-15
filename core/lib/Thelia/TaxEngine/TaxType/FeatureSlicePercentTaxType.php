@@ -23,7 +23,7 @@
 namespace Thelia\TaxEngine\TaxType;
 
 use Thelia\Type\FloatToFloatArrayType;
-use Thelia\Type\ModelType;
+use Thelia\Type\ModelValidIdType;
 
 /**
  *
@@ -32,17 +32,12 @@ use Thelia\Type\ModelType;
  */
 class featureSlicePercentTaxType extends  BaseTaxType
 {
-    public function calculate($untaxedPrice)
-    {
-
-    }
-
     public function pricePercentRetriever()
     {
 
     }
 
-    public function fixAmountRetriever()
+    public function fixAmountRetriever(\Thelia\Model\Product $product)
     {
 
     }
@@ -50,7 +45,7 @@ class featureSlicePercentTaxType extends  BaseTaxType
     public function getRequirementsList()
     {
         return array(
-            'featureId' => new ModelType('Currency'),
+            'featureId' => new ModelValidIdType('Currency'),
             'slices' => new FloatToFloatArrayType(),
         );
     }

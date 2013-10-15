@@ -5,7 +5,7 @@ Thelia
 ------
 [![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia)
 
-[Thelia](http://thelia.net) is an open source tool for creating e-business websites and managing online content. This software is published under GPL.
+[Thelia](http://thelia.net/v2) is an open source tool for creating e-business websites and managing online content. This software is published under GPL.
 
 Here is the current developping next major version. You can download this version for testing or see the code.
 Here is the most recent developed code for the next major version (v2). You can download this version for testing or having a look on the code (or anything you wish, respecting GPL). See http://thelia.net/v2 web site for more information.

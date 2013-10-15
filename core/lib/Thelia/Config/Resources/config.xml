@@ -7,6 +7,7 @@
     <loops>
         <loop class="Thelia\Core\Template\Loop\Accessory" name="accessory"/>
         <loop class="Thelia\Core\Template\Loop\Address" name="address"/>
+        <loop class="Thelia\Core\Template\Loop\Area" name="area"/>
         <loop class="Thelia\Core\Template\Loop\AssociatedContent" name="associated_content"/>
         <loop class="Thelia\Core\Template\Loop\Attribute" name="attribute"/>
         <loop class="Thelia\Core\Template\Loop\AttributeAvailability" name="attribute_availability"/>
@@ -45,7 +46,9 @@
         <loop class="Thelia\Core\Template\Loop\Message" name="message"/>
         <loop class="Thelia\Core\Template\Loop\Delivery" name="delivery"/>
         <loop class="Thelia\Core\Template\Loop\Template" name="template"/> <!--  This is product templates ;-) -->
+        <loop class="Thelia\Core\Template\Loop\Tax" name="tax"/>
         <loop class="Thelia\Core\Template\Loop\TaxRule" name="tax-rule"/>
+        <loop class="Thelia\Core\Template\Loop\TaxRuleCountry" name="tax-rule-country"/>
     </loops>
 
     <forms>
@@ -111,6 +114,10 @@
 
         <form name="thelia.admin.featureav.creation" class="Thelia\Form\FeatureAvCreationForm"/>
 
+        <form name="thelia.admin.taxrule.modification" class="Thelia\Form\TaxRuleModificationForm"/>
+        <form name="thelia.admin.taxrule.taxlistupdate" class="Thelia\Form\TaxRuleTaxListUpdateForm"/>
+        <form name="thelia.admin.taxrule.add" class="Thelia\Form\TaxRuleCreationForm"/>
+
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>
 
@@ -119,6 +126,13 @@
 
         <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
 
+        <form name="thelia.admin.area.create" class="Thelia\Form\Area\AreaCreateForm"/>
+        <form name="thelia.admin.area.modification" class="Thelia\Form\Area\AreaModificationForm"/>
+        <form name="thelia.admin.area.country" class="Thelia\Form\Area\AreaCountryForm"/>
+        <form name="thelia.admin.area.postage" class="Thelia\Form\Area\AreaPostageForm"/>
+
+        <form name="thelia.shopping_zone_area" class="Thelia\Form\ShippingZone\ShippingZoneAddArea"/>
+        <form name="thelia.shopping_zone_remove_area" class="Thelia\Form\ShippingZone\ShippingZoneRemoveArea"/>
     </forms>
 
 

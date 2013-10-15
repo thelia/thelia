@@ -106,6 +106,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.taxrule" class="Thelia\Action\TaxRule">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.content" class="Thelia\Action\Content">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
@@ -117,6 +122,16 @@
         </service>
 
         <service id="thelia.action.country" class="Thelia\Action\Country">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.area" class="Thelia\Action\Area">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.shippingZone" class="Thelia\Action\ShippingZone">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>

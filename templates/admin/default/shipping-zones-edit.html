@@ -26,25 +26,33 @@
 
                     <div class="form-container clearfix">
                         <div class="col-md-4">
-                            
-                            <form method="POST" action="">
-                                <label class="control-label" for="">{intl l="Zones"}</label>
+                            {form name="thelia.shopping_zone_area"}
+                            <form method="POST" action="{url path="/admin/configuration/shipping_zones/area/add"}">
+                                {form_hidden_fields form=$form}
 
+                                {form_field form=$form field='success_url'}
+                                    <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$shipping_zones_id}"}" /> {* the url the user is redirected to on login success *}
+                                {/form_field}
+
+                                {form_field form=$form field='shipping_zone_id'}
+                                <input type="hidden" name="{$name}" value="{$shipping_zones_id}" />
+                                {/form_field}
+
+                                {form_field form=$form field='area_id'}
+                                <label class="control-label" for="{$label_attr.for}">{$label}</label>
                                 <div class="input-group">                                    
-                                    <select name="" id="" data-toggle="selectpicker">
-                                        <option value="">1</option>
-                                        <option value="">2</option>
-                                        <option value="">3</option>
-                                        <option value="">4</option>
-                                        <option value="">5</option>
+                                    <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
+                                        {loop name="area.module.not_associated" type="area" without_zone=$shipping_zones_id}
+                                        <option value="{$ID}">{$NAME}</option>
+                                        {/loop}
                                     </select>
                                     <span class="input-group-btn">
                                         <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add"}</button>
                                     </span>
                                 </div>                                    
-                                
+                                {/form_field}
                             </form>
-                            
+                            {/form}
                         </div>
 
                         <div class="col-md-8">
@@ -57,30 +65,16 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {loop type="area" name="area.module.associated" with_zone=$shipping_zones_id}
                                         <tr>
-                                            <td>France</td>
+                                            <td>{$NAME}</td>
                                             <td>
-                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this zone'}"  href="#delete_zone_dialog" data-id="{$ID}" data-toggle="modal">
+                                                <a class="btn btn-default btn-xs delete-zone-area" title="{intl l='Delete this zone'}"  href="#delete_zone_dialog" data-id="{$ID}" data-toggle="modal">
                                                     <span class="glyphicon glyphicon-trash"></span>
                                                 </a>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>Zone 1</td>
-                                            <td>
-                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this zone'}"  href="#delete_zone_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-trash"></span>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Zone 2</td>
-                                            <td>
-                                                <a class="btn btn-default btn-xs" title="{intl l='Delete this zone'}"  href="#delete_zone_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-trash"></span>
-                                                </a>
-                                            </td>
-                                        </tr>
+                                        {/loop}
                                     </tbody>
                                 </table>
                             </div>
@@ -97,7 +91,22 @@
     {* Delete related content confirmation dialog *}
 
     {capture "delete_zone_dialog"}
-        
+        {form name="thelia.shopping_zone_remove_area"}
+            {form_hidden_fields form=$form}
+
+            {form_field form=$form field='success_url'}
+                <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$shipping_zones_id}"}" /> {* the url the user is redirected to on login success *}
+            {/form_field}
+
+            {form_field form=$form field='shipping_zone_id'}
+                <input type="hidden" name="{$name}" value="{$shipping_zones_id}" />
+            {/form_field}
+
+            {form_field form=$form field='area_id'}
+                <input type="hidden" name="{$name}" value="" id="shipping-zone-id-delete" />
+            {/form_field}
+
+        {/form}
     {/capture}
 
     {include
@@ -107,7 +116,7 @@
         dialog_title    = {intl l="Remove zone"}
         dialog_message  = {intl l="Do you really want to remove this zone ?"}
 
-        form_action     = {url path=''}
+        form_action     = {url path='/admin/configuration/shipping_zones/area/remove'}
         form_content    = {$smarty.capture.delete_zone_dialog nofilter}
     }  
 {/block}
@@ -119,4 +128,12 @@
     {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
         <script src="{$asset_url}"></script>        
     {/javascripts}
+
+    <script>
+        $(document).ready(function(){
+            $(".delete-zone-area").click(function(e){
+                $("#shipping-zone-id-delete").val($(this).data('id'));
+            });
+        });
+    </script>
 {/block}

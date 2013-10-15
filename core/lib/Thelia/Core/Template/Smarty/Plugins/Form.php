@@ -151,6 +151,11 @@ class Form extends AbstractSmartyPlugin
 
             $template->assign("options", $formFieldView->vars);
 
+            /* access to choices */
+            if(isset($formFieldView->vars['choices'])) {
+                $template->assign("choices", $formFieldView->vars['choices']);
+            }
+
             $value = $formFieldView->vars["value"];
 /* FIXME: doesnt work. We got "This form should not contain extra fields." error.
 // We have a collection
@@ -182,7 +187,8 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
 
     public function renderHiddenFormField($params, \Smarty_Internal_Template $template)
     {
-        $field = '<input type="hidden" name="%s" value="%s">';
+        $attrFormat = '%s="%s"';
+        $field = '<input type="hidden" name="%s" value="%s" %s>';
 
         $instance = $this->getInstanceFromParams($params);
 
@@ -192,7 +198,13 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
 
         foreach ($formView->getIterator() as $row) {
             if ($this->isHidden($row) && $row->isRendered() === false) {
-                $return .= sprintf($field, $row->vars["full_name"], $row->vars["value"]);
+                $attributeList = array();
+                if(isset($row->vars["attr"])) {
+                    foreach($row->vars["attr"] as $attrKey => $attrValue) {
+                        $attributeList[] = sprintf($attrFormat, $attrKey, $attrValue);
+                    }
+                }
+                $return .= sprintf($field, $row->vars["full_name"], $row->vars["value"], implode(' ', $attributeList));
             }
         }
 

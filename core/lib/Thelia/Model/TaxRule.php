@@ -3,11 +3,14 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\TaxRule as BaseTaxRule;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\TaxEngine\Calculator;
 use Thelia\TaxEngine\OrderProductTaxCollection;
 
 class TaxRule extends BaseTaxRule
 {
+    use ModelEventDispatcherTrait;
+
     /**
      * @param Country $country
      * @param         $untaxedAmount
@@ -16,14 +19,14 @@ class TaxRule extends BaseTaxRule
      *
      * @return OrderProductTaxCollection
      */
-    public function getTaxDetail(Country $country, $untaxedAmount, $untaxedPromoAmount, $askedLocale = null)
+    public function getTaxDetail(Product $product, Country $country, $untaxedAmount, $untaxedPromoAmount, $askedLocale = null)
     {
         $taxCalculator = new Calculator();
 
         $taxCollection = new OrderProductTaxCollection();
-        $taxCalculator->loadTaxRule($this, $country)->getTaxedPrice($untaxedAmount, $taxCollection, $askedLocale);
+        $taxCalculator->loadTaxRule($this, $country, $product)->getTaxedPrice($untaxedAmount, $taxCollection, $askedLocale);
         $promoTaxCollection = new OrderProductTaxCollection();
-        $taxCalculator->loadTaxRule($this, $country)->getTaxedPrice($untaxedPromoAmount, $promoTaxCollection, $askedLocale);
+        $taxCalculator->loadTaxRule($this, $country, $product)->getTaxedPrice($untaxedPromoAmount, $promoTaxCollection, $askedLocale);
 
         foreach($taxCollection as $index => $tax) {
             $tax->setPromoAmount($promoTaxCollection->getKey($index)->getAmount());
