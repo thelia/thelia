@@ -816,7 +816,7 @@
 
     <!-- Modules rule management -->
 
-    <route id="admin.module" path="/admin/modules">
+    <route id="admin.module" path="/admin/configuration/modules">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::indexAction</default>
     </route>
 

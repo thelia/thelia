@@ -33,6 +33,10 @@ class ModuleController extends BaseAdminController
     public function indexAction()
     {
         if (null !== $response = $this->checkAuth("admin.module.view")) return $response;
+
+
+
+
         return $this->render("modules", array("display_module" => 20));
     }
 
