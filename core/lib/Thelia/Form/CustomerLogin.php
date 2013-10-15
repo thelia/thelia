@@ -25,6 +25,7 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Base\CustomerQuery;
@@ -67,9 +68,6 @@ class CustomerLogin extends BaseForm
                 "data" => 0
             ))
             ->add("password", "password", array(
-                "constraints" => array(
-                    new Constraints\NotBlank()
-                ),
                 "label" => Translator::getInstance()->trans("Please enter your password"),
                 "label_attr" => array(
                     "for" => "password"
@@ -90,6 +88,23 @@ class CustomerLogin extends BaseForm
                 $context->addViolation("A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password.");
             }
         }
+
+        $context->addViolation('toto');
+
+        $root = $context->getRoot();
+        $password = $root->get('password')->getPropertyPath();
+        $parent = $password->getParent();
+        //$propertyPath =
+        $context->getViolations()->add(new ConstraintViolation(
+            'failed password',
+            'toto',
+            array(),
+            $root,
+            'children[password].data',
+            'propertyPath'
+        ));
+
+
     }
 
     public function getName()
