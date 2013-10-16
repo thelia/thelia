@@ -21,31 +21,35 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
-use Thelia\Module\ModuleManagement;
+namespace Thelia\Module;
+use Symfony\Component\Finder\Finder;
+
 
 /**
- * Class ModuleController
- * @package Thelia\Controller\Admin
+ * Class ModuleManagement
+ * @package Thelia\Module
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ModuleController extends BaseAdminController
+class ModuleManagement 
 {
-    public function indexAction()
+    protected $baseModuleDir;
+
+    public function __construct()
     {
-        if (null !== $response = $this->checkAuth("admin.module.view")) return $response;
-
-
-        $modulemanagement = new ModuleManagement();
-        $modulemanagement->updateModules();
-
-        return $this->render("modules", array("display_module" => 20));
+        $this->baseModuleDir = THELIA_MODULE_DIR;
     }
 
-    public function updateAction($module_id)
+    public function updateModules()
     {
-        return $this->render("module-edit", array(
-            "module_id" => $module_id
-        ));
+        $finder = new Finder();
+
+        $finder
+            ->name('config.xml')
+            ->in($this->baseModuleDir . '/*/Config');
+
+        foreach ($finder as $file) {
+            echo $file->getRealPath()."\n";
+        }
     }
+
 }

@@ -72,7 +72,7 @@ abstract class BaseModule extends ContainerAware
     public function getContainer()
     {
         if ($this->hasContainer() === false) {
-            throw new \RuntimeException("Sorry, container his not available in this context");
+            throw new \RuntimeException("Sorry, container is not available in this context");
         }
 
         return $this->container;

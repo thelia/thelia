@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="plugin">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="descriptif" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation>le descriptif complet, dans autant de langues que nécessaire.
+                            Le code de la langue doit être un code pays ISO 639</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:string" name="title" minOccurs="1" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="subtitle" minOccurs="0" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="description" minOccurs="0" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="postscriptum" minOccurs="0" maxOccurs="1"/>
+                        </xs:sequence>
+                        <xs:attribute type="xs:string" name="locale"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element type="xs:string" name="version">
+                    <xs:annotation>
+                        <xs:documentation>La version du plugin. Format libre</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="auteur">
+                    <xs:annotation>
+                        <xs:documentation>Auteur du plugin</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:string" name="nom"/>
+                            <xs:element type="xs:string" name="societe" minOccurs="0" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="email"/>
+                            <xs:element type="xs:anyURI" name="web" minOccurs="0" maxOccurs="1"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="type">
+                    <xs:annotation>
+                        <xs:documentation>Le type du plugin: classique, transport, paiement, filtre, taxe</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="classique"/>
+                            <xs:enumeration value="transport"/>
+                            <xs:enumeration value="paiement"/>
+                            <xs:enumeration value="filtre"/>
+                            <xs:enumeration value="taxe"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="prerequis" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Les plugins qui doivent déjà être présents</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="plugin" maxOccurs="unbounded" minOccurs="0">
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:string">
+                                            <xs:attribute type="xs:string" name="version" use="optional"/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="thelia">
+                    <xs:annotation>
+                        <xs:documentation>La version minimum requise de Thelia, au format 'dot' (1.2.3.4 par exemple)</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="[0-9.]+"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="etat">
+                    <xs:annotation>
+                        <xs:documentation>Le statut actuel du plugin: alpha, beta, rc, production</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="alpha"/>
+                            <xs:enumeration value="beta"/>
+                            <xs:enumeration value="rc"/>
+                            <xs:enumeration value="production"/>
+                            <xs:enumeration value="autre"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element type="xs:string" name="documentation" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Le nom du fichier contenant la documentation. Ce fichier doit se trouver dans le répertoire du plugin.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element type="xs:anyURI" name="urlmiseajour" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>L'URL a interroger pour vérifier la présence d'une nouvelle version, appellé avec le nom du plugin et sa version</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
