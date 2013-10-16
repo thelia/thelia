@@ -1,17 +1,17 @@
 {extends file="layout.tpl"}
 
-{block name="no-return-functions"}
+{block name="no-return-functions" prepend}
     {check_auth context="front" roles="CUSTOMER" login_tpl="login"}
 {/block}
-
-{block name="body-class"}page-account{/block}
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = [
-        ['title' => {intl l="Account"}, 'url'=>{url path="/account"}]
+    ['title' => {intl l="Account"}, 'url'=>{url path="/account"}]
     ]}
 {/block}
+
+{block name="body-class"}page-account{/block}
 
 {block name="main-content"}
     <div class="main">
@@ -45,7 +45,7 @@
                                             <span class="extended-address">{$ADDRESS3}</span><br>
                                         {/if}
                                         <span class="postal-code">{$ZIPCODE}</span>
-                                        <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                        <span class="locality">{$CITY}<br><span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
                                     </address>
                                 </li>
                                 <li>
@@ -139,6 +139,7 @@
                     </div>
                     <div id="account-orders" class="panel-collapse collapse">
                         <div class="panel-body table-responsive">
+                            {ifloop rel="customer.orders"}
                             <table class="table table-orders" summary="{intl l="List of orders"}">
                                 <thead>
                                 <tr>
@@ -162,6 +163,7 @@
 
                                 </tbody>
                             </table>
+                            {/ifloop}
                             {elseloop rel="customer.orders"}
                             <div class="orders-warning">
                                 <strong>{intl l="Warning"}!</strong> {intl l="You don't have orders yet."}
