@@ -91,15 +91,20 @@ class CustomerLogin extends BaseForm
     {
         if ($value == 1) {
             $data = $context->getRoot()->getData();
-
-            //$context->validate('password', array(new Constraints\NotBlank()) );
-
             if (false === $data['password'] || (empty($data['password']) && '0' != $data['password'])) {
-                $context->addViolationAt("password", "This value should not sssbe blank");
+
+                $context->getViolations()->add(new ConstraintViolation(
+                    'This value should not be blank.',
+                    'account_password',
+                    array(),
+                    $context->getRoot(),
+                    'children[password].data',
+                    'propertyPath'
+                ));
+
             }
         }
     }
-
 
     /**
      * If the user select "I'am a new customer", we make sure is email address does not exit in the database.
@@ -113,18 +118,6 @@ class CustomerLogin extends BaseForm
                 $context->addViolation("A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password.");
             }
         }
-
-        //$propertyPath =
-        $context->getViolations()->add(new ConstraintViolation(
-            'failed password',
-            'toto',
-            array(),
-            $context->getRoot(),
-            'children[password].data',
-            'propertyPath'
-        ));
-
-
     }
 
     public function getName()
