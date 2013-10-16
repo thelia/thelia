@@ -76,6 +76,11 @@ class TaxController extends AbstractCrudController
     {
         $event = new TaxEvent();
 
+        /* check the requirements */
+        if(!$this->checkRequirements($formData)) {
+
+        }
+
         $event->setLocale($formData['locale']);
         $event->setId($formData['id']);
         $event->setTitle($formData['title']);
@@ -194,5 +199,12 @@ class TaxController extends AbstractCrudController
         $this->redirectToRoute(
             "admin.configuration.taxes-rules.list"
         );
+    }
+
+    protected function checkRequirements($formData)
+    {
+        $type = $formData['type'];
+
+
     }
 }

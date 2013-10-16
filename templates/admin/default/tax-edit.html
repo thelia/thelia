@@ -93,12 +93,12 @@
                             {if $formType == 'choice'}
                                 <select name="{$name}">
                                     {foreach $choices as $choice}
-                                        <option value="{$choice->value}">{$choice->label}</option>
+                                        <option value="{$choice->value}" {if $REQUIREMENTS.$label == $choice->value}selected="selected" {/if}>{$choice->label}</option>
                                     {/foreach}
                                 </select>
                             {/if}
                             {if $formType == 'text'}
-                                <input type="text" name="{$name}" value="">
+                                <input type="text" name="{$name}" value="{$REQUIREMENTS.$label}">
                             {/if}
                         </div>
                     {/form_tagged_fields}

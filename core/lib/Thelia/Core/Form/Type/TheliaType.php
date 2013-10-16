@@ -12,12 +12,16 @@ class TheliaType extends AbstractType
     {
         $resolver->setDefaults(array(
             'instance'          => false,
-            'type'          => false,
-            'options'          => false,
+            'type'              => false,
+            'options'           => false,
         ));
 
         $resolver->setAllowedTypes(array(
-            'instance' => array('Thelia\Type\TypeInterface'),
+            'instance'  => array('Thelia\Type\TypeInterface'),
+        ));
+
+        $resolver->setAllowedValues(array(
+            'type'      => array('text', 'choice'),
         ));
     }
 

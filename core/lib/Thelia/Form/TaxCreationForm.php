@@ -24,6 +24,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Core\Translation\Translator;
 use Thelia\TaxEngine\TaxEngine;
@@ -54,6 +55,13 @@ class TaxCreationForm extends BaseForm
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
+                    new Constraints\Callback(
+                        array(
+                            "methods" => array(
+                                array($this, "verifyRequirements"),
+                            ),
+                        )
+                    ),
                 ),
                 "label" => Translator::getInstance()->trans("Type"),
                 "label_attr" => array("for" => "type_field"),
@@ -66,8 +74,12 @@ class TaxCreationForm extends BaseForm
                     ->add($type . '_' . $name, new TheliaType(), array(
                         "instance" => $requirementType,
                         "constraints" => array(
-                            "methods" => array(
-                                array($this, "verifyTaxId"),
+                            new Constraints\Callback(
+                                array(
+                                    "methods" => array(
+                                        array($this, "verifyRequirements"),
+                                    ),
+                                )
                             ),
                         ),
                         "attr" => array(
@@ -90,5 +102,12 @@ class TaxCreationForm extends BaseForm
     public function getName()
     {
         return "thelia_tax_creation";
+    }
+
+    public function verifyRequirements($value, ExecutionContextInterface $context)
+    {
+        $in = true;
+
+
     }
 }
