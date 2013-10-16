@@ -3,25 +3,28 @@
     <div class="block-content">
         <nav class="nav-categories">
             <ul id="category" class="accordion">
-                {assign "previousLevel" 0}
-                {loop name="cat-parent" type="category-tree" category="0"}
+            {assign "previousLevel" 0}
+            {loop name="cat-parent" type="category-tree" category="0"}
 
-                {for $foo=1 to $previousLevel-$LEVEL}
-            </ul>
-            </li>
+            {for $foo=1 to $previousLevel-$LEVEL}
+                    </ul>
+                </li>
             {/for}
 
             {if $CHILD_COUNT > 0 }
-            <li><a class="accordion-toggle" data-toggle="collapse" data-parent="#category" href="{$URL}#collapse{$ID}">{$TITLE} <span class="amount">({$CHILD_COUNT})</span></a>
-
+            <li>
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#category" href="{$URL}#collapse{$ID}">{$TITLE} <span class="amount">({$CHILD_COUNT})</span></a>
                 <ul id="collapse{$ID}" class="collapse">
-                    {else}
-
-                    <li><a href="{$URL}">{$TITLE} <span class="amount">(0)</span></a></li>
-                    {/if}
-                    {assign "previousLevel" $LEVEL}
-                    {/loop}
+            {else}
+                <li><a href="{$URL}">{$TITLE} <span class="amount">(0)</span></a></li>
+            {/if}
+                {assign "previousLevel" $LEVEL}
+            {/loop}
+            {for $i=$previousLevel to 1 step -1}
                 </ul>
+            </li>
+            {/for}
+            </ul>
         </nav>
     </div>
 </section>
