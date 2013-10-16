@@ -117,11 +117,7 @@ class Form extends AbstractSmartyPlugin
         $template->assign("name", $fieldName);
 
         $template->assign("value", $fieldValue);
-
-        // If Checkbox input type
-        if ($fieldVars['checked'] !== null) {
-            $this->renderFormFieldCheckBox($template, $formFieldView['checked']);
-        }
+        $template->assign("checked", isset($fieldVars['checked']) ? $fieldVars['checked'] : false);
 
         $template->assign("label", $fieldVars["label"]);
         $template->assign("label_attr", $fieldVars["label_attr"]);
@@ -310,18 +306,5 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
             new SmartyPluginDescriptor("function", "form_enctype", $this, "formEnctype"),
             new SmartyPluginDescriptor("block", "form_error", $this, "formError")
         );
-    }
-
-    /**
-     * @param \Smarty_Internal_Template $template
-     * @param $formFieldView
-     */
-    public function renderFormFieldCheckBox(\Smarty_Internal_Template $template, $isChecked)
-    {
-        $template->assign("value", 0);
-        if ($isChecked) {
-            $template->assign("value", 1);
-        }
-        $template->assign("value", $isChecked);
     }
 }
