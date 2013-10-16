@@ -69,4 +69,14 @@ class EnumListType implements TypeInterface
     {
         return in_array($value, $this->values);
     }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
+    }
 }

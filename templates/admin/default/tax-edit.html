@@ -76,7 +76,7 @@
                             </label>
 
                             <div class="form-group">
-                                <select name="{$name}" data-toggle="selectpicker">
+                                <select name="{$name}" class="js-change-tax-type" data-toggle="selectpicker">
                                     {foreach $choices as $choice}
                                         <option value="{$choice->value}" {if $choice->value == $TYPE}selected="selected" {/if}>{$choice->label}</option>
                                     {/foreach}
@@ -84,6 +84,24 @@
                             </div>
                         </div>
                     {/form_field}
+
+                    {form_tagged_fields form=$form tag='requirements'}
+                        <div class="form-group {if $error}has-error{/if} js-tax-requirements" data-tax-type="{$data.tax_type}" {if $data.tax_type != $TYPE}style="display: none"{/if}>
+                            <label for="{$label_attr.for}" class="control-label">
+                                {intl l=$label} :
+                            </label>
+                            {if $formType == 'choice'}
+                                <select name="{$name}">
+                                    {foreach $choices as $choice}
+                                        <option value="{$choice->value}">{$choice->label}</option>
+                                    {/foreach}
+                                </select>
+                            {/if}
+                            {if $formType == 'text'}
+                                <input type="text" name="{$name}" value="">
+                            {/if}
+                        </div>
+                    {/form_tagged_fields}
 
                     <div class="row">
                         <div class="col-md-12">
@@ -123,6 +141,10 @@
 
     <script>
         $(function() {
+            $('.js-change-tax-type').change(function(e){
+                $('.js-tax-requirements').hide();
+                $('.js-tax-requirements[data-tax-type="' + $(this).val() + '"]').show();
+            });
         });
 
     </script>

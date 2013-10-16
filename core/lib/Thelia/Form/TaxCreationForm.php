@@ -24,6 +24,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Core\Translation\Translator;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\TaxEngine\TaxType;
@@ -36,10 +37,12 @@ class TaxCreationForm extends BaseForm
     {
         $types = TaxEngine::getInstance()->getTaxTypeList();
         $typeList = array();
+        $requirementList = array();
         foreach($types as $type) {
             $classPath = "\\Thelia\\TaxEngine\\TaxType\\$type";
             $instance = new $classPath();
             $typeList[$type] = $instance->getTitle();
+            $requirementList[$type] = $instance->getRequirementsList();
         }
 
         $this->formBuilder
@@ -56,6 +59,26 @@ class TaxCreationForm extends BaseForm
                 "label_attr" => array("for" => "type_field"),
             ))
         ;
+
+        foreach($requirementList as $type => $requirements) {
+            foreach($requirements as $name => $requirementType) {
+                $this->formBuilder
+                    ->add($type . '_' . $name, new TheliaType(), array(
+                        "instance" => $requirementType,
+                        "constraints" => array(new NotBlank()),
+                        "attr" => array(
+                            "tag" => "requirements",
+                        ),
+                        "data" => array(
+                            "tax_type" => $type,
+                        ),
+                        "label" => Translator::getInstance()->trans($name),
+                        "type" => $requirementType->getFormType(),
+                        "options" => $requirementType->getFormOptions(),
+                    ))
+                ;
+            }
+        }
 
         $this->addStandardDescFields(array('postscriptum', 'chapo', 'locale'));
     }

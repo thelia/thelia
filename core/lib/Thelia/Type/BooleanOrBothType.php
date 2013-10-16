@@ -49,4 +49,14 @@ class BooleanOrBothType implements TypeInterface
         if ($value === self::ANY) return $value;
         return $value === null ? null : filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
+    }
 }

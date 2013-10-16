@@ -50,4 +50,14 @@ class IntListType implements TypeInterface
     {
         return $this->isValid($values) ? explode(',', $values) : null;
     }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
+    }
 }

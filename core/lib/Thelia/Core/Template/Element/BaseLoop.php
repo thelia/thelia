@@ -254,7 +254,7 @@ abstract class BaseLoop
      *
      * @param $pagination
      *
-     * @return mixed
+     * @return LoopResult
      */
     abstract public function exec(&$pagination);
 

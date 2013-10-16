@@ -44,4 +44,14 @@ class AnyType implements TypeInterface
     {
         return $value;
     }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
+    }
 }
