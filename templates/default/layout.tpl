@@ -66,6 +66,7 @@ URL: http://www.thelia.net
 
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
             <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="{intl l="Main Navigation"}">
+                {nocache}
                 <ul class="nav navbar-nav navbar-cart navbar-right">
                     {loop type="auth" name="customer_info_block" roles="CUSTOMER" context="front"}
                         <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
@@ -81,15 +82,18 @@ URL: http://www.thelia.net
                                 {form_hidden_fields form=$form}
                                 {form_field form=$form field="email"}
                                 <div class="form-group group-email">
-                                    <label for="{$label_attr.for}-mini">{$label}</label>
-                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control"{if $required} aria-required="true" required{/if}>
+                                    <label for="{$label_attr.for}-mini">Email address</label>
+                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" aria-required="true" required>
                                 </div>
                                 {/form_field}
                                 {form_field form=$form field="password"}
                                 <div class="form-group group-password">
                                     <label for="{$label_attr.for}-mini">Password</label>
-                                    <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control"{if $required} aria-required="true" required{/if}>
+                                    <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control" aria-required="true" required>
                                 </div>
+                                {/form_field}
+                                {form_field form=$form field="account"}
+                                <input type="hidden" name="{$name}" value="1">
                                 {/form_field}
                                 <div class="group-btn">
                                     <button type="submit" class="btn btn-login-mini">{intl l="Sign In"}</button>
@@ -100,13 +104,9 @@ URL: http://www.thelia.net
                         </div>
                     </li>
                     {/elseloop}
-                    <li class="dropdown cart-not-empty">
-                        <a href="{url path="/cart"}" rel="nofollow" class="cart">
-                            Cart <span class="badge">{cart attr="count_item"}</span>
-                        </a>
-                        {include file="includes/mini-cart.html"}
-                    </li>
+                    {include file="includes/mini-cart.html" nocache}
                 </ul>
+                {/nocache}
                 <ul class="nav navbar-nav navbar-categories">
                     <li><a href="{navigate to="index"}" class="home">{intl l="Home"}</a></li>
                     {loop type="category" name="category.navigation" parent="0"}
