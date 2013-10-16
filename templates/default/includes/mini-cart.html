@@ -1,4 +1,8 @@
 {ifloop rel="cartloop"}
+<li class="dropdown pull-right cart-not-empty">
+    <a href="{url path="/cart"}" rel="nofollow" class="cart">
+        {intl l="Cart"} <span class="badge">{cart attr="count_item"}</span>
+    </a>
     <div class="dropdown-menu cart-content">
         <form id="form-cart-mini" action="{url path="/order/delivery"}" method="post" role="form">
             <table class="table table-cart-mini">
@@ -40,8 +44,8 @@
                 <tfoot>
                     <tr>
                         <td colspan="2" class="empty">
-                            <a href="{url path="/cart"}" role="button" class="btn btn-default btn-sm"><span>View Cart</span></a>
-                            <button type="submit" name="checkout" class="btn btn-warning btn-sm"><span>Checkout</span></button>
+                            <a href="{url path="/cart"}" role="button" class="btn btn-default btn-sm"><span>{intl l="View Cart"}</span></a>
+                            <button type="submit" name="checkout" class="btn btn-warning btn-sm"><span>{intl l="Checkout"}</span></button>
                         </td>
                         <td class="total">
                             <div class="total-price">
@@ -53,9 +57,15 @@
             </table>
         </form>
     </div>
+</li>
 {/ifloop}
 {elseloop rel="cartloop"}
+<li class="dropdown pull-right">
+    <a href="{url path="/cart"}" rel="nofollow" class="cart">
+        {intl l="Cart"} <span class="badge">0</span>
+    </a>
     <div class="dropdown-menu cart-content">
-        <p>You have no items in your shopping cart.</p>
+        <p>{intl l="You have no items in your shopping cart."}</p>
     </div>
+</li>
 {/elseloop}
