@@ -65,7 +65,11 @@ class TaxCreationForm extends BaseForm
                 $this->formBuilder
                     ->add($type . '_' . $name, new TheliaType(), array(
                         "instance" => $requirementType,
-                        "constraints" => array(new NotBlank()),
+                        "constraints" => array(
+                            "methods" => array(
+                                array($this, "verifyTaxId"),
+                            ),
+                        ),
                         "attr" => array(
                             "tag" => "requirements",
                         ),
