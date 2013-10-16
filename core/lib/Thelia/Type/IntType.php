@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class IntType implements TypeInterface
+class IntType extends BaseType
 {
     public function getType()
     {

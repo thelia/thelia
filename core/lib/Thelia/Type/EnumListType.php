@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class EnumListType implements TypeInterface
+class EnumListType extends BaseType
 {
     protected $values = array();
 

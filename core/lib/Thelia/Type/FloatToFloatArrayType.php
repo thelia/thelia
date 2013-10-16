@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class FloatToFloatArrayType implements TypeInterface
+class FloatToFloatArrayType extends BaseType
 {
     public function getType()
     {

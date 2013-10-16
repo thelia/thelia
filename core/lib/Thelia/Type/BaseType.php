@@ -22,44 +22,25 @@
 /*************************************************************************************/
 namespace Thelia\Type;
 
+use Symfony\Component\Validator\ExecutionContextInterface;
+
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-
-class EnumType extends BaseType
+abstract class BaseType implements TypeInterface
 {
-    protected $values = array();
+    abstract public function getType();
+    abstract public function isValid($value);
+    abstract public function getFormattedValue($value);
+    abstract public function getFormType();
+    abstract public function getFormOptions();
 
-    public function __construct($values = array())
+    public function verifyForm($value, ExecutionContextInterface $context)
     {
-        if(is_array($values))
-            $this->values = $values;
-    }
-
-    public function getType()
-    {
-        return 'Enum type';
-    }
-
-    public function isValid($value)
-    {
-        return in_array($value, $this->values);
-    }
-
-    public function getFormattedValue($value)
-    {
-        return $this->isValid($value) ? $value : null;
-    }
-
-    public function getFormType()
-    {
-        return 'text';
-    }
-
-    public function getFormOptions()
-    {
-        return array();
+        if( ! $this->isValid($value) ) {
+            $context->addViolation("Thelia Type not matched");
+        }
     }
 }

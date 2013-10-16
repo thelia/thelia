@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class AnyType implements TypeInterface
+class AnyType extends BaseType
 {
     public function getType()
     {

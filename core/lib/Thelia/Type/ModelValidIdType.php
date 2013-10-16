@@ -30,7 +30,7 @@ use Thelia\Exception\TypeException;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class ModelValidIdType implements TypeInterface
+class ModelValidIdType extends BaseType
 {
     protected $expectedModelActiveRecordQuery = null;
 

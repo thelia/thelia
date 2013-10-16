@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class IntToCombinedIntsListType implements TypeInterface
+class IntToCombinedIntsListType extends BaseType
 {
     public function getType()
     {

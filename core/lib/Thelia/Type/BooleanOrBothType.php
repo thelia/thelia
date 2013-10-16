@@ -29,7 +29,7 @@ namespace Thelia\Type;
  *
  */
 
-class BooleanOrBothType implements TypeInterface
+class BooleanOrBothType extends BaseType
 {
 
     const ANY = '*';

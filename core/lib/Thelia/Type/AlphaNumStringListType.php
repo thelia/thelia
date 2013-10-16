@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class AlphaNumStringListType implements TypeInterface
+class AlphaNumStringListType extends BaseType
 {
     public function getType()
     {

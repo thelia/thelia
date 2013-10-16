@@ -88,7 +88,7 @@
                     {form_tagged_fields form=$form tag='requirements'}
                         <div class="form-group {if $error}has-error{/if} js-tax-requirements" data-tax-type="{$data.tax_type}" {if $data.tax_type != $TYPE}style="display: none"{/if}>
                             <label for="{$label_attr.for}" class="control-label">
-                                {intl l=$label} :
+                                {intl l=$label} : {$formType}
                             </label>
                             {if $formType == 'choice'}
                                 <select name="{$name}">

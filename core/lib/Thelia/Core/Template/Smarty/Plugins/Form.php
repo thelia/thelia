@@ -152,6 +152,7 @@ class Form extends AbstractSmartyPlugin
         }
 
         $template->assign("attr", implode(" ", $attr));
+        $template->assign("attr_list", $fieldVars["attr"]);
     }
 
     protected function assignFormTypeValues($template, $formFieldConfig, $formFieldView)

@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class BooleanType implements TypeInterface
+class BooleanType extends BaseType
 {
     public function getType()
     {

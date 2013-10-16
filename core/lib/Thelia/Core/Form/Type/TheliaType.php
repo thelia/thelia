@@ -39,7 +39,7 @@ class TheliaType extends AbstractType
 
     public function getParent()
     {
-        return 'form';
+        return 'text';
     }
 
     public function getName()

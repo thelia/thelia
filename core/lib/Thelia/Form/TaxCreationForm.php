@@ -55,13 +55,6 @@ class TaxCreationForm extends BaseForm
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(
-                        array(
-                            "methods" => array(
-                                array($this, "verifyRequirements"),
-                            ),
-                        )
-                    ),
                 ),
                 "label" => Translator::getInstance()->trans("Type"),
                 "label_attr" => array("for" => "type_field"),
@@ -77,7 +70,7 @@ class TaxCreationForm extends BaseForm
                             new Constraints\Callback(
                                 array(
                                     "methods" => array(
-                                        array($this, "verifyRequirements"),
+                                        array($requirementType, "verifyForm"),
                                     ),
                                 )
                             ),
@@ -104,10 +97,10 @@ class TaxCreationForm extends BaseForm
         return "thelia_tax_creation";
     }
 
-    public function verifyRequirements($value, ExecutionContextInterface $context)
+    public function verifyForm($value, ExecutionContextInterface $context)
     {
         $in = true;
 
-
+        //$this->getForm()->getChildren()
     }
 }

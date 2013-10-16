@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class JsonType implements TypeInterface
+class JsonType extends BaseType
 {
     public function getType()
     {
