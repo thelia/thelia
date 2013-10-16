@@ -45,8 +45,13 @@ class featureSlicePercentTaxType extends  BaseTaxType
     public function getRequirementsList()
     {
         return array(
-            'featureId' => new ModelValidIdType('Currency'),
+            'featureId' => new ModelValidIdType('Feature'),
             'slices' => new FloatToFloatArrayType(),
         );
+    }
+
+    public function getTitle()
+    {
+        return "% slice Tax depending on a feature";
     }
 }

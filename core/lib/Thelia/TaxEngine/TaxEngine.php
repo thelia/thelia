@@ -20,46 +20,52 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+namespace Thelia\TaxEngine;
 
 /**
- *
+ * Class TaxEngine
+ * @package Thelia\TaxEngine
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
-
-class EnumType extends BaseType
+class TaxEngine
 {
-    protected $values = array();
-
-    public function __construct($values = array())
+    static public function getInstance()
     {
-        if(is_array($values))
-            $this->values = $values;
+        return new TaxEngine();
     }
 
-    public function getType()
+    private function getTaxTypeDirectory()
     {
-        return 'Enum type';
+        return __DIR__ . "/TaxType";
     }
 
-    public function isValid($value)
+    public function getTaxTypeList()
     {
-        return in_array($value, $this->values);
-    }
+        $typeList = array();
 
-    public function getFormattedValue($value)
-    {
-        return $this->isValid($value) ? $value : null;
-    }
+        try {
+            $directoryBrowser = new \DirectoryIterator($this->getTaxTypeDirectory($this->getTaxTypeDirectory()));
+        } catch (\UnexpectedValueException $e) {
+            return $typeList;
+        }
 
-    public function getFormType()
-    {
-        return 'text';
-    }
+        /* browse the directory */
+        foreach ($directoryBrowser as $directoryContent) {
+            /* is it a file ? */
+            if (!$directoryContent->isFile()) {
+                continue;
+            }
 
-    public function getFormOptions()
-    {
-        return array();
+            $fileName = $directoryContent->getFilename();
+            $className = substr($fileName, 0, (1+strlen($directoryContent->getExtension())) * -1);
+
+            if($className == "BaseTaxType") {
+                continue;
+            }
+
+            $typeList[] = $className;
+        }
+
+        return $typeList;
     }
 }

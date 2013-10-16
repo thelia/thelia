@@ -22,7 +22,11 @@
 /*************************************************************************************/
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormView;
+use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Form\BaseForm;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,6 +60,8 @@ use Thelia\Core\Template\ParserContext;
  */
 class Form extends AbstractSmartyPlugin
 {
+    static private $taggedFieldsStack = null;
+    static private $taggedFieldsStackPosition = null;
 
     protected $request;
     protected $parserContext;
@@ -118,10 +124,15 @@ class Form extends AbstractSmartyPlugin
 
         $template->assign("value", $fieldValue);
 
+        $template->assign("options", $formFieldView->vars);
+
         // If Checkbox input type
         if ($fieldVars['checked'] !== null) {
             $this->renderFormFieldCheckBox($template, $formFieldView['checked']);
         }
+
+        //data
+        $template->assign("data", $fieldVars['data']);
 
         $template->assign("label", $fieldVars["label"]);
         $template->assign("label_attr", $fieldVars["label_attr"]);
@@ -141,20 +152,54 @@ class Form extends AbstractSmartyPlugin
         }
 
         $template->assign("attr", implode(" ", $attr));
+        $template->assign("attr_list", $fieldVars["attr"]);
+    }
+
+    protected function assignFormTypeValues($template, $formFieldConfig, $formFieldView)
+    {
+        $formFieldType = $formFieldConfig->getType()->getInnerType();
+
+        /* access to choices */
+        if($formFieldType instanceof ChoiceType) {
+            $template->assign("choices", $formFieldView->vars['choices']);
+        }
+
+        /* access to collections */
+        if($formFieldType instanceof CollectionType) {
+            if( true === $formFieldConfig->getOption('prototype') ) {
+
+            } else {
+
+            }
+        }
+
+        /* access to thelia type */
+        if($formFieldType instanceof TheliaType) {
+            $template->assign("formType", $formFieldView->vars['type']);
+
+            switch($formFieldView->vars['type']) {
+                case "choice":
+                    if(!isset($formFieldView->vars['options']['choices']) || !is_array($formFieldView->vars['options']['choices'])) {
+                        //throw new
+                    }
+                    $choices = array();
+                    foreach($formFieldView->vars['options']['choices'] as $value => $choice) {
+                        $choices[] = new ChoiceView($value, $value, $choice);
+                    }
+                    $template->assign("choices", $choices);
+                    break;
+            }
+        }
     }
 
     public function renderFormField($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-            if ($repeat) {
+        if ($repeat) {
 
-            $formFieldView = $this->getFormFieldView($params);
+        $formFieldView = $this->getFormFieldView($params);
+        $formFieldConfig = $this->getFormFieldConfig($params);
 
-            $template->assign("options", $formFieldView->vars);
-
-            /* access to choices */
-            if(isset($formFieldView->vars['choices'])) {
-                $template->assign("choices", $formFieldView->vars['choices']);
-            }
+        $this->assignFormTypeValues($template, $formFieldConfig, $formFieldView);
 
             $value = $formFieldView->vars["value"];
 /* FIXME: doesnt work. We got "This form should not contain extra fields." error.
@@ -183,6 +228,38 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
         } else {
             return $content;
         }
+    }
+
+    public function renderTaggedFormFields($params, $content, \Smarty_Internal_Template $template, &$repeat)
+    {
+        if(null === $content) {
+            self::$taggedFieldsStack = $this->getFormFieldsFromTag($params);
+            self::$taggedFieldsStackPosition = 0;
+        } else {
+            self::$taggedFieldsStackPosition++;
+        }
+
+        if(isset(self::$taggedFieldsStack[self::$taggedFieldsStackPosition])) {
+            $this->assignFieldValues(
+                $template,
+                self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']->vars["full_name"],
+                self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']->vars["value"],
+                self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']->vars
+            );
+
+            $this->assignFormTypeValues($template, self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['config'], self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']);
+
+            self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']->setRendered();
+
+            $repeat = true;
+        }
+
+        if (! $repeat) {
+            self::$taggedFieldsStack = null;
+            self::$taggedFieldsStackPosition = null;
+        }
+
+        return $content;
     }
 
     public function renderHiddenFormField($params, \Smarty_Internal_Template $template)
@@ -266,6 +343,48 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
         return $instance->getView()[$fieldName];
     }
 
+    protected function getFormFieldsFromTag($params)
+    {
+        $instance = $this->getInstanceFromParams($params);
+
+        $tag = $this->getParam($params, 'tag');
+
+        if (null == $tag)
+            throw new \InvalidArgumentException("'tag' parameter is missing");
+
+        $viewList = array();
+        foreach($instance->getView() as $view) {
+            if(isset($view->vars['attr']['tag']) && $tag == $view->vars['attr']['tag']) {
+                $fieldData = $instance->getForm()->all()[$view->vars['name']];
+                $viewList[] = array(
+                    'view' => $view,
+                    'config' => $fieldData->getConfig(),
+                );
+            }
+        }
+
+        return $viewList;
+    }
+
+    protected function getFormFieldConfig($params)
+    {
+        $instance = $this->getInstanceFromParams($params);
+
+        $fieldName = $this->getParam($params, 'field');
+
+        if (null == $fieldName) {
+            throw new \InvalidArgumentException("'field' parameter is missing");
+        }
+
+        $fieldData = $instance->getForm()->all()[$fieldName];
+
+        if (empty( $fieldData )) {
+            throw new \InvalidArgumentException(sprintf("Field name '%s' not found in form %s children", $fieldName, $instance->getName()));
+        }
+
+        return $fieldData->getConfig();
+    }
+
     protected function getInstanceFromParams($params)
     {
         $instance = $this->getParam($params, 'form');
@@ -304,6 +423,7 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
         return array(
             new SmartyPluginDescriptor("block", "form", $this, "generateForm"),
             new SmartyPluginDescriptor("block", "form_field", $this, "renderFormField"),
+            new SmartyPluginDescriptor("block", "form_tagged_fields", $this, "renderTaggedFormFields"),
             new SmartyPluginDescriptor("function", "form_hidden_fields", $this, "renderHiddenFormField"),
             new SmartyPluginDescriptor("function", "form_enctype", $this, "formEnctype"),
             new SmartyPluginDescriptor("block", "form_error", $this, "formError")

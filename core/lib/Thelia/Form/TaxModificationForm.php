@@ -20,46 +20,47 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+namespace Thelia\Form;
 
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
+use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Model\TaxQuery;
 
-class EnumType extends BaseType
+class TaxModificationForm extends TaxCreationForm
 {
-    protected $values = array();
-
-    public function __construct($values = array())
+    protected function buildForm()
     {
-        if(is_array($values))
-            $this->values = $values;
+        parent::buildForm(true);
+
+        $this->formBuilder
+            ->add("id", "hidden", array(
+                    "required" => true,
+                    "constraints" => array(
+                        new Constraints\NotBlank(),
+                        new Constraints\Callback(
+                            array(
+                                "methods" => array(
+                                    array($this, "verifyTaxId"),
+                                ),
+                            )
+                        ),
+                    )
+            ))
+        ;
     }
 
-    public function getType()
+    public function getName()
     {
-        return 'Enum type';
+        return "thelia_tax_modification";
     }
 
-    public function isValid($value)
+    public function verifyTaxId($value, ExecutionContextInterface $context)
     {
-        return in_array($value, $this->values);
-    }
+        $tax = TaxQuery::create()
+            ->findPk($value);
 
-    public function getFormattedValue($value)
-    {
-        return $this->isValid($value) ? $value : null;
-    }
-
-    public function getFormType()
-    {
-        return 'text';
-    }
-
-    public function getFormOptions()
-    {
-        return array();
+        if (null === $tax) {
+            $context->addViolation("Tax ID not found");
+        }
     }
 }
