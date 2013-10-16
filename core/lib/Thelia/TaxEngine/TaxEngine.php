@@ -20,63 +20,52 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+namespace Thelia\TaxEngine;
 
 /**
- *
+ * Class TaxEngine
+ * @package Thelia\TaxEngine
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
-
-class EnumListType implements TypeInterface
+class TaxEngine
 {
-    protected $values = array();
-
-    public function __construct($values = array())
+    static public function getInstance()
     {
-        if(is_array($values))
-            $this->values = $values;
+        return new TaxEngine();
     }
 
-    public function addValue($value)
+    private function getTaxTypeDirectory()
     {
-        if(!in_array($value, $this->values))
-            $this->values[] = $value;
+        return __DIR__ . "/TaxType";
     }
 
-    public function getType()
+    public function getTaxTypeList()
     {
-        return 'Enum list type';
-    }
+        $typeList = array();
 
-    public function isValid($values)
-    {
-        foreach (explode(',', $values) as $value) {
-            if(!$this->isSingleValueValid($value))
-
-                return false;
+        try {
+            $directoryBrowser = new \DirectoryIterator($this->getTaxTypeDirectory($this->getTaxTypeDirectory()));
+        } catch (\UnexpectedValueException $e) {
+            return $typeList;
         }
 
-        return true;
-    }
+        /* browse the directory */
+        foreach ($directoryBrowser as $directoryContent) {
+            /* is it a file ? */
+            if (!$directoryContent->isFile()) {
+                continue;
+            }
 
-    public function getFormattedValue($values)
-    {
-        return $this->isValid($values) ? explode(',', $values) : null;
-    }
+            $fileName = $directoryContent->getFilename();
+            $className = substr($fileName, 0, (1+strlen($directoryContent->getExtension())) * -1);
 
-    public function isSingleValueValid($value)
-    {
-        return in_array($value, $this->values);
-    }
+            if($className == "BaseTaxType") {
+                continue;
+            }
 
-    public function getFormType()
-    {
-        return 'text';
-    }
+            $typeList[] = $className;
+        }
 
-    public function getFormOptions()
-    {
-        return array();
+        return $typeList;
     }
 }

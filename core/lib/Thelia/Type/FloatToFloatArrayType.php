@@ -54,4 +54,14 @@ class FloatToFloatArrayType implements TypeInterface
     {
         return $this->isValid($value) ? $value : null;
     }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
+    }
 }

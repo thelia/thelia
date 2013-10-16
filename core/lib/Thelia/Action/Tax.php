@@ -20,63 +20,85 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
 
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
+namespace Thelia\Action;
 
-class EnumListType implements TypeInterface
+use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Tax\TaxEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Tax as TaxModel;
+use Thelia\Model\TaxQuery;
+
+class Tax extends BaseAction implements EventSubscriberInterface
 {
-    protected $values = array();
-
-    public function __construct($values = array())
+    /**
+     * @param TaxEvent $event
+     */
+    public function create(TaxEvent $event)
     {
-        if(is_array($values))
-            $this->values = $values;
+        $tax = new TaxModel();
+
+        $tax
+            ->setDispatcher($this->getDispatcher())
+            ->setType($event->getType())
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setDescription($event->getDescription())
+         ;
+
+        $tax->save();
+
+        $event->setTax($tax);
     }
 
-    public function addValue($value)
+    /**
+     * @param TaxEvent $event
+     */
+    public function update(TaxEvent $event)
     {
-        if(!in_array($value, $this->values))
-            $this->values[] = $value;
-    }
+        if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
 
-    public function getType()
-    {
-        return 'Enum list type';
-    }
+            $tax
+                ->setDispatcher($this->getDispatcher())
+                ->setType($event->getType())
+                ->setLocale($event->getLocale())
+                ->setTitle($event->getTitle())
+                ->setDescription($event->getDescription())
+                ->save()
+            ;
 
-    public function isValid($values)
-    {
-        foreach (explode(',', $values) as $value) {
-            if(!$this->isSingleValueValid($value))
 
-                return false;
+
+            $event->setTax($tax);
         }
-
-        return true;
     }
 
-    public function getFormattedValue($values)
+    /**
+     * @param TaxEvent $event
+     */
+    public function delete(TaxEvent $event)
     {
-        return $this->isValid($values) ? explode(',', $values) : null;
+        if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
+
+            $tax
+                ->delete()
+            ;
+
+            $event->setTax($tax);
+        }
     }
 
-    public function isSingleValueValid($value)
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedEvents()
     {
-        return in_array($value, $this->values);
-    }
+        return array(
+            TheliaEvents::TAX_CREATE            => array("create", 128),
+            TheliaEvents::TAX_UPDATE            => array("update", 128),
+            TheliaEvents::TAX_DELETE            => array("delete", 128),
 
-    public function getFormType()
-    {
-        return 'text';
-    }
-
-    public function getFormOptions()
-    {
-        return array();
+        );
     }
 }

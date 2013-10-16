@@ -32,6 +32,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Model\CountryQuery;
 use Thelia\Model\Map\CountryTableMap;
 use Thelia\Model\Map\TaxRuleCountryTableMap;
 use Thelia\Model\Map\TaxTableMap;
@@ -58,8 +59,14 @@ class TaxRuleCountry extends BaseI18nLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('country'),
-            Argument::createIntListTypeArgument('taxes'),
+            Argument::createIntTypeArgument('country', null, true),
+            new Argument(
+                'ask',
+                new TypeCollection(
+                    new Type\EnumType(array('taxes', 'countries'))
+                ),
+                'taxes'
+            ),
             Argument::createIntTypeArgument('tax_rule', null, true)
         );
     }
@@ -73,40 +80,54 @@ class TaxRuleCountry extends BaseI18nLoop
     {
         $search = TaxRuleCountryQuery::create();
 
+        $ask = $this->getAsk();
+
         $country = $this->getCountry();
-        $taxes = $this->getTaxes();
+        $taxRule = $this->getTax_rule();
 
-        if((null === $country && null === $taxes)) {
-            throw new \InvalidArgumentException('You must provide either `country` or `taxes` parameter in tax-rule-country loop');
-        }
+        if($ask === 'countries') {
+            $taxCountForOriginCountry = TaxRuleCountryQuery::create()->filterByCountryId($country)->count();
 
-        if((null === $country && null !== $taxes)) {
-            throw new \InvalidArgumentException('You must provide `country` parameter with `taxes` parameter in tax-rule-country loop');
-        }
+            if($taxCountForOriginCountry > 0) {
+                $search->groupByCountryId();
 
-        if(null !== $taxes) {
-            $search->groupByCountryId();
+                $originalCountryJoin = new Join();
+                $originalCountryJoin->addExplicitCondition(TaxRuleCountryTableMap::TABLE_NAME, 'TAX_RULE_ID', null, TaxRuleCountryTableMap::TABLE_NAME, 'TAX_RULE_ID', 'origin');
+                $originalCountryJoin->addExplicitCondition(TaxRuleCountryTableMap::TABLE_NAME, 'TAX_ID', null, TaxRuleCountryTableMap::TABLE_NAME, 'TAX_ID', 'origin');
+                $originalCountryJoin->addExplicitCondition(TaxRuleCountryTableMap::TABLE_NAME, 'POSITION', null, TaxRuleCountryTableMap::TABLE_NAME, 'POSITION', 'origin');
+                $originalCountryJoin->addExplicitCondition(TaxRuleCountryTableMap::TABLE_NAME, 'COUNTRY_ID', null, TaxRuleCountryTableMap::TABLE_NAME, 'COUNTRY_ID', 'origin', Criteria::NOT_EQUAL);
+                $originalCountryJoin->setJoinType(Criteria::LEFT_JOIN);
 
-            $originalCountryJoin = new Join();
-            $originalCountryJoin->addExplicitCondition(TaxRuleCountryTableMap::TABLE_NAME, 'TAX_RULE_ID', null, TaxRuleCountryTableMap::TABLE_NAME, 'TAX_RULE_ID', 'origin');
-            $originalCountryJoin->addExplicitCondition(TaxRuleCountryTableMap::TABLE_NAME, 'TAX_ID', null, TaxRuleCountryTableMap::TABLE_NAME, 'TAX_ID', 'origin');
-            $originalCountryJoin->addExplicitCondition(TaxRuleCountryTableMap::TABLE_NAME, 'POSITION', null, TaxRuleCountryTableMap::TABLE_NAME, 'POSITION', 'origin');
-            $originalCountryJoin->addExplicitCondition(TaxRuleCountryTableMap::TABLE_NAME, 'COUNTRY_ID', null, TaxRuleCountryTableMap::TABLE_NAME, 'COUNTRY_ID', 'origin', Criteria::NOT_EQUAL);
-            $originalCountryJoin->setJoinType(Criteria::LEFT_JOIN);
+                $search->addJoinObject($originalCountryJoin, 's_to_o');
+                $search->where('`origin`.`COUNTRY_ID`' . Criteria::EQUAL . '?', $country, \PDO::PARAM_INT);
 
-            $search->addJoinObject($originalCountryJoin, 's_to_o');
-            $search->where('`origin`.`COUNTRY_ID`' . Criteria::EQUAL . '?', $country, \PDO::PARAM_INT);
+                $search->having('COUNT(*)=?', $taxCountForOriginCountry, \PDO::PARAM_INT);
 
-            $search->having('COUNT(*)=?', count($taxes), \PDO::PARAM_INT);
+                $search->filterByTaxRuleId($taxRule);
 
-            /* manage tax translation */
-            $this->configureI18nProcessing(
-                $search,
-                array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
-                CountryTableMap::TABLE_NAME,
-                'COUNTRY_ID'
-            );
-        } elseif(null !== $country) {
+                /* manage tax translation */
+                $this->configureI18nProcessing(
+                    $search,
+                    array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+                    CountryTableMap::TABLE_NAME,
+                    'COUNTRY_ID'
+                );
+
+                $search->addAscendingOrderByColumn('`' . CountryTableMap::TABLE_NAME . '_i18n_TITLE`');
+            } else {
+                $search = CountryQuery::create()
+                    ->joinTaxRuleCountry('trc', Criteria::LEFT_JOIN);
+
+                /* manage tax translation */
+                $this->configureI18nProcessing(
+                    $search
+                );
+
+                $search->where('ISNULL(`trc`.`COUNTRY_ID`)');
+
+                $search->addAscendingOrderByColumn('i18n_TITLE');
+            }
+        } elseif($ask === 'taxes') {
             $search->filterByCountryId($country);
 
             /* manage tax translation */
@@ -116,12 +137,10 @@ class TaxRuleCountry extends BaseI18nLoop
                 TaxTableMap::TABLE_NAME,
                 'TAX_ID'
             );
+
+            $search->filterByTaxRuleId($taxRule);
+            $search->orderByPosition(Criteria::ASC);
         }
-
-        $taxRule = $this->getTax_rule();
-        $search->filterByTaxRuleId($taxRule);
-
-        $search->orderByPosition(Criteria::ASC);
 
         /* perform search */
         $taxRuleCountries = $this->search($search, $pagination);
@@ -132,16 +151,23 @@ class TaxRuleCountry extends BaseI18nLoop
 
             $loopResultRow = new LoopResultRow($loopResult, $taxRuleCountry, $this->versionable, $this->timestampable, $this->countable);
 
-            if(null !== $taxes) {
-                $loopResultRow
-                    ->set("TAX_RULE"            , $taxRuleCountry->getTaxRuleId())
-                    ->set("COUNTRY"             , $taxRuleCountry->getCountryId())
-                    ->set("COUNTRY_TITLE"               , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_TITLE'))
-                    ->set("COUNTRY_CHAPO"               , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_CHAPO'))
-                    ->set("COUNTRY_DESCRIPTION"         , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
-                    ->set("COUNTRY_POSTSCRIPTUM"         , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
-                ;
-            }elseif(null !== $country) {
+            if($ask === 'countries') {
+                if($taxCountForOriginCountry > 0) {
+                    $loopResultRow
+                        ->set("COUNTRY"             , $taxRuleCountry->getCountryId())
+                        ->set("COUNTRY_TITLE"               , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_TITLE'))
+                        ->set("COUNTRY_CHAPO"               , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                        ->set("COUNTRY_DESCRIPTION"         , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                        ->set("COUNTRY_POSTSCRIPTUM"         , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'));
+                } else {
+                    $loopResultRow
+                        ->set("COUNTRY"             , $taxRuleCountry->getId())
+                        ->set("COUNTRY_TITLE"               , $taxRuleCountry->getVirtualColumn('i18n_TITLE'))
+                        ->set("COUNTRY_CHAPO"               , $taxRuleCountry->getVirtualColumn('i18n_CHAPO'))
+                        ->set("COUNTRY_DESCRIPTION"         , $taxRuleCountry->getVirtualColumn('i18n_DESCRIPTION'))
+                        ->set("COUNTRY_POSTSCRIPTUM"         , $taxRuleCountry->getVirtualColumn('i18n_POSTSCRIPTUM'));
+                }
+            } elseif($ask === 'taxes') {
                 $loopResultRow
                     ->set("TAX_RULE"            , $taxRuleCountry->getTaxRuleId())
                     ->set("COUNTRY"             , $taxRuleCountry->getCountryId())

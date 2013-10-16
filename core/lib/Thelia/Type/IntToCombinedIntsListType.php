@@ -124,4 +124,14 @@ class IntToCombinedIntsListType implements TypeInterface
 
         return true;
     }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
+    }
 }

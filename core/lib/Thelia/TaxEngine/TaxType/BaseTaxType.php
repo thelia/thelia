@@ -41,6 +41,8 @@ abstract class BaseTaxType
 
     public abstract function getRequirementsList();
 
+    public abstract function getTitle();
+
     public function calculate(Product $product, $untaxedPrice)
     {
         return $untaxedPrice * $this->pricePercentRetriever() + $this->fixAmountRetriever($product);

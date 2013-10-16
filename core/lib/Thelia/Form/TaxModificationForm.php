@@ -20,63 +20,47 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+namespace Thelia\Form;
 
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
+use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Model\TaxQuery;
 
-class EnumListType implements TypeInterface
+class TaxModificationForm extends TaxCreationForm
 {
-    protected $values = array();
-
-    public function __construct($values = array())
+    protected function buildForm()
     {
-        if(is_array($values))
-            $this->values = $values;
+        parent::buildForm(true);
+
+        $this->formBuilder
+            ->add("id", "hidden", array(
+                    "required" => true,
+                    "constraints" => array(
+                        new Constraints\NotBlank(),
+                        new Constraints\Callback(
+                            array(
+                                "methods" => array(
+                                    array($this, "verifyTaxId"),
+                                ),
+                            )
+                        ),
+                    )
+            ))
+        ;
     }
 
-    public function addValue($value)
+    public function getName()
     {
-        if(!in_array($value, $this->values))
-            $this->values[] = $value;
+        return "thelia_tax_modification";
     }
 
-    public function getType()
+    public function verifyTaxId($value, ExecutionContextInterface $context)
     {
-        return 'Enum list type';
-    }
+        $tax = TaxQuery::create()
+            ->findPk($value);
 
-    public function isValid($values)
-    {
-        foreach (explode(',', $values) as $value) {
-            if(!$this->isSingleValueValid($value))
-
-                return false;
+        if (null === $tax) {
+            $context->addViolation("Tax ID not found");
         }
-
-        return true;
-    }
-
-    public function getFormattedValue($values)
-    {
-        return $this->isValid($values) ? explode(',', $values) : null;
-    }
-
-    public function isSingleValueValid($value)
-    {
-        return in_array($value, $this->values);
-    }
-
-    public function getFormType()
-    {
-        return 'text';
-    }
-
-    public function getFormOptions()
-    {
-        return array();
     }
 }

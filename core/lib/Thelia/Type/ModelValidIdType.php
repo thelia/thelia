@@ -67,4 +67,23 @@ class ModelValidIdType implements TypeInterface
 
         return $this->isValid($value) ? $queryClass::create()->findPk($value) : null;
     }
+
+    public function getFormType()
+    {
+        return 'choice';
+    }
+
+    public function getFormOptions()
+    {
+        $queryClass = $this->expectedModelActiveRecordQuery;
+
+        $choices = array();
+        foreach($queryClass::create()->find() as $item) {
+            $choices[$item->getId()] = method_exists($item, "getTitle") ? $item->getTitle() : $item->getId();
+        }
+
+        return array(
+            "choices" => $choices,
+        );
+    }
 }
