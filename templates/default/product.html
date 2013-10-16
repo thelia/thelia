@@ -88,9 +88,32 @@
                     </div>
                 </div>
 
+                {loop name="stock_meta" type="product_sale_elements" product="$ID"}
+                    {loop name="combi_meta" type="attribute_combination" product_sale_elements="$ID"}
+                       {if $LOOP_COUNT == 0}
+                           {if $QUANTITY == 0}
+
+                               {assign  var="current_stock_class" value = "out-of-stock"}
+                               {assign  var="current_stock_href" value = "http://schema.org/OutOfStock"}
+
+                               {else}
+
+                               {assign  var="current_stock_class" value = "out-of-stock"}
+                               {assign  var="current_stock_href" value = "http://schema.org/OutOfStock"}
+
+                           {/if}
+                       {/if}
+                    {/loop}
+                {/loop}
 
                 <div class="product-price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                    <div class="availability"><span class="availibity-label">{intl l="Availability"}: </span><span itemprop="availability" href="http://schema.org/InStock" class="in-stock">In stock</span></div>
+                    <div class="availability">
+                        <span class="availibity-label">{intl l="Availability"}: </span>
+                        <span itemprop="availability" href="{$current_stock_href}" class="{$current_stock_class}" id="stockInformations">
+                            <span class="in">{intl l='In stock'}</span><span class="out">{intl l='Out of stock'}</span>
+
+                        </span>
+                    </div>
 
                     <div class="price-container">
                         {loop type="category" name="category_tag" id=$DEFAULT_CATEGORY}
@@ -98,14 +121,6 @@
                         {/loop}
                         <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition"> <!-- List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition -->
                         <meta itemprop="priceCurrency" content="{currency attr="symbol"}"> <!-- List of currency : The currency used to describe the product price, in three-letter ISO format. -->
-                        <link itemprop="availability" href="http://schema.org/InStock" content="in_stock" />
-                        <!-- List of availibility :
-                            out_of_stock : http://schema.org/OutOfStock
-                            in_stock : http://schema.org/InStock
-                            instore_only : http://schema.org/InStoreOnly
-                            preorder : http://schema.org/PreOrder
-                            online_only : http://schema.org/OnlineOnly
-                        -->
                         {if $IS_PROMO }
                         {loop name="productSaleElements_promo" type="product_sale_elements" product="{$ID}" limit="1" order="min_price"}
                             {assign var="default_product_sale_elements" value="$ID"}
@@ -136,36 +151,24 @@
                     {/if}
                     {/form_field}
                     {form_field form=$form field="product"}
-                    <input id="{$label_attr.for}" type="hidden" name="{$name}" value="{$ID}" {$attr} >
+                        <input id="{$label_attr.for}" type="hidden" name="{$name}" value="{$ID}" {$attr} >
                     {/form_field}
+
                     <fieldset class="product-options">
-                        <div class="option option-color">
-                            <label for="option-color" class="option-heading">Show</label>
+                        {ifloop rel="stock"}
+                        <div class="option">
+                            <label for="options" class="option-heading">Options</label>
                             <div class="option-content">
-                                <select id="option-color" name="option-color" class="form-control">
-                                    <option value="0">Blue</option>
-                                    <option value="1">Red</option>
-                                    <option value="2">Purple</option>
+                                <select name="options" class="form-control">
+                                    {loop name="stock" type="product_sale_elements" product="$ID"}
+                                        {loop name="combi" type="attribute_combination" product_sale_elements="$ID"}
+                                            <option value="{$ID}" data-quantity="{$QUANTITY}" data-price="{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}" data-old-price="{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}">{$ATTRIBUTE_AVAILABILITY_TITLE}</small></option>
+                                        {/loop}
+                                    {/loop}
                                 </select>
                             </div>
                         </div>
-
-                        <div class="option option-size">
-                            <fieldset>
-                                <legend class="option-heading">Size</legend>
-                                <div class="option-content">
-                                    <label class="checkbox-inline" for="size1">
-                                        <input type="checkbox" name="size1" id="size1" value="1"> Large
-                                    </label>
-                                    <label class="checkbox-inline" for="size2">
-                                        <input type="checkbox" name="size2" id="size2" value="2"> Medium
-                                    </label>
-                                    <label class="checkbox-inline" for="size3">
-                                        <input type="checkbox" name="size3" id="size3" value="3"> Small
-                                    </label>
-                                </div>
-                            </fieldset>
-                        </div>
+                        {/ifloop}
                     </fieldset>
                     <fieldset class="product-cart form-inline">
                         {form_field form=$form field='quantity'}
@@ -201,10 +204,11 @@
                         {ifloop rel="feature_value_info"}
                         <ul>
                         {loop name="feature_info" type="feature" product="{$ID}"}
-                            <li> <strong>{$TITLE}</strong> :
-                            {loop name="feature_value_info" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
-                                {$TITLE}
-                            {/loop}
+                            <li>
+                                <strong>{$TITLE}</strong> :
+                                {loop name="feature_value_info" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
+                                    {$TITLE}
+                                {/loop}
                             </li>
                         {/loop}
                         </ul>
