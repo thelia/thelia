@@ -193,34 +193,33 @@ class CustomerController extends BaseFrontController
 
                 $form = $this->validateForm($customerLoginForm, "post");
 
-                try {
-
-                    $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
-
-                    $customer = $authenticator->getAuthentifiedUser();
-
-                    $this->processLogin($customer);
-
-                    $this->redirectSuccess($customerLoginForm);
-
-                } catch (UsernameNotFoundException $e) {
-                    $message = "1.Wrong email or password. Please try again";
-                } catch (WrongPasswordException $e) {
-                    $message = "2.Wrong email or password. Please try again";
-                } catch (AuthenticationException $e) {
-                    $message = "3.Wrong email or password. Please try again";
-                }
-
-            } catch (FormValidationException $e) {
-
                 // If User is a new customer
-                $form = $customerLoginForm->getForm();
                 if ($form->get('account')->getData() == 0 && !$form->get("email")->getErrors()) {
                     $this->redirectToRoute("customer.create.view", array("email" => $form->get("email")->getData()));
                 } else {
-                    $message = sprintf("Please check your input: %s", $e->getMessage());
+
+                    try {
+
+                        $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
+
+                        $customer = $authenticator->getAuthentifiedUser();
+
+                        $this->processLogin($customer);
+
+                        $this->redirectSuccess($customerLoginForm);
+
+                    } catch (UsernameNotFoundException $e) {
+                        $message = "Wrong email or password. Please try again";
+                    } catch (WrongPasswordException $e) {
+                        $message = "Wrong email or password. Please try again";
+                    } catch (AuthenticationException $e) {
+                        $message = "Wrong email or password. Please try again";
+                    }
+
                 }
 
+            } catch (FormValidationException $e) {
+                $message = sprintf("Please check your input: %s", $e->getMessage());
             } catch (\Exception $e) {
                 $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
