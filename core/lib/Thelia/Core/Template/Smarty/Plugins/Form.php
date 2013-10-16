@@ -126,6 +126,8 @@ class Form extends AbstractSmartyPlugin
         $template->assign("label", $fieldVars["label"]);
         $template->assign("label_attr", $fieldVars["label_attr"]);
 
+        $template->assign('required', isset($fieldVars['required']) ? $fieldVars['required'] : false);
+
         $errors = $fieldVars["errors"];
 
         $template->assign("error", empty($errors) ? false : true);
