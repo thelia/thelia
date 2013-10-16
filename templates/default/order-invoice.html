@@ -30,9 +30,9 @@
                 <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">4</span> <span class="step-label">{intl l="Secure payment"}</span></a>
             </div>
 
-            {form name="thelia.order.payment"}
+            {form name="thelia.order.coupon"}
 
-            <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" role="form" {form_enctype form=$form}>
+            <form id="form-coupon" action="{url path="/order/coupon"}" method="post" role="form" {form_enctype form=$form}>
 
                 {form_hidden_fields form=$form}
 
@@ -137,12 +137,17 @@
                     <tr >
                         <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
                         <td class="coupon">
-                            <div class="input-group">
-                                <input type="text" name="coupon" id="coupon" class="form-control">
-												<span class="input-group-btn">
-													<button type="button" class="btn btn-coupon">{intl l="Ok"}</button>
-												</span>
-                            </div><!-- /input-group -->
+                            {form_field form=$form field='coupon-code'}
+                                <div class="input-group {if $error}has-error{/if}">
+                                    <label class="control-label" for="code">{intl l='Code :'}</label>
+                                    <input id="coupon" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='Coupon code'}">
+                                    <span class="input-group-btn">
+                                        <button type="submit" class="btn btn-coupon">{intl l="Ok"}</button>
+                                    </span>
+                                    {if $error}{$message}{/if}
+                                </div>
+                            {/form_field}
+                            <!-- /input-group -->
                         </td>
                     </tr>
                     <tr >
@@ -155,7 +160,15 @@
                     </tr>
                     </tfoot>
                 </table>
+                </form>
+            {/form}
+            {form name="thelia.order.payment"}
 
+            <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" role="form" {form_enctype form=$form}>
+
+                {form_hidden_fields form=$form}
+
+                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
                 <div id="cart-address">
                     <div class="panel">
                         {loop type="address" name="delivery-address" id={order attr="delivery_address"}}

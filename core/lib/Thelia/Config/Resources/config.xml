@@ -93,6 +93,8 @@
         <form name="thelia.order.payment" class="Thelia\Form\OrderPayment"/>
         <form name="thelia.order.update.address" class="Thelia\Form\OrderUpdateAddress"/>
 
+        <form name="thelia.order.coupon" class="Thelia\Form\CouponCode"/>
+
         <form name="thelia.admin.config.creation" class="Thelia\Form\ConfigCreationForm"/>
         <form name="thelia.admin.config.modification" class="Thelia\Form\ConfigModificationForm"/>
 
