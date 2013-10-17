@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding='UTF-8'?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="plugin">
+    <xs:element name="module">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="descriptif" maxOccurs="unbounded">
+                <xs:element type="xs:string" minOccurs="1" name="full-namespace">
                     <xs:annotation>
-                        <xs:documentation>le descriptif complet, dans autant de langues que nécessaire.
-                            Le code de la langue doit être un code pays ISO 639</xs:documentation>
+                        <xs:documentation>The full namespace for the main class module (for example MyModule\MyModule)</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="descriptive" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation>complete description, each description must be identify by ISO CODE 639</xs:documentation>
                     </xs:annotation>
                     <xs:complexType>
                         <xs:sequence>
@@ -20,33 +24,31 @@
                 </xs:element>
                 <xs:element type="xs:string" name="version">
                     <xs:annotation>
-                        <xs:documentation>La version du plugin. Format libre</xs:documentation>
+                        <xs:documentation>Module version</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:element name="auteur">
                     <xs:annotation>
-                        <xs:documentation>Auteur du plugin</xs:documentation>
+                        <xs:documentation>Module author</xs:documentation>
                     </xs:annotation>
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element type="xs:string" name="nom"/>
-                            <xs:element type="xs:string" name="societe" minOccurs="0" maxOccurs="1"/>
+                            <xs:element type="xs:string" name="name"/>
+                            <xs:element type="xs:string" name="company" minOccurs="0" maxOccurs="1"/>
                             <xs:element type="xs:string" name="email"/>
-                            <xs:element type="xs:anyURI" name="web" minOccurs="0" maxOccurs="1"/>
+                            <xs:element type="xs:anyURI" name="website" minOccurs="0" maxOccurs="1"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="type">
                     <xs:annotation>
-                        <xs:documentation>Le type du plugin: classique, transport, paiement, filtre, taxe</xs:documentation>
+                        <xs:documentation>module type : classic, delivery, payment</xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            <xs:enumeration value="classique"/>
-                            <xs:enumeration value="transport"/>
-                            <xs:enumeration value="paiement"/>
-                            <xs:enumeration value="filtre"/>
-                            <xs:enumeration value="taxe"/>
+                            <xs:enumeration value="classic"/>
+                            <xs:enumeration value="delivery"/>
+                            <xs:enumeration value="payment"/>
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
@@ -70,7 +72,7 @@
                 </xs:element>
                 <xs:element name="thelia">
                     <xs:annotation>
-                        <xs:documentation>La version minimum requise de Thelia, au format 'dot' (1.2.3.4 par exemple)</xs:documentation>
+                        <xs:documentation>minimum required version of Thelia in 'dot' format (for example 1.2.3.4)</xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
@@ -78,17 +80,17 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
-                <xs:element name="etat">
+                <xs:element name="stability">
                     <xs:annotation>
-                        <xs:documentation>Le statut actuel du plugin: alpha, beta, rc, production</xs:documentation>
+                        <xs:documentation>current module stability: alpha, beta, rc, prod</xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
                             <xs:enumeration value="alpha"/>
                             <xs:enumeration value="beta"/>
                             <xs:enumeration value="rc"/>
-                            <xs:enumeration value="production"/>
-                            <xs:enumeration value="autre"/>
+                            <xs:enumeration value="prod"/>
+                            <xs:enumeration value="other"/>
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>

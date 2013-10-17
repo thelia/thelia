@@ -21,35 +21,51 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Module;
-use Symfony\Component\Finder\Finder;
+namespace Thelia\Module\Loader;
+use Symfony\Component\Config\Loader\FileLoader;
+use Symfony\Component\Config\Util\XmlUtils;
 
 
 /**
- * Class ModuleManagement
- * @package Thelia\Module
+ * Class XmlFileLoader
+ * @package Thelia\Module\Loader
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ModuleManagement 
+class XmlFileLoader extends FileLoader
 {
-    protected $baseModuleDir;
 
-    public function __construct()
+    /**
+     * Loads a resource.
+     *
+     * @param mixed $resource The resource
+     * @param string $type     The resource type
+     */
+    public function load($resource, $type = null)
     {
-        $this->baseModuleDir = THELIA_MODULE_DIR;
+        $path = $this->locator->locate($resource);
+
+        $xml = $this->parseFile($path);
     }
 
-    public function updateModules()
+    protected function parseFile($file)
     {
-        $finder = new Finder();
+        $schema = str_replace('\\', '/',__DIR__.'/schema/module-1.0.xsd');
 
-        $finder
-            ->name('module.xml')
-            ->in($this->baseModuleDir . '/*/Config');
+        $dom = XmlUtils::loadFile($file, $schema);
 
-        foreach ($finder as $file) {
-            echo $file->getRealPath()."\n";
-        }
+        return simplexml_import_dom($dom);
     }
 
+    /**
+     * Returns true if this class supports the given resource.
+     *
+     * @param mixed $resource A resource
+     * @param string $type     The resource type
+     *
+     * @return Boolean true if this class supports the given resource, false otherwise
+     */
+    public function supports($resource, $type = null)
+    {
+        // TODO: Implement supports() method.
+    }
 }
