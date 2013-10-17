@@ -24,7 +24,10 @@
 
 namespace Thelia\Module;
 
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\Map\ModuleImageTableMap;
 use Thelia\Model\ModuleI18n;
@@ -50,19 +53,51 @@ abstract class BaseModule extends ContainerAware
 
     }
 
-    public function activate()
+
+    public function activate($moduleModel = null)
     {
-        $moduleModel = $this->getModuleModel();
+        if(null === $moduleModel) {
+            $moduleModel = $this->getModuleModel();
+        }
+
         if ($moduleModel->getActivate() == self::IS_NOT_ACTIVATED) {
-            $moduleModel->setActivate(self::IS_ACTIVATED);
-            $moduleModel->save();
+            $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
+            $con->beginTransaction();
             try {
-                $this->afterActivation();
+                if($this->preActivation($con)) {
+                    $moduleModel->setActivate(self::IS_ACTIVATED);
+                    $moduleModel->save($con);
+                    $this->postActivation($con);
+                    $con->commit();
+                }
             } catch (\Exception $e) {
-                $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
-                $moduleModel->save();
+                $con->rollBack();
                 throw $e;
             }
+        }
+    }
+
+    public function deActivate($moduleModel = null)
+    {
+        if(null === $moduleModel) {
+            $moduleModel = $this->getModuleModel();
+        }
+        if ($moduleModel->getActivate() == self::IS_ACTIVATED) {
+            $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
+            $con->beginTransaction();
+            try {
+                if($this->preDeactivation($con)) {
+                    $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
+                    $moduleModel->save($con);
+                    $this->postDeactivation($con);
+
+                    $con->commit();
+                }
+            } catch (\Exception $e) {
+                $con->rollBack();
+                throw $e;
+            }
+
         }
     }
 
@@ -190,8 +225,33 @@ abstract class BaseModule extends ContainerAware
         return basename(dirname($this->reflected->getFileName()));
     }
 
-    abstract public function install();
-    abstract public function afterActivation();
-    abstract public function destroy();
+    public function install(){
+
+    }
+
+    public function preActivation(ConnectionInterface $con = null)
+    {
+        return true;
+    }
+
+    public function postActivation(ConnectionInterface $con = null)
+    {
+
+    }
+
+    public function preDeactivation(ConnectionInterface $con = null)
+    {
+        return true;
+    }
+
+    public function postDeactivation(ConnectionInterface $con = null)
+    {
+
+    }
+
+    public function destroy()
+    {
+
+    }
 
 }

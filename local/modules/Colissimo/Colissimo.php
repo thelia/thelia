@@ -67,25 +67,6 @@ class Colissimo extends BaseModule implements DeliveryModuleInterface
         return 2;
     }
 
-    public function afterActivation()
-    {
-
-    }
-
-    /**
-     * YOU HAVE TO IMPLEMENT HERE ABSTRACT METHODD FROM BaseModule Class
-     * Like install and destroy
-     */
-    public function install()
-    {
-        // TODO: Implement install() method.
-    }
-
-    public function destroy()
-    {
-        // TODO: Implement destroy() method.
-    }
-
     public function getCode()
     {
         return 'Colissimo';

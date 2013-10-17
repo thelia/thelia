@@ -58,6 +58,11 @@ class ModuleController extends BaseAdminController
         try {
             $event = new ModuleToggleActivationEvent($module_id);
             $this->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
+
+            if(null === $event->getModule()) {
+                throw new \LogicException(
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj' => 'Module')));
+            }
         } catch (\Exception $e) {
             $message = $e->getMessage();
         }
@@ -69,7 +74,7 @@ class ModuleController extends BaseAdminController
             }
             $response = $this->nullResponse();
         } else {
-            $response = $this->render("modules");
+            $this->redirectToRoute('admin.module');
         }
 
         return $response;

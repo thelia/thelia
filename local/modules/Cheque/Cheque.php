@@ -23,6 +23,7 @@
 
 namespace Cheque;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Model\ModuleImageQuery;
@@ -59,12 +60,8 @@ class Cheque extends BaseModule implements PaymentModuleInterface
         // no special process, waiting for the cheque.
     }
 
-    public function install()
-    {
 
-    }
-
-    public function afterActivation()
+    public function postActivation(ConnectionInterface $con = null)
     {
         /* insert the images from image folder if first module activation */
         $module = $this->getModuleModel();
@@ -82,10 +79,6 @@ class Cheque extends BaseModule implements PaymentModuleInterface
         );
     }
 
-    public function destroy()
-    {
-        // TODO: Implement destroy() method.
-    }
 
     public function getCode()
     {

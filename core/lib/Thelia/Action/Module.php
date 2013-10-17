@@ -25,6 +25,8 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\ModuleQuery;
+use Thelia\Module\BaseModule;
 
 
 /**
@@ -37,7 +39,24 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     public function toggleActivation(ModuleToggleActivationEvent $event)
     {
+        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
+            $moduleClass = new \ReflectionClass($module->getFullNamespace());
 
+            $moduleInstance = $moduleClass->newInstance();
+
+            if( method_exists($moduleInstance, 'setContainer')) {
+                $moduleInstance->setContainer($this->container);
+                if($module->getActivate() == BaseModule::IS_ACTIVATED) {
+                    $moduleInstance->deActivate($module);
+                } else {
+                    $moduleInstance->activate($module);
+                }
+            }
+
+            if($module->isModified()) {
+                $event->setModule($module);
+            }
+        }
     }
 
     /**
