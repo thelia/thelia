@@ -27,7 +27,7 @@
                         <xs:documentation>Module version</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="auteur">
+                <xs:element name="author">
                     <xs:annotation>
                         <xs:documentation>Module author</xs:documentation>
                     </xs:annotation>

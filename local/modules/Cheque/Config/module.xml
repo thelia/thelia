@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module xmlns="http://thelia.net/schema/module"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://thelia.net/schema/module http://thelia.net/schema/module/module-1.0.xsd">
+<module>
+    <full-namespace>Cheque\\Cheque</full-namespace>
     <descriptive locale="en_US">
         <title>Cheque</title>
     </descriptive>
-    <full-namespace>Cheque\\Cheque</full-namespace>
     <version>1.1</version>
     <author>
         <name>Manuel Raynaud</name>

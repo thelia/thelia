@@ -47,8 +47,10 @@ class ModuleManagement
             ->name('module.xml')
             ->in($this->baseModuleDir . '/*/Config');
 
+        $descriptorValidator = new ModuleDescriptorValidator();
         foreach ($finder as $file) {
-            echo $file->getRealPath()."\n";
+            $content = $descriptorValidator->getDescriptor($file->getRealPath());
+            var_dump($content); exit;
         }
     }
 

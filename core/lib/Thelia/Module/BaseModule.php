@@ -43,6 +43,8 @@ abstract class BaseModule extends ContainerAware
     const IS_ACTIVATED = 1;
     const IS_NOT_ACTIVATED = 0;
 
+    protected $reflected;
+
     public function __construct()
     {
 
@@ -178,7 +180,16 @@ abstract class BaseModule extends ContainerAware
         return $moduleModel;
     }
 
-    abstract public function getCode();
+
+    public function getCode()
+    {
+        if (null === $this->reflected) {
+            $this->reflected = new \ReflectionObject($this);
+        }
+
+        return dirname($this->reflected->getFileName());
+    }
+
     abstract public function install();
     abstract public function afterActivation();
     abstract public function destroy();
