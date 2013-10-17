@@ -2,23 +2,16 @@
 <module xmlns="http://thelia.net/schema/module"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/module http://thelia.net/schema/module/module-1.0.xsd">
-    <descriptif lang="fr">
-        <titre>Produits factices</titre>
-        <chapo></chapo>
-        <description>Insertion des produits dans votre site Thelia permettant d'avoir un Thelia de test vite opérationnel.</description>
-        <postscriptum></postscriptum>
-    </descriptif>
+    <descriptive locale="en_US">
+        <title>Cheque</title>
+    </descriptive>
+    <full-namespace>Cheque\\Cheque</full-namespace>
     <version>1.1</version>
-    <auteur>
-        <nom>Manuel Raynaud - mraynaud@openstudio.fr</nom>
-        <societe></societe>
-        <email></email>
-        <web></web>
-    </auteur>
-    <type>classique</type>
-    <prerequis/>
-    <thelia>1.5.0</thelia>
-    <etat>production</etat>
-    <documentation>README.TXT</documentation>
-    <urlmiseajour></urlmiseajour>
+    <author>
+        <name>Manuel Raynaud</name>
+        <email>mraynaud@openstudio.fr</email>
+    </author>
+    <type>payment</type>
+    <thelia>2.0.0</thelia>
+    <stability>alpha</stability>
 </module>

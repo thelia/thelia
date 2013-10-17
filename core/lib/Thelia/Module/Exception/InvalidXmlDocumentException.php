@@ -21,51 +21,15 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Module\Loader;
-use Symfony\Component\Config\Loader\FileLoader;
-use Symfony\Component\Config\Util\XmlUtils;
+namespace Thelia\Module\Exception;
 
 
 /**
- * Class XmlFileLoader
- * @package Thelia\Module\Loader
+ * Class InvalidXmlDocumentException
+ * @package Thelia\Module\Exception
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class XmlFileLoader extends FileLoader
+class InvalidXmlDocumentException extends \RuntimeException
 {
 
-    /**
-     * Loads a resource.
-     *
-     * @param mixed $resource The resource
-     * @param string $type     The resource type
-     */
-    public function load($resource, $type = null)
-    {
-        $path = $this->locator->locate($resource);
-
-        $xml = $this->parseFile($path);
-    }
-
-    protected function parseFile($file)
-    {
-        $schema = str_replace('\\', '/',__DIR__.'/schema/module-1.0.xsd');
-
-        $dom = XmlUtils::loadFile($file, $schema);
-
-        return simplexml_import_dom($dom);
-    }
-
-    /**
-     * Returns true if this class supports the given resource.
-     *
-     * @param mixed $resource A resource
-     * @param string $type     The resource type
-     *
-     * @return Boolean true if this class supports the given resource, false otherwise
-     */
-    public function supports($resource, $type = null)
-    {
-        // TODO: Implement supports() method.
-    }
 }
