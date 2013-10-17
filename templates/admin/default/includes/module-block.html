@@ -22,9 +22,16 @@
                     <td><a href="#">{$TITLE}</a></td>
                     <td>{$CHAPO}</td>
                     <td>
-                        <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                        <div class="make-switch switch-small module-activation" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
                             <input type="checkbox" {if $ACTIVE}checked{/if}>
                         </div>
+                        <noscript>
+                            {if $ACTIVE}
+                                <a href="{url path="/admin/configuration/modules/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
+                            {else}
+                                <a href="{url path="/admin/configuration/modules/toggle-activation/{$ID}"}">{intl l="activation"}</a>
+                            {/if}
+                        </noscript>
                     </td>
 
                     {module_include location='modules_table_row'}

@@ -21,57 +21,49 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
-
+namespace Thelia\Action;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Module\ModuleManagement;
+
 
 /**
- * Class ModuleController
- * @package Thelia\Controller\Admin
+ * Class Module
+ * @package Thelia\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ModuleController extends BaseAdminController
+class Module extends BaseAction implements EventSubscriberInterface
 {
-    public function indexAction()
+
+    public function toggleActivation(ModuleToggleActivationEvent $event)
     {
-        if (null !== $response = $this->checkAuth("admin.module.view")) return $response;
 
-        $modulemanagement = new ModuleManagement();
-        $modulemanagement->updateModules();
-
-        return $this->render("modules");
     }
 
-    public function updateAction($module_id)
+    /**
+     * Returns an array of event names this subscriber wants to listen to.
+     *
+     * The array keys are event names and the value can be:
+     *
+     *  * The method name to call (priority defaults to 0)
+     *  * An array composed of the method name to call and the priority
+     *  * An array of arrays composed of the method names to call and respective
+     *    priorities, or 0 if unset
+     *
+     * For instance:
+     *
+     *  * array('eventName' => 'methodName')
+     *  * array('eventName' => array('methodName', $priority))
+     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
+     *
+     * @return array The event names to listen to
+     *
+     * @api
+     */
+    public static function getSubscribedEvents()
     {
-        return $this->render("module-edit", array(
-            "module_id" => $module_id
-        ));
-    }
-
-    public function toggleActivationAction($module_id)
-    {
-        if (null !== $response = $this->checkAuth("admin.module.update")) return $response;
-        $message = null;
-        try {
-            $event = new ModuleToggleActivationEvent($module_id);
-            $this->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
-        }
-
-
-        if($this->getRequest()->isXmlHttpRequest()) {
-            if($message) {
-                $response = $this->nullResponse($message, 500);
-            }
-            $response = $this->nullResponse();
-        } else {
-            $response = $this->render("modules");
-        }
-
-        return $response;
+        return array(
+            TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleActivation', 128)
+        );
     }
 }

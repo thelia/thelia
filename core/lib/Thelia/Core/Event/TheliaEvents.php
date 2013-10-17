@@ -657,4 +657,6 @@ final class TheliaEvents
 
     const GENERATE_PDF = 'thelia.generatePdf';
 
+    const MODULE_TOGGLE_ACTIVATION = 'thelia.module.toggleActivation';
+
 }

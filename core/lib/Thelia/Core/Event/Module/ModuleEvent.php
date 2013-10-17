@@ -21,57 +21,49 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
+namespace Thelia\Core\Event\Module;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Module;
 
-use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Module\ModuleManagement;
 
 /**
- * Class ModuleController
- * @package Thelia\Controller\Admin
+ * Class ModuleEvent
+ * @package Thelia\Core\Event\Module
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ModuleController extends BaseAdminController
+class ModuleEvent extends ActionEvent
 {
-    public function indexAction()
+    /**
+     * @var \Thelia\Model\Module
+     */
+    protected $module;
+
+    function __construct(Module $module = null)
     {
-        if (null !== $response = $this->checkAuth("admin.module.view")) return $response;
-
-        $modulemanagement = new ModuleManagement();
-        $modulemanagement->updateModules();
-
-        return $this->render("modules");
+        $this->module = $module;
     }
 
-    public function updateAction($module_id)
+    /**
+     * @param \Thelia\Model\Module $module
+     *
+     * @return $this
+     */
+    public function setModule(Module $module)
     {
-        return $this->render("module-edit", array(
-            "module_id" => $module_id
-        ));
+        $this->module = $module;
+
+        return $this;
     }
 
-    public function toggleActivationAction($module_id)
+    /**
+     * @return \Thelia\Model\Module
+     */
+    public function getModule()
     {
-        if (null !== $response = $this->checkAuth("admin.module.update")) return $response;
-        $message = null;
-        try {
-            $event = new ModuleToggleActivationEvent($module_id);
-            $this->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
-        }
-
-
-        if($this->getRequest()->isXmlHttpRequest()) {
-            if($message) {
-                $response = $this->nullResponse($message, 500);
-            }
-            $response = $this->nullResponse();
-        } else {
-            $response = $this->render("modules");
-        }
-
-        return $response;
+        return $this->module;
     }
+
+
+
+
 }

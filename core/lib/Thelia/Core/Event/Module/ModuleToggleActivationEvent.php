@@ -21,57 +21,47 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
+namespace Thelia\Core\Event\Module;
 
-use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Module\ModuleManagement;
 
 /**
- * Class ModuleController
- * @package Thelia\Controller\Admin
+ * Class ModuleToggleActivationEvent
+ * @package Thelia\Core\Event\Module
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ModuleController extends BaseAdminController
+class ModuleToggleActivationEvent extends ModuleEvent
 {
-    public function indexAction()
+    /**
+     * @var int
+     */
+    protected $module_id;
+
+    function __construct($module_id)
     {
-        if (null !== $response = $this->checkAuth("admin.module.view")) return $response;
-
-        $modulemanagement = new ModuleManagement();
-        $modulemanagement->updateModules();
-
-        return $this->render("modules");
+        $this->module_id = $module_id;
     }
 
-    public function updateAction($module_id)
+    /**
+     * @param int $module_id
+     *
+     * @return $this
+     */
+    public function setModuleId($module_id)
     {
-        return $this->render("module-edit", array(
-            "module_id" => $module_id
-        ));
+        $this->module_id = $module_id;
+
+        return $this;
     }
 
-    public function toggleActivationAction($module_id)
+    /**
+     * @return int
+     */
+    public function getModuleId()
     {
-        if (null !== $response = $this->checkAuth("admin.module.update")) return $response;
-        $message = null;
-        try {
-            $event = new ModuleToggleActivationEvent($module_id);
-            $this->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
-        } catch (\Exception $e) {
-            $message = $e->getMessage();
-        }
-
-
-        if($this->getRequest()->isXmlHttpRequest()) {
-            if($message) {
-                $response = $this->nullResponse($message, 500);
-            }
-            $response = $this->nullResponse();
-        } else {
-            $response = $this->render("modules");
-        }
-
-        return $response;
+        return $this->module_id;
     }
+
+
+
+
 }
