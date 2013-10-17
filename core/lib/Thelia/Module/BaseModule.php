@@ -187,7 +187,7 @@ abstract class BaseModule extends ContainerAware
             $this->reflected = new \ReflectionObject($this);
         }
 
-        return dirname($this->reflected->getFileName());
+        return basename(dirname($this->reflected->getFileName()));
     }
 
     abstract public function install();

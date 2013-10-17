@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module>
-    <full-namespace>Cheque\\Cheque</full-namespace>
+    <fullnamespace>Cheque\Cheque</fullnamespace>
     <descriptive locale="en_US">
+        <title>Cheque</title>
+    </descriptive>
+    <descriptive locale="fr_FR">
         <title>Cheque</title>
     </descriptive>
     <version>1.1</version>

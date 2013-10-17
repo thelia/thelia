@@ -3,7 +3,7 @@
     <xs:element name="module">
         <xs:complexType>
             <xs:sequence>
-                <xs:element type="xs:string" minOccurs="1" name="full-namespace">
+                <xs:element type="xs:string" minOccurs="1" name="fullnamespace">
                     <xs:annotation>
                         <xs:documentation>The full namespace for the main class module (for example MyModule\MyModule)</xs:documentation>
                     </xs:annotation>
