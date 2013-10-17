@@ -64,8 +64,8 @@ class TaxCreationForm extends BaseForm
         foreach($requirementList as $type => $requirements) {
             foreach($requirements as $name => $requirementType) {
                 $this->formBuilder
-                    ->add($type . '_' . $name, new TheliaType(), array(
-                        "instance" => $requirementType,
+                    ->add($type . ':' . $name, new TheliaType(), array(
+                        //"instance" => $requirementType,
                         "constraints" => array(
                             new Constraints\Callback(
                                 array(
@@ -77,8 +77,6 @@ class TaxCreationForm extends BaseForm
                         ),
                         "attr" => array(
                             "tag" => "requirements",
-                        ),
-                        "data" => array(
                             "tax_type" => $type,
                         ),
                         "label" => Translator::getInstance()->trans($name),
@@ -95,12 +93,5 @@ class TaxCreationForm extends BaseForm
     public function getName()
     {
         return "thelia_tax_creation";
-    }
-
-    public function verifyForm($value, ExecutionContextInterface $context)
-    {
-        $in = true;
-
-        //$this->getForm()->getChildren()
     }
 }

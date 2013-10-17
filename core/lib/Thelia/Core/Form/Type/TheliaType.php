@@ -11,13 +11,13 @@ class TheliaType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'instance'          => false,
+            //'instance'          => false,
             'type'              => false,
             'options'           => false,
         ));
 
         $resolver->setAllowedTypes(array(
-            'instance'  => array('Thelia\Type\TypeInterface'),
+            //'instance'  => array('Thelia\Type\TypeInterface'),
         ));
 
         $resolver->setAllowedValues(array(
@@ -31,7 +31,7 @@ class TheliaType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars = array_replace($view->vars, array(
-            'instance'          => $options['instance'],
+            //'instance'          => $options['instance'],
             'type'              => $options['type'],
             'options'           => $options['options'],
         ));

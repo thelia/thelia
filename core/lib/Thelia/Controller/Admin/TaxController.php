@@ -76,16 +76,12 @@ class TaxController extends AbstractCrudController
     {
         $event = new TaxEvent();
 
-        /* check the requirements */
-        if(!$this->checkRequirements($formData)) {
-
-        }
-
         $event->setLocale($formData['locale']);
         $event->setId($formData['id']);
         $event->setTitle($formData['title']);
         $event->setDescription($formData['description']);
         $event->setType($formData['type']);
+        $event->setRequirements($this->getRequirements($formData['type'], $formData));
 
         return $event;
     }
@@ -206,5 +202,25 @@ class TaxController extends AbstractCrudController
         $type = $formData['type'];
 
 
+    }
+
+    protected function getRequirements($type, $formData)
+    {
+        $requirements = array();
+        foreach($formData as $data => $value) {
+            if(!strstr($data, ':')) {
+                continue;
+            }
+
+            $couple = explode(':', $data);
+
+            if(count($couple) != 2 || $couple[0] != $type) {
+                continue;
+            }
+
+            $requirements[$couple[1]] = $value;
+        }
+
+        return $requirements;
     }
 }

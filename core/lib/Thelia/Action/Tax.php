@@ -61,14 +61,13 @@ class Tax extends BaseAction implements EventSubscriberInterface
 
             $tax
                 ->setDispatcher($this->getDispatcher())
+                ->setRequirements($event->getRequirements())
                 ->setType($event->getType())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())
                 ->save()
             ;
-
-
 
             $event->setTax($tax);
         }
