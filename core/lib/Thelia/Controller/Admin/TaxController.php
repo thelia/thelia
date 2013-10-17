@@ -68,6 +68,7 @@ class TaxController extends AbstractCrudController
         $event->setTitle($formData['title']);
         $event->setDescription($formData['description']);
         $event->setType($formData['type']);
+        $event->setRequirements($this->getRequirements($formData['type'], $formData));
 
         return $event;
     }

@@ -41,11 +41,12 @@ class Tax extends BaseAction implements EventSubscriberInterface
 
         $tax
             ->setDispatcher($this->getDispatcher())
+            ->setRequirements($event->getRequirements())
             ->setType($event->getType())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->setDescription($event->getDescription())
-         ;
+        ;
 
         $tax->save();
 
@@ -66,8 +67,9 @@ class Tax extends BaseAction implements EventSubscriberInterface
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())
-                ->save()
             ;
+
+            $tax->save();
 
             $event->setTax($tax);
         }
@@ -97,7 +99,6 @@ class Tax extends BaseAction implements EventSubscriberInterface
             TheliaEvents::TAX_CREATE            => array("create", 128),
             TheliaEvents::TAX_UPDATE            => array("update", 128),
             TheliaEvents::TAX_DELETE            => array("delete", 128),
-
         );
     }
 }

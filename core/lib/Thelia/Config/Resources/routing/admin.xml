@@ -870,6 +870,11 @@
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::deleteAction</default>
     </route>
 
+    <route id="admin.configuration.taxes-rules.set-default" path="/admin/configuration/taxes_rules/update/set_default/{tax_rule_id}">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::setDefaultAction</default>
+        <requirement key="tax_rule_id">\d+</requirement>
+    </route>
+
     <!-- end tax rules management -->
 
 
