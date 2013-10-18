@@ -16,6 +16,8 @@
 
             <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
 
+            {nocache}
+            {ifloop rel="cartloop"}
             <div class="btn-group checkout-progress">
                 <a href="#" role="button" class="btn btn-step active"><span class="step-nb">1</span> <span class="step-label">{intl l="Your Cart"}</span></a>
                 <a href="#" role="button" class="btn btn-step disabled"><span class="step-nb">2</span> <span class="step-label">{intl l="Billing and delivery"}</span></a>
@@ -53,10 +55,7 @@
                 </tr>
                 </thead>
                 <tbody>
-
-                {nocache}
                     {loop type="cart" name="cartloop"}
-
                     <tr>
                         <td class="image">
                             <a href="{$PRODUCT_URL}" class="thumbnail">
@@ -120,7 +119,6 @@
                     </tr>
 
                     {/loop}
-                {/nocache}
                 </tbody>
                 <tfoot>
                 <tr >
@@ -138,6 +136,13 @@
             <a href="{navigate to="index"}" role="button" class="btn btn-continue-shopping"><span>{intl l="Continue Shopping"}</span></a>
             <a href="{url path="/order/delivery"}" class="btn btn-checkout">{intl l="Proceed checkout"}</a>
 
+            {/ifloop}
+            {elseloop rel="cartloop"}
+                <div class="cart-warning">
+                    <strong>{intl l="Warning"}!</strong> {intl l="You have no items in your shopping cart."}
+                </div>
+            {/elseloop}
+            {/nocache}
         </article>
 
         {ifloop rel="product_upsell"}
