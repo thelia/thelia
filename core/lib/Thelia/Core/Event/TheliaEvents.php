@@ -657,6 +657,13 @@ final class TheliaEvents
 
     const GENERATE_PDF = 'thelia.generatePdf';
 
+    /**
+     * sent when a module is activated or deactivated
+     */
     const MODULE_TOGGLE_ACTIVATION = 'thelia.module.toggleActivation';
 
+    /**
+     * sent for clearing cache
+     */
+    const CACHE_CLEAR = 'thelia.cache.clear';
 }

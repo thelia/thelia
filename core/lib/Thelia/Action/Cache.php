@@ -21,78 +21,57 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Command;
-
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+namespace Thelia\Action;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOException;
-
-use Thelia\Command\ContainerAwareCommand;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 
+
 /**
- * clear the cache
- *
- * Class CacheClear
- * @package Thelia\Command
+ * Class Cache
+ * @package Thelia\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
- *
  */
-class CacheClear extends ContainerAwareCommand
+class Cache extends BaseAction implements EventSubscriberInterface
 {
-    protected function configure()
+
+    public function cacheClear(CacheEvent $event)
     {
-        $this
-            ->setName("cache:clear")
-            ->setDescription("Invalidate all caches")
-            ->addOption(
-                "without-assets",
-                null,
-                InputOption::VALUE_NONE,
-                "remove cache assets"
-            )
-        ;
-    }
+        $dir = $event->getDir();
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
+        $directoryBrowser = new \DirectoryIterator($dir);
 
-        $cacheDir = $this->getContainer()->getParameter("kernel.cache_dir");
 
-        $this->clearCache($cacheDir, $output);
-        if (!$input->getOption("without-assets")) {
-            $this->clearCache(THELIA_WEB_DIR . "assets", $output);
-        }
+        $fs = new Filesystem();
+        $fs->remove($dir);
 
     }
 
-    protected function clearCache($dir, OutputInterface $output)
+    /**
+     * Returns an array of event names this subscriber wants to listen to.
+     *
+     * The array keys are event names and the value can be:
+     *
+     *  * The method name to call (priority defaults to 0)
+     *  * An array composed of the method name to call and the priority
+     *  * An array of arrays composed of the method names to call and respective
+     *    priorities, or 0 if unset
+     *
+     * For instance:
+     *
+     *  * array('eventName' => 'methodName')
+     *  * array('eventName' => array('methodName', $priority))
+     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
+     *
+     * @return array The event names to listen to
+     *
+     * @api
+     */
+    public static function getSubscribedEvents()
     {
-        $output->writeln(sprintf("Clearing cache in <info>%s</info> directory", $dir));
-
-        try {
-            $cacheEvent = new CacheEvent($dir);
-            $this->
-                getContainer()
-                ->get('event_dispatcher')
-                ->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
-        } catch (\UnexpectedValueException $e) {
-            // throws same exception code for does not exist and permission denied ...
-            if (!file_exists($dir)) {
-                $output->writeln(sprintf("<info>%s cache dir already clear</info>", $dir));
-
-                return;
-            }
-
-            throw $e;
-        } catch (IOException $e) {
-            $output->writeln(sprintf("Error during clearing cache : %s", $e->getMessage()));
-        }
-
-        $output->writeln(sprintf("<info>%s cache dir cleared successfully</info>", $dir));
-
+        return array(
+            TheliaEvents::CACHE_CLEAR => array('cacheClear', 128)
+        );
     }
 }
