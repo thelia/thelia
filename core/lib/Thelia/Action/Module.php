@@ -23,6 +23,7 @@
 
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ModuleQuery;
@@ -56,7 +57,16 @@ class Module extends BaseAction implements EventSubscriberInterface
             if($module->isModified()) {
                 $event->setModule($module);
             }
+
+            $this->cacheClear();
         }
+    }
+
+    protected function cacheClear()
+    {
+        $cacheEvent = new CacheEvent($this->container->getParameter('kernel.cache_dir'));
+
+        $this->getDispatcher()->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
     }
 
     /**
