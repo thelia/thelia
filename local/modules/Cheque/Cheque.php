@@ -66,7 +66,7 @@ class Cheque extends BaseModule implements PaymentModuleInterface
         /* insert the images from image folder if first module activation */
         $module = $this->getModuleModel();
         if(ModuleImageQuery::create()->filterByModule($module)->count() == 0) {
-            $this->deployImageFolder($module, sprintf('%s/images', __DIR__));
+            $this->deployImageFolder($module, sprintf('%s/images', __DIR__), $con);
         }
 
         /* set module title */

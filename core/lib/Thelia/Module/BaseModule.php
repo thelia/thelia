@@ -135,17 +135,19 @@ abstract class BaseModule extends ContainerAware
         }
     }
 
-    public function deployImageFolder(Module $module, $folderPath)
+    public function deployImageFolder(Module $module, $folderPath, ConnectionInterface $con = null)
     {
         try {
             $directoryBrowser = new \DirectoryIterator($folderPath);
         } catch (\UnexpectedValueException $e) {
             throw $e;
         }
+        if(null === $con) {
+            $con = \Propel\Runtime\Propel::getConnection(
+                ModuleImageTableMap::DATABASE_NAME
+            );
+        }
 
-        $con = \Propel\Runtime\Propel::getConnection(
-            ModuleImageTableMap::DATABASE_NAME
-        );
 
         /* browse the directory */
         $imagePosition = 1;

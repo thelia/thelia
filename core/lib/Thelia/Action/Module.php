@@ -53,9 +53,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 }
             }
 
-            if ($module->isModified()) {
-                $event->setModule($module);
-            }
+            $event->setModule($module);
 
             $this->cacheClear();
         }
