@@ -25,7 +25,7 @@
         {loop name="customer.update" type="address" customer="current" id="{$address_id}"}
         <form id="form-address" class="form-horizontal" action="{url path="/address/update/{$address_id}"}" method="post" role="form">
         {form_field form=$form field='success_url'}
-            <input type="hidden" name="{$name}" value="{url path="/customer/account"}" /> {* the url the user is redirected to on login success *}
+            <input type="hidden" name="{$name}" value="{url path="/account"}" /> {* the url the user is redirected to on login success *}
         {/form_field}
 
         {form_field form=$form field='error_message'}
