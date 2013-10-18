@@ -21,7 +21,6 @@
 /*                                                                                   */
 /*************************************************************************************/
 namespace Thelia\Core\Template\Smarty\Plugins;
-
 use Symfony\Component\Form\FormView;
 use Thelia\Form\BaseForm;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
@@ -72,8 +71,8 @@ class Form extends AbstractSmartyPlugin
     {
         foreach ($formDefinition as $name => $className) {
             if (array_key_exists($name, $this->formDefinition)) {
-                throw new \InvalidArgumentException(sprintf("%s form name already exists for %s class", $name,
-                    $className));
+                throw new \InvalidArgumentException(
+                        sprintf("%s form name already exists for %s class", $name, $className));
             }
 
             $this->formDefinition[$name] = $className;
@@ -107,7 +106,8 @@ class Form extends AbstractSmartyPlugin
 
             $template->assign("form_error", $instance->hasError() ? true : false);
             $template->assign("form_error_message", $instance->getErrorMessage());
-        } else {
+        }
+        else {
             return $content;
         }
     }
@@ -130,7 +130,7 @@ class Form extends AbstractSmartyPlugin
 
         $template->assign("error", empty($errors) ? false : true);
 
-        if (! empty($errors)) {
+        if (!empty($errors)) {
             $this->assignFieldErrorVars($template, $errors);
         }
 
@@ -145,37 +145,46 @@ class Form extends AbstractSmartyPlugin
 
     public function renderFormField($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-            if ($repeat) {
+        if ($repeat) {
 
             $formFieldView = $this->getFormFieldView($params);
 
             $template->assign("options", $formFieldView->vars);
 
             $value = $formFieldView->vars["value"];
-/* FIXME: doesnt work. We got "This form should not contain extra fields." error.
-// We have a collection
-if (is_array($value)) {
 
-$key = $this->getParam($params, 'value_key');
+            // We have a collection
+            if (count($formFieldView->children) > 0) {
 
-if ($key != null) {
+                $key = $this->getParam($params, 'value_key');
+var_dump($formFieldView);
+echo "k=$key<br />";
+                if ($key != null) {
 
-if (isset($value[$key])) {
+                    if (isset($value[$key])) {
 
-$name = sprintf("%s[%s]", $formFieldView->vars["full_name"], $key);
-$val = $value[$key];
+                        $name = sprintf("%s[%s]", $formFieldView->vars["full_name"], $key);
+echo "name=$name<br />";
+                        $val = $value[$key];
+echo "val=$val<br />";
 
-$this->assignFieldValues($template, $name, $val, $formFieldView->vars);
-}
-}
-} else {
-$this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVars["value"], $formFieldView->vars);
-}
-*/
-            $this->assignFieldValues($template, $formFieldView->vars["full_name"], $formFieldView->vars["value"], $formFieldView->vars);
+                        $this->assignFieldValues($template, $name, $val, $formFieldView->vars);
+                    }
+                    else {
+                        throw new \LogicException(sprintf("Cannot find a value for key '%s' in field '%s'", $key, $formFieldView->vars["name"]));
+                    }
+                }
+                else {
+                    throw new \InvalidArgumentException(sprintf("Missing or empty parameter 'value_key' for field '%s'", $formFieldView->vars["name"]));
+                }
+            }
+            else {
+                $this->assignFieldValues($template, $formFieldView->vars["full_name"], $formFieldView->vars["value"], $formFieldView->vars);
+            }
 
             $formFieldView->setRendered();
-        } else {
+        }
+        else {
             return $content;
         }
     }
@@ -206,7 +215,7 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
         $formView = $instance->getView();
 
         if ($formView->vars["multipart"]) {
-            return sprintf('%s="%s"',"enctype", "multipart/form-data");
+            return sprintf('%s="%s"', "enctype", "multipart/form-data");
         }
     }
 
@@ -222,7 +231,8 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
 
         if ($repeat) {
             $this->assignFieldErrorVars($template, $errors);
-        } else {
+        }
+        else {
             return $content;
         }
     }
@@ -245,11 +255,10 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
 
         $fieldName = $this->getParam($params, 'field');
 
-        if (null == $fieldName)
-            throw new \InvalidArgumentException("'field' parameter is missing");
+        if (null == $fieldName) throw new \InvalidArgumentException("'field' parameter is missing");
 
-        if (empty($instance->getView()[$fieldName]))
-            throw new \InvalidArgumentException(sprintf("Field name '%s' not found in form %s", $fieldName, $instance->getName()));
+        if (empty($instance->getView()[$fieldName])) throw new \InvalidArgumentException(
+                sprintf("Field name '%s' not found in form %s", $fieldName, $instance->getName()));
 
         return $instance->getView()[$fieldName];
     }
@@ -262,8 +271,10 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
             throw new \InvalidArgumentException("Missing 'form' parameter in form arguments");
         }
 
-        if (! $instance instanceof \Thelia\Form\BaseForm) {
-            throw new \InvalidArgumentException(sprintf("form parameter in form_field block must be an instance of
+        if (!$instance instanceof \Thelia\Form\BaseForm) {
+            throw new \InvalidArgumentException(
+                    sprintf(
+                            "form parameter in form_field block must be an instance of
                 \Thelia\Form\BaseForm, instance of %s found", get_class($instance)));
         }
 
@@ -278,10 +289,7 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
 
         $class = new \ReflectionClass($this->formDefinition[$name]);
 
-        return $class->newInstance(
-            $this->request,
-            "form"
-        );
+        return $class->newInstance($this->request, "form");
     }
 
     /**
@@ -290,11 +298,11 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor("block", "form", $this, "generateForm"),
-            new SmartyPluginDescriptor("block", "form_field", $this, "renderFormField"),
-            new SmartyPluginDescriptor("function", "form_hidden_fields", $this, "renderHiddenFormField"),
-            new SmartyPluginDescriptor("function", "form_enctype", $this, "formEnctype"),
-            new SmartyPluginDescriptor("block", "form_error", $this, "formError")
+                new SmartyPluginDescriptor("block", "form", $this, "generateForm"),
+                new SmartyPluginDescriptor("block", "form_field", $this, "renderFormField"),
+                new SmartyPluginDescriptor("function", "form_hidden_fields", $this, "renderHiddenFormField"),
+                new SmartyPluginDescriptor("function", "form_enctype", $this, "formEnctype"),
+                new SmartyPluginDescriptor("block", "form_error", $this, "formError")
         );
     }
 
