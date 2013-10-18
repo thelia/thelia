@@ -201,26 +201,23 @@ URL: http://www.thelia.net
                     <section class="block block-links">
                         <div class="block-heading"><h3 class="block-title">Latest articles</h3></div>
                         <div class="block-content">
-                            <ul>
-                                <li>
-                                    <a href="#">
-                                        <h4 class="block-subtitle">Heading</h4>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <h4 class="block-subtitle">Heading</h4>
-                                        <p>Lorem ipsum dolor sit amet...</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <h4 class="block-subtitle">Heading</h4>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit...</p>
-                                    </a>
-                                </li>
-                            </ul>
+                            {ifloop rel="blog.articles"}
+                                <ul>
+                                    {loop type="content" name="blog.articles" folder="1" limit="3"}
+                                        <li>
+                                            <a href="{$URL}">
+                                                <h4 class="block-subtitle">{$TITLE}</h4>
+                                                <p>{$CHAPO}</p>
+                                            </a>
+                                        </li>
+                                    {/loop}
+                                </ul>
+                            {/ifloop}
+                            {elseloop rel="blog.articles"}
+                                <ul>
+                                    <li>{intl l="No articles currently"}</li>
+                                </ul>
+                            {/elseloop}
                         </div>
                     </section>
                 </div>
@@ -229,13 +226,12 @@ URL: http://www.thelia.net
                         <div class="block-heading"><h3 class="block-title">Usefull links</h3></div>
                         <div class="block-content">
                             <ul>
-                                <li class="active"><a href="#" tabindex="-1">About Us </a></li>
-                                <li><a href="#">Delivery & Returns</a></li>
-                                <li><a href="#">Terms & Conditions </a></li>
-                                <li><a href="contact.html">Contact Us</a></li>
+                                {loop name="footer_links" type="content" folder="2"}
+                                    <li><a href="{$URL}">{$TITLE}</a></li>
+                                {/loop}
                                 <li><a href="{url path="/login"}">Login</a></li>
                                 <li><a href="{url path="/register"}">Register</a></li>
-                                <li><a href="checkout.html">Checkout</a></li>
+                                <li><a href="{url path="/order/delivery"}">Checkout</a></li>
                             </ul>
                         </div>
                     </section>
@@ -346,8 +342,9 @@ URL: http://www.thelia.net
             <div class="info">
                 <nav class="nav-footer" role="navigation">
                     <ul>
-                        <li class="active"><a href="#" tabindex="-1">About Us </a></li>
-                        <li><a href="#">Delivery & Returns</a></li>
+                        {loop name="footer_links" type="content" folder="2"}
+                            <li><a href="{$URL}">{$TITLE}</a></li>
+                        {/loop}
                         <li><a href="#">Site Map</a></li>
                         <li><a href="#">Terms & Conditions</a></li>
                         <li><a href="#">Contact Us</a></li>

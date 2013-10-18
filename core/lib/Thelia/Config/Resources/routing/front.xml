@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="home" path="/" >
+    <route id="home" path="/">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">index</default>
     </route>
@@ -14,6 +14,11 @@
     <route id="search" path="/search">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">search</default>
+    </route>
+
+    <route id="view_all" path="/view_all"  methods="get">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">view_all</default>
     </route>
 
     <!-- Customer routes : Register -->

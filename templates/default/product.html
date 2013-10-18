@@ -160,8 +160,8 @@
                             <label for="options" class="option-heading">Options</label>
                             <div class="option-content">
                                 <select name="options" class="form-control">
-                                    {loop name="stock" type="product_sale_elements" product="$ID"}
-                                        {loop name="combi" type="attribute_combination" product_sale_elements="$ID"}
+                                    {loop name="stock" type="product_sale_elements" product="$ID" order="min_price"}
+                                        {loop name="combi" type="attribute_combination" product_sale_elements="$ID" order="alpha"}
                                             <option value="{$ID}" data-quantity="{$QUANTITY}" data-price="{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}" data-old-price="{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}">{$ATTRIBUTE_AVAILABILITY_TITLE}</small></option>
                                         {/loop}
                                     {/loop}

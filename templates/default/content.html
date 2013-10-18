@@ -1,0 +1,36 @@
+{extends file="layout.tpl"}
+
+{block name="no-return-functions"}
+    {check_auth context="front" roles="CUSTOMER" login_tpl="login"}
+{/block}
+
+{block name="body-class"}page-content{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+
+{/block}
+
+{block name="main-content"}
+    <div class="main layout-col-2-left" <!--   class="mainlayout-col-2-left -->">
+
+        <article class="col-main" role="main" aria-labelledby="main-label">
+            {loop name="blog.article"  type="content" current="yes"}
+                <h1>{$TITLE}</h1>
+                <p class="chapo">
+                    {$CHAPO}
+                </p>
+                <p>{$DESCRIPTION nofilter}</p>
+            {/loop}
+        </article>
+
+        <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
+
+    {include file="includes/asides/articles.html"}
+
+        </aside>
+
+    </div><!-- /.layout -->
+{/block}
+
+{block name="after-javascript-include"}{/block}
