@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,49 +17,104 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
 
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
+namespace Thelia\Core\Event\Tax;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Tax;
 
-class EnumType extends BaseType
+class TaxEvent extends ActionEvent
 {
-    protected $values = array();
+    protected $tax = null;
 
-    public function __construct($values = array())
+    protected $locale;
+    protected $id;
+    protected $title;
+    protected $description;
+    protected $type;
+    protected $requirements;
+
+    public function __construct(Tax $tax = null)
     {
-        if(is_array($values))
-            $this->values = $values;
+        $this->tax = $tax;
+    }
+
+    public function hasTax()
+    {
+        return ! is_null($this->tax);
+    }
+
+    public function getTax()
+    {
+        return $this->tax;
+    }
+
+    public function setTax(Tax $tax)
+    {
+        $this->tax = $tax;
+
+        return $this;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
     }
 
     public function getType()
     {
-        return 'Enum type';
+        return $this->type;
     }
 
-    public function isValid($value)
+    public function setRequirements($requirements)
     {
-        return in_array($value, $this->values);
+        $this->requirements = $requirements;
     }
 
-    public function getFormattedValue($value)
+    public function getRequirements()
     {
-        return $this->isValid($value) ? $value : null;
-    }
-
-    public function getFormType()
-    {
-        return 'text';
-    }
-
-    public function getFormOptions()
-    {
-        return array();
+        return $this->requirements;
     }
 }

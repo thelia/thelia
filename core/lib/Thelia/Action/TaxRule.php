@@ -27,6 +27,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Map\TaxRuleTableMap;
 use Thelia\Model\TaxRuleCountry;
 use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Model\TaxRule as TaxRuleModel;
@@ -135,6 +136,23 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * @param TaxRuleEvent $event
+     */
+    public function setDefault(TaxRuleEvent $event)
+    {
+        if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
+
+            TaxRuleQuery::create()->update(array(
+                "IsDefault" => 0
+            ));
+
+            $taxRule->setIsDefault(1)->save();
+
+            $event->setTaxRule($taxRule);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public static function getSubscribedEvents()
@@ -144,7 +162,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
             TheliaEvents::TAX_RULE_UPDATE            => array("update", 128),
             TheliaEvents::TAX_RULE_TAXES_UPDATE      => array("updateTaxes", 128),
             TheliaEvents::TAX_RULE_DELETE            => array("delete", 128),
-
+            TheliaEvents::TAX_RULE_SET_DEFAULT       => array("setDefault", 128),
         );
     }
 }

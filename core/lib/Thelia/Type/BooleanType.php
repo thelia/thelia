@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class BooleanType implements TypeInterface
+class BooleanType extends BaseType
 {
     public function getType()
     {
@@ -43,5 +43,15 @@ class BooleanType implements TypeInterface
     public function getFormattedValue($value)
     {
         return $value === null ? null : filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
     }
 }

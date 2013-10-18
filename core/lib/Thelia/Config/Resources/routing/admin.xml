@@ -822,7 +822,28 @@
 
     <!-- end Modules rule management -->
 
-    <!-- taxe rules management -->
+    <!-- tax management -->
+
+    <route id="admin.configuration.taxes.update" path="/admin/configuration/taxes/update/{tax_id}">
+        <default key="_controller">Thelia\Controller\Admin\TaxController::updateAction</default>
+        <requirement key="tax_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.taxes.add" path="/admin/configuration/taxes/add">
+        <default key="_controller">Thelia\Controller\Admin\TaxController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.taxes.save" path="/admin/configuration/taxes/save">
+        <default key="_controller">Thelia\Controller\Admin\TaxController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.configuration.taxes.delete" path="/admin/configuration/taxes/delete">
+        <default key="_controller">Thelia\Controller\Admin\TaxController::deleteAction</default>
+    </route>
+
+    <!-- end tax management -->
+
+    <!-- tax rules management -->
 
     <route id="admin.configuration.taxes-rules.list" path="/admin/configuration/taxes_rules">
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::defaultAction</default>
@@ -847,6 +868,11 @@
 
     <route id="admin.configuration.taxes-rules.delete" path="/admin/configuration/taxes_rules/delete">
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.taxes-rules.set-default" path="/admin/configuration/taxes_rules/update/set_default/{tax_rule_id}">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::setDefaultAction</default>
+        <requirement key="tax_rule_id">\d+</requirement>
     </route>
 
     <!-- end tax rules management -->

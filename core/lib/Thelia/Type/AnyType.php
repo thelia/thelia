@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class AnyType implements TypeInterface
+class AnyType extends BaseType
 {
     public function getType()
     {
@@ -43,5 +43,15 @@ class AnyType implements TypeInterface
     public function getFormattedValue($value)
     {
         return $value;
+    }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
     }
 }

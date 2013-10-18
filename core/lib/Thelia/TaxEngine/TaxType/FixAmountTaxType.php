@@ -47,4 +47,9 @@ class FixAmountTaxType extends BaseTaxType
             'amount' => new FloatType(),
         );
     }
+
+    public function getTitle()
+    {
+        return "Fix amount Tax";
+    }
 }

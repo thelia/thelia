@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class FloatType implements TypeInterface
+class FloatType extends BaseType
 {
     public function getType()
     {
@@ -43,5 +43,15 @@ class FloatType implements TypeInterface
     public function getFormattedValue($value)
     {
         return $this->isValid($value) ? $value : null;
+    }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
     }
 }

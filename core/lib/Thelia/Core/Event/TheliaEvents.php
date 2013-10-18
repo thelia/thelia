@@ -543,6 +543,12 @@ final class TheliaEvents
 
     const CHANGE_DEFAULT_CURRENCY = 'action.changeDefaultCurrency';
 
+    // -- Tax management ---------------------------------------------
+
+    const TAX_CREATE          = "action.createTax";
+    const TAX_UPDATE          = "action.updateTax";
+    const TAX_DELETE          = "action.deleteTax";
+
     // -- Tax Rules management ---------------------------------------------
 
     const TAX_RULE_CREATE          = "action.createTaxRule";

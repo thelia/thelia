@@ -21,67 +21,84 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace TheliaDebugBar\Listeners;
+namespace Thelia\Action;
 
-use DebugBar\DataCollector\MemoryCollector;
-use DebugBar\DataCollector\MessagesCollector;
-use DebugBar\DataCollector\PhpInfoCollector;
-use TheliaDebugBar\DataCollector\PropelCollector;
-use DebugBar\DataCollector\TimeDataCollector;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Thelia\Action\BaseAction;
+use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Tax as TaxModel;
+use Thelia\Model\TaxQuery;
 
-
-/**
- * Class DebugBarListeners
- * @package TheliaDebugBar\Listeners
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class DebugBarListeners extends BaseAction implements EventSubscriberInterface {
-
-    public function initDebugBar()
+class Tax extends BaseAction implements EventSubscriberInterface
+{
+    /**
+     * @param TaxEvent $event
+     */
+    public function create(TaxEvent $event)
     {
-        $debugBar = $this->container->get("debugBar");
+        $tax = new TaxModel();
 
-        $alternativelogger = null;
-        if($this->container->getParameter('kernel.debug')) {
-            $alternativelogger = \Thelia\Log\Tlog::getInstance();
-        }
+        $tax
+            ->setDispatcher($this->getDispatcher())
+            ->setRequirements($event->getRequirements())
+            ->setType($event->getType())
+            ->setLocale($event->getLocale())
+            ->setTitle($event->getTitle())
+            ->setDescription($event->getDescription())
+        ;
 
-        $debugBar->addCollector(new PhpInfoCollector());
-        //$debugBar->addCollector(new MessagesCollector());
-        //$debugBar->addCollector(new RequestDataCollector());
-        $debugBar->addCollector(new TimeDataCollector());
-        $debugBar->addCollector(new MemoryCollector());
-        $debugBar->addCollector(new PropelCollector($alternativelogger));
+        $tax->save();
+
+        $event->setTax($tax);
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * @param TaxEvent $event
+     */
+    public function update(TaxEvent $event)
+    {
+        if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
+
+            $tax
+                ->setDispatcher($this->getDispatcher())
+                ->setRequirements($event->getRequirements())
+                ->setType($event->getType())
+                ->setLocale($event->getLocale())
+                ->setTitle($event->getTitle())
+                ->setDescription($event->getDescription())
+            ;
+
+            $tax->save();
+
+            $event->setTax($tax);
+        }
+    }
+
+    /**
+     * @param TaxEvent $event
+     */
+    public function delete(TaxEvent $event)
+    {
+        if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
+
+            $tax
+                ->delete()
+            ;
+
+            $event->setTax($tax);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::BOOT => array("initDebugBar", 128)
+            TheliaEvents::TAX_CREATE            => array("create", 128),
+            TheliaEvents::TAX_UPDATE            => array("update", 128),
+            TheliaEvents::TAX_DELETE            => array("delete", 128),
         );
     }
 }
