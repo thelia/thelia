@@ -78,3 +78,18 @@
     }
 }
 
+// Message if no product in the cart
+.cart-warning {
+  clear: both;
+  .alert; .alert-warning;
+  margin-bottom: 0;
+  text-align: center;
+
+  > a { color: inherit; }
+
+  &:before {
+    .icon(@warning-sign);
+    display: block;
+    font-size: 2.2em;
+  }
+}
