@@ -55,6 +55,21 @@
     form_content        = {$smarty.capture.delete_module_dialog nofilter}
 }
 
+<div class="modal fade" id="module-failed" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>{intl l="An error occured"}</h3>
+            </div>
+            <div class="modal-body" id="module-failed-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+
 {/block}
 
 {block name="javascript-initialization"}
@@ -62,4 +77,24 @@
     {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+
+    <script>
+        $(document).ready(function(){
+           var url_management = "{url path="/admin/configuration/modules/toggle-activation/"}";
+           $(".module-activation").on("switch-change", function(e, data){
+               $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+               $.ajax({
+                    url: url_management+$(this).data('id')
+               }).done(function(){
+                   $("#loading-event").remove();
+               })
+               .fail(function(jqXHR, textStatus, errorThrown){
+                    $("#loading-event").remove();
+                    $('#module-failed-body').html(jqXHR.responseJSON.error);
+                    $("#module-failed").modal("show");
+               });
+
+           });
+        });
+    </script>
 {/block}

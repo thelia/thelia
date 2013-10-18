@@ -70,9 +70,13 @@ class ModuleController extends BaseAdminController
 
         if($this->getRequest()->isXmlHttpRequest()) {
             if($message) {
-                $response = $this->nullResponse($message, 500);
+                $response = $this->jsonResponse(json_encode(array(
+                    "error" => $message
+                )), 500);
+            } else {
+                $response = $this->nullResponse();
             }
-            $response = $this->nullResponse();
+
         } else {
             $this->redirectToRoute('admin.module');
         }
