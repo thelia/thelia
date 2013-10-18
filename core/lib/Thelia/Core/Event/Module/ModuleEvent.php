@@ -25,7 +25,6 @@ namespace Thelia\Core\Event\Module;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Module;
 
-
 /**
  * Class ModuleEvent
  * @package Thelia\Core\Event\Module
@@ -38,7 +37,7 @@ class ModuleEvent extends ActionEvent
      */
     protected $module;
 
-    function __construct(Module $module = null)
+    public function __construct(Module $module = null)
     {
         $this->module = $module;
     }
@@ -62,8 +61,5 @@ class ModuleEvent extends ActionEvent
     {
         return $this->module;
     }
-
-
-
 
 }

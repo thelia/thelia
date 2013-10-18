@@ -199,8 +199,8 @@ class TaxRuleController extends AbstractCrudController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param  TaxRuleEvent  $createEvent the create event
-     * @return Response a response, or null to continue normal processing
+     * @param  TaxRuleEvent $createEvent the create event
+     * @return Response     a response, or null to continue normal processing
      */
     protected function performAdditionalCreateAction($createEvent)
     {

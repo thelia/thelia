@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Area;
 
-
 /**
  * Class AreaDeleteEvent
  * @package Thelia\Core\Event\Area
@@ -60,6 +59,5 @@ class AreaDeleteEvent extends AreaEvent
     {
         return $this->area_id;
     }
-
 
 }

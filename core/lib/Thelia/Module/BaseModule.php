@@ -53,10 +53,9 @@ abstract class BaseModule extends ContainerAware
 
     }
 
-
     public function activate($moduleModel = null)
     {
-        if(null === $moduleModel) {
+        if (null === $moduleModel) {
             $moduleModel = $this->getModuleModel();
         }
 
@@ -64,7 +63,7 @@ abstract class BaseModule extends ContainerAware
             $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
             $con->beginTransaction();
             try {
-                if($this->preActivation($con)) {
+                if ($this->preActivation($con)) {
                     $moduleModel->setActivate(self::IS_ACTIVATED);
                     $moduleModel->save($con);
                     $this->postActivation($con);
@@ -79,14 +78,14 @@ abstract class BaseModule extends ContainerAware
 
     public function deActivate($moduleModel = null)
     {
-        if(null === $moduleModel) {
+        if (null === $moduleModel) {
             $moduleModel = $this->getModuleModel();
         }
         if ($moduleModel->getActivate() == self::IS_ACTIVATED) {
             $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
             $con->beginTransaction();
             try {
-                if($this->preDeactivation($con)) {
+                if ($this->preDeactivation($con)) {
                     $moduleModel->setActivate(self::IS_NOT_ACTIVATED);
                     $moduleModel->save($con);
                     $this->postDeactivation($con);
@@ -215,7 +214,6 @@ abstract class BaseModule extends ContainerAware
         return $moduleModel;
     }
 
-
     public function getCode()
     {
         if (null === $this->reflected) {
@@ -225,8 +223,8 @@ abstract class BaseModule extends ContainerAware
         return basename(dirname($this->reflected->getFileName()));
     }
 
-    public function install(){
-
+    public function install()
+    {
     }
 
     public function preActivation(ConnectionInterface $con = null)

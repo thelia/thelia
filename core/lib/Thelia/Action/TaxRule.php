@@ -68,8 +68,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
                 ->save()
             ;
 
-
-
             $event->setTaxRule($taxRule);
         }
     }
@@ -90,12 +88,12 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
                 ->delete();
 
             /* for each country */
-            foreach($event->getCountryList() as $country) {
+            foreach ($event->getCountryList() as $country) {
                 $position = 1;
                 /* on applique les nouvelles regles */
-                foreach($taxList as $tax) {
-                    if(is_array($tax)) {
-                        foreach($tax as $samePositionTax) {
+                foreach ($taxList as $tax) {
+                    if (is_array($tax)) {
+                        foreach ($tax as $samePositionTax) {
                             $taxModel = new TaxRuleCountry();
                             $taxModel->setTaxRule($taxRule)
                                 ->setCountryId($country)

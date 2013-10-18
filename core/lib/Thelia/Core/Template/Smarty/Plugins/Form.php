@@ -152,7 +152,7 @@ class Form extends AbstractSmartyPlugin
             $template->assign("options", $formFieldView->vars);
 
             /* access to choices */
-            if(isset($formFieldView->vars['choices'])) {
+            if (isset($formFieldView->vars['choices'])) {
                 $template->assign("choices", $formFieldView->vars['choices']);
             }
 
@@ -199,8 +199,8 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
         foreach ($formView->getIterator() as $row) {
             if ($this->isHidden($row) && $row->isRendered() === false) {
                 $attributeList = array();
-                if(isset($row->vars["attr"])) {
-                    foreach($row->vars["attr"] as $attrKey => $attrValue) {
+                if (isset($row->vars["attr"])) {
+                    foreach ($row->vars["attr"] as $attrKey => $attrValue) {
                         $attributeList[] = sprintf($attrFormat, $attrKey, $attrValue);
                     }
                 }

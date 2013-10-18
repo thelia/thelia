@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Area;
 
-
 /**
  * Class AreaUpdateEvent
  * @package Thelia\Core\Event\Area

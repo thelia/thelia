@@ -25,14 +25,11 @@ namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\Form;
-use Thelia\Core\Event\Address\AddressEvent;
-use Thelia\Core\Event\Customer\CustomerAddressEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CustomerModification;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Core\Translation\Translator;
 
@@ -56,8 +53,6 @@ class CustomerController extends BaseAdminController
             "customer_id" => $customer_id
         ));
     }
-
-
 
     /**
      * update customer action

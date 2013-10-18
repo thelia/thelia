@@ -24,13 +24,11 @@
 namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
-use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
-
 
 /**
  * Class AddressController
@@ -78,7 +76,7 @@ class AddressController extends AbstractCrudController
             $this->dispatch(TheliaEvents::ADDRESS_DEFAULT, $addressEvent);
 
             $this->adminLogAppend(sprintf("address %d for customer %d removal", $address_id, $address->getCustomerId()));
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             \Thelia\Log\Tlog::getInstance()->error(sprintf("error during address removal with message %s", $e->getMessage()));
         }
 
@@ -175,8 +173,6 @@ class AddressController extends AbstractCrudController
             $formData["company"],
             $formData["is_default"]
         );
-
-
 
         return $event;
 
@@ -279,8 +275,8 @@ class AddressController extends AbstractCrudController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param  \Thelia\Core\Event\AddressEvent  $deleteEvent the delete event
-     * @return Response a response, or null to continue normal processing
+     * @param  \Thelia\Core\Event\AddressEvent $deleteEvent the delete event
+     * @return Response                        a response, or null to continue normal processing
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
@@ -291,8 +287,8 @@ class AddressController extends AbstractCrudController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param  AddressCreateOrUpdateEvent  $createEvent the create event
-     * @return Response a response, or null to continue normal processing
+     * @param  AddressCreateOrUpdateEvent $createEvent the create event
+     * @return Response                   a response, or null to continue normal processing
      */
     protected function performAdditionalCreateAction($createEvent)
     {

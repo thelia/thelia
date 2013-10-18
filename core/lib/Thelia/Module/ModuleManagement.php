@@ -32,13 +32,12 @@ use Thelia\Model\Module;
 use Thelia\Model\ModuleI18n;
 use Thelia\Model\ModuleQuery;
 
-
 /**
  * Class ModuleManagement
  * @package Thelia\Module
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ModuleManagement 
+class ModuleManagement
 {
     protected $baseModuleDir;
     protected $reflected;
@@ -59,16 +58,16 @@ class ModuleManagement
         $descriptorValidator = new ModuleDescriptorValidator();
         foreach ($finder as $file) {
             $content = $descriptorValidator->getDescriptor($file->getRealPath());
-            $reflected = new \ReflectionClass((string)$content->fullnamespace);
+            $reflected = new \ReflectionClass((string) $content->fullnamespace);
             $code = basename(dirname($reflected->getFileName()));
-            if(null === ModuleQuery::create()->filterByCode($code)->findOne()) {
+            if (null === ModuleQuery::create()->filterByCode($code)->findOne()) {
                 $module = new Module();
                 $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
                 $con->beginTransaction();
                 try {
                     $module
                         ->setCode($code)
-                        ->setFullNamespace((string)$content->fullnamespace)
+                        ->setFullNamespace((string) $content->fullnamespace)
                         ->setType($this->getModuleType($reflected))
                         ->setActivate(0)
                         ->save($con);
@@ -76,7 +75,7 @@ class ModuleManagement
                     $this->saveDescription($module, $content, $con);
 
                     $con->commit();
-                } catch(PropelException $e) {
+                } catch (PropelException $e) {
                     $con->rollBack();
                     throw $e;
                 }
@@ -88,8 +87,7 @@ class ModuleManagement
     private function saveDescription(Module $module,\SimpleXMLElement $content, ConnectionInterface $con)
     {
 
-        foreach($content->descriptive as $description)
-        {
+        foreach ($content->descriptive as $description) {
             $locale = $description->attributes()->locale;
 
             $moduleI18n = new ModuleI18n();
@@ -107,14 +105,13 @@ class ModuleManagement
 
     private function getModuleType(\ReflectionClass $reflected)
     {
-        if($reflected->implementsInterface('Thelia\Module\DeliveryModuleInterface')) {
+        if ($reflected->implementsInterface('Thelia\Module\DeliveryModuleInterface')) {
             return BaseModule::DELIVERY_MODULE_TYPE;
-        } else if($reflected->implementsInterface('Thelia\Module\PaymentModuleInterface')) {
+        } elseif ($reflected->implementsInterface('Thelia\Module\PaymentModuleInterface')) {
             return BaseModule::PAYMENT_MODULE_TYPE;
         } else {
             return BaseModule::CLASSIC_MODULE_TYPE;
         }
-
 
     }
 

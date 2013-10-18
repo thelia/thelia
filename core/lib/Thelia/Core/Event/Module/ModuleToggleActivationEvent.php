@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Module;
 
-
 /**
  * Class ModuleToggleActivationEvent
  * @package Thelia\Core\Event\Module
@@ -36,7 +35,7 @@ class ModuleToggleActivationEvent extends ModuleEvent
      */
     protected $module_id;
 
-    function __construct($module_id)
+    public function __construct($module_id)
     {
         $this->module_id = $module_id;
     }
@@ -60,8 +59,5 @@ class ModuleToggleActivationEvent extends ModuleEvent
     {
         return $this->module_id;
     }
-
-
-
 
 }

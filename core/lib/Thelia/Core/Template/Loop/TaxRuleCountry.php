@@ -35,8 +35,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\Map\CountryTableMap;
 use Thelia\Model\Map\TaxRuleCountryTableMap;
 use Thelia\Model\Map\TaxTableMap;
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
 use Thelia\Model\TaxRuleCountryQuery;
 
 /**
@@ -76,15 +74,15 @@ class TaxRuleCountry extends BaseI18nLoop
         $country = $this->getCountry();
         $taxes = $this->getTaxes();
 
-        if((null === $country && null === $taxes)) {
+        if ((null === $country && null === $taxes)) {
             throw new \InvalidArgumentException('You must provide either `country` or `taxes` parameter in tax-rule-country loop');
         }
 
-        if((null === $country && null !== $taxes)) {
+        if ((null === $country && null !== $taxes)) {
             throw new \InvalidArgumentException('You must provide `country` parameter with `taxes` parameter in tax-rule-country loop');
         }
 
-        if(null !== $taxes) {
+        if (null !== $taxes) {
             $search->groupByCountryId();
 
             $originalCountryJoin = new Join();
@@ -106,7 +104,7 @@ class TaxRuleCountry extends BaseI18nLoop
                 CountryTableMap::TABLE_NAME,
                 'COUNTRY_ID'
             );
-        } elseif(null !== $country) {
+        } elseif (null !== $country) {
             $search->filterByCountryId($country);
 
             /* manage tax translation */
@@ -132,7 +130,7 @@ class TaxRuleCountry extends BaseI18nLoop
 
             $loopResultRow = new LoopResultRow($loopResult, $taxRuleCountry, $this->versionable, $this->timestampable, $this->countable);
 
-            if(null !== $taxes) {
+            if (null !== $taxes) {
                 $loopResultRow
                     ->set("TAX_RULE"            , $taxRuleCountry->getTaxRuleId())
                     ->set("COUNTRY"             , $taxRuleCountry->getCountryId())
@@ -141,7 +139,7 @@ class TaxRuleCountry extends BaseI18nLoop
                     ->set("COUNTRY_DESCRIPTION"         , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
                     ->set("COUNTRY_POSTSCRIPTUM"         , $taxRuleCountry->getVirtualColumn(CountryTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
                 ;
-            }elseif(null !== $country) {
+            } elseif (null !== $country) {
                 $loopResultRow
                     ->set("TAX_RULE"            , $taxRuleCountry->getTaxRuleId())
                     ->set("COUNTRY"             , $taxRuleCountry->getCountryId())
@@ -151,8 +149,6 @@ class TaxRuleCountry extends BaseI18nLoop
                     ->set("TAX_DESCRIPTION"         , $taxRuleCountry->getVirtualColumn(TaxTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
                 ;
             }
-
-
 
             $loopResult->addRow($loopResultRow);
         }

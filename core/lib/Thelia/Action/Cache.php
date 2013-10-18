@@ -27,7 +27,6 @@ use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 
-
 /**
  * Class Cache
  * @package Thelia\Action
@@ -41,7 +40,6 @@ class Cache extends BaseAction implements EventSubscriberInterface
         $dir = $event->getDir();
 
         $directoryBrowser = new \DirectoryIterator($dir);
-
 
         $fs = new Filesystem();
         $fs->remove($dir);

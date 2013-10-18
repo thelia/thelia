@@ -24,13 +24,12 @@
 namespace Thelia\Module;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 
-
 /**
  * Class ModuleDescriptorValidator
  * @package Thelia\Module
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class ModuleDescriptorValidator 
+class ModuleDescriptorValidator
 {
     private $xsd_file;
 
@@ -44,7 +43,7 @@ class ModuleDescriptorValidator
         $dom = new \DOMDocument();
 
         if ($dom->load($xml_file)) {
-            if($dom->schemaValidate($this->xsd_file)) {
+            if ($dom->schemaValidate($this->xsd_file)) {
                 return true;
             }
         }
@@ -52,7 +51,8 @@ class ModuleDescriptorValidator
         throw new InvalidXmlDocumentException(sprintf("%s file is not a valid file", $xml_file));
     }
 
-    public function getDescriptor($xml_file) {
+    public function getDescriptor($xml_file)
+    {
         $this->validate($xml_file);
 
         return @simplexml_load_file($xml_file);

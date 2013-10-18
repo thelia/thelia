@@ -31,7 +31,6 @@ use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\FolderQuery;
 
-
 /**
  * Class FolderTest
  * @package Thelia\Tests\Action\ImageTest
@@ -72,8 +71,6 @@ class FolderTest extends BaseAction
     public function testUpdateFolder()
     {
         $folder = $this->getRandomFolder();
-
-
 
         $visible = !$folder->getVisible();
         $event = new FolderUpdateEvent($folder->getId());
@@ -147,7 +144,7 @@ class FolderTest extends BaseAction
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
 
-        if(null === $folder) {
+        if (null === $folder) {
             $this->fail('use fixtures before launching test, there is no folder in database');
         }
 
@@ -169,7 +166,7 @@ class FolderTest extends BaseAction
             ->filterByPosition(1)
             ->findOne();
 
-        if(null === $folder) {
+        if (null === $folder) {
             $this->fail('use fixtures before launching test, there is no folder in database');
         }
 
@@ -191,7 +188,7 @@ class FolderTest extends BaseAction
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
 
-        if(null === $folder) {
+        if (null === $folder) {
             $this->fail('use fixtures before launching test, there is no folder in database');
         }
 
@@ -215,7 +212,7 @@ class FolderTest extends BaseAction
             ->addAscendingOrderByColumn('RAND()')
             ->findOne();
 
-        if(null === $folder) {
+        if (null === $folder) {
             $this->fail('use fixtures before launching test, there is no folder in database');
         }
 

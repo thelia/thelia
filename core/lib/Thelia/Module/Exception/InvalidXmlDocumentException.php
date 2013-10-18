@@ -23,7 +23,6 @@
 
 namespace Thelia\Module\Exception;
 
-
 /**
  * Class InvalidXmlDocumentException
  * @package Thelia\Module\Exception

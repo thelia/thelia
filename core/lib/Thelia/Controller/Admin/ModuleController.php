@@ -59,7 +59,7 @@ class ModuleController extends BaseAdminController
             $event = new ModuleToggleActivationEvent($module_id);
             $this->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
 
-            if(null === $event->getModule()) {
+            if (null === $event->getModule()) {
                 throw new \LogicException(
                     $this->getTranslator()->trans("No %obj was updated.", array('%obj' => 'Module')));
             }
@@ -67,9 +67,8 @@ class ModuleController extends BaseAdminController
             $message = $e->getMessage();
         }
 
-
-        if($this->getRequest()->isXmlHttpRequest()) {
-            if($message) {
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            if ($message) {
                 $response = $this->jsonResponse(json_encode(array(
                     "error" => $message
                 )), 500);

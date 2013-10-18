@@ -25,7 +25,6 @@ namespace Thelia\Core\Event\Cache;
 
 use Thelia\Core\Event\ActionEvent;
 
-
 /**
  * Class CacheEvent
  * @package Thelia\Core\Event\Cache
@@ -62,6 +61,5 @@ class CacheEvent extends ActionEvent
     {
         return $this->dir;
     }
-
 
 }

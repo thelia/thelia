@@ -29,7 +29,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
-
 /**
  * Class Module
  * @package Thelia\Action
@@ -45,16 +44,16 @@ class Module extends BaseAction implements EventSubscriberInterface
 
             $moduleInstance = $moduleClass->newInstance();
 
-            if( method_exists($moduleInstance, 'setContainer')) {
+            if ( method_exists($moduleInstance, 'setContainer')) {
                 $moduleInstance->setContainer($this->container);
-                if($module->getActivate() == BaseModule::IS_ACTIVATED) {
+                if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
                     $moduleInstance->deActivate($module);
                 } else {
                     $moduleInstance->activate($module);
                 }
             }
 
-            if($module->isModified()) {
+            if ($module->isModified()) {
                 $event->setModule($module);
             }
 
