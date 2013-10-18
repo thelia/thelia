@@ -37,7 +37,6 @@ URL: http://www.thelia.net
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
-    {debugbar_rendercss}
     {block name="stylesheet"}{/block}
 </head>
 
@@ -70,7 +69,7 @@ URL: http://www.thelia.net
                 <ul class="nav navbar-nav navbar-cart navbar-right">
                     {loop type="auth" name="customer_info_block" roles="CUSTOMER" context="front"}
                         <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
-                        <li><a href="{url path="/customer/account"}" class="account">{intl l="My Account"}</a></li>
+                        <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
                     {/loop}
                     {elseloop rel="customer_info_block"}
                     <li><a href="{url path="/register"}" class="register">{intl l="Register!"}</a></li>
@@ -326,7 +325,7 @@ URL: http://www.thelia.net
                                     <span class="tel" itemprop="telephone">+33 04 44 05 31 00</span>
                                 </li>
                                 <li class="contact-email">
-                                    <a href="mailto:demo@thelia.net" class="email" itemprop="email">info@thelia.net</a>
+                                    {mailto address="info@thelia.net" encode="hex" extra='class="email" itemprop="email"'}
                                 </li>
                             </ul>
                         </div>
@@ -394,9 +393,6 @@ URL: http://www.thelia.net
 <!--[if lt IE 9]>
 <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
-
-{debugbar_renderjs}
-{debugbar_renderresult}
 
 </body>
 </html>
