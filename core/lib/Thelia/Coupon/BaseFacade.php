@@ -107,7 +107,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getCheckoutTotalPrice()
     {
-        // TODO: Implement getCheckoutTotalPrice() method.
+        return $this->getRequest()->getSession()->getOrder()->getTotalAmount();
     }
 
     /**
@@ -117,7 +117,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getCheckoutPostagePrice()
     {
-        // TODO: Implement getCheckoutPostagePrice() method.
+        return $this->getRequest()->getSession()->getOrder()->getPostage();
     }
 
     /**
@@ -127,7 +127,8 @@ class BaseFacade implements FacadeInterface
      */
     public function getCartTotalPrice()
     {
-        // TODO: Implement getCartTotalPrice() method.
+        return $this->getRequest()->getSession()->getCart()->getTotalAmount();
+
     }
 
     /**
@@ -137,7 +138,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getCheckoutCurrency()
     {
-        $this->getRequest()->getSession()->getCurrency();
+        return $this->getRequest()->getSession()->getCurrency()->getCode();
     }
 
 
@@ -148,7 +149,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getNbArticlesInCart()
     {
-        // TODO: Implement getNbArticlesInCart() method.
+        return count($this->getRequest()->getSession()->getCart()->getCartItems());
     }
 
     /**
@@ -158,15 +159,12 @@ class BaseFacade implements FacadeInterface
      */
     public function getCurrentCoupons()
     {
-        // @todo implement
-//        $consumedCoupons = $this->getRequest()->getSession()->getConsumedCoupons();
-        // @todo convert coupon code to coupon Interface
+        $couponCodes = $this->getRequest()->getSession()->getConsumedCoupons();
 
-
+        if (null === $couponCodes) {
+            return array();
+        }
         $couponFactory = $this->container->get('thelia.coupon.factory');
-
-        // @todo get from cart
-        $couponCodes = array('XMAS', 'SPRINGBREAK');
 
         $coupons = array();
         foreach ($couponCodes as $couponCode) {
@@ -246,7 +244,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getMainCurrency()
     {
-        // TODO: Implement getMainCurrency() method.
+        return $this->getRequest()->getSession()->getCurrency();
     }
 
     /**

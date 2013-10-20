@@ -73,6 +73,7 @@ class CouponController extends BaseFrontController
 
             // Dispatch Event to the Action
             $this->getDispatcher()->dispatch(TheliaEvents::COUPON_CONSUME, $couponConsumeEvent);
+
         } catch (FormValidationException $e) {
             $message = sprintf('Please check your coupon code: %s', $e->getMessage());
         } catch (PropelException $e) {

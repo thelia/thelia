@@ -195,7 +195,7 @@ abstract class CouponAbstract implements CouponInterface
      *
      * @return float Amount removed from the Total Checkout
      */
-    public function getDiscount()
+    public function exec()
     {
         return $this->amount;
     }

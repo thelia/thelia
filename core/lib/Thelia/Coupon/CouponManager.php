@@ -184,7 +184,7 @@ class CouponManager
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
             // @todo modify Cart with discount for each cart item
-            $discount += $coupon->getDiscount($this->adapter);
+            $discount += $coupon->exec($this->adapter);
         }
 
         return $discount;

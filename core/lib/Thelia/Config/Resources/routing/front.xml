@@ -155,7 +155,7 @@
     </route>
 
     <route id="order.coupon.process" path="/order/coupon" methods="post">
-        <default key="_controller">Thelia\Controller\Front\CouponController::consume</default>
+        <default key="_controller">Thelia\Controller\Front\CouponController::consumeAction</default>
         <default key="_view">order-invoice</default>
     </route>
 

@@ -105,6 +105,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $coupon = $couponFactory->buildCouponFromCode($event->getCode());
 
         $isValid = $coupon->isMatching();
+
         if ($isValid) {
             /** @var Request $request */
             $request = $this->container->get('request');
@@ -121,7 +122,11 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
             $totalDiscount = $couponManager->getDiscount();
 
+            // @todo decrement coupon quantity
+
             // @todo modify Cart total discount
+            $request->getSession()->getCart()->setDiscount($totalDiscount);
+
         }
 
         $event->setIsValid($isValid);
