@@ -45,13 +45,17 @@ class DebugBarListeners extends BaseAction implements EventSubscriberInterface {
     {
         $debugBar = $this->container->get("debugBar");
 
+        $alternativelogger = null;
+        if($this->container->getParameter('kernel.debug')) {
+            $alternativelogger = \Thelia\Log\Tlog::getInstance();
+        }
 
         $debugBar->addCollector(new PhpInfoCollector());
         //$debugBar->addCollector(new MessagesCollector());
         //$debugBar->addCollector(new RequestDataCollector());
         $debugBar->addCollector(new TimeDataCollector());
         $debugBar->addCollector(new MemoryCollector());
-        $debugBar->addCollector(new PropelCollector(\Thelia\Log\Tlog::getInstance()));
+        $debugBar->addCollector(new PropelCollector($alternativelogger));
     }
 
     /**

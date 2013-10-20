@@ -20,38 +20,46 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\TaxEngine\TaxType;
+namespace Thelia\Form;
 
-use Thelia\Type\FloatToFloatArrayType;
-use Thelia\Type\ModelValidIdType;
+use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
 
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
-class featureSlicePercentTaxType extends  BaseTaxType
+class AdminProfileCreationForm extends BaseForm
 {
-    public function pricePercentRetriever()
+    protected function buildForm()
     {
-
+        $this->formBuilder
+            ->add("wording"   , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Wording *"),
+                "label_attr" => array(
+                    "for" => "wording"
+                ))
+            )
+            ->add("name"   , "text"  , array(
+                "constraints" => array(
+                    new NotBlank()
+                ),
+                "label" => Translator::getInstance()->trans("Name *"),
+                "label_attr" => array(
+                    "for" => "name"
+                ))
+            )
+            ->add("description"   , "text"  , array(
+                "label" => Translator::getInstance()->trans("Description"),
+                "label_attr" => array(
+                    "for" => "description"
+                ))
+            )
+        ;
     }
 
-    public function fixAmountRetriever(\Thelia\Model\Product $product)
+    public function getName()
     {
-
-    }
-
-    public function getRequirementsList()
-    {
-        return array(
-            'featureId' => new ModelValidIdType('Feature'),
-            'slices' => new FloatToFloatArrayType(),
-        );
-    }
-
-    public function getTitle()
-    {
-        return "% slice Tax depending on a feature";
+        return "thelia_admin_profile_creation";
     }
 }

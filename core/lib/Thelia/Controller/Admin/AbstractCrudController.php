@@ -392,8 +392,6 @@ abstract class AbstractCrudController extends BaseAdminController
             // Get the form field values
             $data = $form->getData();
 
-            $dataType = $form->all();
-
             $changeEvent = $this->getUpdateEvent($data);
 
             $this->dispatch($this->updateEventIdentifier, $changeEvent);

@@ -34,6 +34,7 @@ class TaxEvent extends ActionEvent
     protected $title;
     protected $description;
     protected $type;
+    protected $requirements;
 
     public function __construct(Tax $tax = null)
     {
@@ -105,5 +106,15 @@ class TaxEvent extends ActionEvent
     public function getType()
     {
         return $this->type;
+    }
+
+    public function setRequirements($requirements)
+    {
+        $this->requirements = $requirements;
+    }
+
+    public function getRequirements()
+    {
+        return $this->requirements;
     }
 }

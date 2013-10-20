@@ -4,15 +4,15 @@
     {check_auth context="front" roles="CUSTOMER" login_tpl="login"}
 {/block}
 
-{block name="breadcrumb"}
-    <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">{intl l="You are here"}: </strong>
-        <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><span itemprop="title">{intl l="Account"}</span></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{intl l="Address"}</span></li>
-        </ul>
-    </nav><!-- /.nav-breadcrumb -->
+{* Body Class *}
+{block name="body-class"}page-address{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
+        ['title' => {intl l="Address Update"}, 'url'=>{url path="/address"}]
+    ]}
 {/block}
 
 {block name="main-content"}
@@ -25,7 +25,7 @@
         {loop name="customer.update" type="address" customer="current" id="{$address_id}"}
         <form id="form-address" class="form-horizontal" action="{url path="/address/update/{$address_id}"}" method="post" role="form">
         {form_field form=$form field='success_url'}
-            <input type="hidden" name="{$name}" value="{url path="/customer/account"}" /> {* the url the user is redirected to on login success *}
+            <input type="hidden" name="{$name}" value="{url path="/account"}" /> {* the url the user is redirected to on login success *}
         {/form_field}
 
         {form_field form=$form field='error_message'}

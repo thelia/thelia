@@ -6,16 +6,17 @@
     {check_valid_delivery}
 {/block}
 
-{block name="breadcrumb"}
-    <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">{intl l="You are here"} : </strong>
-        <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{url path="/cart"}" itemprop="url"><span itemprop="title">{intl l="Cart"}</span></a></li>
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active"><span itemprop="title">{intl l="My order"}</span></li>
-        </ul>
-    </nav><!-- /.nav-breadcrumb -->
+{* Body Class *}
+{block name="body-class"}page-order-invoice{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$breadcrumbs = [
+        ['title' => {intl l="Cart"}, 'url'=>{url path="/cart"}],
+        ['title' => {intl l="My order"}, 'url'=>{url path="/order/invoice"}]
+    ]}
 {/block}
+
 
 {block name="main-content"}
     <div class="main">

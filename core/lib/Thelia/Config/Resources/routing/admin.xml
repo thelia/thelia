@@ -4,22 +4,22 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-	<!-- Route to administration base -->
+    <!-- Route to administration base -->
     <route id="admin" path="/admin">
         <default key="_controller">Thelia\Controller\Admin\AdminController::indexAction</default>
     </route>
 
-	<!-- Route to the administration login page -->
+    <!-- Route to the administration login page -->
     <route id="admin.login" path="/admin/login">
         <default key="_controller">Thelia\Controller\Admin\SessionController::showLoginAction</default>
     </route>
 
-	<!-- Route to the administration logout page -->
+    <!-- Route to the administration logout page -->
     <route id="admin.logout" path="/admin/logout">
         <default key="_controller">Thelia\Controller\Admin\SessionController::checkLogoutAction</default>
     </route>
 
-	<!-- Route to the login check controller -->
+    <!-- Route to the login check controller -->
     <route id="admin.checklogin" path="/admin/checklogin">
         <default key="_controller">Thelia\Controller\Admin\SessionController::checkLoginAction</default>
     </route>
@@ -31,7 +31,7 @@
 
 
 
-	<!-- Route to the catalog controller -->
+    <!-- Route to the catalog controller -->
 
     <route id="admin.catalog" path="/admin/catalog">
         <default key="_controller">Thelia\Controller\Admin\CategoryController::defaultAction</default>
@@ -870,10 +870,15 @@
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::deleteAction</default>
     </route>
 
+    <route id="admin.configuration.taxes-rules.set-default" path="/admin/configuration/taxes_rules/update/set_default/{tax_rule_id}">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::setDefaultAction</default>
+        <requirement key="tax_rule_id">\d+</requirement>
+    </route>
+
     <!-- end tax rules management -->
 
 
-	<!-- The default route, to display a template -->
+    <!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">
         <default key="_controller">Thelia\Controller\Admin\AdminController::processTemplateAction</default>

@@ -151,12 +151,10 @@ class Tax extends BaseI18nLoop
 
             $loopResultRow = new LoopResultRow($loopResult, $tax, $this->versionable, $this->timestampable, $this->countable);
 
-            $requirements = json_decode( base64_decode( $tax->getSerializedRequirements() ), true );
-
             $loopResultRow
                 ->set("ID"                      , $tax->getId())
                 ->set("TYPE"                    , $tax->getType())
-                ->set("REQUIREMENTS"            , $requirements)
+                ->set("REQUIREMENTS"            , $tax->getRequirements())
                 ->set("IS_TRANSLATED"           , $tax->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE"                  , $locale)
                 ->set("TITLE"                   , $tax->getVirtualColumn('i18n_TITLE'))
