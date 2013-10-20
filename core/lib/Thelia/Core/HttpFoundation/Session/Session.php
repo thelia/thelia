@@ -70,6 +70,13 @@ class Session extends BaseSession
         $this->set("thelia.current.currency", $currency);
     }
 
+    /**
+     * Return current currency
+     *
+     * @param bool $forceDefault If default currency forced
+     *
+     * @return Currency
+     */
     public function getCurrency($forceDefault = true)
     {
         $currency = $this->get("thelia.current.currency");
