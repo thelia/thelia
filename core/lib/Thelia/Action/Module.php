@@ -90,6 +90,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 $con->commit();
 
                 $event->setModule($module);
+                $this->cacheClear();
 
             } catch (\Exception $e) {
                 $con->rollBack();
