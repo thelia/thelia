@@ -303,4 +303,17 @@ class BaseController extends ContainerAware
 
         return $mailer->getSwiftMailer();
     }
+
+    /**
+     * @return ParserInterface instance parser
+     */
+    protected function getParser()
+    {
+        return $this->container->get("thelia.parser");
+    }
+
+    protected function render($inline)
+    {
+        return $this->getParser()->fetch(sprintf("string:%s", $inline));
+    }
 }
