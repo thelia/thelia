@@ -60,7 +60,7 @@ class ContactForm extends BaseForm
     {
         $this->formBuilder
             ->add('firstname', 'text', array(
-                'constraint' => array(
+                'constraints' => array(
                     new NotBlank()
                 ),
                 'label' => Translator::getInstance()->trans('firstname'),
@@ -69,7 +69,7 @@ class ContactForm extends BaseForm
                 )
             ))
             ->add('lastname', 'text', array(
-                'constraint' => array(
+                'constraints' => array(
                     new NotBlank()
                 ),
                 'label' => Translator::getInstance()->trans('lastname'),
@@ -78,7 +78,7 @@ class ContactForm extends BaseForm
                 )
             ))
             ->add('email', 'email', array(
-                'constraint' => array(
+                'constraints' => array(
                     new NotBlank(),
                     new Email()
                 ),
@@ -88,7 +88,7 @@ class ContactForm extends BaseForm
                 )
             ))
             ->add('subject', 'text', array(
-                'constraint' => array(
+                'constraints' => array(
                     new NotBlank()
                 ),
                 'label' => Translator::getInstance()->trans('subject'),
@@ -97,7 +97,7 @@ class ContactForm extends BaseForm
                 )
             ))
             ->add('message', 'text', array(
-                'constraint' => array(
+                'constraints' => array(
                     new NotBlank()
                 ),
                 'label' => Translator::getInstance()->trans('message'),
@@ -114,6 +114,6 @@ class ContactForm extends BaseForm
      */
     public function getName()
     {
-        return 'thelia.contact';
+        return 'thelia_contact';
     }
 }

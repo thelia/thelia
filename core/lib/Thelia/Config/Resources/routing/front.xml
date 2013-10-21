@@ -173,4 +173,14 @@
         <default key="_view">contact</default>
     </route>
 
+    <route id="contact.send" path="/contact" methods="post">
+        <default key="_controller">Thelia\Controller\Front\ContactController::sendAction</default>
+        <default key="_view">contact</default>
+    </route>
+
+    <route id="contact.success" path="/contact/success">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">contact-success</default>
+    </route>
+
 </routes>

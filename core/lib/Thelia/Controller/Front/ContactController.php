@@ -22,6 +22,9 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Front;
+use Thelia\Form\ContactForm;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\ConfigQuery;
 
 
 /**
@@ -31,5 +34,40 @@ namespace Thelia\Controller\Front;
  */
 class ContactController extends BaseFrontController
 {
+    /**
+     * send contact message
+     */
+    public function sendAction()
+    {
+        $error_message = false;
+        $contactForm = new ContactForm($this->getRequest());
 
+        try {
+            $form = $this->validateForm($contactForm);
+
+            $message = \Swift_Message::newInstance($form->get('subject')->getData())
+                ->addFrom($form->get('email')->getData(), $form->get('firstname')->getData().' '.$form->get('lastname')->getData())
+                ->addTo(ConfigQuery::read('contact_email'), ConfigQuery::read('company_name'))
+                ->setBody($form->get('message')->getData())
+            ;
+
+            $this->getMailer()->send($message);
+
+        } catch(FormValidationException $e) {
+            $error_message = $e->getMessage();
+        }
+
+        if ($error_message !== false) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during customer creation process : %s", $error_message));
+
+            $contactForm->setErrorMessage($error_message);
+
+            $this->getParserContext()
+                ->addForm($contactForm)
+                ->setGeneralError($error_message)
+            ;
+        } else {
+            $this->redirectToRoute('contact.success');
+        }
+    }
 }
