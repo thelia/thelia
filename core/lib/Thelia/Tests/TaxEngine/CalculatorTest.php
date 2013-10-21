@@ -127,7 +127,7 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         $taxRulesCollection = new ObjectCollection();
 
         $aProduct = ProductQuery::create()->findOne();
-        if(null === $aProduct) {
+        if (null === $aProduct) {
             return;
         }
 
@@ -169,7 +169,7 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         $taxRulesCollection->setModel('\Thelia\Model\Tax');
 
         $aProduct = ProductQuery::create()->findOne();
-        if(null === $aProduct) {
+        if (null === $aProduct) {
             return;
         }
 
@@ -214,7 +214,7 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         $taxRulesCollection->append($tax);
 
         $aProduct = ProductQuery::create()->findOne();
-        if(null === $aProduct) {
+        if (null === $aProduct) {
             return;
         }
 
@@ -270,7 +270,7 @@ class CalculatorTest extends \PHPUnit_Framework_TestCase
         $taxRulesCollection->append($tax);
 
         $aProduct = ProductQuery::create()->findOne();
-        if(null === $aProduct) {
+        if (null === $aProduct) {
             return;
         }
 

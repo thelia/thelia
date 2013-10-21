@@ -143,8 +143,8 @@ class Install extends ContainerAwareCommand
         $permissions = new CheckPermission(false, $this->getContainer()->get('thelia.translator'));
         $isValid = $permissions->exec();
 
-        foreach($permissions->getValidationMessages() as $item => $data) {
-            if($data['status']) {
+        foreach ($permissions->getValidationMessages() as $item => $data) {
+            if ($data['status']) {
                 $output->writeln(array(
                     sprintf("<info>%s ...</info> %s",
                         $data['text'],
@@ -162,7 +162,7 @@ class Install extends ContainerAwareCommand
 
         }
 
-        if(false === $isValid) {
+        if (false === $isValid) {
             $output->writeln(array(
                 "",
                 "<error>Please put correct permissions and reload install process</error>"

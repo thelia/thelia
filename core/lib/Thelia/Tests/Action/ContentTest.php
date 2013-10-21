@@ -36,7 +36,6 @@ use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderQuery;
 
-
 /**
  * Class ContentTest
  * @package Thelia\Tests\Action
@@ -205,7 +204,7 @@ class ContentTest extends BaseAction
             $test = ContentFolderQuery::create()
                 ->filterByContent($content)
                 ->filterByFolder($folder);
-        } while($test->count() > 0);
+        } while ($test->count() > 0);
 
         $event = new ContentAddFolderEvent($content, $folder->getId());
 
@@ -267,7 +266,7 @@ class ContentTest extends BaseAction
             ->addAscendingOrderByColumn('RAND()')
             ->findOne();
 
-        if(null === $folder) {
+        if (null === $folder) {
             $this->fail('use fixtures before launching test, there is no folder in database');
         }
 

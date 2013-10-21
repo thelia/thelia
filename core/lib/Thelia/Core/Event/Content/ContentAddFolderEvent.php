@@ -24,7 +24,6 @@
 namespace Thelia\Core\Event\Content;
 use Thelia\Model\Content;
 
-
 /**
  * Class ContentAddFolderEvent
  * @package Thelia\Core\Event\Content
@@ -60,7 +59,5 @@ class ContentAddFolderEvent extends ContentEvent
     {
         return $this->folderId;
     }
-
-
 
 }

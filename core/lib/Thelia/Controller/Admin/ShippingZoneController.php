@@ -140,5 +140,4 @@ class ShippingZoneController extends BaseAdminController
         return $this->getRequest()->get('shipping_zone_id', 0);
     }
 
-
 }

@@ -26,7 +26,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
 
-
 /**
  * Class Pdf
  * @package Thelia\Action

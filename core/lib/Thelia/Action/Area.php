@@ -34,7 +34,6 @@ use Thelia\Model\CountryQuery;
 use Thelia\Action\BaseAction;
 use Thelia\Model\Area as AreaModel;
 
-
 /**
  * Class Area
  * @package Thelia\Action
@@ -96,7 +95,6 @@ class Area extends BaseAction implements EventSubscriberInterface
 
         $event->setArea($area);
     }
-
 
     /**
      * Returns an array of event names this subscriber wants to listen to.

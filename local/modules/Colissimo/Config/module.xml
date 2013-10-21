@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+    <fullnamespace>Colissimo\Colissimo</fullnamespace>
+    <descriptive locale="en_US">
+        <title>colisimo</title>
+    </descriptive>
+    <descriptive locale="fr_FR">
+        <title>colisimo</title>
+    </descriptive>
+    <version>1.0</version>
+    <author>
+        <name>Manuel Raynaud</name>
+        <email>mraynaud@openstudio.fr</email>
+    </author>
+    <type>delivery</type>
+    <thelia>2.0.0</thelia>
+    <stability>alpha</stability>
+</module>
