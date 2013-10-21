@@ -5,180 +5,180 @@
 {block name="check-permissions"}admin.configuration.view{/block}
 
 {block name="main-content"}
-<div class="configuration">
+    <div class="configuration">
 
-    <div id="wrapper" class="container">
+        <div id="wrapper" class="container">
 
-	    {module_include location='configuration_top'}
+            {module_include location='configuration_top'}
 
-        <h2>{intl l="Thelia configuration"}</h2>
+            <h2>{intl l="Thelia configuration"}</h2>
 
-	    <div class="row">
+            <div class="row">
 
-	        <div class="col-md-4">
-	            <div class="menu-list-table general-block-decorator">
-	            	<div class="table-responsive">
-			            <table class="table table-striped table-condensed">
-			                <caption>{intl l='Product catalog configuration'}</caption>
+                <div class="col-md-4">
+                    <div class="menu-list-table general-block-decorator">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed">
+                                <caption>{intl l='Product catalog configuration'}</caption>
 
-		                    {module_include location='catalog_configuration_top'}
+                                {module_include location='catalog_configuration_top'}
 
-	                        {loop type="auth" name="pcc1" roles="ADMIN" permissions="admin.configuration.templates"}
-			                <tr>
-			                    <td><a href="{url path='/admin/configuration/templates'}">{intl l='Product templates'}</a></td>
-			                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/templates'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-			                </tr>
-			                {/loop}
+                                {loop type="auth" name="pcc1" roles="ADMIN" permissions="admin.configuration.templates"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/templates'}">{intl l='Product templates'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/templates'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc2" roles="ADMIN" permissions="admin.configuration.attributes"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/attributes'}">{intl l='Product attributes'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/attributes'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc2" roles="ADMIN" permissions="admin.configuration.attributes"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/attributes'}">{intl l='Product attributes'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/attributes'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc3" roles="ADMIN" permissions="admin.configuration.features"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/features'}">{intl l='Product features'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/features'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc3" roles="ADMIN" permissions="admin.configuration.features"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/features'}">{intl l='Product features'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/features'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc4" roles="ADMIN" permissions="admin.configuration.messages"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/messages'}">{intl l='Mailing templates'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/messages'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc4" roles="ADMIN" permissions="admin.configuration.messages"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/messages'}">{intl l='Mailing templates'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/messages'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc5" roles="ADMIN" permissions="admin.configuration.currencies"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/currencies'}">{intl l='Currencies'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/currencies'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc5" roles="ADMIN" permissions="admin.configuration.currencies"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/currencies'}">{intl l='Currencies'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/currencies'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-                            {loop type="auth" name="pcc6" roles="ADMIN" permissions="admin.configuration.taxe-rules"}
-                            <tr>
-                                <td><a href="{url path='/admin/configuration/taxes_rules'}">{intl l='Taxes rules'}</a></td>
-                                <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/taxes_rules'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-                            </tr>
-                            {/loop}
+                                {loop type="auth" name="pcc6" roles="ADMIN" permissions="admin.configuration.taxe-rules"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/taxes_rules'}">{intl l='Taxes rules'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/taxes_rules'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-		                    {module_include location='catalog_configuration_bottom'}
-			            </table>
-			        </div>
-	            </div>
-	        </div>
+                                {module_include location='catalog_configuration_bottom'}
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-	        <div class="col-md-4">
-	            <div class="menu-list-table general-block-decorator">
-	            	<div class="table-responsive">
-		                <table class="table table-striped table-condensed">
-		                    <caption>{intl l='Shipping configuration'}</caption>
+                <div class="col-md-4">
+                    <div class="menu-list-table general-block-decorator">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed">
+                                <caption>{intl l='Shipping configuration'}</caption>
 
-		                    {module_include location='shipping_configuration_top'}
+                                {module_include location='shipping_configuration_top'}
 
-	                        {loop type="auth" name="pcc1" roles="ADMIN" permissions="admin.configuration.contries"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/countries'}">{intl l='Countries'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/countries'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc1" roles="ADMIN" permissions="admin.configuration.contries"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/countries'}">{intl l='Countries'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/countries'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc2" roles="ADMIN" permissions="admin.configuration.shipping_zones"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/shipping_zones'}">{intl l='Shipping zones'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_zones'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc2" roles="ADMIN" permissions="admin.configuration.shipping_zones"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/shipping_zones'}">{intl l='Shipping zones'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_zones'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc3" roles="ADMIN" permissions="admin.configuration.shipping_configuration"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l='Shipping configuration'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_configuration'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc3" roles="ADMIN" permissions="admin.configuration.shipping_configuration"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l='Shipping configuration'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_configuration'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-		                    {module_include location='shipping_configuration_bottom'}
+                                {module_include location='shipping_configuration_bottom'}
 
-		                </table>
-		            </div>
-	            </div>
-	        </div>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-	        <div class="col-md-4">
-	            <div class="menu-list-table general-block-decorator">
-	            	<div class="table-responsive">
-		                <table class="table table-striped table-condensed">
-		                    <caption>{intl l='System parameters'}</caption>
+                <div class="col-md-4">
+                    <div class="menu-list-table general-block-decorator">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed">
+                                <caption>{intl l='System parameters'}</caption>
 
-		                    {module_include location='system_configuration_top'}
+                                {module_include location='system_configuration_top'}
 
-	                        {loop type="auth" name="pcc1" roles="ADMIN" permissions="admin.configuration.modules"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/modules'}">{intl l='Modules activation'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/modules'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc1" roles="ADMIN" permissions="admin.configuration.modules"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/modules'}">{intl l='Modules activation'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/modules'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc2" roles="ADMIN" permissions="admin.configuration.variables"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/variables'}">{intl l='System variables'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/variables'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc2" roles="ADMIN" permissions="admin.configuration.variables"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/variables'}">{intl l='System variables'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/variables'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc3" roles="ADMIN" permissions="admin.configuration.profiles"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/profiles'}">{intl l='Back-office profiles'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/profiles'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc3" roles="ADMIN" permissions="admin.configuration.profiles"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/profiles'}">{intl l='Back-office profiles'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/profiles'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc4" roles="ADMIN" permissions="admin.configuration.admin_users"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/admin_users'}">{intl l='Back-office users'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/admin_users'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc4" roles="ADMIN" permissions="admin.configuration.admin_users"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/admin_users'}">{intl l='Back-office users'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/admin_users'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc5" roles="ADMIN" permissions="admin.configuration.languages"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/languages'}">{intl l='Languages &amp; URLs'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/languages'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc5" roles="ADMIN" permissions="admin.configuration.languages"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/languages'}">{intl l='Languages &amp; URLs'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/languages'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc6" roles="ADMIN" permissions="admin.configuration.mailing_system"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/mailing_system'}">{intl l='Mailing system'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/mailing_system'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc6" roles="ADMIN" permissions="admin.configuration.mailing_system"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/mailing_system'}">{intl l='Mailing system'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/mailing_system'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc7" roles="ADMIN" permissions="admin.configuration.admin_logs"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/admin_logs'}">{intl l='Administration logs'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/admin_logs'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc7" roles="ADMIN" permissions="admin.configuration.admin_logs"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/admin_logs'}">{intl l='Administration logs'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/admin_logs'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-	                        {loop type="auth" name="pcc8" roles="ADMIN" permissions="admin.configuration.system_logs"}
-		                    <tr>
-		                        <td><a href="{url path='/admin/configuration/system_logs'}">{intl l='System logs'}</a></td>
-		                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/system_logs'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-		                    </tr>
-	                        {/loop}
+                                {loop type="auth" name="pcc8" roles="ADMIN" permissions="admin.configuration.system_logs"}
+                                    <tr>
+                                        <td><a href="{url path='/admin/configuration/system_logs'}">{intl l='System logs'}</a></td>
+                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/system_logs'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                    </tr>
+                                {/loop}
 
-		                    {module_include location='system_configuration_bottom'}
-		                </table>
-		            </div>
-	            </div>
-	        </div>
+                                {module_include location='system_configuration_bottom'}
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-	        {module_include location='configuration_bottom'}
-	    </div>
-	</div>
-</div>
+                {module_include location='configuration_bottom'}
+            </div>
+        </div>
+    </div>
 {/block}

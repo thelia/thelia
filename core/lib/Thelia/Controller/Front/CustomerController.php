@@ -31,10 +31,11 @@ use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Thelia\Form\CustomerCreation;
 use Thelia\Form\CustomerLogin;
 use Thelia\Form\CustomerLostPasswordForm;
-use Thelia\Form\CustomerModification;
+use Thelia\Form\CustomerUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\CustomerQuery;
 use Thelia\Tools\URL;
 use Thelia\Log\Tlog;
 use Thelia\Core\Security\Exception\WrongPasswordException;
@@ -128,32 +129,56 @@ class CustomerController extends BaseFrontController
         }
     }
 
+    protected function getExistingCustomer($customer_id)
+    {
+        return CustomerQuery::create()
+            ->findOneById($customer_id);
+    }
+
     /**
      * Update customer data. On success, redirect to success_url if exists.
      * Otherwise, display the same view again.
      */
+    public function viewAction()
+    {
+        $this->checkAuth();
+
+        $customer = $this->getSecurityContext()->getCustomerUser();
+        $data = array(
+            'id'           => $customer->getId(),
+            'title'        => $customer->getTitleId(),
+            'firstname'    => $customer->getFirstName(),
+            'lastname'     => $customer->getLastName(),
+            'email'        => $customer->getEmail(),
+        );
+
+        $customerUpdateForm = new CustomerUpdateForm($this->getRequest(), 'form', $data);
+
+        // Pass it to the parser
+        $this->getParserContext()->addForm($customerUpdateForm);
+    }
+
     public function updateAction()
     {
         if ($this->getSecurityContext()->hasCustomerUser()) {
 
             $message = false;
 
-            $customerModification = new CustomerModification($this->getRequest());
+            $customerUpdateForm = new CustomerUpdateForm($this->getRequest());
 
             try {
 
                 $customer = $this->getSecurityContext()->getCustomerUser();
 
-                $form = $this->validateForm($customerModification, "post");
+                $form = $this->validateForm($customerUpdateForm, "post");
 
                 $customerChangeEvent = $this->createEventInstance($form->getData());
                 $customerChangeEvent->setCustomer($customer);
-
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEACCOUNT, $customerChangeEvent);
 
                 $this->processLogin($customerChangeEvent->getCustomer());
 
-                $this->redirectSuccess($customerModification);
+                $this->redirectSuccess($customerUpdateForm);
 
             } catch (FormValidationException $e) {
                 $message = sprintf("Please check your input: %s", $e->getMessage());
@@ -164,10 +189,10 @@ class CustomerController extends BaseFrontController
             if ($message !== false) {
                 Tlog::getInstance()->error(sprintf("Error during customer modification process : %s.", $message));
 
-                $customerModification->setErrorMessage($message);
+                $customerUpdateForm->setErrorMessage($message);
 
                 $this->getParserContext()
-                    ->addForm($customerModification)
+                    ->addForm($customerUpdateForm)
                     ->setGeneralError($message)
                 ;
             }
@@ -193,31 +218,33 @@ class CustomerController extends BaseFrontController
 
                 $form = $this->validateForm($customerLoginForm, "post");
 
-                $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
+                // If User is a new customer
+                if ($form->get('account')->getData() == 0 && !$form->get("email")->getErrors()) {
+                    $this->redirectToRoute("customer.create.view", array("email" => $form->get("email")->getData()));
+                } else {
 
-                $customer = $authenticator->getAuthentifiedUser();
+                    try {
 
-                $this->processLogin($customer);
+                        $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
 
-                $this->redirectSuccess($customerLoginForm);
+                        $customer = $authenticator->getAuthentifiedUser();
 
-            } catch (FormValidationException $e) {
+                        $this->processLogin($customer);
 
-                if ($request->request->has("account")) {
-                    $account = $request->request->get("account");
-                    $form = $customerLoginForm->getForm();
-                    if ($account == 0 && $form->get("email")->getData() !== null) {
-                        $this->redirectToRoute("customer.create.view", array("email" => $form->get("email")->getData()));
+                        $this->redirectSuccess($customerLoginForm);
+
+                    } catch (UsernameNotFoundException $e) {
+                        $message = "Wrong email or password. Please try again";
+                    } catch (WrongPasswordException $e) {
+                        $message = "Wrong email or password. Please try again";
+                    } catch (AuthenticationException $e) {
+                        $message = "Wrong email or password. Please try again";
                     }
+
                 }
 
+            } catch (FormValidationException $e) {
                 $message = sprintf("Please check your input: %s", $e->getMessage());
-            } catch (UsernameNotFoundException $e) {
-                $message = "Wrong email or password. Please try again";
-            } catch (WrongPasswordException $e) {
-                $message = "Wrong email or password. Please try again";
-            } catch (AuthenticationException $e) {
-                $message = "Wrong email or password. Please try again";
             } catch (\Exception $e) {
                 $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
             }
@@ -265,14 +292,14 @@ class CustomerController extends BaseFrontController
             $data["title"],
             $data["firstname"],
             $data["lastname"],
-            $data["address1"],
-            $data["address2"],
-            $data["address3"],
-            $data["phone"],
-            $data["cellphone"],
-            $data["zipcode"],
-            $data["city"],
-            $data["country"],
+            isset($data["address1"])?$data["address1"]:null,
+            isset($data["address2"])?$data["address2"]:null,
+            isset($data["address3"])?$data["address3"]:null,
+            isset($data["phone"])?$data["phone"]:null,
+            isset($data["cellphone"])?$data["cellphone"]:null,
+            isset($data["zipcode"])?$data["zipcode"]:null,
+            isset($data["city"])?$data["city"]:null,
+            isset($data["country"])?$data["country"]:null,
             isset($data["email"])?$data["email"]:null,
             isset($data["password"]) ? $data["password"]:null,
             $this->getRequest()->getSession()->getLang()->getId(),

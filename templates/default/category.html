@@ -1,22 +1,16 @@
 {extends file='layout.tpl'}
 
-{block name="breadcrumb"}
-    <nav class="nav-breadcrumb" role="navigation" aria-labelledby="breadcrumb-label">
-        <strong id="breadcrumb-label">You are here: </strong>
-        <ul class="breadcrumb" itemprop="breadcrumb">
-            <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{navigate to="index"}" itemprop="url"><span itemprop="title">{intl l="Home"}</span></a></li>
-            {loop name="category_path" type="category-path" category="{category attr="id"}"}
-            {if $ID == {category attr="id"}}
-                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb" class="active">
-                    <span itemprop="title">{$TITLE}</span>
-                </li>
-            {else}
-                <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{$URL}"  itemprop="url"><span itemprop="title">{$TITLE}</span></a></li>
-            {/if}
-            {/loop}
-        </ul>
-    </nav><!-- /.nav-breadcrumb -->
+{* Body Class *}
+{block name="body-class"}page-category{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+    {$sBreadcrumb = []}
+    {loop name="category_path" type="category-path" category="{category attr="id"}"}
+        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
+    {/loop}
 {/block}
+
 
 {block name="main-content"}
     <div class="main layout-col-2-left">
@@ -24,7 +18,7 @@
         {$product_page={$smarty.get.page|default:1}}
         {$product_order={$smarty.get.order|default:'alpha'}}
         <article class="col-main {$smarty.get.mode|default:"grid"}" role="main">
-            {include file="includes/category-toolbar.html" toolbar="top" limit=$limit order=$product_order}
+            {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order}
             <div id="category-products">
                 <div class="products-content">
                     <ul class="product-col-4">
@@ -34,7 +28,7 @@
                     </ul>
                 </div>
             </div><!-- /#category-products -->
-            {include file="includes/category-toolbar.html" toolbar="bottom"}
+            {include file="includes/toolbar.html" toolbar="bottom"}
         </article>
 
         <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">

@@ -9,32 +9,31 @@
 
 // Buttons
 .btn {
-    
+
     // Remove Box Shadow
     &:active,
     &.active {
         .box-shadow(none);
     }
-    
+
     // Primary Buttons
     &.btn_add_to_cart,
     &.btn-cart,
     &.btn-checkout,
     &.btn-checkout-next,
     &.btn-checkout-home,
-    &.btn-filter,
     &.btn-forgot,
     &.btn-login,
     &.btn-proceed-checkout,
     &.btn-register,
     &.btn-submit { .btn-primary; }
-    
+
     &.btn-add-address,
     &.btn-checkout,
     &.btn-checkout-next,
     &.btn-checkout-home { float: right; }
-    
-    
+
+
     // Secondary Buttons
     &.btn-back,
     &.btn-continue-shopping {
@@ -44,11 +43,13 @@
     // Keep old style button
     &.btn-add-address,
     &.btn-coupon,
+    &.btn-filter,
     &.btn-grid,
     &.btn-list,
+    &.btn-login-mini,
     &.btn-search,
     &.btn-subscribe { .button-variant(@btn-primary-color; @btn-primary-bg; @btn-primary-border); }
-    
+
     // Account Info
     &.btn-change-account,
     &.btn-change-password { padding: 0; }
@@ -57,7 +58,7 @@
     &.btn-edit-address,
     &.btn-order-details,
     &.btn-remove-address {
-        border: 1px solid @btn-primary-border; 
+        border: 1px solid @btn-primary-border;
         margin-bottom: 10px; padding: 4px 9px;
 
         &:hover,
@@ -66,9 +67,9 @@
             color: @text-color;
         }
     }
-    
+
     // Checkout Step 3
-    &.btn-change-address { 
+    &.btn-change-address {
         padding: 0;
         &:before {
             .icon(@pencil);
@@ -85,8 +86,8 @@
             }
         }
     }
-    
-    
+
+
     // Not styled
     &.btn-cancel { padding-left: 0; }
     &.btn-compare {}

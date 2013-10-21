@@ -56,7 +56,7 @@
 		        <div class="row">
 		            <div class="col-md-12 clearfix">
 		      		    <div class="version-info pull-left">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
-                        
+
                         <div class="clearfix pull-right hidden-xs">
                             <div class="btn-group pull-right">
                                 <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
@@ -74,7 +74,7 @@
 		            </div>
 
 		    		{module_include location='inside_topbar'}
-		            
+
 		        </div>
 
 		    </div>
@@ -89,7 +89,7 @@
 		<nav class="navbar navbar-default" role="navigation">
 
             <div class="container">
-                
+
                 <div class="row">
         			<div class="navbar-header">
         				<button type="button" class="btn navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">

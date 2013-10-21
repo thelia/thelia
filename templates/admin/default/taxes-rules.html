@@ -5,376 +5,376 @@
 {block name="check-permissions"}admin.taxes-rules.view{/block}
 
 {block name="main-content"}
-<div class="taxes-rules">
+    <div class="taxes-rules">
 
-    <div id="wrapper" class="container">
-        
-        <div class="clearfix">
-            <ul class="breadcrumb">
-                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
-                <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
-                <li><a href="{url path='/admin/configuration/taxes_rules'}">{intl l="Taxes rules"}</a></li>
-            </ul>
-        </div>
+        <div id="wrapper" class="container">
 
-        {module_include location='taxes_rules_top'}
+            <div class="clearfix">
+                <ul class="breadcrumb">
+                    <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                    <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                    <li><a href="{url path='/admin/configuration/taxes_rules'}">{intl l="Taxes rules"}</a></li>
+                </ul>
+            </div>
 
-        <div class="row">
-            <div class="col-md-12">
+            {module_include location='taxes_rules_top'}
 
-                <div class="alert alert-info">
-                    <p>{intl l="In order to manges your shop taxes you can manage"} <strong>{intl l="taxes"}</strong> {intl l="and"} <strong>{intl l="tax rules"}</strong>.</p>
-                    <p>{intl l="Taxes define the amount of money which is add to a bought product."}</p>
-                    <p>
-                        {intl l="Example :"}
-                    <ul>
-                        <li>{intl l="French 19.6% VAT is a tax which add a 19.6% tax to the product price."}</li>
-                        <li>{intl l="Ecotax is a tax wich add a defined amount (throug a product feature) to the product price."}</li>
-                    </ul>
-                    </p>
-                    <p>{intl l="Tax rules are combination of different taxes."}</p>
-                    <p>
-                        {intl l="Example :"}
-                    <ul>
-                        <li>{intl l="French 19.6% VAT with ecotax is the applicance of the ecotax (on the product price) then the applicance of the 19.6% tax (on the product price + the ecotax amount)."}</li>
-                    </ul>
-                    </p>
-                    <p>{intl l="you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not."}</p>
-                </div>
+            <div class="row">
+                <div class="col-md-12">
 
-                <div class="general-block-decorator">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-condensed table-left-aligned">
-                            <caption class="clearfix">
-                                {intl l="Taxes"}
-                                {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.taxes.create"}
-                                    <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new tax'}" href="#tax_create_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </a>
-                                {/loop}
-                            </caption>
-                            <thead>
+                    <div class="alert alert-info">
+                        <p>{intl l="In order to manges your shop taxes you can manage"} <strong>{intl l="taxes"}</strong> {intl l="and"} <strong>{intl l="tax rules"}</strong>.</p>
+                        <p>{intl l="Taxes define the amount of money which is add to a bought product."}</p>
+                        <p>
+                            {intl l="Example :"}
+                        <ul>
+                            <li>{intl l="French 19.6% VAT is a tax which add a 19.6% tax to the product price."}</li>
+                            <li>{intl l="Ecotax is a tax wich add a defined amount (throug a product feature) to the product price."}</li>
+                        </ul>
+                        </p>
+                        <p>{intl l="Tax rules are combination of different taxes."}</p>
+                        <p>
+                            {intl l="Example :"}
+                        <ul>
+                            <li>{intl l="French 19.6% VAT with ecotax is the applicance of the ecotax (on the product price) then the applicance of the 19.6% tax (on the product price + the ecotax amount)."}</li>
+                        </ul>
+                        </p>
+                        <p>{intl l="you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not."}</p>
+                    </div>
+
+                    <div class="general-block-decorator">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed table-left-aligned">
+                                <caption class="clearfix">
+                                    {intl l="Taxes"}
+                                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.taxes.create"}
+                                        <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new tax'}" href="#tax_create_dialog" data-toggle="modal">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                        </a>
+                                    {/loop}
+                                </caption>
+                                <thead>
                                 <tr>
                                     <th class="col-md-3">{intl l="Name"}</th>
                                     <th class="col-md-5">{intl l="Description"}</th>
                                     <th class="col-md-1">{intl l="Actions"}</th>
                                 </tr>
-                            </thead>
-                            <tbody>
+                                </thead>
+                                <tbody>
 
                                 {loop type="tax" name="taxes" backend_context="1"}
 
-                                <tr>
-                                    <td>{$TITLE}</td>
-                                    <td>{$DESCRIPTION}</td>
-                                    <td>
-                                        <div class="btn-group">
-                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes.change"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Change this tax'}" href="{url path="/admin/configuration/taxes/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
+                                    <tr>
+                                        <td>{$TITLE}</td>
+                                        <td>{$DESCRIPTION}</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes.change"}
+                                                    <a class="btn btn-default btn-xs" title="{intl l='Change this tax'}" href="{url path="/admin/configuration/taxes/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                {/loop}
 
-                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes.change"}
-                                                <a class="btn btn-default btn-xs js-delete-tax" title="{intl l='Delete this tax'}" href="#tax_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                            {/loop}
-                                        </div>
-                                    </td>
-                                </tr>
+                                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes.change"}
+                                                    <a class="btn btn-default btn-xs js-delete-tax" title="{intl l='Delete this tax'}" href="#tax_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                {/loop}
+                                            </div>
+                                        </td>
+                                    </tr>
 
                                 {/loop}
 
-                            </tbody>                            
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
 
-                <div class="general-block-decorator">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-condensed table-left-aligned">
-                            <caption class="clearfix">
-                                {intl l="Taxes rules"}
-                                {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.taxes-rules.create"}
-                                    <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new tax rule'}" href="#tax_rule_create_dialog" data-toggle="modal">
-                                        <span class="glyphicon glyphicon-plus"></span>
-                                    </a>
-                                {/loop}
-                            </caption>
-                            <thead>
+                    <div class="general-block-decorator">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed table-left-aligned">
+                                <caption class="clearfix">
+                                    {intl l="Taxes rules"}
+                                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.taxes-rules.create"}
+                                        <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new tax rule'}" href="#tax_rule_create_dialog" data-toggle="modal">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                        </a>
+                                    {/loop}
+                                </caption>
+                                <thead>
                                 <tr>
                                     <th class="col-md-3">{intl l="Name"}</th>
                                     <th class="col-md-4">{intl l="Description"}</th>
                                     <th class="col-md-1">{intl l="Default"}</th>
                                     <th class="col-md-1">{intl l="Actions"}</th>
                                 </tr>
-                            </thead>
-                            <tbody>
+                                </thead>
+                                <tbody>
 
                                 {loop type="tax-rule" name="taxes-rules" backend_context="1"}
 
-                                <tr>
-                                    <td>{$TITLE}</td>
-                                    <td>{$DESCRIPTION}</td>
-                                    <td>
-                                        {if $IS_DEFAULT == 1}
-                                            <span class="glyphicon glyphicon-ok"></span>
-                                        {/if}
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes-rules.change"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Change this tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
-                                                <a class="btn btn-default btn-xs" title="{intl l='Set as default tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/set_default/$ID"}" {if $IS_DEFAULT == 1}disabled{/if}><span class="glyphicon glyphicon-star"></span></a>
-                                            {/loop}
+                                    <tr>
+                                        <td>{$TITLE}</td>
+                                        <td>{$DESCRIPTION}</td>
+                                        <td>
+                                            {if $IS_DEFAULT == 1}
+                                                <span class="glyphicon glyphicon-ok"></span>
+                                            {/if}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes-rules.change"}
+                                                    <a class="btn btn-default btn-xs" title="{intl l='Change this tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                    <a class="btn btn-default btn-xs" title="{intl l='Set as default tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/set_default/$ID"}" {if $IS_DEFAULT == 1}disabled{/if}><span class="glyphicon glyphicon-star"></span></a>
+                                                {/loop}
 
-                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes-rules.dele"}
-                                                <a class="btn btn-default btn-xs js-delete-tax-rule" title="{intl l='Delete this tax rule'}" href="#tax_rule_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-                                            {/loop}
-                                        </div>
-                                    </td>
-                                </tr>
+                                                {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.taxes-rules.dele"}
+                                                    <a class="btn btn-default btn-xs js-delete-tax-rule" title="{intl l='Delete this tax rule'}" href="#tax_rule_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                {/loop}
+                                            </div>
+                                        </td>
+                                    </tr>
 
                                 {/loop}
 
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            {module_include location='taxes_rules_bottom'}
+
         </div>
-
-        {module_include location='taxes_rules_bottom'}
-
     </div>
-</div>
 
 {* -- Add tax confirmation dialog ----------------------------------- *}
-{form name="thelia.admin.tax.add"}
+    {form name="thelia.admin.tax.add"}
 
-{if $form_error_message}
-    {$taxCreateError = true}
-{else}
-    {$taxCreateError = false}
-{/if}
+    {if $form_error_message}
+        {$taxCreateError = true}
+    {else}
+        {$taxCreateError = false}
+    {/if}
 
-{* Capture the dialog body, to pass it to the generic dialog *}
-{capture "tax_create_dialog"}
+    {* Capture the dialog body, to pass it to the generic dialog *}
+    {capture "tax_create_dialog"}
 
-    {form_hidden_fields form=$form}
+        {form_hidden_fields form=$form}
 
-    {form_field form=$form field='locale'}
-        <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
-    {/form_field}
+        {form_field form=$form field='locale'}
+            <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+        {/form_field}
 
-    {form_field form=$form field='title'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $form_error}{$value}{else}{if $IS_TRANSLATED == 1}{$TITLE}{/if}{/if}">
-        </div>
-    {/form_field}
-
-    {form_field form=$form field='description'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">
-                {intl l=$label} :
-                <span class="label-help-block">{intl l="The detailed description."}</span>
-            </label>
-
-            <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $form_error}{$value}{else}{if $IS_TRANSLATED == 1}{$DESCRIPTION}{/if}{/if}</textarea>
-        </div>
-    {/form_field}
-
-    {form_field form=$form field='type'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">
-                {intl l=$label} :
-            </label>
-
-            <div class="form-group">
-                <select name="{$name}" class="js-change-tax-type" data-toggle="selectpicker">
-                    {$typeValueWithError = $value}
-                    {foreach from=$choices key=key item=choice}
-                        {if $key == 0}
-                            {$typeValue = $choice->value}
-                        {/if}
-                        <option value="{$choice->value}" {if $form_error && $choice->value == $value || !$form_error && $key == 0}selected="selected" {/if}>{$choice->label}</option>
-                    {/foreach}
-                </select>
+        {form_field form=$form field='title'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+                <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $form_error}{$value}{else}{if $IS_TRANSLATED == 1}{$TITLE}{/if}{/if}">
             </div>
-        </div>
-    {/form_field}
+        {/form_field}
 
-    {form_tagged_fields form=$form tag='requirements'}
-        <div class="form-group {if $error}has-error{/if} js-tax-requirements" data-tax-type="{$attr_list.tax_type}" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}style="display: none"{/if}>
-            <label for="{$label_attr.for}" class="control-label">
-                {intl l=$label}
-            </label>
-            {if $formType == 'choice'}
-                <select name="{$name}" data-toggle="selectpicker" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}disabled="disabled"{/if}>
-                    {foreach $choices as $choice}
-                        <option value="{$choice->value}" {if !$form_error && $REQUIREMENTS.$label == $choice->value || $form_error && $value == $choice->value}selected="selected" {/if}>{$choice->label}</option>
-                    {/foreach}
-                </select>
-            {/if}
-            {if $formType == 'text'}
-                <input type="text" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}disabled="disabled"{/if} id="{$label_attr.for}" name="{$name}" required="required" class="form-control" value="{if $form_error}{$value}{else}{$REQUIREMENTS.$label}{/if}">
-            {/if}
-        </div>
-    {/form_tagged_fields}
+        {form_field form=$form field='description'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">
+                    {intl l=$label} :
+                    <span class="label-help-block">{intl l="The detailed description."}</span>
+                </label>
 
-{/capture}
+                <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $form_error}{$value}{else}{if $IS_TRANSLATED == 1}{$DESCRIPTION}{/if}{/if}</textarea>
+            </div>
+        {/form_field}
 
-    {include
+        {form_field form=$form field='type'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">
+                    {intl l=$label} :
+                </label>
+
+                <div class="form-group">
+                    <select name="{$name}" class="js-change-tax-type" data-toggle="selectpicker">
+                        {$typeValueWithError = $value}
+                        {foreach from=$choices key=key item=choice}
+                            {if $key == 0}
+                                {$typeValue = $choice->value}
+                            {/if}
+                            <option value="{$choice->value}" {if $form_error && $choice->value == $value || !$form_error && $key == 0}selected="selected" {/if}>{$choice->label}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+        {/form_field}
+
+        {form_tagged_fields form=$form tag='requirements'}
+            <div class="form-group {if $error}has-error{/if} js-tax-requirements" data-tax-type="{$attr_list.tax_type}" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}style="display: none"{/if}>
+                <label for="{$label_attr.for}" class="control-label">
+                    {intl l=$label}
+                </label>
+                {if $formType == 'choice'}
+                    <select name="{$name}" data-toggle="selectpicker" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}disabled="disabled"{/if}>
+                        {foreach $choices as $choice}
+                            <option value="{$choice->value}" {if !$form_error && $REQUIREMENTS.$label == $choice->value || $form_error && $value == $choice->value}selected="selected" {/if}>{$choice->label}</option>
+                        {/foreach}
+                    </select>
+                {/if}
+                {if $formType == 'text'}
+                    <input type="text" {if !$form_error && $attr_list.tax_type != $typeValue || $form_error && $attr_list.tax_type != $typeValueWithError}disabled="disabled"{/if} id="{$label_attr.for}" name="{$name}" required="required" class="form-control" value="{if $form_error}{$value}{else}{$REQUIREMENTS.$label}{/if}">
+                {/if}
+            </div>
+        {/form_tagged_fields}
+
+    {/capture}
+
+        {include
         file = "includes/generic-create-dialog.html"
 
         dialog_id    = "tax_create_dialog"
         dialog_title = {intl l="Create a new tax"}
         dialog_body  = {$smarty.capture.tax_create_dialog nofilter}
 
-        dialog_ok_label     = {intl l="Create"}
-        dialog_cancel_label = {intl l="Cancel"}
+    dialog_ok_label     = {intl l="Create"}
+    dialog_cancel_label = {intl l="Cancel"}
 
-        form_action        = {url path="/admin/configuration/taxes/add"}
-        form_enctype       = {form_enctype form=$form}
-        form_error_message = $form_error_message
+    form_action        = {url path="/admin/configuration/taxes/add"}
+    form_enctype       = {form_enctype form=$form}
+    form_error_message = $form_error_message
     }
 
-{/form}
+    {/form}
 
 {* -- Delete tax confirmation dialog ----------------------------------- *}
 
-{capture "tax_delete_dialog"}
-    <input type="hidden" name="tax_id" id="tax_delete_id" value="" />
+    {capture "tax_delete_dialog"}
+        <input type="hidden" name="tax_id" id="tax_delete_id" value="" />
 
-    {module_include location='tax_delete_form'}
+        {module_include location='tax_delete_form'}
 
-{/capture}
+    {/capture}
 
-{include
+    {include
     file = "includes/generic-confirm-dialog.html"
 
     dialog_id       = "tax_delete_dialog"
     dialog_title    = {intl l="Delete tax"}
     dialog_message  = {intl l="Do you really want to delete this tax ?"}
 
-    form_action         = {url path='/admin/configuration/taxes/delete'}
-    form_content        = {$smarty.capture.tax_delete_dialog nofilter}
+form_action         = {url path='/admin/configuration/taxes/delete'}
+form_content        = {$smarty.capture.tax_delete_dialog nofilter}
 }
 
 {* -- Add tax rule confirmation dialog ----------------------------------- *}
-{form name="thelia.admin.taxrule.add"}
+    {form name="thelia.admin.taxrule.add"}
 
-{if $form_error_message}
-    {$taxRuleCreateError = true}
-{else}
-    {$taxRuleCreateError = false}
-{/if}
+    {if $form_error_message}
+        {$taxRuleCreateError = true}
+    {else}
+        {$taxRuleCreateError = false}
+    {/if}
 
-{* Capture the dialog body, to pass it to the generic dialog *}
-{capture "tax_rule_create_dialog"}
+    {* Capture the dialog body, to pass it to the generic dialog *}
+    {capture "tax_rule_create_dialog"}
 
-    {form_hidden_fields form=$form}
+        {form_hidden_fields form=$form}
 
-    {form_field form=$form field='locale'}
-        <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
-    {/form_field}
+        {form_field form=$form field='locale'}
+            <input type="hidden" name="{$name}" value="{$edit_language_locale}" />
+        {/form_field}
 
-    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-    {form_field form=$form field='title'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$TITLE}{/if}{/if}">
-        </div>
-    {/form_field}
+        {form_field form=$form field='title'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{intl l=$label} : </label>
+                <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$TITLE}{/if}{/if}">
+            </div>
+        {/form_field}
 
-    {form_field form=$form field='description'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">
-                {intl l=$label} :
-                <span class="label-help-block">{intl l="The detailed description."}</span>
-            </label>
+        {form_field form=$form field='description'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">
+                    {intl l=$label} :
+                    <span class="label-help-block">{intl l="The detailed description."}</span>
+                </label>
 
-            <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$DESCRIPTION}{/if}{/if}</textarea>
-        </div>
-    {/form_field}
+                <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $error}{$value}{else}{if $IS_TRANSLATED == 1}{$DESCRIPTION}{/if}{/if}</textarea>
+            </div>
+        {/form_field}
 
-{/capture}
+    {/capture}
 
-    {include
+        {include
         file = "includes/generic-create-dialog.html"
 
         dialog_id    = "tax_rule_create_dialog"
         dialog_title = {intl l="Create a new tax rule"}
         dialog_body  = {$smarty.capture.tax_rule_create_dialog nofilter}
 
-        dialog_ok_label     = {intl l="Create"}
-        dialog_cancel_label = {intl l="Cancel"}
+    dialog_ok_label     = {intl l="Create"}
+    dialog_cancel_label = {intl l="Cancel"}
 
-        form_action        = {url path="/admin/configuration/taxes_rules/add"}
-        form_enctype       = {form_enctype form=$form}
-        form_error_message = $form_error_message
+    form_action        = {url path="/admin/configuration/taxes_rules/add"}
+    form_enctype       = {form_enctype form=$form}
+    form_error_message = $form_error_message
     }
 
-{/form}
+    {/form}
 
 {* -- Delete tax rule confirmation dialog ----------------------------------- *}
 
-{capture "tax_rule_delete_dialog"}
-    <input type="hidden" name="tax_rule_id" id="tax_rule_delete_id" value="" />
+    {capture "tax_rule_delete_dialog"}
+        <input type="hidden" name="tax_rule_id" id="tax_rule_delete_id" value="" />
 
-    {module_include location='tax_rule_delete_form'}
+        {module_include location='tax_rule_delete_form'}
 
-{/capture}
+    {/capture}
 
-{include
+    {include
     file = "includes/generic-confirm-dialog.html"
 
     dialog_id       = "tax_rule_delete_dialog"
     dialog_title    = {intl l="Delete tax rule"}
     dialog_message  = {intl l="Do you really want to delete this tax rule ?"}
 
-    form_action         = {url path='/admin/configuration/taxes_rules/delete'}
-    form_content        = {$smarty.capture.tax_rule_delete_dialog nofilter}
+form_action         = {url path='/admin/configuration/taxes_rules/delete'}
+form_content        = {$smarty.capture.tax_rule_delete_dialog nofilter}
 }
 
 {/block}
 
 {block name="javascript-initialization"}
 
-{javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
-    <script src='{$asset_url}'></script>
-{/javascripts}
+    {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
+        <script src='{$asset_url}'></script>
+    {/javascripts}
 
-{javascripts file='assets/js/main.js'}
-    <script src='{$asset_url}'></script>
-{/javascripts}
+    {javascripts file='assets/js/main.js'}
+        <script src='{$asset_url}'></script>
+    {/javascripts}
 
-<script type="text/javascript">
-jQuery(function($) {
+    <script type="text/javascript">
+        jQuery(function($) {
 
-{if $taxRuleCreateError == true}
-    $('#tax_rule_create_dialog').modal();
-{/if}
+            {if $taxRuleCreateError == true}
+            $('#tax_rule_create_dialog').modal();
+            {/if}
 
-{if $taxCreateError == true}
-    $('#tax_create_dialog').modal();
-{/if}
+            {if $taxCreateError == true}
+            $('#tax_create_dialog').modal();
+            {/if}
 
-    $(".js-delete-tax-rule").click(function(e){
-        $('#tax_rule_delete_id').val($(this).data('id'))
-    });
+            $(".js-delete-tax-rule").click(function(e){
+                $('#tax_rule_delete_id').val($(this).data('id'))
+            });
 
-    $(".js-delete-tax").click(function(e){
-        $('#tax_delete_id').val($(this).data('id'))
-    });
+            $(".js-delete-tax").click(function(e){
+                $('#tax_delete_id').val($(this).data('id'))
+            });
 
-    $('.js-change-tax-type').change(function(e){
-        $('.js-tax-requirements').children('select, input').attr('disabled', true);
-        $('.js-tax-requirements').hide();
-        $('.js-tax-requirements[data-tax-type="' + $(this).val() + '"]').children('select, input').attr('disabled', false);
-        $('.js-tax-requirements[data-tax-type="' + $(this).val() + '"]').children('select').selectpicker("refresh");
-        $('.js-tax-requirements[data-tax-type="' + $(this).val() + '"]').show();
-    });
-})
-</script>
+            $('.js-change-tax-type').change(function(e){
+                $('.js-tax-requirements').children('select, input').attr('disabled', true);
+                $('.js-tax-requirements').hide();
+                $('.js-tax-requirements[data-tax-type="' + $(this).val() + '"]').children('select, input').attr('disabled', false);
+                $('.js-tax-requirements[data-tax-type="' + $(this).val() + '"]').children('select').selectpicker("refresh");
+                $('.js-tax-requirements[data-tax-type="' + $(this).val() + '"]').show();
+            });
+        })
+    </script>
 
 {/block}

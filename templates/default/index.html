@@ -1,5 +1,10 @@
 {extends file="layout.tpl"}
 
+{* Body Class *}
+{block name="body-class"}page-home{/block}
+
+{* Hide breadcrumb *}
+{block name='breadcrumb'}{/block}
 
 {block name="main-content"}
     <section class="carousel-container">
@@ -25,7 +30,7 @@
 
     <section id="products-new">
         <div class="products-heading">
-            <h2>Latest <a href="#latest" class="btn-all">+ View All</a></h2>
+            <h2>{intl l="Latest"} <a href="{url path="/view_all"  type="new"}" class="btn-all">{intl l="+ View All"}</a></h2>
         </div>
 
         <div class="products-content">
@@ -94,7 +99,7 @@
 
     <section id="products-offer">
         <div class="products-heading">
-            <h2>Offers <a href="#offer" class="btn-all">+ View All</a></h2>
+            <h2>{intl l="Offers"} <a href="{url path="/view_all" type="offers"}" class="btn-all">{intl l="+ View All"}</a></h2>
         </div>
 
         <div class="products-content">
