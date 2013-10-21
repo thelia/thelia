@@ -35,6 +35,7 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProductQuery orderByWasNew($order = Criteria::ASC) Order by the was_new column
  * @method     ChildOrderProductQuery orderByWasInPromo($order = Criteria::ASC) Order by the was_in_promo column
  * @method     ChildOrderProductQuery orderByWeight($order = Criteria::ASC) Order by the weight column
+ * @method     ChildOrderProductQuery orderByEanCode($order = Criteria::ASC) Order by the ean_code column
  * @method     ChildOrderProductQuery orderByTaxRuleTitle($order = Criteria::ASC) Order by the tax_rule_title column
  * @method     ChildOrderProductQuery orderByTaxRuleDescription($order = Criteria::ASC) Order by the tax_rule_description column
  * @method     ChildOrderProductQuery orderByParent($order = Criteria::ASC) Order by the parent column
@@ -55,6 +56,7 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProductQuery groupByWasNew() Group by the was_new column
  * @method     ChildOrderProductQuery groupByWasInPromo() Group by the was_in_promo column
  * @method     ChildOrderProductQuery groupByWeight() Group by the weight column
+ * @method     ChildOrderProductQuery groupByEanCode() Group by the ean_code column
  * @method     ChildOrderProductQuery groupByTaxRuleTitle() Group by the tax_rule_title column
  * @method     ChildOrderProductQuery groupByTaxRuleDescription() Group by the tax_rule_description column
  * @method     ChildOrderProductQuery groupByParent() Group by the parent column
@@ -94,6 +96,7 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProduct findOneByWasNew(int $was_new) Return the first ChildOrderProduct filtered by the was_new column
  * @method     ChildOrderProduct findOneByWasInPromo(int $was_in_promo) Return the first ChildOrderProduct filtered by the was_in_promo column
  * @method     ChildOrderProduct findOneByWeight(string $weight) Return the first ChildOrderProduct filtered by the weight column
+ * @method     ChildOrderProduct findOneByEanCode(string $ean_code) Return the first ChildOrderProduct filtered by the ean_code column
  * @method     ChildOrderProduct findOneByTaxRuleTitle(string $tax_rule_title) Return the first ChildOrderProduct filtered by the tax_rule_title column
  * @method     ChildOrderProduct findOneByTaxRuleDescription(string $tax_rule_description) Return the first ChildOrderProduct filtered by the tax_rule_description column
  * @method     ChildOrderProduct findOneByParent(int $parent) Return the first ChildOrderProduct filtered by the parent column
@@ -114,6 +117,7 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     array findByWasNew(int $was_new) Return ChildOrderProduct objects filtered by the was_new column
  * @method     array findByWasInPromo(int $was_in_promo) Return ChildOrderProduct objects filtered by the was_in_promo column
  * @method     array findByWeight(string $weight) Return ChildOrderProduct objects filtered by the weight column
+ * @method     array findByEanCode(string $ean_code) Return ChildOrderProduct objects filtered by the ean_code column
  * @method     array findByTaxRuleTitle(string $tax_rule_title) Return ChildOrderProduct objects filtered by the tax_rule_title column
  * @method     array findByTaxRuleDescription(string $tax_rule_description) Return ChildOrderProduct objects filtered by the tax_rule_description column
  * @method     array findByParent(int $parent) Return ChildOrderProduct objects filtered by the parent column
@@ -207,7 +211,7 @@ abstract class OrderProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, ORDER_ID, PRODUCT_REF, PRODUCT_SALE_ELEMENTS_REF, TITLE, CHAPO, DESCRIPTION, POSTSCRIPTUM, QUANTITY, PRICE, PROMO_PRICE, WAS_NEW, WAS_IN_PROMO, WEIGHT, TAX_RULE_TITLE, TAX_RULE_DESCRIPTION, PARENT, CREATED_AT, UPDATED_AT FROM order_product WHERE ID = :p0';
+        $sql = 'SELECT ID, ORDER_ID, PRODUCT_REF, PRODUCT_SALE_ELEMENTS_REF, TITLE, CHAPO, DESCRIPTION, POSTSCRIPTUM, QUANTITY, PRICE, PROMO_PRICE, WAS_NEW, WAS_IN_PROMO, WEIGHT, EAN_CODE, TAX_RULE_TITLE, TAX_RULE_DESCRIPTION, PARENT, CREATED_AT, UPDATED_AT FROM order_product WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -774,6 +778,35 @@ abstract class OrderProductQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderProductTableMap::WEIGHT, $weight, $comparison);
+    }
+
+    /**
+     * Filter the query on the ean_code column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByEanCode('fooValue');   // WHERE ean_code = 'fooValue'
+     * $query->filterByEanCode('%fooValue%'); // WHERE ean_code LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $eanCode The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function filterByEanCode($eanCode = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($eanCode)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $eanCode)) {
+                $eanCode = str_replace('*', '%', $eanCode);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductTableMap::EAN_CODE, $eanCode, $comparison);
     }
 
     /**

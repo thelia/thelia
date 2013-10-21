@@ -146,6 +146,12 @@ abstract class OrderProduct implements ActiveRecordInterface
     protected $weight;
 
     /**
+     * The value for the ean_code field.
+     * @var        string
+     */
+    protected $ean_code;
+
+    /**
      * The value for the tax_rule_title field.
      * @var        string
      */
@@ -625,6 +631,17 @@ abstract class OrderProduct implements ActiveRecordInterface
     }
 
     /**
+     * Get the [ean_code] column value.
+     *
+     * @return   string
+     */
+    public function getEanCode()
+    {
+
+        return $this->ean_code;
+    }
+
+    /**
      * Get the [tax_rule_title] column value.
      *
      * @return   string
@@ -996,6 +1013,27 @@ abstract class OrderProduct implements ActiveRecordInterface
     } // setWeight()
 
     /**
+     * Set the value of [ean_code] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
+     */
+    public function setEanCode($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->ean_code !== $v) {
+            $this->ean_code = $v;
+            $this->modifiedColumns[] = OrderProductTableMap::EAN_CODE;
+        }
+
+
+        return $this;
+    } // setEanCode()
+
+    /**
      * Set the value of [tax_rule_title] column.
      *
      * @param      string $v new value
@@ -1179,22 +1217,25 @@ abstract class OrderProduct implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderProductTableMap::translateFieldName('Weight', TableMap::TYPE_PHPNAME, $indexType)];
             $this->weight = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderProductTableMap::translateFieldName('TaxRuleTitle', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderProductTableMap::translateFieldName('EanCode', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->ean_code = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderProductTableMap::translateFieldName('TaxRuleTitle', TableMap::TYPE_PHPNAME, $indexType)];
             $this->tax_rule_title = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderProductTableMap::translateFieldName('TaxRuleDescription', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderProductTableMap::translateFieldName('TaxRuleDescription', TableMap::TYPE_PHPNAME, $indexType)];
             $this->tax_rule_description = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderProductTableMap::translateFieldName('Parent', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderProductTableMap::translateFieldName('Parent', TableMap::TYPE_PHPNAME, $indexType)];
             $this->parent = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderProductTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OrderProductTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OrderProductTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : OrderProductTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1207,7 +1248,7 @@ abstract class OrderProduct implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 19; // 19 = OrderProductTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 20; // 20 = OrderProductTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\OrderProduct object", 0, $e);
@@ -1523,6 +1564,9 @@ abstract class OrderProduct implements ActiveRecordInterface
         if ($this->isColumnModified(OrderProductTableMap::WEIGHT)) {
             $modifiedColumns[':p' . $index++]  = 'WEIGHT';
         }
+        if ($this->isColumnModified(OrderProductTableMap::EAN_CODE)) {
+            $modifiedColumns[':p' . $index++]  = 'EAN_CODE';
+        }
         if ($this->isColumnModified(OrderProductTableMap::TAX_RULE_TITLE)) {
             $modifiedColumns[':p' . $index++]  = 'TAX_RULE_TITLE';
         }
@@ -1590,6 +1634,9 @@ abstract class OrderProduct implements ActiveRecordInterface
                         break;
                     case 'WEIGHT':
                         $stmt->bindValue($identifier, $this->weight, PDO::PARAM_STR);
+                        break;
+                    case 'EAN_CODE':
+                        $stmt->bindValue($identifier, $this->ean_code, PDO::PARAM_STR);
                         break;
                     case 'TAX_RULE_TITLE':
                         $stmt->bindValue($identifier, $this->tax_rule_title, PDO::PARAM_STR);
@@ -1711,18 +1758,21 @@ abstract class OrderProduct implements ActiveRecordInterface
                 return $this->getWeight();
                 break;
             case 14:
-                return $this->getTaxRuleTitle();
+                return $this->getEanCode();
                 break;
             case 15:
-                return $this->getTaxRuleDescription();
+                return $this->getTaxRuleTitle();
                 break;
             case 16:
-                return $this->getParent();
+                return $this->getTaxRuleDescription();
                 break;
             case 17:
-                return $this->getCreatedAt();
+                return $this->getParent();
                 break;
             case 18:
+                return $this->getCreatedAt();
+                break;
+            case 19:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1768,11 +1818,12 @@ abstract class OrderProduct implements ActiveRecordInterface
             $keys[11] => $this->getWasNew(),
             $keys[12] => $this->getWasInPromo(),
             $keys[13] => $this->getWeight(),
-            $keys[14] => $this->getTaxRuleTitle(),
-            $keys[15] => $this->getTaxRuleDescription(),
-            $keys[16] => $this->getParent(),
-            $keys[17] => $this->getCreatedAt(),
-            $keys[18] => $this->getUpdatedAt(),
+            $keys[14] => $this->getEanCode(),
+            $keys[15] => $this->getTaxRuleTitle(),
+            $keys[16] => $this->getTaxRuleDescription(),
+            $keys[17] => $this->getParent(),
+            $keys[18] => $this->getCreatedAt(),
+            $keys[19] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1866,18 +1917,21 @@ abstract class OrderProduct implements ActiveRecordInterface
                 $this->setWeight($value);
                 break;
             case 14:
-                $this->setTaxRuleTitle($value);
+                $this->setEanCode($value);
                 break;
             case 15:
-                $this->setTaxRuleDescription($value);
+                $this->setTaxRuleTitle($value);
                 break;
             case 16:
-                $this->setParent($value);
+                $this->setTaxRuleDescription($value);
                 break;
             case 17:
-                $this->setCreatedAt($value);
+                $this->setParent($value);
                 break;
             case 18:
+                $this->setCreatedAt($value);
+                break;
+            case 19:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1918,11 +1972,12 @@ abstract class OrderProduct implements ActiveRecordInterface
         if (array_key_exists($keys[11], $arr)) $this->setWasNew($arr[$keys[11]]);
         if (array_key_exists($keys[12], $arr)) $this->setWasInPromo($arr[$keys[12]]);
         if (array_key_exists($keys[13], $arr)) $this->setWeight($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setTaxRuleTitle($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setTaxRuleDescription($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setParent($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setCreatedAt($arr[$keys[17]]);
-        if (array_key_exists($keys[18], $arr)) $this->setUpdatedAt($arr[$keys[18]]);
+        if (array_key_exists($keys[14], $arr)) $this->setEanCode($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setTaxRuleTitle($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setTaxRuleDescription($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setParent($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setCreatedAt($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setUpdatedAt($arr[$keys[19]]);
     }
 
     /**
@@ -1948,6 +2003,7 @@ abstract class OrderProduct implements ActiveRecordInterface
         if ($this->isColumnModified(OrderProductTableMap::WAS_NEW)) $criteria->add(OrderProductTableMap::WAS_NEW, $this->was_new);
         if ($this->isColumnModified(OrderProductTableMap::WAS_IN_PROMO)) $criteria->add(OrderProductTableMap::WAS_IN_PROMO, $this->was_in_promo);
         if ($this->isColumnModified(OrderProductTableMap::WEIGHT)) $criteria->add(OrderProductTableMap::WEIGHT, $this->weight);
+        if ($this->isColumnModified(OrderProductTableMap::EAN_CODE)) $criteria->add(OrderProductTableMap::EAN_CODE, $this->ean_code);
         if ($this->isColumnModified(OrderProductTableMap::TAX_RULE_TITLE)) $criteria->add(OrderProductTableMap::TAX_RULE_TITLE, $this->tax_rule_title);
         if ($this->isColumnModified(OrderProductTableMap::TAX_RULE_DESCRIPTION)) $criteria->add(OrderProductTableMap::TAX_RULE_DESCRIPTION, $this->tax_rule_description);
         if ($this->isColumnModified(OrderProductTableMap::PARENT)) $criteria->add(OrderProductTableMap::PARENT, $this->parent);
@@ -2029,6 +2085,7 @@ abstract class OrderProduct implements ActiveRecordInterface
         $copyObj->setWasNew($this->getWasNew());
         $copyObj->setWasInPromo($this->getWasInPromo());
         $copyObj->setWeight($this->getWeight());
+        $copyObj->setEanCode($this->getEanCode());
         $copyObj->setTaxRuleTitle($this->getTaxRuleTitle());
         $copyObj->setTaxRuleDescription($this->getTaxRuleDescription());
         $copyObj->setParent($this->getParent());
@@ -2607,6 +2664,7 @@ abstract class OrderProduct implements ActiveRecordInterface
         $this->was_new = null;
         $this->was_in_promo = null;
         $this->weight = null;
+        $this->ean_code = null;
         $this->tax_rule_title = null;
         $this->tax_rule_description = null;
         $this->parent = null;

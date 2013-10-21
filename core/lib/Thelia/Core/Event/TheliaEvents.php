@@ -549,6 +549,13 @@ final class TheliaEvents
     const TAX_UPDATE          = "action.updateTax";
     const TAX_DELETE          = "action.deleteTax";
 
+
+    // -- Profile management ---------------------------------------------
+
+    const PROFILE_CREATE          = "action.createProfile";
+    const PROFILE_UPDATE          = "action.updateProfile";
+    const PROFILE_DELETE          = "action.deleteProfile";
+
     // -- Tax Rules management ---------------------------------------------
 
     const TAX_RULE_CREATE          = "action.createTaxRule";

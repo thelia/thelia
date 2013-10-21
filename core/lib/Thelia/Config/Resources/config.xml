@@ -122,13 +122,14 @@
         <form name="thelia.admin.tax.taxlistupdate" class="Thelia\Form\TaxTaxListUpdateForm"/>
         <form name="thelia.admin.tax.add" class="Thelia\Form\TaxCreationForm"/>
 
+        <form name="thelia.admin.profile.add" class="Thelia\Form\ProfileCreationForm"/>
+        <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
+
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>
 
         <form name="thelia.admin.country.creation" class="Thelia\Form\CountryCreationForm"/>
         <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
-
-        <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
 
         <form name="thelia.admin.area.create" class="Thelia\Form\Area\AreaCreateForm"/>
         <form name="thelia.admin.area.modification" class="Thelia\Form\Area\AreaModificationForm"/>

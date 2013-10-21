@@ -23,49 +23,50 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\ExecutionContextInterface;
-use Thelia\Model\ProfileQuery;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
 
 /**
- * Class ProfileModificationForm
+ * Class ProfileCreationForm
  * @package Thelia\Form
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class ProfileModificationForm extends ProfileCreationForm
+class ProfileCreationForm extends BaseForm
 {
-    protected function buildForm()
+    use StandardDescriptionFieldsTrait;
+
+    protected function buildForm($change_mode = false)
     {
-        parent::buildForm(true);
+        $types = ProfileEngine::getInstance()->getProfileTypeList();
+        $typeList = array();
+        $requirementList = array();
+        foreach($types as $type) {
+            $classPath = "\\Thelia\\ProfileEngine\\ProfileType\\$type";
+            $instance = new $classPath();
+            $typeList[$type] = $instance->getTitle();
+            $requirementList[$type] = $instance->getRequirementsList();
+        }
 
         $this->formBuilder
-            ->add("id", "hidden", array(
+            ->add("locale", "text", array(
+                "constraints" => array(new NotBlank())
+            ))
+            ->add("type", "choice", array(
+                "choices" => $typeList,
                 "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(
-                        array(
-                            "methods" => array(
-                                array($this, "verifyProfileId"),
-                            ),
-                        )
-                    ),
-                )
+                ),
+                "label" => Translator::getInstance()->trans("Type"),
+                "label_attr" => array("for" => "type_field"),
             ))
         ;
+
+        $this->addStandardDescFields(array('postscriptum', 'chapo', 'locale'));
     }
 
     public function getName()
     {
-        return "thelia_profile_modification";
-    }
-
-    public function verifyProfileId($value, ExecutionContextInterface $context)
-    {
-        $profile = ProfileQuery::create()
-            ->findPk($value);
-
-        if (null === $profile) {
-            $context->addViolation("Profile ID not found");
-        }
+        return "thelia_profile_creation";
     }
 }

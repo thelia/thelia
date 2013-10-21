@@ -24,12 +24,16 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Core\Translation\Translator;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\TaxEngine\TaxType;
 
+/**
+ * Class TaxCreationForm
+ * @package Thelia\Form
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ */
 class TaxCreationForm extends BaseForm
 {
     use StandardDescriptionFieldsTrait;

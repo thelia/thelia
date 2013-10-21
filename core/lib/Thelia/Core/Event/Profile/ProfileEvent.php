@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,55 +17,38 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Validator\Constraints;
-use Symfony\Component\Validator\ExecutionContextInterface;
-use Thelia\Model\ProfileQuery;
+namespace Thelia\Core\Event\Profile;
 
-/**
- * Class ProfileModificationForm
- * @package Thelia\Form
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- */
-class ProfileModificationForm extends ProfileCreationForm
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Group;
+
+class ProfileEvent extends ActionEvent
 {
-    protected function buildForm()
-    {
-        parent::buildForm(true);
+    protected $group = null;
 
-        $this->formBuilder
-            ->add("id", "hidden", array(
-                "required" => true,
-                "constraints" => array(
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback(
-                        array(
-                            "methods" => array(
-                                array($this, "verifyProfileId"),
-                            ),
-                        )
-                    ),
-                )
-            ))
-        ;
+    public function __construct(Group $group = null)
+    {
+        $this->group = $group;
     }
 
-    public function getName()
+    public function hasGroup()
     {
-        return "thelia_profile_modification";
+        return ! is_null($this->group);
     }
 
-    public function verifyProfileId($value, ExecutionContextInterface $context)
+    public function getGroup()
     {
-        $profile = ProfileQuery::create()
-            ->findPk($value);
+        return $this->group;
+    }
 
-        if (null === $profile) {
-            $context->addViolation("Profile ID not found");
-        }
+    public function setGroup(Group $group)
+    {
+        $this->group = $group;
+
+        return $this;
     }
 }

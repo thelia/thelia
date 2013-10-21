@@ -193,8 +193,8 @@ class AdminTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AdminGroup', '\\Thelia\\Model\\AdminGroup', RelationMap::ONE_TO_MANY, array('id' => 'admin_id', ), 'CASCADE', 'RESTRICT', 'AdminGroups');
-        $this->addRelation('Group', '\\Thelia\\Model\\Group', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Groups');
+        $this->addRelation('AdminProfile', '\\Thelia\\Model\\AdminProfile', RelationMap::ONE_TO_MANY, array('id' => 'admin_id', ), 'CASCADE', 'RESTRICT', 'AdminProfiles');
+        $this->addRelation('Profile', '\\Thelia\\Model\\Profile', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Profiles');
     } // buildRelations()
 
     /**
@@ -216,7 +216,7 @@ class AdminTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                AdminGroupTableMap::clearInstancePool();
+                AdminProfileTableMap::clearInstancePool();
             }
 
     /**

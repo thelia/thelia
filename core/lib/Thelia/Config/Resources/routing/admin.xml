@@ -757,6 +757,15 @@
 
     <!-- end countries routes management -->
 
+    <!-- profiles management -->
+
+    <route id="admin.configuration.profiles.list" path="/admin/configuration/profiles">
+        <default key="_controller">Thelia\Controller\Admin\ProfileController::defaultAction</default>
+        <requirement key="address_id">\d+</requirement>
+    </route>
+
+    <!-- end profiles management -->
+
     <!-- feature and features value management -->
 
     <route id="admin.configuration.features.default" path="/admin/configuration/features">

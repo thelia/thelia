@@ -18,11 +18,11 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Admin as ChildAdmin;
-use Thelia\Model\AdminGroup as ChildAdminGroup;
-use Thelia\Model\AdminGroupQuery as ChildAdminGroupQuery;
+use Thelia\Model\AdminProfile as ChildAdminProfile;
+use Thelia\Model\AdminProfileQuery as ChildAdminProfileQuery;
 use Thelia\Model\AdminQuery as ChildAdminQuery;
-use Thelia\Model\Group as ChildGroup;
-use Thelia\Model\GroupQuery as ChildGroupQuery;
+use Thelia\Model\Profile as ChildProfile;
+use Thelia\Model\ProfileQuery as ChildProfileQuery;
 use Thelia\Model\Map\AdminTableMap;
 
 abstract class Admin implements ActiveRecordInterface
@@ -126,15 +126,15 @@ abstract class Admin implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        ObjectCollection|ChildAdminGroup[] Collection to store aggregation of ChildAdminGroup objects.
+     * @var        ObjectCollection|ChildAdminProfile[] Collection to store aggregation of ChildAdminProfile objects.
      */
-    protected $collAdminGroups;
-    protected $collAdminGroupsPartial;
+    protected $collAdminProfiles;
+    protected $collAdminProfilesPartial;
 
     /**
-     * @var        ChildGroup[] Collection to store aggregation of ChildGroup objects.
+     * @var        ChildProfile[] Collection to store aggregation of ChildProfile objects.
      */
-    protected $collGroups;
+    protected $collProfiles;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -148,13 +148,13 @@ abstract class Admin implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $groupsScheduledForDeletion = null;
+    protected $profilesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $adminGroupsScheduledForDeletion = null;
+    protected $adminProfilesScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Thelia\Model\Base\Admin object.
@@ -928,9 +928,9 @@ abstract class Admin implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collAdminGroups = null;
+            $this->collAdminProfiles = null;
 
-            $this->collGroups = null;
+            $this->collProfiles = null;
         } // if (deep)
     }
 
@@ -1064,44 +1064,44 @@ abstract class Admin implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->groupsScheduledForDeletion !== null) {
-                if (!$this->groupsScheduledForDeletion->isEmpty()) {
+            if ($this->profilesScheduledForDeletion !== null) {
+                if (!$this->profilesScheduledForDeletion->isEmpty()) {
                     $pks = array();
                     $pk  = $this->getPrimaryKey();
-                    foreach ($this->groupsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                    foreach ($this->profilesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
                         $pks[] = array($remotePk, $pk);
                     }
 
-                    AdminGroupQuery::create()
+                    AdminProfileQuery::create()
                         ->filterByPrimaryKeys($pks)
                         ->delete($con);
-                    $this->groupsScheduledForDeletion = null;
+                    $this->profilesScheduledForDeletion = null;
                 }
 
-                foreach ($this->getGroups() as $group) {
-                    if ($group->isModified()) {
-                        $group->save($con);
+                foreach ($this->getProfiles() as $profile) {
+                    if ($profile->isModified()) {
+                        $profile->save($con);
                     }
                 }
-            } elseif ($this->collGroups) {
-                foreach ($this->collGroups as $group) {
-                    if ($group->isModified()) {
-                        $group->save($con);
+            } elseif ($this->collProfiles) {
+                foreach ($this->collProfiles as $profile) {
+                    if ($profile->isModified()) {
+                        $profile->save($con);
                     }
                 }
             }
 
-            if ($this->adminGroupsScheduledForDeletion !== null) {
-                if (!$this->adminGroupsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\AdminGroupQuery::create()
-                        ->filterByPrimaryKeys($this->adminGroupsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->adminProfilesScheduledForDeletion !== null) {
+                if (!$this->adminProfilesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\AdminProfileQuery::create()
+                        ->filterByPrimaryKeys($this->adminProfilesScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->adminGroupsScheduledForDeletion = null;
+                    $this->adminProfilesScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collAdminGroups !== null) {
-            foreach ($this->collAdminGroups as $referrerFK) {
+                if ($this->collAdminProfiles !== null) {
+            foreach ($this->collAdminProfiles as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1353,8 +1353,8 @@ abstract class Admin implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collAdminGroups) {
-                $result['AdminGroups'] = $this->collAdminGroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collAdminProfiles) {
+                $result['AdminProfiles'] = $this->collAdminProfiles->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1559,9 +1559,9 @@ abstract class Admin implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getAdminGroups() as $relObj) {
+            foreach ($this->getAdminProfiles() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAdminGroup($relObj->copy($deepCopy));
+                    $copyObj->addAdminProfile($relObj->copy($deepCopy));
                 }
             }
 
@@ -1606,37 +1606,37 @@ abstract class Admin implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('AdminGroup' == $relationName) {
-            return $this->initAdminGroups();
+        if ('AdminProfile' == $relationName) {
+            return $this->initAdminProfiles();
         }
     }
 
     /**
-     * Clears out the collAdminGroups collection
+     * Clears out the collAdminProfiles collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addAdminGroups()
+     * @see        addAdminProfiles()
      */
-    public function clearAdminGroups()
+    public function clearAdminProfiles()
     {
-        $this->collAdminGroups = null; // important to set this to NULL since that means it is uninitialized
+        $this->collAdminProfiles = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collAdminGroups collection loaded partially.
+     * Reset is the collAdminProfiles collection loaded partially.
      */
-    public function resetPartialAdminGroups($v = true)
+    public function resetPartialAdminProfiles($v = true)
     {
-        $this->collAdminGroupsPartial = $v;
+        $this->collAdminProfilesPartial = $v;
     }
 
     /**
-     * Initializes the collAdminGroups collection.
+     * Initializes the collAdminProfiles collection.
      *
-     * By default this just sets the collAdminGroups collection to an empty array (like clearcollAdminGroups());
+     * By default this just sets the collAdminProfiles collection to an empty array (like clearcollAdminProfiles());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1645,17 +1645,17 @@ abstract class Admin implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initAdminGroups($overrideExisting = true)
+    public function initAdminProfiles($overrideExisting = true)
     {
-        if (null !== $this->collAdminGroups && !$overrideExisting) {
+        if (null !== $this->collAdminProfiles && !$overrideExisting) {
             return;
         }
-        $this->collAdminGroups = new ObjectCollection();
-        $this->collAdminGroups->setModel('\Thelia\Model\AdminGroup');
+        $this->collAdminProfiles = new ObjectCollection();
+        $this->collAdminProfiles->setModel('\Thelia\Model\AdminProfile');
     }
 
     /**
-     * Gets an array of ChildAdminGroup objects which contain a foreign key that references this object.
+     * Gets an array of ChildAdminProfile objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1665,112 +1665,112 @@ abstract class Admin implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildAdminGroup[] List of ChildAdminGroup objects
+     * @return Collection|ChildAdminProfile[] List of ChildAdminProfile objects
      * @throws PropelException
      */
-    public function getAdminGroups($criteria = null, ConnectionInterface $con = null)
+    public function getAdminProfiles($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collAdminGroupsPartial && !$this->isNew();
-        if (null === $this->collAdminGroups || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collAdminGroups) {
+        $partial = $this->collAdminProfilesPartial && !$this->isNew();
+        if (null === $this->collAdminProfiles || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAdminProfiles) {
                 // return empty collection
-                $this->initAdminGroups();
+                $this->initAdminProfiles();
             } else {
-                $collAdminGroups = ChildAdminGroupQuery::create(null, $criteria)
+                $collAdminProfiles = ChildAdminProfileQuery::create(null, $criteria)
                     ->filterByAdmin($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collAdminGroupsPartial && count($collAdminGroups)) {
-                        $this->initAdminGroups(false);
+                    if (false !== $this->collAdminProfilesPartial && count($collAdminProfiles)) {
+                        $this->initAdminProfiles(false);
 
-                        foreach ($collAdminGroups as $obj) {
-                            if (false == $this->collAdminGroups->contains($obj)) {
-                                $this->collAdminGroups->append($obj);
+                        foreach ($collAdminProfiles as $obj) {
+                            if (false == $this->collAdminProfiles->contains($obj)) {
+                                $this->collAdminProfiles->append($obj);
                             }
                         }
 
-                        $this->collAdminGroupsPartial = true;
+                        $this->collAdminProfilesPartial = true;
                     }
 
-                    $collAdminGroups->getInternalIterator()->rewind();
+                    $collAdminProfiles->getInternalIterator()->rewind();
 
-                    return $collAdminGroups;
+                    return $collAdminProfiles;
                 }
 
-                if ($partial && $this->collAdminGroups) {
-                    foreach ($this->collAdminGroups as $obj) {
+                if ($partial && $this->collAdminProfiles) {
+                    foreach ($this->collAdminProfiles as $obj) {
                         if ($obj->isNew()) {
-                            $collAdminGroups[] = $obj;
+                            $collAdminProfiles[] = $obj;
                         }
                     }
                 }
 
-                $this->collAdminGroups = $collAdminGroups;
-                $this->collAdminGroupsPartial = false;
+                $this->collAdminProfiles = $collAdminProfiles;
+                $this->collAdminProfilesPartial = false;
             }
         }
 
-        return $this->collAdminGroups;
+        return $this->collAdminProfiles;
     }
 
     /**
-     * Sets a collection of AdminGroup objects related by a one-to-many relationship
+     * Sets a collection of AdminProfile objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $adminGroups A Propel collection.
+     * @param      Collection $adminProfiles A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildAdmin The current object (for fluent API support)
      */
-    public function setAdminGroups(Collection $adminGroups, ConnectionInterface $con = null)
+    public function setAdminProfiles(Collection $adminProfiles, ConnectionInterface $con = null)
     {
-        $adminGroupsToDelete = $this->getAdminGroups(new Criteria(), $con)->diff($adminGroups);
+        $adminProfilesToDelete = $this->getAdminProfiles(new Criteria(), $con)->diff($adminProfiles);
 
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
         //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->adminGroupsScheduledForDeletion = clone $adminGroupsToDelete;
+        $this->adminProfilesScheduledForDeletion = clone $adminProfilesToDelete;
 
-        foreach ($adminGroupsToDelete as $adminGroupRemoved) {
-            $adminGroupRemoved->setAdmin(null);
+        foreach ($adminProfilesToDelete as $adminProfileRemoved) {
+            $adminProfileRemoved->setAdmin(null);
         }
 
-        $this->collAdminGroups = null;
-        foreach ($adminGroups as $adminGroup) {
-            $this->addAdminGroup($adminGroup);
+        $this->collAdminProfiles = null;
+        foreach ($adminProfiles as $adminProfile) {
+            $this->addAdminProfile($adminProfile);
         }
 
-        $this->collAdminGroups = $adminGroups;
-        $this->collAdminGroupsPartial = false;
+        $this->collAdminProfiles = $adminProfiles;
+        $this->collAdminProfilesPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related AdminGroup objects.
+     * Returns the number of related AdminProfile objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related AdminGroup objects.
+     * @return int             Count of related AdminProfile objects.
      * @throws PropelException
      */
-    public function countAdminGroups(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countAdminProfiles(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collAdminGroupsPartial && !$this->isNew();
-        if (null === $this->collAdminGroups || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collAdminGroups) {
+        $partial = $this->collAdminProfilesPartial && !$this->isNew();
+        if (null === $this->collAdminProfiles || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAdminProfiles) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getAdminGroups());
+                return count($this->getAdminProfiles());
             }
 
-            $query = ChildAdminGroupQuery::create(null, $criteria);
+            $query = ChildAdminProfileQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1780,53 +1780,53 @@ abstract class Admin implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collAdminGroups);
+        return count($this->collAdminProfiles);
     }
 
     /**
-     * Method called to associate a ChildAdminGroup object to this object
-     * through the ChildAdminGroup foreign key attribute.
+     * Method called to associate a ChildAdminProfile object to this object
+     * through the ChildAdminProfile foreign key attribute.
      *
-     * @param    ChildAdminGroup $l ChildAdminGroup
+     * @param    ChildAdminProfile $l ChildAdminProfile
      * @return   \Thelia\Model\Admin The current object (for fluent API support)
      */
-    public function addAdminGroup(ChildAdminGroup $l)
+    public function addAdminProfile(ChildAdminProfile $l)
     {
-        if ($this->collAdminGroups === null) {
-            $this->initAdminGroups();
-            $this->collAdminGroupsPartial = true;
+        if ($this->collAdminProfiles === null) {
+            $this->initAdminProfiles();
+            $this->collAdminProfilesPartial = true;
         }
 
-        if (!in_array($l, $this->collAdminGroups->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddAdminGroup($l);
+        if (!in_array($l, $this->collAdminProfiles->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddAdminProfile($l);
         }
 
         return $this;
     }
 
     /**
-     * @param AdminGroup $adminGroup The adminGroup object to add.
+     * @param AdminProfile $adminProfile The adminProfile object to add.
      */
-    protected function doAddAdminGroup($adminGroup)
+    protected function doAddAdminProfile($adminProfile)
     {
-        $this->collAdminGroups[]= $adminGroup;
-        $adminGroup->setAdmin($this);
+        $this->collAdminProfiles[]= $adminProfile;
+        $adminProfile->setAdmin($this);
     }
 
     /**
-     * @param  AdminGroup $adminGroup The adminGroup object to remove.
+     * @param  AdminProfile $adminProfile The adminProfile object to remove.
      * @return ChildAdmin The current object (for fluent API support)
      */
-    public function removeAdminGroup($adminGroup)
+    public function removeAdminProfile($adminProfile)
     {
-        if ($this->getAdminGroups()->contains($adminGroup)) {
-            $this->collAdminGroups->remove($this->collAdminGroups->search($adminGroup));
-            if (null === $this->adminGroupsScheduledForDeletion) {
-                $this->adminGroupsScheduledForDeletion = clone $this->collAdminGroups;
-                $this->adminGroupsScheduledForDeletion->clear();
+        if ($this->getAdminProfiles()->contains($adminProfile)) {
+            $this->collAdminProfiles->remove($this->collAdminProfiles->search($adminProfile));
+            if (null === $this->adminProfilesScheduledForDeletion) {
+                $this->adminProfilesScheduledForDeletion = clone $this->collAdminProfiles;
+                $this->adminProfilesScheduledForDeletion->clear();
             }
-            $this->adminGroupsScheduledForDeletion[]= clone $adminGroup;
-            $adminGroup->setAdmin(null);
+            $this->adminProfilesScheduledForDeletion[]= clone $adminProfile;
+            $adminProfile->setAdmin(null);
         }
 
         return $this;
@@ -1838,7 +1838,7 @@ abstract class Admin implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this Admin is new, it will return
      * an empty collection; or if this Admin has previously
-     * been saved, it will retrieve related AdminGroups from storage.
+     * been saved, it will retrieve related AdminProfiles from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1847,49 +1847,49 @@ abstract class Admin implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildAdminGroup[] List of ChildAdminGroup objects
+     * @return Collection|ChildAdminProfile[] List of ChildAdminProfile objects
      */
-    public function getAdminGroupsJoinGroup($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getAdminProfilesJoinProfile($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildAdminGroupQuery::create(null, $criteria);
-        $query->joinWith('Group', $joinBehavior);
+        $query = ChildAdminProfileQuery::create(null, $criteria);
+        $query->joinWith('Profile', $joinBehavior);
 
-        return $this->getAdminGroups($query, $con);
+        return $this->getAdminProfiles($query, $con);
     }
 
     /**
-     * Clears out the collGroups collection
+     * Clears out the collProfiles collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addGroups()
+     * @see        addProfiles()
      */
-    public function clearGroups()
+    public function clearProfiles()
     {
-        $this->collGroups = null; // important to set this to NULL since that means it is uninitialized
-        $this->collGroupsPartial = null;
+        $this->collProfiles = null; // important to set this to NULL since that means it is uninitialized
+        $this->collProfilesPartial = null;
     }
 
     /**
-     * Initializes the collGroups collection.
+     * Initializes the collProfiles collection.
      *
-     * By default this just sets the collGroups collection to an empty collection (like clearGroups());
+     * By default this just sets the collProfiles collection to an empty collection (like clearProfiles());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
      * @return void
      */
-    public function initGroups()
+    public function initProfiles()
     {
-        $this->collGroups = new ObjectCollection();
-        $this->collGroups->setModel('\Thelia\Model\Group');
+        $this->collProfiles = new ObjectCollection();
+        $this->collProfiles->setModel('\Thelia\Model\Profile');
     }
 
     /**
-     * Gets a collection of ChildGroup objects related by a many-to-many relationship
-     * to the current object by way of the admin_group cross-reference table.
+     * Gets a collection of ChildProfile objects related by a many-to-many relationship
+     * to the current object by way of the admin_profile cross-reference table.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1900,73 +1900,73 @@ abstract class Admin implements ActiveRecordInterface
      * @param      Criteria $criteria Optional query object to filter the query
      * @param      ConnectionInterface $con Optional connection object
      *
-     * @return ObjectCollection|ChildGroup[] List of ChildGroup objects
+     * @return ObjectCollection|ChildProfile[] List of ChildProfile objects
      */
-    public function getGroups($criteria = null, ConnectionInterface $con = null)
+    public function getProfiles($criteria = null, ConnectionInterface $con = null)
     {
-        if (null === $this->collGroups || null !== $criteria) {
-            if ($this->isNew() && null === $this->collGroups) {
+        if (null === $this->collProfiles || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProfiles) {
                 // return empty collection
-                $this->initGroups();
+                $this->initProfiles();
             } else {
-                $collGroups = ChildGroupQuery::create(null, $criteria)
+                $collProfiles = ChildProfileQuery::create(null, $criteria)
                     ->filterByAdmin($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    return $collGroups;
+                    return $collProfiles;
                 }
-                $this->collGroups = $collGroups;
+                $this->collProfiles = $collProfiles;
             }
         }
 
-        return $this->collGroups;
+        return $this->collProfiles;
     }
 
     /**
-     * Sets a collection of Group objects related by a many-to-many relationship
-     * to the current object by way of the admin_group cross-reference table.
+     * Sets a collection of Profile objects related by a many-to-many relationship
+     * to the current object by way of the admin_profile cross-reference table.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection $groups A Propel collection.
+     * @param  Collection $profiles A Propel collection.
      * @param  ConnectionInterface $con Optional connection object
      * @return ChildAdmin The current object (for fluent API support)
      */
-    public function setGroups(Collection $groups, ConnectionInterface $con = null)
+    public function setProfiles(Collection $profiles, ConnectionInterface $con = null)
     {
-        $this->clearGroups();
-        $currentGroups = $this->getGroups();
+        $this->clearProfiles();
+        $currentProfiles = $this->getProfiles();
 
-        $this->groupsScheduledForDeletion = $currentGroups->diff($groups);
+        $this->profilesScheduledForDeletion = $currentProfiles->diff($profiles);
 
-        foreach ($groups as $group) {
-            if (!$currentGroups->contains($group)) {
-                $this->doAddGroup($group);
+        foreach ($profiles as $profile) {
+            if (!$currentProfiles->contains($profile)) {
+                $this->doAddProfile($profile);
             }
         }
 
-        $this->collGroups = $groups;
+        $this->collProfiles = $profiles;
 
         return $this;
     }
 
     /**
-     * Gets the number of ChildGroup objects related by a many-to-many relationship
-     * to the current object by way of the admin_group cross-reference table.
+     * Gets the number of ChildProfile objects related by a many-to-many relationship
+     * to the current object by way of the admin_profile cross-reference table.
      *
      * @param      Criteria $criteria Optional query object to filter the query
      * @param      boolean $distinct Set to true to force count distinct
      * @param      ConnectionInterface $con Optional connection object
      *
-     * @return int the number of related ChildGroup objects
+     * @return int the number of related ChildProfile objects
      */
-    public function countGroups($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countProfiles($criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        if (null === $this->collGroups || null !== $criteria) {
-            if ($this->isNew() && null === $this->collGroups) {
+        if (null === $this->collProfiles || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProfiles) {
                 return 0;
             } else {
-                $query = ChildGroupQuery::create(null, $criteria);
+                $query = ChildProfileQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -1976,65 +1976,65 @@ abstract class Admin implements ActiveRecordInterface
                     ->count($con);
             }
         } else {
-            return count($this->collGroups);
+            return count($this->collProfiles);
         }
     }
 
     /**
-     * Associate a ChildGroup object to this object
-     * through the admin_group cross reference table.
+     * Associate a ChildProfile object to this object
+     * through the admin_profile cross reference table.
      *
-     * @param  ChildGroup $group The ChildAdminGroup object to relate
+     * @param  ChildProfile $profile The ChildAdminProfile object to relate
      * @return ChildAdmin The current object (for fluent API support)
      */
-    public function addGroup(ChildGroup $group)
+    public function addProfile(ChildProfile $profile)
     {
-        if ($this->collGroups === null) {
-            $this->initGroups();
+        if ($this->collProfiles === null) {
+            $this->initProfiles();
         }
 
-        if (!$this->collGroups->contains($group)) { // only add it if the **same** object is not already associated
-            $this->doAddGroup($group);
-            $this->collGroups[] = $group;
+        if (!$this->collProfiles->contains($profile)) { // only add it if the **same** object is not already associated
+            $this->doAddProfile($profile);
+            $this->collProfiles[] = $profile;
         }
 
         return $this;
     }
 
     /**
-     * @param    Group $group The group object to add.
+     * @param    Profile $profile The profile object to add.
      */
-    protected function doAddGroup($group)
+    protected function doAddProfile($profile)
     {
-        $adminGroup = new ChildAdminGroup();
-        $adminGroup->setGroup($group);
-        $this->addAdminGroup($adminGroup);
+        $adminProfile = new ChildAdminProfile();
+        $adminProfile->setProfile($profile);
+        $this->addAdminProfile($adminProfile);
         // set the back reference to this object directly as using provided method either results
         // in endless loop or in multiple relations
-        if (!$group->getAdmins()->contains($this)) {
-            $foreignCollection   = $group->getAdmins();
+        if (!$profile->getAdmins()->contains($this)) {
+            $foreignCollection   = $profile->getAdmins();
             $foreignCollection[] = $this;
         }
     }
 
     /**
-     * Remove a ChildGroup object to this object
-     * through the admin_group cross reference table.
+     * Remove a ChildProfile object to this object
+     * through the admin_profile cross reference table.
      *
-     * @param ChildGroup $group The ChildAdminGroup object to relate
+     * @param ChildProfile $profile The ChildAdminProfile object to relate
      * @return ChildAdmin The current object (for fluent API support)
      */
-    public function removeGroup(ChildGroup $group)
+    public function removeProfile(ChildProfile $profile)
     {
-        if ($this->getGroups()->contains($group)) {
-            $this->collGroups->remove($this->collGroups->search($group));
+        if ($this->getProfiles()->contains($profile)) {
+            $this->collProfiles->remove($this->collProfiles->search($profile));
 
-            if (null === $this->groupsScheduledForDeletion) {
-                $this->groupsScheduledForDeletion = clone $this->collGroups;
-                $this->groupsScheduledForDeletion->clear();
+            if (null === $this->profilesScheduledForDeletion) {
+                $this->profilesScheduledForDeletion = clone $this->collProfiles;
+                $this->profilesScheduledForDeletion->clear();
             }
 
-            $this->groupsScheduledForDeletion[] = $group;
+            $this->profilesScheduledForDeletion[] = $profile;
         }
 
         return $this;
@@ -2075,26 +2075,26 @@ abstract class Admin implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collAdminGroups) {
-                foreach ($this->collAdminGroups as $o) {
+            if ($this->collAdminProfiles) {
+                foreach ($this->collAdminProfiles as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collGroups) {
-                foreach ($this->collGroups as $o) {
+            if ($this->collProfiles) {
+                foreach ($this->collProfiles as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
-        if ($this->collAdminGroups instanceof Collection) {
-            $this->collAdminGroups->clearIterator();
+        if ($this->collAdminProfiles instanceof Collection) {
+            $this->collAdminProfiles->clearIterator();
         }
-        $this->collAdminGroups = null;
-        if ($this->collGroups instanceof Collection) {
-            $this->collGroups->clearIterator();
+        $this->collAdminProfiles = null;
+        if ($this->collProfiles instanceof Collection) {
+            $this->collProfiles->clearIterator();
         }
-        $this->collGroups = null;
+        $this->collProfiles = null;
     }
 
     /**
