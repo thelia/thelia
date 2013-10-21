@@ -666,6 +666,11 @@ final class TheliaEvents
     const MODULE_TOGGLE_ACTIVATION = 'thelia.module.toggleActivation';
 
     /**
+     * sent when a module is deleted
+     */
+    const MODULE_DELETE = 'thelia.module.delete';
+
+    /**
      * sent for clearing cache
      */
     const CACHE_CLEAR = 'thelia.cache.clear';

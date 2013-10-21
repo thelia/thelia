@@ -825,6 +825,10 @@
         <requirement key="module_id">\d+</requirement>
     </route>
 
+    <route id="admin.module.delete" path="/admin/configuration/modules/delete">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::deleteAction</default>
+    </route>
+
     <!-- end Modules rule management -->
 
     <!-- tax management -->

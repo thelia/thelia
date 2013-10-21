@@ -40,8 +40,7 @@
 {* Delete module confirmation dialog *}
 
 {capture "delete_module_dialog"}
-    <input type="hidden" name="current_module_id" value="{$current_module_id}" />
-    <input type="hidden" name="module_id" id="delete_module_id" value"" />
+    <input type="hidden" name="module_id" id="delete_module_id" value="" />
 {/capture}
 
 {include
@@ -51,7 +50,7 @@
     dialog_title    = {intl l="Delete a module"}
     dialog_message  = {intl l="Do you really want to delete this module ?"}
 
-    form_action         = {url path='/admin/modules/delete'}
+    form_action         = {url path='/admin/configuration/modules/delete'}
     form_content        = {$smarty.capture.delete_module_dialog nofilter}
 }
 
@@ -94,6 +93,10 @@
                     $("#module-failed").modal("show");
                });
 
+           });
+
+           $(".module-delete-action").click(function(){
+                $("#delete_module_id").val($(this).data("id"));
            });
         });
     </script>

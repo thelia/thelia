@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Module\ModuleManagement;
@@ -81,5 +82,22 @@ class ModuleController extends BaseAdminController
         }
 
         return $response;
+    }
+
+    public function deleteAction()
+    {
+        if (null !== $response = $this->checkAuth("admin.module.delete")) return $response;
+
+        try {
+
+            $module_id = $this->getRequest()->get('module_id');
+
+            $deleteEvent = new ModuleDeleteEvent($module_id);
+
+            $this->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);
+
+        } catch (\Exception $e) {
+
+        }
     }
 }

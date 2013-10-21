@@ -48,7 +48,7 @@
                             {/loop}
 
                             {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.modules.delete"}
-                                <a class="btn btn-default btn-xs" title="{intl l='Delete this module'}"  href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                <a class="btn btn-default btn-xs module-delete-action" title="{intl l='Delete this module'}"  href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                             {/loop}
                         </div>
                     </td>

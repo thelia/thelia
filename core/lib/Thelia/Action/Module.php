@@ -22,10 +22,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
+use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
@@ -59,6 +62,11 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function delete(ModuleDeleteEvent $event)
+    {
+        
+    }
+
     protected function cacheClear()
     {
         $cacheEvent = new CacheEvent($this->container->getParameter('kernel.cache_dir'));
@@ -89,7 +97,8 @@ class Module extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleActivation', 128)
+            TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleActivation', 128),
+            TheliaEvents::MODULE_DELETE => array('delete', 128)
         );
     }
 }
