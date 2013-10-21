@@ -36,7 +36,11 @@ trait ModelEventDispatcherTrait {
      */
     protected $dispatcher = null;
 
-
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     *
+     * @return $this
+     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;

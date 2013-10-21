@@ -236,6 +236,23 @@ class TaxRuleController extends AbstractCrudController
         return parent::updateAction();
     }
 
+    public function setDefaultAction()
+    {
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+
+        $setDefaultEvent = new TaxRuleEvent();
+
+        $taxRuleId = $this->getRequest()->attributes->get('tax_rule_id');
+
+        $setDefaultEvent->setId(
+            $taxRuleId
+        );
+
+        $this->dispatch(TheliaEvents::TAX_RULE_SET_DEFAULT, $setDefaultEvent);
+
+        $this->redirectToListTemplate();
+    }
+
     public function processUpdateTaxesAction()
     {
         // Check current user authorization

@@ -1,11 +1,18 @@
 /* JQUERY PREVENT CONFLICT */
 (function($) {
 
-
     /*	------------------------------------------------------------------
      onLoad Function -------------------------------------------------- */
     $(document).ready(function(){
 
+        // Loader
+        var $loader = $('<div class="loader"></div>');
+        $('body').append($loader);
+
+        // Display loader if we do ajax call
+        $(document)
+            .ajaxStart(function() { $loader.show(); })
+            .ajaxStop(function(){ $loader.hide(); });
 
         // Main Navigation Hover
         $('.nav-main')
@@ -30,6 +37,29 @@
             selector: '[data-toggle=tooltip]'
         });
 
+        // Confirm Dialog
+        $(document).on('click.confirm', '[data-toggle="confirm"]', function (e) {
+            var $this   = $(this),
+                href    = $this.attr('href'),
+                title   = $this.attr('data-confirm-title') ? $this.attr('data-confirm-title') : 'Are you sure?';
+
+                bootbox.confirm(title, function(confirm) {
+                    if(confirm){
+                        if(href){
+                            window.location.href = href;
+                        } else {
+                            // If forms
+                            var $form = $this.closest("form");
+                            if($form.size() > 0){
+                                $form.submit();
+                            }
+                        }
+                    }
+                });
+
+            return false;
+        });
+
         // Toolbar
         var $category_products = $('#category-products');
         if($category_products.size() > 0){
@@ -40,7 +70,9 @@
                 if( ($(this).hasClass('btn-grid') && $parent.hasClass('grid')) || ($(this).hasClass('btn-list') && $parent.hasClass('list')))
                     return;
 
-                $parent.toggleClass('grid').toggleClass('list');
+                // Add loader effect
+                $loader.show();
+                setTimeout(function(){ $parent.toggleClass('grid').toggleClass('list'); $loader.hide(); }, 400);
 
                 return false;
             });
@@ -89,6 +121,7 @@
 
             $form
                 .on('change.filter', ':checkbox', function(){
+                    $loader.show();
                     $form.submit();
                 })
                 .find('.group-btn > .btn').addClass('sr-only');
@@ -125,6 +158,78 @@
                 $label.filter('[for="' + $(this).attr('id') + '"]').addClass('active');
             }).filter(':has(:checked)').addClass('active');
         });
+
+
+        if($("body").is(".page-product")){
+
+            var $quantityInput  = $("#quantity");
+
+
+            var $btnAddToCart   = $(".btn_add_to_cart", $("#form-product-details"));
+
+            var $productMeta    = $("#stockInformations");
+
+            var $inStock        = $(".in",$productMeta);
+            var $outOfStock     = $(".out",$productMeta);
+
+            var $old_price_container    = $(".old-price", $("#product-details"));
+
+
+            // Switch Quantity in product page
+            $("select", $(".product-options")).change(function(){
+                var $select_quantity        = $(this).find(":selected").attr("data-quantity");
+                var $old_price              = $(this).find(":selected").attr("data-old-price");
+
+                var $best_price             = $(this).find(":selected").attr("data-price");
+
+                $quantityInput.attr("max", $select_quantity);
+
+                // Show Out Of Stock OR In Stock
+                if($select_quantity == 0){
+                    $btnAddToCart.attr("disabled", true);
+
+                    $productMeta.removeClass("in-stock");
+                    $productMeta.addClass("out-of-stock");
+
+                    $productMeta.attr("href", "http://schema.org/OutOfStock");
+
+                    $outOfStock.show();
+                    $inStock.hide();
+
+                }else{
+                    $btnAddToCart.attr("disabled", false);
+
+                    $productMeta.removeClass("out-of-stock");
+                    $productMeta.addClass("in-stock");
+
+                    $productMeta.attr("href", "http://schema.org/InStock");
+
+                    $inStock.show();
+                    $outOfStock.hide();
+                }
+
+                if(parseInt($quantityInput.val()) > parseInt($select_quantity)){
+                    $quantityInput.val($select_quantity);
+                }
+
+                if($old_price_container.size() > 0 ){
+                    $(".price", $old_price_container).html($old_price);
+                    $(".price", $(".special-price")).html($best_price);
+                }else{
+                    $(".price", $(".regular-price")).html($best_price);
+                }
+
+            }).change();
+
+            $quantityInput.focusout(function() {
+                $quantityInput.attr("max", $select_quantity);
+                if(parseInt($quantityInput.val()) > parseInt($select_quantity)){
+                    $quantityInput.val($select_quantity);
+                }
+            });
+        }
+
+
 
         $('#limit-top').change(function(e){
             window.location = $(this).val()

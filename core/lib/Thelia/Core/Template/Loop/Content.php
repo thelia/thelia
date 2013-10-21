@@ -86,6 +86,7 @@ class Content extends BaseI18nLoop
      */
     public function exec(&$pagination)
     {
+
         $search = ContentQuery::create();
 
         /* manage translations */
@@ -138,27 +139,15 @@ class Content extends BaseI18nLoop
         $current_folder = $this->getCurrent_folder();
 
         if ($current_folder === true) {
-            $search->filterByFolder(
-                FolderQuery::create()->filterByContent(
-                    ContentFolderQuery::create()->filterByContentId(
-                        $this->request->get("content_id"),
-                        Criteria::EQUAL
-                    )->find(),
-                    Criteria::IN
-                )->find(),
-                Criteria::IN
-            );
+            $current = ContentQuery::create()->findPk($this->request->get("content_id"));
+
+            $search->filterByFolder($current->getFolders(), Criteria::IN);
+
         } elseif ($current_folder === false) {
-            $search->filterByFolder(
-                FolderQuery::create()->filterByContent(
-                    ContentFolderQuery::create()->filterByContentId(
-                        $this->request->get("content_id"),
-                        Criteria::EQUAL
-                    )->find(),
-                    Criteria::IN
-                )->find(),
-                Criteria::NOT_IN
-            );
+
+            $current = ContentQuery::create()->findPk($this->request->get("content_id"));
+
+            $search->filterByFolder($current->getFolders(), Criteria::NOT_IN);
         }
 
         $visible = $this->getVisible();

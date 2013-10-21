@@ -4,10 +4,13 @@ namespace Thelia\Model;
 
 use Thelia\Exception\TaxEngineException;
 use Thelia\Model\Base\Tax as BaseTax;
+use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\TaxEngine\TaxType\BaseTaxType;
 
 class Tax extends BaseTax
 {
+    use ModelEventDispatcherTrait;
+
     public function calculateTax($amount)
     {
         if(false === filter_var($amount, FILTER_VALIDATE_FLOAT)) {

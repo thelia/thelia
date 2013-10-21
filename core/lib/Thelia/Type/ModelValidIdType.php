@@ -30,7 +30,7 @@ use Thelia\Exception\TypeException;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class ModelValidIdType implements TypeInterface
+class ModelValidIdType extends BaseType
 {
     protected $expectedModelActiveRecordQuery = null;
 
@@ -66,5 +66,24 @@ class ModelValidIdType implements TypeInterface
         $queryClass = $this->expectedModelActiveRecordQuery;
 
         return $this->isValid($value) ? $queryClass::create()->findPk($value) : null;
+    }
+
+    public function getFormType()
+    {
+        return 'choice';
+    }
+
+    public function getFormOptions()
+    {
+        $queryClass = $this->expectedModelActiveRecordQuery;
+
+        $choices = array();
+        foreach($queryClass::create()->find() as $item) {
+            $choices[$item->getId()] = method_exists($item, "getTitle") ? $item->getTitle() : $item->getId();
+        }
+
+        return array(
+            "choices" => $choices,
+        );
     }
 }

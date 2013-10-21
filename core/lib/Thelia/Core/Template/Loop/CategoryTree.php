@@ -84,10 +84,14 @@ class CategoryTree extends BaseI18nLoop
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow
-                ->set("ID", $result->getId())->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
-                ->set("PARENT", $result->getParent())->set("URL", $result->getUrl($locale))
-                ->set("VISIBLE", $result->getVisible() ? "1" : "0")->set("LEVEL", $level)
-                ->set('CHILD_COUNT', $result->countChild())->set('PREV_LEVEL', $previousLevel)
+                ->set("ID", $result->getId())
+                ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
+                ->set("PARENT", $result->getParent())
+                ->set("URL", $result->getUrl($locale))
+                ->set("VISIBLE", $result->getVisible() ? "1" : "0")
+                ->set("LEVEL", $level)
+                ->set('CHILD_COUNT', $result->countChild())
+                ->set('PREV_LEVEL', $previousLevel)
             ;
 
             $loopResult->addRow($loopResultRow);

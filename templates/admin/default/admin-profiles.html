@@ -1,0 +1,219 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Admin profiles'}{/block}
+
+{block name="check-permissions"}admin.admin-profiles.view{/block}
+
+{block name="main-content"}
+<div class="admin-profiles">
+
+    <div id="wrapper" class="container">
+        
+        <div class="clearfix">
+            <ul class="breadcrumb pull-left">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                <li><a href="{url path='/admin/configuration/admin_profiles'}">{intl l="Admin profiles"}</a></li>
+            </ul>
+            {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.admin-profiles.create"}
+                <a class="btn btn-default btn-primary pull-right" title="{intl l='Create a new admin profile'}" href="#creation_dialog" data-toggle="modal">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </a>
+            {/loop}
+        </div>
+
+        {module_include location='admin_profiles_top'}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <form action="">
+                            <table class="table table-striped table-condensed table-left-aligned">
+                                <caption>
+                                    {intl l="Profile"}
+                                </caption>
+                                <tbody>
+                                    <tr>
+                                        <td><label for="" class="label-control">{intl l="Profile"}</label></td>
+                                        <td>
+                                            <select name="" id="" data-toggle="selectpicker">
+                                                <option value="">1</option>
+                                                <option value="">2</option>
+                                                <option value="">3</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><label for="" class="label-control">{intl l="Wording"}</label></td>
+                                        <td><input type="text" class="form-control" name="" value="gestionnairecommande" readonly></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label for="" class="label-control">{intl l="Name"}</label></td>
+                                        <td><input type="text" class="form-control" name="" value=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label for="" class="label-control">{intl l="Description"}</label></td>
+                                        <td><textarea type="text" class="form-control" name=""></textarea></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="btn-group pull-right">
+                                                <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
+                                                <button class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> {intl l="Delete"}</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </form>
+                    </div>
+                </div>                
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <form action="">
+                            <table class="table table-striped table-condensed table-left-aligned">
+                                <caption>
+                                    {intl l="General rights"}
+                                </caption>
+                                <thead>
+                                    <tr>
+                                        <th>{intl l="Authorization"}</th>
+                                        <th>{intl l="Description"}</th>
+                                        <th>{intl l="Access"}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Access to customers</td>
+                                        <td>
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur, saepe, libero, veniam ab quod.
+                                        </td>
+                                        <td>
+                                            <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <input type="checkbox" checked>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Access to orders</td>
+                                        <td>
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur, saepe, libero, veniam ab quod.
+                                        </td>
+                                        <td>
+                                            <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <input type="checkbox">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Access to catalog</td>
+                                        <td>
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur, saepe, libero, veniam ab quod.
+                                        </td>
+                                        <td>
+                                            <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <input type="checkbox">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3">
+                                            <button type="submit" class="btn btn-default btn-primary pull-right"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </form>
+                    </div>
+                </div>                
+            </div>
+        </div>
+
+        {module_include location='admin_profiles_bottom'}
+
+    </div>
+</div>
+
+{* Creation dialog *}
+
+{form name="thelia.admin.admin-profile.creation"}
+
+    {* Capture the dialog body, to pass it to the generic dialog *}
+    {capture "creation_dialog"}
+
+        {form_hidden_fields form=$form}
+
+        {* Be sure to get the language_id, even if the form could not be validated *}
+        <input type="hidden" name="language_id" value="{$language_id}" />
+
+        {form_field form=$form field='success_url'}
+           {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+           <input type="hidden" name="{$name}" value="{url path='/admin/configuration/admin_profile/update' admin_profile_id='_ID_'}" />
+        {/form_field}
+
+        {form_field form=$form field='wording'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Wording'}">
+            </div>
+        {/form_field}
+
+        {form_field form=$form field='name'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Name'}">
+            </div>
+        {/form_field}
+
+        {form_field form=$form field='description'}
+            <div class="form-group {if $error}has-error{/if}">
+                <label for="{$label_attr.for}" class="control-label">{intl l="{$label}"} : </label>
+                <textarea id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="{$label}"}" placeholder="{intl l='Description'}"></textarea>
+            </div>
+        {/form_field}
+
+        {module_include location='admin_profile_create_form'}
+
+    {/capture}
+
+    {include
+        file = "includes/generic-create-dialog.html"
+
+        dialog_id    = "creation_dialog"
+        dialog_title = {intl l="Create a new admin profile"}
+        dialog_body  = {$smarty.capture.creation_dialog nofilter}
+
+        dialog_ok_label     = {intl l="Create this admin profile"}
+
+        form_action        = {url path='/admin/configuration/admin_profile/create'}
+        form_enctype       = {form_enctype form=$form}
+        form_error_message = $form_error_message
+    }
+{/form}
+
+{/block}
+
+{block name="javascript-initialization"}
+
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/bootstrap-select/bootstrap-select.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/main.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+{/block}

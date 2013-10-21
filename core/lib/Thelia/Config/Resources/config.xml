@@ -55,6 +55,7 @@
         <form name="thelia.install.step3" class="Thelia\Form\InstallStep3Form"/>
 
         <form name="thelia.customer.creation" class="Thelia\Form\CustomerCreation"/>
+        <form name="thelia.customer.update" class="Thelia\Form\CustomerUpdateForm"/>
         <form name="thelia.customer.modification" class="Thelia\Form\CustomerModification"/>
         <form name="thelia.customer.lostpassword" class="Thelia\Form\CustomerLostPasswordForm"/>
 
@@ -118,6 +119,10 @@
         <form name="thelia.admin.taxrule.taxlistupdate" class="Thelia\Form\TaxRuleTaxListUpdateForm"/>
         <form name="thelia.admin.taxrule.add" class="Thelia\Form\TaxRuleCreationForm"/>
 
+        <form name="thelia.admin.tax.modification" class="Thelia\Form\TaxModificationForm"/>
+        <form name="thelia.admin.tax.taxlistupdate" class="Thelia\Form\TaxTaxListUpdateForm"/>
+        <form name="thelia.admin.tax.add" class="Thelia\Form\TaxCreationForm"/>
+
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>
 
@@ -125,6 +130,10 @@
         <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
 
         <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
+        
+        <form name="thelia.admin.language.creation" class="Thelia\Form\LanguageCreationForm"/>
+
+        <form name="thelia.admin.admin-profile.creation" class="Thelia\Form\AdminProfileCreationForm"/>
 
         <form name="thelia.admin.area.create" class="Thelia\Form\Area\AreaCreateForm"/>
         <form name="thelia.admin.area.modification" class="Thelia\Form\Area\AreaModificationForm"/>

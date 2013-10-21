@@ -65,4 +65,9 @@ class FeatureFixAmountTaxType extends BaseTaxType
             'feature' => new ModelValidIdType('Feature'),
         );
     }
+
+    public function getTitle()
+    {
+        return "Fix amount Tax depending on a feature";
+    }
 }

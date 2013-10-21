@@ -1,9 +1,17 @@
 // Thelia : Shopping Cart
 
+
+// Cart Empty
+.cart-empty { margin: 0; padding: 40px; }
+
+// Cart Mini
+.table-cart-mini { margin-bottom: 0; }
+
+
 // Cart
 .table-cart {
     .table-bordered;
-    
+
     thead,
     tbody,
     tfooter {
@@ -70,3 +78,18 @@
     }
 }
 
+// Message if no product in the cart
+.cart-warning {
+  clear: both;
+  .alert; .alert-warning;
+  margin-bottom: 0;
+  text-align: center;
+
+  > a { color: inherit; }
+
+  &:before {
+    .icon(@warning-sign);
+    display: block;
+    font-size: 2.2em;
+  }
+}
