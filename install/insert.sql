@@ -39,6 +39,8 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 (4, 'FakeCB', 3, 0, 2, 'FakeCB\\FakeCB', NOW(), NOW());
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+('1',  'en_US',  'Debug bar', NULL,  NULL,  NULL),
+('1',  'fr_FR',  'Debug bar', NULL,  NULL,  NULL),
 ('2',  'en_US',  '72h delivery', NULL,  NULL,  NULL),
 ('2',  'fr_FR',  'Livraison par colissimo en 72h', NULL,  NULL,  NULL);
 
