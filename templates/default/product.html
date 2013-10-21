@@ -217,13 +217,21 @@
                 </div>
             </section>
         </article><!-- /product -->
-        {/loop}
-        <ul class="pager">
-            <li class="previous"><a href="#">Previous product</a></li>
-            <li class="next"><a href="#">Next product</a></li>
-        </ul
 
-                ></div>
+        <ul class="pager">
+            {if $HAS_PREVIOUS == 1}
+                {loop type="product" name="prev_product" id="{$PREVIOUS}"}
+                    <li class="previous"><a href="{$URL}">{intl l="Previous product"}</a></li>
+                {/loop}
+            {/if}
+            {if $HAS_NEXT == 1}
+                {loop type="product" name="next_product" id="{$NEXT}"}
+                    <li class="next"><a href="{$URL}">{intl l="Next product"}</a></li>
+                {/loop}
+            {/if}
+        </ul>
+       {/loop}
+        </div>
 
     </div><!-- /.container -->
 {/block}
