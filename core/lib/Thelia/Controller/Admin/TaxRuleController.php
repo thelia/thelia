@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\TaxRuleCreationForm;
@@ -40,10 +41,10 @@ class TaxRuleController extends AbstractCrudController
             'manual',
             'order',
 
-            'admin.configuration.taxrule.view',
-            'admin.configuration.taxrule.create',
-            'admin.configuration.taxrule.update',
-            'admin.configuration.taxrule.delete',
+            AdminResources::TAX_VIEW,
+            AdminResources::TAX_CREATE,
+            AdminResources::TAX_UPDATE,
+            AdminResources::TAX_DELETE,
 
             TheliaEvents::TAX_RULE_CREATE,
             TheliaEvents::TAX_RULE_UPDATE,
@@ -256,7 +257,7 @@ class TaxRuleController extends AbstractCrudController
     public function processUpdateTaxesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth('admin.configuration.taxrule.update')) return $response;
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
 
         $error_msg = false;
 

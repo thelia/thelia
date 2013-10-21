@@ -23,6 +23,8 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\AdminResources;
+
 /**
  * Class LanguageController
  * @package Thelia\Controller\Admin
@@ -32,7 +34,7 @@ class LanguageController extends BaseAdminController
 {
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth("admin.configuration.languages.view")) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE_VIEW)) return $response;
         return $this->render("languages");
     }
     

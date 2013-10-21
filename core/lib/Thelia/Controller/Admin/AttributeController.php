@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Attribute\AttributeDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
@@ -50,10 +51,10 @@ class AttributeController extends AbstractCrudController
             'manual',
             'order',
 
-            'admin.configuration.attributes.view',
-            'admin.configuration.attributes.create',
-            'admin.configuration.attributes.update',
-            'admin.configuration.attributes.delete',
+            AdminResources::ATTRIBUTE_VIEW,
+            AdminResources::ATTRIBUTE_CREATE,
+            AdminResources::ATTRIBUTE_UPDATE,
+            AdminResources::ATTRIBUTE_DELETE,
 
             TheliaEvents::ATTRIBUTE_CREATE,
             TheliaEvents::ATTRIBUTE_UPDATE,
@@ -253,7 +254,7 @@ class AttributeController extends AbstractCrudController
     protected function addRemoveFromAllTemplates($eventType)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.attributes.update")) return $response;
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
 
         try {
             if (null !== $object = $this->getExistingObject()) {

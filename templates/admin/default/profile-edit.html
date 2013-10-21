@@ -25,6 +25,10 @@
         <div class="row">
             <div class="col-md-12 general-block-decorator clearfix">
 
+                <div class="lead clearfix">
+                    <span class='label label-default pull-left'>{$CODE}</span>
+                </div>
+
                 <ul class="nav nav-tabs clearfix">
                     <li {if $oder_tab == 'data'}class="active"{/if}><a href="#data" data-tab-name="cart" data-toggle="tab"><span class="glyphicon glyphicon-shopping-cart"></span> {intl l="Description"}</a></li>
                     <li {if $oder_tab == 'permissions'}class="active"{/if}><a href="#permissions" data-tab-name="bill" data-toggle="tab"><span class="glyphicon glyphicon-list-alt"></span> {intl l="Permissions"}</a></li>

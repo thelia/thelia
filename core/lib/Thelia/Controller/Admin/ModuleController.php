@@ -23,6 +23,8 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\AdminResources;
+
 /**
  * Class ModuleController
  * @package Thelia\Controller\Admin
@@ -32,7 +34,7 @@ class ModuleController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth("admin.module.view")) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE_VIEW)) return $response;
         return $this->render("modules", array("display_module" => 20));
     }
 

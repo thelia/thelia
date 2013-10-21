@@ -755,6 +755,7 @@
   </table>
   <table name="admin" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="profile_id" type="INTEGER" />
     <column name="firstname" required="true" size="100" type="VARCHAR" />
     <column name="lastname" required="true" size="100" type="VARCHAR" />
     <column name="login" required="true" size="100" type="VARCHAR" />
@@ -763,12 +764,11 @@
     <column name="salt" size="128" type="VARCHAR" />
     <column name="remember_me_token" size="255" type="VARCHAR" />
     <column name="remember_me_serial" size="255" type="VARCHAR" />
-    <column name="profile_id" size="45" type="VARCHAR" />
     <foreign-key foreignTable="profile" name="fk_admin_profile_id" onDelete="RESTRICT" onUpdate="RESTRICT">
-      <reference foreign="id" local="id" />
+      <reference foreign="id" local="profile_id" />
     </foreign-key>
     <index name="fk_admin_profile_id">
-      <index-column name="id" />
+      <index-column name="profile_id" />
     </index>
     <behavior name="timestampable" />
   </table>

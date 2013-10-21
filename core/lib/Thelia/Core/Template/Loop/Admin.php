@@ -31,20 +31,20 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\ProfileQuery;
+use Thelia\Model\AdminQuery;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 
 /**
  *
- * Profile loop
+ * Admin loop
  *
  *
- * Class Profile
+ * Class Admin
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Profile extends BaseI18nLoop
+class Admin extends BaseI18nLoop
 {
     public $timestampable = true;
 
@@ -54,7 +54,8 @@ class Profile extends BaseI18nLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id')
+            Argument::createIntListTypeArgument('id'),
+            Argument::createIntListTypeArgument('profile')
         );
     }
 
@@ -65,10 +66,7 @@ class Profile extends BaseI18nLoop
      */
     public function exec(&$pagination)
     {
-        $search = ProfileQuery::create();
-
-        /* manage translations */
-        $locale = $this->configureI18nProcessing($search);
+        $search = AdminQuery::create();
 
         $id = $this->getId();
 
@@ -76,7 +74,13 @@ class Profile extends BaseI18nLoop
             $search->filterById($id, Criteria::IN);
         }
 
-        $search->orderById(Criteria::ASC);
+        $profile = $this->getProfile();
+
+        if (null !== $profile) {
+            $search->filterByProfileId($profile, Criteria::IN);
+        }
+
+        $search->orderByFirstname(Criteria::ASC);
 
         /* perform search */
         $features = $this->search($search, $pagination);
@@ -86,13 +90,10 @@ class Profile extends BaseI18nLoop
         foreach ($features as $feature) {
             $loopResultRow = new LoopResultRow($loopResult, $feature, $this->versionable, $this->timestampable, $this->countable);
             $loopResultRow->set("ID", $feature->getId())
-                ->set("IS_TRANSLATED",$feature->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$locale)
-                ->set("CODE",$feature->getCode())
-                ->set("TITLE",$feature->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $feature->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $feature->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $feature->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("PROFILE",$feature->getProfileId())
+                ->set("FIRSTNAME",$feature->getFirstname())
+                ->set("LASTNAME",$feature->getLastname())
+                ->set("LOGIN",$feature->getLogin())
             ;
 
             $loopResult->addRow($loopResultRow);

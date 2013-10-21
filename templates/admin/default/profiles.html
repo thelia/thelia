@@ -53,8 +53,10 @@
                                                 <a class="btn btn-default btn-xs" title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
+                                            {assign linkedAdminCount {count name="linked-admin" type="admin" profile=$ID}}
+
                                             {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.profile.change"}
-                                                <a class="btn btn-default btn-xs js-delete-profile" title="{intl l='Delete this profile'}" href="#profile_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                <a class="btn btn-default btn-xs js-delete-profile" title="{intl l='Delete this profile'}" href="#{if $linkedAdminCount > 0}profile_cannot_delete_dialog{else}profile_delete_dialog{/if}" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                             {/loop}
                                         </div>
                                     </td>
@@ -171,6 +173,15 @@
     form_action         = {url path='/admin/configuration/profiles/delete'}
     form_content        = {$smarty.capture.profile_delete_dialog nofilter}
 }
+
+{include
+    file = "includes/generic-warning-dialog.html"
+
+    dialog_id       = "profile_cannot_delete_dialog"
+    dialog_title    = {intl l="You can't delete this profile"}
+    dialog_body     = {intl l="They are some administrator which are linked to this profile. Please edit/remove them before deleting this profile."}
+}
+
 {/block}
 
 {block name="javascript-initialization"}

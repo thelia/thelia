@@ -50,7 +50,7 @@ CREATE TABLE `product`
         FOREIGN KEY (`tax_rule_id`)
         REFERENCES `tax_rule` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL,
+        ON DELETE RESTRICT,
     CONSTRAINT `fk_product_template`
         FOREIGN KEY (`template_id`)
         REFERENCES `template` (`id`)
@@ -971,6 +971,7 @@ DROP TABLE IF EXISTS `admin`;
 CREATE TABLE `admin`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `profile_id` INTEGER,
     `firstname` VARCHAR(100) NOT NULL,
     `lastname` VARCHAR(100) NOT NULL,
     `login` VARCHAR(100) NOT NULL,
@@ -981,35 +982,13 @@ CREATE TABLE `admin`
     `remember_me_serial` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- admin_profile
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `admin_profile`;
-
-CREATE TABLE `admin_profile`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `profile_id` INTEGER NOT NULL,
-    `admin_id` INTEGER NOT NULL,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`,`profile_id`,`admin_id`),
-    INDEX `idx_admin_profile_profile_id` (`profile_id`),
-    INDEX `idx_admin_profile_admin_id` (`admin_id`),
-    CONSTRAINT `fk_admin_profile_profile_id`
+    PRIMARY KEY (`id`),
+    INDEX `fk_admin_profile_id` (`profile_id`),
+    CONSTRAINT `fk_admin_profile_id`
         FOREIGN KEY (`profile_id`)
         REFERENCES `profile` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_admin_profile_admin_id`
-        FOREIGN KEY (`admin_id`)
-        REFERENCES `admin` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

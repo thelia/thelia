@@ -160,11 +160,10 @@ class ProfileTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AdminProfile', '\\Thelia\\Model\\AdminProfile', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'CASCADE', 'RESTRICT', 'AdminProfiles');
+        $this->addRelation('Admin', '\\Thelia\\Model\\Admin', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'RESTRICT', 'RESTRICT', 'Admins');
         $this->addRelation('ProfileResource', '\\Thelia\\Model\\ProfileResource', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'CASCADE', 'RESTRICT', 'ProfileResources');
         $this->addRelation('ProfileModule', '\\Thelia\\Model\\ProfileModule', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'CASCADE', 'CASCADE', 'ProfileModules');
         $this->addRelation('ProfileI18n', '\\Thelia\\Model\\ProfileI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ProfileI18ns');
-        $this->addRelation('Admin', '\\Thelia\\Model\\Admin', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Admins');
         $this->addRelation('Resource', '\\Thelia\\Model\\Resource', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Resources');
     } // buildRelations()
 
@@ -188,7 +187,6 @@ class ProfileTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                AdminProfileTableMap::clearInstancePool();
                 ProfileResourceTableMap::clearInstancePool();
                 ProfileModuleTableMap::clearInstancePool();
                 ProfileI18nTableMap::clearInstancePool();

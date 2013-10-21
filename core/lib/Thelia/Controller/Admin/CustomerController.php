@@ -26,6 +26,7 @@ namespace Thelia\Controller\Admin;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Form\Form;
 use Thelia\Core\Event\Address\AddressEvent;
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Customer\CustomerAddressEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
@@ -45,13 +46,13 @@ class CustomerController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth("admin.customer.view")) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER_VIEW)) return $response;
         return $this->render("customers", array("display_customer" => 20));
     }
 
     public function viewAction($customer_id)
     {
-        if (null !== $response = $this->checkAuth("admin.customer.view")) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER_VIEW)) return $response;
         return $this->render("customer-edit", array(
             "customer_id" => $customer_id
         ));
@@ -67,7 +68,7 @@ class CustomerController extends BaseAdminController
      */
     public function updateAction($customer_id)
     {
-        if (null !== $response = $this->checkAuth("admin.customer.update")) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER_UPDATE)) return $response;
 
         $message = false;
 
@@ -123,7 +124,7 @@ class CustomerController extends BaseAdminController
 
     public function deleteAction()
     {
-        if (null !== $response = $this->checkAuth("admin.customer.delete")) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER_DELETE)) return $response;
 
         $message = null;
 

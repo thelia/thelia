@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\ProfileCreationForm;
@@ -39,10 +40,10 @@ class ProfileController extends AbstractCrudController
             'manual',
             'order',
 
-            'admin.configuration.profile.view',
-            'admin.configuration.profile.create',
-            'admin.configuration.profile.update',
-            'admin.configuration.profile.delete',
+            AdminResources::PRODUCT_VIEW,
+            AdminResources::PRODUCT_CREATE,
+            AdminResources::PRODUCT_UPDATE,
+            AdminResources::PRODUCT_DELETE,
 
             TheliaEvents::PROFILE_CREATE,
             TheliaEvents::PROFILE_UPDATE,

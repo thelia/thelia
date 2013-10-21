@@ -27,6 +27,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\ConditionManagerInterface;
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Condition\ConditionCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
@@ -62,7 +63,7 @@ class CouponController extends BaseAdminController
      */
     public function browseAction()
     {
-        $this->checkAuth('ADMIN', 'admin.coupon.view');
+        $this->checkAuth('ADMIN', AdminResources::COUPON_VIEW);
 
         $args['urlReadCoupon'] = $this->getRoute(
             'admin.coupon.read',
@@ -94,7 +95,7 @@ class CouponController extends BaseAdminController
      */
     public function readAction($couponId)
     {
-        $this->checkAuth('ADMIN', 'admin.coupon.read');
+        $this->checkAuth('ADMIN', AdminResources::COUPON_VIEW);
 
         // Database request repeated in the loop but cached
         $search = CouponQuery::create();
@@ -122,7 +123,7 @@ class CouponController extends BaseAdminController
     public function createAction()
     {
         // Check current user authorization
-        $response = $this->checkAuth('admin.coupon.create');
+        $response = $this->checkAuth(AdminResources::COUPON_CREATE);
         if ($response !==  null) {
             return $response;
         }
@@ -170,7 +171,7 @@ class CouponController extends BaseAdminController
     public function updateAction($couponId)
     {
         // Check current user authorization
-        $response = $this->checkAuth('admin.coupon.update');
+        $response = $this->checkAuth(AdminResources::COUPON_UPDATE);
         if ($response !==  null) {
             return $response;
         }
@@ -277,7 +278,7 @@ var_dump($coupon->getIsRemovingPostage());;
      */
     public function getConditionInputAction($conditionId)
     {
-        $this->checkAuth('ADMIN', 'admin.coupon.read');
+        $this->checkAuth('ADMIN', AdminResources::COUPON_VIEW);
 
         $this->checkXmlHttpRequest();
 
@@ -307,7 +308,7 @@ var_dump($coupon->getIsRemovingPostage());;
      */
     public function updateConditionsAction($couponId)
     {
-        $this->checkAuth('ADMIN', 'admin.coupon.read');
+        $this->checkAuth('ADMIN', AdminResources::COUPON_VIEW);
 
         $this->checkXmlHttpRequest();
 
