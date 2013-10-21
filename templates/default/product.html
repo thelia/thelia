@@ -5,7 +5,7 @@
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-    {$sBreadcrumb = []}
+    {$breadcrumbs = []}
     {loop type="product" name="product_breadcrumb" id="{product attr="id"}"}
         {loop name="category_path" type="category-path" category="{$DEFAULT_CATEGORY}"}
             {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
