@@ -183,37 +183,10 @@ class CouponManager
         $discount = 0.00;
         /** @var CouponInterface $coupon */
         foreach ($coupons as $coupon) {
-            // @todo modify Cart with discount for each cart item
             $discount += $coupon->exec($this->adapter);
         }
 
         return $discount;
-    }
-
-    /**
-     * Build a ConditionManagerInterface from data coming from a form
-     *
-     * @param string $conditionServiceId Condition service id you want to instantiate
-     * @param array  $operators          Condition Operator set by the Admin
-     * @param array  $values             Condition Values set by the Admin
-     *
-     * @return ConditionManagerInterface
-     */
-    public function buildRuleFromForm($conditionServiceId, array $operators, array $values)
-    {
-        $condition = false;
-        try {
-
-            if ($this->container->has($conditionServiceId)) {
-                /** @var ConditionManagerInterface $condition */
-                $condition = $this->container->get($conditionServiceId);
-                $condition->populateFromForm($operators, $values);
-            }
-        } catch (\InvalidArgumentException $e) {
-
-        }
-
-        return $condition;
     }
 
     /**

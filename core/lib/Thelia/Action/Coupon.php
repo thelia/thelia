@@ -26,7 +26,6 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\ConditionManagerInterface;
-use Thelia\Core\Event\Condition\ConditionCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -124,7 +123,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
             // @todo decrement coupon quantity
 
-            // @todo modify Cart total discount
             $request->getSession()->getCart()->setDiscount($totalDiscount);
 
         }

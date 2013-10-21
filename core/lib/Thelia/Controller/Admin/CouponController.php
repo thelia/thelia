@@ -28,7 +28,6 @@ use Symfony\Component\Routing\Router;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\ConditionManagerInterface;
 use Thelia\Core\Event\AdminResources;
-use Thelia\Core\Event\Condition\ConditionCreateOrUpdateEvent;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -331,10 +330,6 @@ class CouponController extends BaseAdminController
             $conditions->add(clone $condition);
         }
 
-//        $coupon->setSerializedConditions(
-//            $conditionFactory->serializeCouponConditionCollection($conditions)
-//        );
-
         $couponEvent = new CouponCreateOrUpdateEvent(
             $coupon->getCode(),
             $coupon->getTitle(),
@@ -379,31 +374,6 @@ class CouponController extends BaseAdminController
                 'urlDelete' => $couponId
             )
         );
-    }
-
-    /**
-     * Test Coupon consuming
-     *
-     * @param string $couponCode Coupon code
-     *
-     * @todo remove (event dispatcher testing purpose)
-     *
-     */
-    public function consumeAction($couponCode)
-    {
-        // @todo remove (event dispatcher testing purpose)
-        $couponConsumeEvent = new CouponConsumeEvent($couponCode);
-        $eventToDispatch = TheliaEvents::COUPON_CONSUME;
-
-        // Dispatch Event to the Action
-        $this->dispatch(
-            $eventToDispatch,
-            $couponConsumeEvent
-        );
-
-        var_dump('test', $couponConsumeEvent->getCode(), $couponConsumeEvent->getDiscount(), $couponConsumeEvent->getIsValid());
-
-        exit();
     }
 
     /**
@@ -599,27 +569,5 @@ class CouponController extends BaseAdminController
 
         return $cleanedConditions;
     }
-
-//    /**
-//     * Validation Condition creation
-//     *
-//     * @param string $type     Condition class type
-//     * @param string $operator Condition operator (<, >, =, etc)
-//     * @param array  $values   Condition values
-//     *
-//     * @return bool
-//     */
-//    protected function validateConditionsCreation($type, $operator, $values)
-//    {
-//        /** @var FacadeInterface $adapter */
-//        $adapter = $this->container->get('thelia.adapter');
-//        $validator = new PriceParam()
-//        try {
-//            $condition = new AvailableForTotalAmount($adapter, $validators);
-//            $condition = new $type($adapter, $validators);
-//        } catch (\Exception $e) {
-//            return false;
-//        }
-//    }
 
 }

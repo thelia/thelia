@@ -29,7 +29,6 @@ use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Cart\CartTrait;
@@ -45,7 +44,6 @@ use Thelia\Model\CurrencyQuery;
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- * @todo implements
  *
  */
 class BaseFacade implements FacadeInterface
@@ -87,7 +85,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getDeliveryAddress()
     {
-        // TODO: Implement getDeliveryAddress() method.
+        // @todo: Implement getDeliveryAddress() method.
     }
 
     /**
@@ -189,34 +187,7 @@ class BaseFacade implements FacadeInterface
     }
 
     /**
-     * Save a Coupon in the database
-     *
-     * @param CouponInterface $coupon Coupon
-     *
-     * @return $this
-     */
-    public function saveCoupon(CouponInterface $coupon)
-    {
-//        $couponModel = new Coupon();
-//        $couponModel->setCode($coupon->getCode());
-//        $couponModel->setType(get_class($coupon));
-//        $couponModel->setTitle($coupon->getTitle());
-//        $couponModel->setShortDescription($coupon->getShortDescription());
-//        $couponModel->setDescription($coupon->getDescription());
-//        $couponModel->setAmount($coupon->getDiscount());
-//        $couponModel->setIsUsed(0);
-//        $couponModel->setIsEnabled(1);
-//        $couponModel->set
-//        $couponModel->set
-//        $couponModel->set
-//        $couponModel->set
-//        $couponModel->set
-//        $couponModel->set
-//        $couponModel->set
-    }
-
-    /**
-     * Return plateform Container
+     * Return platform Container
      *
      * @return Container
      */

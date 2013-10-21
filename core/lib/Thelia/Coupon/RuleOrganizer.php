@@ -45,7 +45,7 @@ class RuleOrganizer implements RuleOrganizerInterface
      */
     public function organize(array $conditions)
     {
-        // TODO: Implement organize() method.
+        // @todo: Implement organize() method.
     }
 
 }

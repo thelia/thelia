@@ -28,7 +28,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 
 /**
@@ -124,15 +123,6 @@ interface FacadeInterface
      * @return Coupon
      */
     public function findOneCouponByCode($code);
-
-    /**
-     * Save a Coupon in the database
-     *
-     * @param CouponInterface $coupon Coupon
-     *
-     * @return $this
-     */
-    public function saveCoupon(CouponInterface $coupon);
 
     /**
      * Return platform Container

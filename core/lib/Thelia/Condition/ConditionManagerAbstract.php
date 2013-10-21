@@ -43,10 +43,6 @@ use Thelia\Type\FloatType;
  */
 abstract class ConditionManagerAbstract implements ConditionManagerInterface
 {
-//    /** Operator key in $validators */
-//    CONST OPERATOR = 'operator';
-//    /** Value key in $validators */
-//    CONST VALUE = 'value';
 
     /** @var string Service Id from Resources/config.xml  */
     protected $serviceId = null;
@@ -56,9 +52,6 @@ abstract class ConditionManagerAbstract implements ConditionManagerInterface
 
     /** @var array Parameters validating parameters against */
     protected $validators = array();
-
-//    /** @var array Parameters to be validated */
-//    protected $paramsToValidate = array();
 
     /** @var  FacadeInterface Provide necessary value from Thelia */
     protected $adapter = null;
@@ -87,62 +80,6 @@ abstract class ConditionManagerAbstract implements ConditionManagerInterface
         $this->conditionValidator = $adapter->getConditionEvaluator();
     }
 
-//    /**
-//     * Check validator relevancy and store them
-//     *
-//     * @param array $validators Array of RuleValidator
-//     *                          validating $paramsToValidate against
-//     *
-//     * @return $this
-//     * @throws InvalidConditionException
-//     */
-//    protected function setValidators(array $validators)
-//    {
-//        foreach ($validators as $validator) {
-//            if (!$validator instanceof RuleValidator) {
-//                throw new InvalidConditionException(get_class());
-//            }
-//            if (!in_array($validator->getOperator(), $this->availableOperators)) {
-//                throw new InvalidConditionOperatorException(
-//                    get_class(),
-//                    $validator->getOperator()
-//                );
-//            }
-//        }
-//        $this->validators = $validators;
-//
-//        return $this;
-//    }
-
-
-
-//    /**
-//     * Check if the current Checkout matches this condition
-//     *
-//     * @return bool
-//     */
-//    public function isMatching()
-//    {
-//        $this->checkBackOfficeInput();
-//        $this->checkCheckoutInput();
-//
-//        $isMatching = true;
-//        /** @var $validator RuleValidator*/
-//        foreach ($this->validators as $param => $validator) {
-//            $a = $this->paramsToValidate[$param];
-//            $operator = $validator->getOperator();
-//            /** @var ComparableInterface, RuleParameterAbstract $b */
-//            $b = $validator->getParam();
-//
-//            if (!Operators::isValid($a, $operator, $b)) {
-//                $isMatching = false;
-//            }
-//        }
-//
-//        return $isMatching;
-//
-//    }
-
     /**
      * Return all available Operators for this Condition
      *
@@ -152,37 +89,6 @@ abstract class ConditionManagerAbstract implements ConditionManagerInterface
     {
         return $this->availableOperators;
     }
-
-//    /**
-//     * Check if Operators set for this Rule in the BackOffice are legit
-//     *
-//     * @throws InvalidConditionOperatorException if Operator is not allowed
-//     * @return bool
-//     */
-//    protected function checkBackOfficeInputsOperators()
-//    {
-//        /** @var RuleValidator $param */
-//        foreach ($this->validators as $key => $param) {
-//            $operator = $param->getOperator();
-//            if (!isset($operator)
-//                ||!in_array($operator, $this->availableOperators)
-//            ) {
-//                throw new InvalidConditionOperatorException(get_class(), $key);
-//            }
-//        }
-//        return true;
-//    }
-
-//    /**
-//     * Generate current Rule param to be validated from adapter
-//     *
-//     * @throws \Thelia\Exception\NotImplementedException
-//     * @return $this
-//     */
-//    protected function setParametersToValidate()
-//    {
-//        throw new \Thelia\Exception\NotImplementedException();
-//    }
 
     /**
      * Return all validators

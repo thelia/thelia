@@ -630,35 +630,6 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 
     }
 
-//    public function testGetValidators()
-//    {
-//        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
-//            ->disableOriginalConstructor()
-//            ->getMock();
-//
-//        $stubFacade->expects($this->any())
-//            ->method('getNbArticlesInCart')
-//            ->will($this->returnValue(4));
-//
-//        $condition1 = new MatchForXArticlesManager($stubFacade);
-//        $operators = array(
-//            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
-//        );
-//        $values = array(
-//            MatchForXArticlesManager::INPUT1 => 4
-//        );
-//        $condition1->setValidatorsFromForm($operators, $values);
-//
-//        $expected = array(
-//            $operators,
-//            $values
-//        );
-//        $actual = $condition1->getValidators();
-//
-//        $this->assertEquals($expected, $actual);
-//
-//    }
-
     /**
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
