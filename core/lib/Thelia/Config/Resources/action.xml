@@ -141,6 +141,16 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.module" class="Thelia\Action\Module">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.cache" class="Thelia\Action\Cache">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.profile" class="Thelia\Action\Profile">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>

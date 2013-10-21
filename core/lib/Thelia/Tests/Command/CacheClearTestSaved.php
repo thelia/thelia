@@ -115,6 +115,10 @@ class CacheClearTest extends \PHPUnit_Framework_TestCase
 
         $container->setParameter("kernel.cache_dir", $this->cache_dir);
 
+        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+
+        $container->set("event_dispatcher", $dispatcher);
+
         return $container;
     }
 

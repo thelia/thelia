@@ -160,7 +160,7 @@ class Content extends BaseAction implements EventSubscriberInterface
             ->filterByFolderId($event->getFolderId())
             ->findOne();
 
-        if(null !== $contentFolder) {
+        if (null !== $contentFolder) {
             $contentFolder->delete();
         }
     }

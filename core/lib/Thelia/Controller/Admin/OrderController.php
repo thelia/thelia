@@ -212,7 +212,6 @@ class OrderController extends BaseAdminController
     {
         if (null !== $response = $this->checkAuth(AdminResources::ORDER_UPDATE)) return $response;
 
-
         $html = $this->renderRaw(
             $fileName,
             array(
@@ -228,7 +227,7 @@ class OrderController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::GENERATE_PDF, $pdfEvent);
 
-            if($pdfEvent->hasPdf()) {
+            if ($pdfEvent->hasPdf()) {
                 return Response::create($pdfEvent->getPdf(), 200,
                     array(
                         'Content-type' => "application/pdf",

@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Area;
 
-
 /**
  * Class AreaAddCountryEvent
  * @package Thelia\Core\Event\Area
@@ -34,7 +33,7 @@ class AreaAddCountryEvent extends AreaEvent
     protected $area_id;
     protected $country_id;
 
-    function __construct($area_id, $country_id)
+    public function __construct($area_id, $country_id)
     {
         $this->area_id = $area_id;
         $this->country_id = $country_id;
@@ -79,8 +78,5 @@ class AreaAddCountryEvent extends AreaEvent
     {
         return $this->country_id;
     }
-
-
-
 
 }

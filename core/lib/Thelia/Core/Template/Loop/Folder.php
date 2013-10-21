@@ -114,7 +114,7 @@ class Folder extends BaseI18nLoop
         if (null !== $content) {
             $obj = ContentQuery::create()->findPk($content);
 
-            if($obj) {
+            if ($obj) {
                 $search->filterByContent($obj, Criteria::IN);
             }
         }

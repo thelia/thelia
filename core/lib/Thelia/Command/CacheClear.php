@@ -30,6 +30,8 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 use Thelia\Command\ContainerAwareCommand;
+use Thelia\Core\Event\Cache\CacheEvent;
+use Thelia\Core\Event\TheliaEvents;
 
 /**
  * clear the cache
@@ -72,7 +74,11 @@ class CacheClear extends ContainerAwareCommand
         $output->writeln(sprintf("Clearing cache in <info>%s</info> directory", $dir));
 
         try {
-            $directoryBrowser = new \DirectoryIterator($dir);
+            $cacheEvent = new CacheEvent($dir);
+            $this->
+                getContainer()
+                ->get('event_dispatcher')
+                ->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
         } catch (\UnexpectedValueException $e) {
             // throws same exception code for does not exist and permission denied ...
             if (!file_exists($dir)) {
@@ -82,15 +88,11 @@ class CacheClear extends ContainerAwareCommand
             }
 
             throw $e;
-        }
-
-        $fs = new Filesystem();
-        try {
-            $fs->remove($dir);
-
-            $output->writeln(sprintf("<info>%s cache dir cleared successfully</info>", $dir));
         } catch (IOException $e) {
             $output->writeln(sprintf("Error during clearing cache : %s", $e->getMessage()));
         }
+
+        $output->writeln(sprintf("<info>%s cache dir cleared successfully</info>", $dir));
+
     }
 }

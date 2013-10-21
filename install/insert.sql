@@ -19,7 +19,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('image_cache_dir_from_web_root', 'cache/images', 0, 0, NOW(), NOW()),
 ('document_cache_dir_from_web_root', 'cache/documents', 0, 0, NOW(), NOW()),
 ('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', 0, 0, NOW(), NOW()),
-('page_not_found_view', '404', 0, 0, NOW(), NOW()),
+('page_not_found_view', '404.html', 0, 0, NOW(), NOW()),
 ('passed_url_view', 'passed-url', 0, 0, NOW(), NOW()),
 ('use_tax_free_amounts', 0, 0, 0, NOW(), NOW()),
 ('process_assets', '1', 0, 0, NOW(), NOW()),
@@ -39,6 +39,8 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 (4, 'FakeCB', 3, 0, 2, 'FakeCB\\FakeCB', NOW(), NOW());
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+('1',  'en_US',  'Debug bar', NULL,  NULL,  NULL),
+('1',  'fr_FR',  'Debug bar', NULL,  NULL,  NULL),
 ('2',  'en_US',  '72h delivery', NULL,  NULL,  NULL),
 ('2',  'fr_FR',  'Livraison par colissimo en 72h', NULL,  NULL,  NULL);
 
@@ -275,7 +277,6 @@ INSERT INTO `country` (`id`, `area_id`, `isocode`, `isoalpha2`, `isoalpha3`, `by
 (187, NULL, '862', 'VE', 'VEN', 0, NOW(), NOW()),
 (188, NULL, '704', 'VN', 'VNM', 0, NOW(), NOW()),
 (189, NULL, '887', 'YE', 'YEM', 0, NOW(), NOW()),
-(190, NULL, '807', 'MK', 'MKD', 0, NOW(), NOW()),
 (191, NULL, '180', 'CD', 'COD', 0, NOW(), NOW()),
 (192, NULL, '894', 'ZM', 'ZMB', 0, NOW(), NOW()),
 (193, NULL, '716', 'ZW', 'ZWE', 0, NOW(), NOW()),
@@ -915,9 +916,6 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (189, 'en_US', 'Yemen', '', '', ''),
 (189, 'es_ES', 'Yemen', '', '', ''),
 (189, 'fr_FR', 'Yémen', '', '', ''),
-(190, 'en_US', 'Yougoslavia', '', '', ''),
-(190, 'es_ES', 'Yugoslavia', '', '', ''),
-(190, 'fr_FR', 'Yougoslavie', '', '', ''),
 (191, 'en_US', 'Zaire', '', '', ''),
 (191, 'es_ES', 'Zaire', '', '', ''),
 (191, 'fr_FR', 'Zaïre', '', '', ''),

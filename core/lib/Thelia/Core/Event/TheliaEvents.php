@@ -183,7 +183,6 @@ final class TheliaEvents
     const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
     const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
 
-
     const BEFORE_CREATEFOLDER = "action.before_createFolder";
     const AFTER_CREATEFOLDER 	= "action.after_createFolder";
 
@@ -204,7 +203,6 @@ final class TheliaEvents
     const CONTENT_ADD_FOLDER      = "action.contentAddFolder";
     const CONTENT_REMOVE_FOLDER   = "action.contentRemoveFolder";
 
-
     const BEFORE_CREATECONTENT = "action.before_createContent";
     const AFTER_CREATECONTENT	= "action.after_createContent";
 
@@ -221,7 +219,6 @@ final class TheliaEvents
     const COUNTRY_DELETE            = "action.deleteCountry";
     const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
     //const COUNTRY_UPDATE_POSITION   = "action.updateFolderPosition";
-
 
     const BEFORE_CREATECOUNTRY = "action.before_createCountry";
     const AFTER_CREATECOUNTRY 	= "action.after_createCountry";
@@ -670,4 +667,18 @@ final class TheliaEvents
 
     const GENERATE_PDF = 'thelia.generatePdf';
 
+    /**
+     * sent when a module is activated or deactivated
+     */
+    const MODULE_TOGGLE_ACTIVATION = 'thelia.module.toggleActivation';
+
+    /**
+     * sent when a module is deleted
+     */
+    const MODULE_DELETE = 'thelia.module.delete';
+
+    /**
+     * sent for clearing cache
+     */
+    const CACHE_CLEAR = 'thelia.cache.clear';
 }

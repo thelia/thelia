@@ -244,7 +244,7 @@ class CountryController extends AbstractCrudController
             try {
                 $this->dispatch(TheliaEvents::COUNTRY_TOGGLE_DEFAULT, $toogleDefaultEvent);
 
-                if($toogleDefaultEvent->hasCountry()) {
+                if ($toogleDefaultEvent->hasCountry()) {
                     return $this->nullResponse();
                 }
             } catch (\Exception $ex) {

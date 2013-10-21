@@ -23,6 +23,7 @@
 
 namespace FakeCB;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Model\Base\ModuleImageQuery;
@@ -59,12 +60,8 @@ class FakeCB extends BaseModule implements PaymentModuleInterface
         // TODO: Implement pay() method.
     }
 
-    public function install()
-    {
 
-    }
-
-    public function afterActivation()
+    public function postActivation(ConnectionInterface $con = null)
     {
         /* insert the images from image folder if first module activation */
         $module = $this->getModuleModel();
@@ -82,10 +79,6 @@ class FakeCB extends BaseModule implements PaymentModuleInterface
         );
     }
 
-    public function destroy()
-    {
-        // TODO: Implement destroy() method.
-    }
 
     public function getCode()
     {
