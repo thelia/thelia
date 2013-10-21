@@ -225,7 +225,7 @@ abstract class BaseModule extends ContainerAware
         return basename(dirname($this->reflected->getFileName()));
     }
 
-    public function install()
+    public function install(ConnectionInterface $con = null)
     {
     }
 
@@ -249,7 +249,7 @@ abstract class BaseModule extends ContainerAware
 
     }
 
-    public function destroy()
+    public function destroy(ConnectionInterface $con = null)
     {
 
     }

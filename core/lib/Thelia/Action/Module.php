@@ -24,6 +24,7 @@
 namespace Thelia\Action;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
@@ -64,7 +65,37 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     public function delete(ModuleDeleteEvent $event)
     {
-        
+        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
+            $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
+            $con->beginTransaction();
+
+            try {
+                if(null === $module->getFullNamespace()) {
+                    throw new \LogicException('can not instanciante this module if namespace is null. Maybe the model is not loaded ?');
+                }
+
+                $reflected = new \ReflectionClass($module->getFullNamespace());
+                $instance = $reflected->newInstance();
+                $instance->setContainer($this->container);
+
+                $path = dirname($reflected->getFileName());
+
+                $instance->destroy($con);
+
+                $fs = new Filesystem();
+                $fs->remove($path);
+
+                $module->delete($con);
+
+                $con->commit();
+
+                $event->setModule($module);
+
+            } catch (\Exception $e) {
+                $con->rollBack();
+                throw $e;
+            }
+        }
     }
 
     protected function cacheClear()

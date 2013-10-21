@@ -88,6 +88,7 @@ class ModuleController extends BaseAdminController
     {
         if (null !== $response = $this->checkAuth("admin.module.delete")) return $response;
 
+        $message = null;
         try {
 
             $module_id = $this->getRequest()->get('module_id');
@@ -96,8 +97,22 @@ class ModuleController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);
 
-        } catch (\Exception $e) {
+            if($deleteEvent->hasModule() === false) {
+                throw new \LogicException(
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj' => 'Module')));
+            }
 
+        } catch (\Exception $e) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("error during module removal : %s", $message));
+            $message = $e->getMessage();
+        }
+
+        if($message) {
+            return $this->render("modules", array(
+                "error_message" => $message
+            ));
+        } else {
+            $this->redirectToRoute('admin.module');
         }
     }
 }

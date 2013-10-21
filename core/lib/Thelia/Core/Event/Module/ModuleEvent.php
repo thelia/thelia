@@ -62,4 +62,9 @@ class ModuleEvent extends ActionEvent
         return $this->module;
     }
 
+    public function hasModule()
+    {
+        return null !== $this->module;
+    }
+
 }
