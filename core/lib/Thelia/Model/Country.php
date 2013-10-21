@@ -47,6 +47,10 @@ class Country extends BaseCountry
 
     public function preDelete(ConnectionInterface $con = null)
     {
+        if($this->getByDefault()) {
+            return false;
+        }
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECOUNTRY, new CountryEvent($this));
 
         return true;
