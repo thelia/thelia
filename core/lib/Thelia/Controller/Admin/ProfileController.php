@@ -44,9 +44,9 @@ class ProfileController extends AbstractCrudController
             'admin.configuration.profile.update',
             'admin.configuration.profile.delete',
 
-            TheliaEvents::TAX_CREATE,
-            TheliaEvents::TAX_UPDATE,
-            TheliaEvents::TAX_DELETE
+            TheliaEvents::PROFILE_CREATE,
+            TheliaEvents::PROFILE_UPDATE,
+            TheliaEvents::PROFILE_DELETE
         );
     }
 
@@ -65,10 +65,11 @@ class ProfileController extends AbstractCrudController
         $event = new ProfileEvent();
 
         $event->setLocale($formData['locale']);
+        $event->setCode($formData['code']);
         $event->setTitle($formData['title']);
+        $event->setChapo($formData['chapo']);
         $event->setDescription($formData['description']);
-        $event->setType($formData['type']);
-        $event->setRequirements($this->getRequirements($formData['type'], $formData));
+        $event->setPostscriptum($formData['postscriptum']);
 
         return $event;
     }
@@ -80,9 +81,9 @@ class ProfileController extends AbstractCrudController
         $event->setLocale($formData['locale']);
         $event->setId($formData['id']);
         $event->setTitle($formData['title']);
+        $event->setChapo($formData['chapo']);
         $event->setDescription($formData['description']);
-        $event->setType($formData['type']);
-        $event->setRequirements($this->getRequirements($formData['type'], $formData));
+        $event->setPostscriptum($formData['postscriptum']);
 
         return $event;
     }
@@ -110,7 +111,7 @@ class ProfileController extends AbstractCrudController
             'locale'       => $object->getLocale(),
             'title'        => $object->getTitle(),
             'description'  => $object->getDescription(),
-            'type'         => $object->getType(),
+            'code'         => $object->getCode(),
         );
 
         // Setup the object form
@@ -170,7 +171,7 @@ class ProfileController extends AbstractCrudController
     {
         // We always return to the feature edition form
         $this->redirectToRoute(
-            "admin.configuration.profilees.update",
+            "admin.configuration.profiles.update",
             $this->getViewArguments($country),
             $this->getRouteArguments()
         );

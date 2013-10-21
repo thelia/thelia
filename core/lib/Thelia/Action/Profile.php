@@ -27,8 +27,8 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Group as GroupModel;
-use Thelia\Model\GroupQuery;
+use Thelia\Model\Profile as ProfileModel;
+use Thelia\Model\ProfileQuery;
 
 class Profile extends BaseAction implements EventSubscriberInterface
 {
@@ -37,20 +37,21 @@ class Profile extends BaseAction implements EventSubscriberInterface
      */
     public function create(ProfileEvent $event)
     {
-        /*$group = new GroupModel();
+        $profile = new ProfileModel();
 
-        $group
+        $profile
             ->setDispatcher($this->getDispatcher())
-            ->setRequirements($event->getRequirements())
-            ->setType($event->getType())
+            ->setCode($event->getCode())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
+            ->setChapo($event->getChapo())
             ->setDescription($event->getDescription())
+            ->setPostscriptum($event->getPostscriptum())
         ;
 
-        $group->save();
+        $profile->save();
 
-        $event->setGroup($group);*/
+        $event->setProfile($profile);
     }
 
     /**
@@ -58,20 +59,20 @@ class Profile extends BaseAction implements EventSubscriberInterface
      */
     public function update(ProfileEvent $event)
     {
-        if (null !== $group = GroupQuery::create()->findPk($event->getId())) {
+        if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
 
-            /*$group
+            $profile
                 ->setDispatcher($this->getDispatcher())
-                ->setRequirements($event->getRequirements())
-                ->setType($event->getType())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
+                ->setChapo($event->getChapo())
                 ->setDescription($event->getDescription())
+                ->setPostscriptum($event->getPostscriptum())
             ;
 
-            $group->save();
+            $profile->save();
 
-            $event->setGroup($group);*/
+            $event->setProfile($profile);
         }
     }
 
@@ -80,13 +81,13 @@ class Profile extends BaseAction implements EventSubscriberInterface
      */
     public function delete(ProfileEvent $event)
     {
-        if (null !== $group = GroupQuery::create()->findPk($event->getId())) {
+        if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
 
-            /*$group
+            $profile
                 ->delete()
             ;
 
-            $event->setGroup($group);*/
+            $event->setProfile($profile);
         }
     }
 

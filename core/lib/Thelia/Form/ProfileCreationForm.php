@@ -24,7 +24,9 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ProfileQuery;
 
 /**
  * Class ProfileCreationForm
@@ -37,36 +39,42 @@ class ProfileCreationForm extends BaseForm
 
     protected function buildForm($change_mode = false)
     {
-        $types = ProfileEngine::getInstance()->getProfileTypeList();
-        $typeList = array();
-        $requirementList = array();
-        foreach($types as $type) {
-            $classPath = "\\Thelia\\ProfileEngine\\ProfileType\\$type";
-            $instance = new $classPath();
-            $typeList[$type] = $instance->getTitle();
-            $requirementList[$type] = $instance->getRequirementsList();
-        }
-
         $this->formBuilder
             ->add("locale", "text", array(
                 "constraints" => array(new NotBlank())
             ))
-            ->add("type", "choice", array(
-                "choices" => $typeList,
-                "required" => true,
+            ->add("code", "text", array(
                 "constraints" => array(
-                    new Constraints\NotBlank(),
+                    new NotBlank(),
+                    new Constraints\Callback(
+                        array(
+                            "methods" => array(
+                                array($this, "verifyCode"),
+                            ),
+                        )
+                    ),
                 ),
-                "label" => Translator::getInstance()->trans("Type"),
-                "label_attr" => array("for" => "type_field"),
+                "label" => Translator::getInstance()->trans("Profile Code"),
+                "label_attr" => array("for" => "profile_code_fiels"),
             ))
         ;
 
-        $this->addStandardDescFields(array('postscriptum', 'chapo', 'locale'));
+        $this->addStandardDescFields(array('locale'));
     }
 
     public function getName()
     {
         return "thelia_profile_creation";
+    }
+
+    public function verifyCode($value, ExecutionContextInterface $context)
+    {
+        /* check unicity */
+        $profile = ProfileQuery::create()
+            ->findOneByCode($value);
+
+        if (null !== $profile) {
+            $context->addViolation("Profile `code` already exists");
+        }
     }
 }

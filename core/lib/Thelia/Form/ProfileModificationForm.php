@@ -52,6 +52,8 @@ class ProfileModificationForm extends ProfileCreationForm
                 )
             ))
         ;
+
+        $this->formBuilder->remove("code");
     }
 
     public function getName()

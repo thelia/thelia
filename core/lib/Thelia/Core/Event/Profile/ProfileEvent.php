@@ -24,31 +24,108 @@
 namespace Thelia\Core\Event\Profile;
 
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Model\Group;
+use Thelia\Model\Profile;
 
 class ProfileEvent extends ActionEvent
 {
-    protected $group = null;
+    protected $profile = null;
+    protected $id = null;
+    protected $locale = null;
+    protected $code = null;
+    protected $title = null;
+    protected $chapo = null;
+    protected $description = null;
+    protected $postscriptum = null;
 
-    public function __construct(Group $group = null)
+    public function __construct(Profile $profile = null)
     {
-        $this->group = $group;
+        $this->profile = $profile;
     }
 
-    public function hasGroup()
+    public function hasProfile()
     {
-        return ! is_null($this->group);
+        return ! is_null($this->profile);
     }
 
-    public function getGroup()
+    public function getProfile()
     {
-        return $this->group;
+        return $this->profile;
     }
 
-    public function setGroup(Group $group)
+    public function setProfile(Profile $profile)
     {
-        $this->group = $group;
+        $this->profile = $profile;
 
         return $this;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setCode($code)
+    {
+        $this->code = $code;
+    }
+
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    public function setChapo($chapo)
+    {
+        $this->chapo = $chapo;
+    }
+
+    public function getChapo()
+    {
+        return $this->chapo;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setPostscriptum($postscriptum)
+    {
+        $this->postscriptum = $postscriptum;
+    }
+
+    public function getPostscriptum()
+    {
+        return $this->postscriptum;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
     }
 }
