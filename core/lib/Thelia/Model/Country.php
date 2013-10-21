@@ -13,6 +13,9 @@ class Country extends BaseCountry
 
     public function toggleDefault()
     {
+        if($this->getId() === null) {
+            throw new \RuntimeException("impossible to just uncheck default country, choose a new one");
+        }
         CountryQuery::create()
             ->filterByByDefault(1)
             ->update(array('ByDefault' => 0));
