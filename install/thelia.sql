@@ -955,7 +955,7 @@ DROP TABLE IF EXISTS `resource`;
 CREATE TABLE `resource`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `code` VARCHAR(30) NOT NULL,
+    `code` VARCHAR(255) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),

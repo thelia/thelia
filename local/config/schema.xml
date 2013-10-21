@@ -740,7 +740,7 @@
   </table>
   <table name="resource" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="code" required="true" size="30" type="VARCHAR" />
+    <column name="code" required="true" size="255" type="VARCHAR" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />

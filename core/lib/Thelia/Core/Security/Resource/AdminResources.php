@@ -50,6 +50,8 @@ final class AdminResources
         }
     }
 
+    const SUPERADMINISTRATOR = "SUPERADMINISTRATOR";
+
     const ADDRESS_VIEW = "admin.address.view";
     const ADDRESS_CREATE = "admin.address.create";
     const ADDRESS_UPDATE = "admin.address.update";

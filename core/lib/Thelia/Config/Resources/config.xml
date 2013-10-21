@@ -158,6 +158,7 @@
         <command class="Thelia\Command\ModuleActivateCommand"/>
         <command class="Thelia\Command\CreateAdminUser"/>
         <command class="Thelia\Command\ReloadDatabaseCommand"/>
+        <command class="Thelia\Command\GenerateResources"/>
     </commands>
 
     <services>
