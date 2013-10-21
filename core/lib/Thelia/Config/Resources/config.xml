@@ -7,6 +7,7 @@
     <loops>
         <loop class="Thelia\Core\Template\Loop\Accessory" name="accessory"/>
         <loop class="Thelia\Core\Template\Loop\Address" name="address"/>
+        <loop class="Thelia\Core\Template\Loop\Admin" name="admin"/>
         <loop class="Thelia\Core\Template\Loop\Area" name="area"/>
         <loop class="Thelia\Core\Template\Loop\AssociatedContent" name="associated_content"/>
         <loop class="Thelia\Core\Template\Loop\Attribute" name="attribute"/>
@@ -33,6 +34,7 @@
         <loop class="Thelia\Core\Template\Loop\Payment" name="payment"/>
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
         <loop class="Thelia\Core\Template\Loop\ProductSaleElements" name="product_sale_elements"/>
+        <loop class="Thelia\Core\Template\Loop\Profile" name="profile"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
         <loop class="Thelia\Core\Template\Loop\Title" name="title"/>
         <loop class="Thelia\Core\Template\Loop\Lang" name="lang"/>
@@ -125,13 +127,14 @@
         <form name="thelia.admin.tax.taxlistupdate" class="Thelia\Form\TaxTaxListUpdateForm"/>
         <form name="thelia.admin.tax.add" class="Thelia\Form\TaxCreationForm"/>
 
+        <form name="thelia.admin.profile.add" class="Thelia\Form\ProfileCreationForm"/>
+        <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
+
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>
 
         <form name="thelia.admin.country.creation" class="Thelia\Form\CountryCreationForm"/>
         <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
-
-        <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
         
         <form name="thelia.admin.language.creation" class="Thelia\Form\LanguageCreationForm"/>
 
@@ -144,6 +147,8 @@
 
         <form name="thelia.shopping_zone_area" class="Thelia\Form\ShippingZone\ShippingZoneAddArea"/>
         <form name="thelia.shopping_zone_remove_area" class="Thelia\Form\ShippingZone\ShippingZoneRemoveArea"/>
+
+        <form name="thelia.contact" class="Thelia\Form\ContactForm"/>
     </forms>
 
 
@@ -157,6 +162,7 @@
         <command class="Thelia\Command\ModuleActivateCommand"/>
         <command class="Thelia\Command\CreateAdminUser"/>
         <command class="Thelia\Command\ReloadDatabaseCommand"/>
+        <command class="Thelia\Command\GenerateResources"/>
     </commands>
 
     <services>

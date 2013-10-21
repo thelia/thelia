@@ -378,8 +378,8 @@ class BaseAdminController extends BaseController
      * Render the given template, and returns the result as a string.
      *
      * @param $templateName the complete template name, with extension
-     * @param  array $args the template arguments
-     * @param null $templateDir
+     * @param array $args        the template arguments
+     * @param null  $templateDir
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */

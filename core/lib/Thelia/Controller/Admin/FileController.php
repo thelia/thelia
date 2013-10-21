@@ -26,6 +26,7 @@ namespace Thelia\Controller\Admin;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
 use Thelia\Core\Event\Document\DocumentDeleteEvent;
 use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
@@ -69,7 +70,7 @@ class FileController extends BaseAdminController
      */
     public function saveImageAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth('ADMIN', 'admin.image.save');
+        $this->checkAuth('ADMIN', AdminResources::retrieve($parentType, 'update'));
         $this->checkXmlHttpRequest();
 
         if ($this->isParentTypeValid($parentType)) {
@@ -145,7 +146,7 @@ class FileController extends BaseAdminController
      */
     public function saveDocumentAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth('ADMIN', 'admin.document.save');
+        $this->checkAuth('ADMIN', AdminResources::retrieve($parentType, 'update'));
         $this->checkXmlHttpRequest();
 
         if ($this->isParentTypeValid($parentType)) {
@@ -209,7 +210,7 @@ class FileController extends BaseAdminController
      */
     public function getImageListAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth('ADMIN', 'admin.image.save');
+        $this->checkAuth('ADMIN', AdminResources::retrieve($parentType, 'update'));
         $this->checkXmlHttpRequest();
         $args = array('imageType' => $parentType, 'parentId' => $parentId);
 
@@ -226,7 +227,7 @@ class FileController extends BaseAdminController
      */
     public function getDocumentListAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth('ADMIN', 'admin.document.save');
+        $this->checkAuth('ADMIN', AdminResources::retrieve($parentType, 'update'));
         $this->checkXmlHttpRequest();
         $args = array('documentType' => $parentType, 'parentId' => $parentId);
 
@@ -243,7 +244,7 @@ class FileController extends BaseAdminController
      */
     public function getImageFormAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth('ADMIN', 'admin.image.save');
+        $this->checkAuth('ADMIN', AdminResources::retrieve($parentType, 'update'));
         $this->checkXmlHttpRequest();
         $args = array('imageType' => $parentType, 'parentId' => $parentId);
 
@@ -260,7 +261,7 @@ class FileController extends BaseAdminController
      */
     public function getDocumentFormAjaxAction($parentId, $parentType)
     {
-        $this->checkAuth('ADMIN', 'admin.document.save');
+        $this->checkAuth('ADMIN', AdminResources::retrieve($parentType, 'update'));
         $this->checkXmlHttpRequest();
         $args = array('documentType' => $parentType, 'parentId' => $parentId);
 
@@ -277,7 +278,7 @@ class FileController extends BaseAdminController
      */
     public function viewImageAction($imageId, $parentType)
     {
-        if (null !== $response = $this->checkAuth('admin.image.view')) {
+        if (null !== $response = $this->checkAuth('ADMIN', AdminResources::retrieve($parentType, 'update'))) {
             return $response;
         }
         try {
@@ -306,7 +307,7 @@ class FileController extends BaseAdminController
      */
     public function viewDocumentAction($documentId, $parentType)
     {
-        if (null !== $response = $this->checkAuth('admin.document.view')) {
+        if (null !== $response = $this->checkAuth('ADMIN', AdminResources::retrieve($parentType, 'update'))) {
             return $response;
         }
         try {
@@ -335,7 +336,7 @@ class FileController extends BaseAdminController
      */
     public function updateImageAction($imageId, $parentType)
     {
-        if (null !== $response = $this->checkAuth('admin.image.update')) {
+        if (null !== $response = $this->checkAuth('ADMIN', AdminResources::retrieve($parentType, 'update'))) {
             return $response;
         }
 
@@ -412,7 +413,7 @@ class FileController extends BaseAdminController
      */
     public function updateDocumentAction($documentId, $parentType)
     {
-        if (null !== $response = $this->checkAuth('admin.document.update')) {
+        if (null !== $response = $this->checkAuth('ADMIN', AdminResources::retrieve($parentType, 'update'))) {
             return $response;
         }
 
@@ -489,7 +490,7 @@ class FileController extends BaseAdminController
      */
     public function deleteImageAction($imageId, $parentType)
     {
-        $this->checkAuth('ADMIN', 'admin.image.delete');
+        $this->checkAuth('ADMIN', AdminResources::retrieve($parentType, 'update'));
         $this->checkXmlHttpRequest();
 
         $fileManager = new FileManager($this->container);
@@ -532,7 +533,7 @@ class FileController extends BaseAdminController
      */
     public function deleteDocumentAction($documentId, $parentType)
     {
-        $this->checkAuth('ADMIN', 'admin.document.delete');
+        $this->checkAuth('ADMIN', AdminResources::retrieve($parentType, 'update'));
         $this->checkXmlHttpRequest();
 
         $fileManager = new FileManager($this->container);

@@ -118,5 +118,4 @@ class TaxRuleEvent extends ActionEvent
         return $this->taxList;
     }
 
-
 }

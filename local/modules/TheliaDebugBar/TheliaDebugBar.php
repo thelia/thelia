@@ -32,21 +32,6 @@ class TheliaDebugBar extends BaseModule
      * Like install and destroy
      */
 
-    public function afterActivation()
-    {
-
-    }
-
-    public function install()
-    {
-        // TODO: Implement install() method.
-    }
-
-    public function destroy()
-    {
-        // TODO: Implement destroy() method.
-    }
-
     public function getCode()
     {
         return 'TheliaDebugBar';

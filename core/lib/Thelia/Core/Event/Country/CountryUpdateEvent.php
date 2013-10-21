@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Country;
 
-
 /**
  * Class CountryUpdateEvent
  * @package Thelia\Core\Event\Country
@@ -37,7 +36,7 @@ class CountryUpdateEvent extends CountryCreateEvent
     protected $description;
     protected $postscriptum;
 
-    function __construct($country_id)
+    public function __construct($country_id)
     {
         $this->country_id = $country_id;
     }
@@ -113,8 +112,5 @@ class CountryUpdateEvent extends CountryCreateEvent
     {
         return $this->country_id;
     }
-
-
-
 
 }

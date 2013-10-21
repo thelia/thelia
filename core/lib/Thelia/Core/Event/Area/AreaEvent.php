@@ -24,7 +24,6 @@
 namespace Thelia\Core\Event\Area;
 use Thelia\Core\Event\ActionEvent;
 
-
 /**
  * Class AreaEvent
  * @package Thelia\Core\Event\Shipping

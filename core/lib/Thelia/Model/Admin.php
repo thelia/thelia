@@ -2,6 +2,8 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Security\Role\Role;
 
@@ -21,6 +23,28 @@ use Propel\Runtime\Connection\ConnectionInterface;
  */
 class Admin extends BaseAdmin implements UserInterface
 {
+    public function getPermissions()
+    {
+        $profileId = $this->getProfileId();
+
+        if( null === $profileId ) {
+            return AdminResources::SUPERADMINISTRATOR;
+        }
+
+        $userPermissionsQuery = ProfileResourceQuery::create()
+            ->joinResource("resource", Criteria::LEFT_JOIN)
+            ->withColumn('resource.code', 'code')
+            ->filterByProfileId($profileId)
+            ->find();
+
+        $userPermissions = array();
+        foreach($userPermissionsQuery as $userPermission) {
+            $userPermissions[] = $userPermission->getVirtualColumn('code');
+        }
+
+        return $userPermissions;
+    }
+
     /**
      * {@inheritDoc}
      */

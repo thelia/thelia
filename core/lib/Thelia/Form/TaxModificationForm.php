@@ -26,6 +26,11 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\TaxQuery;
 
+/**
+ * Class TaxModificationForm
+ * @package Thelia\Form
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ */
 class TaxModificationForm extends TaxCreationForm
 {
     protected function buildForm()

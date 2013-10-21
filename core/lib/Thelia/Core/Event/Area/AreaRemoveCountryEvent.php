@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Area;
 
-
 /**
  * Class AreaRemoveCountryEvent
  * @package Thelia\Core\Event\Area

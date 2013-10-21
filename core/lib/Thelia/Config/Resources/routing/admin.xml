@@ -757,6 +757,32 @@
 
     <!-- end countries routes management -->
 
+    <!-- profiles management -->
+
+    <route id="admin.configuration.profiles.list" path="/admin/configuration/profiles">
+        <default key="_controller">Thelia\Controller\Admin\ProfileController::defaultAction</default>
+        <requirement key="address_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.profiles.update" path="/admin/configuration/profiles/update/{profile_id}">
+        <default key="_controller">Thelia\Controller\Admin\ProfileController::updateAction</default>
+        <requirement key="tax_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.profiles.add" path="/admin/configuration/profiles/add">
+        <default key="_controller">Thelia\Controller\Admin\ProfileController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.profiles.save" path="/admin/configuration/profiles/save">
+        <default key="_controller">Thelia\Controller\Admin\ProfileController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.configuration.profiles.delete" path="/admin/configuration/profiles/delete">
+        <default key="_controller">Thelia\Controller\Admin\ProfileController::deleteAction</default>
+    </route>
+
+    <!-- end profiles management -->
+
     <!-- feature and features value management -->
 
     <route id="admin.configuration.features.default" path="/admin/configuration/features">
@@ -816,8 +842,17 @@
 
     <!-- Modules rule management -->
 
-    <route id="admin.module" path="/admin/modules">
+    <route id="admin.module" path="/admin/configuration/modules">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::indexAction</default>
+    </route>
+
+    <route id="admin.module.toggle-activation" path="/admin/configuration/modules/toggle-activation/{module_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::toggleActivationAction</default>
+        <requirement key="module_id">\d+</requirement>
+    </route>
+
+    <route id="admin.module.delete" path="/admin/configuration/modules/delete">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::deleteAction</default>
     </route>
 
     <!-- end Modules rule management -->

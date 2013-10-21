@@ -9,7 +9,7 @@
     {assign oder_tab {$smarty.get.tab|default:$smarty.post.tab|default:'data'}}
     {assign asked_country {$smarty.get.country|default:{country ask="default" attr="id"}}}
 
-    <div class="taxes-rules edit-taxes-rules">
+<div class="taxes-rules edit-taxes-rules">
 
     <div id="wrapper" class="container">
 
@@ -208,11 +208,10 @@
             </div>
 
         </div>
+        {/loop}
     </div>
 
-    {/loop}
-
-    </div>
+</div>
 
 {* Confirmation dialog *}
     {form name="thelia.admin.taxrule.taxlistupdate"}

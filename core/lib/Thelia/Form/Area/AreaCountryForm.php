@@ -28,7 +28,6 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
 
-
 /**
  * Class AreaCountryForm
  * @package Thelia\Form\Area

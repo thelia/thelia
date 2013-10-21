@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaCreateEvent;
 use Thelia\Core\Event\Area\AreaDeleteEvent;
@@ -52,10 +53,10 @@ class AreaController extends AbstractCrudController
             null,
             null,
 
-            'admin.area.default',
-            'admin.area.create',
-            'admin.area.update',
-            'admin.area.delete',
+            AdminResources::AREA_VIEW,
+            AdminResources::AREA_CREATE,
+            AdminResources::AREA_UPDATE,
+            AdminResources::AREA_DELETE,
 
             TheliaEvents::AREA_CREATE,
             TheliaEvents::AREA_UPDATE,

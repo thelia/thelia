@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event;
 
-
 /**
  * Class PdfEvent
  * @package Thelia\Core\Event
@@ -44,12 +43,12 @@ class PdfEvent extends ActionEvent
 
     /**
      * @param $content              html content to transform into pdf
-     * @param string $orientation   page orientation, same as TCPDF
-     * @param string $format        The format used for pages, same as TCPDF
-     * @param string $lang          Lang : fr, en, it...
-     * @param bool $unicode         TRUE means that the input text is unicode (default = true)
-     * @param string $encoding      charset encoding; default is UTF-8
-     * @param array $marges         Default marges (left, top, right, bottom)
+     * @param string $orientation page orientation, same as TCPDF
+     * @param string $format      The format used for pages, same as TCPDF
+     * @param string $lang        Lang : fr, en, it...
+     * @param bool   $unicode     TRUE means that the input text is unicode (default = true)
+     * @param string $encoding    charset encoding; default is UTF-8
+     * @param array  $marges      Default marges (left, top, right, bottom)
      */
     public function __construct($content, $orientation = 'P', $format = 'A4', $lang='fr', $unicode=true, $encoding='UTF-8',array $marges = array(0, 0, 0, 0))
     {
@@ -188,6 +187,5 @@ class PdfEvent extends ActionEvent
     {
         return $this->unicode;
     }
-
 
 }

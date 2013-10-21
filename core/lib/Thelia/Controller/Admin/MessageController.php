@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Message\MessageDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;use Thelia\Core\Event\Message\MessageUpdateEvent;
 use Thelia\Core\Event\Message\MessageCreateEvent;
@@ -44,10 +45,10 @@ class MessageController extends AbstractCrudController
             null, // no sort order change
             null, // no sort order change
 
-            'admin.configuration.messages.view',
-            'admin.configuration.messages.create',
-            'admin.configuration.messages.update',
-            'admin.configuration.messages.delete',
+            AdminResources::MESSAGE_VIEW,
+            AdminResources::MESSAGE_CREATE,
+            AdminResources::MESSAGE_UPDATE,
+            AdminResources::MESSAGE_DELETE,
 
             TheliaEvents::MESSAGE_CREATE,
             TheliaEvents::MESSAGE_UPDATE,

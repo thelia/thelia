@@ -24,13 +24,12 @@
 namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
-use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
-
 
 /**
  * Class AddressController
@@ -46,10 +45,10 @@ class AddressController extends AbstractCrudController
             null,
             null,
 
-            'admin.customer.update.view',
-            'admin.address.create',
-            'admin.address.update',
-            'admin.address.delete',
+            AdminResources::ADDRESS_VIEW,
+            AdminResources::ADDRESS_CREATE,
+            AdminResources::ADDRESS_UPDATE,
+            AdminResources::ADDRESS_DELETE,
 
             TheliaEvents::ADDRESS_CREATE,
             TheliaEvents::ADDRESS_UPDATE,
@@ -62,7 +61,7 @@ class AddressController extends AbstractCrudController
 
     public function useAddressAction()
     {
-        if (null !== $response = $this->checkAuth("admin.customer.update")) return $response;
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
 
         $address_id = $this->getRequest()->request->get('address_id');
 
@@ -78,7 +77,7 @@ class AddressController extends AbstractCrudController
             $this->dispatch(TheliaEvents::ADDRESS_DEFAULT, $addressEvent);
 
             $this->adminLogAppend(sprintf("address %d for customer %d removal", $address_id, $address->getCustomerId()));
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             \Thelia\Log\Tlog::getInstance()->error(sprintf("error during address removal with message %s", $e->getMessage()));
         }
 
@@ -175,8 +174,6 @@ class AddressController extends AbstractCrudController
             $formData["company"],
             $formData["is_default"]
         );
-
-
 
         return $event;
 
@@ -279,8 +276,8 @@ class AddressController extends AbstractCrudController
     /**
      * Put in this method post object delete processing if required.
      *
-     * @param  \Thelia\Core\Event\AddressEvent  $deleteEvent the delete event
-     * @return Response a response, or null to continue normal processing
+     * @param  \Thelia\Core\Event\AddressEvent $deleteEvent the delete event
+     * @return Response                        a response, or null to continue normal processing
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
@@ -291,8 +288,8 @@ class AddressController extends AbstractCrudController
     /**
      * Put in this method post object creation processing if required.
      *
-     * @param  AddressCreateOrUpdateEvent  $createEvent the create event
-     * @return Response a response, or null to continue normal processing
+     * @param  AddressCreateOrUpdateEvent $createEvent the create event
+     * @return Response                   a response, or null to continue normal processing
      */
     protected function performAdditionalCreateAction($createEvent)
     {
