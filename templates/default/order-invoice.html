@@ -92,15 +92,17 @@
                             <div class="product-options">
                                 <dl class="dl-horizontal">
                                     <dt>{intl l="Available"} :</dt>
-                                    <dd>{intl l="In Stock"}</dd>
+                                    {if $STOCK > 0}
+                                        <dd>{intl l="In Stock"}</dd>
+                                    {else}
+                                        <dd>{intl l="Out of Stock"}</dd>
+                                    {/if}
                                     <dt>{intl l="No."}</dt>
                                     <dd>{$REF}</dd>
-                                    {*<dt>Select Size</dt>
-                                    <dd>Large</dd>
-                                    <dt>Select Delivery Date</dt>
-                                    <dd>Jan 2, 2013</dd>
-                                    <dt>Additional Option</dt>
-                                    <dd>Option 1</dd>*}
+                                    {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
+                                        <dt>{$ATTRIBUTE_TITLE}</dt>
+                                        <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
+                                    {/loop}
                                 </dl>
                             </div>
                         </td>
