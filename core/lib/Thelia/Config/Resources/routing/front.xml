@@ -168,4 +168,9 @@
         <default key="_controller">Thelia\Controller\Front\Mail::test</default>
     </route>
 
+    <route id="contact.display" path="/contact" methods="get">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">contact</default>
+    </route>
+
 </routes>

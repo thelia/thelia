@@ -142,6 +142,8 @@
 
         <form name="thelia.shopping_zone_area" class="Thelia\Form\ShippingZone\ShippingZoneAddArea"/>
         <form name="thelia.shopping_zone_remove_area" class="Thelia\Form\ShippingZone\ShippingZoneRemoveArea"/>
+
+        <form name="thelia.contact" class="Thelia\Form\ContactForm"/>
     </forms>
 
 
