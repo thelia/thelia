@@ -19,7 +19,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('image_cache_dir_from_web_root', 'cache/images', 0, 0, NOW(), NOW()),
 ('document_cache_dir_from_web_root', 'cache/documents', 0, 0, NOW(), NOW()),
 ('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml', 0, 0, NOW(), NOW()),
-('page_not_found_view', '404', 0, 0, NOW(), NOW()),
+('page_not_found_view', '404.html', 0, 0, NOW(), NOW()),
 ('passed_url_view', 'passed-url', 0, 0, NOW(), NOW()),
 ('use_tax_free_amounts', 0, 0, 0, NOW(), NOW()),
 ('process_assets', '1', 0, 0, NOW(), NOW()),
