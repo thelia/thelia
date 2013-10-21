@@ -115,12 +115,13 @@
                     </div>
                     <div>
                         <div class="product-btn">
-                            {if $hasSubmit == true}
-                                <button type="submit" class="btn btn-cart">{intl l="Add to cart"}</button>
-                            {else}
-                                <a href="{$URL}" class="btn btn-cart">{intl l="View product"}</a>
+                           {if $hasBtn == true}
+                                {if $hasSubmit == true}
+                                    <button type="submit" class="btn btn-cart">{intl l="Add to cart"}</button>
+                                {else}
+                                    <a href="{$URL}" class="btn btn-cart">{intl l="View product"}</a>
+                                {/if}
                             {/if}
-
                         </div>
                     </div>
 
