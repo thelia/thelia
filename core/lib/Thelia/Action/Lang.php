@@ -21,49 +21,61 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Lang;
+namespace Thelia\Action;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Lang\LangUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\LangQuery;
 
 
 /**
- * Class LangUpdateEvent
- * @package Thelia\Core\Event\Lang
+ * Class Lang
+ * @package Thelia\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class LangUpdateEvent extends LangCreateEvent
+class Lang extends BaseAction implements EventSubscriberInterface
 {
-    /**
-     * @var int lang id
-     */
-    protected $id;
 
-    /**
-     * @param int $id
-     */
-    function __construct($id)
+    public function update(LangUpdateEvent $event)
     {
-        $this->id = $id;
+        if (null !== $lang = LangQuery::create()->findPk($event->getId())) {
+            $lang->setDispatcher($this->getDispatcher());
+
+            $lang->setTitle($event->getTitle())
+                ->setLocale($event->getLocale())
+                ->setCode($event->getCode())
+                ->setDateFormat($event->getDateFormat())
+                ->setTimeFormat($event->getTimeFormat())
+                ->save();
+
+            $event->setLang($lang);
+        }
     }
 
-
     /**
-     * @param int $id
+     * Returns an array of event names this subscriber wants to listen to.
      *
-     * @return $this
+     * The array keys are event names and the value can be:
+     *
+     *  * The method name to call (priority defaults to 0)
+     *  * An array composed of the method name to call and the priority
+     *  * An array of arrays composed of the method names to call and respective
+     *    priorities, or 0 if unset
+     *
+     * For instance:
+     *
+     *  * array('eventName' => 'methodName')
+     *  * array('eventName' => array('methodName', $priority))
+     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
+     *
+     * @return array The event names to listen to
+     *
+     * @api
      */
-    public function setId($id)
+    public static function getSubscribedEvents()
     {
-        $this->id = $id;
-
-        return $this;
+        return array(
+            TheliaEvents::LANG_UPDATE => array('update', 128)
+        );
     }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-
 }

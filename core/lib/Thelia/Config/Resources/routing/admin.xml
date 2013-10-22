@@ -931,7 +931,7 @@
         <requirement key="lang_id">\d+</requirement>
     </route>
 
-    <route id="admin.configuration.languages.update" path="/admin/configuration/languages/save/{lang_id}">
+    <route id="admin.configuration.languages.update.process" path="/admin/configuration/languages/save/{lang_id}">
         <default key="_controller">Thelia\Controller\Admin\LangController::processUpdateAction</default>
         <requirement key="lang_id">\d+</requirement>
     </route>

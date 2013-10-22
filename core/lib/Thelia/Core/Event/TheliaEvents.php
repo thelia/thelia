@@ -688,4 +688,15 @@ final class TheliaEvents
      * sent for subscribing to the newsletter
      */
     const NEWSLETTER_SUBSCRIBE = 'thelia.newsletter.subscribe';
+
+    const LANG_UPDATE = 'action.lang.update';
+
+    const BEFORE_UPDATELANG = 'action.lang.beforeUpdate';
+    const AFTER_UPDATELANG = 'action.lang.afterUpdate';
+
+    const BEFORE_CREATELANG = 'action.lang.beforeCreate';
+    const AFTER_CREATELANG = 'action.lang.afterCreate';
+
+    const BEFORE_DELETELANG = 'action.lang.beforeDelete';
+    const AFTER_DELETELANG = 'action.lang.afterDelete';
 }

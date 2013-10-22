@@ -23,6 +23,8 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\Lang\LangUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Lang\LangUpdateForm;
@@ -78,8 +80,30 @@ class LangController extends BaseAdminController
 
         try {
             $form = $this->validateForm($langForm);
-        } catch(\Exception $e) {
 
+            $event = new LangUpdateEvent($form->get('id')->getData());
+            $event
+                ->setTitle($form->get('title')->getData())
+                ->setCode($form->get('code')->getData())
+                ->setLocale($form->get('locale')->getData())
+                ->setDateFormat($form->get('date_format')->getData())
+                ->setTimeFormat($form->get('time_format')->getData())
+            ;
+
+            $this->dispatch(TheliaEvents::LANG_UPDATE, $event);
+
+            if (false === $event->hasLang()) {
+                throw new \LogicException(
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang')));
+            }
+
+            $changedObject = $event->getLang();
+            $this->adminLogAppend(sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
+            $this->redirectToRoute('/admin/configuration/languages');
+        } catch(\Exception $e) {
+            $error_msg = $e->getMessage();
         }
+
+        return $this->render('languages');
     }
 }
