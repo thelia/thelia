@@ -222,7 +222,7 @@
 
 									            <td class="actions">
 									                <div class="btn-group">
-									                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.folder.content.delete"}
+									                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.folder" access="UPDATE"}
 									                       <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$ID}" data-toggle="modal">
 									                        <span class="glyphicon glyphicon-trash"></span>
 									                       </a>

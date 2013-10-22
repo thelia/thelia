@@ -27,7 +27,7 @@
                         <table class="table table-striped table-condensed table-left-aligned">
                             <caption>
                                {intl l="Languages management"}
-                               {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.languages.create"}
+                               {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.language" access="CREATE"}
                                 <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new language'}" href="#creation_dialog" data-toggle="modal">
                                     <span class="glyphicon glyphicon-plus-sign"></span>
                                 </a>

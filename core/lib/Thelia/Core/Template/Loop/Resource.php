@@ -24,28 +24,28 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\BaseI18nLoop;
-use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Model\AdminQuery;
+use Thelia\Model\ResourceQuery;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 
 /**
  *
- * Admin loop
+ * Resource loop
  *
  *
- * Class Admin
+ * Class Resource
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Admin extends BaseLoop
+class Resource extends BaseI18nLoop
 {
     public $timestampable = true;
 
@@ -55,8 +55,7 @@ class Admin extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('profile')
+            Argument::createIntTypeArgument('profile')
         );
     }
 
@@ -67,35 +66,46 @@ class Admin extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = AdminQuery::create();
+        $search = ResourceQuery::create();
 
-        $id = $this->getId();
-
-        if (null !== $id) {
-            $search->filterById($id, Criteria::IN);
-        }
+        /* manage translations */
+        $locale = $this->configureI18nProcessing($search);
 
         $profile = $this->getProfile();
 
         if (null !== $profile) {
-            $search->filterByProfileId($profile, Criteria::IN);
+            $search->leftJoinProfileResource('profile_resource')
+                ->withColumn('profile_resource.access', 'access');
+            //$search->filterById($id, Criteria::IN);
         }
 
-        $search->orderByFirstname(Criteria::ASC);
+        $search->orderById(Criteria::ASC);
 
         /* perform search */
-        $admins = $this->search($search, $pagination);
+        $resources = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult($admins);
+        $loopResult = new LoopResult($resources);
 
-        foreach ($admins as $admin) {
-            $loopResultRow = new LoopResultRow($loopResult, $admin, $this->versionable, $this->timestampable, $this->countable);
-            $loopResultRow->set("ID", $admin->getId())
-                ->set("PROFILE",$admin->getProfileId())
-                ->set("FIRSTNAME",$admin->getFirstname())
-                ->set("LASTNAME",$admin->getLastname())
-                ->set("LOGIN",$admin->getLogin())
+        foreach ($resources as $resource) {
+            $loopResultRow = new LoopResultRow($loopResult, $resource, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow->set("ID", $resource->getId())
+                ->set("IS_TRANSLATED",$resource->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE",$locale)
+                ->set("CODE",$resource->getCode())
+                ->set("TITLE",$resource->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $resource->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $resource->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $resource->getVirtualColumn('i18n_POSTSCRIPTUM'))
             ;
+
+            if (null !== $profile) {
+                $accessValue = $resource->getVirtualColumn('access');
+                $manager = new AccessManager($accessValue);
+                $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW))
+                    ->set("CREATABLE", $manager->can(AccessManager::CREATE))
+                    ->set("UPDATABLE", $manager->can(AccessManager::UPDATE))
+                    ->set("DELETABLE", $manager->can(AccessManager::DELETE));
+            }
 
             $loopResult->addRow($loopResultRow);
         }

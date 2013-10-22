@@ -63,8 +63,9 @@ class AccessManager
         $this->accessValue = $accessValue;
 
         foreach($this->accessPows as $type => $value) {
-            if($accessValue >= $value) {
-                $accessValue -= $value;
+            $pow = pow(2, $value);
+            if($accessValue >= $pow) {
+                $accessValue -= $pow;
                 $this->accessGranted[$type] = true;
             } else {
                 $this->accessGranted[$type] = false;

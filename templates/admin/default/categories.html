@@ -31,7 +31,7 @@
 
                                  {module_include location='category_list_caption'}
 
-                                 {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.categories.create"}
+                                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.category" access="CREATE"}
                                  <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new category'}" href="#category_creation_dialog" data-toggle="modal">
                                      <span class="glyphicon glyphicon-plus-sign"></span>
                                  </a>
@@ -113,7 +113,7 @@
                                      {module_include location='category_list_row'}
 
                                      <td>
-                                         {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.categories.edit"}
+                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
                                              <div class="make-switch switch-small categoryVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                  <input type="checkbox" class="categoryVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
                                              </div>
@@ -142,11 +142,11 @@
                                          <div class="btn-group">
                                              <a class="btn btn-default btn-xs" title="{intl l='Browse this category'}" href="{url path='admin/categories' category_id=$ID}"><i class="glyphicon glyphicon-folder-open"></i></a>
 
-                                             {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.categories.edit"}
+                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
                                                 <a class="btn btn-default btn-xs" title="{intl l='Edit this category'}" href="{url path='/admin/categories/update' category_id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
                                              {/loop}
 
-                                             {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.categories.delete"}
+                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.category" access="DELETE"}
                                                 <a class="btn btn-default btn-xs category-delete" title="{intl l='Delete this category and all its contents'}"  href="#category_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
                                              {/loop}
                                          </div>
@@ -161,7 +161,7 @@
                                  <tr>
                                      <td class="message">
                                          <div class="alert alert-info">
-                                         {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.categories.create"}
+                                         {loop type="auth" name="can_create" role="ADMIN" resource="admin.category" access="CREATE"}
                                              {intl l="This category has no sub-categories. To create a new one, click the + button above."}
                                          {/loop}
 
@@ -281,7 +281,7 @@
                              {module_include location='product_list_row'}
 
                              <td>
-                                    {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.products.edit"}
+                                    {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
                                         <div class="make-switch switch-small productVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                             <input type="checkbox" class="productVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
                                         </div>
@@ -308,11 +308,11 @@
 
                              <td class="actions">
                                  <div class="btn-group">
-                                 {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.product.edit"}
+                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
                                     <a class="btn btn-default btn-xs" title="{intl l='Edit this product'}" href="{url path='/admin/products/update' product_id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
                                 {/loop}
 
-                                 {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.product.delete"}
+                                 {loop type="auth" name="can_delete" role="ADMIN" resource="admin.product" access="DELETE"}
                                        <a class="btn btn-default btn-xs product-delete" title="{intl l='Delete this product'}"  href="#product_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
                                  {/loop}
                                  </div>

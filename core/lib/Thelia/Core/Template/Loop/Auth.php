@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -45,7 +46,7 @@ class Auth extends BaseLoop
     {
         return new ArgumentCollection(
             new Argument(
-                'roles',
+                'role',
                 new TypeCollection(
                     new AlphaNumStringListType()
                 ),
@@ -61,7 +62,7 @@ class Auth extends BaseLoop
             new Argument(
                 'access',
                 new TypeCollection(
-                    new EnumListType(array("view", "create", "update", "delete"))
+                    new EnumListType(array(AccessManager::VIEW, AccessManager::CREATE, AccessManager::UPDATE, AccessManager::DELETE))
                 )
             ),
             Argument::createAnyTypeArgument('context', 'front', false)
@@ -75,7 +76,7 @@ class Auth extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $roles = $this->getRoles();
+        $roles = $this->getRole();
         $resource = $this->getResource();
         $access = $this->getAccess();
 

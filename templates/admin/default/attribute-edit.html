@@ -66,7 +66,7 @@
 
 		     						         {intl l='Attribute values'}
 
-		                                     {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.attribute-av.create"}
+		                                     {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
 		                                     <span class="pull-right">
 		                                         <a data-toggle="modal" href="#creation_dialog" title="Add a new attribute value" class="btn btn-default btn-primary">
 		                                             <span class="glyphicon glyphicon-plus-sign"></span>
@@ -148,7 +148,7 @@
 
     				                                    <td class="actions">
     				                                        <div class="btn-group">
-    				                                            {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.attribute-av.delete"}
+    				                                            {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
     				                                               <a class="btn btn-default btn-xs value-delete" title="{intl l='Delete this value'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
     				                                                <span class="glyphicon glyphicon-trash"></span>
     				                                               </a>
