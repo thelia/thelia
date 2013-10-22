@@ -23,8 +23,12 @@
 
 namespace Thelia\Core\Security;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Model\ProfileQuery;
+use Thelia\Model\ProfileResourceQuery;
 
 /**
  * A simple security manager, in charge of checking user
@@ -124,6 +128,10 @@ class SecurityContext
     */
     final public function isGranted(array $roles, array $permissions)
     {
+        if (empty($permissions)) {
+            return true;
+        }
+
         // Find a user which matches the required roles.
         $user = $this->getCustomerUser();
 
@@ -135,38 +143,31 @@ class SecurityContext
             }
         }
 
-        if ($user != null) {
-
-            if (empty($permissions)) {
-               return true;
-            }
-
-            // Get permissions from profile
-            // $userPermissions = $user->getPermissions(); FIXME
-
-            // TODO: Finalize permissions system !;
-
-            $userPermissions = array('*'); // FIXME !
-
-            $permissionsFound = true;
-
-            // User have all permissions ?
-            if (in_array('*', $userPermissions))
-               return true;
-
-            // Check that user's permissions matches required permissions
-            foreach ($permissions as $permission) {
-               if (! in_array($permission, $userPermissions)) {
-                   $permissionsFound = false;
-
-                   break;
-               }
-            }
-
-            return $permissionsFound;
+        if (null === $user) {
+            return false;
         }
 
-        return false;
+        if( !method_exists($user, 'getProfileId') ) {
+            return false;
+        }
+
+        $userPermissions = $user->getPermissions();
+
+        if($userPermissions === AdminResources::SUPERADMINISTRATOR) {
+            return true;
+        }
+
+        foreach($permissions as $permission) {
+            if($permission === '') {
+                continue;
+            }
+
+            if(! in_array($permission, $userPermissions)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia                                                                       */
+/*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,102 +17,57 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-use Thelia\Core\Translation\Translator;
-use Thelia\Model\ConfigQuery;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Model\ProfileQuery;
 
 /**
- * Class ProfileModification
+ * Class ProfileModificationForm
  * @package Thelia\Form
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class ProfileModificationForm extends BaseForm
+class ProfileModificationForm extends ProfileCreationForm
 {
-
     protected function buildForm()
     {
+        parent::buildForm(true);
 
         $this->formBuilder
-            ->add("firstname", "text", array(
-                "constraints" => array(
-                    new Constraints\NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("First Name"),
-                "label_attr" => array(
-                    "for" => "firstname"
-                )
-            ))
-            ->add("lastname", "text", array(
-                "constraints" => array(
-                    new Constraints\NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Last Name"),
-                "label_attr" => array(
-                    "for" => "lastname"
-                )
-            ))
-            ->add("default_language", "text", array(
-                "constraints" => array(
-                    new Constraints\NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Default language"),
-                "label_attr" => array(
-                    "for" => "default_language"
-                )
-            ))
-            ->add("editing_language_default", "text", array(
-                "constraints" => array(
-                    new Constraints\NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Editing language default"),
-                "label_attr" => array(
-                    "for" => "editing_language_default"
-                )
-            ))
-            ->add("old_password", "password", array(
+            ->add("id", "hidden", array(
+                "required" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4)))
-                ),
-                "label" => Translator::getInstance()->trans("Old password"),
-                "label_attr" => array(
-                    "for" => "old_password"
-                )
-            ))
-            ->add("password", "password", array(
-                "constraints" => array(
-                    new Constraints\NotBlank(),
-                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4)))
-                ),
-                "label" => Translator::getInstance()->trans("Password"),
-                "label_attr" => array(
-                    "for" => "password"
-                )
-            ))
-            ->add("password_confirm", "password", array(
-                "constraints" => array(
-                    new Constraints\NotBlank(),
-                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
-                    new Constraints\Callback(array("methods" => array(
-                        array($this, "verifyPasswordField")
-                    )))
-                ),
-                "label" => "Password confirmation",
-                "label_attr" => array(
-                    "for" => "password_confirmation"
+                    new Constraints\Callback(
+                        array(
+                            "methods" => array(
+                                array($this, "verifyProfileId"),
+                            ),
+                        )
+                    ),
                 )
             ))
         ;
+
+        $this->formBuilder->remove("code");
     }
 
     public function getName()
     {
         return "thelia_profile_modification";
+    }
+
+    public function verifyProfileId($value, ExecutionContextInterface $context)
+    {
+        $profile = ProfileQuery::create()
+            ->findPk($value);
+
+        if (null === $profile) {
+            $context->addViolation("Profile ID not found");
+        }
     }
 }

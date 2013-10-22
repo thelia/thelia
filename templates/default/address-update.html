@@ -21,7 +21,7 @@
     <article class="col-main" role="main" aria-labelledby="main-label">
 
     <h1 id="main-label" class="page-header">{intl l="Create New Address"}</h1>
-    {form name="thelia.address.update"}
+    {form name="thelia.front.address.update"}
         {loop name="customer.update" type="address" customer="current" id="{$address_id}"}
         <form id="form-address" class="form-horizontal" action="{url path="/address/update/{$address_id}"}" method="post" role="form">
         {form_field form=$form field='success_url'}

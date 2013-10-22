@@ -62,7 +62,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             $output->renderBlock(array(
                 '',
                 sprintf("module %s create with success", $this->module),
-                "You can now configure your module and complete plugin.xml file",
+                "You can now configure your module and complete module.xml file",
                 ''
             ), "bg=green;fg=black");
         }
@@ -86,7 +86,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         $fs = new Filesystem();
         $skeletonDir = str_replace("/", DIRECTORY_SEPARATOR, THELIA_ROOT . "/core/lib/Thelia/Command/Skeleton/Module/");
         $fs->copy($skeletonDir . "config.xml", $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "config.xml");
-        $fs->copy($skeletonDir . "plugin.xml", $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "plugin.xml");
+        $fs->copy($skeletonDir . "module.xml", $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "module.xml");
 
         $classContent = file_get_contents($skeletonDir . "Class.php");
 

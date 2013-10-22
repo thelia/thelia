@@ -10,7 +10,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
@@ -18,11 +17,9 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Admin as ChildAdmin;
-use Thelia\Model\AdminGroup as ChildAdminGroup;
-use Thelia\Model\AdminGroupQuery as ChildAdminGroupQuery;
 use Thelia\Model\AdminQuery as ChildAdminQuery;
-use Thelia\Model\Group as ChildGroup;
-use Thelia\Model\GroupQuery as ChildGroupQuery;
+use Thelia\Model\Profile as ChildProfile;
+use Thelia\Model\ProfileQuery as ChildProfileQuery;
 use Thelia\Model\Map\AdminTableMap;
 
 abstract class Admin implements ActiveRecordInterface
@@ -64,6 +61,12 @@ abstract class Admin implements ActiveRecordInterface
      * @var        int
      */
     protected $id;
+
+    /**
+     * The value for the profile_id field.
+     * @var        int
+     */
+    protected $profile_id;
 
     /**
      * The value for the firstname field.
@@ -126,15 +129,9 @@ abstract class Admin implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        ObjectCollection|ChildAdminGroup[] Collection to store aggregation of ChildAdminGroup objects.
+     * @var        Profile
      */
-    protected $collAdminGroups;
-    protected $collAdminGroupsPartial;
-
-    /**
-     * @var        ChildGroup[] Collection to store aggregation of ChildGroup objects.
-     */
-    protected $collGroups;
+    protected $aProfile;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -143,18 +140,6 @@ abstract class Admin implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $groupsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $adminGroupsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Thelia\Model\Base\Admin object.
@@ -426,6 +411,17 @@ abstract class Admin implements ActiveRecordInterface
     }
 
     /**
+     * Get the [profile_id] column value.
+     *
+     * @return   int
+     */
+    public function getProfileId()
+    {
+
+        return $this->profile_id;
+    }
+
+    /**
      * Get the [firstname] column value.
      *
      * @return   string
@@ -573,6 +569,31 @@ abstract class Admin implements ActiveRecordInterface
 
         return $this;
     } // setId()
+
+    /**
+     * Set the value of [profile_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Admin The current object (for fluent API support)
+     */
+    public function setProfileId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->profile_id !== $v) {
+            $this->profile_id = $v;
+            $this->modifiedColumns[] = AdminTableMap::PROFILE_ID;
+        }
+
+        if ($this->aProfile !== null && $this->aProfile->getId() !== $v) {
+            $this->aProfile = null;
+        }
+
+
+        return $this;
+    } // setProfileId()
 
     /**
      * Set the value of [firstname] column.
@@ -824,37 +845,40 @@ abstract class Admin implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AdminTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AdminTableMap::translateFieldName('Firstname', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AdminTableMap::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->profile_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AdminTableMap::translateFieldName('Firstname', TableMap::TYPE_PHPNAME, $indexType)];
             $this->firstname = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AdminTableMap::translateFieldName('Lastname', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AdminTableMap::translateFieldName('Lastname', TableMap::TYPE_PHPNAME, $indexType)];
             $this->lastname = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AdminTableMap::translateFieldName('Login', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AdminTableMap::translateFieldName('Login', TableMap::TYPE_PHPNAME, $indexType)];
             $this->login = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AdminTableMap::translateFieldName('Password', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AdminTableMap::translateFieldName('Password', TableMap::TYPE_PHPNAME, $indexType)];
             $this->password = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AdminTableMap::translateFieldName('Algo', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AdminTableMap::translateFieldName('Algo', TableMap::TYPE_PHPNAME, $indexType)];
             $this->algo = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AdminTableMap::translateFieldName('Salt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AdminTableMap::translateFieldName('Salt', TableMap::TYPE_PHPNAME, $indexType)];
             $this->salt = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AdminTableMap::translateFieldName('RememberMeToken', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : AdminTableMap::translateFieldName('RememberMeToken', TableMap::TYPE_PHPNAME, $indexType)];
             $this->remember_me_token = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : AdminTableMap::translateFieldName('RememberMeSerial', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : AdminTableMap::translateFieldName('RememberMeSerial', TableMap::TYPE_PHPNAME, $indexType)];
             $this->remember_me_serial = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : AdminTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : AdminTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : AdminTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : AdminTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -867,7 +891,7 @@ abstract class Admin implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 11; // 11 = AdminTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = AdminTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Admin object", 0, $e);
@@ -889,6 +913,9 @@ abstract class Admin implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aProfile !== null && $this->profile_id !== $this->aProfile->getId()) {
+            $this->aProfile = null;
+        }
     } // ensureConsistency
 
     /**
@@ -928,9 +955,7 @@ abstract class Admin implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collAdminGroups = null;
-
-            $this->collGroups = null;
+            $this->aProfile = null;
         } // if (deep)
     }
 
@@ -1053,6 +1078,18 @@ abstract class Admin implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aProfile !== null) {
+                if ($this->aProfile->isModified() || $this->aProfile->isNew()) {
+                    $affectedRows += $this->aProfile->save($con);
+                }
+                $this->setProfile($this->aProfile);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -1062,50 +1099,6 @@ abstract class Admin implements ActiveRecordInterface
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->groupsScheduledForDeletion !== null) {
-                if (!$this->groupsScheduledForDeletion->isEmpty()) {
-                    $pks = array();
-                    $pk  = $this->getPrimaryKey();
-                    foreach ($this->groupsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($remotePk, $pk);
-                    }
-
-                    AdminGroupQuery::create()
-                        ->filterByPrimaryKeys($pks)
-                        ->delete($con);
-                    $this->groupsScheduledForDeletion = null;
-                }
-
-                foreach ($this->getGroups() as $group) {
-                    if ($group->isModified()) {
-                        $group->save($con);
-                    }
-                }
-            } elseif ($this->collGroups) {
-                foreach ($this->collGroups as $group) {
-                    if ($group->isModified()) {
-                        $group->save($con);
-                    }
-                }
-            }
-
-            if ($this->adminGroupsScheduledForDeletion !== null) {
-                if (!$this->adminGroupsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\AdminGroupQuery::create()
-                        ->filterByPrimaryKeys($this->adminGroupsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->adminGroupsScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collAdminGroups !== null) {
-            foreach ($this->collAdminGroups as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
             }
 
             $this->alreadyInSave = false;
@@ -1136,6 +1129,9 @@ abstract class Admin implements ActiveRecordInterface
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(AdminTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
+        }
+        if ($this->isColumnModified(AdminTableMap::PROFILE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'PROFILE_ID';
         }
         if ($this->isColumnModified(AdminTableMap::FIRSTNAME)) {
             $modifiedColumns[':p' . $index++]  = 'FIRSTNAME';
@@ -1180,6 +1176,9 @@ abstract class Admin implements ActiveRecordInterface
                 switch ($columnName) {
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
+                    case 'PROFILE_ID':
+                        $stmt->bindValue($identifier, $this->profile_id, PDO::PARAM_INT);
                         break;
                     case 'FIRSTNAME':
                         $stmt->bindValue($identifier, $this->firstname, PDO::PARAM_STR);
@@ -1277,33 +1276,36 @@ abstract class Admin implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getFirstname();
+                return $this->getProfileId();
                 break;
             case 2:
-                return $this->getLastname();
+                return $this->getFirstname();
                 break;
             case 3:
-                return $this->getLogin();
+                return $this->getLastname();
                 break;
             case 4:
-                return $this->getPassword();
+                return $this->getLogin();
                 break;
             case 5:
-                return $this->getAlgo();
+                return $this->getPassword();
                 break;
             case 6:
-                return $this->getSalt();
+                return $this->getAlgo();
                 break;
             case 7:
-                return $this->getRememberMeToken();
+                return $this->getSalt();
                 break;
             case 8:
-                return $this->getRememberMeSerial();
+                return $this->getRememberMeToken();
                 break;
             case 9:
-                return $this->getCreatedAt();
+                return $this->getRememberMeSerial();
                 break;
             case 10:
+                return $this->getCreatedAt();
+                break;
+            case 11:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1336,16 +1338,17 @@ abstract class Admin implements ActiveRecordInterface
         $keys = AdminTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getFirstname(),
-            $keys[2] => $this->getLastname(),
-            $keys[3] => $this->getLogin(),
-            $keys[4] => $this->getPassword(),
-            $keys[5] => $this->getAlgo(),
-            $keys[6] => $this->getSalt(),
-            $keys[7] => $this->getRememberMeToken(),
-            $keys[8] => $this->getRememberMeSerial(),
-            $keys[9] => $this->getCreatedAt(),
-            $keys[10] => $this->getUpdatedAt(),
+            $keys[1] => $this->getProfileId(),
+            $keys[2] => $this->getFirstname(),
+            $keys[3] => $this->getLastname(),
+            $keys[4] => $this->getLogin(),
+            $keys[5] => $this->getPassword(),
+            $keys[6] => $this->getAlgo(),
+            $keys[7] => $this->getSalt(),
+            $keys[8] => $this->getRememberMeToken(),
+            $keys[9] => $this->getRememberMeSerial(),
+            $keys[10] => $this->getCreatedAt(),
+            $keys[11] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1353,8 +1356,8 @@ abstract class Admin implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collAdminGroups) {
-                $result['AdminGroups'] = $this->collAdminGroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->aProfile) {
+                $result['Profile'] = $this->aProfile->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1394,33 +1397,36 @@ abstract class Admin implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setFirstname($value);
+                $this->setProfileId($value);
                 break;
             case 2:
-                $this->setLastname($value);
+                $this->setFirstname($value);
                 break;
             case 3:
-                $this->setLogin($value);
+                $this->setLastname($value);
                 break;
             case 4:
-                $this->setPassword($value);
+                $this->setLogin($value);
                 break;
             case 5:
-                $this->setAlgo($value);
+                $this->setPassword($value);
                 break;
             case 6:
-                $this->setSalt($value);
+                $this->setAlgo($value);
                 break;
             case 7:
-                $this->setRememberMeToken($value);
+                $this->setSalt($value);
                 break;
             case 8:
-                $this->setRememberMeSerial($value);
+                $this->setRememberMeToken($value);
                 break;
             case 9:
-                $this->setCreatedAt($value);
+                $this->setRememberMeSerial($value);
                 break;
             case 10:
+                $this->setCreatedAt($value);
+                break;
+            case 11:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1448,16 +1454,17 @@ abstract class Admin implements ActiveRecordInterface
         $keys = AdminTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setFirstname($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setLastname($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setLogin($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPassword($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setAlgo($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setSalt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setRememberMeToken($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setRememberMeSerial($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
+        if (array_key_exists($keys[1], $arr)) $this->setProfileId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setFirstname($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setLastname($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setLogin($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setPassword($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setAlgo($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setSalt($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setRememberMeToken($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setRememberMeSerial($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
     }
 
     /**
@@ -1470,6 +1477,7 @@ abstract class Admin implements ActiveRecordInterface
         $criteria = new Criteria(AdminTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(AdminTableMap::ID)) $criteria->add(AdminTableMap::ID, $this->id);
+        if ($this->isColumnModified(AdminTableMap::PROFILE_ID)) $criteria->add(AdminTableMap::PROFILE_ID, $this->profile_id);
         if ($this->isColumnModified(AdminTableMap::FIRSTNAME)) $criteria->add(AdminTableMap::FIRSTNAME, $this->firstname);
         if ($this->isColumnModified(AdminTableMap::LASTNAME)) $criteria->add(AdminTableMap::LASTNAME, $this->lastname);
         if ($this->isColumnModified(AdminTableMap::LOGIN)) $criteria->add(AdminTableMap::LOGIN, $this->login);
@@ -1543,6 +1551,7 @@ abstract class Admin implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
+        $copyObj->setProfileId($this->getProfileId());
         $copyObj->setFirstname($this->getFirstname());
         $copyObj->setLastname($this->getLastname());
         $copyObj->setLogin($this->getLogin());
@@ -1553,20 +1562,6 @@ abstract class Admin implements ActiveRecordInterface
         $copyObj->setRememberMeSerial($this->getRememberMeSerial());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
-
-        if ($deepCopy) {
-            // important: temporarily setNew(false) because this affects the behavior of
-            // the getter/setter methods for fkey referrer objects.
-            $copyObj->setNew(false);
-
-            foreach ($this->getAdminGroups() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAdminGroup($relObj->copy($deepCopy));
-                }
-            }
-
-        } // if ($deepCopy)
-
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1595,449 +1590,55 @@ abstract class Admin implements ActiveRecordInterface
         return $copyObj;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a ChildProfile object.
      *
-     * @param      string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-        if ('AdminGroup' == $relationName) {
-            return $this->initAdminGroups();
-        }
-    }
-
-    /**
-     * Clears out the collAdminGroups collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addAdminGroups()
-     */
-    public function clearAdminGroups()
-    {
-        $this->collAdminGroups = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collAdminGroups collection loaded partially.
-     */
-    public function resetPartialAdminGroups($v = true)
-    {
-        $this->collAdminGroupsPartial = $v;
-    }
-
-    /**
-     * Initializes the collAdminGroups collection.
-     *
-     * By default this just sets the collAdminGroups collection to an empty array (like clearcollAdminGroups());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initAdminGroups($overrideExisting = true)
-    {
-        if (null !== $this->collAdminGroups && !$overrideExisting) {
-            return;
-        }
-        $this->collAdminGroups = new ObjectCollection();
-        $this->collAdminGroups->setModel('\Thelia\Model\AdminGroup');
-    }
-
-    /**
-     * Gets an array of ChildAdminGroup objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildAdmin is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildAdminGroup[] List of ChildAdminGroup objects
+     * @param                  ChildProfile $v
+     * @return                 \Thelia\Model\Admin The current object (for fluent API support)
      * @throws PropelException
      */
-    public function getAdminGroups($criteria = null, ConnectionInterface $con = null)
+    public function setProfile(ChildProfile $v = null)
     {
-        $partial = $this->collAdminGroupsPartial && !$this->isNew();
-        if (null === $this->collAdminGroups || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collAdminGroups) {
-                // return empty collection
-                $this->initAdminGroups();
-            } else {
-                $collAdminGroups = ChildAdminGroupQuery::create(null, $criteria)
-                    ->filterByAdmin($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collAdminGroupsPartial && count($collAdminGroups)) {
-                        $this->initAdminGroups(false);
-
-                        foreach ($collAdminGroups as $obj) {
-                            if (false == $this->collAdminGroups->contains($obj)) {
-                                $this->collAdminGroups->append($obj);
-                            }
-                        }
-
-                        $this->collAdminGroupsPartial = true;
-                    }
-
-                    $collAdminGroups->getInternalIterator()->rewind();
-
-                    return $collAdminGroups;
-                }
-
-                if ($partial && $this->collAdminGroups) {
-                    foreach ($this->collAdminGroups as $obj) {
-                        if ($obj->isNew()) {
-                            $collAdminGroups[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collAdminGroups = $collAdminGroups;
-                $this->collAdminGroupsPartial = false;
-            }
-        }
-
-        return $this->collAdminGroups;
-    }
-
-    /**
-     * Sets a collection of AdminGroup objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $adminGroups A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildAdmin The current object (for fluent API support)
-     */
-    public function setAdminGroups(Collection $adminGroups, ConnectionInterface $con = null)
-    {
-        $adminGroupsToDelete = $this->getAdminGroups(new Criteria(), $con)->diff($adminGroups);
-
-
-        //since at least one column in the foreign key is at the same time a PK
-        //we can not just set a PK to NULL in the lines below. We have to store
-        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->adminGroupsScheduledForDeletion = clone $adminGroupsToDelete;
-
-        foreach ($adminGroupsToDelete as $adminGroupRemoved) {
-            $adminGroupRemoved->setAdmin(null);
-        }
-
-        $this->collAdminGroups = null;
-        foreach ($adminGroups as $adminGroup) {
-            $this->addAdminGroup($adminGroup);
-        }
-
-        $this->collAdminGroups = $adminGroups;
-        $this->collAdminGroupsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related AdminGroup objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related AdminGroup objects.
-     * @throws PropelException
-     */
-    public function countAdminGroups(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collAdminGroupsPartial && !$this->isNew();
-        if (null === $this->collAdminGroups || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collAdminGroups) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getAdminGroups());
-            }
-
-            $query = ChildAdminGroupQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByAdmin($this)
-                ->count($con);
-        }
-
-        return count($this->collAdminGroups);
-    }
-
-    /**
-     * Method called to associate a ChildAdminGroup object to this object
-     * through the ChildAdminGroup foreign key attribute.
-     *
-     * @param    ChildAdminGroup $l ChildAdminGroup
-     * @return   \Thelia\Model\Admin The current object (for fluent API support)
-     */
-    public function addAdminGroup(ChildAdminGroup $l)
-    {
-        if ($this->collAdminGroups === null) {
-            $this->initAdminGroups();
-            $this->collAdminGroupsPartial = true;
-        }
-
-        if (!in_array($l, $this->collAdminGroups->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddAdminGroup($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param AdminGroup $adminGroup The adminGroup object to add.
-     */
-    protected function doAddAdminGroup($adminGroup)
-    {
-        $this->collAdminGroups[]= $adminGroup;
-        $adminGroup->setAdmin($this);
-    }
-
-    /**
-     * @param  AdminGroup $adminGroup The adminGroup object to remove.
-     * @return ChildAdmin The current object (for fluent API support)
-     */
-    public function removeAdminGroup($adminGroup)
-    {
-        if ($this->getAdminGroups()->contains($adminGroup)) {
-            $this->collAdminGroups->remove($this->collAdminGroups->search($adminGroup));
-            if (null === $this->adminGroupsScheduledForDeletion) {
-                $this->adminGroupsScheduledForDeletion = clone $this->collAdminGroups;
-                $this->adminGroupsScheduledForDeletion->clear();
-            }
-            $this->adminGroupsScheduledForDeletion[]= clone $adminGroup;
-            $adminGroup->setAdmin(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Admin is new, it will return
-     * an empty collection; or if this Admin has previously
-     * been saved, it will retrieve related AdminGroups from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Admin.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildAdminGroup[] List of ChildAdminGroup objects
-     */
-    public function getAdminGroupsJoinGroup($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildAdminGroupQuery::create(null, $criteria);
-        $query->joinWith('Group', $joinBehavior);
-
-        return $this->getAdminGroups($query, $con);
-    }
-
-    /**
-     * Clears out the collGroups collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addGroups()
-     */
-    public function clearGroups()
-    {
-        $this->collGroups = null; // important to set this to NULL since that means it is uninitialized
-        $this->collGroupsPartial = null;
-    }
-
-    /**
-     * Initializes the collGroups collection.
-     *
-     * By default this just sets the collGroups collection to an empty collection (like clearGroups());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @return void
-     */
-    public function initGroups()
-    {
-        $this->collGroups = new ObjectCollection();
-        $this->collGroups->setModel('\Thelia\Model\Group');
-    }
-
-    /**
-     * Gets a collection of ChildGroup objects related by a many-to-many relationship
-     * to the current object by way of the admin_group cross-reference table.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildAdmin is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      ConnectionInterface $con Optional connection object
-     *
-     * @return ObjectCollection|ChildGroup[] List of ChildGroup objects
-     */
-    public function getGroups($criteria = null, ConnectionInterface $con = null)
-    {
-        if (null === $this->collGroups || null !== $criteria) {
-            if ($this->isNew() && null === $this->collGroups) {
-                // return empty collection
-                $this->initGroups();
-            } else {
-                $collGroups = ChildGroupQuery::create(null, $criteria)
-                    ->filterByAdmin($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    return $collGroups;
-                }
-                $this->collGroups = $collGroups;
-            }
-        }
-
-        return $this->collGroups;
-    }
-
-    /**
-     * Sets a collection of Group objects related by a many-to-many relationship
-     * to the current object by way of the admin_group cross-reference table.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param  Collection $groups A Propel collection.
-     * @param  ConnectionInterface $con Optional connection object
-     * @return ChildAdmin The current object (for fluent API support)
-     */
-    public function setGroups(Collection $groups, ConnectionInterface $con = null)
-    {
-        $this->clearGroups();
-        $currentGroups = $this->getGroups();
-
-        $this->groupsScheduledForDeletion = $currentGroups->diff($groups);
-
-        foreach ($groups as $group) {
-            if (!$currentGroups->contains($group)) {
-                $this->doAddGroup($group);
-            }
-        }
-
-        $this->collGroups = $groups;
-
-        return $this;
-    }
-
-    /**
-     * Gets the number of ChildGroup objects related by a many-to-many relationship
-     * to the current object by way of the admin_group cross-reference table.
-     *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      boolean $distinct Set to true to force count distinct
-     * @param      ConnectionInterface $con Optional connection object
-     *
-     * @return int the number of related ChildGroup objects
-     */
-    public function countGroups($criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        if (null === $this->collGroups || null !== $criteria) {
-            if ($this->isNew() && null === $this->collGroups) {
-                return 0;
-            } else {
-                $query = ChildGroupQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByAdmin($this)
-                    ->count($con);
-            }
+        if ($v === null) {
+            $this->setProfileId(NULL);
         } else {
-            return count($this->collGroups);
-        }
-    }
-
-    /**
-     * Associate a ChildGroup object to this object
-     * through the admin_group cross reference table.
-     *
-     * @param  ChildGroup $group The ChildAdminGroup object to relate
-     * @return ChildAdmin The current object (for fluent API support)
-     */
-    public function addGroup(ChildGroup $group)
-    {
-        if ($this->collGroups === null) {
-            $this->initGroups();
+            $this->setProfileId($v->getId());
         }
 
-        if (!$this->collGroups->contains($group)) { // only add it if the **same** object is not already associated
-            $this->doAddGroup($group);
-            $this->collGroups[] = $group;
+        $this->aProfile = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildProfile object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAdmin($this);
         }
+
 
         return $this;
     }
 
-    /**
-     * @param    Group $group The group object to add.
-     */
-    protected function doAddGroup($group)
-    {
-        $adminGroup = new ChildAdminGroup();
-        $adminGroup->setGroup($group);
-        $this->addAdminGroup($adminGroup);
-        // set the back reference to this object directly as using provided method either results
-        // in endless loop or in multiple relations
-        if (!$group->getAdmins()->contains($this)) {
-            $foreignCollection   = $group->getAdmins();
-            $foreignCollection[] = $this;
-        }
-    }
 
     /**
-     * Remove a ChildGroup object to this object
-     * through the admin_group cross reference table.
+     * Get the associated ChildProfile object
      *
-     * @param ChildGroup $group The ChildAdminGroup object to relate
-     * @return ChildAdmin The current object (for fluent API support)
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildProfile The associated ChildProfile object.
+     * @throws PropelException
      */
-    public function removeGroup(ChildGroup $group)
+    public function getProfile(ConnectionInterface $con = null)
     {
-        if ($this->getGroups()->contains($group)) {
-            $this->collGroups->remove($this->collGroups->search($group));
-
-            if (null === $this->groupsScheduledForDeletion) {
-                $this->groupsScheduledForDeletion = clone $this->collGroups;
-                $this->groupsScheduledForDeletion->clear();
-            }
-
-            $this->groupsScheduledForDeletion[] = $group;
+        if ($this->aProfile === null && ($this->profile_id !== null)) {
+            $this->aProfile = ChildProfileQuery::create()->findPk($this->profile_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aProfile->addAdmins($this);
+             */
         }
 
-        return $this;
+        return $this->aProfile;
     }
 
     /**
@@ -2046,6 +1647,7 @@ abstract class Admin implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
+        $this->profile_id = null;
         $this->firstname = null;
         $this->lastname = null;
         $this->login = null;
@@ -2075,26 +1677,9 @@ abstract class Admin implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collAdminGroups) {
-                foreach ($this->collAdminGroups as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collGroups) {
-                foreach ($this->collGroups as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
         } // if ($deep)
 
-        if ($this->collAdminGroups instanceof Collection) {
-            $this->collAdminGroups->clearIterator();
-        }
-        $this->collAdminGroups = null;
-        if ($this->collGroups instanceof Collection) {
-            $this->collGroups->clearIterator();
-        }
-        $this->collGroups = null;
+        $this->aProfile = null;
     }
 
     /**

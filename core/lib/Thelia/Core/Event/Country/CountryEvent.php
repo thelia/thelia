@@ -25,7 +25,6 @@ namespace Thelia\Core\Event\Country;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Country;
 
-
 /**
  * Class CountryEvent
  * @package Thelia\Core\Event\Country
@@ -38,7 +37,7 @@ class CountryEvent extends ActionEvent
      */
     protected $country;
 
-    function __construct(Country $country = null)
+    public function __construct(Country $country = null)
     {
         $this->country = $country;
     }
@@ -68,6 +67,5 @@ class CountryEvent extends ActionEvent
     {
         return null !== $this->country;
     }
-
 
 }

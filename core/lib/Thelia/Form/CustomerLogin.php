@@ -22,6 +22,8 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
@@ -56,13 +58,13 @@ class CustomerLogin extends BaseForm
                 )
             ))
             ->add("account", "choice", array(
-                "constraints" => array(
+                /*"constraints" => array(
                     new Constraints\Callback(array(
                         "methods" => array(
                             array($this, "verifyAccount")
                         )
                     ))
-                ),
+                ),*/
                 "choices" => array(
                     0 => Translator::getInstance()->trans("No, I am a new customer."),
                     1 => Translator::getInstance()->trans("Yes, I have a password :")
@@ -70,12 +72,21 @@ class CustomerLogin extends BaseForm
                 "label_attr" => array(
                     "for" => "account"
                 ),
-                "data" => 0
+                "data" => 0,
+                'validation_groups' => function(FormInterface $form) {
+                    $account = $form->getData();
+                    if ($account === 1)
+                        return 'existing_customer';
+                    else
+                        return 'Default';
+                }
             ))
             ->add("password", "password", array(
-                /*"constraints" => array(
-                    new Constraints\NotBlank()
-                ),*/
+                "constraints" => array(
+                    new Constraints\NotBlank(array(
+                        'groups' => array('existing_customer'),
+                    ))
+                ),
                 "label" => Translator::getInstance()->trans("Please enter your password"),
                 "label_attr" => array(
                     "for" => "password"
@@ -118,6 +129,26 @@ class CustomerLogin extends BaseForm
                 $context->addViolation("A user already exists with this email address. Please login or if you've forgotten your password, go to Reset Your Password.");
             }
         }
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(array(
+            //'cascade_validation' => true,
+            //    'csrf_protection' => true,
+            //'csrf_field_name' => '_token',
+            'validation_groups' => function(FormInterface $form) {
+                $data = $form->getData();
+                if ($data->getAccount()  == 1)
+                    return array('Default', 'existing_customer');
+                else
+                    return 'Default';
+            }
+        ));
     }
 
     public function getName()

@@ -5,7 +5,7 @@
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-    {$sBreadcrumb = []}
+    {$breadcrumbs = []}
     {loop type="product" name="product_breadcrumb" id="{product attr="id"}"}
         {loop name="category_path" type="category-path" category="{$DEFAULT_CATEGORY}"}
             {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
@@ -138,6 +138,10 @@
                     {form_hidden_fields form=$form}
                     <input type="hidden" name="view" value="product">
                     <input type="hidden" name="product_id" value="{$ID}">
+                    {form_field form=$form field="append"}
+                        <input type="hidden" name="{$name}" value="1">
+                    {/form_field}
+
 
                     {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
 

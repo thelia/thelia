@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class IntType implements TypeInterface
+class IntType extends BaseType
 {
     public function getType()
     {
@@ -43,5 +43,15 @@ class IntType implements TypeInterface
     public function getFormattedValue($value)
     {
         return $this->isValid($value) ? $value : null;
+    }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
     }
 }

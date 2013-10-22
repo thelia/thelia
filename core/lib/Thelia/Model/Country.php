@@ -13,6 +13,9 @@ class Country extends BaseCountry
 
     public function toggleDefault()
     {
+        if($this->getId() === null) {
+            throw new \RuntimeException("impossible to just uncheck default country, choose a new one");
+        }
         CountryQuery::create()
             ->filterByByDefault(1)
             ->update(array('ByDefault' => 0));
@@ -47,6 +50,10 @@ class Country extends BaseCountry
 
     public function preDelete(ConnectionInterface $con = null)
     {
+        if($this->getByDefault()) {
+            return false;
+        }
+
         $this->dispatchEvent(TheliaEvents::BEFORE_DELETECOUNTRY, new CountryEvent($this));
 
         return true;

@@ -199,7 +199,7 @@ class URL
      public function retrieve($view, $viewId, $viewLocale)
      {
          if (ConfigQuery::isRewritingEnable()) {
-             $this->retriever->loadViewUrl($view, $viewLocale, $viewId);
+             URL::getInstance()->absoluteUrl($this->retriever->loadViewUrl($view, $viewLocale, $viewId));
          } else {
              $allParametersWithoutView = array();
              $allParametersWithoutView['locale'] = $viewLocale;

@@ -300,7 +300,7 @@ class TheliaLoop extends AbstractSmartyPlugin
     /**
      * @param $smartyParams
      *
-     * @return object
+     * @return BaseLoop
      * @throws \Thelia\Core\Template\Element\Exception\InvalidElementException
      * @throws \Thelia\Core\Template\Element\Exception\ElementNotFoundException
      */

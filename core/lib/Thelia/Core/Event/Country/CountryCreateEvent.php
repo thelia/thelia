@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Country;
 
-
 /**
  * Class CountryCreateEvent
  * @package Thelia\Core\Event\Country
@@ -149,6 +148,5 @@ class CountryCreateEvent extends CountryEvent
     {
         return $this->area;
     }
-
 
 }

@@ -7,6 +7,7 @@
     <loops>
         <loop class="Thelia\Core\Template\Loop\Accessory" name="accessory"/>
         <loop class="Thelia\Core\Template\Loop\Address" name="address"/>
+        <loop class="Thelia\Core\Template\Loop\Admin" name="admin"/>
         <loop class="Thelia\Core\Template\Loop\Area" name="area"/>
         <loop class="Thelia\Core\Template\Loop\AssociatedContent" name="associated_content"/>
         <loop class="Thelia\Core\Template\Loop\Attribute" name="attribute"/>
@@ -33,6 +34,7 @@
         <loop class="Thelia\Core\Template\Loop\Payment" name="payment"/>
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
         <loop class="Thelia\Core\Template\Loop\ProductSaleElements" name="product_sale_elements"/>
+        <loop class="Thelia\Core\Template\Loop\Profile" name="profile"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
         <loop class="Thelia\Core\Template\Loop\Title" name="title"/>
         <loop class="Thelia\Core\Template\Loop\Lang" name="lang"/>
@@ -52,18 +54,26 @@
     </loops>
 
     <forms>
+        <!-- Forms for Frontend -->
+        <form name="thelia.front.customer.login" class="Thelia\Form\CustomerLogin"/>
+        <form name="thelia.front.customer.lostpassword" class="Thelia\Form\CustomerLostPasswordForm"/>
+        <form name="thelia.front.customer.create" class="Thelia\Form\CustomerCreateForm"/>
+        <form name="thelia.front.customer.profil.update" class="Thelia\Form\CustomerProfilUpdateForm"/>
+        <form name="thelia.front.customer.password.update" class="Thelia\Form\CustomerPasswordUpdateForm"/>
+        <form name="thelia.front.address.create" class="Thelia\Form\AddressCreateForm"/>
+        <form name="thelia.front.address.update" class="Thelia\Form\AddressUpdateForm"/>
+        <form name="thelia.front.contact" class="Thelia\Form\ContactForm"/>
+
+        <!--  Forms for Admin -->
         <form name="thelia.install.step3" class="Thelia\Form\InstallStep3Form"/>
 
-        <form name="thelia.customer.creation" class="Thelia\Form\CustomerCreation"/>
-        <form name="thelia.customer.update" class="Thelia\Form\CustomerUpdateForm"/>
-        <form name="thelia.customer.modification" class="Thelia\Form\CustomerModification"/>
-        <form name="thelia.customer.lostpassword" class="Thelia\Form\CustomerLostPasswordForm"/>
-
-        <form name="thelia.customer.login" class="Thelia\Form\CustomerLogin"/>
         <form name="thelia.admin.login" class="Thelia\Form\AdminLogin"/>
 
-        <form name="thelia.address.create" class="Thelia\Form\AddressCreateForm" />
-        <form name="thelia.address.update" class="Thelia\Form\AddressUpdateForm" />
+        <form name="thelia.admin.customer.create" class="Thelia\Form\CustomerCreateForm"/>
+        <form name="thelia.admin.customer.update" class="Thelia\Form\CustomerUpdateForm"/>
+
+        <form name="thelia.admin.address.create" class="Thelia\Form\AddressCreateForm" />
+        <form name="thelia.admin.address.update" class="Thelia\Form\AddressUpdateForm" />
 
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
         <form name="thelia.admin.category.modification" class="Thelia\Form\CategoryModificationForm"/>
@@ -119,13 +129,18 @@
         <form name="thelia.admin.taxrule.taxlistupdate" class="Thelia\Form\TaxRuleTaxListUpdateForm"/>
         <form name="thelia.admin.taxrule.add" class="Thelia\Form\TaxRuleCreationForm"/>
 
+        <form name="thelia.admin.tax.modification" class="Thelia\Form\TaxModificationForm"/>
+        <form name="thelia.admin.tax.taxlistupdate" class="Thelia\Form\TaxTaxListUpdateForm"/>
+        <form name="thelia.admin.tax.add" class="Thelia\Form\TaxCreationForm"/>
+
+        <form name="thelia.admin.profile.add" class="Thelia\Form\ProfileCreationForm"/>
+        <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
+
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>
 
         <form name="thelia.admin.country.creation" class="Thelia\Form\CountryCreationForm"/>
         <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
-
-        <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
         
         <form name="thelia.admin.language.creation" class="Thelia\Form\LanguageCreationForm"/>
 
@@ -151,6 +166,7 @@
         <command class="Thelia\Command\ModuleActivateCommand"/>
         <command class="Thelia\Command\CreateAdminUser"/>
         <command class="Thelia\Command\ReloadDatabaseCommand"/>
+        <command class="Thelia\Command\GenerateResources"/>
     </commands>
 
     <services>

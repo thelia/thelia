@@ -23,7 +23,6 @@
 
 namespace Thelia\Tests\Action;
 
-
 /**
  * Class BaseAction
  * @package Thelia\Tests\Action\ImageTest

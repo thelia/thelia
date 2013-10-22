@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
 use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
@@ -46,10 +47,10 @@ class CountryController extends AbstractCrudController
             'manual',
             'country_order',
 
-            'admin.country.default',
-            'admin.country.create',
-            'admin.country.update',
-            'admin.country.delete',
+            AdminResources::COUNTRY_VIEW,
+            AdminResources::COUNTRY_CREATE,
+            AdminResources::COUNTRY_UPDATE,
+            AdminResources::COUNTRY_DELETE,
 
             TheliaEvents::COUNTRY_CREATE,
             TheliaEvents::COUNTRY_UPDATE,
@@ -243,7 +244,7 @@ class CountryController extends AbstractCrudController
             try {
                 $this->dispatch(TheliaEvents::COUNTRY_TOGGLE_DEFAULT, $toogleDefaultEvent);
 
-                if($toogleDefaultEvent->hasCountry()) {
+                if ($toogleDefaultEvent->hasCountry()) {
                     return $this->nullResponse();
                 }
             } catch (\Exception $ex) {

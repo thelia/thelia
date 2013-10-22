@@ -32,7 +32,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Country as CountryModel;
 use Thelia\Model\CountryQuery;
 
-
 /**
  * Class Country
  * @package Thelia\Action
@@ -85,14 +84,12 @@ class Country extends BaseAction implements EventSubscriberInterface
 
     public function toggleDefault(CountryToggleDefaultEvent $event)
     {
-        if( null !== $country = CountryQuery::create()->findPk($event->getCountryId()))
-        {
+        if ( null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
             $country->toggleDefault();
 
             $event->setCountry($country);
         }
     }
-
 
     /**
      * Returns an array of event names this subscriber wants to listen to.

@@ -29,7 +29,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\AreaDeliveryModule;
 use Thelia\Model\AreaDeliveryModuleQuery;
 
-
 /**
  * Class ShippingZone
  * @package Thelia\Action
@@ -55,7 +54,7 @@ class ShippingZone extends BaseAction implements EventSubscriberInterface
             ->filterByDeliveryModuleId($event->getShoppingZoneId())
             ->findOne();
 
-        if($areaDelivery) {
+        if ($areaDelivery) {
             $areaDelivery->delete();
         } else {
             throw new \RuntimeException(sprintf('areaDeliveryModule not found with area_id = %d and delivery_module_id = %d', $event->getAreaId(), $event->getShoppingZoneId()));

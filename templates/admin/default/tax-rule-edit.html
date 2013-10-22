@@ -9,7 +9,7 @@
     {assign oder_tab {$smarty.get.tab|default:$smarty.post.tab|default:'data'}}
     {assign asked_country {$smarty.get.country|default:{country ask="default" attr="id"}}}
 
-    <div class="taxes-rules edit-taxes-rules">
+<div class="taxes-rules edit-taxes-rules">
 
     <div id="wrapper" class="container">
 
@@ -116,11 +116,11 @@
                         </div>
 
                         <p><strong>{intl l="Countries that have the same tax rule"} :<strong></p>
-                        <p class="lead">
+                        <p class="lead js-collapse" id="same_countries" data-collapse-height="86">
 
                             {$matchedCountries.first=$asked_country}
 
-                            {loop type="tax-rule-country" name="same-country-list" tax_rule=$ID taxes="1,2,3" country=$asked_country}
+                            {loop type="tax-rule-country" name="same-country-list" tax_rule=$ID ask="countries" country=$asked_country}
                             {$matchedCountries[]=$COUNTRY}
                                 <span class="label label-info">{$COUNTRY_TITLE}</span>
                             {/loop}
@@ -129,6 +129,7 @@
                                 <span class="label label-danger">{intl l="NONE"}</span>
                             {/elseloop}
                         </p>
+                        <button data-collapse-block="same_countries" type="button" class="btn btn-info btn-sm btn-block js-collapse-btn" style="margin-bottom: 15px">See all countries</button>
 
                         <div class="row">
                             <div class="col-md-6">
@@ -207,11 +208,10 @@
             </div>
 
         </div>
+        {/loop}
     </div>
 
-    {/loop}
-
-    </div>
+</div>
 
 {* Confirmation dialog *}
     {form name="thelia.admin.taxrule.taxlistupdate"}
@@ -234,11 +234,16 @@
 
             <p>{intl l="Tax rule taxes will be update for the following countries :"}</p>
             <div class="form-group">
-                <select name="{$name}" data-toggle="selectpicker" multiple>
-                    {loop type="country" name="country-list"}
-                        <option value='{$ID}' {if (!$value AND in_array($ID, $matchedCountries)) OR ($value AND in_array($ID, $value))}selected="selected"{/if}>{$TITLE}</option>
-                    {/loop}
-                </select>
+                <div class="input-group">
+                    <select id="countries-select" class="" name="{$name}" data-toggle="selectpicker" multiple>
+                        {loop type="country" name="country-list"}
+                            <option value='{$ID}' {if (!$value AND in_array($ID, $matchedCountries)) OR ($value AND in_array($ID, $value))}selected="selected"{/if}>{$TITLE}</option>
+                        {/loop}
+                    </select>
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary js-uncheck-all" data-uncheck-select="countries-select">{intl l="uncheck all"}</button>
+                    </span>
+                </div>
             </div>
 
         {/form_field}
@@ -283,6 +288,29 @@
             $('#tax_list_update_dialog').modal();
             {/if}
 
+
+            $('.js-collapse').each(function(k, v) {
+                var h = $(v).data('collapse-height');
+                if( $(v).height() > h ) {
+                    $(v).css('overflow', 'hidden').css('height', h + 'px');
+                } else {
+                    $('[data-collapse-block=' + $(v).attr('id') + ']').hide();
+                }
+            });
+
+            $('.js-collapse-btn').click(function(e) {
+                e.preventDefault();
+                var block = $(this).data('collapseBlock');
+                $('#' + block).css('overflow', 'initial').css('height', 'initial');
+                $(this).unbind().remove();
+            });
+
+            $('.js-uncheck-all').click(function(e) {
+                e.preventDefault();
+                var selectId = $(this).data('uncheckSelect');
+                $('#' + selectId).selectpicker('deselectAll');
+            });
+
             {literal}
             $('#country-selector').change(function(e) {
                 $('#country-selector-form').submit();
@@ -308,7 +336,6 @@
                     });
                 });
 
-                console.log(taxesRules);
                 $('#tax_list').val(JSON.stringify(taxesRules));
             });
 

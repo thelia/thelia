@@ -26,7 +26,6 @@ use Thelia\Core\Translation\Translator;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
 
-
 /**
  * Class AreaCreateForm
  * @package Thelia\Form\Shipping

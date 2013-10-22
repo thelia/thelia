@@ -150,7 +150,7 @@ class ResourceTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('CODE', 'Code', 'VARCHAR', true, 30, null);
+        $this->addColumn('CODE', 'Code', 'VARCHAR', true, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -160,9 +160,9 @@ class ResourceTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('GroupResource', '\\Thelia\\Model\\GroupResource', RelationMap::ONE_TO_MANY, array('id' => 'resource_id', ), 'CASCADE', 'RESTRICT', 'GroupResources');
+        $this->addRelation('ProfileResource', '\\Thelia\\Model\\ProfileResource', RelationMap::ONE_TO_MANY, array('id' => 'resource_id', ), 'CASCADE', 'RESTRICT', 'ProfileResources');
         $this->addRelation('ResourceI18n', '\\Thelia\\Model\\ResourceI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ResourceI18ns');
-        $this->addRelation('Group', '\\Thelia\\Model\\Group', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Groups');
+        $this->addRelation('Profile', '\\Thelia\\Model\\Profile', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Profiles');
     } // buildRelations()
 
     /**
@@ -185,7 +185,7 @@ class ResourceTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                GroupResourceTableMap::clearInstancePool();
+                ProfileResourceTableMap::clearInstancePool();
                 ResourceI18nTableMap::clearInstancePool();
             }
 

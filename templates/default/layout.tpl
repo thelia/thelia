@@ -76,7 +76,7 @@ URL: http://www.thelia.net
                     <li class="dropdown">
                         <a href="{url path="/login"}" class="login">{intl l="Log In!"}</a>
                         <div class="dropdown-menu">
-                            {form name="thelia.customer.login"}
+                            {form name="thelia.front.customer.login"}
                             <form id="form-login-mini" action="{url path="/login"}" method="post" role="form" {form_enctype form=$form}>
                                 {form_hidden_fields form=$form}
                                 {form_field form=$form field="email"}
