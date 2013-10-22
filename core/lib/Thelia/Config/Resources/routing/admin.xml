@@ -920,6 +920,12 @@
 
     <!-- end tax rules management -->
 
+    <!-- language management -->
+
+    <route id="admin.configuration.languages" path="/admin/configuration/languages">
+        <default key="_controller">Thelia\Controller\Admin\LangController::defaultAction</default>
+    </route>
+
 
     <!-- The default route, to display a template -->
 
