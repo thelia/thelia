@@ -43,6 +43,16 @@
         <default key="_view">login</default>
     </route>
 
+    <route id="customer.password.retrieve.process" path="/password" methods="post">
+        <default key="_controller">Thelia\Controller\Front\CustomerController::newPasswordAction</default>
+        <default key="_view">password</default>
+    </route>
+
+    <route id="customer.password.retrieve.view" path="/password" methods="get">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">password</default>
+    </route>
+
     <!-- Customer routes : Logout -->
     <route id="customer.logout.process" path="/logout">
         <default key="_controller">Thelia\Controller\Front\CustomerController::logoutAction</default>
@@ -65,12 +75,12 @@
     </route>
 
 
-    <route id="customer.password.retrieve.process" path="/account/password" methods="post">
+    <route id="customer.password.change.process" path="/account/password" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::newPasswordAction</default>
         <default key="_view">account-password</default>
     </route>
 
-    <route id="customer.password.retrieve.view" path="account/password" methods="get">
+    <route id="customer.password.change.view" path="/account/password" methods="get">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">account-password</default>
     </route>
