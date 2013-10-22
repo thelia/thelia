@@ -47,9 +47,15 @@ class NewsletterEvent extends ActionEvent
      */
     protected $lastname;
 
-    function __construct($email)
+    /**
+     * @var string current locale
+     */
+    protected $locale;
+
+    function __construct($email, $locale)
     {
         $this->email = $email;
+        $this->locale = $locale;
     }
 
     /**
@@ -111,6 +117,28 @@ class NewsletterEvent extends ActionEvent
     {
         return $this->lastname;
     }
+
+    /**
+     * @param string $locale
+     *
+     * @return $this
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+
 
 
 
