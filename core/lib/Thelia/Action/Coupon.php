@@ -35,6 +35,7 @@ use Thelia\Coupon\CouponManager;
 use Thelia\Coupon\ConditionCollection;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon as CouponModel;
+use Thelia\Model\CouponQuery;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -120,8 +121,12 @@ class Coupon extends BaseAction implements EventSubscriberInterface
             $request->getSession()->setConsumedCoupons($consumedCoupons);
 
             $totalDiscount = $couponManager->getDiscount();
+            // @todo insert false product in cart with the name of the coupon and the discount as negative price
 
-            // @todo decrement coupon quantity
+            // Decrement coupon quantity
+            $couponQuery = CouponQuery::create();
+            $couponModel = $couponQuery->findOneByCode($coupon->getCode());
+            $couponManager->decrementeQuantity($couponModel);
 
             $request->getSession()->getCart()->setDiscount($totalDiscount);
 

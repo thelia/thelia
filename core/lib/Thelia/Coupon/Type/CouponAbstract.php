@@ -307,5 +307,4 @@ abstract class CouponAbstract implements CouponInterface
         return $this->conditionEvaluator->isMatching($this->conditions);
     }
 
-
 }

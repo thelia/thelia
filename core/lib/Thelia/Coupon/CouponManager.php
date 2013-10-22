@@ -26,6 +26,7 @@ namespace Thelia\Coupon;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionManagerInterface;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Model\Coupon;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -227,5 +228,35 @@ class CouponManager
     public function getAvailableConditions()
     {
         return $this->availableConditions;
+    }
+
+    /**
+     * Decrement this coupon quantity
+     *
+     * To call when a coupon is consumed
+     *
+     * @param \Thelia\Model\Coupon $coupon Coupon consumed
+     *
+     * @return bool
+     */
+    public function decrementeQuantity(Coupon $coupon)
+    {
+        $ret = true;
+        try {
+
+        $oldMaxUsage = $coupon->getMaxUsage();
+
+        if ($oldMaxUsage > 0) {
+            $oldMaxUsage--;
+            $coupon->setMaxUsage($$oldMaxUsage);
+
+            $coupon->save();
+        }
+
+        } catch(\Exception $e) {
+            $ret = false;
+        }
+
+        return $ret;
     }
 }
