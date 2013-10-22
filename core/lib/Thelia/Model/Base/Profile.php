@@ -18,27 +18,25 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Admin as ChildAdmin;
-use Thelia\Model\AdminGroup as ChildAdminGroup;
-use Thelia\Model\AdminGroupQuery as ChildAdminGroupQuery;
 use Thelia\Model\AdminQuery as ChildAdminQuery;
-use Thelia\Model\Group as ChildGroup;
-use Thelia\Model\GroupI18n as ChildGroupI18n;
-use Thelia\Model\GroupI18nQuery as ChildGroupI18nQuery;
-use Thelia\Model\GroupModule as ChildGroupModule;
-use Thelia\Model\GroupModuleQuery as ChildGroupModuleQuery;
-use Thelia\Model\GroupQuery as ChildGroupQuery;
-use Thelia\Model\GroupResource as ChildGroupResource;
-use Thelia\Model\GroupResourceQuery as ChildGroupResourceQuery;
+use Thelia\Model\Profile as ChildProfile;
+use Thelia\Model\ProfileI18n as ChildProfileI18n;
+use Thelia\Model\ProfileI18nQuery as ChildProfileI18nQuery;
+use Thelia\Model\ProfileModule as ChildProfileModule;
+use Thelia\Model\ProfileModuleQuery as ChildProfileModuleQuery;
+use Thelia\Model\ProfileQuery as ChildProfileQuery;
+use Thelia\Model\ProfileResource as ChildProfileResource;
+use Thelia\Model\ProfileResourceQuery as ChildProfileResourceQuery;
 use Thelia\Model\Resource as ChildResource;
 use Thelia\Model\ResourceQuery as ChildResourceQuery;
-use Thelia\Model\Map\GroupTableMap;
+use Thelia\Model\Map\ProfileTableMap;
 
-abstract class Group implements ActiveRecordInterface
+abstract class Profile implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\GroupTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\ProfileTableMap';
 
 
     /**
@@ -92,33 +90,28 @@ abstract class Group implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        ObjectCollection|ChildAdminGroup[] Collection to store aggregation of ChildAdminGroup objects.
-     */
-    protected $collAdminGroups;
-    protected $collAdminGroupsPartial;
-
-    /**
-     * @var        ObjectCollection|ChildGroupResource[] Collection to store aggregation of ChildGroupResource objects.
-     */
-    protected $collGroupResources;
-    protected $collGroupResourcesPartial;
-
-    /**
-     * @var        ObjectCollection|ChildGroupModule[] Collection to store aggregation of ChildGroupModule objects.
-     */
-    protected $collGroupModules;
-    protected $collGroupModulesPartial;
-
-    /**
-     * @var        ObjectCollection|ChildGroupI18n[] Collection to store aggregation of ChildGroupI18n objects.
-     */
-    protected $collGroupI18ns;
-    protected $collGroupI18nsPartial;
-
-    /**
-     * @var        ChildAdmin[] Collection to store aggregation of ChildAdmin objects.
+     * @var        ObjectCollection|ChildAdmin[] Collection to store aggregation of ChildAdmin objects.
      */
     protected $collAdmins;
+    protected $collAdminsPartial;
+
+    /**
+     * @var        ObjectCollection|ChildProfileResource[] Collection to store aggregation of ChildProfileResource objects.
+     */
+    protected $collProfileResources;
+    protected $collProfileResourcesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildProfileModule[] Collection to store aggregation of ChildProfileModule objects.
+     */
+    protected $collProfileModules;
+    protected $collProfileModulesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildProfileI18n[] Collection to store aggregation of ChildProfileI18n objects.
+     */
+    protected $collProfileI18ns;
+    protected $collProfileI18nsPartial;
 
     /**
      * @var        ChildResource[] Collection to store aggregation of ChildResource objects.
@@ -143,15 +136,9 @@ abstract class Group implements ActiveRecordInterface
 
     /**
      * Current translation objects
-     * @var        array[ChildGroupI18n]
+     * @var        array[ChildProfileI18n]
      */
     protected $currentTranslations;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $adminsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -163,28 +150,28 @@ abstract class Group implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $adminGroupsScheduledForDeletion = null;
+    protected $adminsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $groupResourcesScheduledForDeletion = null;
+    protected $profileResourcesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $groupModulesScheduledForDeletion = null;
+    protected $profileModulesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $groupI18nsScheduledForDeletion = null;
+    protected $profileI18nsScheduledForDeletion = null;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\Group object.
+     * Initializes internal state of Thelia\Model\Base\Profile object.
      */
     public function __construct()
     {
@@ -279,9 +266,9 @@ abstract class Group implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Group</code> instance.  If
-     * <code>obj</code> is an instance of <code>Group</code>, delegates to
-     * <code>equals(Group)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>Profile</code> instance.  If
+     * <code>obj</code> is an instance of <code>Profile</code>, delegates to
+     * <code>equals(Profile)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -364,7 +351,7 @@ abstract class Group implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return Group The current object, for fluid interface
+     * @return Profile The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -396,7 +383,7 @@ abstract class Group implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return Group The current object, for fluid interface
+     * @return Profile The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -507,7 +494,7 @@ abstract class Group implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\Group The current object (for fluent API support)
+     * @return   \Thelia\Model\Profile The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -517,7 +504,7 @@ abstract class Group implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = GroupTableMap::ID;
+            $this->modifiedColumns[] = ProfileTableMap::ID;
         }
 
 
@@ -528,7 +515,7 @@ abstract class Group implements ActiveRecordInterface
      * Set the value of [code] column.
      *
      * @param      string $v new value
-     * @return   \Thelia\Model\Group The current object (for fluent API support)
+     * @return   \Thelia\Model\Profile The current object (for fluent API support)
      */
     public function setCode($v)
     {
@@ -538,7 +525,7 @@ abstract class Group implements ActiveRecordInterface
 
         if ($this->code !== $v) {
             $this->code = $v;
-            $this->modifiedColumns[] = GroupTableMap::CODE;
+            $this->modifiedColumns[] = ProfileTableMap::CODE;
         }
 
 
@@ -550,7 +537,7 @@ abstract class Group implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Group The current object (for fluent API support)
+     * @return   \Thelia\Model\Profile The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -558,7 +545,7 @@ abstract class Group implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = GroupTableMap::CREATED_AT;
+                $this->modifiedColumns[] = ProfileTableMap::CREATED_AT;
             }
         } // if either are not null
 
@@ -571,7 +558,7 @@ abstract class Group implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Group The current object (for fluent API support)
+     * @return   \Thelia\Model\Profile The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -579,7 +566,7 @@ abstract class Group implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = GroupTableMap::UPDATED_AT;
+                $this->modifiedColumns[] = ProfileTableMap::UPDATED_AT;
             }
         } // if either are not null
 
@@ -624,19 +611,19 @@ abstract class Group implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : GroupTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProfileTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : GroupTableMap::translateFieldName('Code', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProfileTableMap::translateFieldName('Code', TableMap::TYPE_PHPNAME, $indexType)];
             $this->code = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : GroupTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProfileTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : GroupTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProfileTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -649,10 +636,10 @@ abstract class Group implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = GroupTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = ProfileTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\Group object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\Profile object", 0, $e);
         }
     }
 
@@ -694,13 +681,13 @@ abstract class Group implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(GroupTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProfileTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildGroupQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildProfileQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -710,15 +697,14 @@ abstract class Group implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collAdminGroups = null;
-
-            $this->collGroupResources = null;
-
-            $this->collGroupModules = null;
-
-            $this->collGroupI18ns = null;
-
             $this->collAdmins = null;
+
+            $this->collProfileResources = null;
+
+            $this->collProfileModules = null;
+
+            $this->collProfileI18ns = null;
+
             $this->collResources = null;
         } // if (deep)
     }
@@ -729,8 +715,8 @@ abstract class Group implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Group::setDeleted()
-     * @see Group::isDeleted()
+     * @see Profile::setDeleted()
+     * @see Profile::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -739,12 +725,12 @@ abstract class Group implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildGroupQuery::create()
+            $deleteQuery = ChildProfileQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -781,7 +767,7 @@ abstract class Group implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -791,16 +777,16 @@ abstract class Group implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(GroupTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(ProfileTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(GroupTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(ProfileTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(GroupTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(ProfileTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -812,7 +798,7 @@ abstract class Group implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                GroupTableMap::addInstanceToPool($this);
+                ProfileTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -853,33 +839,6 @@ abstract class Group implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->adminsScheduledForDeletion !== null) {
-                if (!$this->adminsScheduledForDeletion->isEmpty()) {
-                    $pks = array();
-                    $pk  = $this->getPrimaryKey();
-                    foreach ($this->adminsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($pk, $remotePk);
-                    }
-
-                    AdminGroupQuery::create()
-                        ->filterByPrimaryKeys($pks)
-                        ->delete($con);
-                    $this->adminsScheduledForDeletion = null;
-                }
-
-                foreach ($this->getAdmins() as $admin) {
-                    if ($admin->isModified()) {
-                        $admin->save($con);
-                    }
-                }
-            } elseif ($this->collAdmins) {
-                foreach ($this->collAdmins as $admin) {
-                    if ($admin->isModified()) {
-                        $admin->save($con);
-                    }
-                }
-            }
-
             if ($this->resourcesScheduledForDeletion !== null) {
                 if (!$this->resourcesScheduledForDeletion->isEmpty()) {
                     $pks = array();
@@ -888,7 +847,7 @@ abstract class Group implements ActiveRecordInterface
                         $pks[] = array($pk, $remotePk);
                     }
 
-                    GroupResourceQuery::create()
+                    ProfileResourceQuery::create()
                         ->filterByPrimaryKeys($pks)
                         ->delete($con);
                     $this->resourcesScheduledForDeletion = null;
@@ -907,68 +866,69 @@ abstract class Group implements ActiveRecordInterface
                 }
             }
 
-            if ($this->adminGroupsScheduledForDeletion !== null) {
-                if (!$this->adminGroupsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\AdminGroupQuery::create()
-                        ->filterByPrimaryKeys($this->adminGroupsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->adminGroupsScheduledForDeletion = null;
+            if ($this->adminsScheduledForDeletion !== null) {
+                if (!$this->adminsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->adminsScheduledForDeletion as $admin) {
+                        // need to save related object because we set the relation to null
+                        $admin->save($con);
+                    }
+                    $this->adminsScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collAdminGroups !== null) {
-            foreach ($this->collAdminGroups as $referrerFK) {
+                if ($this->collAdmins !== null) {
+            foreach ($this->collAdmins as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
             }
 
-            if ($this->groupResourcesScheduledForDeletion !== null) {
-                if (!$this->groupResourcesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\GroupResourceQuery::create()
-                        ->filterByPrimaryKeys($this->groupResourcesScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->profileResourcesScheduledForDeletion !== null) {
+                if (!$this->profileResourcesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProfileResourceQuery::create()
+                        ->filterByPrimaryKeys($this->profileResourcesScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->groupResourcesScheduledForDeletion = null;
+                    $this->profileResourcesScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collGroupResources !== null) {
-            foreach ($this->collGroupResources as $referrerFK) {
+                if ($this->collProfileResources !== null) {
+            foreach ($this->collProfileResources as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
             }
 
-            if ($this->groupModulesScheduledForDeletion !== null) {
-                if (!$this->groupModulesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\GroupModuleQuery::create()
-                        ->filterByPrimaryKeys($this->groupModulesScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->profileModulesScheduledForDeletion !== null) {
+                if (!$this->profileModulesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProfileModuleQuery::create()
+                        ->filterByPrimaryKeys($this->profileModulesScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->groupModulesScheduledForDeletion = null;
+                    $this->profileModulesScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collGroupModules !== null) {
-            foreach ($this->collGroupModules as $referrerFK) {
+                if ($this->collProfileModules !== null) {
+            foreach ($this->collProfileModules as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
             }
 
-            if ($this->groupI18nsScheduledForDeletion !== null) {
-                if (!$this->groupI18nsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\GroupI18nQuery::create()
-                        ->filterByPrimaryKeys($this->groupI18nsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->profileI18nsScheduledForDeletion !== null) {
+                if (!$this->profileI18nsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProfileI18nQuery::create()
+                        ->filterByPrimaryKeys($this->profileI18nsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->groupI18nsScheduledForDeletion = null;
+                    $this->profileI18nsScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collGroupI18ns !== null) {
-            foreach ($this->collGroupI18ns as $referrerFK) {
+                if ($this->collProfileI18ns !== null) {
+            foreach ($this->collProfileI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -995,27 +955,27 @@ abstract class Group implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = GroupTableMap::ID;
+        $this->modifiedColumns[] = ProfileTableMap::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . GroupTableMap::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProfileTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(GroupTableMap::ID)) {
+        if ($this->isColumnModified(ProfileTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(GroupTableMap::CODE)) {
+        if ($this->isColumnModified(ProfileTableMap::CODE)) {
             $modifiedColumns[':p' . $index++]  = 'CODE';
         }
-        if ($this->isColumnModified(GroupTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(ProfileTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
-        if ($this->isColumnModified(GroupTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(ProfileTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO group (%s) VALUES (%s)',
+            'INSERT INTO profile (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1082,7 +1042,7 @@ abstract class Group implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = GroupTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProfileTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1133,11 +1093,11 @@ abstract class Group implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Group'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['Profile'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Group'][$this->getPrimaryKey()] = true;
-        $keys = GroupTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['Profile'][$this->getPrimaryKey()] = true;
+        $keys = ProfileTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
@@ -1150,17 +1110,17 @@ abstract class Group implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collAdminGroups) {
-                $result['AdminGroups'] = $this->collAdminGroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collAdmins) {
+                $result['Admins'] = $this->collAdmins->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collGroupResources) {
-                $result['GroupResources'] = $this->collGroupResources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collProfileResources) {
+                $result['ProfileResources'] = $this->collProfileResources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collGroupModules) {
-                $result['GroupModules'] = $this->collGroupModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collProfileModules) {
+                $result['ProfileModules'] = $this->collProfileModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collGroupI18ns) {
-                $result['GroupI18ns'] = $this->collGroupI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collProfileI18ns) {
+                $result['ProfileI18ns'] = $this->collProfileI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1180,7 +1140,7 @@ abstract class Group implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = GroupTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProfileTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1230,7 +1190,7 @@ abstract class Group implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = GroupTableMap::getFieldNames($keyType);
+        $keys = ProfileTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
@@ -1245,12 +1205,12 @@ abstract class Group implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(GroupTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ProfileTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(GroupTableMap::ID)) $criteria->add(GroupTableMap::ID, $this->id);
-        if ($this->isColumnModified(GroupTableMap::CODE)) $criteria->add(GroupTableMap::CODE, $this->code);
-        if ($this->isColumnModified(GroupTableMap::CREATED_AT)) $criteria->add(GroupTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(GroupTableMap::UPDATED_AT)) $criteria->add(GroupTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(ProfileTableMap::ID)) $criteria->add(ProfileTableMap::ID, $this->id);
+        if ($this->isColumnModified(ProfileTableMap::CODE)) $criteria->add(ProfileTableMap::CODE, $this->code);
+        if ($this->isColumnModified(ProfileTableMap::CREATED_AT)) $criteria->add(ProfileTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(ProfileTableMap::UPDATED_AT)) $criteria->add(ProfileTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1265,8 +1225,8 @@ abstract class Group implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(GroupTableMap::DATABASE_NAME);
-        $criteria->add(GroupTableMap::ID, $this->id);
+        $criteria = new Criteria(ProfileTableMap::DATABASE_NAME);
+        $criteria->add(ProfileTableMap::ID, $this->id);
 
         return $criteria;
     }
@@ -1307,7 +1267,7 @@ abstract class Group implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Group (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\Profile (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1323,27 +1283,27 @@ abstract class Group implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getAdminGroups() as $relObj) {
+            foreach ($this->getAdmins() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAdminGroup($relObj->copy($deepCopy));
+                    $copyObj->addAdmin($relObj->copy($deepCopy));
                 }
             }
 
-            foreach ($this->getGroupResources() as $relObj) {
+            foreach ($this->getProfileResources() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addGroupResource($relObj->copy($deepCopy));
+                    $copyObj->addProfileResource($relObj->copy($deepCopy));
                 }
             }
 
-            foreach ($this->getGroupModules() as $relObj) {
+            foreach ($this->getProfileModules() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addGroupModule($relObj->copy($deepCopy));
+                    $copyObj->addProfileModule($relObj->copy($deepCopy));
                 }
             }
 
-            foreach ($this->getGroupI18ns() as $relObj) {
+            foreach ($this->getProfileI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addGroupI18n($relObj->copy($deepCopy));
+                    $copyObj->addProfileI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1364,7 +1324,7 @@ abstract class Group implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Group Clone of current object.
+     * @return                 \Thelia\Model\Profile Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1388,978 +1348,18 @@ abstract class Group implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('AdminGroup' == $relationName) {
-            return $this->initAdminGroups();
+        if ('Admin' == $relationName) {
+            return $this->initAdmins();
         }
-        if ('GroupResource' == $relationName) {
-            return $this->initGroupResources();
+        if ('ProfileResource' == $relationName) {
+            return $this->initProfileResources();
         }
-        if ('GroupModule' == $relationName) {
-            return $this->initGroupModules();
+        if ('ProfileModule' == $relationName) {
+            return $this->initProfileModules();
         }
-        if ('GroupI18n' == $relationName) {
-            return $this->initGroupI18ns();
+        if ('ProfileI18n' == $relationName) {
+            return $this->initProfileI18ns();
         }
-    }
-
-    /**
-     * Clears out the collAdminGroups collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addAdminGroups()
-     */
-    public function clearAdminGroups()
-    {
-        $this->collAdminGroups = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collAdminGroups collection loaded partially.
-     */
-    public function resetPartialAdminGroups($v = true)
-    {
-        $this->collAdminGroupsPartial = $v;
-    }
-
-    /**
-     * Initializes the collAdminGroups collection.
-     *
-     * By default this just sets the collAdminGroups collection to an empty array (like clearcollAdminGroups());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initAdminGroups($overrideExisting = true)
-    {
-        if (null !== $this->collAdminGroups && !$overrideExisting) {
-            return;
-        }
-        $this->collAdminGroups = new ObjectCollection();
-        $this->collAdminGroups->setModel('\Thelia\Model\AdminGroup');
-    }
-
-    /**
-     * Gets an array of ChildAdminGroup objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildGroup is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildAdminGroup[] List of ChildAdminGroup objects
-     * @throws PropelException
-     */
-    public function getAdminGroups($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collAdminGroupsPartial && !$this->isNew();
-        if (null === $this->collAdminGroups || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collAdminGroups) {
-                // return empty collection
-                $this->initAdminGroups();
-            } else {
-                $collAdminGroups = ChildAdminGroupQuery::create(null, $criteria)
-                    ->filterByGroup($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collAdminGroupsPartial && count($collAdminGroups)) {
-                        $this->initAdminGroups(false);
-
-                        foreach ($collAdminGroups as $obj) {
-                            if (false == $this->collAdminGroups->contains($obj)) {
-                                $this->collAdminGroups->append($obj);
-                            }
-                        }
-
-                        $this->collAdminGroupsPartial = true;
-                    }
-
-                    $collAdminGroups->getInternalIterator()->rewind();
-
-                    return $collAdminGroups;
-                }
-
-                if ($partial && $this->collAdminGroups) {
-                    foreach ($this->collAdminGroups as $obj) {
-                        if ($obj->isNew()) {
-                            $collAdminGroups[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collAdminGroups = $collAdminGroups;
-                $this->collAdminGroupsPartial = false;
-            }
-        }
-
-        return $this->collAdminGroups;
-    }
-
-    /**
-     * Sets a collection of AdminGroup objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $adminGroups A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildGroup The current object (for fluent API support)
-     */
-    public function setAdminGroups(Collection $adminGroups, ConnectionInterface $con = null)
-    {
-        $adminGroupsToDelete = $this->getAdminGroups(new Criteria(), $con)->diff($adminGroups);
-
-
-        //since at least one column in the foreign key is at the same time a PK
-        //we can not just set a PK to NULL in the lines below. We have to store
-        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->adminGroupsScheduledForDeletion = clone $adminGroupsToDelete;
-
-        foreach ($adminGroupsToDelete as $adminGroupRemoved) {
-            $adminGroupRemoved->setGroup(null);
-        }
-
-        $this->collAdminGroups = null;
-        foreach ($adminGroups as $adminGroup) {
-            $this->addAdminGroup($adminGroup);
-        }
-
-        $this->collAdminGroups = $adminGroups;
-        $this->collAdminGroupsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related AdminGroup objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related AdminGroup objects.
-     * @throws PropelException
-     */
-    public function countAdminGroups(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collAdminGroupsPartial && !$this->isNew();
-        if (null === $this->collAdminGroups || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collAdminGroups) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getAdminGroups());
-            }
-
-            $query = ChildAdminGroupQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByGroup($this)
-                ->count($con);
-        }
-
-        return count($this->collAdminGroups);
-    }
-
-    /**
-     * Method called to associate a ChildAdminGroup object to this object
-     * through the ChildAdminGroup foreign key attribute.
-     *
-     * @param    ChildAdminGroup $l ChildAdminGroup
-     * @return   \Thelia\Model\Group The current object (for fluent API support)
-     */
-    public function addAdminGroup(ChildAdminGroup $l)
-    {
-        if ($this->collAdminGroups === null) {
-            $this->initAdminGroups();
-            $this->collAdminGroupsPartial = true;
-        }
-
-        if (!in_array($l, $this->collAdminGroups->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddAdminGroup($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param AdminGroup $adminGroup The adminGroup object to add.
-     */
-    protected function doAddAdminGroup($adminGroup)
-    {
-        $this->collAdminGroups[]= $adminGroup;
-        $adminGroup->setGroup($this);
-    }
-
-    /**
-     * @param  AdminGroup $adminGroup The adminGroup object to remove.
-     * @return ChildGroup The current object (for fluent API support)
-     */
-    public function removeAdminGroup($adminGroup)
-    {
-        if ($this->getAdminGroups()->contains($adminGroup)) {
-            $this->collAdminGroups->remove($this->collAdminGroups->search($adminGroup));
-            if (null === $this->adminGroupsScheduledForDeletion) {
-                $this->adminGroupsScheduledForDeletion = clone $this->collAdminGroups;
-                $this->adminGroupsScheduledForDeletion->clear();
-            }
-            $this->adminGroupsScheduledForDeletion[]= clone $adminGroup;
-            $adminGroup->setGroup(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Group is new, it will return
-     * an empty collection; or if this Group has previously
-     * been saved, it will retrieve related AdminGroups from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Group.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildAdminGroup[] List of ChildAdminGroup objects
-     */
-    public function getAdminGroupsJoinAdmin($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildAdminGroupQuery::create(null, $criteria);
-        $query->joinWith('Admin', $joinBehavior);
-
-        return $this->getAdminGroups($query, $con);
-    }
-
-    /**
-     * Clears out the collGroupResources collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addGroupResources()
-     */
-    public function clearGroupResources()
-    {
-        $this->collGroupResources = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collGroupResources collection loaded partially.
-     */
-    public function resetPartialGroupResources($v = true)
-    {
-        $this->collGroupResourcesPartial = $v;
-    }
-
-    /**
-     * Initializes the collGroupResources collection.
-     *
-     * By default this just sets the collGroupResources collection to an empty array (like clearcollGroupResources());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initGroupResources($overrideExisting = true)
-    {
-        if (null !== $this->collGroupResources && !$overrideExisting) {
-            return;
-        }
-        $this->collGroupResources = new ObjectCollection();
-        $this->collGroupResources->setModel('\Thelia\Model\GroupResource');
-    }
-
-    /**
-     * Gets an array of ChildGroupResource objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildGroup is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildGroupResource[] List of ChildGroupResource objects
-     * @throws PropelException
-     */
-    public function getGroupResources($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collGroupResourcesPartial && !$this->isNew();
-        if (null === $this->collGroupResources || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collGroupResources) {
-                // return empty collection
-                $this->initGroupResources();
-            } else {
-                $collGroupResources = ChildGroupResourceQuery::create(null, $criteria)
-                    ->filterByGroup($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collGroupResourcesPartial && count($collGroupResources)) {
-                        $this->initGroupResources(false);
-
-                        foreach ($collGroupResources as $obj) {
-                            if (false == $this->collGroupResources->contains($obj)) {
-                                $this->collGroupResources->append($obj);
-                            }
-                        }
-
-                        $this->collGroupResourcesPartial = true;
-                    }
-
-                    $collGroupResources->getInternalIterator()->rewind();
-
-                    return $collGroupResources;
-                }
-
-                if ($partial && $this->collGroupResources) {
-                    foreach ($this->collGroupResources as $obj) {
-                        if ($obj->isNew()) {
-                            $collGroupResources[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collGroupResources = $collGroupResources;
-                $this->collGroupResourcesPartial = false;
-            }
-        }
-
-        return $this->collGroupResources;
-    }
-
-    /**
-     * Sets a collection of GroupResource objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $groupResources A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildGroup The current object (for fluent API support)
-     */
-    public function setGroupResources(Collection $groupResources, ConnectionInterface $con = null)
-    {
-        $groupResourcesToDelete = $this->getGroupResources(new Criteria(), $con)->diff($groupResources);
-
-
-        //since at least one column in the foreign key is at the same time a PK
-        //we can not just set a PK to NULL in the lines below. We have to store
-        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->groupResourcesScheduledForDeletion = clone $groupResourcesToDelete;
-
-        foreach ($groupResourcesToDelete as $groupResourceRemoved) {
-            $groupResourceRemoved->setGroup(null);
-        }
-
-        $this->collGroupResources = null;
-        foreach ($groupResources as $groupResource) {
-            $this->addGroupResource($groupResource);
-        }
-
-        $this->collGroupResources = $groupResources;
-        $this->collGroupResourcesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related GroupResource objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related GroupResource objects.
-     * @throws PropelException
-     */
-    public function countGroupResources(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collGroupResourcesPartial && !$this->isNew();
-        if (null === $this->collGroupResources || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collGroupResources) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getGroupResources());
-            }
-
-            $query = ChildGroupResourceQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByGroup($this)
-                ->count($con);
-        }
-
-        return count($this->collGroupResources);
-    }
-
-    /**
-     * Method called to associate a ChildGroupResource object to this object
-     * through the ChildGroupResource foreign key attribute.
-     *
-     * @param    ChildGroupResource $l ChildGroupResource
-     * @return   \Thelia\Model\Group The current object (for fluent API support)
-     */
-    public function addGroupResource(ChildGroupResource $l)
-    {
-        if ($this->collGroupResources === null) {
-            $this->initGroupResources();
-            $this->collGroupResourcesPartial = true;
-        }
-
-        if (!in_array($l, $this->collGroupResources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddGroupResource($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param GroupResource $groupResource The groupResource object to add.
-     */
-    protected function doAddGroupResource($groupResource)
-    {
-        $this->collGroupResources[]= $groupResource;
-        $groupResource->setGroup($this);
-    }
-
-    /**
-     * @param  GroupResource $groupResource The groupResource object to remove.
-     * @return ChildGroup The current object (for fluent API support)
-     */
-    public function removeGroupResource($groupResource)
-    {
-        if ($this->getGroupResources()->contains($groupResource)) {
-            $this->collGroupResources->remove($this->collGroupResources->search($groupResource));
-            if (null === $this->groupResourcesScheduledForDeletion) {
-                $this->groupResourcesScheduledForDeletion = clone $this->collGroupResources;
-                $this->groupResourcesScheduledForDeletion->clear();
-            }
-            $this->groupResourcesScheduledForDeletion[]= clone $groupResource;
-            $groupResource->setGroup(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Group is new, it will return
-     * an empty collection; or if this Group has previously
-     * been saved, it will retrieve related GroupResources from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Group.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildGroupResource[] List of ChildGroupResource objects
-     */
-    public function getGroupResourcesJoinResource($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildGroupResourceQuery::create(null, $criteria);
-        $query->joinWith('Resource', $joinBehavior);
-
-        return $this->getGroupResources($query, $con);
-    }
-
-    /**
-     * Clears out the collGroupModules collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addGroupModules()
-     */
-    public function clearGroupModules()
-    {
-        $this->collGroupModules = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collGroupModules collection loaded partially.
-     */
-    public function resetPartialGroupModules($v = true)
-    {
-        $this->collGroupModulesPartial = $v;
-    }
-
-    /**
-     * Initializes the collGroupModules collection.
-     *
-     * By default this just sets the collGroupModules collection to an empty array (like clearcollGroupModules());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initGroupModules($overrideExisting = true)
-    {
-        if (null !== $this->collGroupModules && !$overrideExisting) {
-            return;
-        }
-        $this->collGroupModules = new ObjectCollection();
-        $this->collGroupModules->setModel('\Thelia\Model\GroupModule');
-    }
-
-    /**
-     * Gets an array of ChildGroupModule objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildGroup is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildGroupModule[] List of ChildGroupModule objects
-     * @throws PropelException
-     */
-    public function getGroupModules($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collGroupModulesPartial && !$this->isNew();
-        if (null === $this->collGroupModules || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collGroupModules) {
-                // return empty collection
-                $this->initGroupModules();
-            } else {
-                $collGroupModules = ChildGroupModuleQuery::create(null, $criteria)
-                    ->filterByGroup($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collGroupModulesPartial && count($collGroupModules)) {
-                        $this->initGroupModules(false);
-
-                        foreach ($collGroupModules as $obj) {
-                            if (false == $this->collGroupModules->contains($obj)) {
-                                $this->collGroupModules->append($obj);
-                            }
-                        }
-
-                        $this->collGroupModulesPartial = true;
-                    }
-
-                    $collGroupModules->getInternalIterator()->rewind();
-
-                    return $collGroupModules;
-                }
-
-                if ($partial && $this->collGroupModules) {
-                    foreach ($this->collGroupModules as $obj) {
-                        if ($obj->isNew()) {
-                            $collGroupModules[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collGroupModules = $collGroupModules;
-                $this->collGroupModulesPartial = false;
-            }
-        }
-
-        return $this->collGroupModules;
-    }
-
-    /**
-     * Sets a collection of GroupModule objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $groupModules A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildGroup The current object (for fluent API support)
-     */
-    public function setGroupModules(Collection $groupModules, ConnectionInterface $con = null)
-    {
-        $groupModulesToDelete = $this->getGroupModules(new Criteria(), $con)->diff($groupModules);
-
-
-        $this->groupModulesScheduledForDeletion = $groupModulesToDelete;
-
-        foreach ($groupModulesToDelete as $groupModuleRemoved) {
-            $groupModuleRemoved->setGroup(null);
-        }
-
-        $this->collGroupModules = null;
-        foreach ($groupModules as $groupModule) {
-            $this->addGroupModule($groupModule);
-        }
-
-        $this->collGroupModules = $groupModules;
-        $this->collGroupModulesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related GroupModule objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related GroupModule objects.
-     * @throws PropelException
-     */
-    public function countGroupModules(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collGroupModulesPartial && !$this->isNew();
-        if (null === $this->collGroupModules || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collGroupModules) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getGroupModules());
-            }
-
-            $query = ChildGroupModuleQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByGroup($this)
-                ->count($con);
-        }
-
-        return count($this->collGroupModules);
-    }
-
-    /**
-     * Method called to associate a ChildGroupModule object to this object
-     * through the ChildGroupModule foreign key attribute.
-     *
-     * @param    ChildGroupModule $l ChildGroupModule
-     * @return   \Thelia\Model\Group The current object (for fluent API support)
-     */
-    public function addGroupModule(ChildGroupModule $l)
-    {
-        if ($this->collGroupModules === null) {
-            $this->initGroupModules();
-            $this->collGroupModulesPartial = true;
-        }
-
-        if (!in_array($l, $this->collGroupModules->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddGroupModule($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param GroupModule $groupModule The groupModule object to add.
-     */
-    protected function doAddGroupModule($groupModule)
-    {
-        $this->collGroupModules[]= $groupModule;
-        $groupModule->setGroup($this);
-    }
-
-    /**
-     * @param  GroupModule $groupModule The groupModule object to remove.
-     * @return ChildGroup The current object (for fluent API support)
-     */
-    public function removeGroupModule($groupModule)
-    {
-        if ($this->getGroupModules()->contains($groupModule)) {
-            $this->collGroupModules->remove($this->collGroupModules->search($groupModule));
-            if (null === $this->groupModulesScheduledForDeletion) {
-                $this->groupModulesScheduledForDeletion = clone $this->collGroupModules;
-                $this->groupModulesScheduledForDeletion->clear();
-            }
-            $this->groupModulesScheduledForDeletion[]= clone $groupModule;
-            $groupModule->setGroup(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Group is new, it will return
-     * an empty collection; or if this Group has previously
-     * been saved, it will retrieve related GroupModules from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Group.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildGroupModule[] List of ChildGroupModule objects
-     */
-    public function getGroupModulesJoinModule($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildGroupModuleQuery::create(null, $criteria);
-        $query->joinWith('Module', $joinBehavior);
-
-        return $this->getGroupModules($query, $con);
-    }
-
-    /**
-     * Clears out the collGroupI18ns collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addGroupI18ns()
-     */
-    public function clearGroupI18ns()
-    {
-        $this->collGroupI18ns = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collGroupI18ns collection loaded partially.
-     */
-    public function resetPartialGroupI18ns($v = true)
-    {
-        $this->collGroupI18nsPartial = $v;
-    }
-
-    /**
-     * Initializes the collGroupI18ns collection.
-     *
-     * By default this just sets the collGroupI18ns collection to an empty array (like clearcollGroupI18ns());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initGroupI18ns($overrideExisting = true)
-    {
-        if (null !== $this->collGroupI18ns && !$overrideExisting) {
-            return;
-        }
-        $this->collGroupI18ns = new ObjectCollection();
-        $this->collGroupI18ns->setModel('\Thelia\Model\GroupI18n');
-    }
-
-    /**
-     * Gets an array of ChildGroupI18n objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildGroup is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildGroupI18n[] List of ChildGroupI18n objects
-     * @throws PropelException
-     */
-    public function getGroupI18ns($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collGroupI18nsPartial && !$this->isNew();
-        if (null === $this->collGroupI18ns || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collGroupI18ns) {
-                // return empty collection
-                $this->initGroupI18ns();
-            } else {
-                $collGroupI18ns = ChildGroupI18nQuery::create(null, $criteria)
-                    ->filterByGroup($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collGroupI18nsPartial && count($collGroupI18ns)) {
-                        $this->initGroupI18ns(false);
-
-                        foreach ($collGroupI18ns as $obj) {
-                            if (false == $this->collGroupI18ns->contains($obj)) {
-                                $this->collGroupI18ns->append($obj);
-                            }
-                        }
-
-                        $this->collGroupI18nsPartial = true;
-                    }
-
-                    $collGroupI18ns->getInternalIterator()->rewind();
-
-                    return $collGroupI18ns;
-                }
-
-                if ($partial && $this->collGroupI18ns) {
-                    foreach ($this->collGroupI18ns as $obj) {
-                        if ($obj->isNew()) {
-                            $collGroupI18ns[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collGroupI18ns = $collGroupI18ns;
-                $this->collGroupI18nsPartial = false;
-            }
-        }
-
-        return $this->collGroupI18ns;
-    }
-
-    /**
-     * Sets a collection of GroupI18n objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $groupI18ns A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildGroup The current object (for fluent API support)
-     */
-    public function setGroupI18ns(Collection $groupI18ns, ConnectionInterface $con = null)
-    {
-        $groupI18nsToDelete = $this->getGroupI18ns(new Criteria(), $con)->diff($groupI18ns);
-
-
-        //since at least one column in the foreign key is at the same time a PK
-        //we can not just set a PK to NULL in the lines below. We have to store
-        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->groupI18nsScheduledForDeletion = clone $groupI18nsToDelete;
-
-        foreach ($groupI18nsToDelete as $groupI18nRemoved) {
-            $groupI18nRemoved->setGroup(null);
-        }
-
-        $this->collGroupI18ns = null;
-        foreach ($groupI18ns as $groupI18n) {
-            $this->addGroupI18n($groupI18n);
-        }
-
-        $this->collGroupI18ns = $groupI18ns;
-        $this->collGroupI18nsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related GroupI18n objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related GroupI18n objects.
-     * @throws PropelException
-     */
-    public function countGroupI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collGroupI18nsPartial && !$this->isNew();
-        if (null === $this->collGroupI18ns || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collGroupI18ns) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getGroupI18ns());
-            }
-
-            $query = ChildGroupI18nQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByGroup($this)
-                ->count($con);
-        }
-
-        return count($this->collGroupI18ns);
-    }
-
-    /**
-     * Method called to associate a ChildGroupI18n object to this object
-     * through the ChildGroupI18n foreign key attribute.
-     *
-     * @param    ChildGroupI18n $l ChildGroupI18n
-     * @return   \Thelia\Model\Group The current object (for fluent API support)
-     */
-    public function addGroupI18n(ChildGroupI18n $l)
-    {
-        if ($l && $locale = $l->getLocale()) {
-            $this->setLocale($locale);
-            $this->currentTranslations[$locale] = $l;
-        }
-        if ($this->collGroupI18ns === null) {
-            $this->initGroupI18ns();
-            $this->collGroupI18nsPartial = true;
-        }
-
-        if (!in_array($l, $this->collGroupI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddGroupI18n($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param GroupI18n $groupI18n The groupI18n object to add.
-     */
-    protected function doAddGroupI18n($groupI18n)
-    {
-        $this->collGroupI18ns[]= $groupI18n;
-        $groupI18n->setGroup($this);
-    }
-
-    /**
-     * @param  GroupI18n $groupI18n The groupI18n object to remove.
-     * @return ChildGroup The current object (for fluent API support)
-     */
-    public function removeGroupI18n($groupI18n)
-    {
-        if ($this->getGroupI18ns()->contains($groupI18n)) {
-            $this->collGroupI18ns->remove($this->collGroupI18ns->search($groupI18n));
-            if (null === $this->groupI18nsScheduledForDeletion) {
-                $this->groupI18nsScheduledForDeletion = clone $this->collGroupI18ns;
-                $this->groupI18nsScheduledForDeletion->clear();
-            }
-            $this->groupI18nsScheduledForDeletion[]= clone $groupI18n;
-            $groupI18n->setGroup(null);
-        }
-
-        return $this;
     }
 
     /**
@@ -2374,53 +1374,91 @@ abstract class Group implements ActiveRecordInterface
     public function clearAdmins()
     {
         $this->collAdmins = null; // important to set this to NULL since that means it is uninitialized
-        $this->collAdminsPartial = null;
+    }
+
+    /**
+     * Reset is the collAdmins collection loaded partially.
+     */
+    public function resetPartialAdmins($v = true)
+    {
+        $this->collAdminsPartial = $v;
     }
 
     /**
      * Initializes the collAdmins collection.
      *
-     * By default this just sets the collAdmins collection to an empty collection (like clearAdmins());
+     * By default this just sets the collAdmins collection to an empty array (like clearcollAdmins());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
      * @return void
      */
-    public function initAdmins()
+    public function initAdmins($overrideExisting = true)
     {
+        if (null !== $this->collAdmins && !$overrideExisting) {
+            return;
+        }
         $this->collAdmins = new ObjectCollection();
         $this->collAdmins->setModel('\Thelia\Model\Admin');
     }
 
     /**
-     * Gets a collection of ChildAdmin objects related by a many-to-many relationship
-     * to the current object by way of the admin_group cross-reference table.
+     * Gets an array of ChildAdmin objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildGroup is new, it will return
+     * If this ChildProfile is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      ConnectionInterface $con Optional connection object
-     *
-     * @return ObjectCollection|ChildAdmin[] List of ChildAdmin objects
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildAdmin[] List of ChildAdmin objects
+     * @throws PropelException
      */
     public function getAdmins($criteria = null, ConnectionInterface $con = null)
     {
-        if (null === $this->collAdmins || null !== $criteria) {
+        $partial = $this->collAdminsPartial && !$this->isNew();
+        if (null === $this->collAdmins || null !== $criteria  || $partial) {
             if ($this->isNew() && null === $this->collAdmins) {
                 // return empty collection
                 $this->initAdmins();
             } else {
                 $collAdmins = ChildAdminQuery::create(null, $criteria)
-                    ->filterByGroup($this)
+                    ->filterByProfile($this)
                     ->find($con);
+
                 if (null !== $criteria) {
+                    if (false !== $this->collAdminsPartial && count($collAdmins)) {
+                        $this->initAdmins(false);
+
+                        foreach ($collAdmins as $obj) {
+                            if (false == $this->collAdmins->contains($obj)) {
+                                $this->collAdmins->append($obj);
+                            }
+                        }
+
+                        $this->collAdminsPartial = true;
+                    }
+
+                    $collAdmins->getInternalIterator()->rewind();
+
                     return $collAdmins;
                 }
+
+                if ($partial && $this->collAdmins) {
+                    foreach ($this->collAdmins as $obj) {
+                        if ($obj->isNew()) {
+                            $collAdmins[] = $obj;
+                        }
+                    }
+                }
+
                 $this->collAdmins = $collAdmins;
+                $this->collAdminsPartial = false;
             }
         }
 
@@ -2428,118 +1466,829 @@ abstract class Group implements ActiveRecordInterface
     }
 
     /**
-     * Sets a collection of Admin objects related by a many-to-many relationship
-     * to the current object by way of the admin_group cross-reference table.
+     * Sets a collection of Admin objects related by a one-to-many relationship
+     * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection $admins A Propel collection.
-     * @param  ConnectionInterface $con Optional connection object
-     * @return ChildGroup The current object (for fluent API support)
+     * @param      Collection $admins A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProfile The current object (for fluent API support)
      */
     public function setAdmins(Collection $admins, ConnectionInterface $con = null)
     {
-        $this->clearAdmins();
-        $currentAdmins = $this->getAdmins();
+        $adminsToDelete = $this->getAdmins(new Criteria(), $con)->diff($admins);
 
-        $this->adminsScheduledForDeletion = $currentAdmins->diff($admins);
 
+        $this->adminsScheduledForDeletion = $adminsToDelete;
+
+        foreach ($adminsToDelete as $adminRemoved) {
+            $adminRemoved->setProfile(null);
+        }
+
+        $this->collAdmins = null;
         foreach ($admins as $admin) {
-            if (!$currentAdmins->contains($admin)) {
-                $this->doAddAdmin($admin);
-            }
+            $this->addAdmin($admin);
         }
 
         $this->collAdmins = $admins;
+        $this->collAdminsPartial = false;
 
         return $this;
     }
 
     /**
-     * Gets the number of ChildAdmin objects related by a many-to-many relationship
-     * to the current object by way of the admin_group cross-reference table.
+     * Returns the number of related Admin objects.
      *
-     * @param      Criteria $criteria Optional query object to filter the query
-     * @param      boolean $distinct Set to true to force count distinct
-     * @param      ConnectionInterface $con Optional connection object
-     *
-     * @return int the number of related ChildAdmin objects
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Admin objects.
+     * @throws PropelException
      */
-    public function countAdmins($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countAdmins(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        if (null === $this->collAdmins || null !== $criteria) {
+        $partial = $this->collAdminsPartial && !$this->isNew();
+        if (null === $this->collAdmins || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collAdmins) {
                 return 0;
-            } else {
-                $query = ChildAdminQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByGroup($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collAdmins);
+
+            if ($partial && !$criteria) {
+                return count($this->getAdmins());
+            }
+
+            $query = ChildAdminQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByProfile($this)
+                ->count($con);
         }
+
+        return count($this->collAdmins);
     }
 
     /**
-     * Associate a ChildAdmin object to this object
-     * through the admin_group cross reference table.
+     * Method called to associate a ChildAdmin object to this object
+     * through the ChildAdmin foreign key attribute.
      *
-     * @param  ChildAdmin $admin The ChildAdminGroup object to relate
-     * @return ChildGroup The current object (for fluent API support)
+     * @param    ChildAdmin $l ChildAdmin
+     * @return   \Thelia\Model\Profile The current object (for fluent API support)
      */
-    public function addAdmin(ChildAdmin $admin)
+    public function addAdmin(ChildAdmin $l)
     {
         if ($this->collAdmins === null) {
             $this->initAdmins();
+            $this->collAdminsPartial = true;
         }
 
-        if (!$this->collAdmins->contains($admin)) { // only add it if the **same** object is not already associated
-            $this->doAddAdmin($admin);
-            $this->collAdmins[] = $admin;
+        if (!in_array($l, $this->collAdmins->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddAdmin($l);
         }
 
         return $this;
     }
 
     /**
-     * @param    Admin $admin The admin object to add.
+     * @param Admin $admin The admin object to add.
      */
     protected function doAddAdmin($admin)
     {
-        $adminGroup = new ChildAdminGroup();
-        $adminGroup->setAdmin($admin);
-        $this->addAdminGroup($adminGroup);
-        // set the back reference to this object directly as using provided method either results
-        // in endless loop or in multiple relations
-        if (!$admin->getGroups()->contains($this)) {
-            $foreignCollection   = $admin->getGroups();
-            $foreignCollection[] = $this;
-        }
+        $this->collAdmins[]= $admin;
+        $admin->setProfile($this);
     }
 
     /**
-     * Remove a ChildAdmin object to this object
-     * through the admin_group cross reference table.
-     *
-     * @param ChildAdmin $admin The ChildAdminGroup object to relate
-     * @return ChildGroup The current object (for fluent API support)
+     * @param  Admin $admin The admin object to remove.
+     * @return ChildProfile The current object (for fluent API support)
      */
-    public function removeAdmin(ChildAdmin $admin)
+    public function removeAdmin($admin)
     {
         if ($this->getAdmins()->contains($admin)) {
             $this->collAdmins->remove($this->collAdmins->search($admin));
-
             if (null === $this->adminsScheduledForDeletion) {
                 $this->adminsScheduledForDeletion = clone $this->collAdmins;
                 $this->adminsScheduledForDeletion->clear();
             }
+            $this->adminsScheduledForDeletion[]= $admin;
+            $admin->setProfile(null);
+        }
 
-            $this->adminsScheduledForDeletion[] = $admin;
+        return $this;
+    }
+
+    /**
+     * Clears out the collProfileResources collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProfileResources()
+     */
+    public function clearProfileResources()
+    {
+        $this->collProfileResources = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collProfileResources collection loaded partially.
+     */
+    public function resetPartialProfileResources($v = true)
+    {
+        $this->collProfileResourcesPartial = $v;
+    }
+
+    /**
+     * Initializes the collProfileResources collection.
+     *
+     * By default this just sets the collProfileResources collection to an empty array (like clearcollProfileResources());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProfileResources($overrideExisting = true)
+    {
+        if (null !== $this->collProfileResources && !$overrideExisting) {
+            return;
+        }
+        $this->collProfileResources = new ObjectCollection();
+        $this->collProfileResources->setModel('\Thelia\Model\ProfileResource');
+    }
+
+    /**
+     * Gets an array of ChildProfileResource objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildProfile is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildProfileResource[] List of ChildProfileResource objects
+     * @throws PropelException
+     */
+    public function getProfileResources($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProfileResourcesPartial && !$this->isNew();
+        if (null === $this->collProfileResources || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProfileResources) {
+                // return empty collection
+                $this->initProfileResources();
+            } else {
+                $collProfileResources = ChildProfileResourceQuery::create(null, $criteria)
+                    ->filterByProfile($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collProfileResourcesPartial && count($collProfileResources)) {
+                        $this->initProfileResources(false);
+
+                        foreach ($collProfileResources as $obj) {
+                            if (false == $this->collProfileResources->contains($obj)) {
+                                $this->collProfileResources->append($obj);
+                            }
+                        }
+
+                        $this->collProfileResourcesPartial = true;
+                    }
+
+                    $collProfileResources->getInternalIterator()->rewind();
+
+                    return $collProfileResources;
+                }
+
+                if ($partial && $this->collProfileResources) {
+                    foreach ($this->collProfileResources as $obj) {
+                        if ($obj->isNew()) {
+                            $collProfileResources[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProfileResources = $collProfileResources;
+                $this->collProfileResourcesPartial = false;
+            }
+        }
+
+        return $this->collProfileResources;
+    }
+
+    /**
+     * Sets a collection of ProfileResource objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $profileResources A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProfile The current object (for fluent API support)
+     */
+    public function setProfileResources(Collection $profileResources, ConnectionInterface $con = null)
+    {
+        $profileResourcesToDelete = $this->getProfileResources(new Criteria(), $con)->diff($profileResources);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->profileResourcesScheduledForDeletion = clone $profileResourcesToDelete;
+
+        foreach ($profileResourcesToDelete as $profileResourceRemoved) {
+            $profileResourceRemoved->setProfile(null);
+        }
+
+        $this->collProfileResources = null;
+        foreach ($profileResources as $profileResource) {
+            $this->addProfileResource($profileResource);
+        }
+
+        $this->collProfileResources = $profileResources;
+        $this->collProfileResourcesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ProfileResource objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProfileResource objects.
+     * @throws PropelException
+     */
+    public function countProfileResources(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProfileResourcesPartial && !$this->isNew();
+        if (null === $this->collProfileResources || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProfileResources) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getProfileResources());
+            }
+
+            $query = ChildProfileResourceQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByProfile($this)
+                ->count($con);
+        }
+
+        return count($this->collProfileResources);
+    }
+
+    /**
+     * Method called to associate a ChildProfileResource object to this object
+     * through the ChildProfileResource foreign key attribute.
+     *
+     * @param    ChildProfileResource $l ChildProfileResource
+     * @return   \Thelia\Model\Profile The current object (for fluent API support)
+     */
+    public function addProfileResource(ChildProfileResource $l)
+    {
+        if ($this->collProfileResources === null) {
+            $this->initProfileResources();
+            $this->collProfileResourcesPartial = true;
+        }
+
+        if (!in_array($l, $this->collProfileResources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProfileResource($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ProfileResource $profileResource The profileResource object to add.
+     */
+    protected function doAddProfileResource($profileResource)
+    {
+        $this->collProfileResources[]= $profileResource;
+        $profileResource->setProfile($this);
+    }
+
+    /**
+     * @param  ProfileResource $profileResource The profileResource object to remove.
+     * @return ChildProfile The current object (for fluent API support)
+     */
+    public function removeProfileResource($profileResource)
+    {
+        if ($this->getProfileResources()->contains($profileResource)) {
+            $this->collProfileResources->remove($this->collProfileResources->search($profileResource));
+            if (null === $this->profileResourcesScheduledForDeletion) {
+                $this->profileResourcesScheduledForDeletion = clone $this->collProfileResources;
+                $this->profileResourcesScheduledForDeletion->clear();
+            }
+            $this->profileResourcesScheduledForDeletion[]= clone $profileResource;
+            $profileResource->setProfile(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Profile is new, it will return
+     * an empty collection; or if this Profile has previously
+     * been saved, it will retrieve related ProfileResources from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Profile.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildProfileResource[] List of ChildProfileResource objects
+     */
+    public function getProfileResourcesJoinResource($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildProfileResourceQuery::create(null, $criteria);
+        $query->joinWith('Resource', $joinBehavior);
+
+        return $this->getProfileResources($query, $con);
+    }
+
+    /**
+     * Clears out the collProfileModules collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProfileModules()
+     */
+    public function clearProfileModules()
+    {
+        $this->collProfileModules = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collProfileModules collection loaded partially.
+     */
+    public function resetPartialProfileModules($v = true)
+    {
+        $this->collProfileModulesPartial = $v;
+    }
+
+    /**
+     * Initializes the collProfileModules collection.
+     *
+     * By default this just sets the collProfileModules collection to an empty array (like clearcollProfileModules());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProfileModules($overrideExisting = true)
+    {
+        if (null !== $this->collProfileModules && !$overrideExisting) {
+            return;
+        }
+        $this->collProfileModules = new ObjectCollection();
+        $this->collProfileModules->setModel('\Thelia\Model\ProfileModule');
+    }
+
+    /**
+     * Gets an array of ChildProfileModule objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildProfile is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildProfileModule[] List of ChildProfileModule objects
+     * @throws PropelException
+     */
+    public function getProfileModules($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProfileModulesPartial && !$this->isNew();
+        if (null === $this->collProfileModules || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProfileModules) {
+                // return empty collection
+                $this->initProfileModules();
+            } else {
+                $collProfileModules = ChildProfileModuleQuery::create(null, $criteria)
+                    ->filterByProfile($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collProfileModulesPartial && count($collProfileModules)) {
+                        $this->initProfileModules(false);
+
+                        foreach ($collProfileModules as $obj) {
+                            if (false == $this->collProfileModules->contains($obj)) {
+                                $this->collProfileModules->append($obj);
+                            }
+                        }
+
+                        $this->collProfileModulesPartial = true;
+                    }
+
+                    $collProfileModules->getInternalIterator()->rewind();
+
+                    return $collProfileModules;
+                }
+
+                if ($partial && $this->collProfileModules) {
+                    foreach ($this->collProfileModules as $obj) {
+                        if ($obj->isNew()) {
+                            $collProfileModules[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProfileModules = $collProfileModules;
+                $this->collProfileModulesPartial = false;
+            }
+        }
+
+        return $this->collProfileModules;
+    }
+
+    /**
+     * Sets a collection of ProfileModule objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $profileModules A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProfile The current object (for fluent API support)
+     */
+    public function setProfileModules(Collection $profileModules, ConnectionInterface $con = null)
+    {
+        $profileModulesToDelete = $this->getProfileModules(new Criteria(), $con)->diff($profileModules);
+
+
+        $this->profileModulesScheduledForDeletion = $profileModulesToDelete;
+
+        foreach ($profileModulesToDelete as $profileModuleRemoved) {
+            $profileModuleRemoved->setProfile(null);
+        }
+
+        $this->collProfileModules = null;
+        foreach ($profileModules as $profileModule) {
+            $this->addProfileModule($profileModule);
+        }
+
+        $this->collProfileModules = $profileModules;
+        $this->collProfileModulesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ProfileModule objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProfileModule objects.
+     * @throws PropelException
+     */
+    public function countProfileModules(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProfileModulesPartial && !$this->isNew();
+        if (null === $this->collProfileModules || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProfileModules) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getProfileModules());
+            }
+
+            $query = ChildProfileModuleQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByProfile($this)
+                ->count($con);
+        }
+
+        return count($this->collProfileModules);
+    }
+
+    /**
+     * Method called to associate a ChildProfileModule object to this object
+     * through the ChildProfileModule foreign key attribute.
+     *
+     * @param    ChildProfileModule $l ChildProfileModule
+     * @return   \Thelia\Model\Profile The current object (for fluent API support)
+     */
+    public function addProfileModule(ChildProfileModule $l)
+    {
+        if ($this->collProfileModules === null) {
+            $this->initProfileModules();
+            $this->collProfileModulesPartial = true;
+        }
+
+        if (!in_array($l, $this->collProfileModules->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProfileModule($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ProfileModule $profileModule The profileModule object to add.
+     */
+    protected function doAddProfileModule($profileModule)
+    {
+        $this->collProfileModules[]= $profileModule;
+        $profileModule->setProfile($this);
+    }
+
+    /**
+     * @param  ProfileModule $profileModule The profileModule object to remove.
+     * @return ChildProfile The current object (for fluent API support)
+     */
+    public function removeProfileModule($profileModule)
+    {
+        if ($this->getProfileModules()->contains($profileModule)) {
+            $this->collProfileModules->remove($this->collProfileModules->search($profileModule));
+            if (null === $this->profileModulesScheduledForDeletion) {
+                $this->profileModulesScheduledForDeletion = clone $this->collProfileModules;
+                $this->profileModulesScheduledForDeletion->clear();
+            }
+            $this->profileModulesScheduledForDeletion[]= clone $profileModule;
+            $profileModule->setProfile(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Profile is new, it will return
+     * an empty collection; or if this Profile has previously
+     * been saved, it will retrieve related ProfileModules from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Profile.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildProfileModule[] List of ChildProfileModule objects
+     */
+    public function getProfileModulesJoinModule($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildProfileModuleQuery::create(null, $criteria);
+        $query->joinWith('Module', $joinBehavior);
+
+        return $this->getProfileModules($query, $con);
+    }
+
+    /**
+     * Clears out the collProfileI18ns collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProfileI18ns()
+     */
+    public function clearProfileI18ns()
+    {
+        $this->collProfileI18ns = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collProfileI18ns collection loaded partially.
+     */
+    public function resetPartialProfileI18ns($v = true)
+    {
+        $this->collProfileI18nsPartial = $v;
+    }
+
+    /**
+     * Initializes the collProfileI18ns collection.
+     *
+     * By default this just sets the collProfileI18ns collection to an empty array (like clearcollProfileI18ns());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProfileI18ns($overrideExisting = true)
+    {
+        if (null !== $this->collProfileI18ns && !$overrideExisting) {
+            return;
+        }
+        $this->collProfileI18ns = new ObjectCollection();
+        $this->collProfileI18ns->setModel('\Thelia\Model\ProfileI18n');
+    }
+
+    /**
+     * Gets an array of ChildProfileI18n objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildProfile is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildProfileI18n[] List of ChildProfileI18n objects
+     * @throws PropelException
+     */
+    public function getProfileI18ns($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProfileI18nsPartial && !$this->isNew();
+        if (null === $this->collProfileI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProfileI18ns) {
+                // return empty collection
+                $this->initProfileI18ns();
+            } else {
+                $collProfileI18ns = ChildProfileI18nQuery::create(null, $criteria)
+                    ->filterByProfile($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collProfileI18nsPartial && count($collProfileI18ns)) {
+                        $this->initProfileI18ns(false);
+
+                        foreach ($collProfileI18ns as $obj) {
+                            if (false == $this->collProfileI18ns->contains($obj)) {
+                                $this->collProfileI18ns->append($obj);
+                            }
+                        }
+
+                        $this->collProfileI18nsPartial = true;
+                    }
+
+                    $collProfileI18ns->getInternalIterator()->rewind();
+
+                    return $collProfileI18ns;
+                }
+
+                if ($partial && $this->collProfileI18ns) {
+                    foreach ($this->collProfileI18ns as $obj) {
+                        if ($obj->isNew()) {
+                            $collProfileI18ns[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProfileI18ns = $collProfileI18ns;
+                $this->collProfileI18nsPartial = false;
+            }
+        }
+
+        return $this->collProfileI18ns;
+    }
+
+    /**
+     * Sets a collection of ProfileI18n objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $profileI18ns A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProfile The current object (for fluent API support)
+     */
+    public function setProfileI18ns(Collection $profileI18ns, ConnectionInterface $con = null)
+    {
+        $profileI18nsToDelete = $this->getProfileI18ns(new Criteria(), $con)->diff($profileI18ns);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->profileI18nsScheduledForDeletion = clone $profileI18nsToDelete;
+
+        foreach ($profileI18nsToDelete as $profileI18nRemoved) {
+            $profileI18nRemoved->setProfile(null);
+        }
+
+        $this->collProfileI18ns = null;
+        foreach ($profileI18ns as $profileI18n) {
+            $this->addProfileI18n($profileI18n);
+        }
+
+        $this->collProfileI18ns = $profileI18ns;
+        $this->collProfileI18nsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ProfileI18n objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProfileI18n objects.
+     * @throws PropelException
+     */
+    public function countProfileI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProfileI18nsPartial && !$this->isNew();
+        if (null === $this->collProfileI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProfileI18ns) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getProfileI18ns());
+            }
+
+            $query = ChildProfileI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByProfile($this)
+                ->count($con);
+        }
+
+        return count($this->collProfileI18ns);
+    }
+
+    /**
+     * Method called to associate a ChildProfileI18n object to this object
+     * through the ChildProfileI18n foreign key attribute.
+     *
+     * @param    ChildProfileI18n $l ChildProfileI18n
+     * @return   \Thelia\Model\Profile The current object (for fluent API support)
+     */
+    public function addProfileI18n(ChildProfileI18n $l)
+    {
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
+        }
+        if ($this->collProfileI18ns === null) {
+            $this->initProfileI18ns();
+            $this->collProfileI18nsPartial = true;
+        }
+
+        if (!in_array($l, $this->collProfileI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProfileI18n($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ProfileI18n $profileI18n The profileI18n object to add.
+     */
+    protected function doAddProfileI18n($profileI18n)
+    {
+        $this->collProfileI18ns[]= $profileI18n;
+        $profileI18n->setProfile($this);
+    }
+
+    /**
+     * @param  ProfileI18n $profileI18n The profileI18n object to remove.
+     * @return ChildProfile The current object (for fluent API support)
+     */
+    public function removeProfileI18n($profileI18n)
+    {
+        if ($this->getProfileI18ns()->contains($profileI18n)) {
+            $this->collProfileI18ns->remove($this->collProfileI18ns->search($profileI18n));
+            if (null === $this->profileI18nsScheduledForDeletion) {
+                $this->profileI18nsScheduledForDeletion = clone $this->collProfileI18ns;
+                $this->profileI18nsScheduledForDeletion->clear();
+            }
+            $this->profileI18nsScheduledForDeletion[]= clone $profileI18n;
+            $profileI18n->setProfile(null);
         }
 
         return $this;
@@ -2577,12 +2326,12 @@ abstract class Group implements ActiveRecordInterface
 
     /**
      * Gets a collection of ChildResource objects related by a many-to-many relationship
-     * to the current object by way of the group_resource cross-reference table.
+     * to the current object by way of the profile_resource cross-reference table.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildGroup is new, it will return
+     * If this ChildProfile is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param      Criteria $criteria Optional query object to filter the query
@@ -2598,7 +2347,7 @@ abstract class Group implements ActiveRecordInterface
                 $this->initResources();
             } else {
                 $collResources = ChildResourceQuery::create(null, $criteria)
-                    ->filterByGroup($this)
+                    ->filterByProfile($this)
                     ->find($con);
                 if (null !== $criteria) {
                     return $collResources;
@@ -2612,13 +2361,13 @@ abstract class Group implements ActiveRecordInterface
 
     /**
      * Sets a collection of Resource objects related by a many-to-many relationship
-     * to the current object by way of the group_resource cross-reference table.
+     * to the current object by way of the profile_resource cross-reference table.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
      * @param  Collection $resources A Propel collection.
      * @param  ConnectionInterface $con Optional connection object
-     * @return ChildGroup The current object (for fluent API support)
+     * @return ChildProfile The current object (for fluent API support)
      */
     public function setResources(Collection $resources, ConnectionInterface $con = null)
     {
@@ -2640,7 +2389,7 @@ abstract class Group implements ActiveRecordInterface
 
     /**
      * Gets the number of ChildResource objects related by a many-to-many relationship
-     * to the current object by way of the group_resource cross-reference table.
+     * to the current object by way of the profile_resource cross-reference table.
      *
      * @param      Criteria $criteria Optional query object to filter the query
      * @param      boolean $distinct Set to true to force count distinct
@@ -2660,7 +2409,7 @@ abstract class Group implements ActiveRecordInterface
                 }
 
                 return $query
-                    ->filterByGroup($this)
+                    ->filterByProfile($this)
                     ->count($con);
             }
         } else {
@@ -2670,10 +2419,10 @@ abstract class Group implements ActiveRecordInterface
 
     /**
      * Associate a ChildResource object to this object
-     * through the group_resource cross reference table.
+     * through the profile_resource cross reference table.
      *
-     * @param  ChildResource $resource The ChildGroupResource object to relate
-     * @return ChildGroup The current object (for fluent API support)
+     * @param  ChildResource $resource The ChildProfileResource object to relate
+     * @return ChildProfile The current object (for fluent API support)
      */
     public function addResource(ChildResource $resource)
     {
@@ -2694,23 +2443,23 @@ abstract class Group implements ActiveRecordInterface
      */
     protected function doAddResource($resource)
     {
-        $groupResource = new ChildGroupResource();
-        $groupResource->setResource($resource);
-        $this->addGroupResource($groupResource);
+        $profileResource = new ChildProfileResource();
+        $profileResource->setResource($resource);
+        $this->addProfileResource($profileResource);
         // set the back reference to this object directly as using provided method either results
         // in endless loop or in multiple relations
-        if (!$resource->getGroups()->contains($this)) {
-            $foreignCollection   = $resource->getGroups();
+        if (!$resource->getProfiles()->contains($this)) {
+            $foreignCollection   = $resource->getProfiles();
             $foreignCollection[] = $this;
         }
     }
 
     /**
      * Remove a ChildResource object to this object
-     * through the group_resource cross reference table.
+     * through the profile_resource cross reference table.
      *
-     * @param ChildResource $resource The ChildGroupResource object to relate
-     * @return ChildGroup The current object (for fluent API support)
+     * @param ChildResource $resource The ChildProfileResource object to relate
+     * @return ChildProfile The current object (for fluent API support)
      */
     public function removeResource(ChildResource $resource)
     {
@@ -2756,28 +2505,23 @@ abstract class Group implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collAdminGroups) {
-                foreach ($this->collAdminGroups as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collGroupResources) {
-                foreach ($this->collGroupResources as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collGroupModules) {
-                foreach ($this->collGroupModules as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collGroupI18ns) {
-                foreach ($this->collGroupI18ns as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collAdmins) {
                 foreach ($this->collAdmins as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProfileResources) {
+                foreach ($this->collProfileResources as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProfileModules) {
+                foreach ($this->collProfileModules as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProfileI18ns) {
+                foreach ($this->collProfileI18ns as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2792,26 +2536,22 @@ abstract class Group implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collAdminGroups instanceof Collection) {
-            $this->collAdminGroups->clearIterator();
-        }
-        $this->collAdminGroups = null;
-        if ($this->collGroupResources instanceof Collection) {
-            $this->collGroupResources->clearIterator();
-        }
-        $this->collGroupResources = null;
-        if ($this->collGroupModules instanceof Collection) {
-            $this->collGroupModules->clearIterator();
-        }
-        $this->collGroupModules = null;
-        if ($this->collGroupI18ns instanceof Collection) {
-            $this->collGroupI18ns->clearIterator();
-        }
-        $this->collGroupI18ns = null;
         if ($this->collAdmins instanceof Collection) {
             $this->collAdmins->clearIterator();
         }
         $this->collAdmins = null;
+        if ($this->collProfileResources instanceof Collection) {
+            $this->collProfileResources->clearIterator();
+        }
+        $this->collProfileResources = null;
+        if ($this->collProfileModules instanceof Collection) {
+            $this->collProfileModules->clearIterator();
+        }
+        $this->collProfileModules = null;
+        if ($this->collProfileI18ns instanceof Collection) {
+            $this->collProfileI18ns->clearIterator();
+        }
+        $this->collProfileI18ns = null;
         if ($this->collResources instanceof Collection) {
             $this->collResources->clearIterator();
         }
@@ -2825,7 +2565,7 @@ abstract class Group implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(GroupTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ProfileTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -2833,11 +2573,11 @@ abstract class Group implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildGroup The current object (for fluent API support)
+     * @return     ChildProfile The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = GroupTableMap::UPDATED_AT;
+        $this->modifiedColumns[] = ProfileTableMap::UPDATED_AT;
 
         return $this;
     }
@@ -2849,7 +2589,7 @@ abstract class Group implements ActiveRecordInterface
      *
      * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      *
-     * @return    ChildGroup The current object (for fluent API support)
+     * @return    ChildProfile The current object (for fluent API support)
      */
     public function setLocale($locale = 'en_US')
     {
@@ -2874,12 +2614,12 @@ abstract class Group implements ActiveRecordInterface
      * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      * @param     ConnectionInterface $con an optional connection object
      *
-     * @return ChildGroupI18n */
+     * @return ChildProfileI18n */
     public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
-            if (null !== $this->collGroupI18ns) {
-                foreach ($this->collGroupI18ns as $translation) {
+            if (null !== $this->collProfileI18ns) {
+                foreach ($this->collProfileI18ns as $translation) {
                     if ($translation->getLocale() == $locale) {
                         $this->currentTranslations[$locale] = $translation;
 
@@ -2888,15 +2628,15 @@ abstract class Group implements ActiveRecordInterface
                 }
             }
             if ($this->isNew()) {
-                $translation = new ChildGroupI18n();
+                $translation = new ChildProfileI18n();
                 $translation->setLocale($locale);
             } else {
-                $translation = ChildGroupI18nQuery::create()
+                $translation = ChildProfileI18nQuery::create()
                     ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
                     ->findOneOrCreate($con);
                 $this->currentTranslations[$locale] = $translation;
             }
-            $this->addGroupI18n($translation);
+            $this->addProfileI18n($translation);
         }
 
         return $this->currentTranslations[$locale];
@@ -2908,21 +2648,21 @@ abstract class Group implements ActiveRecordInterface
      * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      * @param     ConnectionInterface $con an optional connection object
      *
-     * @return    ChildGroup The current object (for fluent API support)
+     * @return    ChildProfile The current object (for fluent API support)
      */
     public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
         if (!$this->isNew()) {
-            ChildGroupI18nQuery::create()
+            ChildProfileI18nQuery::create()
                 ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
                 ->delete($con);
         }
         if (isset($this->currentTranslations[$locale])) {
             unset($this->currentTranslations[$locale]);
         }
-        foreach ($this->collGroupI18ns as $key => $translation) {
+        foreach ($this->collProfileI18ns as $key => $translation) {
             if ($translation->getLocale() == $locale) {
-                unset($this->collGroupI18ns[$key]);
+                unset($this->collProfileI18ns[$key]);
                 break;
             }
         }
@@ -2935,7 +2675,7 @@ abstract class Group implements ActiveRecordInterface
      *
      * @param     ConnectionInterface $con an optional connection object
      *
-     * @return ChildGroupI18n */
+     * @return ChildProfileI18n */
     public function getCurrentTranslation(ConnectionInterface $con = null)
     {
         return $this->getTranslation($this->getLocale(), $con);
@@ -2957,7 +2697,7 @@ abstract class Group implements ActiveRecordInterface
          * Set the value of [title] column.
          *
          * @param      string $v new value
-         * @return   \Thelia\Model\GroupI18n The current object (for fluent API support)
+         * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
          */
         public function setTitle($v)
         {    $this->getCurrentTranslation()->setTitle($v);
@@ -2981,7 +2721,7 @@ abstract class Group implements ActiveRecordInterface
          * Set the value of [description] column.
          *
          * @param      string $v new value
-         * @return   \Thelia\Model\GroupI18n The current object (for fluent API support)
+         * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
          */
         public function setDescription($v)
         {    $this->getCurrentTranslation()->setDescription($v);
@@ -3005,7 +2745,7 @@ abstract class Group implements ActiveRecordInterface
          * Set the value of [chapo] column.
          *
          * @param      string $v new value
-         * @return   \Thelia\Model\GroupI18n The current object (for fluent API support)
+         * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
          */
         public function setChapo($v)
         {    $this->getCurrentTranslation()->setChapo($v);
@@ -3029,7 +2769,7 @@ abstract class Group implements ActiveRecordInterface
          * Set the value of [postscriptum] column.
          *
          * @param      string $v new value
-         * @return   \Thelia\Model\GroupI18n The current object (for fluent API support)
+         * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
          */
         public function setPostscriptum($v)
         {    $this->getCurrentTranslation()->setPostscriptum($v);

@@ -16,20 +16,20 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Admin as ChildAdmin;
-use Thelia\Model\AdminGroup as ChildAdminGroup;
-use Thelia\Model\AdminGroupQuery as ChildAdminGroupQuery;
-use Thelia\Model\AdminQuery as ChildAdminQuery;
-use Thelia\Model\Group as ChildGroup;
-use Thelia\Model\GroupQuery as ChildGroupQuery;
-use Thelia\Model\Map\AdminGroupTableMap;
+use Thelia\Model\Module as ChildModule;
+use Thelia\Model\ModuleQuery as ChildModuleQuery;
+use Thelia\Model\Profile as ChildProfile;
+use Thelia\Model\ProfileModule as ChildProfileModule;
+use Thelia\Model\ProfileModuleQuery as ChildProfileModuleQuery;
+use Thelia\Model\ProfileQuery as ChildProfileQuery;
+use Thelia\Model\Map\ProfileModuleTableMap;
 
-abstract class AdminGroup implements ActiveRecordInterface
+abstract class ProfileModule implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\AdminGroupTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\ProfileModuleTableMap';
 
 
     /**
@@ -65,16 +65,23 @@ abstract class AdminGroup implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the group_id field.
+     * The value for the profile_id field.
      * @var        int
      */
-    protected $group_id;
+    protected $profile_id;
 
     /**
-     * The value for the admin_id field.
+     * The value for the module_id field.
      * @var        int
      */
-    protected $admin_id;
+    protected $module_id;
+
+    /**
+     * The value for the access field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $access;
 
     /**
      * The value for the created_at field.
@@ -89,14 +96,14 @@ abstract class AdminGroup implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        Group
+     * @var        Profile
      */
-    protected $aGroup;
+    protected $aProfile;
 
     /**
-     * @var        Admin
+     * @var        Module
      */
-    protected $aAdmin;
+    protected $aModule;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -107,10 +114,23 @@ abstract class AdminGroup implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\AdminGroup object.
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->access = 0;
+    }
+
+    /**
+     * Initializes internal state of Thelia\Model\Base\ProfileModule object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -202,9 +222,9 @@ abstract class AdminGroup implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>AdminGroup</code> instance.  If
-     * <code>obj</code> is an instance of <code>AdminGroup</code>, delegates to
-     * <code>equals(AdminGroup)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>ProfileModule</code> instance.  If
+     * <code>obj</code> is an instance of <code>ProfileModule</code>, delegates to
+     * <code>equals(ProfileModule)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -287,7 +307,7 @@ abstract class AdminGroup implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return AdminGroup The current object, for fluid interface
+     * @return ProfileModule The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -319,7 +339,7 @@ abstract class AdminGroup implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return AdminGroup The current object, for fluid interface
+     * @return ProfileModule The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -376,25 +396,36 @@ abstract class AdminGroup implements ActiveRecordInterface
     }
 
     /**
-     * Get the [group_id] column value.
+     * Get the [profile_id] column value.
      *
      * @return   int
      */
-    public function getGroupId()
+    public function getProfileId()
     {
 
-        return $this->group_id;
+        return $this->profile_id;
     }
 
     /**
-     * Get the [admin_id] column value.
+     * Get the [module_id] column value.
      *
      * @return   int
      */
-    public function getAdminId()
+    public function getModuleId()
     {
 
-        return $this->admin_id;
+        return $this->module_id;
+    }
+
+    /**
+     * Get the [access] column value.
+     *
+     * @return   int
+     */
+    public function getAccess()
+    {
+
+        return $this->access;
     }
 
     /**
@@ -441,7 +472,7 @@ abstract class AdminGroup implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\AdminGroup The current object (for fluent API support)
+     * @return   \Thelia\Model\ProfileModule The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -451,7 +482,7 @@ abstract class AdminGroup implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = AdminGroupTableMap::ID;
+            $this->modifiedColumns[] = ProfileModuleTableMap::ID;
         }
 
 
@@ -459,61 +490,82 @@ abstract class AdminGroup implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [group_id] column.
+     * Set the value of [profile_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\AdminGroup The current object (for fluent API support)
+     * @return   \Thelia\Model\ProfileModule The current object (for fluent API support)
      */
-    public function setGroupId($v)
+    public function setProfileId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->group_id !== $v) {
-            $this->group_id = $v;
-            $this->modifiedColumns[] = AdminGroupTableMap::GROUP_ID;
+        if ($this->profile_id !== $v) {
+            $this->profile_id = $v;
+            $this->modifiedColumns[] = ProfileModuleTableMap::PROFILE_ID;
         }
 
-        if ($this->aGroup !== null && $this->aGroup->getId() !== $v) {
-            $this->aGroup = null;
+        if ($this->aProfile !== null && $this->aProfile->getId() !== $v) {
+            $this->aProfile = null;
         }
 
 
         return $this;
-    } // setGroupId()
+    } // setProfileId()
 
     /**
-     * Set the value of [admin_id] column.
+     * Set the value of [module_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\AdminGroup The current object (for fluent API support)
+     * @return   \Thelia\Model\ProfileModule The current object (for fluent API support)
      */
-    public function setAdminId($v)
+    public function setModuleId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->admin_id !== $v) {
-            $this->admin_id = $v;
-            $this->modifiedColumns[] = AdminGroupTableMap::ADMIN_ID;
+        if ($this->module_id !== $v) {
+            $this->module_id = $v;
+            $this->modifiedColumns[] = ProfileModuleTableMap::MODULE_ID;
         }
 
-        if ($this->aAdmin !== null && $this->aAdmin->getId() !== $v) {
-            $this->aAdmin = null;
+        if ($this->aModule !== null && $this->aModule->getId() !== $v) {
+            $this->aModule = null;
         }
 
 
         return $this;
-    } // setAdminId()
+    } // setModuleId()
+
+    /**
+     * Set the value of [access] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\ProfileModule The current object (for fluent API support)
+     */
+    public function setAccess($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->access !== $v) {
+            $this->access = $v;
+            $this->modifiedColumns[] = ProfileModuleTableMap::ACCESS;
+        }
+
+
+        return $this;
+    } // setAccess()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\AdminGroup The current object (for fluent API support)
+     * @return   \Thelia\Model\ProfileModule The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -521,7 +573,7 @@ abstract class AdminGroup implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = AdminGroupTableMap::CREATED_AT;
+                $this->modifiedColumns[] = ProfileModuleTableMap::CREATED_AT;
             }
         } // if either are not null
 
@@ -534,7 +586,7 @@ abstract class AdminGroup implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\AdminGroup The current object (for fluent API support)
+     * @return   \Thelia\Model\ProfileModule The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -542,7 +594,7 @@ abstract class AdminGroup implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = AdminGroupTableMap::UPDATED_AT;
+                $this->modifiedColumns[] = ProfileModuleTableMap::UPDATED_AT;
             }
         } // if either are not null
 
@@ -560,6 +612,10 @@ abstract class AdminGroup implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->access !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -587,22 +643,25 @@ abstract class AdminGroup implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AdminGroupTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProfileModuleTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AdminGroupTableMap::translateFieldName('GroupId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->group_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProfileModuleTableMap::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->profile_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AdminGroupTableMap::translateFieldName('AdminId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->admin_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProfileModuleTableMap::translateFieldName('ModuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->module_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AdminGroupTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProfileModuleTableMap::translateFieldName('Access', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->access = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProfileModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AdminGroupTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProfileModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -615,10 +674,10 @@ abstract class AdminGroup implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = AdminGroupTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = ProfileModuleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\AdminGroup object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\ProfileModule object", 0, $e);
         }
     }
 
@@ -637,11 +696,11 @@ abstract class AdminGroup implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aGroup !== null && $this->group_id !== $this->aGroup->getId()) {
-            $this->aGroup = null;
+        if ($this->aProfile !== null && $this->profile_id !== $this->aProfile->getId()) {
+            $this->aProfile = null;
         }
-        if ($this->aAdmin !== null && $this->admin_id !== $this->aAdmin->getId()) {
-            $this->aAdmin = null;
+        if ($this->aModule !== null && $this->module_id !== $this->aModule->getId()) {
+            $this->aModule = null;
         }
     } // ensureConsistency
 
@@ -666,13 +725,13 @@ abstract class AdminGroup implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(AdminGroupTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProfileModuleTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildAdminGroupQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildProfileModuleQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -682,8 +741,8 @@ abstract class AdminGroup implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aGroup = null;
-            $this->aAdmin = null;
+            $this->aProfile = null;
+            $this->aModule = null;
         } // if (deep)
     }
 
@@ -693,8 +752,8 @@ abstract class AdminGroup implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see AdminGroup::setDeleted()
-     * @see AdminGroup::isDeleted()
+     * @see ProfileModule::setDeleted()
+     * @see ProfileModule::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -703,12 +762,12 @@ abstract class AdminGroup implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AdminGroupTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileModuleTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildAdminGroupQuery::create()
+            $deleteQuery = ChildProfileModuleQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -745,7 +804,7 @@ abstract class AdminGroup implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AdminGroupTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileModuleTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -755,16 +814,16 @@ abstract class AdminGroup implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(AdminGroupTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(ProfileModuleTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(AdminGroupTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(ProfileModuleTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(AdminGroupTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(ProfileModuleTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -776,7 +835,7 @@ abstract class AdminGroup implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                AdminGroupTableMap::addInstanceToPool($this);
+                ProfileModuleTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -811,18 +870,18 @@ abstract class AdminGroup implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aGroup !== null) {
-                if ($this->aGroup->isModified() || $this->aGroup->isNew()) {
-                    $affectedRows += $this->aGroup->save($con);
+            if ($this->aProfile !== null) {
+                if ($this->aProfile->isModified() || $this->aProfile->isNew()) {
+                    $affectedRows += $this->aProfile->save($con);
                 }
-                $this->setGroup($this->aGroup);
+                $this->setProfile($this->aProfile);
             }
 
-            if ($this->aAdmin !== null) {
-                if ($this->aAdmin->isModified() || $this->aAdmin->isNew()) {
-                    $affectedRows += $this->aAdmin->save($con);
+            if ($this->aModule !== null) {
+                if ($this->aModule->isModified() || $this->aModule->isNew()) {
+                    $affectedRows += $this->aModule->save($con);
                 }
-                $this->setAdmin($this->aAdmin);
+                $this->setModule($this->aModule);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -856,30 +915,33 @@ abstract class AdminGroup implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = AdminGroupTableMap::ID;
+        $this->modifiedColumns[] = ProfileModuleTableMap::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . AdminGroupTableMap::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProfileModuleTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(AdminGroupTableMap::ID)) {
+        if ($this->isColumnModified(ProfileModuleTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(AdminGroupTableMap::GROUP_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'GROUP_ID';
+        if ($this->isColumnModified(ProfileModuleTableMap::PROFILE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'PROFILE_ID';
         }
-        if ($this->isColumnModified(AdminGroupTableMap::ADMIN_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ADMIN_ID';
+        if ($this->isColumnModified(ProfileModuleTableMap::MODULE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'MODULE_ID';
         }
-        if ($this->isColumnModified(AdminGroupTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(ProfileModuleTableMap::ACCESS)) {
+            $modifiedColumns[':p' . $index++]  = 'ACCESS';
+        }
+        if ($this->isColumnModified(ProfileModuleTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
-        if ($this->isColumnModified(AdminGroupTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(ProfileModuleTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO admin_group (%s) VALUES (%s)',
+            'INSERT INTO profile_module (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -891,11 +953,14 @@ abstract class AdminGroup implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'GROUP_ID':
-                        $stmt->bindValue($identifier, $this->group_id, PDO::PARAM_INT);
+                    case 'PROFILE_ID':
+                        $stmt->bindValue($identifier, $this->profile_id, PDO::PARAM_INT);
                         break;
-                    case 'ADMIN_ID':
-                        $stmt->bindValue($identifier, $this->admin_id, PDO::PARAM_INT);
+                    case 'MODULE_ID':
+                        $stmt->bindValue($identifier, $this->module_id, PDO::PARAM_INT);
+                        break;
+                    case 'ACCESS':
+                        $stmt->bindValue($identifier, $this->access, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -949,7 +1014,7 @@ abstract class AdminGroup implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = AdminGroupTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProfileModuleTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -969,15 +1034,18 @@ abstract class AdminGroup implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getGroupId();
+                return $this->getProfileId();
                 break;
             case 2:
-                return $this->getAdminId();
+                return $this->getModuleId();
                 break;
             case 3:
-                return $this->getCreatedAt();
+                return $this->getAccess();
                 break;
             case 4:
+                return $this->getCreatedAt();
+                break;
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1003,17 +1071,18 @@ abstract class AdminGroup implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['AdminGroup'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['ProfileModule'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['AdminGroup'][serialize($this->getPrimaryKey())] = true;
-        $keys = AdminGroupTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['ProfileModule'][$this->getPrimaryKey()] = true;
+        $keys = ProfileModuleTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getGroupId(),
-            $keys[2] => $this->getAdminId(),
-            $keys[3] => $this->getCreatedAt(),
-            $keys[4] => $this->getUpdatedAt(),
+            $keys[1] => $this->getProfileId(),
+            $keys[2] => $this->getModuleId(),
+            $keys[3] => $this->getAccess(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1021,11 +1090,11 @@ abstract class AdminGroup implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aGroup) {
-                $result['Group'] = $this->aGroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aProfile) {
+                $result['Profile'] = $this->aProfile->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aAdmin) {
-                $result['Admin'] = $this->aAdmin->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aModule) {
+                $result['Module'] = $this->aModule->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1045,7 +1114,7 @@ abstract class AdminGroup implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = AdminGroupTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProfileModuleTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1065,15 +1134,18 @@ abstract class AdminGroup implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setGroupId($value);
+                $this->setProfileId($value);
                 break;
             case 2:
-                $this->setAdminId($value);
+                $this->setModuleId($value);
                 break;
             case 3:
-                $this->setCreatedAt($value);
+                $this->setAccess($value);
                 break;
             case 4:
+                $this->setCreatedAt($value);
+                break;
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1098,13 +1170,14 @@ abstract class AdminGroup implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = AdminGroupTableMap::getFieldNames($keyType);
+        $keys = ProfileModuleTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setGroupId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setAdminId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[1], $arr)) $this->setProfileId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setModuleId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setAccess($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -1114,13 +1187,14 @@ abstract class AdminGroup implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(AdminGroupTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ProfileModuleTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(AdminGroupTableMap::ID)) $criteria->add(AdminGroupTableMap::ID, $this->id);
-        if ($this->isColumnModified(AdminGroupTableMap::GROUP_ID)) $criteria->add(AdminGroupTableMap::GROUP_ID, $this->group_id);
-        if ($this->isColumnModified(AdminGroupTableMap::ADMIN_ID)) $criteria->add(AdminGroupTableMap::ADMIN_ID, $this->admin_id);
-        if ($this->isColumnModified(AdminGroupTableMap::CREATED_AT)) $criteria->add(AdminGroupTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(AdminGroupTableMap::UPDATED_AT)) $criteria->add(AdminGroupTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(ProfileModuleTableMap::ID)) $criteria->add(ProfileModuleTableMap::ID, $this->id);
+        if ($this->isColumnModified(ProfileModuleTableMap::PROFILE_ID)) $criteria->add(ProfileModuleTableMap::PROFILE_ID, $this->profile_id);
+        if ($this->isColumnModified(ProfileModuleTableMap::MODULE_ID)) $criteria->add(ProfileModuleTableMap::MODULE_ID, $this->module_id);
+        if ($this->isColumnModified(ProfileModuleTableMap::ACCESS)) $criteria->add(ProfileModuleTableMap::ACCESS, $this->access);
+        if ($this->isColumnModified(ProfileModuleTableMap::CREATED_AT)) $criteria->add(ProfileModuleTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(ProfileModuleTableMap::UPDATED_AT)) $criteria->add(ProfileModuleTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1135,40 +1209,30 @@ abstract class AdminGroup implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(AdminGroupTableMap::DATABASE_NAME);
-        $criteria->add(AdminGroupTableMap::ID, $this->id);
-        $criteria->add(AdminGroupTableMap::GROUP_ID, $this->group_id);
-        $criteria->add(AdminGroupTableMap::ADMIN_ID, $this->admin_id);
+        $criteria = new Criteria(ProfileModuleTableMap::DATABASE_NAME);
+        $criteria->add(ProfileModuleTableMap::ID, $this->id);
 
         return $criteria;
     }
 
     /**
-     * Returns the composite primary key for this object.
-     * The array elements will be in same order as specified in XML.
-     * @return array
+     * Returns the primary key for this object (row).
+     * @return   int
      */
     public function getPrimaryKey()
     {
-        $pks = array();
-        $pks[0] = $this->getId();
-        $pks[1] = $this->getGroupId();
-        $pks[2] = $this->getAdminId();
-
-        return $pks;
+        return $this->getId();
     }
 
     /**
-     * Set the [composite] primary key.
+     * Generic method to set the primary key (id column).
      *
-     * @param      array $keys The elements of the composite key (order must match the order in XML file).
+     * @param       int $key Primary key.
      * @return void
      */
-    public function setPrimaryKey($keys)
+    public function setPrimaryKey($key)
     {
-        $this->setId($keys[0]);
-        $this->setGroupId($keys[1]);
-        $this->setAdminId($keys[2]);
+        $this->setId($key);
     }
 
     /**
@@ -1178,7 +1242,7 @@ abstract class AdminGroup implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getId()) && (null === $this->getGroupId()) && (null === $this->getAdminId());
+        return null === $this->getId();
     }
 
     /**
@@ -1187,15 +1251,16 @@ abstract class AdminGroup implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\AdminGroup (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\ProfileModule (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setGroupId($this->getGroupId());
-        $copyObj->setAdminId($this->getAdminId());
+        $copyObj->setProfileId($this->getProfileId());
+        $copyObj->setModuleId($this->getModuleId());
+        $copyObj->setAccess($this->getAccess());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1213,7 +1278,7 @@ abstract class AdminGroup implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\AdminGroup Clone of current object.
+     * @return                 \Thelia\Model\ProfileModule Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1227,26 +1292,26 @@ abstract class AdminGroup implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildGroup object.
+     * Declares an association between this object and a ChildProfile object.
      *
-     * @param                  ChildGroup $v
-     * @return                 \Thelia\Model\AdminGroup The current object (for fluent API support)
+     * @param                  ChildProfile $v
+     * @return                 \Thelia\Model\ProfileModule The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setGroup(ChildGroup $v = null)
+    public function setProfile(ChildProfile $v = null)
     {
         if ($v === null) {
-            $this->setGroupId(NULL);
+            $this->setProfileId(NULL);
         } else {
-            $this->setGroupId($v->getId());
+            $this->setProfileId($v->getId());
         }
 
-        $this->aGroup = $v;
+        $this->aProfile = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildGroup object, it will not be re-added.
+        // If this object has already been added to the ChildProfile object, it will not be re-added.
         if ($v !== null) {
-            $v->addAdminGroup($this);
+            $v->addProfileModule($this);
         }
 
 
@@ -1255,49 +1320,49 @@ abstract class AdminGroup implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildGroup object
+     * Get the associated ChildProfile object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildGroup The associated ChildGroup object.
+     * @return                 ChildProfile The associated ChildProfile object.
      * @throws PropelException
      */
-    public function getGroup(ConnectionInterface $con = null)
+    public function getProfile(ConnectionInterface $con = null)
     {
-        if ($this->aGroup === null && ($this->group_id !== null)) {
-            $this->aGroup = ChildGroupQuery::create()->findPk($this->group_id, $con);
+        if ($this->aProfile === null && ($this->profile_id !== null)) {
+            $this->aProfile = ChildProfileQuery::create()->findPk($this->profile_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aGroup->addAdminGroups($this);
+                $this->aProfile->addProfileModules($this);
              */
         }
 
-        return $this->aGroup;
+        return $this->aProfile;
     }
 
     /**
-     * Declares an association between this object and a ChildAdmin object.
+     * Declares an association between this object and a ChildModule object.
      *
-     * @param                  ChildAdmin $v
-     * @return                 \Thelia\Model\AdminGroup The current object (for fluent API support)
+     * @param                  ChildModule $v
+     * @return                 \Thelia\Model\ProfileModule The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setAdmin(ChildAdmin $v = null)
+    public function setModule(ChildModule $v = null)
     {
         if ($v === null) {
-            $this->setAdminId(NULL);
+            $this->setModuleId(NULL);
         } else {
-            $this->setAdminId($v->getId());
+            $this->setModuleId($v->getId());
         }
 
-        $this->aAdmin = $v;
+        $this->aModule = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildAdmin object, it will not be re-added.
+        // If this object has already been added to the ChildModule object, it will not be re-added.
         if ($v !== null) {
-            $v->addAdminGroup($this);
+            $v->addProfileModule($this);
         }
 
 
@@ -1306,26 +1371,26 @@ abstract class AdminGroup implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildAdmin object
+     * Get the associated ChildModule object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildAdmin The associated ChildAdmin object.
+     * @return                 ChildModule The associated ChildModule object.
      * @throws PropelException
      */
-    public function getAdmin(ConnectionInterface $con = null)
+    public function getModule(ConnectionInterface $con = null)
     {
-        if ($this->aAdmin === null && ($this->admin_id !== null)) {
-            $this->aAdmin = ChildAdminQuery::create()->findPk($this->admin_id, $con);
+        if ($this->aModule === null && ($this->module_id !== null)) {
+            $this->aModule = ChildModuleQuery::create()->findPk($this->module_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aAdmin->addAdminGroups($this);
+                $this->aModule->addProfileModules($this);
              */
         }
 
-        return $this->aAdmin;
+        return $this->aModule;
     }
 
     /**
@@ -1334,12 +1399,14 @@ abstract class AdminGroup implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->group_id = null;
-        $this->admin_id = null;
+        $this->profile_id = null;
+        $this->module_id = null;
+        $this->access = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1359,8 +1426,8 @@ abstract class AdminGroup implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aGroup = null;
-        $this->aAdmin = null;
+        $this->aProfile = null;
+        $this->aModule = null;
     }
 
     /**
@@ -1370,7 +1437,7 @@ abstract class AdminGroup implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(AdminGroupTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ProfileModuleTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1378,11 +1445,11 @@ abstract class AdminGroup implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildAdminGroup The current object (for fluent API support)
+     * @return     ChildProfileModule The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = AdminGroupTableMap::UPDATED_AT;
+        $this->modifiedColumns[] = ProfileModuleTableMap::UPDATED_AT;
 
         return $this;
     }

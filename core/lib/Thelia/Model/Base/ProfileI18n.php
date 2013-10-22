@@ -2,7 +2,6 @@
 
 namespace Thelia\Model\Base;
 
-use \DateTime;
 use \Exception;
 use \PDO;
 use Propel\Runtime\Propel;
@@ -15,21 +14,17 @@ use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
-use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Group as ChildGroup;
-use Thelia\Model\GroupQuery as ChildGroupQuery;
-use Thelia\Model\GroupResource as ChildGroupResource;
-use Thelia\Model\GroupResourceQuery as ChildGroupResourceQuery;
-use Thelia\Model\Resource as ChildResource;
-use Thelia\Model\ResourceQuery as ChildResourceQuery;
-use Thelia\Model\Map\GroupResourceTableMap;
+use Thelia\Model\Profile as ChildProfile;
+use Thelia\Model\ProfileI18nQuery as ChildProfileI18nQuery;
+use Thelia\Model\ProfileQuery as ChildProfileQuery;
+use Thelia\Model\Map\ProfileI18nTableMap;
 
-abstract class GroupResource implements ActiveRecordInterface
+abstract class ProfileI18n implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\GroupResourceTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\ProfileI18nTableMap';
 
 
     /**
@@ -65,52 +60,40 @@ abstract class GroupResource implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the group_id field.
-     * @var        int
-     */
-    protected $group_id;
-
-    /**
-     * The value for the resource_id field.
-     * @var        int
-     */
-    protected $resource_id;
-
-    /**
-     * The value for the read field.
-     * Note: this column has a database default value of: 0
-     * @var        int
-     */
-    protected $read;
-
-    /**
-     * The value for the write field.
-     * Note: this column has a database default value of: 0
-     * @var        int
-     */
-    protected $write;
-
-    /**
-     * The value for the created_at field.
+     * The value for the locale field.
+     * Note: this column has a database default value of: 'en_US'
      * @var        string
      */
-    protected $created_at;
+    protected $locale;
 
     /**
-     * The value for the updated_at field.
+     * The value for the title field.
      * @var        string
      */
-    protected $updated_at;
+    protected $title;
 
     /**
-     * @var        Group
+     * The value for the description field.
+     * @var        string
      */
-    protected $aGroup;
+    protected $description;
 
     /**
-     * @var        Resource
+     * The value for the chapo field.
+     * @var        string
      */
-    protected $aResource;
+    protected $chapo;
+
+    /**
+     * The value for the postscriptum field.
+     * @var        string
+     */
+    protected $postscriptum;
+
+    /**
+     * @var        Profile
+     */
+    protected $aProfile;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -128,12 +111,11 @@ abstract class GroupResource implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->read = 0;
-        $this->write = 0;
+        $this->locale = 'en_US';
     }
 
     /**
-     * Initializes internal state of Thelia\Model\Base\GroupResource object.
+     * Initializes internal state of Thelia\Model\Base\ProfileI18n object.
      * @see applyDefaults()
      */
     public function __construct()
@@ -230,9 +212,9 @@ abstract class GroupResource implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>GroupResource</code> instance.  If
-     * <code>obj</code> is an instance of <code>GroupResource</code>, delegates to
-     * <code>equals(GroupResource)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>ProfileI18n</code> instance.  If
+     * <code>obj</code> is an instance of <code>ProfileI18n</code>, delegates to
+     * <code>equals(ProfileI18n)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -315,7 +297,7 @@ abstract class GroupResource implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return GroupResource The current object, for fluid interface
+     * @return ProfileI18n The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -347,7 +329,7 @@ abstract class GroupResource implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return GroupResource The current object, for fluid interface
+     * @return ProfileI18n The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -404,94 +386,65 @@ abstract class GroupResource implements ActiveRecordInterface
     }
 
     /**
-     * Get the [group_id] column value.
+     * Get the [locale] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getGroupId()
+    public function getLocale()
     {
 
-        return $this->group_id;
+        return $this->locale;
     }
 
     /**
-     * Get the [resource_id] column value.
+     * Get the [title] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getResourceId()
+    public function getTitle()
     {
 
-        return $this->resource_id;
+        return $this->title;
     }
 
     /**
-     * Get the [read] column value.
+     * Get the [description] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getRead()
+    public function getDescription()
     {
 
-        return $this->read;
+        return $this->description;
     }
 
     /**
-     * Get the [write] column value.
+     * Get the [chapo] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getWrite()
+    public function getChapo()
     {
 
-        return $this->write;
+        return $this->chapo;
     }
 
     /**
-     * Get the [optionally formatted] temporal [created_at] column value.
+     * Get the [postscriptum] column value.
      *
-     *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
-     *
-     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-     *
-     * @throws PropelException - if unable to parse/validate the date/time value.
+     * @return   string
      */
-    public function getCreatedAt($format = NULL)
+    public function getPostscriptum()
     {
-        if ($format === null) {
-            return $this->created_at;
-        } else {
-            return $this->created_at instanceof \DateTime ? $this->created_at->format($format) : null;
-        }
-    }
 
-    /**
-     * Get the [optionally formatted] temporal [updated_at] column value.
-     *
-     *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
-     *
-     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-     *
-     * @throws PropelException - if unable to parse/validate the date/time value.
-     */
-    public function getUpdatedAt($format = NULL)
-    {
-        if ($format === null) {
-            return $this->updated_at;
-        } else {
-            return $this->updated_at instanceof \DateTime ? $this->updated_at->format($format) : null;
-        }
+        return $this->postscriptum;
     }
 
     /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\GroupResource The current object (for fluent API support)
+     * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -501,7 +454,11 @@ abstract class GroupResource implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = GroupResourceTableMap::ID;
+            $this->modifiedColumns[] = ProfileI18nTableMap::ID;
+        }
+
+        if ($this->aProfile !== null && $this->aProfile->getId() !== $v) {
+            $this->aProfile = null;
         }
 
 
@@ -509,138 +466,109 @@ abstract class GroupResource implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [group_id] column.
+     * Set the value of [locale] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\GroupResource The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
      */
-    public function setGroupId($v)
+    public function setLocale($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->group_id !== $v) {
-            $this->group_id = $v;
-            $this->modifiedColumns[] = GroupResourceTableMap::GROUP_ID;
-        }
-
-        if ($this->aGroup !== null && $this->aGroup->getId() !== $v) {
-            $this->aGroup = null;
+        if ($this->locale !== $v) {
+            $this->locale = $v;
+            $this->modifiedColumns[] = ProfileI18nTableMap::LOCALE;
         }
 
 
         return $this;
-    } // setGroupId()
+    } // setLocale()
 
     /**
-     * Set the value of [resource_id] column.
+     * Set the value of [title] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\GroupResource The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
      */
-    public function setResourceId($v)
+    public function setTitle($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->resource_id !== $v) {
-            $this->resource_id = $v;
-            $this->modifiedColumns[] = GroupResourceTableMap::RESOURCE_ID;
-        }
-
-        if ($this->aResource !== null && $this->aResource->getId() !== $v) {
-            $this->aResource = null;
+        if ($this->title !== $v) {
+            $this->title = $v;
+            $this->modifiedColumns[] = ProfileI18nTableMap::TITLE;
         }
 
 
         return $this;
-    } // setResourceId()
+    } // setTitle()
 
     /**
-     * Set the value of [read] column.
+     * Set the value of [description] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\GroupResource The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
      */
-    public function setRead($v)
+    public function setDescription($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->read !== $v) {
-            $this->read = $v;
-            $this->modifiedColumns[] = GroupResourceTableMap::READ;
+        if ($this->description !== $v) {
+            $this->description = $v;
+            $this->modifiedColumns[] = ProfileI18nTableMap::DESCRIPTION;
         }
 
 
         return $this;
-    } // setRead()
+    } // setDescription()
 
     /**
-     * Set the value of [write] column.
+     * Set the value of [chapo] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\GroupResource The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
      */
-    public function setWrite($v)
+    public function setChapo($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->write !== $v) {
-            $this->write = $v;
-            $this->modifiedColumns[] = GroupResourceTableMap::WRITE;
+        if ($this->chapo !== $v) {
+            $this->chapo = $v;
+            $this->modifiedColumns[] = ProfileI18nTableMap::CHAPO;
         }
 
 
         return $this;
-    } // setWrite()
+    } // setChapo()
 
     /**
-     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     * Set the value of [postscriptum] column.
      *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\GroupResource The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
      */
-    public function setCreatedAt($v)
+    public function setPostscriptum($v)
     {
-        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
-        if ($this->created_at !== null || $dt !== null) {
-            if ($dt !== $this->created_at) {
-                $this->created_at = $dt;
-                $this->modifiedColumns[] = GroupResourceTableMap::CREATED_AT;
-            }
-        } // if either are not null
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->postscriptum !== $v) {
+            $this->postscriptum = $v;
+            $this->modifiedColumns[] = ProfileI18nTableMap::POSTSCRIPTUM;
+        }
 
 
         return $this;
-    } // setCreatedAt()
-
-    /**
-     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
-     *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\GroupResource The current object (for fluent API support)
-     */
-    public function setUpdatedAt($v)
-    {
-        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
-        if ($this->updated_at !== null || $dt !== null) {
-            if ($dt !== $this->updated_at) {
-                $this->updated_at = $dt;
-                $this->modifiedColumns[] = GroupResourceTableMap::UPDATED_AT;
-            }
-        } // if either are not null
-
-
-        return $this;
-    } // setUpdatedAt()
+    } // setPostscriptum()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -652,11 +580,7 @@ abstract class GroupResource implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->read !== 0) {
-                return false;
-            }
-
-            if ($this->write !== 0) {
+            if ($this->locale !== 'en_US') {
                 return false;
             }
 
@@ -687,32 +611,23 @@ abstract class GroupResource implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : GroupResourceTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProfileI18nTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : GroupResourceTableMap::translateFieldName('GroupId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->group_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProfileI18nTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->locale = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : GroupResourceTableMap::translateFieldName('ResourceId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->resource_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProfileI18nTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->title = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : GroupResourceTableMap::translateFieldName('Read', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->read = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProfileI18nTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->description = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : GroupResourceTableMap::translateFieldName('Write', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->write = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProfileI18nTableMap::translateFieldName('Chapo', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->chapo = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : GroupResourceTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00 00:00:00') {
-                $col = null;
-            }
-            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : GroupResourceTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00 00:00:00') {
-                $col = null;
-            }
-            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProfileI18nTableMap::translateFieldName('Postscriptum', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->postscriptum = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -721,10 +636,10 @@ abstract class GroupResource implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = GroupResourceTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = ProfileI18nTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\GroupResource object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\ProfileI18n object", 0, $e);
         }
     }
 
@@ -743,11 +658,8 @@ abstract class GroupResource implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aGroup !== null && $this->group_id !== $this->aGroup->getId()) {
-            $this->aGroup = null;
-        }
-        if ($this->aResource !== null && $this->resource_id !== $this->aResource->getId()) {
-            $this->aResource = null;
+        if ($this->aProfile !== null && $this->id !== $this->aProfile->getId()) {
+            $this->aProfile = null;
         }
     } // ensureConsistency
 
@@ -772,13 +684,13 @@ abstract class GroupResource implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(GroupResourceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProfileI18nTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildGroupResourceQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildProfileI18nQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -788,8 +700,7 @@ abstract class GroupResource implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aGroup = null;
-            $this->aResource = null;
+            $this->aProfile = null;
         } // if (deep)
     }
 
@@ -799,8 +710,8 @@ abstract class GroupResource implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see GroupResource::setDeleted()
-     * @see GroupResource::isDeleted()
+     * @see ProfileI18n::setDeleted()
+     * @see ProfileI18n::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -809,12 +720,12 @@ abstract class GroupResource implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupResourceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileI18nTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildGroupResourceQuery::create()
+            $deleteQuery = ChildProfileI18nQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -851,7 +762,7 @@ abstract class GroupResource implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupResourceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileI18nTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -860,19 +771,8 @@ abstract class GroupResource implements ActiveRecordInterface
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
-                // timestampable behavior
-                if (!$this->isColumnModified(GroupResourceTableMap::CREATED_AT)) {
-                    $this->setCreatedAt(time());
-                }
-                if (!$this->isColumnModified(GroupResourceTableMap::UPDATED_AT)) {
-                    $this->setUpdatedAt(time());
-                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
-                // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(GroupResourceTableMap::UPDATED_AT)) {
-                    $this->setUpdatedAt(time());
-                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -882,7 +782,7 @@ abstract class GroupResource implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                GroupResourceTableMap::addInstanceToPool($this);
+                ProfileI18nTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -917,18 +817,11 @@ abstract class GroupResource implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aGroup !== null) {
-                if ($this->aGroup->isModified() || $this->aGroup->isNew()) {
-                    $affectedRows += $this->aGroup->save($con);
+            if ($this->aProfile !== null) {
+                if ($this->aProfile->isModified() || $this->aProfile->isNew()) {
+                    $affectedRows += $this->aProfile->save($con);
                 }
-                $this->setGroup($this->aGroup);
-            }
-
-            if ($this->aResource !== null) {
-                if ($this->aResource->isModified() || $this->aResource->isNew()) {
-                    $affectedRows += $this->aResource->save($con);
-                }
-                $this->setResource($this->aResource);
+                $this->setProfile($this->aProfile);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -962,36 +855,29 @@ abstract class GroupResource implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = GroupResourceTableMap::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . GroupResourceTableMap::ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(GroupResourceTableMap::ID)) {
+        if ($this->isColumnModified(ProfileI18nTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(GroupResourceTableMap::GROUP_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'GROUP_ID';
+        if ($this->isColumnModified(ProfileI18nTableMap::LOCALE)) {
+            $modifiedColumns[':p' . $index++]  = 'LOCALE';
         }
-        if ($this->isColumnModified(GroupResourceTableMap::RESOURCE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'RESOURCE_ID';
+        if ($this->isColumnModified(ProfileI18nTableMap::TITLE)) {
+            $modifiedColumns[':p' . $index++]  = 'TITLE';
         }
-        if ($this->isColumnModified(GroupResourceTableMap::READ)) {
-            $modifiedColumns[':p' . $index++]  = 'READ';
+        if ($this->isColumnModified(ProfileI18nTableMap::DESCRIPTION)) {
+            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
         }
-        if ($this->isColumnModified(GroupResourceTableMap::WRITE)) {
-            $modifiedColumns[':p' . $index++]  = 'WRITE';
+        if ($this->isColumnModified(ProfileI18nTableMap::CHAPO)) {
+            $modifiedColumns[':p' . $index++]  = 'CHAPO';
         }
-        if ($this->isColumnModified(GroupResourceTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
-        }
-        if ($this->isColumnModified(GroupResourceTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+        if ($this->isColumnModified(ProfileI18nTableMap::POSTSCRIPTUM)) {
+            $modifiedColumns[':p' . $index++]  = 'POSTSCRIPTUM';
         }
 
         $sql = sprintf(
-            'INSERT INTO group_resource (%s) VALUES (%s)',
+            'INSERT INTO profile_i18n (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1003,23 +889,20 @@ abstract class GroupResource implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'GROUP_ID':
-                        $stmt->bindValue($identifier, $this->group_id, PDO::PARAM_INT);
+                    case 'LOCALE':
+                        $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
-                    case 'RESOURCE_ID':
-                        $stmt->bindValue($identifier, $this->resource_id, PDO::PARAM_INT);
+                    case 'TITLE':
+                        $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case 'READ':
-                        $stmt->bindValue($identifier, $this->read, PDO::PARAM_INT);
+                    case 'DESCRIPTION':
+                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
-                    case 'WRITE':
-                        $stmt->bindValue($identifier, $this->write, PDO::PARAM_INT);
+                    case 'CHAPO':
+                        $stmt->bindValue($identifier, $this->chapo, PDO::PARAM_STR);
                         break;
-                    case 'CREATED_AT':
-                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
-                        break;
-                    case 'UPDATED_AT':
-                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                    case 'POSTSCRIPTUM':
+                        $stmt->bindValue($identifier, $this->postscriptum, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1028,13 +911,6 @@ abstract class GroupResource implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
-
-        try {
-            $pk = $con->lastInsertId();
-        } catch (Exception $e) {
-            throw new PropelException('Unable to get autoincrement id.', 0, $e);
-        }
-        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -1067,7 +943,7 @@ abstract class GroupResource implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = GroupResourceTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProfileI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1087,22 +963,19 @@ abstract class GroupResource implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getGroupId();
+                return $this->getLocale();
                 break;
             case 2:
-                return $this->getResourceId();
+                return $this->getTitle();
                 break;
             case 3:
-                return $this->getRead();
+                return $this->getDescription();
                 break;
             case 4:
-                return $this->getWrite();
+                return $this->getChapo();
                 break;
             case 5:
-                return $this->getCreatedAt();
-                break;
-            case 6:
-                return $this->getUpdatedAt();
+                return $this->getPostscriptum();
                 break;
             default:
                 return null;
@@ -1127,19 +1000,18 @@ abstract class GroupResource implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['GroupResource'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['ProfileI18n'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['GroupResource'][serialize($this->getPrimaryKey())] = true;
-        $keys = GroupResourceTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['ProfileI18n'][serialize($this->getPrimaryKey())] = true;
+        $keys = ProfileI18nTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getGroupId(),
-            $keys[2] => $this->getResourceId(),
-            $keys[3] => $this->getRead(),
-            $keys[4] => $this->getWrite(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[1] => $this->getLocale(),
+            $keys[2] => $this->getTitle(),
+            $keys[3] => $this->getDescription(),
+            $keys[4] => $this->getChapo(),
+            $keys[5] => $this->getPostscriptum(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1147,11 +1019,8 @@ abstract class GroupResource implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aGroup) {
-                $result['Group'] = $this->aGroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aResource) {
-                $result['Resource'] = $this->aResource->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aProfile) {
+                $result['Profile'] = $this->aProfile->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1171,7 +1040,7 @@ abstract class GroupResource implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = GroupResourceTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProfileI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1191,22 +1060,19 @@ abstract class GroupResource implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setGroupId($value);
+                $this->setLocale($value);
                 break;
             case 2:
-                $this->setResourceId($value);
+                $this->setTitle($value);
                 break;
             case 3:
-                $this->setRead($value);
+                $this->setDescription($value);
                 break;
             case 4:
-                $this->setWrite($value);
+                $this->setChapo($value);
                 break;
             case 5:
-                $this->setCreatedAt($value);
-                break;
-            case 6:
-                $this->setUpdatedAt($value);
+                $this->setPostscriptum($value);
                 break;
         } // switch()
     }
@@ -1230,15 +1096,14 @@ abstract class GroupResource implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = GroupResourceTableMap::getFieldNames($keyType);
+        $keys = ProfileI18nTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setGroupId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setResourceId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setRead($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setWrite($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[1], $arr)) $this->setLocale($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setTitle($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setChapo($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setPostscriptum($arr[$keys[5]]);
     }
 
     /**
@@ -1248,15 +1113,14 @@ abstract class GroupResource implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(GroupResourceTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ProfileI18nTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(GroupResourceTableMap::ID)) $criteria->add(GroupResourceTableMap::ID, $this->id);
-        if ($this->isColumnModified(GroupResourceTableMap::GROUP_ID)) $criteria->add(GroupResourceTableMap::GROUP_ID, $this->group_id);
-        if ($this->isColumnModified(GroupResourceTableMap::RESOURCE_ID)) $criteria->add(GroupResourceTableMap::RESOURCE_ID, $this->resource_id);
-        if ($this->isColumnModified(GroupResourceTableMap::READ)) $criteria->add(GroupResourceTableMap::READ, $this->read);
-        if ($this->isColumnModified(GroupResourceTableMap::WRITE)) $criteria->add(GroupResourceTableMap::WRITE, $this->write);
-        if ($this->isColumnModified(GroupResourceTableMap::CREATED_AT)) $criteria->add(GroupResourceTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(GroupResourceTableMap::UPDATED_AT)) $criteria->add(GroupResourceTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(ProfileI18nTableMap::ID)) $criteria->add(ProfileI18nTableMap::ID, $this->id);
+        if ($this->isColumnModified(ProfileI18nTableMap::LOCALE)) $criteria->add(ProfileI18nTableMap::LOCALE, $this->locale);
+        if ($this->isColumnModified(ProfileI18nTableMap::TITLE)) $criteria->add(ProfileI18nTableMap::TITLE, $this->title);
+        if ($this->isColumnModified(ProfileI18nTableMap::DESCRIPTION)) $criteria->add(ProfileI18nTableMap::DESCRIPTION, $this->description);
+        if ($this->isColumnModified(ProfileI18nTableMap::CHAPO)) $criteria->add(ProfileI18nTableMap::CHAPO, $this->chapo);
+        if ($this->isColumnModified(ProfileI18nTableMap::POSTSCRIPTUM)) $criteria->add(ProfileI18nTableMap::POSTSCRIPTUM, $this->postscriptum);
 
         return $criteria;
     }
@@ -1271,10 +1135,9 @@ abstract class GroupResource implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(GroupResourceTableMap::DATABASE_NAME);
-        $criteria->add(GroupResourceTableMap::ID, $this->id);
-        $criteria->add(GroupResourceTableMap::GROUP_ID, $this->group_id);
-        $criteria->add(GroupResourceTableMap::RESOURCE_ID, $this->resource_id);
+        $criteria = new Criteria(ProfileI18nTableMap::DATABASE_NAME);
+        $criteria->add(ProfileI18nTableMap::ID, $this->id);
+        $criteria->add(ProfileI18nTableMap::LOCALE, $this->locale);
 
         return $criteria;
     }
@@ -1288,8 +1151,7 @@ abstract class GroupResource implements ActiveRecordInterface
     {
         $pks = array();
         $pks[0] = $this->getId();
-        $pks[1] = $this->getGroupId();
-        $pks[2] = $this->getResourceId();
+        $pks[1] = $this->getLocale();
 
         return $pks;
     }
@@ -1303,8 +1165,7 @@ abstract class GroupResource implements ActiveRecordInterface
     public function setPrimaryKey($keys)
     {
         $this->setId($keys[0]);
-        $this->setGroupId($keys[1]);
-        $this->setResourceId($keys[2]);
+        $this->setLocale($keys[1]);
     }
 
     /**
@@ -1314,7 +1175,7 @@ abstract class GroupResource implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getId()) && (null === $this->getGroupId()) && (null === $this->getResourceId());
+        return (null === $this->getId()) && (null === $this->getLocale());
     }
 
     /**
@@ -1323,22 +1184,21 @@ abstract class GroupResource implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\GroupResource (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\ProfileI18n (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setGroupId($this->getGroupId());
-        $copyObj->setResourceId($this->getResourceId());
-        $copyObj->setRead($this->getRead());
-        $copyObj->setWrite($this->getWrite());
-        $copyObj->setCreatedAt($this->getCreatedAt());
-        $copyObj->setUpdatedAt($this->getUpdatedAt());
+        $copyObj->setId($this->getId());
+        $copyObj->setLocale($this->getLocale());
+        $copyObj->setTitle($this->getTitle());
+        $copyObj->setDescription($this->getDescription());
+        $copyObj->setChapo($this->getChapo());
+        $copyObj->setPostscriptum($this->getPostscriptum());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1351,7 +1211,7 @@ abstract class GroupResource implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\GroupResource Clone of current object.
+     * @return                 \Thelia\Model\ProfileI18n Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1365,26 +1225,26 @@ abstract class GroupResource implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildGroup object.
+     * Declares an association between this object and a ChildProfile object.
      *
-     * @param                  ChildGroup $v
-     * @return                 \Thelia\Model\GroupResource The current object (for fluent API support)
+     * @param                  ChildProfile $v
+     * @return                 \Thelia\Model\ProfileI18n The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setGroup(ChildGroup $v = null)
+    public function setProfile(ChildProfile $v = null)
     {
         if ($v === null) {
-            $this->setGroupId(NULL);
+            $this->setId(NULL);
         } else {
-            $this->setGroupId($v->getId());
+            $this->setId($v->getId());
         }
 
-        $this->aGroup = $v;
+        $this->aProfile = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildGroup object, it will not be re-added.
+        // If this object has already been added to the ChildProfile object, it will not be re-added.
         if ($v !== null) {
-            $v->addGroupResource($this);
+            $v->addProfileI18n($this);
         }
 
 
@@ -1393,77 +1253,26 @@ abstract class GroupResource implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildGroup object
+     * Get the associated ChildProfile object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildGroup The associated ChildGroup object.
+     * @return                 ChildProfile The associated ChildProfile object.
      * @throws PropelException
      */
-    public function getGroup(ConnectionInterface $con = null)
+    public function getProfile(ConnectionInterface $con = null)
     {
-        if ($this->aGroup === null && ($this->group_id !== null)) {
-            $this->aGroup = ChildGroupQuery::create()->findPk($this->group_id, $con);
+        if ($this->aProfile === null && ($this->id !== null)) {
+            $this->aProfile = ChildProfileQuery::create()->findPk($this->id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aGroup->addGroupResources($this);
+                $this->aProfile->addProfileI18ns($this);
              */
         }
 
-        return $this->aGroup;
-    }
-
-    /**
-     * Declares an association between this object and a ChildResource object.
-     *
-     * @param                  ChildResource $v
-     * @return                 \Thelia\Model\GroupResource The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setResource(ChildResource $v = null)
-    {
-        if ($v === null) {
-            $this->setResourceId(NULL);
-        } else {
-            $this->setResourceId($v->getId());
-        }
-
-        $this->aResource = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildResource object, it will not be re-added.
-        if ($v !== null) {
-            $v->addGroupResource($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildResource object
-     *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildResource The associated ChildResource object.
-     * @throws PropelException
-     */
-    public function getResource(ConnectionInterface $con = null)
-    {
-        if ($this->aResource === null && ($this->resource_id !== null)) {
-            $this->aResource = ChildResourceQuery::create()->findPk($this->resource_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aResource->addGroupResources($this);
-             */
-        }
-
-        return $this->aResource;
+        return $this->aProfile;
     }
 
     /**
@@ -1472,12 +1281,11 @@ abstract class GroupResource implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->group_id = null;
-        $this->resource_id = null;
-        $this->read = null;
-        $this->write = null;
-        $this->created_at = null;
-        $this->updated_at = null;
+        $this->locale = null;
+        $this->title = null;
+        $this->description = null;
+        $this->chapo = null;
+        $this->postscriptum = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
@@ -1500,8 +1308,7 @@ abstract class GroupResource implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aGroup = null;
-        $this->aResource = null;
+        $this->aProfile = null;
     }
 
     /**
@@ -1511,21 +1318,7 @@ abstract class GroupResource implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(GroupResourceTableMap::DEFAULT_STRING_FORMAT);
-    }
-
-    // timestampable behavior
-
-    /**
-     * Mark the current object so that the update date doesn't get updated during next save
-     *
-     * @return     ChildGroupResource The current object (for fluent API support)
-     */
-    public function keepUpdateDateUnchanged()
-    {
-        $this->modifiedColumns[] = GroupResourceTableMap::UPDATED_AT;
-
-        return $this;
+        return (string) $this->exportTo(ProfileI18nTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

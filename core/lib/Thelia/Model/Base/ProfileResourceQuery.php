@@ -12,92 +12,92 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\GroupResource as ChildGroupResource;
-use Thelia\Model\GroupResourceQuery as ChildGroupResourceQuery;
-use Thelia\Model\Map\GroupResourceTableMap;
+use Thelia\Model\ProfileResource as ChildProfileResource;
+use Thelia\Model\ProfileResourceQuery as ChildProfileResourceQuery;
+use Thelia\Model\Map\ProfileResourceTableMap;
 
 /**
- * Base class that represents a query for the 'group_resource' table.
+ * Base class that represents a query for the 'profile_resource' table.
  *
  *
  *
- * @method     ChildGroupResourceQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildGroupResourceQuery orderByGroupId($order = Criteria::ASC) Order by the group_id column
- * @method     ChildGroupResourceQuery orderByResourceId($order = Criteria::ASC) Order by the resource_id column
- * @method     ChildGroupResourceQuery orderByRead($order = Criteria::ASC) Order by the read column
- * @method     ChildGroupResourceQuery orderByWrite($order = Criteria::ASC) Order by the write column
- * @method     ChildGroupResourceQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method     ChildGroupResourceQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method     ChildProfileResourceQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildProfileResourceQuery orderByProfileId($order = Criteria::ASC) Order by the profile_id column
+ * @method     ChildProfileResourceQuery orderByResourceId($order = Criteria::ASC) Order by the resource_id column
+ * @method     ChildProfileResourceQuery orderByRead($order = Criteria::ASC) Order by the read column
+ * @method     ChildProfileResourceQuery orderByWrite($order = Criteria::ASC) Order by the write column
+ * @method     ChildProfileResourceQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildProfileResourceQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildGroupResourceQuery groupById() Group by the id column
- * @method     ChildGroupResourceQuery groupByGroupId() Group by the group_id column
- * @method     ChildGroupResourceQuery groupByResourceId() Group by the resource_id column
- * @method     ChildGroupResourceQuery groupByRead() Group by the read column
- * @method     ChildGroupResourceQuery groupByWrite() Group by the write column
- * @method     ChildGroupResourceQuery groupByCreatedAt() Group by the created_at column
- * @method     ChildGroupResourceQuery groupByUpdatedAt() Group by the updated_at column
+ * @method     ChildProfileResourceQuery groupById() Group by the id column
+ * @method     ChildProfileResourceQuery groupByProfileId() Group by the profile_id column
+ * @method     ChildProfileResourceQuery groupByResourceId() Group by the resource_id column
+ * @method     ChildProfileResourceQuery groupByRead() Group by the read column
+ * @method     ChildProfileResourceQuery groupByWrite() Group by the write column
+ * @method     ChildProfileResourceQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildProfileResourceQuery groupByUpdatedAt() Group by the updated_at column
  *
- * @method     ChildGroupResourceQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildGroupResourceQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildGroupResourceQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildProfileResourceQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildProfileResourceQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildProfileResourceQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildGroupResourceQuery leftJoinGroup($relationAlias = null) Adds a LEFT JOIN clause to the query using the Group relation
- * @method     ChildGroupResourceQuery rightJoinGroup($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Group relation
- * @method     ChildGroupResourceQuery innerJoinGroup($relationAlias = null) Adds a INNER JOIN clause to the query using the Group relation
+ * @method     ChildProfileResourceQuery leftJoinProfile($relationAlias = null) Adds a LEFT JOIN clause to the query using the Profile relation
+ * @method     ChildProfileResourceQuery rightJoinProfile($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Profile relation
+ * @method     ChildProfileResourceQuery innerJoinProfile($relationAlias = null) Adds a INNER JOIN clause to the query using the Profile relation
  *
- * @method     ChildGroupResourceQuery leftJoinResource($relationAlias = null) Adds a LEFT JOIN clause to the query using the Resource relation
- * @method     ChildGroupResourceQuery rightJoinResource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Resource relation
- * @method     ChildGroupResourceQuery innerJoinResource($relationAlias = null) Adds a INNER JOIN clause to the query using the Resource relation
+ * @method     ChildProfileResourceQuery leftJoinResource($relationAlias = null) Adds a LEFT JOIN clause to the query using the Resource relation
+ * @method     ChildProfileResourceQuery rightJoinResource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Resource relation
+ * @method     ChildProfileResourceQuery innerJoinResource($relationAlias = null) Adds a INNER JOIN clause to the query using the Resource relation
  *
- * @method     ChildGroupResource findOne(ConnectionInterface $con = null) Return the first ChildGroupResource matching the query
- * @method     ChildGroupResource findOneOrCreate(ConnectionInterface $con = null) Return the first ChildGroupResource matching the query, or a new ChildGroupResource object populated from the query conditions when no match is found
+ * @method     ChildProfileResource findOne(ConnectionInterface $con = null) Return the first ChildProfileResource matching the query
+ * @method     ChildProfileResource findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProfileResource matching the query, or a new ChildProfileResource object populated from the query conditions when no match is found
  *
- * @method     ChildGroupResource findOneById(int $id) Return the first ChildGroupResource filtered by the id column
- * @method     ChildGroupResource findOneByGroupId(int $group_id) Return the first ChildGroupResource filtered by the group_id column
- * @method     ChildGroupResource findOneByResourceId(int $resource_id) Return the first ChildGroupResource filtered by the resource_id column
- * @method     ChildGroupResource findOneByRead(int $read) Return the first ChildGroupResource filtered by the read column
- * @method     ChildGroupResource findOneByWrite(int $write) Return the first ChildGroupResource filtered by the write column
- * @method     ChildGroupResource findOneByCreatedAt(string $created_at) Return the first ChildGroupResource filtered by the created_at column
- * @method     ChildGroupResource findOneByUpdatedAt(string $updated_at) Return the first ChildGroupResource filtered by the updated_at column
+ * @method     ChildProfileResource findOneById(int $id) Return the first ChildProfileResource filtered by the id column
+ * @method     ChildProfileResource findOneByProfileId(int $profile_id) Return the first ChildProfileResource filtered by the profile_id column
+ * @method     ChildProfileResource findOneByResourceId(int $resource_id) Return the first ChildProfileResource filtered by the resource_id column
+ * @method     ChildProfileResource findOneByRead(int $read) Return the first ChildProfileResource filtered by the read column
+ * @method     ChildProfileResource findOneByWrite(int $write) Return the first ChildProfileResource filtered by the write column
+ * @method     ChildProfileResource findOneByCreatedAt(string $created_at) Return the first ChildProfileResource filtered by the created_at column
+ * @method     ChildProfileResource findOneByUpdatedAt(string $updated_at) Return the first ChildProfileResource filtered by the updated_at column
  *
- * @method     array findById(int $id) Return ChildGroupResource objects filtered by the id column
- * @method     array findByGroupId(int $group_id) Return ChildGroupResource objects filtered by the group_id column
- * @method     array findByResourceId(int $resource_id) Return ChildGroupResource objects filtered by the resource_id column
- * @method     array findByRead(int $read) Return ChildGroupResource objects filtered by the read column
- * @method     array findByWrite(int $write) Return ChildGroupResource objects filtered by the write column
- * @method     array findByCreatedAt(string $created_at) Return ChildGroupResource objects filtered by the created_at column
- * @method     array findByUpdatedAt(string $updated_at) Return ChildGroupResource objects filtered by the updated_at column
+ * @method     array findById(int $id) Return ChildProfileResource objects filtered by the id column
+ * @method     array findByProfileId(int $profile_id) Return ChildProfileResource objects filtered by the profile_id column
+ * @method     array findByResourceId(int $resource_id) Return ChildProfileResource objects filtered by the resource_id column
+ * @method     array findByRead(int $read) Return ChildProfileResource objects filtered by the read column
+ * @method     array findByWrite(int $write) Return ChildProfileResource objects filtered by the write column
+ * @method     array findByCreatedAt(string $created_at) Return ChildProfileResource objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildProfileResource objects filtered by the updated_at column
  *
  */
-abstract class GroupResourceQuery extends ModelCriteria
+abstract class ProfileResourceQuery extends ModelCriteria
 {
 
     /**
-     * Initializes internal state of \Thelia\Model\Base\GroupResourceQuery object.
+     * Initializes internal state of \Thelia\Model\Base\ProfileResourceQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\GroupResource', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\ProfileResource', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildGroupResourceQuery object.
+     * Returns a new ChildProfileResourceQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildGroupResourceQuery
+     * @return ChildProfileResourceQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof \Thelia\Model\GroupResourceQuery) {
+        if ($criteria instanceof \Thelia\Model\ProfileResourceQuery) {
             return $criteria;
         }
-        $query = new \Thelia\Model\GroupResourceQuery();
+        $query = new \Thelia\Model\ProfileResourceQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -117,22 +117,22 @@ abstract class GroupResourceQuery extends ModelCriteria
      * $obj = $c->findPk(array(12, 34, 56), $con);
      * </code>
      *
-     * @param array[$id, $group_id, $resource_id] $key Primary key to use for the query
+     * @param array[$id, $profile_id, $resource_id] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildGroupResource|array|mixed the result, formatted by the current formatter
+     * @return ChildProfileResource|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = GroupResourceTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2]))))) && !$this->formatter) {
+        if ((null !== ($obj = ProfileResourceTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2]))))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(GroupResourceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProfileResourceTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -151,11 +151,11 @@ abstract class GroupResourceQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return   ChildGroupResource A model object, or null if the key is not found
+     * @return   ChildProfileResource A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, GROUP_ID, RESOURCE_ID, READ, WRITE, CREATED_AT, UPDATED_AT FROM group_resource WHERE ID = :p0 AND GROUP_ID = :p1 AND RESOURCE_ID = :p2';
+        $sql = 'SELECT ID, PROFILE_ID, RESOURCE_ID, READ, WRITE, CREATED_AT, UPDATED_AT FROM profile_resource WHERE ID = :p0 AND PROFILE_ID = :p1 AND RESOURCE_ID = :p2';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -168,9 +168,9 @@ abstract class GroupResourceQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            $obj = new ChildGroupResource();
+            $obj = new ChildProfileResource();
             $obj->hydrate($row);
-            GroupResourceTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2])));
+            ProfileResourceTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2])));
         }
         $stmt->closeCursor();
 
@@ -183,7 +183,7 @@ abstract class GroupResourceQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildGroupResource|array|mixed the result, formatted by the current formatter
+     * @return ChildProfileResource|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -225,13 +225,13 @@ abstract class GroupResourceQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(GroupResourceTableMap::ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(GroupResourceTableMap::GROUP_ID, $key[1], Criteria::EQUAL);
-        $this->addUsingAlias(GroupResourceTableMap::RESOURCE_ID, $key[2], Criteria::EQUAL);
+        $this->addUsingAlias(ProfileResourceTableMap::ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(ProfileResourceTableMap::PROFILE_ID, $key[1], Criteria::EQUAL);
+        $this->addUsingAlias(ProfileResourceTableMap::RESOURCE_ID, $key[2], Criteria::EQUAL);
 
         return $this;
     }
@@ -241,7 +241,7 @@ abstract class GroupResourceQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
@@ -249,10 +249,10 @@ abstract class GroupResourceQuery extends ModelCriteria
             return $this->add(null, '1<>1', Criteria::CUSTOM);
         }
         foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(GroupResourceTableMap::ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(GroupResourceTableMap::GROUP_ID, $key[1], Criteria::EQUAL);
+            $cton0 = $this->getNewCriterion(ProfileResourceTableMap::ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(ProfileResourceTableMap::PROFILE_ID, $key[1], Criteria::EQUAL);
             $cton0->addAnd($cton1);
-            $cton2 = $this->getNewCriterion(GroupResourceTableMap::RESOURCE_ID, $key[2], Criteria::EQUAL);
+            $cton2 = $this->getNewCriterion(ProfileResourceTableMap::RESOURCE_ID, $key[2], Criteria::EQUAL);
             $cton0->addAnd($cton2);
             $this->addOr($cton0);
         }
@@ -276,18 +276,18 @@ abstract class GroupResourceQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(GroupResourceTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProfileResourceTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(GroupResourceTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProfileResourceTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -298,39 +298,39 @@ abstract class GroupResourceQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupResourceTableMap::ID, $id, $comparison);
+        return $this->addUsingAlias(ProfileResourceTableMap::ID, $id, $comparison);
     }
 
     /**
-     * Filter the query on the group_id column
+     * Filter the query on the profile_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByGroupId(1234); // WHERE group_id = 1234
-     * $query->filterByGroupId(array(12, 34)); // WHERE group_id IN (12, 34)
-     * $query->filterByGroupId(array('min' => 12)); // WHERE group_id > 12
+     * $query->filterByProfileId(1234); // WHERE profile_id = 1234
+     * $query->filterByProfileId(array(12, 34)); // WHERE profile_id IN (12, 34)
+     * $query->filterByProfileId(array('min' => 12)); // WHERE profile_id > 12
      * </code>
      *
-     * @see       filterByGroup()
+     * @see       filterByProfile()
      *
-     * @param     mixed $groupId The value to use as filter.
+     * @param     mixed $profileId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
-    public function filterByGroupId($groupId = null, $comparison = null)
+    public function filterByProfileId($profileId = null, $comparison = null)
     {
-        if (is_array($groupId)) {
+        if (is_array($profileId)) {
             $useMinMax = false;
-            if (isset($groupId['min'])) {
-                $this->addUsingAlias(GroupResourceTableMap::GROUP_ID, $groupId['min'], Criteria::GREATER_EQUAL);
+            if (isset($profileId['min'])) {
+                $this->addUsingAlias(ProfileResourceTableMap::PROFILE_ID, $profileId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($groupId['max'])) {
-                $this->addUsingAlias(GroupResourceTableMap::GROUP_ID, $groupId['max'], Criteria::LESS_EQUAL);
+            if (isset($profileId['max'])) {
+                $this->addUsingAlias(ProfileResourceTableMap::PROFILE_ID, $profileId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -341,7 +341,7 @@ abstract class GroupResourceQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupResourceTableMap::GROUP_ID, $groupId, $comparison);
+        return $this->addUsingAlias(ProfileResourceTableMap::PROFILE_ID, $profileId, $comparison);
     }
 
     /**
@@ -362,18 +362,18 @@ abstract class GroupResourceQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
     public function filterByResourceId($resourceId = null, $comparison = null)
     {
         if (is_array($resourceId)) {
             $useMinMax = false;
             if (isset($resourceId['min'])) {
-                $this->addUsingAlias(GroupResourceTableMap::RESOURCE_ID, $resourceId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProfileResourceTableMap::RESOURCE_ID, $resourceId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($resourceId['max'])) {
-                $this->addUsingAlias(GroupResourceTableMap::RESOURCE_ID, $resourceId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProfileResourceTableMap::RESOURCE_ID, $resourceId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -384,7 +384,7 @@ abstract class GroupResourceQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupResourceTableMap::RESOURCE_ID, $resourceId, $comparison);
+        return $this->addUsingAlias(ProfileResourceTableMap::RESOURCE_ID, $resourceId, $comparison);
     }
 
     /**
@@ -403,18 +403,18 @@ abstract class GroupResourceQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
     public function filterByRead($read = null, $comparison = null)
     {
         if (is_array($read)) {
             $useMinMax = false;
             if (isset($read['min'])) {
-                $this->addUsingAlias(GroupResourceTableMap::READ, $read['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProfileResourceTableMap::READ, $read['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($read['max'])) {
-                $this->addUsingAlias(GroupResourceTableMap::READ, $read['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProfileResourceTableMap::READ, $read['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -425,7 +425,7 @@ abstract class GroupResourceQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupResourceTableMap::READ, $read, $comparison);
+        return $this->addUsingAlias(ProfileResourceTableMap::READ, $read, $comparison);
     }
 
     /**
@@ -444,18 +444,18 @@ abstract class GroupResourceQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
     public function filterByWrite($write = null, $comparison = null)
     {
         if (is_array($write)) {
             $useMinMax = false;
             if (isset($write['min'])) {
-                $this->addUsingAlias(GroupResourceTableMap::WRITE, $write['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProfileResourceTableMap::WRITE, $write['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($write['max'])) {
-                $this->addUsingAlias(GroupResourceTableMap::WRITE, $write['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProfileResourceTableMap::WRITE, $write['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -466,7 +466,7 @@ abstract class GroupResourceQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupResourceTableMap::WRITE, $write, $comparison);
+        return $this->addUsingAlias(ProfileResourceTableMap::WRITE, $write, $comparison);
     }
 
     /**
@@ -487,18 +487,18 @@ abstract class GroupResourceQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
     public function filterByCreatedAt($createdAt = null, $comparison = null)
     {
         if (is_array($createdAt)) {
             $useMinMax = false;
             if (isset($createdAt['min'])) {
-                $this->addUsingAlias(GroupResourceTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProfileResourceTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($createdAt['max'])) {
-                $this->addUsingAlias(GroupResourceTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProfileResourceTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -509,7 +509,7 @@ abstract class GroupResourceQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupResourceTableMap::CREATED_AT, $createdAt, $comparison);
+        return $this->addUsingAlias(ProfileResourceTableMap::CREATED_AT, $createdAt, $comparison);
     }
 
     /**
@@ -530,18 +530,18 @@ abstract class GroupResourceQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
     public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
         if (is_array($updatedAt)) {
             $useMinMax = false;
             if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(GroupResourceTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProfileResourceTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(GroupResourceTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProfileResourceTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -552,46 +552,46 @@ abstract class GroupResourceQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupResourceTableMap::UPDATED_AT, $updatedAt, $comparison);
+        return $this->addUsingAlias(ProfileResourceTableMap::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Group object
+     * Filter the query by a related \Thelia\Model\Profile object
      *
-     * @param \Thelia\Model\Group|ObjectCollection $group The related object(s) to use as filter
+     * @param \Thelia\Model\Profile|ObjectCollection $profile The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
-    public function filterByGroup($group, $comparison = null)
+    public function filterByProfile($profile, $comparison = null)
     {
-        if ($group instanceof \Thelia\Model\Group) {
+        if ($profile instanceof \Thelia\Model\Profile) {
             return $this
-                ->addUsingAlias(GroupResourceTableMap::GROUP_ID, $group->getId(), $comparison);
-        } elseif ($group instanceof ObjectCollection) {
+                ->addUsingAlias(ProfileResourceTableMap::PROFILE_ID, $profile->getId(), $comparison);
+        } elseif ($profile instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(GroupResourceTableMap::GROUP_ID, $group->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(ProfileResourceTableMap::PROFILE_ID, $profile->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByGroup() only accepts arguments of type \Thelia\Model\Group or Collection');
+            throw new PropelException('filterByProfile() only accepts arguments of type \Thelia\Model\Profile or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Group relation
+     * Adds a JOIN clause to the query using the Profile relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
-    public function joinGroup($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinProfile($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Group');
+        $relationMap = $tableMap->getRelation('Profile');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -606,14 +606,14 @@ abstract class GroupResourceQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Group');
+            $this->addJoinObject($join, 'Profile');
         }
 
         return $this;
     }
 
     /**
-     * Use the Group relation Group object
+     * Use the Profile relation Profile object
      *
      * @see useQuery()
      *
@@ -621,13 +621,13 @@ abstract class GroupResourceQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\GroupQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProfileQuery A secondary query class using the current class as primary query
      */
-    public function useGroupQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useProfileQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinGroup($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Group', '\Thelia\Model\GroupQuery');
+            ->joinProfile($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Profile', '\Thelia\Model\ProfileQuery');
     }
 
     /**
@@ -636,20 +636,20 @@ abstract class GroupResourceQuery extends ModelCriteria
      * @param \Thelia\Model\Resource|ObjectCollection $resource The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
     public function filterByResource($resource, $comparison = null)
     {
         if ($resource instanceof \Thelia\Model\Resource) {
             return $this
-                ->addUsingAlias(GroupResourceTableMap::RESOURCE_ID, $resource->getId(), $comparison);
+                ->addUsingAlias(ProfileResourceTableMap::RESOURCE_ID, $resource->getId(), $comparison);
         } elseif ($resource instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(GroupResourceTableMap::RESOURCE_ID, $resource->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(ProfileResourceTableMap::RESOURCE_ID, $resource->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByResource() only accepts arguments of type \Thelia\Model\Resource or Collection');
         }
@@ -661,7 +661,7 @@ abstract class GroupResourceQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
     public function joinResource($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -708,16 +708,16 @@ abstract class GroupResourceQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildGroupResource $groupResource Object to remove from the list of results
+     * @param   ChildProfileResource $profileResource Object to remove from the list of results
      *
-     * @return ChildGroupResourceQuery The current query, for fluid interface
+     * @return ChildProfileResourceQuery The current query, for fluid interface
      */
-    public function prune($groupResource = null)
+    public function prune($profileResource = null)
     {
-        if ($groupResource) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(GroupResourceTableMap::ID), $groupResource->getId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(GroupResourceTableMap::GROUP_ID), $groupResource->getGroupId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond2', $this->getAliasedColName(GroupResourceTableMap::RESOURCE_ID), $groupResource->getResourceId(), Criteria::NOT_EQUAL);
+        if ($profileResource) {
+            $this->addCond('pruneCond0', $this->getAliasedColName(ProfileResourceTableMap::ID), $profileResource->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(ProfileResourceTableMap::PROFILE_ID), $profileResource->getProfileId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond2', $this->getAliasedColName(ProfileResourceTableMap::RESOURCE_ID), $profileResource->getResourceId(), Criteria::NOT_EQUAL);
             $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2'), Criteria::LOGICAL_OR);
         }
 
@@ -725,7 +725,7 @@ abstract class GroupResourceQuery extends ModelCriteria
     }
 
     /**
-     * Deletes all rows from the group_resource table.
+     * Deletes all rows from the profile_resource table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -733,7 +733,7 @@ abstract class GroupResourceQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupResourceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileResourceTableMap::DATABASE_NAME);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
@@ -744,8 +744,8 @@ abstract class GroupResourceQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            GroupResourceTableMap::clearInstancePool();
-            GroupResourceTableMap::clearRelatedInstancePool();
+            ProfileResourceTableMap::clearInstancePool();
+            ProfileResourceTableMap::clearRelatedInstancePool();
 
             $con->commit();
         } catch (PropelException $e) {
@@ -757,9 +757,9 @@ abstract class GroupResourceQuery extends ModelCriteria
     }
 
     /**
-     * Performs a DELETE on the database, given a ChildGroupResource or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ChildProfileResource or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildGroupResource object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ChildProfileResource object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -770,13 +770,13 @@ abstract class GroupResourceQuery extends ModelCriteria
      public function delete(ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupResourceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileResourceTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(GroupResourceTableMap::DATABASE_NAME);
+        $criteria->setDbName(ProfileResourceTableMap::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -786,10 +786,10 @@ abstract class GroupResourceQuery extends ModelCriteria
             $con->beginTransaction();
 
 
-        GroupResourceTableMap::removeInstanceFromPool($criteria);
+        ProfileResourceTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            GroupResourceTableMap::clearRelatedInstancePool();
+            ProfileResourceTableMap::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -806,11 +806,11 @@ abstract class GroupResourceQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildGroupResourceQuery The current query, for fluid interface
+     * @return     ChildProfileResourceQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(GroupResourceTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(ProfileResourceTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
@@ -818,51 +818,51 @@ abstract class GroupResourceQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of in days
      *
-     * @return     ChildGroupResourceQuery The current query, for fluid interface
+     * @return     ChildProfileResourceQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(GroupResourceTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(ProfileResourceTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
      * Order by update date desc
      *
-     * @return     ChildGroupResourceQuery The current query, for fluid interface
+     * @return     ChildProfileResourceQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
-        return $this->addDescendingOrderByColumn(GroupResourceTableMap::UPDATED_AT);
+        return $this->addDescendingOrderByColumn(ProfileResourceTableMap::UPDATED_AT);
     }
 
     /**
      * Order by update date asc
      *
-     * @return     ChildGroupResourceQuery The current query, for fluid interface
+     * @return     ChildProfileResourceQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
-        return $this->addAscendingOrderByColumn(GroupResourceTableMap::UPDATED_AT);
+        return $this->addAscendingOrderByColumn(ProfileResourceTableMap::UPDATED_AT);
     }
 
     /**
      * Order by create date desc
      *
-     * @return     ChildGroupResourceQuery The current query, for fluid interface
+     * @return     ChildProfileResourceQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
-        return $this->addDescendingOrderByColumn(GroupResourceTableMap::CREATED_AT);
+        return $this->addDescendingOrderByColumn(ProfileResourceTableMap::CREATED_AT);
     }
 
     /**
      * Order by create date asc
      *
-     * @return     ChildGroupResourceQuery The current query, for fluid interface
+     * @return     ChildProfileResourceQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(GroupResourceTableMap::CREATED_AT);
+        return $this->addAscendingOrderByColumn(ProfileResourceTableMap::CREATED_AT);
     }
 
-} // GroupResourceQuery
+} // ProfileResourceQuery

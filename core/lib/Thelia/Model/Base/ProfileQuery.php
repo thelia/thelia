@@ -12,89 +12,89 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\Group as ChildGroup;
-use Thelia\Model\GroupI18nQuery as ChildGroupI18nQuery;
-use Thelia\Model\GroupQuery as ChildGroupQuery;
-use Thelia\Model\Map\GroupTableMap;
+use Thelia\Model\Profile as ChildProfile;
+use Thelia\Model\ProfileI18nQuery as ChildProfileI18nQuery;
+use Thelia\Model\ProfileQuery as ChildProfileQuery;
+use Thelia\Model\Map\ProfileTableMap;
 
 /**
- * Base class that represents a query for the 'group' table.
+ * Base class that represents a query for the 'profile' table.
  *
  *
  *
- * @method     ChildGroupQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildGroupQuery orderByCode($order = Criteria::ASC) Order by the code column
- * @method     ChildGroupQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method     ChildGroupQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method     ChildProfileQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildProfileQuery orderByCode($order = Criteria::ASC) Order by the code column
+ * @method     ChildProfileQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildProfileQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildGroupQuery groupById() Group by the id column
- * @method     ChildGroupQuery groupByCode() Group by the code column
- * @method     ChildGroupQuery groupByCreatedAt() Group by the created_at column
- * @method     ChildGroupQuery groupByUpdatedAt() Group by the updated_at column
+ * @method     ChildProfileQuery groupById() Group by the id column
+ * @method     ChildProfileQuery groupByCode() Group by the code column
+ * @method     ChildProfileQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildProfileQuery groupByUpdatedAt() Group by the updated_at column
  *
- * @method     ChildGroupQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildGroupQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildGroupQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildProfileQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildProfileQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildProfileQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildGroupQuery leftJoinAdminGroup($relationAlias = null) Adds a LEFT JOIN clause to the query using the AdminGroup relation
- * @method     ChildGroupQuery rightJoinAdminGroup($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AdminGroup relation
- * @method     ChildGroupQuery innerJoinAdminGroup($relationAlias = null) Adds a INNER JOIN clause to the query using the AdminGroup relation
+ * @method     ChildProfileQuery leftJoinAdmin($relationAlias = null) Adds a LEFT JOIN clause to the query using the Admin relation
+ * @method     ChildProfileQuery rightJoinAdmin($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Admin relation
+ * @method     ChildProfileQuery innerJoinAdmin($relationAlias = null) Adds a INNER JOIN clause to the query using the Admin relation
  *
- * @method     ChildGroupQuery leftJoinGroupResource($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupResource relation
- * @method     ChildGroupQuery rightJoinGroupResource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupResource relation
- * @method     ChildGroupQuery innerJoinGroupResource($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupResource relation
+ * @method     ChildProfileQuery leftJoinProfileResource($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProfileResource relation
+ * @method     ChildProfileQuery rightJoinProfileResource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProfileResource relation
+ * @method     ChildProfileQuery innerJoinProfileResource($relationAlias = null) Adds a INNER JOIN clause to the query using the ProfileResource relation
  *
- * @method     ChildGroupQuery leftJoinGroupModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupModule relation
- * @method     ChildGroupQuery rightJoinGroupModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupModule relation
- * @method     ChildGroupQuery innerJoinGroupModule($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupModule relation
+ * @method     ChildProfileQuery leftJoinProfileModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProfileModule relation
+ * @method     ChildProfileQuery rightJoinProfileModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProfileModule relation
+ * @method     ChildProfileQuery innerJoinProfileModule($relationAlias = null) Adds a INNER JOIN clause to the query using the ProfileModule relation
  *
- * @method     ChildGroupQuery leftJoinGroupI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupI18n relation
- * @method     ChildGroupQuery rightJoinGroupI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupI18n relation
- * @method     ChildGroupQuery innerJoinGroupI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupI18n relation
+ * @method     ChildProfileQuery leftJoinProfileI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProfileI18n relation
+ * @method     ChildProfileQuery rightJoinProfileI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProfileI18n relation
+ * @method     ChildProfileQuery innerJoinProfileI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ProfileI18n relation
  *
- * @method     ChildGroup findOne(ConnectionInterface $con = null) Return the first ChildGroup matching the query
- * @method     ChildGroup findOneOrCreate(ConnectionInterface $con = null) Return the first ChildGroup matching the query, or a new ChildGroup object populated from the query conditions when no match is found
+ * @method     ChildProfile findOne(ConnectionInterface $con = null) Return the first ChildProfile matching the query
+ * @method     ChildProfile findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProfile matching the query, or a new ChildProfile object populated from the query conditions when no match is found
  *
- * @method     ChildGroup findOneById(int $id) Return the first ChildGroup filtered by the id column
- * @method     ChildGroup findOneByCode(string $code) Return the first ChildGroup filtered by the code column
- * @method     ChildGroup findOneByCreatedAt(string $created_at) Return the first ChildGroup filtered by the created_at column
- * @method     ChildGroup findOneByUpdatedAt(string $updated_at) Return the first ChildGroup filtered by the updated_at column
+ * @method     ChildProfile findOneById(int $id) Return the first ChildProfile filtered by the id column
+ * @method     ChildProfile findOneByCode(string $code) Return the first ChildProfile filtered by the code column
+ * @method     ChildProfile findOneByCreatedAt(string $created_at) Return the first ChildProfile filtered by the created_at column
+ * @method     ChildProfile findOneByUpdatedAt(string $updated_at) Return the first ChildProfile filtered by the updated_at column
  *
- * @method     array findById(int $id) Return ChildGroup objects filtered by the id column
- * @method     array findByCode(string $code) Return ChildGroup objects filtered by the code column
- * @method     array findByCreatedAt(string $created_at) Return ChildGroup objects filtered by the created_at column
- * @method     array findByUpdatedAt(string $updated_at) Return ChildGroup objects filtered by the updated_at column
+ * @method     array findById(int $id) Return ChildProfile objects filtered by the id column
+ * @method     array findByCode(string $code) Return ChildProfile objects filtered by the code column
+ * @method     array findByCreatedAt(string $created_at) Return ChildProfile objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildProfile objects filtered by the updated_at column
  *
  */
-abstract class GroupQuery extends ModelCriteria
+abstract class ProfileQuery extends ModelCriteria
 {
 
     /**
-     * Initializes internal state of \Thelia\Model\Base\GroupQuery object.
+     * Initializes internal state of \Thelia\Model\Base\ProfileQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Group', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Profile', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildGroupQuery object.
+     * Returns a new ChildProfileQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildGroupQuery
+     * @return ChildProfileQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof \Thelia\Model\GroupQuery) {
+        if ($criteria instanceof \Thelia\Model\ProfileQuery) {
             return $criteria;
         }
-        $query = new \Thelia\Model\GroupQuery();
+        $query = new \Thelia\Model\ProfileQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -117,19 +117,19 @@ abstract class GroupQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildGroup|array|mixed the result, formatted by the current formatter
+     * @return ChildProfile|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = GroupTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = ProfileTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(GroupTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProfileTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -148,11 +148,11 @@ abstract class GroupQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return   ChildGroup A model object, or null if the key is not found
+     * @return   ChildProfile A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, CREATED_AT, UPDATED_AT FROM group WHERE ID = :p0';
+        $sql = 'SELECT ID, CODE, CREATED_AT, UPDATED_AT FROM profile WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -163,9 +163,9 @@ abstract class GroupQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            $obj = new ChildGroup();
+            $obj = new ChildProfile();
             $obj->hydrate($row);
-            GroupTableMap::addInstanceToPool($obj, (string) $key);
+            ProfileTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -178,7 +178,7 @@ abstract class GroupQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildGroup|array|mixed the result, formatted by the current formatter
+     * @return ChildProfile|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -220,12 +220,12 @@ abstract class GroupQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(GroupTableMap::ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(ProfileTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -233,12 +233,12 @@ abstract class GroupQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(GroupTableMap::ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(ProfileTableMap::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -257,18 +257,18 @@ abstract class GroupQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(GroupTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProfileTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(GroupTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProfileTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -279,7 +279,7 @@ abstract class GroupQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupTableMap::ID, $id, $comparison);
+        return $this->addUsingAlias(ProfileTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -295,7 +295,7 @@ abstract class GroupQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
     public function filterByCode($code = null, $comparison = null)
     {
@@ -308,7 +308,7 @@ abstract class GroupQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupTableMap::CODE, $code, $comparison);
+        return $this->addUsingAlias(ProfileTableMap::CODE, $code, $comparison);
     }
 
     /**
@@ -329,18 +329,18 @@ abstract class GroupQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
     public function filterByCreatedAt($createdAt = null, $comparison = null)
     {
         if (is_array($createdAt)) {
             $useMinMax = false;
             if (isset($createdAt['min'])) {
-                $this->addUsingAlias(GroupTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProfileTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($createdAt['max'])) {
-                $this->addUsingAlias(GroupTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProfileTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -351,7 +351,7 @@ abstract class GroupQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupTableMap::CREATED_AT, $createdAt, $comparison);
+        return $this->addUsingAlias(ProfileTableMap::CREATED_AT, $createdAt, $comparison);
     }
 
     /**
@@ -372,18 +372,18 @@ abstract class GroupQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
     public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
         if (is_array($updatedAt)) {
             $useMinMax = false;
             if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(GroupTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProfileTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(GroupTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProfileTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -394,44 +394,44 @@ abstract class GroupQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupTableMap::UPDATED_AT, $updatedAt, $comparison);
+        return $this->addUsingAlias(ProfileTableMap::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\AdminGroup object
+     * Filter the query by a related \Thelia\Model\Admin object
      *
-     * @param \Thelia\Model\AdminGroup|ObjectCollection $adminGroup  the related object to use as filter
+     * @param \Thelia\Model\Admin|ObjectCollection $admin  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
-    public function filterByAdminGroup($adminGroup, $comparison = null)
+    public function filterByAdmin($admin, $comparison = null)
     {
-        if ($adminGroup instanceof \Thelia\Model\AdminGroup) {
+        if ($admin instanceof \Thelia\Model\Admin) {
             return $this
-                ->addUsingAlias(GroupTableMap::ID, $adminGroup->getGroupId(), $comparison);
-        } elseif ($adminGroup instanceof ObjectCollection) {
+                ->addUsingAlias(ProfileTableMap::ID, $admin->getProfileId(), $comparison);
+        } elseif ($admin instanceof ObjectCollection) {
             return $this
-                ->useAdminGroupQuery()
-                ->filterByPrimaryKeys($adminGroup->getPrimaryKeys())
+                ->useAdminQuery()
+                ->filterByPrimaryKeys($admin->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByAdminGroup() only accepts arguments of type \Thelia\Model\AdminGroup or Collection');
+            throw new PropelException('filterByAdmin() only accepts arguments of type \Thelia\Model\Admin or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the AdminGroup relation
+     * Adds a JOIN clause to the query using the Admin relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
-    public function joinAdminGroup($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinAdmin($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('AdminGroup');
+        $relationMap = $tableMap->getRelation('Admin');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -446,14 +446,14 @@ abstract class GroupQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'AdminGroup');
+            $this->addJoinObject($join, 'Admin');
         }
 
         return $this;
     }
 
     /**
-     * Use the AdminGroup relation AdminGroup object
+     * Use the Admin relation Admin object
      *
      * @see useQuery()
      *
@@ -461,50 +461,50 @@ abstract class GroupQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\AdminGroupQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\AdminQuery A secondary query class using the current class as primary query
      */
-    public function useAdminGroupQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useAdminQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinAdminGroup($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'AdminGroup', '\Thelia\Model\AdminGroupQuery');
+            ->joinAdmin($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Admin', '\Thelia\Model\AdminQuery');
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\GroupResource object
+     * Filter the query by a related \Thelia\Model\ProfileResource object
      *
-     * @param \Thelia\Model\GroupResource|ObjectCollection $groupResource  the related object to use as filter
+     * @param \Thelia\Model\ProfileResource|ObjectCollection $profileResource  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
-    public function filterByGroupResource($groupResource, $comparison = null)
+    public function filterByProfileResource($profileResource, $comparison = null)
     {
-        if ($groupResource instanceof \Thelia\Model\GroupResource) {
+        if ($profileResource instanceof \Thelia\Model\ProfileResource) {
             return $this
-                ->addUsingAlias(GroupTableMap::ID, $groupResource->getGroupId(), $comparison);
-        } elseif ($groupResource instanceof ObjectCollection) {
+                ->addUsingAlias(ProfileTableMap::ID, $profileResource->getProfileId(), $comparison);
+        } elseif ($profileResource instanceof ObjectCollection) {
             return $this
-                ->useGroupResourceQuery()
-                ->filterByPrimaryKeys($groupResource->getPrimaryKeys())
+                ->useProfileResourceQuery()
+                ->filterByPrimaryKeys($profileResource->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByGroupResource() only accepts arguments of type \Thelia\Model\GroupResource or Collection');
+            throw new PropelException('filterByProfileResource() only accepts arguments of type \Thelia\Model\ProfileResource or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the GroupResource relation
+     * Adds a JOIN clause to the query using the ProfileResource relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
-    public function joinGroupResource($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinProfileResource($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('GroupResource');
+        $relationMap = $tableMap->getRelation('ProfileResource');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -519,14 +519,14 @@ abstract class GroupQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'GroupResource');
+            $this->addJoinObject($join, 'ProfileResource');
         }
 
         return $this;
     }
 
     /**
-     * Use the GroupResource relation GroupResource object
+     * Use the ProfileResource relation ProfileResource object
      *
      * @see useQuery()
      *
@@ -534,50 +534,50 @@ abstract class GroupQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\GroupResourceQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProfileResourceQuery A secondary query class using the current class as primary query
      */
-    public function useGroupResourceQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useProfileResourceQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinGroupResource($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'GroupResource', '\Thelia\Model\GroupResourceQuery');
+            ->joinProfileResource($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProfileResource', '\Thelia\Model\ProfileResourceQuery');
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\GroupModule object
+     * Filter the query by a related \Thelia\Model\ProfileModule object
      *
-     * @param \Thelia\Model\GroupModule|ObjectCollection $groupModule  the related object to use as filter
+     * @param \Thelia\Model\ProfileModule|ObjectCollection $profileModule  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
-    public function filterByGroupModule($groupModule, $comparison = null)
+    public function filterByProfileModule($profileModule, $comparison = null)
     {
-        if ($groupModule instanceof \Thelia\Model\GroupModule) {
+        if ($profileModule instanceof \Thelia\Model\ProfileModule) {
             return $this
-                ->addUsingAlias(GroupTableMap::ID, $groupModule->getGroupId(), $comparison);
-        } elseif ($groupModule instanceof ObjectCollection) {
+                ->addUsingAlias(ProfileTableMap::ID, $profileModule->getProfileId(), $comparison);
+        } elseif ($profileModule instanceof ObjectCollection) {
             return $this
-                ->useGroupModuleQuery()
-                ->filterByPrimaryKeys($groupModule->getPrimaryKeys())
+                ->useProfileModuleQuery()
+                ->filterByPrimaryKeys($profileModule->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByGroupModule() only accepts arguments of type \Thelia\Model\GroupModule or Collection');
+            throw new PropelException('filterByProfileModule() only accepts arguments of type \Thelia\Model\ProfileModule or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the GroupModule relation
+     * Adds a JOIN clause to the query using the ProfileModule relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
-    public function joinGroupModule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinProfileModule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('GroupModule');
+        $relationMap = $tableMap->getRelation('ProfileModule');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -592,14 +592,14 @@ abstract class GroupQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'GroupModule');
+            $this->addJoinObject($join, 'ProfileModule');
         }
 
         return $this;
     }
 
     /**
-     * Use the GroupModule relation GroupModule object
+     * Use the ProfileModule relation ProfileModule object
      *
      * @see useQuery()
      *
@@ -607,50 +607,50 @@ abstract class GroupQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\GroupModuleQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProfileModuleQuery A secondary query class using the current class as primary query
      */
-    public function useGroupModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useProfileModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinGroupModule($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'GroupModule', '\Thelia\Model\GroupModuleQuery');
+            ->joinProfileModule($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProfileModule', '\Thelia\Model\ProfileModuleQuery');
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\GroupI18n object
+     * Filter the query by a related \Thelia\Model\ProfileI18n object
      *
-     * @param \Thelia\Model\GroupI18n|ObjectCollection $groupI18n  the related object to use as filter
+     * @param \Thelia\Model\ProfileI18n|ObjectCollection $profileI18n  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
-    public function filterByGroupI18n($groupI18n, $comparison = null)
+    public function filterByProfileI18n($profileI18n, $comparison = null)
     {
-        if ($groupI18n instanceof \Thelia\Model\GroupI18n) {
+        if ($profileI18n instanceof \Thelia\Model\ProfileI18n) {
             return $this
-                ->addUsingAlias(GroupTableMap::ID, $groupI18n->getId(), $comparison);
-        } elseif ($groupI18n instanceof ObjectCollection) {
+                ->addUsingAlias(ProfileTableMap::ID, $profileI18n->getId(), $comparison);
+        } elseif ($profileI18n instanceof ObjectCollection) {
             return $this
-                ->useGroupI18nQuery()
-                ->filterByPrimaryKeys($groupI18n->getPrimaryKeys())
+                ->useProfileI18nQuery()
+                ->filterByPrimaryKeys($profileI18n->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByGroupI18n() only accepts arguments of type \Thelia\Model\GroupI18n or Collection');
+            throw new PropelException('filterByProfileI18n() only accepts arguments of type \Thelia\Model\ProfileI18n or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the GroupI18n relation
+     * Adds a JOIN clause to the query using the ProfileI18n relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
-    public function joinGroupI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    public function joinProfileI18n($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('GroupI18n');
+        $relationMap = $tableMap->getRelation('ProfileI18n');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -665,14 +665,14 @@ abstract class GroupQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'GroupI18n');
+            $this->addJoinObject($join, 'ProfileI18n');
         }
 
         return $this;
     }
 
     /**
-     * Use the GroupI18n relation GroupI18n object
+     * Use the ProfileI18n relation ProfileI18n object
      *
      * @see useQuery()
      *
@@ -680,45 +680,28 @@ abstract class GroupQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\GroupI18nQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProfileI18nQuery A secondary query class using the current class as primary query
      */
-    public function useGroupI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    public function useProfileI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
-            ->joinGroupI18n($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'GroupI18n', '\Thelia\Model\GroupI18nQuery');
-    }
-
-    /**
-     * Filter the query by a related Admin object
-     * using the admin_group table as cross reference
-     *
-     * @param Admin $admin the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildGroupQuery The current query, for fluid interface
-     */
-    public function filterByAdmin($admin, $comparison = Criteria::EQUAL)
-    {
-        return $this
-            ->useAdminGroupQuery()
-            ->filterByAdmin($admin, $comparison)
-            ->endUse();
+            ->joinProfileI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProfileI18n', '\Thelia\Model\ProfileI18nQuery');
     }
 
     /**
      * Filter the query by a related Resource object
-     * using the group_resource table as cross reference
+     * using the profile_resource table as cross reference
      *
      * @param Resource $resource the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
     public function filterByResource($resource, $comparison = Criteria::EQUAL)
     {
         return $this
-            ->useGroupResourceQuery()
+            ->useProfileResourceQuery()
             ->filterByResource($resource, $comparison)
             ->endUse();
     }
@@ -726,21 +709,21 @@ abstract class GroupQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildGroup $group Object to remove from the list of results
+     * @param   ChildProfile $profile Object to remove from the list of results
      *
-     * @return ChildGroupQuery The current query, for fluid interface
+     * @return ChildProfileQuery The current query, for fluid interface
      */
-    public function prune($group = null)
+    public function prune($profile = null)
     {
-        if ($group) {
-            $this->addUsingAlias(GroupTableMap::ID, $group->getId(), Criteria::NOT_EQUAL);
+        if ($profile) {
+            $this->addUsingAlias(ProfileTableMap::ID, $profile->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the group table.
+     * Deletes all rows from the profile table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -748,7 +731,7 @@ abstract class GroupQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileTableMap::DATABASE_NAME);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
@@ -759,8 +742,8 @@ abstract class GroupQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            GroupTableMap::clearInstancePool();
-            GroupTableMap::clearRelatedInstancePool();
+            ProfileTableMap::clearInstancePool();
+            ProfileTableMap::clearRelatedInstancePool();
 
             $con->commit();
         } catch (PropelException $e) {
@@ -772,9 +755,9 @@ abstract class GroupQuery extends ModelCriteria
     }
 
     /**
-     * Performs a DELETE on the database, given a ChildGroup or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ChildProfile or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildGroup object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ChildProfile object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -785,13 +768,13 @@ abstract class GroupQuery extends ModelCriteria
      public function delete(ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(GroupTableMap::DATABASE_NAME);
+        $criteria->setDbName(ProfileTableMap::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -801,10 +784,10 @@ abstract class GroupQuery extends ModelCriteria
             $con->beginTransaction();
 
 
-        GroupTableMap::removeInstanceFromPool($criteria);
+        ProfileTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            GroupTableMap::clearRelatedInstancePool();
+            ProfileTableMap::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -821,11 +804,11 @@ abstract class GroupQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildGroupQuery The current query, for fluid interface
+     * @return     ChildProfileQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(GroupTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(ProfileTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
@@ -833,51 +816,51 @@ abstract class GroupQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of in days
      *
-     * @return     ChildGroupQuery The current query, for fluid interface
+     * @return     ChildProfileQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(GroupTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(ProfileTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
      * Order by update date desc
      *
-     * @return     ChildGroupQuery The current query, for fluid interface
+     * @return     ChildProfileQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
-        return $this->addDescendingOrderByColumn(GroupTableMap::UPDATED_AT);
+        return $this->addDescendingOrderByColumn(ProfileTableMap::UPDATED_AT);
     }
 
     /**
      * Order by update date asc
      *
-     * @return     ChildGroupQuery The current query, for fluid interface
+     * @return     ChildProfileQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
-        return $this->addAscendingOrderByColumn(GroupTableMap::UPDATED_AT);
+        return $this->addAscendingOrderByColumn(ProfileTableMap::UPDATED_AT);
     }
 
     /**
      * Order by create date desc
      *
-     * @return     ChildGroupQuery The current query, for fluid interface
+     * @return     ChildProfileQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
-        return $this->addDescendingOrderByColumn(GroupTableMap::CREATED_AT);
+        return $this->addDescendingOrderByColumn(ProfileTableMap::CREATED_AT);
     }
 
     /**
      * Order by create date asc
      *
-     * @return     ChildGroupQuery The current query, for fluid interface
+     * @return     ChildProfileQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(GroupTableMap::CREATED_AT);
+        return $this->addAscendingOrderByColumn(ProfileTableMap::CREATED_AT);
     }
 
     // i18n behavior
@@ -889,14 +872,14 @@ abstract class GroupQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildGroupQuery The current query, for fluid interface
+     * @return    ChildProfileQuery The current query, for fluid interface
      */
     public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
-        $relationName = $relationAlias ? $relationAlias : 'GroupI18n';
+        $relationName = $relationAlias ? $relationAlias : 'ProfileI18n';
 
         return $this
-            ->joinGroupI18n($relationAlias, $joinType)
+            ->joinProfileI18n($relationAlias, $joinType)
             ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
     }
 
@@ -907,14 +890,14 @@ abstract class GroupQuery extends ModelCriteria
      * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildGroupQuery The current query, for fluid interface
+     * @return    ChildProfileQuery The current query, for fluid interface
      */
     public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
-            ->with('GroupI18n');
-        $this->with['GroupI18n']->setIsWithOneToMany(false);
+            ->with('ProfileI18n');
+        $this->with['ProfileI18n']->setIsWithOneToMany(false);
 
         return $this;
     }
@@ -928,13 +911,13 @@ abstract class GroupQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildGroupI18nQuery A secondary query class using the current class as primary query
+     * @return    ChildProfileI18nQuery A secondary query class using the current class as primary query
      */
     public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'GroupI18n', '\Thelia\Model\GroupI18nQuery');
+            ->useQuery($relationAlias ? $relationAlias : 'ProfileI18n', '\Thelia\Model\ProfileI18nQuery');
     }
 
-} // GroupQuery
+} // ProfileQuery

@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\TaxCreationForm;
@@ -39,10 +40,10 @@ class TaxController extends AbstractCrudController
             'manual',
             'order',
 
-            'admin.configuration.tax.view',
-            'admin.configuration.tax.create',
-            'admin.configuration.tax.update',
-            'admin.configuration.tax.delete',
+            AdminResources::TAX_VIEW,
+            AdminResources::TAX_CREATE,
+            AdminResources::TAX_UPDATE,
+            AdminResources::TAX_DELETE,
 
             TheliaEvents::TAX_CREATE,
             TheliaEvents::TAX_UPDATE,

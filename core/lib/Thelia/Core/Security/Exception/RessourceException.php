@@ -21,19 +21,19 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
+namespace Thelia\Core\Security\Exception;
 
-/**
- * Class AdminProfileController
- * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class AdminProfileController extends BaseAdminController
+class ResourceException extends \RuntimeException
 {
-    public function defaultAction()
+    const UNKNOWN_EXCEPTION = 0;
+
+    const RESOURCE_NOT_FOUND = 404;
+
+    public function __construct($message, $code = null, $previous = null)
     {
-        if (null !== $response = $this->checkAuth("admin.admin-profile.view")) return $response;
-        return $this->render("admin-profiles", array("display_admin_profile" => 20));
+        if ($code === null) {
+            $code = self::UNKNOWN_EXCEPTION;
+        }
+        parent::__construct($message, $code, $previous);
     }
-    
 }

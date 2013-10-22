@@ -17,10 +17,10 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Group as ChildGroup;
-use Thelia\Model\GroupQuery as ChildGroupQuery;
-use Thelia\Model\GroupResource as ChildGroupResource;
-use Thelia\Model\GroupResourceQuery as ChildGroupResourceQuery;
+use Thelia\Model\Profile as ChildProfile;
+use Thelia\Model\ProfileQuery as ChildProfileQuery;
+use Thelia\Model\ProfileResource as ChildProfileResource;
+use Thelia\Model\ProfileResourceQuery as ChildProfileResourceQuery;
 use Thelia\Model\Resource as ChildResource;
 use Thelia\Model\ResourceI18n as ChildResourceI18n;
 use Thelia\Model\ResourceI18nQuery as ChildResourceI18nQuery;
@@ -86,10 +86,10 @@ abstract class Resource implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        ObjectCollection|ChildGroupResource[] Collection to store aggregation of ChildGroupResource objects.
+     * @var        ObjectCollection|ChildProfileResource[] Collection to store aggregation of ChildProfileResource objects.
      */
-    protected $collGroupResources;
-    protected $collGroupResourcesPartial;
+    protected $collProfileResources;
+    protected $collProfileResourcesPartial;
 
     /**
      * @var        ObjectCollection|ChildResourceI18n[] Collection to store aggregation of ChildResourceI18n objects.
@@ -98,9 +98,9 @@ abstract class Resource implements ActiveRecordInterface
     protected $collResourceI18nsPartial;
 
     /**
-     * @var        ChildGroup[] Collection to store aggregation of ChildGroup objects.
+     * @var        ChildProfile[] Collection to store aggregation of ChildProfile objects.
      */
-    protected $collGroups;
+    protected $collProfiles;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -128,13 +128,13 @@ abstract class Resource implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $groupsScheduledForDeletion = null;
+    protected $profilesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $groupResourcesScheduledForDeletion = null;
+    protected $profileResourcesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -669,11 +669,11 @@ abstract class Resource implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collGroupResources = null;
+            $this->collProfileResources = null;
 
             $this->collResourceI18ns = null;
 
-            $this->collGroups = null;
+            $this->collProfiles = null;
         } // if (deep)
     }
 
@@ -807,44 +807,44 @@ abstract class Resource implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->groupsScheduledForDeletion !== null) {
-                if (!$this->groupsScheduledForDeletion->isEmpty()) {
+            if ($this->profilesScheduledForDeletion !== null) {
+                if (!$this->profilesScheduledForDeletion->isEmpty()) {
                     $pks = array();
                     $pk  = $this->getPrimaryKey();
-                    foreach ($this->groupsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                    foreach ($this->profilesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
                         $pks[] = array($remotePk, $pk);
                     }
 
-                    GroupResourceQuery::create()
+                    ProfileResourceQuery::create()
                         ->filterByPrimaryKeys($pks)
                         ->delete($con);
-                    $this->groupsScheduledForDeletion = null;
+                    $this->profilesScheduledForDeletion = null;
                 }
 
-                foreach ($this->getGroups() as $group) {
-                    if ($group->isModified()) {
-                        $group->save($con);
+                foreach ($this->getProfiles() as $profile) {
+                    if ($profile->isModified()) {
+                        $profile->save($con);
                     }
                 }
-            } elseif ($this->collGroups) {
-                foreach ($this->collGroups as $group) {
-                    if ($group->isModified()) {
-                        $group->save($con);
+            } elseif ($this->collProfiles) {
+                foreach ($this->collProfiles as $profile) {
+                    if ($profile->isModified()) {
+                        $profile->save($con);
                     }
                 }
             }
 
-            if ($this->groupResourcesScheduledForDeletion !== null) {
-                if (!$this->groupResourcesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\GroupResourceQuery::create()
-                        ->filterByPrimaryKeys($this->groupResourcesScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->profileResourcesScheduledForDeletion !== null) {
+                if (!$this->profileResourcesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProfileResourceQuery::create()
+                        ->filterByPrimaryKeys($this->profileResourcesScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->groupResourcesScheduledForDeletion = null;
+                    $this->profileResourcesScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collGroupResources !== null) {
-            foreach ($this->collGroupResources as $referrerFK) {
+                if ($this->collProfileResources !== null) {
+            foreach ($this->collProfileResources as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1043,8 +1043,8 @@ abstract class Resource implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collGroupResources) {
-                $result['GroupResources'] = $this->collGroupResources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collProfileResources) {
+                $result['ProfileResources'] = $this->collProfileResources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collResourceI18ns) {
                 $result['ResourceI18ns'] = $this->collResourceI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1210,9 +1210,9 @@ abstract class Resource implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getGroupResources() as $relObj) {
+            foreach ($this->getProfileResources() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addGroupResource($relObj->copy($deepCopy));
+                    $copyObj->addProfileResource($relObj->copy($deepCopy));
                 }
             }
 
@@ -1263,8 +1263,8 @@ abstract class Resource implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('GroupResource' == $relationName) {
-            return $this->initGroupResources();
+        if ('ProfileResource' == $relationName) {
+            return $this->initProfileResources();
         }
         if ('ResourceI18n' == $relationName) {
             return $this->initResourceI18ns();
@@ -1272,31 +1272,31 @@ abstract class Resource implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collGroupResources collection
+     * Clears out the collProfileResources collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addGroupResources()
+     * @see        addProfileResources()
      */
-    public function clearGroupResources()
+    public function clearProfileResources()
     {
-        $this->collGroupResources = null; // important to set this to NULL since that means it is uninitialized
+        $this->collProfileResources = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collGroupResources collection loaded partially.
+     * Reset is the collProfileResources collection loaded partially.
      */
-    public function resetPartialGroupResources($v = true)
+    public function resetPartialProfileResources($v = true)
     {
-        $this->collGroupResourcesPartial = $v;
+        $this->collProfileResourcesPartial = $v;
     }
 
     /**
-     * Initializes the collGroupResources collection.
+     * Initializes the collProfileResources collection.
      *
-     * By default this just sets the collGroupResources collection to an empty array (like clearcollGroupResources());
+     * By default this just sets the collProfileResources collection to an empty array (like clearcollProfileResources());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1305,17 +1305,17 @@ abstract class Resource implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initGroupResources($overrideExisting = true)
+    public function initProfileResources($overrideExisting = true)
     {
-        if (null !== $this->collGroupResources && !$overrideExisting) {
+        if (null !== $this->collProfileResources && !$overrideExisting) {
             return;
         }
-        $this->collGroupResources = new ObjectCollection();
-        $this->collGroupResources->setModel('\Thelia\Model\GroupResource');
+        $this->collProfileResources = new ObjectCollection();
+        $this->collProfileResources->setModel('\Thelia\Model\ProfileResource');
     }
 
     /**
-     * Gets an array of ChildGroupResource objects which contain a foreign key that references this object.
+     * Gets an array of ChildProfileResource objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1325,112 +1325,112 @@ abstract class Resource implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildGroupResource[] List of ChildGroupResource objects
+     * @return Collection|ChildProfileResource[] List of ChildProfileResource objects
      * @throws PropelException
      */
-    public function getGroupResources($criteria = null, ConnectionInterface $con = null)
+    public function getProfileResources($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collGroupResourcesPartial && !$this->isNew();
-        if (null === $this->collGroupResources || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collGroupResources) {
+        $partial = $this->collProfileResourcesPartial && !$this->isNew();
+        if (null === $this->collProfileResources || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProfileResources) {
                 // return empty collection
-                $this->initGroupResources();
+                $this->initProfileResources();
             } else {
-                $collGroupResources = ChildGroupResourceQuery::create(null, $criteria)
+                $collProfileResources = ChildProfileResourceQuery::create(null, $criteria)
                     ->filterByResource($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collGroupResourcesPartial && count($collGroupResources)) {
-                        $this->initGroupResources(false);
+                    if (false !== $this->collProfileResourcesPartial && count($collProfileResources)) {
+                        $this->initProfileResources(false);
 
-                        foreach ($collGroupResources as $obj) {
-                            if (false == $this->collGroupResources->contains($obj)) {
-                                $this->collGroupResources->append($obj);
+                        foreach ($collProfileResources as $obj) {
+                            if (false == $this->collProfileResources->contains($obj)) {
+                                $this->collProfileResources->append($obj);
                             }
                         }
 
-                        $this->collGroupResourcesPartial = true;
+                        $this->collProfileResourcesPartial = true;
                     }
 
-                    $collGroupResources->getInternalIterator()->rewind();
+                    $collProfileResources->getInternalIterator()->rewind();
 
-                    return $collGroupResources;
+                    return $collProfileResources;
                 }
 
-                if ($partial && $this->collGroupResources) {
-                    foreach ($this->collGroupResources as $obj) {
+                if ($partial && $this->collProfileResources) {
+                    foreach ($this->collProfileResources as $obj) {
                         if ($obj->isNew()) {
-                            $collGroupResources[] = $obj;
+                            $collProfileResources[] = $obj;
                         }
                     }
                 }
 
-                $this->collGroupResources = $collGroupResources;
-                $this->collGroupResourcesPartial = false;
+                $this->collProfileResources = $collProfileResources;
+                $this->collProfileResourcesPartial = false;
             }
         }
 
-        return $this->collGroupResources;
+        return $this->collProfileResources;
     }
 
     /**
-     * Sets a collection of GroupResource objects related by a one-to-many relationship
+     * Sets a collection of ProfileResource objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $groupResources A Propel collection.
+     * @param      Collection $profileResources A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildResource The current object (for fluent API support)
      */
-    public function setGroupResources(Collection $groupResources, ConnectionInterface $con = null)
+    public function setProfileResources(Collection $profileResources, ConnectionInterface $con = null)
     {
-        $groupResourcesToDelete = $this->getGroupResources(new Criteria(), $con)->diff($groupResources);
+        $profileResourcesToDelete = $this->getProfileResources(new Criteria(), $con)->diff($profileResources);
 
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
         //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->groupResourcesScheduledForDeletion = clone $groupResourcesToDelete;
+        $this->profileResourcesScheduledForDeletion = clone $profileResourcesToDelete;
 
-        foreach ($groupResourcesToDelete as $groupResourceRemoved) {
-            $groupResourceRemoved->setResource(null);
+        foreach ($profileResourcesToDelete as $profileResourceRemoved) {
+            $profileResourceRemoved->setResource(null);
         }
 
-        $this->collGroupResources = null;
-        foreach ($groupResources as $groupResource) {
-            $this->addGroupResource($groupResource);
+        $this->collProfileResources = null;
+        foreach ($profileResources as $profileResource) {
+            $this->addProfileResource($profileResource);
         }
 
-        $this->collGroupResources = $groupResources;
-        $this->collGroupResourcesPartial = false;
+        $this->collProfileResources = $profileResources;
+        $this->collProfileResourcesPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related GroupResource objects.
+     * Returns the number of related ProfileResource objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related GroupResource objects.
+     * @return int             Count of related ProfileResource objects.
      * @throws PropelException
      */
-    public function countGroupResources(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countProfileResources(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collGroupResourcesPartial && !$this->isNew();
-        if (null === $this->collGroupResources || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collGroupResources) {
+        $partial = $this->collProfileResourcesPartial && !$this->isNew();
+        if (null === $this->collProfileResources || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProfileResources) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getGroupResources());
+                return count($this->getProfileResources());
             }
 
-            $query = ChildGroupResourceQuery::create(null, $criteria);
+            $query = ChildProfileResourceQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1440,53 +1440,53 @@ abstract class Resource implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collGroupResources);
+        return count($this->collProfileResources);
     }
 
     /**
-     * Method called to associate a ChildGroupResource object to this object
-     * through the ChildGroupResource foreign key attribute.
+     * Method called to associate a ChildProfileResource object to this object
+     * through the ChildProfileResource foreign key attribute.
      *
-     * @param    ChildGroupResource $l ChildGroupResource
+     * @param    ChildProfileResource $l ChildProfileResource
      * @return   \Thelia\Model\Resource The current object (for fluent API support)
      */
-    public function addGroupResource(ChildGroupResource $l)
+    public function addProfileResource(ChildProfileResource $l)
     {
-        if ($this->collGroupResources === null) {
-            $this->initGroupResources();
-            $this->collGroupResourcesPartial = true;
+        if ($this->collProfileResources === null) {
+            $this->initProfileResources();
+            $this->collProfileResourcesPartial = true;
         }
 
-        if (!in_array($l, $this->collGroupResources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddGroupResource($l);
+        if (!in_array($l, $this->collProfileResources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProfileResource($l);
         }
 
         return $this;
     }
 
     /**
-     * @param GroupResource $groupResource The groupResource object to add.
+     * @param ProfileResource $profileResource The profileResource object to add.
      */
-    protected function doAddGroupResource($groupResource)
+    protected function doAddProfileResource($profileResource)
     {
-        $this->collGroupResources[]= $groupResource;
-        $groupResource->setResource($this);
+        $this->collProfileResources[]= $profileResource;
+        $profileResource->setResource($this);
     }
 
     /**
-     * @param  GroupResource $groupResource The groupResource object to remove.
+     * @param  ProfileResource $profileResource The profileResource object to remove.
      * @return ChildResource The current object (for fluent API support)
      */
-    public function removeGroupResource($groupResource)
+    public function removeProfileResource($profileResource)
     {
-        if ($this->getGroupResources()->contains($groupResource)) {
-            $this->collGroupResources->remove($this->collGroupResources->search($groupResource));
-            if (null === $this->groupResourcesScheduledForDeletion) {
-                $this->groupResourcesScheduledForDeletion = clone $this->collGroupResources;
-                $this->groupResourcesScheduledForDeletion->clear();
+        if ($this->getProfileResources()->contains($profileResource)) {
+            $this->collProfileResources->remove($this->collProfileResources->search($profileResource));
+            if (null === $this->profileResourcesScheduledForDeletion) {
+                $this->profileResourcesScheduledForDeletion = clone $this->collProfileResources;
+                $this->profileResourcesScheduledForDeletion->clear();
             }
-            $this->groupResourcesScheduledForDeletion[]= clone $groupResource;
-            $groupResource->setResource(null);
+            $this->profileResourcesScheduledForDeletion[]= clone $profileResource;
+            $profileResource->setResource(null);
         }
 
         return $this;
@@ -1498,7 +1498,7 @@ abstract class Resource implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this Resource is new, it will return
      * an empty collection; or if this Resource has previously
-     * been saved, it will retrieve related GroupResources from storage.
+     * been saved, it will retrieve related ProfileResources from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1507,14 +1507,14 @@ abstract class Resource implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildGroupResource[] List of ChildGroupResource objects
+     * @return Collection|ChildProfileResource[] List of ChildProfileResource objects
      */
-    public function getGroupResourcesJoinGroup($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getProfileResourcesJoinProfile($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildGroupResourceQuery::create(null, $criteria);
-        $query->joinWith('Group', $joinBehavior);
+        $query = ChildProfileResourceQuery::create(null, $criteria);
+        $query->joinWith('Profile', $joinBehavior);
 
-        return $this->getGroupResources($query, $con);
+        return $this->getProfileResources($query, $con);
     }
 
     /**
@@ -1743,38 +1743,38 @@ abstract class Resource implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collGroups collection
+     * Clears out the collProfiles collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addGroups()
+     * @see        addProfiles()
      */
-    public function clearGroups()
+    public function clearProfiles()
     {
-        $this->collGroups = null; // important to set this to NULL since that means it is uninitialized
-        $this->collGroupsPartial = null;
+        $this->collProfiles = null; // important to set this to NULL since that means it is uninitialized
+        $this->collProfilesPartial = null;
     }
 
     /**
-     * Initializes the collGroups collection.
+     * Initializes the collProfiles collection.
      *
-     * By default this just sets the collGroups collection to an empty collection (like clearGroups());
+     * By default this just sets the collProfiles collection to an empty collection (like clearProfiles());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
      * @return void
      */
-    public function initGroups()
+    public function initProfiles()
     {
-        $this->collGroups = new ObjectCollection();
-        $this->collGroups->setModel('\Thelia\Model\Group');
+        $this->collProfiles = new ObjectCollection();
+        $this->collProfiles->setModel('\Thelia\Model\Profile');
     }
 
     /**
-     * Gets a collection of ChildGroup objects related by a many-to-many relationship
-     * to the current object by way of the group_resource cross-reference table.
+     * Gets a collection of ChildProfile objects related by a many-to-many relationship
+     * to the current object by way of the profile_resource cross-reference table.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1785,73 +1785,73 @@ abstract class Resource implements ActiveRecordInterface
      * @param      Criteria $criteria Optional query object to filter the query
      * @param      ConnectionInterface $con Optional connection object
      *
-     * @return ObjectCollection|ChildGroup[] List of ChildGroup objects
+     * @return ObjectCollection|ChildProfile[] List of ChildProfile objects
      */
-    public function getGroups($criteria = null, ConnectionInterface $con = null)
+    public function getProfiles($criteria = null, ConnectionInterface $con = null)
     {
-        if (null === $this->collGroups || null !== $criteria) {
-            if ($this->isNew() && null === $this->collGroups) {
+        if (null === $this->collProfiles || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProfiles) {
                 // return empty collection
-                $this->initGroups();
+                $this->initProfiles();
             } else {
-                $collGroups = ChildGroupQuery::create(null, $criteria)
+                $collProfiles = ChildProfileQuery::create(null, $criteria)
                     ->filterByResource($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    return $collGroups;
+                    return $collProfiles;
                 }
-                $this->collGroups = $collGroups;
+                $this->collProfiles = $collProfiles;
             }
         }
 
-        return $this->collGroups;
+        return $this->collProfiles;
     }
 
     /**
-     * Sets a collection of Group objects related by a many-to-many relationship
-     * to the current object by way of the group_resource cross-reference table.
+     * Sets a collection of Profile objects related by a many-to-many relationship
+     * to the current object by way of the profile_resource cross-reference table.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param  Collection $groups A Propel collection.
+     * @param  Collection $profiles A Propel collection.
      * @param  ConnectionInterface $con Optional connection object
      * @return ChildResource The current object (for fluent API support)
      */
-    public function setGroups(Collection $groups, ConnectionInterface $con = null)
+    public function setProfiles(Collection $profiles, ConnectionInterface $con = null)
     {
-        $this->clearGroups();
-        $currentGroups = $this->getGroups();
+        $this->clearProfiles();
+        $currentProfiles = $this->getProfiles();
 
-        $this->groupsScheduledForDeletion = $currentGroups->diff($groups);
+        $this->profilesScheduledForDeletion = $currentProfiles->diff($profiles);
 
-        foreach ($groups as $group) {
-            if (!$currentGroups->contains($group)) {
-                $this->doAddGroup($group);
+        foreach ($profiles as $profile) {
+            if (!$currentProfiles->contains($profile)) {
+                $this->doAddProfile($profile);
             }
         }
 
-        $this->collGroups = $groups;
+        $this->collProfiles = $profiles;
 
         return $this;
     }
 
     /**
-     * Gets the number of ChildGroup objects related by a many-to-many relationship
-     * to the current object by way of the group_resource cross-reference table.
+     * Gets the number of ChildProfile objects related by a many-to-many relationship
+     * to the current object by way of the profile_resource cross-reference table.
      *
      * @param      Criteria $criteria Optional query object to filter the query
      * @param      boolean $distinct Set to true to force count distinct
      * @param      ConnectionInterface $con Optional connection object
      *
-     * @return int the number of related ChildGroup objects
+     * @return int the number of related ChildProfile objects
      */
-    public function countGroups($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countProfiles($criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        if (null === $this->collGroups || null !== $criteria) {
-            if ($this->isNew() && null === $this->collGroups) {
+        if (null === $this->collProfiles || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProfiles) {
                 return 0;
             } else {
-                $query = ChildGroupQuery::create(null, $criteria);
+                $query = ChildProfileQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -1861,65 +1861,65 @@ abstract class Resource implements ActiveRecordInterface
                     ->count($con);
             }
         } else {
-            return count($this->collGroups);
+            return count($this->collProfiles);
         }
     }
 
     /**
-     * Associate a ChildGroup object to this object
-     * through the group_resource cross reference table.
+     * Associate a ChildProfile object to this object
+     * through the profile_resource cross reference table.
      *
-     * @param  ChildGroup $group The ChildGroupResource object to relate
+     * @param  ChildProfile $profile The ChildProfileResource object to relate
      * @return ChildResource The current object (for fluent API support)
      */
-    public function addGroup(ChildGroup $group)
+    public function addProfile(ChildProfile $profile)
     {
-        if ($this->collGroups === null) {
-            $this->initGroups();
+        if ($this->collProfiles === null) {
+            $this->initProfiles();
         }
 
-        if (!$this->collGroups->contains($group)) { // only add it if the **same** object is not already associated
-            $this->doAddGroup($group);
-            $this->collGroups[] = $group;
+        if (!$this->collProfiles->contains($profile)) { // only add it if the **same** object is not already associated
+            $this->doAddProfile($profile);
+            $this->collProfiles[] = $profile;
         }
 
         return $this;
     }
 
     /**
-     * @param    Group $group The group object to add.
+     * @param    Profile $profile The profile object to add.
      */
-    protected function doAddGroup($group)
+    protected function doAddProfile($profile)
     {
-        $groupResource = new ChildGroupResource();
-        $groupResource->setGroup($group);
-        $this->addGroupResource($groupResource);
+        $profileResource = new ChildProfileResource();
+        $profileResource->setProfile($profile);
+        $this->addProfileResource($profileResource);
         // set the back reference to this object directly as using provided method either results
         // in endless loop or in multiple relations
-        if (!$group->getResources()->contains($this)) {
-            $foreignCollection   = $group->getResources();
+        if (!$profile->getResources()->contains($this)) {
+            $foreignCollection   = $profile->getResources();
             $foreignCollection[] = $this;
         }
     }
 
     /**
-     * Remove a ChildGroup object to this object
-     * through the group_resource cross reference table.
+     * Remove a ChildProfile object to this object
+     * through the profile_resource cross reference table.
      *
-     * @param ChildGroup $group The ChildGroupResource object to relate
+     * @param ChildProfile $profile The ChildProfileResource object to relate
      * @return ChildResource The current object (for fluent API support)
      */
-    public function removeGroup(ChildGroup $group)
+    public function removeProfile(ChildProfile $profile)
     {
-        if ($this->getGroups()->contains($group)) {
-            $this->collGroups->remove($this->collGroups->search($group));
+        if ($this->getProfiles()->contains($profile)) {
+            $this->collProfiles->remove($this->collProfiles->search($profile));
 
-            if (null === $this->groupsScheduledForDeletion) {
-                $this->groupsScheduledForDeletion = clone $this->collGroups;
-                $this->groupsScheduledForDeletion->clear();
+            if (null === $this->profilesScheduledForDeletion) {
+                $this->profilesScheduledForDeletion = clone $this->collProfiles;
+                $this->profilesScheduledForDeletion->clear();
             }
 
-            $this->groupsScheduledForDeletion[] = $group;
+            $this->profilesScheduledForDeletion[] = $profile;
         }
 
         return $this;
@@ -1953,8 +1953,8 @@ abstract class Resource implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collGroupResources) {
-                foreach ($this->collGroupResources as $o) {
+            if ($this->collProfileResources) {
+                foreach ($this->collProfileResources as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1963,8 +1963,8 @@ abstract class Resource implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collGroups) {
-                foreach ($this->collGroups as $o) {
+            if ($this->collProfiles) {
+                foreach ($this->collProfiles as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1974,18 +1974,18 @@ abstract class Resource implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collGroupResources instanceof Collection) {
-            $this->collGroupResources->clearIterator();
+        if ($this->collProfileResources instanceof Collection) {
+            $this->collProfileResources->clearIterator();
         }
-        $this->collGroupResources = null;
+        $this->collProfileResources = null;
         if ($this->collResourceI18ns instanceof Collection) {
             $this->collResourceI18ns->clearIterator();
         }
         $this->collResourceI18ns = null;
-        if ($this->collGroups instanceof Collection) {
-            $this->collGroups->clearIterator();
+        if ($this->collProfiles instanceof Collection) {
+            $this->collProfiles->clearIterator();
         }
-        $this->collGroups = null;
+        $this->collProfiles = null;
     }
 
     /**

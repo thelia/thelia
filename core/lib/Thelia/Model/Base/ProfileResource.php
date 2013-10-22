@@ -2,6 +2,7 @@
 
 namespace Thelia\Model\Base;
 
+use \DateTime;
 use \Exception;
 use \PDO;
 use Propel\Runtime\Propel;
@@ -14,17 +15,21 @@ use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
-use Thelia\Model\Group as ChildGroup;
-use Thelia\Model\GroupI18nQuery as ChildGroupI18nQuery;
-use Thelia\Model\GroupQuery as ChildGroupQuery;
-use Thelia\Model\Map\GroupI18nTableMap;
+use Propel\Runtime\Util\PropelDateTime;
+use Thelia\Model\Profile as ChildProfile;
+use Thelia\Model\ProfileQuery as ChildProfileQuery;
+use Thelia\Model\ProfileResource as ChildProfileResource;
+use Thelia\Model\ProfileResourceQuery as ChildProfileResourceQuery;
+use Thelia\Model\Resource as ChildResource;
+use Thelia\Model\ResourceQuery as ChildResourceQuery;
+use Thelia\Model\Map\ProfileResourceTableMap;
 
-abstract class GroupI18n implements ActiveRecordInterface
+abstract class ProfileResource implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\GroupI18nTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\ProfileResourceTableMap';
 
 
     /**
@@ -60,40 +65,52 @@ abstract class GroupI18n implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the locale field.
-     * Note: this column has a database default value of: 'en_US'
-     * @var        string
+     * The value for the profile_id field.
+     * @var        int
      */
-    protected $locale;
+    protected $profile_id;
 
     /**
-     * The value for the title field.
-     * @var        string
+     * The value for the resource_id field.
+     * @var        int
      */
-    protected $title;
+    protected $resource_id;
 
     /**
-     * The value for the description field.
-     * @var        string
+     * The value for the read field.
+     * Note: this column has a database default value of: 0
+     * @var        int
      */
-    protected $description;
+    protected $read;
 
     /**
-     * The value for the chapo field.
-     * @var        string
+     * The value for the write field.
+     * Note: this column has a database default value of: 0
+     * @var        int
      */
-    protected $chapo;
+    protected $write;
 
     /**
-     * The value for the postscriptum field.
+     * The value for the created_at field.
      * @var        string
      */
-    protected $postscriptum;
+    protected $created_at;
 
     /**
-     * @var        Group
+     * The value for the updated_at field.
+     * @var        string
      */
-    protected $aGroup;
+    protected $updated_at;
+
+    /**
+     * @var        Profile
+     */
+    protected $aProfile;
+
+    /**
+     * @var        Resource
+     */
+    protected $aResource;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -111,11 +128,12 @@ abstract class GroupI18n implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->locale = 'en_US';
+        $this->read = 0;
+        $this->write = 0;
     }
 
     /**
-     * Initializes internal state of Thelia\Model\Base\GroupI18n object.
+     * Initializes internal state of Thelia\Model\Base\ProfileResource object.
      * @see applyDefaults()
      */
     public function __construct()
@@ -212,9 +230,9 @@ abstract class GroupI18n implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>GroupI18n</code> instance.  If
-     * <code>obj</code> is an instance of <code>GroupI18n</code>, delegates to
-     * <code>equals(GroupI18n)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>ProfileResource</code> instance.  If
+     * <code>obj</code> is an instance of <code>ProfileResource</code>, delegates to
+     * <code>equals(ProfileResource)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -297,7 +315,7 @@ abstract class GroupI18n implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return GroupI18n The current object, for fluid interface
+     * @return ProfileResource The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -329,7 +347,7 @@ abstract class GroupI18n implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return GroupI18n The current object, for fluid interface
+     * @return ProfileResource The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -386,65 +404,94 @@ abstract class GroupI18n implements ActiveRecordInterface
     }
 
     /**
-     * Get the [locale] column value.
+     * Get the [profile_id] column value.
      *
-     * @return   string
+     * @return   int
      */
-    public function getLocale()
+    public function getProfileId()
     {
 
-        return $this->locale;
+        return $this->profile_id;
     }
 
     /**
-     * Get the [title] column value.
+     * Get the [resource_id] column value.
      *
-     * @return   string
+     * @return   int
      */
-    public function getTitle()
+    public function getResourceId()
     {
 
-        return $this->title;
+        return $this->resource_id;
     }
 
     /**
-     * Get the [description] column value.
+     * Get the [read] column value.
      *
-     * @return   string
+     * @return   int
      */
-    public function getDescription()
+    public function getRead()
     {
 
-        return $this->description;
+        return $this->read;
     }
 
     /**
-     * Get the [chapo] column value.
+     * Get the [write] column value.
      *
-     * @return   string
+     * @return   int
      */
-    public function getChapo()
+    public function getWrite()
     {
 
-        return $this->chapo;
+        return $this->write;
     }
 
     /**
-     * Get the [postscriptum] column value.
+     * Get the [optionally formatted] temporal [created_at] column value.
      *
-     * @return   string
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
+     *
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getPostscriptum()
+    public function getCreatedAt($format = NULL)
     {
+        if ($format === null) {
+            return $this->created_at;
+        } else {
+            return $this->created_at instanceof \DateTime ? $this->created_at->format($format) : null;
+        }
+    }
 
-        return $this->postscriptum;
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param      string $format The date/time format string (either date()-style or strftime()-style).
+     *                            If format is NULL, then the raw \DateTime object will be returned.
+     *
+     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
+     *
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = NULL)
+    {
+        if ($format === null) {
+            return $this->updated_at;
+        } else {
+            return $this->updated_at instanceof \DateTime ? $this->updated_at->format($format) : null;
+        }
     }
 
     /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\GroupI18n The current object (for fluent API support)
+     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -454,11 +501,7 @@ abstract class GroupI18n implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = GroupI18nTableMap::ID;
-        }
-
-        if ($this->aGroup !== null && $this->aGroup->getId() !== $v) {
-            $this->aGroup = null;
+            $this->modifiedColumns[] = ProfileResourceTableMap::ID;
         }
 
 
@@ -466,109 +509,138 @@ abstract class GroupI18n implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [locale] column.
+     * Set the value of [profile_id] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\GroupI18n The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
      */
-    public function setLocale($v)
+    public function setProfileId($v)
     {
         if ($v !== null) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->locale !== $v) {
-            $this->locale = $v;
-            $this->modifiedColumns[] = GroupI18nTableMap::LOCALE;
+        if ($this->profile_id !== $v) {
+            $this->profile_id = $v;
+            $this->modifiedColumns[] = ProfileResourceTableMap::PROFILE_ID;
+        }
+
+        if ($this->aProfile !== null && $this->aProfile->getId() !== $v) {
+            $this->aProfile = null;
         }
 
 
         return $this;
-    } // setLocale()
+    } // setProfileId()
 
     /**
-     * Set the value of [title] column.
+     * Set the value of [resource_id] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\GroupI18n The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
      */
-    public function setTitle($v)
+    public function setResourceId($v)
     {
         if ($v !== null) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->title !== $v) {
-            $this->title = $v;
-            $this->modifiedColumns[] = GroupI18nTableMap::TITLE;
+        if ($this->resource_id !== $v) {
+            $this->resource_id = $v;
+            $this->modifiedColumns[] = ProfileResourceTableMap::RESOURCE_ID;
+        }
+
+        if ($this->aResource !== null && $this->aResource->getId() !== $v) {
+            $this->aResource = null;
         }
 
 
         return $this;
-    } // setTitle()
+    } // setResourceId()
 
     /**
-     * Set the value of [description] column.
+     * Set the value of [read] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\GroupI18n The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
      */
-    public function setDescription($v)
+    public function setRead($v)
     {
         if ($v !== null) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->description !== $v) {
-            $this->description = $v;
-            $this->modifiedColumns[] = GroupI18nTableMap::DESCRIPTION;
+        if ($this->read !== $v) {
+            $this->read = $v;
+            $this->modifiedColumns[] = ProfileResourceTableMap::READ;
         }
 
 
         return $this;
-    } // setDescription()
+    } // setRead()
 
     /**
-     * Set the value of [chapo] column.
+     * Set the value of [write] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\GroupI18n The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
      */
-    public function setChapo($v)
+    public function setWrite($v)
     {
         if ($v !== null) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->chapo !== $v) {
-            $this->chapo = $v;
-            $this->modifiedColumns[] = GroupI18nTableMap::CHAPO;
+        if ($this->write !== $v) {
+            $this->write = $v;
+            $this->modifiedColumns[] = ProfileResourceTableMap::WRITE;
         }
 
 
         return $this;
-    } // setChapo()
+    } // setWrite()
 
     /**
-     * Set the value of [postscriptum] column.
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\GroupI18n The current object (for fluent API support)
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
      */
-    public function setPostscriptum($v)
+    public function setCreatedAt($v)
     {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->postscriptum !== $v) {
-            $this->postscriptum = $v;
-            $this->modifiedColumns[] = GroupI18nTableMap::POSTSCRIPTUM;
-        }
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            if ($dt !== $this->created_at) {
+                $this->created_at = $dt;
+                $this->modifiedColumns[] = ProfileResourceTableMap::CREATED_AT;
+            }
+        } // if either are not null
 
 
         return $this;
-    } // setPostscriptum()
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param      mixed $v string, integer (timestamp), or \DateTime value.
+     *               Empty strings are treated as NULL.
+     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            if ($dt !== $this->updated_at) {
+                $this->updated_at = $dt;
+                $this->modifiedColumns[] = ProfileResourceTableMap::UPDATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setUpdatedAt()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -580,7 +652,11 @@ abstract class GroupI18n implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->locale !== 'en_US') {
+            if ($this->read !== 0) {
+                return false;
+            }
+
+            if ($this->write !== 0) {
                 return false;
             }
 
@@ -611,23 +687,32 @@ abstract class GroupI18n implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : GroupI18nTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProfileResourceTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : GroupI18nTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->locale = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProfileResourceTableMap::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->profile_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : GroupI18nTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->title = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProfileResourceTableMap::translateFieldName('ResourceId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->resource_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : GroupI18nTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->description = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProfileResourceTableMap::translateFieldName('Read', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->read = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : GroupI18nTableMap::translateFieldName('Chapo', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->chapo = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProfileResourceTableMap::translateFieldName('Write', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->write = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : GroupI18nTableMap::translateFieldName('Postscriptum', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->postscriptum = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProfileResourceTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            if ($col === '0000-00-00 00:00:00') {
+                $col = null;
+            }
+            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProfileResourceTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            if ($col === '0000-00-00 00:00:00') {
+                $col = null;
+            }
+            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -636,10 +721,10 @@ abstract class GroupI18n implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = GroupI18nTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = ProfileResourceTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\GroupI18n object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\ProfileResource object", 0, $e);
         }
     }
 
@@ -658,8 +743,11 @@ abstract class GroupI18n implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aGroup !== null && $this->id !== $this->aGroup->getId()) {
-            $this->aGroup = null;
+        if ($this->aProfile !== null && $this->profile_id !== $this->aProfile->getId()) {
+            $this->aProfile = null;
+        }
+        if ($this->aResource !== null && $this->resource_id !== $this->aResource->getId()) {
+            $this->aResource = null;
         }
     } // ensureConsistency
 
@@ -684,13 +772,13 @@ abstract class GroupI18n implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(GroupI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProfileResourceTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildGroupI18nQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildProfileResourceQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -700,7 +788,8 @@ abstract class GroupI18n implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aGroup = null;
+            $this->aProfile = null;
+            $this->aResource = null;
         } // if (deep)
     }
 
@@ -710,8 +799,8 @@ abstract class GroupI18n implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see GroupI18n::setDeleted()
-     * @see GroupI18n::isDeleted()
+     * @see ProfileResource::setDeleted()
+     * @see ProfileResource::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -720,12 +809,12 @@ abstract class GroupI18n implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileResourceTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildGroupI18nQuery::create()
+            $deleteQuery = ChildProfileResourceQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -762,7 +851,7 @@ abstract class GroupI18n implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileResourceTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -771,8 +860,19 @@ abstract class GroupI18n implements ActiveRecordInterface
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(ProfileResourceTableMap::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(ProfileResourceTableMap::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(ProfileResourceTableMap::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -782,7 +882,7 @@ abstract class GroupI18n implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                GroupI18nTableMap::addInstanceToPool($this);
+                ProfileResourceTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -817,11 +917,18 @@ abstract class GroupI18n implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aGroup !== null) {
-                if ($this->aGroup->isModified() || $this->aGroup->isNew()) {
-                    $affectedRows += $this->aGroup->save($con);
+            if ($this->aProfile !== null) {
+                if ($this->aProfile->isModified() || $this->aProfile->isNew()) {
+                    $affectedRows += $this->aProfile->save($con);
                 }
-                $this->setGroup($this->aGroup);
+                $this->setProfile($this->aProfile);
+            }
+
+            if ($this->aResource !== null) {
+                if ($this->aResource->isModified() || $this->aResource->isNew()) {
+                    $affectedRows += $this->aResource->save($con);
+                }
+                $this->setResource($this->aResource);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -855,29 +962,36 @@ abstract class GroupI18n implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
+        $this->modifiedColumns[] = ProfileResourceTableMap::ID;
+        if (null !== $this->id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProfileResourceTableMap::ID . ')');
+        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(GroupI18nTableMap::ID)) {
+        if ($this->isColumnModified(ProfileResourceTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(GroupI18nTableMap::LOCALE)) {
-            $modifiedColumns[':p' . $index++]  = 'LOCALE';
+        if ($this->isColumnModified(ProfileResourceTableMap::PROFILE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'PROFILE_ID';
         }
-        if ($this->isColumnModified(GroupI18nTableMap::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = 'TITLE';
+        if ($this->isColumnModified(ProfileResourceTableMap::RESOURCE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'RESOURCE_ID';
         }
-        if ($this->isColumnModified(GroupI18nTableMap::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = 'DESCRIPTION';
+        if ($this->isColumnModified(ProfileResourceTableMap::READ)) {
+            $modifiedColumns[':p' . $index++]  = 'READ';
         }
-        if ($this->isColumnModified(GroupI18nTableMap::CHAPO)) {
-            $modifiedColumns[':p' . $index++]  = 'CHAPO';
+        if ($this->isColumnModified(ProfileResourceTableMap::WRITE)) {
+            $modifiedColumns[':p' . $index++]  = 'WRITE';
         }
-        if ($this->isColumnModified(GroupI18nTableMap::POSTSCRIPTUM)) {
-            $modifiedColumns[':p' . $index++]  = 'POSTSCRIPTUM';
+        if ($this->isColumnModified(ProfileResourceTableMap::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
+        }
+        if ($this->isColumnModified(ProfileResourceTableMap::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO group_i18n (%s) VALUES (%s)',
+            'INSERT INTO profile_resource (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -889,20 +1003,23 @@ abstract class GroupI18n implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'LOCALE':
-                        $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
+                    case 'PROFILE_ID':
+                        $stmt->bindValue($identifier, $this->profile_id, PDO::PARAM_INT);
                         break;
-                    case 'TITLE':
-                        $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
+                    case 'RESOURCE_ID':
+                        $stmt->bindValue($identifier, $this->resource_id, PDO::PARAM_INT);
                         break;
-                    case 'DESCRIPTION':
-                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
+                    case 'READ':
+                        $stmt->bindValue($identifier, $this->read, PDO::PARAM_INT);
                         break;
-                    case 'CHAPO':
-                        $stmt->bindValue($identifier, $this->chapo, PDO::PARAM_STR);
+                    case 'WRITE':
+                        $stmt->bindValue($identifier, $this->write, PDO::PARAM_INT);
                         break;
-                    case 'POSTSCRIPTUM':
-                        $stmt->bindValue($identifier, $this->postscriptum, PDO::PARAM_STR);
+                    case 'CREATED_AT':
+                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                        break;
+                    case 'UPDATED_AT':
+                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -911,6 +1028,13 @@ abstract class GroupI18n implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
+
+        try {
+            $pk = $con->lastInsertId();
+        } catch (Exception $e) {
+            throw new PropelException('Unable to get autoincrement id.', 0, $e);
+        }
+        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -943,7 +1067,7 @@ abstract class GroupI18n implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = GroupI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProfileResourceTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -963,19 +1087,22 @@ abstract class GroupI18n implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getLocale();
+                return $this->getProfileId();
                 break;
             case 2:
-                return $this->getTitle();
+                return $this->getResourceId();
                 break;
             case 3:
-                return $this->getDescription();
+                return $this->getRead();
                 break;
             case 4:
-                return $this->getChapo();
+                return $this->getWrite();
                 break;
             case 5:
-                return $this->getPostscriptum();
+                return $this->getCreatedAt();
+                break;
+            case 6:
+                return $this->getUpdatedAt();
                 break;
             default:
                 return null;
@@ -1000,18 +1127,19 @@ abstract class GroupI18n implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['GroupI18n'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['ProfileResource'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['GroupI18n'][serialize($this->getPrimaryKey())] = true;
-        $keys = GroupI18nTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['ProfileResource'][serialize($this->getPrimaryKey())] = true;
+        $keys = ProfileResourceTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getLocale(),
-            $keys[2] => $this->getTitle(),
-            $keys[3] => $this->getDescription(),
-            $keys[4] => $this->getChapo(),
-            $keys[5] => $this->getPostscriptum(),
+            $keys[1] => $this->getProfileId(),
+            $keys[2] => $this->getResourceId(),
+            $keys[3] => $this->getRead(),
+            $keys[4] => $this->getWrite(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1019,8 +1147,11 @@ abstract class GroupI18n implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aGroup) {
-                $result['Group'] = $this->aGroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aProfile) {
+                $result['Profile'] = $this->aProfile->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aResource) {
+                $result['Resource'] = $this->aResource->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1040,7 +1171,7 @@ abstract class GroupI18n implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = GroupI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProfileResourceTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1060,19 +1191,22 @@ abstract class GroupI18n implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setLocale($value);
+                $this->setProfileId($value);
                 break;
             case 2:
-                $this->setTitle($value);
+                $this->setResourceId($value);
                 break;
             case 3:
-                $this->setDescription($value);
+                $this->setRead($value);
                 break;
             case 4:
-                $this->setChapo($value);
+                $this->setWrite($value);
                 break;
             case 5:
-                $this->setPostscriptum($value);
+                $this->setCreatedAt($value);
+                break;
+            case 6:
+                $this->setUpdatedAt($value);
                 break;
         } // switch()
     }
@@ -1096,14 +1230,15 @@ abstract class GroupI18n implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = GroupI18nTableMap::getFieldNames($keyType);
+        $keys = ProfileResourceTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setLocale($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setTitle($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setDescription($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setChapo($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setPostscriptum($arr[$keys[5]]);
+        if (array_key_exists($keys[1], $arr)) $this->setProfileId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setResourceId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setRead($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setWrite($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -1113,14 +1248,15 @@ abstract class GroupI18n implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(GroupI18nTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ProfileResourceTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(GroupI18nTableMap::ID)) $criteria->add(GroupI18nTableMap::ID, $this->id);
-        if ($this->isColumnModified(GroupI18nTableMap::LOCALE)) $criteria->add(GroupI18nTableMap::LOCALE, $this->locale);
-        if ($this->isColumnModified(GroupI18nTableMap::TITLE)) $criteria->add(GroupI18nTableMap::TITLE, $this->title);
-        if ($this->isColumnModified(GroupI18nTableMap::DESCRIPTION)) $criteria->add(GroupI18nTableMap::DESCRIPTION, $this->description);
-        if ($this->isColumnModified(GroupI18nTableMap::CHAPO)) $criteria->add(GroupI18nTableMap::CHAPO, $this->chapo);
-        if ($this->isColumnModified(GroupI18nTableMap::POSTSCRIPTUM)) $criteria->add(GroupI18nTableMap::POSTSCRIPTUM, $this->postscriptum);
+        if ($this->isColumnModified(ProfileResourceTableMap::ID)) $criteria->add(ProfileResourceTableMap::ID, $this->id);
+        if ($this->isColumnModified(ProfileResourceTableMap::PROFILE_ID)) $criteria->add(ProfileResourceTableMap::PROFILE_ID, $this->profile_id);
+        if ($this->isColumnModified(ProfileResourceTableMap::RESOURCE_ID)) $criteria->add(ProfileResourceTableMap::RESOURCE_ID, $this->resource_id);
+        if ($this->isColumnModified(ProfileResourceTableMap::READ)) $criteria->add(ProfileResourceTableMap::READ, $this->read);
+        if ($this->isColumnModified(ProfileResourceTableMap::WRITE)) $criteria->add(ProfileResourceTableMap::WRITE, $this->write);
+        if ($this->isColumnModified(ProfileResourceTableMap::CREATED_AT)) $criteria->add(ProfileResourceTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(ProfileResourceTableMap::UPDATED_AT)) $criteria->add(ProfileResourceTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1135,9 +1271,10 @@ abstract class GroupI18n implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(GroupI18nTableMap::DATABASE_NAME);
-        $criteria->add(GroupI18nTableMap::ID, $this->id);
-        $criteria->add(GroupI18nTableMap::LOCALE, $this->locale);
+        $criteria = new Criteria(ProfileResourceTableMap::DATABASE_NAME);
+        $criteria->add(ProfileResourceTableMap::ID, $this->id);
+        $criteria->add(ProfileResourceTableMap::PROFILE_ID, $this->profile_id);
+        $criteria->add(ProfileResourceTableMap::RESOURCE_ID, $this->resource_id);
 
         return $criteria;
     }
@@ -1151,7 +1288,8 @@ abstract class GroupI18n implements ActiveRecordInterface
     {
         $pks = array();
         $pks[0] = $this->getId();
-        $pks[1] = $this->getLocale();
+        $pks[1] = $this->getProfileId();
+        $pks[2] = $this->getResourceId();
 
         return $pks;
     }
@@ -1165,7 +1303,8 @@ abstract class GroupI18n implements ActiveRecordInterface
     public function setPrimaryKey($keys)
     {
         $this->setId($keys[0]);
-        $this->setLocale($keys[1]);
+        $this->setProfileId($keys[1]);
+        $this->setResourceId($keys[2]);
     }
 
     /**
@@ -1175,7 +1314,7 @@ abstract class GroupI18n implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getId()) && (null === $this->getLocale());
+        return (null === $this->getId()) && (null === $this->getProfileId()) && (null === $this->getResourceId());
     }
 
     /**
@@ -1184,21 +1323,22 @@ abstract class GroupI18n implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\GroupI18n (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\ProfileResource (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setId($this->getId());
-        $copyObj->setLocale($this->getLocale());
-        $copyObj->setTitle($this->getTitle());
-        $copyObj->setDescription($this->getDescription());
-        $copyObj->setChapo($this->getChapo());
-        $copyObj->setPostscriptum($this->getPostscriptum());
+        $copyObj->setProfileId($this->getProfileId());
+        $copyObj->setResourceId($this->getResourceId());
+        $copyObj->setRead($this->getRead());
+        $copyObj->setWrite($this->getWrite());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
+            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1211,7 +1351,7 @@ abstract class GroupI18n implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\GroupI18n Clone of current object.
+     * @return                 \Thelia\Model\ProfileResource Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1225,26 +1365,26 @@ abstract class GroupI18n implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildGroup object.
+     * Declares an association between this object and a ChildProfile object.
      *
-     * @param                  ChildGroup $v
-     * @return                 \Thelia\Model\GroupI18n The current object (for fluent API support)
+     * @param                  ChildProfile $v
+     * @return                 \Thelia\Model\ProfileResource The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setGroup(ChildGroup $v = null)
+    public function setProfile(ChildProfile $v = null)
     {
         if ($v === null) {
-            $this->setId(NULL);
+            $this->setProfileId(NULL);
         } else {
-            $this->setId($v->getId());
+            $this->setProfileId($v->getId());
         }
 
-        $this->aGroup = $v;
+        $this->aProfile = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildGroup object, it will not be re-added.
+        // If this object has already been added to the ChildProfile object, it will not be re-added.
         if ($v !== null) {
-            $v->addGroupI18n($this);
+            $v->addProfileResource($this);
         }
 
 
@@ -1253,26 +1393,77 @@ abstract class GroupI18n implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildGroup object
+     * Get the associated ChildProfile object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildGroup The associated ChildGroup object.
+     * @return                 ChildProfile The associated ChildProfile object.
      * @throws PropelException
      */
-    public function getGroup(ConnectionInterface $con = null)
+    public function getProfile(ConnectionInterface $con = null)
     {
-        if ($this->aGroup === null && ($this->id !== null)) {
-            $this->aGroup = ChildGroupQuery::create()->findPk($this->id, $con);
+        if ($this->aProfile === null && ($this->profile_id !== null)) {
+            $this->aProfile = ChildProfileQuery::create()->findPk($this->profile_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aGroup->addGroupI18ns($this);
+                $this->aProfile->addProfileResources($this);
              */
         }
 
-        return $this->aGroup;
+        return $this->aProfile;
+    }
+
+    /**
+     * Declares an association between this object and a ChildResource object.
+     *
+     * @param                  ChildResource $v
+     * @return                 \Thelia\Model\ProfileResource The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setResource(ChildResource $v = null)
+    {
+        if ($v === null) {
+            $this->setResourceId(NULL);
+        } else {
+            $this->setResourceId($v->getId());
+        }
+
+        $this->aResource = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildResource object, it will not be re-added.
+        if ($v !== null) {
+            $v->addProfileResource($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildResource object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildResource The associated ChildResource object.
+     * @throws PropelException
+     */
+    public function getResource(ConnectionInterface $con = null)
+    {
+        if ($this->aResource === null && ($this->resource_id !== null)) {
+            $this->aResource = ChildResourceQuery::create()->findPk($this->resource_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aResource->addProfileResources($this);
+             */
+        }
+
+        return $this->aResource;
     }
 
     /**
@@ -1281,11 +1472,12 @@ abstract class GroupI18n implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->locale = null;
-        $this->title = null;
-        $this->description = null;
-        $this->chapo = null;
-        $this->postscriptum = null;
+        $this->profile_id = null;
+        $this->resource_id = null;
+        $this->read = null;
+        $this->write = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
@@ -1308,7 +1500,8 @@ abstract class GroupI18n implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aGroup = null;
+        $this->aProfile = null;
+        $this->aResource = null;
     }
 
     /**
@@ -1318,7 +1511,21 @@ abstract class GroupI18n implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(GroupI18nTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ProfileResourceTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     ChildProfileResource The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = ProfileResourceTableMap::UPDATED_AT;
+
+        return $this;
     }
 
     /**

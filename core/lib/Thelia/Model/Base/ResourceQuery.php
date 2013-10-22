@@ -36,9 +36,9 @@ use Thelia\Model\Map\ResourceTableMap;
  * @method     ChildResourceQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildResourceQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildResourceQuery leftJoinGroupResource($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupResource relation
- * @method     ChildResourceQuery rightJoinGroupResource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupResource relation
- * @method     ChildResourceQuery innerJoinGroupResource($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupResource relation
+ * @method     ChildResourceQuery leftJoinProfileResource($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProfileResource relation
+ * @method     ChildResourceQuery rightJoinProfileResource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProfileResource relation
+ * @method     ChildResourceQuery innerJoinProfileResource($relationAlias = null) Adds a INNER JOIN clause to the query using the ProfileResource relation
  *
  * @method     ChildResourceQuery leftJoinResourceI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ResourceI18n relation
  * @method     ChildResourceQuery rightJoinResourceI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ResourceI18n relation
@@ -390,40 +390,40 @@ abstract class ResourceQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\GroupResource object
+     * Filter the query by a related \Thelia\Model\ProfileResource object
      *
-     * @param \Thelia\Model\GroupResource|ObjectCollection $groupResource  the related object to use as filter
+     * @param \Thelia\Model\ProfileResource|ObjectCollection $profileResource  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildResourceQuery The current query, for fluid interface
      */
-    public function filterByGroupResource($groupResource, $comparison = null)
+    public function filterByProfileResource($profileResource, $comparison = null)
     {
-        if ($groupResource instanceof \Thelia\Model\GroupResource) {
+        if ($profileResource instanceof \Thelia\Model\ProfileResource) {
             return $this
-                ->addUsingAlias(ResourceTableMap::ID, $groupResource->getResourceId(), $comparison);
-        } elseif ($groupResource instanceof ObjectCollection) {
+                ->addUsingAlias(ResourceTableMap::ID, $profileResource->getResourceId(), $comparison);
+        } elseif ($profileResource instanceof ObjectCollection) {
             return $this
-                ->useGroupResourceQuery()
-                ->filterByPrimaryKeys($groupResource->getPrimaryKeys())
+                ->useProfileResourceQuery()
+                ->filterByPrimaryKeys($profileResource->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByGroupResource() only accepts arguments of type \Thelia\Model\GroupResource or Collection');
+            throw new PropelException('filterByProfileResource() only accepts arguments of type \Thelia\Model\ProfileResource or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the GroupResource relation
+     * Adds a JOIN clause to the query using the ProfileResource relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildResourceQuery The current query, for fluid interface
      */
-    public function joinGroupResource($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinProfileResource($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('GroupResource');
+        $relationMap = $tableMap->getRelation('ProfileResource');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -438,14 +438,14 @@ abstract class ResourceQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'GroupResource');
+            $this->addJoinObject($join, 'ProfileResource');
         }
 
         return $this;
     }
 
     /**
-     * Use the GroupResource relation GroupResource object
+     * Use the ProfileResource relation ProfileResource object
      *
      * @see useQuery()
      *
@@ -453,13 +453,13 @@ abstract class ResourceQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\GroupResourceQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProfileResourceQuery A secondary query class using the current class as primary query
      */
-    public function useGroupResourceQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useProfileResourceQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinGroupResource($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'GroupResource', '\Thelia\Model\GroupResourceQuery');
+            ->joinProfileResource($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProfileResource', '\Thelia\Model\ProfileResourceQuery');
     }
 
     /**
@@ -536,19 +536,19 @@ abstract class ResourceQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Group object
-     * using the group_resource table as cross reference
+     * Filter the query by a related Profile object
+     * using the profile_resource table as cross reference
      *
-     * @param Group $group the related object to use as filter
+     * @param Profile $profile the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildResourceQuery The current query, for fluid interface
      */
-    public function filterByGroup($group, $comparison = Criteria::EQUAL)
+    public function filterByProfile($profile, $comparison = Criteria::EQUAL)
     {
         return $this
-            ->useGroupResourceQuery()
-            ->filterByGroup($group, $comparison)
+            ->useProfileResourceQuery()
+            ->filterByProfile($profile, $comparison)
             ->endUse();
     }
 

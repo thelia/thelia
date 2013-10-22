@@ -23,6 +23,8 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\AdminResources;
+
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -37,8 +39,8 @@ class ModuleController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth("admin.module.view")) return $response;
-
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE_VIEW)) return $response;
+        
         $modulemanagement = new ModuleManagement();
         $modulemanagement->updateModules();
 

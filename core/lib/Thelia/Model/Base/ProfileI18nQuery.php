@@ -12,84 +12,84 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\GroupI18n as ChildGroupI18n;
-use Thelia\Model\GroupI18nQuery as ChildGroupI18nQuery;
-use Thelia\Model\Map\GroupI18nTableMap;
+use Thelia\Model\ProfileI18n as ChildProfileI18n;
+use Thelia\Model\ProfileI18nQuery as ChildProfileI18nQuery;
+use Thelia\Model\Map\ProfileI18nTableMap;
 
 /**
- * Base class that represents a query for the 'group_i18n' table.
+ * Base class that represents a query for the 'profile_i18n' table.
  *
  *
  *
- * @method     ChildGroupI18nQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildGroupI18nQuery orderByLocale($order = Criteria::ASC) Order by the locale column
- * @method     ChildGroupI18nQuery orderByTitle($order = Criteria::ASC) Order by the title column
- * @method     ChildGroupI18nQuery orderByDescription($order = Criteria::ASC) Order by the description column
- * @method     ChildGroupI18nQuery orderByChapo($order = Criteria::ASC) Order by the chapo column
- * @method     ChildGroupI18nQuery orderByPostscriptum($order = Criteria::ASC) Order by the postscriptum column
+ * @method     ChildProfileI18nQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildProfileI18nQuery orderByLocale($order = Criteria::ASC) Order by the locale column
+ * @method     ChildProfileI18nQuery orderByTitle($order = Criteria::ASC) Order by the title column
+ * @method     ChildProfileI18nQuery orderByDescription($order = Criteria::ASC) Order by the description column
+ * @method     ChildProfileI18nQuery orderByChapo($order = Criteria::ASC) Order by the chapo column
+ * @method     ChildProfileI18nQuery orderByPostscriptum($order = Criteria::ASC) Order by the postscriptum column
  *
- * @method     ChildGroupI18nQuery groupById() Group by the id column
- * @method     ChildGroupI18nQuery groupByLocale() Group by the locale column
- * @method     ChildGroupI18nQuery groupByTitle() Group by the title column
- * @method     ChildGroupI18nQuery groupByDescription() Group by the description column
- * @method     ChildGroupI18nQuery groupByChapo() Group by the chapo column
- * @method     ChildGroupI18nQuery groupByPostscriptum() Group by the postscriptum column
+ * @method     ChildProfileI18nQuery groupById() Group by the id column
+ * @method     ChildProfileI18nQuery groupByLocale() Group by the locale column
+ * @method     ChildProfileI18nQuery groupByTitle() Group by the title column
+ * @method     ChildProfileI18nQuery groupByDescription() Group by the description column
+ * @method     ChildProfileI18nQuery groupByChapo() Group by the chapo column
+ * @method     ChildProfileI18nQuery groupByPostscriptum() Group by the postscriptum column
  *
- * @method     ChildGroupI18nQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildGroupI18nQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildGroupI18nQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildProfileI18nQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildProfileI18nQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildProfileI18nQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildGroupI18nQuery leftJoinGroup($relationAlias = null) Adds a LEFT JOIN clause to the query using the Group relation
- * @method     ChildGroupI18nQuery rightJoinGroup($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Group relation
- * @method     ChildGroupI18nQuery innerJoinGroup($relationAlias = null) Adds a INNER JOIN clause to the query using the Group relation
+ * @method     ChildProfileI18nQuery leftJoinProfile($relationAlias = null) Adds a LEFT JOIN clause to the query using the Profile relation
+ * @method     ChildProfileI18nQuery rightJoinProfile($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Profile relation
+ * @method     ChildProfileI18nQuery innerJoinProfile($relationAlias = null) Adds a INNER JOIN clause to the query using the Profile relation
  *
- * @method     ChildGroupI18n findOne(ConnectionInterface $con = null) Return the first ChildGroupI18n matching the query
- * @method     ChildGroupI18n findOneOrCreate(ConnectionInterface $con = null) Return the first ChildGroupI18n matching the query, or a new ChildGroupI18n object populated from the query conditions when no match is found
+ * @method     ChildProfileI18n findOne(ConnectionInterface $con = null) Return the first ChildProfileI18n matching the query
+ * @method     ChildProfileI18n findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProfileI18n matching the query, or a new ChildProfileI18n object populated from the query conditions when no match is found
  *
- * @method     ChildGroupI18n findOneById(int $id) Return the first ChildGroupI18n filtered by the id column
- * @method     ChildGroupI18n findOneByLocale(string $locale) Return the first ChildGroupI18n filtered by the locale column
- * @method     ChildGroupI18n findOneByTitle(string $title) Return the first ChildGroupI18n filtered by the title column
- * @method     ChildGroupI18n findOneByDescription(string $description) Return the first ChildGroupI18n filtered by the description column
- * @method     ChildGroupI18n findOneByChapo(string $chapo) Return the first ChildGroupI18n filtered by the chapo column
- * @method     ChildGroupI18n findOneByPostscriptum(string $postscriptum) Return the first ChildGroupI18n filtered by the postscriptum column
+ * @method     ChildProfileI18n findOneById(int $id) Return the first ChildProfileI18n filtered by the id column
+ * @method     ChildProfileI18n findOneByLocale(string $locale) Return the first ChildProfileI18n filtered by the locale column
+ * @method     ChildProfileI18n findOneByTitle(string $title) Return the first ChildProfileI18n filtered by the title column
+ * @method     ChildProfileI18n findOneByDescription(string $description) Return the first ChildProfileI18n filtered by the description column
+ * @method     ChildProfileI18n findOneByChapo(string $chapo) Return the first ChildProfileI18n filtered by the chapo column
+ * @method     ChildProfileI18n findOneByPostscriptum(string $postscriptum) Return the first ChildProfileI18n filtered by the postscriptum column
  *
- * @method     array findById(int $id) Return ChildGroupI18n objects filtered by the id column
- * @method     array findByLocale(string $locale) Return ChildGroupI18n objects filtered by the locale column
- * @method     array findByTitle(string $title) Return ChildGroupI18n objects filtered by the title column
- * @method     array findByDescription(string $description) Return ChildGroupI18n objects filtered by the description column
- * @method     array findByChapo(string $chapo) Return ChildGroupI18n objects filtered by the chapo column
- * @method     array findByPostscriptum(string $postscriptum) Return ChildGroupI18n objects filtered by the postscriptum column
+ * @method     array findById(int $id) Return ChildProfileI18n objects filtered by the id column
+ * @method     array findByLocale(string $locale) Return ChildProfileI18n objects filtered by the locale column
+ * @method     array findByTitle(string $title) Return ChildProfileI18n objects filtered by the title column
+ * @method     array findByDescription(string $description) Return ChildProfileI18n objects filtered by the description column
+ * @method     array findByChapo(string $chapo) Return ChildProfileI18n objects filtered by the chapo column
+ * @method     array findByPostscriptum(string $postscriptum) Return ChildProfileI18n objects filtered by the postscriptum column
  *
  */
-abstract class GroupI18nQuery extends ModelCriteria
+abstract class ProfileI18nQuery extends ModelCriteria
 {
 
     /**
-     * Initializes internal state of \Thelia\Model\Base\GroupI18nQuery object.
+     * Initializes internal state of \Thelia\Model\Base\ProfileI18nQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\GroupI18n', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\ProfileI18n', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildGroupI18nQuery object.
+     * Returns a new ChildProfileI18nQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildGroupI18nQuery
+     * @return ChildProfileI18nQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof \Thelia\Model\GroupI18nQuery) {
+        if ($criteria instanceof \Thelia\Model\ProfileI18nQuery) {
             return $criteria;
         }
-        $query = new \Thelia\Model\GroupI18nQuery();
+        $query = new \Thelia\Model\ProfileI18nQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -112,19 +112,19 @@ abstract class GroupI18nQuery extends ModelCriteria
      * @param array[$id, $locale] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildGroupI18n|array|mixed the result, formatted by the current formatter
+     * @return ChildProfileI18n|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = GroupI18nTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
+        if ((null !== ($obj = ProfileI18nTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(GroupI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProfileI18nTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -143,11 +143,11 @@ abstract class GroupI18nQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return   ChildGroupI18n A model object, or null if the key is not found
+     * @return   ChildProfileI18n A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, LOCALE, TITLE, DESCRIPTION, CHAPO, POSTSCRIPTUM FROM group_i18n WHERE ID = :p0 AND LOCALE = :p1';
+        $sql = 'SELECT ID, LOCALE, TITLE, DESCRIPTION, CHAPO, POSTSCRIPTUM FROM profile_i18n WHERE ID = :p0 AND LOCALE = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -159,9 +159,9 @@ abstract class GroupI18nQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            $obj = new ChildGroupI18n();
+            $obj = new ChildProfileI18n();
             $obj->hydrate($row);
-            GroupI18nTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
+            ProfileI18nTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
         }
         $stmt->closeCursor();
 
@@ -174,7 +174,7 @@ abstract class GroupI18nQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildGroupI18n|array|mixed the result, formatted by the current formatter
+     * @return ChildProfileI18n|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -216,12 +216,12 @@ abstract class GroupI18nQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return ChildGroupI18nQuery The current query, for fluid interface
+     * @return ChildProfileI18nQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(GroupI18nTableMap::ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(GroupI18nTableMap::LOCALE, $key[1], Criteria::EQUAL);
+        $this->addUsingAlias(ProfileI18nTableMap::ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(ProfileI18nTableMap::LOCALE, $key[1], Criteria::EQUAL);
 
         return $this;
     }
@@ -231,7 +231,7 @@ abstract class GroupI18nQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return ChildGroupI18nQuery The current query, for fluid interface
+     * @return ChildProfileI18nQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
@@ -239,8 +239,8 @@ abstract class GroupI18nQuery extends ModelCriteria
             return $this->add(null, '1<>1', Criteria::CUSTOM);
         }
         foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(GroupI18nTableMap::ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(GroupI18nTableMap::LOCALE, $key[1], Criteria::EQUAL);
+            $cton0 = $this->getNewCriterion(ProfileI18nTableMap::ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(ProfileI18nTableMap::LOCALE, $key[1], Criteria::EQUAL);
             $cton0->addAnd($cton1);
             $this->addOr($cton0);
         }
@@ -258,7 +258,7 @@ abstract class GroupI18nQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByGroup()
+     * @see       filterByProfile()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -266,18 +266,18 @@ abstract class GroupI18nQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupI18nQuery The current query, for fluid interface
+     * @return ChildProfileI18nQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(GroupI18nTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProfileI18nTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(GroupI18nTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProfileI18nTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -288,7 +288,7 @@ abstract class GroupI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupI18nTableMap::ID, $id, $comparison);
+        return $this->addUsingAlias(ProfileI18nTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -304,7 +304,7 @@ abstract class GroupI18nQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupI18nQuery The current query, for fluid interface
+     * @return ChildProfileI18nQuery The current query, for fluid interface
      */
     public function filterByLocale($locale = null, $comparison = null)
     {
@@ -317,7 +317,7 @@ abstract class GroupI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupI18nTableMap::LOCALE, $locale, $comparison);
+        return $this->addUsingAlias(ProfileI18nTableMap::LOCALE, $locale, $comparison);
     }
 
     /**
@@ -333,7 +333,7 @@ abstract class GroupI18nQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupI18nQuery The current query, for fluid interface
+     * @return ChildProfileI18nQuery The current query, for fluid interface
      */
     public function filterByTitle($title = null, $comparison = null)
     {
@@ -346,7 +346,7 @@ abstract class GroupI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupI18nTableMap::TITLE, $title, $comparison);
+        return $this->addUsingAlias(ProfileI18nTableMap::TITLE, $title, $comparison);
     }
 
     /**
@@ -362,7 +362,7 @@ abstract class GroupI18nQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupI18nQuery The current query, for fluid interface
+     * @return ChildProfileI18nQuery The current query, for fluid interface
      */
     public function filterByDescription($description = null, $comparison = null)
     {
@@ -375,7 +375,7 @@ abstract class GroupI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupI18nTableMap::DESCRIPTION, $description, $comparison);
+        return $this->addUsingAlias(ProfileI18nTableMap::DESCRIPTION, $description, $comparison);
     }
 
     /**
@@ -391,7 +391,7 @@ abstract class GroupI18nQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupI18nQuery The current query, for fluid interface
+     * @return ChildProfileI18nQuery The current query, for fluid interface
      */
     public function filterByChapo($chapo = null, $comparison = null)
     {
@@ -404,7 +404,7 @@ abstract class GroupI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupI18nTableMap::CHAPO, $chapo, $comparison);
+        return $this->addUsingAlias(ProfileI18nTableMap::CHAPO, $chapo, $comparison);
     }
 
     /**
@@ -420,7 +420,7 @@ abstract class GroupI18nQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupI18nQuery The current query, for fluid interface
+     * @return ChildProfileI18nQuery The current query, for fluid interface
      */
     public function filterByPostscriptum($postscriptum = null, $comparison = null)
     {
@@ -433,46 +433,46 @@ abstract class GroupI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(GroupI18nTableMap::POSTSCRIPTUM, $postscriptum, $comparison);
+        return $this->addUsingAlias(ProfileI18nTableMap::POSTSCRIPTUM, $postscriptum, $comparison);
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Group object
+     * Filter the query by a related \Thelia\Model\Profile object
      *
-     * @param \Thelia\Model\Group|ObjectCollection $group The related object(s) to use as filter
+     * @param \Thelia\Model\Profile|ObjectCollection $profile The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildGroupI18nQuery The current query, for fluid interface
+     * @return ChildProfileI18nQuery The current query, for fluid interface
      */
-    public function filterByGroup($group, $comparison = null)
+    public function filterByProfile($profile, $comparison = null)
     {
-        if ($group instanceof \Thelia\Model\Group) {
+        if ($profile instanceof \Thelia\Model\Profile) {
             return $this
-                ->addUsingAlias(GroupI18nTableMap::ID, $group->getId(), $comparison);
-        } elseif ($group instanceof ObjectCollection) {
+                ->addUsingAlias(ProfileI18nTableMap::ID, $profile->getId(), $comparison);
+        } elseif ($profile instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(GroupI18nTableMap::ID, $group->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(ProfileI18nTableMap::ID, $profile->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByGroup() only accepts arguments of type \Thelia\Model\Group or Collection');
+            throw new PropelException('filterByProfile() only accepts arguments of type \Thelia\Model\Profile or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Group relation
+     * Adds a JOIN clause to the query using the Profile relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildGroupI18nQuery The current query, for fluid interface
+     * @return ChildProfileI18nQuery The current query, for fluid interface
      */
-    public function joinGroup($relationAlias = null, $joinType = 'LEFT JOIN')
+    public function joinProfile($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Group');
+        $relationMap = $tableMap->getRelation('Profile');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -487,14 +487,14 @@ abstract class GroupI18nQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Group');
+            $this->addJoinObject($join, 'Profile');
         }
 
         return $this;
     }
 
     /**
-     * Use the Group relation Group object
+     * Use the Profile relation Profile object
      *
      * @see useQuery()
      *
@@ -502,27 +502,27 @@ abstract class GroupI18nQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\GroupQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProfileQuery A secondary query class using the current class as primary query
      */
-    public function useGroupQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    public function useProfileQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
-            ->joinGroup($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Group', '\Thelia\Model\GroupQuery');
+            ->joinProfile($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Profile', '\Thelia\Model\ProfileQuery');
     }
 
     /**
      * Exclude object from result
      *
-     * @param   ChildGroupI18n $groupI18n Object to remove from the list of results
+     * @param   ChildProfileI18n $profileI18n Object to remove from the list of results
      *
-     * @return ChildGroupI18nQuery The current query, for fluid interface
+     * @return ChildProfileI18nQuery The current query, for fluid interface
      */
-    public function prune($groupI18n = null)
+    public function prune($profileI18n = null)
     {
-        if ($groupI18n) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(GroupI18nTableMap::ID), $groupI18n->getId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(GroupI18nTableMap::LOCALE), $groupI18n->getLocale(), Criteria::NOT_EQUAL);
+        if ($profileI18n) {
+            $this->addCond('pruneCond0', $this->getAliasedColName(ProfileI18nTableMap::ID), $profileI18n->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(ProfileI18nTableMap::LOCALE), $profileI18n->getLocale(), Criteria::NOT_EQUAL);
             $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 
@@ -530,7 +530,7 @@ abstract class GroupI18nQuery extends ModelCriteria
     }
 
     /**
-     * Deletes all rows from the group_i18n table.
+     * Deletes all rows from the profile_i18n table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -538,7 +538,7 @@ abstract class GroupI18nQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileI18nTableMap::DATABASE_NAME);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
@@ -549,8 +549,8 @@ abstract class GroupI18nQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            GroupI18nTableMap::clearInstancePool();
-            GroupI18nTableMap::clearRelatedInstancePool();
+            ProfileI18nTableMap::clearInstancePool();
+            ProfileI18nTableMap::clearRelatedInstancePool();
 
             $con->commit();
         } catch (PropelException $e) {
@@ -562,9 +562,9 @@ abstract class GroupI18nQuery extends ModelCriteria
     }
 
     /**
-     * Performs a DELETE on the database, given a ChildGroupI18n or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ChildProfileI18n or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildGroupI18n object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ChildProfileI18n object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -575,13 +575,13 @@ abstract class GroupI18nQuery extends ModelCriteria
      public function delete(ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileI18nTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(GroupI18nTableMap::DATABASE_NAME);
+        $criteria->setDbName(ProfileI18nTableMap::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -591,10 +591,10 @@ abstract class GroupI18nQuery extends ModelCriteria
             $con->beginTransaction();
 
 
-        GroupI18nTableMap::removeInstanceFromPool($criteria);
+        ProfileI18nTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            GroupI18nTableMap::clearRelatedInstancePool();
+            ProfileI18nTableMap::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -604,4 +604,4 @@ abstract class GroupI18nQuery extends ModelCriteria
         }
     }
 
-} // GroupI18nQuery
+} // ProfileI18nQuery

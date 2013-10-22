@@ -24,6 +24,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\PdfEvent;
@@ -44,7 +45,7 @@ class OrderController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth("admin.orders.view")) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER_VIEW)) return $response;
         return $this->render("orders", array("display_order" => 20));
     }
 
@@ -57,7 +58,7 @@ class OrderController extends BaseAdminController
 
     public function updateStatus($order_id = null)
     {
-        if (null !== $response = $this->checkAuth("admin.order.update")) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER_UPDATE)) return $response;
 
         $message = null;
 
@@ -108,7 +109,7 @@ class OrderController extends BaseAdminController
 
     public function updateDeliveryRef($order_id)
     {
-        if (null !== $response = $this->checkAuth("admin.order.update")) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER_UPDATE)) return $response;
 
         $message = null;
 
@@ -143,7 +144,7 @@ class OrderController extends BaseAdminController
 
     public function updateAddress($order_id)
     {
-        if (null !== $response = $this->checkAuth("admin.order.update")) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER_UPDATE)) return $response;
 
         $message = null;
 
@@ -209,7 +210,7 @@ class OrderController extends BaseAdminController
 
     protected function generatePdf($order_id, $fileName)
     {
-        if (null !== $response = $this->checkAuth("admin.order.update")) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER_UPDATE)) return $response;
 
         $html = $this->renderRaw(
             $fileName,

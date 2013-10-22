@@ -2,11 +2,11 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\AdminGroupQuery as BaseAdminGroupQuery;
+use Thelia\Model\Base\ProfileI18nQuery as BaseProfileI18nQuery;
 
 
 /**
- * Skeleton subclass for performing query and update operations on the 'admin_group' table.
+ * Skeleton subclass for performing query and update operations on the 'profile_i18n' table.
  *
  *
  *
@@ -15,6 +15,7 @@ use Thelia\Model\Base\AdminGroupQuery as BaseAdminGroupQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class AdminGroupQuery extends BaseAdminGroupQuery {
+class ProfileI18nQuery extends BaseProfileI18nQuery
+{
 
-} // AdminGroupQuery
+} // ProfileI18nQuery

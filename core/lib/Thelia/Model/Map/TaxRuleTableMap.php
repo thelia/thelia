@@ -160,7 +160,7 @@ class TaxRuleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::ONE_TO_MANY, array('id' => 'tax_rule_id', ), 'SET NULL', 'RESTRICT', 'Products');
+        $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::ONE_TO_MANY, array('id' => 'tax_rule_id', ), 'RESTRICT', 'RESTRICT', 'Products');
         $this->addRelation('TaxRuleCountry', '\\Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'tax_rule_id', ), 'CASCADE', 'RESTRICT', 'TaxRuleCountries');
         $this->addRelation('TaxRuleI18n', '\\Thelia\\Model\\TaxRuleI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'TaxRuleI18ns');
     } // buildRelations()
@@ -185,7 +185,6 @@ class TaxRuleTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                ProductTableMap::clearInstancePool();
                 TaxRuleCountryTableMap::clearInstancePool();
                 TaxRuleI18nTableMap::clearInstancePool();
             }

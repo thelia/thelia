@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
 use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
@@ -46,10 +47,10 @@ class CountryController extends AbstractCrudController
             'manual',
             'country_order',
 
-            'admin.country.default',
-            'admin.country.create',
-            'admin.country.update',
-            'admin.country.delete',
+            AdminResources::COUNTRY_VIEW,
+            AdminResources::COUNTRY_CREATE,
+            AdminResources::COUNTRY_UPDATE,
+            AdminResources::COUNTRY_DELETE,
 
             TheliaEvents::COUNTRY_CREATE,
             TheliaEvents::COUNTRY_UPDATE,

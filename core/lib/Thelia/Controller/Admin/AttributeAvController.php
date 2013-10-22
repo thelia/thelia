@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Attribute\AttributeAvDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
@@ -46,10 +47,10 @@ class AttributeAvController extends AbstractCrudController
             'manual',
             'order',
 
-            'admin.configuration.attributes-av.view',
-            'admin.configuration.attributes-av.create',
-            'admin.configuration.attributes-av.update',
-            'admin.configuration.attributes-av.delete',
+            AdminResources::ATTRIBUTE_VIEW,
+            AdminResources::ATTRIBUTE_CREATE,
+            AdminResources::ATTRIBUTE_UPDATE,
+            AdminResources::ATTRIBUTE_DELETE,
 
             TheliaEvents::ATTRIBUTE_AV_CREATE,
             TheliaEvents::ATTRIBUTE_AV_UPDATE,

@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\AdminGroup;
-use Thelia\Model\AdminGroupQuery;
+use Thelia\Model\ProfileResource;
+use Thelia\Model\ProfileResourceQuery;
 
 
 /**
- * This class defines the structure of the 'admin_group' table.
+ * This class defines the structure of the 'profile_resource' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\AdminGroupQuery;
  * (i.e. if it's a text column type).
  *
  */
-class AdminGroupTableMap extends TableMap
+class ProfileResourceTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.AdminGroupTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.ProfileResourceTableMap';
 
     /**
      * The default database name for this class
@@ -42,22 +42,22 @@ class AdminGroupTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'admin_group';
+    const TABLE_NAME = 'profile_resource';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\AdminGroup';
+    const OM_CLASS = '\\Thelia\\Model\\ProfileResource';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.AdminGroup';
+    const CLASS_DEFAULT = 'Thelia.Model.ProfileResource';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -67,32 +67,42 @@ class AdminGroupTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'admin_group.ID';
+    const ID = 'profile_resource.ID';
 
     /**
-     * the column name for the GROUP_ID field
+     * the column name for the PROFILE_ID field
      */
-    const GROUP_ID = 'admin_group.GROUP_ID';
+    const PROFILE_ID = 'profile_resource.PROFILE_ID';
 
     /**
-     * the column name for the ADMIN_ID field
+     * the column name for the RESOURCE_ID field
      */
-    const ADMIN_ID = 'admin_group.ADMIN_ID';
+    const RESOURCE_ID = 'profile_resource.RESOURCE_ID';
+
+    /**
+     * the column name for the READ field
+     */
+    const READ = 'profile_resource.READ';
+
+    /**
+     * the column name for the WRITE field
+     */
+    const WRITE = 'profile_resource.WRITE';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'admin_group.CREATED_AT';
+    const CREATED_AT = 'profile_resource.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'admin_group.UPDATED_AT';
+    const UPDATED_AT = 'profile_resource.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -106,12 +116,12 @@ class AdminGroupTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'GroupId', 'AdminId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'groupId', 'adminId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AdminGroupTableMap::ID, AdminGroupTableMap::GROUP_ID, AdminGroupTableMap::ADMIN_ID, AdminGroupTableMap::CREATED_AT, AdminGroupTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'GROUP_ID', 'ADMIN_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'group_id', 'admin_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id', 'ProfileId', 'ResourceId', 'Read', 'Write', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'profileId', 'resourceId', 'read', 'write', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ProfileResourceTableMap::ID, ProfileResourceTableMap::PROFILE_ID, ProfileResourceTableMap::RESOURCE_ID, ProfileResourceTableMap::READ, ProfileResourceTableMap::WRITE, ProfileResourceTableMap::CREATED_AT, ProfileResourceTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'PROFILE_ID', 'RESOURCE_ID', 'READ', 'WRITE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'profile_id', 'resource_id', 'read', 'write', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -121,12 +131,12 @@ class AdminGroupTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'GroupId' => 1, 'AdminId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'groupId' => 1, 'adminId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        self::TYPE_COLNAME       => array(AdminGroupTableMap::ID => 0, AdminGroupTableMap::GROUP_ID => 1, AdminGroupTableMap::ADMIN_ID => 2, AdminGroupTableMap::CREATED_AT => 3, AdminGroupTableMap::UPDATED_AT => 4, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'GROUP_ID' => 1, 'ADMIN_ID' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'group_id' => 1, 'admin_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ProfileId' => 1, 'ResourceId' => 2, 'Read' => 3, 'Write' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'profileId' => 1, 'resourceId' => 2, 'read' => 3, 'write' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(ProfileResourceTableMap::ID => 0, ProfileResourceTableMap::PROFILE_ID => 1, ProfileResourceTableMap::RESOURCE_ID => 2, ProfileResourceTableMap::READ => 3, ProfileResourceTableMap::WRITE => 4, ProfileResourceTableMap::CREATED_AT => 5, ProfileResourceTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PROFILE_ID' => 1, 'RESOURCE_ID' => 2, 'READ' => 3, 'WRITE' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'profile_id' => 1, 'resource_id' => 2, 'read' => 3, 'write' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -139,16 +149,18 @@ class AdminGroupTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('admin_group');
-        $this->setPhpName('AdminGroup');
-        $this->setClassName('\\Thelia\\Model\\AdminGroup');
+        $this->setName('profile_resource');
+        $this->setPhpName('ProfileResource');
+        $this->setClassName('\\Thelia\\Model\\ProfileResource');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         $this->setIsCrossRef(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignPrimaryKey('GROUP_ID', 'GroupId', 'INTEGER' , 'group', 'ID', true, null, null);
-        $this->addForeignPrimaryKey('ADMIN_ID', 'AdminId', 'INTEGER' , 'admin', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('PROFILE_ID', 'ProfileId', 'INTEGER' , 'profile', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('RESOURCE_ID', 'ResourceId', 'INTEGER' , 'resource', 'ID', true, null, null);
+        $this->addColumn('READ', 'Read', 'TINYINT', false, null, 0);
+        $this->addColumn('WRITE', 'Write', 'TINYINT', false, null, 0);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -158,8 +170,8 @@ class AdminGroupTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Group', '\\Thelia\\Model\\Group', RelationMap::MANY_TO_ONE, array('group_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Admin', '\\Thelia\\Model\\Admin', RelationMap::MANY_TO_ONE, array('admin_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Profile', '\\Thelia\\Model\\Profile', RelationMap::MANY_TO_ONE, array('profile_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Resource', '\\Thelia\\Model\\Resource', RelationMap::MANY_TO_ONE, array('resource_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
 
     /**
@@ -183,14 +195,14 @@ class AdminGroupTableMap extends TableMap
      * to the cache in order to ensure that the same objects are always returned by find*()
      * and findPk*() calls.
      *
-     * @param \Thelia\Model\AdminGroup $obj A \Thelia\Model\AdminGroup object.
+     * @param \Thelia\Model\ProfileResource $obj A \Thelia\Model\ProfileResource object.
      * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
     {
         if (Propel::isInstancePoolingEnabled()) {
             if (null === $key) {
-                $key = serialize(array((string) $obj->getId(), (string) $obj->getGroupId(), (string) $obj->getAdminId()));
+                $key = serialize(array((string) $obj->getId(), (string) $obj->getProfileId(), (string) $obj->getResourceId()));
             } // if key === null
             self::$instances[$key] = $obj;
         }
@@ -204,13 +216,13 @@ class AdminGroupTableMap extends TableMap
      * methods in your stub classes -- you may need to explicitly remove objects
      * from the cache in order to prevent returning objects that no longer exist.
      *
-     * @param mixed $value A \Thelia\Model\AdminGroup object or a primary key value.
+     * @param mixed $value A \Thelia\Model\ProfileResource object or a primary key value.
      */
     public static function removeInstanceFromPool($value)
     {
         if (Propel::isInstancePoolingEnabled() && null !== $value) {
-            if (is_object($value) && $value instanceof \Thelia\Model\AdminGroup) {
-                $key = serialize(array((string) $value->getId(), (string) $value->getGroupId(), (string) $value->getAdminId()));
+            if (is_object($value) && $value instanceof \Thelia\Model\ProfileResource) {
+                $key = serialize(array((string) $value->getId(), (string) $value->getProfileId(), (string) $value->getResourceId()));
 
             } elseif (is_array($value) && count($value) === 3) {
                 // assume we've been passed a primary key";
@@ -220,7 +232,7 @@ class AdminGroupTableMap extends TableMap
 
                 return;
             } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\AdminGroup object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\ProfileResource object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
                 throw $e;
             }
 
@@ -242,11 +254,11 @@ class AdminGroupTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('GroupId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('AdminId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('ResourceId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('GroupId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('AdminId', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('ResourceId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -280,7 +292,7 @@ class AdminGroupTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? AdminGroupTableMap::CLASS_DEFAULT : AdminGroupTableMap::OM_CLASS;
+        return $withPrefix ? ProfileResourceTableMap::CLASS_DEFAULT : ProfileResourceTableMap::OM_CLASS;
     }
 
     /**
@@ -294,21 +306,21 @@ class AdminGroupTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (AdminGroup object, last column rank)
+     * @return array (ProfileResource object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = AdminGroupTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = AdminGroupTableMap::getInstanceFromPool($key))) {
+        $key = ProfileResourceTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ProfileResourceTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + AdminGroupTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ProfileResourceTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = AdminGroupTableMap::OM_CLASS;
+            $cls = ProfileResourceTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            AdminGroupTableMap::addInstanceToPool($obj, $key);
+            ProfileResourceTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -331,8 +343,8 @@ class AdminGroupTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = AdminGroupTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = AdminGroupTableMap::getInstanceFromPool($key))) {
+            $key = ProfileResourceTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ProfileResourceTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -341,7 +353,7 @@ class AdminGroupTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                AdminGroupTableMap::addInstanceToPool($obj, $key);
+                ProfileResourceTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -362,15 +374,19 @@ class AdminGroupTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(AdminGroupTableMap::ID);
-            $criteria->addSelectColumn(AdminGroupTableMap::GROUP_ID);
-            $criteria->addSelectColumn(AdminGroupTableMap::ADMIN_ID);
-            $criteria->addSelectColumn(AdminGroupTableMap::CREATED_AT);
-            $criteria->addSelectColumn(AdminGroupTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(ProfileResourceTableMap::ID);
+            $criteria->addSelectColumn(ProfileResourceTableMap::PROFILE_ID);
+            $criteria->addSelectColumn(ProfileResourceTableMap::RESOURCE_ID);
+            $criteria->addSelectColumn(ProfileResourceTableMap::READ);
+            $criteria->addSelectColumn(ProfileResourceTableMap::WRITE);
+            $criteria->addSelectColumn(ProfileResourceTableMap::CREATED_AT);
+            $criteria->addSelectColumn(ProfileResourceTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.GROUP_ID');
-            $criteria->addSelectColumn($alias . '.ADMIN_ID');
+            $criteria->addSelectColumn($alias . '.PROFILE_ID');
+            $criteria->addSelectColumn($alias . '.RESOURCE_ID');
+            $criteria->addSelectColumn($alias . '.READ');
+            $criteria->addSelectColumn($alias . '.WRITE');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -385,7 +401,7 @@ class AdminGroupTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(AdminGroupTableMap::DATABASE_NAME)->getTable(AdminGroupTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ProfileResourceTableMap::DATABASE_NAME)->getTable(ProfileResourceTableMap::TABLE_NAME);
     }
 
     /**
@@ -393,16 +409,16 @@ class AdminGroupTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(AdminGroupTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(AdminGroupTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new AdminGroupTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProfileResourceTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(ProfileResourceTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new ProfileResourceTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a AdminGroup or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ProfileResource or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or AdminGroup object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ProfileResource object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -413,17 +429,17 @@ class AdminGroupTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AdminGroupTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileResourceTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\AdminGroup) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\ProfileResource) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(AdminGroupTableMap::DATABASE_NAME);
+            $criteria = new Criteria(ProfileResourceTableMap::DATABASE_NAME);
             // primary key is composite; we therefore, expect
             // the primary key passed to be an array of pkey values
             if (count($values) == count($values, COUNT_RECURSIVE)) {
@@ -431,18 +447,18 @@ class AdminGroupTableMap extends TableMap
                 $values = array($values);
             }
             foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(AdminGroupTableMap::ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(AdminGroupTableMap::GROUP_ID, $value[1]));
-                $criterion->addAnd($criteria->getNewCriterion(AdminGroupTableMap::ADMIN_ID, $value[2]));
+                $criterion = $criteria->getNewCriterion(ProfileResourceTableMap::ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(ProfileResourceTableMap::PROFILE_ID, $value[1]));
+                $criterion->addAnd($criteria->getNewCriterion(ProfileResourceTableMap::RESOURCE_ID, $value[2]));
                 $criteria->addOr($criterion);
             }
         }
 
-        $query = AdminGroupQuery::create()->mergeWith($criteria);
+        $query = ProfileResourceQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { AdminGroupTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { ProfileResourceTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { AdminGroupTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { ProfileResourceTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -450,20 +466,20 @@ class AdminGroupTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the admin_group table.
+     * Deletes all rows from the profile_resource table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return AdminGroupQuery::create()->doDeleteAll($con);
+        return ProfileResourceQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a AdminGroup or Criteria object.
+     * Performs an INSERT on the database, given a ProfileResource or Criteria object.
      *
-     * @param mixed               $criteria Criteria or AdminGroup object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or ProfileResource object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -472,22 +488,22 @@ class AdminGroupTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AdminGroupTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileResourceTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from AdminGroup object
+            $criteria = $criteria->buildCriteria(); // build Criteria from ProfileResource object
         }
 
-        if ($criteria->containsKey(AdminGroupTableMap::ID) && $criteria->keyContainsValue(AdminGroupTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.AdminGroupTableMap::ID.')');
+        if ($criteria->containsKey(ProfileResourceTableMap::ID) && $criteria->keyContainsValue(ProfileResourceTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProfileResourceTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = AdminGroupQuery::create()->mergeWith($criteria);
+        $query = ProfileResourceQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -503,7 +519,7 @@ class AdminGroupTableMap extends TableMap
         return $pk;
     }
 
-} // AdminGroupTableMap
+} // ProfileResourceTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-AdminGroupTableMap::buildTableMap();
+ProfileResourceTableMap::buildTableMap();

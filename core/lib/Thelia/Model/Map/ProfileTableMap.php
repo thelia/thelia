@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\GroupI18n;
-use Thelia\Model\GroupI18nQuery;
+use Thelia\Model\Profile;
+use Thelia\Model\ProfileQuery;
 
 
 /**
- * This class defines the structure of the 'group_i18n' table.
+ * This class defines the structure of the 'profile' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\GroupI18nQuery;
  * (i.e. if it's a text column type).
  *
  */
-class GroupI18nTableMap extends TableMap
+class ProfileTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.GroupI18nTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.ProfileTableMap';
 
     /**
      * The default database name for this class
@@ -42,22 +42,22 @@ class GroupI18nTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'group_i18n';
+    const TABLE_NAME = 'profile';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\GroupI18n';
+    const OM_CLASS = '\\Thelia\\Model\\Profile';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.GroupI18n';
+    const CLASS_DEFAULT = 'Thelia.Model.Profile';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -67,42 +67,41 @@ class GroupI18nTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'group_i18n.ID';
+    const ID = 'profile.ID';
 
     /**
-     * the column name for the LOCALE field
+     * the column name for the CODE field
      */
-    const LOCALE = 'group_i18n.LOCALE';
+    const CODE = 'profile.CODE';
 
     /**
-     * the column name for the TITLE field
+     * the column name for the CREATED_AT field
      */
-    const TITLE = 'group_i18n.TITLE';
+    const CREATED_AT = 'profile.CREATED_AT';
 
     /**
-     * the column name for the DESCRIPTION field
+     * the column name for the UPDATED_AT field
      */
-    const DESCRIPTION = 'group_i18n.DESCRIPTION';
-
-    /**
-     * the column name for the CHAPO field
-     */
-    const CHAPO = 'group_i18n.CHAPO';
-
-    /**
-     * the column name for the POSTSCRIPTUM field
-     */
-    const POSTSCRIPTUM = 'group_i18n.POSTSCRIPTUM';
+    const UPDATED_AT = 'profile.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
+
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations.
+     *
+     * @var string
+     */
+    const DEFAULT_LOCALE = 'en_US';
 
     /**
      * holds an array of fieldnames
@@ -111,12 +110,12 @@ class GroupI18nTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Locale', 'Title', 'Description', 'Chapo', 'Postscriptum', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'locale', 'title', 'description', 'chapo', 'postscriptum', ),
-        self::TYPE_COLNAME       => array(GroupI18nTableMap::ID, GroupI18nTableMap::LOCALE, GroupI18nTableMap::TITLE, GroupI18nTableMap::DESCRIPTION, GroupI18nTableMap::CHAPO, GroupI18nTableMap::POSTSCRIPTUM, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', 'TITLE', 'DESCRIPTION', 'CHAPO', 'POSTSCRIPTUM', ),
-        self::TYPE_FIELDNAME     => array('id', 'locale', 'title', 'description', 'chapo', 'postscriptum', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'Code', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ProfileTableMap::ID, ProfileTableMap::CODE, ProfileTableMap::CREATED_AT, ProfileTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'code', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -126,12 +125,12 @@ class GroupI18nTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, 'Title' => 2, 'Description' => 3, 'Chapo' => 4, 'Postscriptum' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, 'chapo' => 4, 'postscriptum' => 5, ),
-        self::TYPE_COLNAME       => array(GroupI18nTableMap::ID => 0, GroupI18nTableMap::LOCALE => 1, GroupI18nTableMap::TITLE => 2, GroupI18nTableMap::DESCRIPTION => 3, GroupI18nTableMap::CHAPO => 4, GroupI18nTableMap::POSTSCRIPTUM => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, 'TITLE' => 2, 'DESCRIPTION' => 3, 'CHAPO' => 4, 'POSTSCRIPTUM' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, 'title' => 2, 'description' => 3, 'chapo' => 4, 'postscriptum' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        self::TYPE_COLNAME       => array(ProfileTableMap::ID => 0, ProfileTableMap::CODE => 1, ProfileTableMap::CREATED_AT => 2, ProfileTableMap::UPDATED_AT => 3, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -144,18 +143,16 @@ class GroupI18nTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('group_i18n');
-        $this->setPhpName('GroupI18n');
-        $this->setClassName('\\Thelia\\Model\\GroupI18n');
+        $this->setName('profile');
+        $this->setPhpName('Profile');
+        $this->setClassName('\\Thelia\\Model\\Profile');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'group', 'ID', true, null, null);
-        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_US');
-        $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
-        $this->addColumn('DESCRIPTION', 'Description', 'CLOB', false, null, null);
-        $this->addColumn('CHAPO', 'Chapo', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('POSTSCRIPTUM', 'Postscriptum', 'LONGVARCHAR', false, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('CODE', 'Code', 'VARCHAR', true, 30, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -163,61 +160,37 @@ class GroupI18nTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Group', '\\Thelia\\Model\\Group', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Admin', '\\Thelia\\Model\\Admin', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'RESTRICT', 'RESTRICT', 'Admins');
+        $this->addRelation('ProfileResource', '\\Thelia\\Model\\ProfileResource', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'CASCADE', 'RESTRICT', 'ProfileResources');
+        $this->addRelation('ProfileModule', '\\Thelia\\Model\\ProfileModule', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'CASCADE', 'CASCADE', 'ProfileModules');
+        $this->addRelation('ProfileI18n', '\\Thelia\\Model\\ProfileI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ProfileI18ns');
+        $this->addRelation('Resource', '\\Thelia\\Model\\Resource', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Resources');
     } // buildRelations()
 
     /**
-     * Adds an object to the instance pool.
      *
-     * Propel keeps cached copies of objects in an instance pool when they are retrieved
-     * from the database. In some cases you may need to explicitly add objects
-     * to the cache in order to ensure that the same objects are always returned by find*()
-     * and findPk*() calls.
+     * Gets the list of behaviors registered for this table
      *
-     * @param \Thelia\Model\GroupI18n $obj A \Thelia\Model\GroupI18n object.
-     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
+     * @return array Associative array (name => parameters) of behaviors
      */
-    public static function addInstanceToPool($obj, $key = null)
+    public function getBehaviors()
     {
-        if (Propel::isInstancePoolingEnabled()) {
-            if (null === $key) {
-                $key = serialize(array((string) $obj->getId(), (string) $obj->getLocale()));
-            } // if key === null
-            self::$instances[$key] = $obj;
-        }
-    }
-
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
+        );
+    } // getBehaviors()
     /**
-     * Removes an object from the instance pool.
-     *
-     * Propel keeps cached copies of objects in an instance pool when they are retrieved
-     * from the database.  In some cases -- especially when you override doDelete
-     * methods in your stub classes -- you may need to explicitly remove objects
-     * from the cache in order to prevent returning objects that no longer exist.
-     *
-     * @param mixed $value A \Thelia\Model\GroupI18n object or a primary key value.
+     * Method to invalidate the instance pool of all tables related to profile     * by a foreign key with ON DELETE CASCADE
      */
-    public static function removeInstanceFromPool($value)
+    public static function clearRelatedInstancePool()
     {
-        if (Propel::isInstancePoolingEnabled() && null !== $value) {
-            if (is_object($value) && $value instanceof \Thelia\Model\GroupI18n) {
-                $key = serialize(array((string) $value->getId(), (string) $value->getLocale()));
-
-            } elseif (is_array($value) && count($value) === 2) {
-                // assume we've been passed a primary key";
-                $key = serialize(array((string) $value[0], (string) $value[1]));
-            } elseif ($value instanceof Criteria) {
-                self::$instances = [];
-
-                return;
-            } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\GroupI18n object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
-                throw $e;
+        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+                ProfileResourceTableMap::clearInstancePool();
+                ProfileModuleTableMap::clearInstancePool();
+                ProfileI18nTableMap::clearInstancePool();
             }
-
-            unset(self::$instances[$key]);
-        }
-    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -233,11 +206,11 @@ class GroupI18nTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)]));
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -255,7 +228,11 @@ class GroupI18nTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return $pks;
+            return (int) $row[
+                            $indexType == TableMap::TYPE_NUM
+                            ? 0 + $offset
+                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                        ];
     }
 
     /**
@@ -271,7 +248,7 @@ class GroupI18nTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? GroupI18nTableMap::CLASS_DEFAULT : GroupI18nTableMap::OM_CLASS;
+        return $withPrefix ? ProfileTableMap::CLASS_DEFAULT : ProfileTableMap::OM_CLASS;
     }
 
     /**
@@ -285,21 +262,21 @@ class GroupI18nTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (GroupI18n object, last column rank)
+     * @return array (Profile object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = GroupI18nTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = GroupI18nTableMap::getInstanceFromPool($key))) {
+        $key = ProfileTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ProfileTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + GroupI18nTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ProfileTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = GroupI18nTableMap::OM_CLASS;
+            $cls = ProfileTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            GroupI18nTableMap::addInstanceToPool($obj, $key);
+            ProfileTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -322,8 +299,8 @@ class GroupI18nTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = GroupI18nTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = GroupI18nTableMap::getInstanceFromPool($key))) {
+            $key = ProfileTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ProfileTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -332,7 +309,7 @@ class GroupI18nTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                GroupI18nTableMap::addInstanceToPool($obj, $key);
+                ProfileTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -353,19 +330,15 @@ class GroupI18nTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(GroupI18nTableMap::ID);
-            $criteria->addSelectColumn(GroupI18nTableMap::LOCALE);
-            $criteria->addSelectColumn(GroupI18nTableMap::TITLE);
-            $criteria->addSelectColumn(GroupI18nTableMap::DESCRIPTION);
-            $criteria->addSelectColumn(GroupI18nTableMap::CHAPO);
-            $criteria->addSelectColumn(GroupI18nTableMap::POSTSCRIPTUM);
+            $criteria->addSelectColumn(ProfileTableMap::ID);
+            $criteria->addSelectColumn(ProfileTableMap::CODE);
+            $criteria->addSelectColumn(ProfileTableMap::CREATED_AT);
+            $criteria->addSelectColumn(ProfileTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.LOCALE');
-            $criteria->addSelectColumn($alias . '.TITLE');
-            $criteria->addSelectColumn($alias . '.DESCRIPTION');
-            $criteria->addSelectColumn($alias . '.CHAPO');
-            $criteria->addSelectColumn($alias . '.POSTSCRIPTUM');
+            $criteria->addSelectColumn($alias . '.CODE');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 
@@ -378,7 +351,7 @@ class GroupI18nTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(GroupI18nTableMap::DATABASE_NAME)->getTable(GroupI18nTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ProfileTableMap::DATABASE_NAME)->getTable(ProfileTableMap::TABLE_NAME);
     }
 
     /**
@@ -386,16 +359,16 @@ class GroupI18nTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(GroupI18nTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(GroupI18nTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new GroupI18nTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProfileTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(ProfileTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new ProfileTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a GroupI18n or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a Profile or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or GroupI18n object or primary key or array of primary keys
+     * @param mixed               $values Criteria or Profile object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -406,35 +379,25 @@ class GroupI18nTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\GroupI18n) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\Profile) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(GroupI18nTableMap::DATABASE_NAME);
-            // primary key is composite; we therefore, expect
-            // the primary key passed to be an array of pkey values
-            if (count($values) == count($values, COUNT_RECURSIVE)) {
-                // array is not multi-dimensional
-                $values = array($values);
-            }
-            foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(GroupI18nTableMap::ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(GroupI18nTableMap::LOCALE, $value[1]));
-                $criteria->addOr($criterion);
-            }
+            $criteria = new Criteria(ProfileTableMap::DATABASE_NAME);
+            $criteria->add(ProfileTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = GroupI18nQuery::create()->mergeWith($criteria);
+        $query = ProfileQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { GroupI18nTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { ProfileTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { GroupI18nTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { ProfileTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -442,20 +405,20 @@ class GroupI18nTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the group_i18n table.
+     * Deletes all rows from the profile table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return GroupI18nQuery::create()->doDeleteAll($con);
+        return ProfileQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a GroupI18n or Criteria object.
+     * Performs an INSERT on the database, given a Profile or Criteria object.
      *
-     * @param mixed               $criteria Criteria or GroupI18n object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or Profile object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -464,18 +427,22 @@ class GroupI18nTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(GroupI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProfileTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from GroupI18n object
+            $criteria = $criteria->buildCriteria(); // build Criteria from Profile object
+        }
+
+        if ($criteria->containsKey(ProfileTableMap::ID) && $criteria->keyContainsValue(ProfileTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProfileTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = GroupI18nQuery::create()->mergeWith($criteria);
+        $query = ProfileQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -491,7 +458,7 @@ class GroupI18nTableMap extends TableMap
         return $pk;
     }
 
-} // GroupI18nTableMap
+} // ProfileTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-GroupI18nTableMap::buildTableMap();
+ProfileTableMap::buildTableMap();

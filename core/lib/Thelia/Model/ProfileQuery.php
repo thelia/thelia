@@ -2,11 +2,11 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\GroupI18nQuery as BaseGroupI18nQuery;
+use Thelia\Model\Base\ProfileQuery as BaseProfileQuery;
 
 
 /**
- * Skeleton subclass for performing query and update operations on the 'group_i18n' table.
+ * Skeleton subclass for performing query and update operations on the 'profile' table.
  *
  *
  *
@@ -15,6 +15,7 @@ use Thelia\Model\Base\GroupI18nQuery as BaseGroupI18nQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class GroupI18nQuery extends BaseGroupI18nQuery {
+class ProfileQuery extends BaseProfileQuery
+{
 
-} // GroupI18nQuery
+} // ProfileQuery
