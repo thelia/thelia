@@ -97,7 +97,7 @@ class Tax extends BaseI18nLoop
         $country = $this->getCountry();
 
         $taxRule = $this->getTax_rule();
-        if(null !== $taxRule && null !== $country) {
+        if (null !== $taxRule && null !== $country) {
             $search->filterByTaxRuleCountry(
                 TaxRuleCountryQuery::create()
                     ->filterByCountryId($country, Criteria::EQUAL)
@@ -108,7 +108,7 @@ class Tax extends BaseI18nLoop
         }
 
         $excludeTaxRule = $this->getExclude_tax_rule();
-        if(null !== $excludeTaxRule && null !== $country) {
+        if (null !== $excludeTaxRule && null !== $country) {
             $excludedTaxes = TaxRuleCountryQuery::create()
                 ->filterByCountryId($country, Criteria::EQUAL)
                 ->filterByTaxRuleId($excludeTaxRule, Criteria::IN)
@@ -118,7 +118,7 @@ class Tax extends BaseI18nLoop
                 $excludedTaxes,
                 Criteria::NOT_IN
             );*/
-            foreach($excludedTaxes as $excludedTax) {
+            foreach ($excludedTaxes as $excludedTax) {
                 $search->filterByTaxRuleCountry($excludedTax, Criteria::NOT_EQUAL);
             }
         }
@@ -152,11 +152,13 @@ class Tax extends BaseI18nLoop
             $loopResultRow = new LoopResultRow($loopResult, $tax, $this->versionable, $this->timestampable, $this->countable);
 
             $loopResultRow
-                ->set("ID"            , $tax->getId())
-                ->set("IS_TRANSLATED" , $tax->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"        , $locale)
-                ->set("TITLE"         , $tax->getVirtualColumn('i18n_TITLE'))
-                ->set("DESCRIPTION"   , $tax->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("ID"                      , $tax->getId())
+                ->set("TYPE"                    , $tax->getType())
+                ->set("REQUIREMENTS"            , $tax->getRequirements())
+                ->set("IS_TRANSLATED"           , $tax->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE"                  , $locale)
+                ->set("TITLE"                   , $tax->getVirtualColumn('i18n_TITLE'))
+                ->set("DESCRIPTION"             , $tax->getVirtualColumn('i18n_DESCRIPTION'))
             ;
 
             $loopResult->addRow($loopResultRow);

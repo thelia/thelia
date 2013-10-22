@@ -59,7 +59,7 @@ class RewritingResolver
     public function load($rewrittenUrl)
     {
         $rewrittenUrl = ltrim($rewrittenUrl, '/');
-
+        $rewrittenUrl = urldecode($rewrittenUrl);
         $this->search = $this->rewritingUrlQuery->getResolverSearch($rewrittenUrl);
 
         if($this->search->count() == 0) {

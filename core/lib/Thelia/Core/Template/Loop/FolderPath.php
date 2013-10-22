@@ -30,7 +30,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\FolderQuery;
 use Thelia\Type\BooleanOrBothType;
 
-
 /**
  * Class FolderPath
  * @package Thelia\Core\Template\Loop
@@ -155,6 +154,5 @@ class FolderPath extends BaseI18nLoop
 
         return $loopResult;
     }
-
 
 }

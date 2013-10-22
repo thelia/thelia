@@ -29,6 +29,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  * @method     ChildProductSaleElementsQuery orderByNewness($order = Criteria::ASC) Order by the newness column
  * @method     ChildProductSaleElementsQuery orderByWeight($order = Criteria::ASC) Order by the weight column
  * @method     ChildProductSaleElementsQuery orderByIsDefault($order = Criteria::ASC) Order by the is_default column
+ * @method     ChildProductSaleElementsQuery orderByEanCode($order = Criteria::ASC) Order by the ean_code column
  * @method     ChildProductSaleElementsQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProductSaleElementsQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -40,6 +41,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  * @method     ChildProductSaleElementsQuery groupByNewness() Group by the newness column
  * @method     ChildProductSaleElementsQuery groupByWeight() Group by the weight column
  * @method     ChildProductSaleElementsQuery groupByIsDefault() Group by the is_default column
+ * @method     ChildProductSaleElementsQuery groupByEanCode() Group by the ean_code column
  * @method     ChildProductSaleElementsQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildProductSaleElementsQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -74,6 +76,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  * @method     ChildProductSaleElements findOneByNewness(int $newness) Return the first ChildProductSaleElements filtered by the newness column
  * @method     ChildProductSaleElements findOneByWeight(double $weight) Return the first ChildProductSaleElements filtered by the weight column
  * @method     ChildProductSaleElements findOneByIsDefault(boolean $is_default) Return the first ChildProductSaleElements filtered by the is_default column
+ * @method     ChildProductSaleElements findOneByEanCode(string $ean_code) Return the first ChildProductSaleElements filtered by the ean_code column
  * @method     ChildProductSaleElements findOneByCreatedAt(string $created_at) Return the first ChildProductSaleElements filtered by the created_at column
  * @method     ChildProductSaleElements findOneByUpdatedAt(string $updated_at) Return the first ChildProductSaleElements filtered by the updated_at column
  *
@@ -85,6 +88,7 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  * @method     array findByNewness(int $newness) Return ChildProductSaleElements objects filtered by the newness column
  * @method     array findByWeight(double $weight) Return ChildProductSaleElements objects filtered by the weight column
  * @method     array findByIsDefault(boolean $is_default) Return ChildProductSaleElements objects filtered by the is_default column
+ * @method     array findByEanCode(string $ean_code) Return ChildProductSaleElements objects filtered by the ean_code column
  * @method     array findByCreatedAt(string $created_at) Return ChildProductSaleElements objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildProductSaleElements objects filtered by the updated_at column
  *
@@ -175,7 +179,7 @@ abstract class ProductSaleElementsQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PRODUCT_ID, REF, QUANTITY, PROMO, NEWNESS, WEIGHT, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM product_sale_elements WHERE ID = :p0';
+        $sql = 'SELECT ID, PRODUCT_ID, REF, QUANTITY, PROMO, NEWNESS, WEIGHT, IS_DEFAULT, EAN_CODE, CREATED_AT, UPDATED_AT FROM product_sale_elements WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -566,6 +570,35 @@ abstract class ProductSaleElementsQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductSaleElementsTableMap::IS_DEFAULT, $isDefault, $comparison);
+    }
+
+    /**
+     * Filter the query on the ean_code column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByEanCode('fooValue');   // WHERE ean_code = 'fooValue'
+     * $query->filterByEanCode('%fooValue%'); // WHERE ean_code LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $eanCode The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
+     */
+    public function filterByEanCode($eanCode = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($eanCode)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $eanCode)) {
+                $eanCode = str_replace('*', '%', $eanCode);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ProductSaleElementsTableMap::EAN_CODE, $eanCode, $comparison);
     }
 
     /**

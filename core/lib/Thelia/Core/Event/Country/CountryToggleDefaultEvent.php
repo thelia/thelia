@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Country;
 
-
 /**
  * Class CountryToggleDefaultEvent
  * @package Thelia\Core\Event\Country
@@ -33,7 +32,7 @@ class CountryToggleDefaultEvent extends CountryEvent
 {
     protected $country_id;
 
-    function __construct($country_id)
+    public function __construct($country_id)
     {
         $this->country_id = $country_id;
     }

@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Feature\FeatureDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Feature\FeatureUpdateEvent;
@@ -50,10 +51,10 @@ class FeatureController extends AbstractCrudController
             'manual',
             'order',
 
-            'admin.configuration.features.view',
-            'admin.configuration.features.create',
-            'admin.configuration.features.update',
-            'admin.configuration.features.delete',
+            AdminResources::FEATURE_VIEW,
+            AdminResources::FEATURE_CREATE,
+            AdminResources::FEATURE_UPDATE,
+            AdminResources::FEATURE_DELETE,
 
             TheliaEvents::FEATURE_CREATE,
             TheliaEvents::FEATURE_UPDATE,
@@ -253,7 +254,7 @@ class FeatureController extends AbstractCrudController
     protected function addRemoveFromAllTemplates($eventType)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth("admin.configuration.features.update")) return $response;
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
 
         try {
             if (null !== $object = $this->getExistingObject()) {

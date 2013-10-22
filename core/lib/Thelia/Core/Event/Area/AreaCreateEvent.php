@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Area;
 
-
 /**
  * Class AreaCreateEvent
  * @package Thelia\Core\Event\Area
@@ -48,6 +47,5 @@ class AreaCreateEvent extends AreaEvent
     {
         return $this->name;
     }
-
 
 }

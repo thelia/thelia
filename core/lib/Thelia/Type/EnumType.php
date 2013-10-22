@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class EnumType implements TypeInterface
+class EnumType extends BaseType
 {
     protected $values = array();
 
@@ -51,5 +51,15 @@ class EnumType implements TypeInterface
     public function getFormattedValue($value)
     {
         return $this->isValid($value) ? $value : null;
+    }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
     }
 }

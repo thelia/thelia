@@ -32,7 +32,6 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\Base\TemplateQuery;
-use Thelia\Type;
 
 /**
  *

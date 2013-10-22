@@ -34,7 +34,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
     protected function buildForm()
     {
         $countryList = array();
-        foreach(CountryQuery::create()->find() as $country) {
+        foreach (CountryQuery::create()->find() as $country) {
             $countryList[$country->getId()] = $country->getId();
         }
 
@@ -96,7 +96,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
     public function verifyTaxList($value, ExecutionContextInterface $context)
     {
         $jsonType = new JsonType();
-        if(!$jsonType->isValid($value)) {
+        if (!$jsonType->isValid($value)) {
             $context->addViolation("Tax list is not valid JSON");
         }
 
@@ -104,10 +104,10 @@ class TaxRuleTaxListUpdateForm extends BaseForm
 
         /* check we have 2 level max */
 
-        foreach($taxList as $taxLevel1) {
-            if(is_array($taxLevel1)) {
-                foreach($taxLevel1 as $taxLevel2) {
-                    if(is_array($taxLevel2)) {
+        foreach ($taxList as $taxLevel1) {
+            if (is_array($taxLevel1)) {
+                foreach ($taxLevel1 as $taxLevel2) {
+                    if (is_array($taxLevel2)) {
                         $context->addViolation("Bad tax list JSON");
                     } else {
                         $taxModel = TaxQuery::create()->findPk($taxLevel2);

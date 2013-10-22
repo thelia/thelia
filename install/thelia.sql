@@ -50,7 +50,7 @@ CREATE TABLE `product`
         FOREIGN KEY (`tax_rule_id`)
         REFERENCES `tax_rule` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE SET NULL,
+        ON DELETE RESTRICT,
     CONSTRAINT `fk_product_template`
         FOREIGN KEY (`template_id`)
         REFERENCES `template` (`id`)
@@ -365,11 +365,12 @@ CREATE TABLE `product_sale_elements`
     `newness` TINYINT DEFAULT 0,
     `weight` FLOAT DEFAULT 0,
     `is_default` TINYINT(1) DEFAULT 0,
+    `ean_code` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `ref_UNIQUE` (`ref`),
     INDEX `idx_product_sale_element_product_id` (`product_id`),
+    INDEX `ref` (`ref`),
     CONSTRAINT `fk_product_sale_element_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
@@ -775,6 +776,7 @@ CREATE TABLE `order_product`
     `was_new` TINYINT NOT NULL,
     `was_in_promo` TINYINT NOT NULL,
     `weight` VARCHAR(45),
+    `ean_code` VARCHAR(255),
     `tax_rule_title` VARCHAR(255),
     `tax_rule_description` LONGTEXT,
     `parent` INTEGER COMMENT 'not managed yet',
@@ -929,12 +931,12 @@ CREATE TABLE `area_delivery_module`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- group
+-- profile
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `group`;
+DROP TABLE IF EXISTS `profile`;
 
-CREATE TABLE `group`
+CREATE TABLE `profile`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(30) NOT NULL,
@@ -953,7 +955,7 @@ DROP TABLE IF EXISTS `resource`;
 CREATE TABLE `resource`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `code` VARCHAR(30) NOT NULL,
+    `code` VARCHAR(255) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -969,6 +971,7 @@ DROP TABLE IF EXISTS `admin`;
 CREATE TABLE `admin`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `profile_id` INTEGER,
     `firstname` VARCHAR(100) NOT NULL,
     `lastname` VARCHAR(100) NOT NULL,
     `login` VARCHAR(100) NOT NULL,
@@ -979,61 +982,39 @@ CREATE TABLE `admin`
     `remember_me_serial` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    INDEX `fk_admin_profile_id` (`profile_id`),
+    CONSTRAINT `fk_admin_profile_id`
+        FOREIGN KEY (`profile_id`)
+        REFERENCES `profile` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- admin_group
+-- profile_resource
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `admin_group`;
+DROP TABLE IF EXISTS `profile_resource`;
 
-CREATE TABLE `admin_group`
+CREATE TABLE `profile_resource`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `group_id` INTEGER NOT NULL,
-    `admin_id` INTEGER NOT NULL,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`,`group_id`,`admin_id`),
-    INDEX `idx_admin_group_group_id` (`group_id`),
-    INDEX `idx_admin_group_admin_id` (`admin_id`),
-    CONSTRAINT `fk_admin_group_group_id`
-        FOREIGN KEY (`group_id`)
-        REFERENCES `group` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_admin_group_admin_id`
-        FOREIGN KEY (`admin_id`)
-        REFERENCES `admin` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- group_resource
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `group_resource`;
-
-CREATE TABLE `group_resource`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `group_id` INTEGER NOT NULL,
+    `profile_id` INTEGER NOT NULL,
     `resource_id` INTEGER NOT NULL,
     `read` TINYINT DEFAULT 0,
     `write` TINYINT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`,`group_id`,`resource_id`),
-    INDEX `id_group_resource_group_id` (`group_id`),
-    INDEX `idx_group_resource_resource_id` (`resource_id`),
-    CONSTRAINT `fk_group_resource_group_id`
-        FOREIGN KEY (`group_id`)
-        REFERENCES `group` (`id`)
+    PRIMARY KEY (`id`,`profile_id`,`resource_id`),
+    INDEX `id_profile_resource_profile_id` (`profile_id`),
+    INDEX `idx_profile_resource_resource_id` (`resource_id`),
+    CONSTRAINT `fk_profile_resource_profile_id`
+        FOREIGN KEY (`profile_id`)
+        REFERENCES `profile` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE,
-    CONSTRAINT `fk_group_resource_resource_id`
+    CONSTRAINT `fk_profile_resource_resource_id`
         FOREIGN KEY (`resource_id`)
         REFERENCES `resource` (`id`)
         ON UPDATE RESTRICT
@@ -1041,28 +1022,28 @@ CREATE TABLE `group_resource`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- group_module
+-- profile_module
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `group_module`;
+DROP TABLE IF EXISTS `profile_module`;
 
-CREATE TABLE `group_module`
+CREATE TABLE `profile_module`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `group_id` INTEGER NOT NULL,
+    `profile_id` INTEGER NOT NULL,
     `module_id` INTEGER,
     `access` TINYINT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_group_module_group_id` (`group_id`),
-    INDEX `idx_group_module_module_id` (`module_id`),
-    CONSTRAINT `fk_group_module_group_id`
-        FOREIGN KEY (`group_id`)
-        REFERENCES `group` (`id`)
+    INDEX `idx_profile_module_profile_id` (`profile_id`),
+    INDEX `idx_profile_module_module_id` (`module_id`),
+    CONSTRAINT `fk_profile_module_profile_id`
+        FOREIGN KEY (`profile_id`)
+        REFERENCES `profile` (`id`)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
-    CONSTRAINT `fk_group_module_module_id`
+    CONSTRAINT `fk_profile_module_module_id`
         FOREIGN KEY (`module_id`)
         REFERENCES `module` (`id`)
         ON UPDATE RESTRICT
@@ -1971,12 +1952,12 @@ CREATE TABLE `module_i18n`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- group_i18n
+-- profile_i18n
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `group_i18n`;
+DROP TABLE IF EXISTS `profile_i18n`;
 
-CREATE TABLE `group_i18n`
+CREATE TABLE `profile_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
@@ -1985,9 +1966,9 @@ CREATE TABLE `group_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `group_i18n_FK_1`
+    CONSTRAINT `profile_i18n_FK_1`
         FOREIGN KEY (`id`)
-        REFERENCES `group` (`id`)
+        REFERENCES `profile` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

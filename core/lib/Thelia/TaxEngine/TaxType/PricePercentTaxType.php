@@ -47,6 +47,9 @@ class PricePercentTaxType extends BaseTaxType
             'percent' => new FloatType(),
         );
     }
-}
 
-//600 / (1 + 0,10 + 0,10)  =/= 600 / (1 + 0,10 ) + 600 / (1 + 0,10 )
+    public function getTitle()
+    {
+        return "Price % Tax";
+    }
+}

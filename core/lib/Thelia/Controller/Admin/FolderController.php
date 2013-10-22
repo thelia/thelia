@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
@@ -47,10 +48,10 @@ class FolderController extends AbstractCrudController
             'manual',
             'folder_order',
 
-            'admin.folder.default',
-            'admin.folder.create',
-            'admin.folder.update',
-            'admin.folder.delete',
+            AdminResources::FOLDER_VIEW,
+            AdminResources::FOLDER_CREATE,
+            AdminResources::FOLDER_UPDATE,
+            AdminResources::FOLDER_DELETE,
 
             TheliaEvents::FOLDER_CREATE,
             TheliaEvents::FOLDER_UPDATE,

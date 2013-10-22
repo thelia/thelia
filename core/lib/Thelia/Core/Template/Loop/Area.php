@@ -30,7 +30,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\AreaQuery;
 
-
 /**
  * Class Area
  * @package Thelia\Core\Template\Loop
@@ -112,8 +111,7 @@ class Area extends BaseLoop
 
         $withoutZone = $this->getWithout_zone();
 
-        if($withoutZone)
-        {
+        if ($withoutZone) {
             $search->joinAreaDeliveryModule('without_zone', Criteria::LEFT_JOIN)
                 ->addJoinCondition('without_zone', 'delivery_module_id '.Criteria::EQUAL.' ?', $withoutZone, null, \PDO::PARAM_INT)
                 ->where('`without_zone`.delivery_module_id '.Criteria::ISNULL);
@@ -139,6 +137,5 @@ class Area extends BaseLoop
 
         return $loopResult;
     }
-
 
 }

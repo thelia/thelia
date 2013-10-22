@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\AdminResources;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
@@ -49,10 +50,10 @@ class ContentController extends AbstractCrudController
             'manual',
             'content_order',
 
-            'admin.content.default',
-            'admin.content.create',
-            'admin.content.update',
-            'admin.content.delete',
+            AdminResources::CONTENT_VIEW,
+            AdminResources::CONTENT_CREATE,
+            AdminResources::CONTENT_UPDATE,
+            AdminResources::CONTENT_DELETE,
 
             TheliaEvents::CONTENT_CREATE,
             TheliaEvents::CONTENT_UPDATE,
@@ -70,7 +71,7 @@ class ContentController extends AbstractCrudController
     public function addAdditionalFolderAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth('admin.content.update')) return $response;
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
 
         $folder_id = intval($this->getRequest()->request->get('additional_folder_id'));
 
@@ -98,7 +99,7 @@ class ContentController extends AbstractCrudController
     public function removeAdditionalFolderAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth('admin.content.update')) return $response;
+        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
 
         $folder_id = intval($this->getRequest()->request->get('additional_folder_id'));
 

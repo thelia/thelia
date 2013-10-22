@@ -60,7 +60,14 @@ class CartItem extends BaseCartItem
             }
         }
 
-        $this->setQuantity($value);
+        $this->addQuantity($value);
+
+        return $this;
+    }
+
+    public function addQuantity($quantity)
+    {
+        $this->setQuantity($this->getQuantity() + $quantity);
 
         return $this;
     }

@@ -24,7 +24,6 @@
 namespace Thelia\Core\Event\ShippingZone;
 use Thelia\Core\Event\ActionEvent;
 
-
 /**
  * Class ShippingZoneAddAreaEvent
  * @package Thelia\Core\Event\ShippingZone
@@ -35,7 +34,7 @@ class ShippingZoneAddAreaEvent extends ActionEvent
     protected $area_id;
     protected $shopping_zone_id;
 
-    function __construct($area_id, $shopping_zone_id)
+    public function __construct($area_id, $shopping_zone_id)
     {
         $this->area_id = $area_id;
         $this->shopping_zone_id = $shopping_zone_id;
@@ -80,8 +79,5 @@ class ShippingZoneAddAreaEvent extends ActionEvent
     {
         return $this->shopping_zone_id;
     }
-
-
-
 
 }

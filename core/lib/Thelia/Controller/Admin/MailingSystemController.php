@@ -23,6 +23,8 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\AdminResources;
+
 /**
  * Class MailingSystemController
  * @package Thelia\Controller\Admin
@@ -32,7 +34,7 @@ class MailingSystemController extends BaseAdminController
 {
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth("admin.configuration.mailing-system.view")) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MAILING_SYSTEM_VIEW)) return $response;
         return $this->render("mailing-system");
     }
     

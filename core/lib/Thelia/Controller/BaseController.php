@@ -58,7 +58,7 @@ class BaseController extends ContainerAware
     /**
      * Return an empty response (after an ajax request, for example)
      */
-    protected function nullResponse($status = 200)
+    protected function nullResponse($content = null, $status = 200)
     {
         return new Response(null, $status);
     }
@@ -66,9 +66,9 @@ class BaseController extends ContainerAware
     /**
      * Return a JSON response
      */
-    protected function jsonResponse($json_data)
+    protected function jsonResponse($json_data, $status = 200)
     {
-        return new Response($json_data, 200, array('content-type' => 'application/json'));
+        return new Response($json_data, $status, array('content-type' => 'application/json'));
     }
 
     /**
@@ -302,5 +302,18 @@ class BaseController extends ContainerAware
         $mailer = $this->container->get('mailer');
 
         return $mailer->getSwiftMailer();
+    }
+
+    /**
+     * @return ParserInterface instance parser
+     */
+    protected function getParser()
+    {
+        return $this->container->get("thelia.parser");
+    }
+
+    protected function render($inline)
+    {
+        return $this->getParser()->fetch(sprintf("string:%s", $inline));
     }
 }

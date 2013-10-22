@@ -23,7 +23,6 @@
 
 namespace Thelia\Form\ShippingZone;
 
-
 /**
  * Class ShippingZoneRemoveArea
  * @package Thelia\Form\ShippingZone

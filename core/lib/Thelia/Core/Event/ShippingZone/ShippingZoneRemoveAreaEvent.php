@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\ShippingZone;
 
-
 /**
  * Class ShippingZoneRemoveAreaEvent
  * @package Thelia\Core\Event\ShippingZone

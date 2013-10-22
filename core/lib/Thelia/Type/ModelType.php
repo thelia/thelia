@@ -30,7 +30,7 @@ use Thelia\Exception\TypeException;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class ModelType implements TypeInterface
+class ModelType extends BaseType
 {
     protected $expectedModelActiveRecord = null;
 
@@ -62,5 +62,15 @@ class ModelType implements TypeInterface
     public function getFormattedValue($value)
     {
         return $this->isValid($value) ? $value : null;
+    }
+
+    public function getFormType()
+    {
+        return 'text';
+    }
+
+    public function getFormOptions()
+    {
+        return array();
     }
 }
