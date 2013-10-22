@@ -46,7 +46,7 @@ class ContactController extends BaseFrontController
             $form = $this->validateForm($contactForm);
 
             $message = \Swift_Message::newInstance($form->get('subject')->getData())
-                ->addFrom($form->get('email')->getData(), $form->get('firstname')->getData().' '.$form->get('lastname')->getData())
+                ->addFrom($form->get('email')->getData(), $form->get('name')->getData())
                 ->addTo(ConfigQuery::read('contact_email'), ConfigQuery::read('company_name'))
                 ->setBody($form->get('message')->getData())
             ;

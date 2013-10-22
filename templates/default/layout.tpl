@@ -348,9 +348,9 @@ URL: http://www.thelia.net
                         {loop name="footer_links" type="content" folder="2"}
                             <li><a href="{$URL}">{$TITLE}</a></li>
                         {/loop}
-                        <li><a href="#">Site Map</a></li>
-                        <li><a href="#">Terms & Conditions</a></li>
-                        <li><a href="#">Contact Us</a></li>
+                        {*<li><a href="#">Site Map</a></li>
+                        <li><a href="#">Terms & Conditions</a></li>*}
+                        <li><a href="{url path="/contact"}">Contact Us</a></li>
                     </ul>
                 </nav>
 
