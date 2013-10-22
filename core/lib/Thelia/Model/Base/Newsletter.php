@@ -16,20 +16,16 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Profile as ChildProfile;
-use Thelia\Model\ProfileQuery as ChildProfileQuery;
-use Thelia\Model\ProfileResource as ChildProfileResource;
-use Thelia\Model\ProfileResourceQuery as ChildProfileResourceQuery;
-use Thelia\Model\Resource as ChildResource;
-use Thelia\Model\ResourceQuery as ChildResourceQuery;
-use Thelia\Model\Map\ProfileResourceTableMap;
+use Thelia\Model\Newsletter as ChildNewsletter;
+use Thelia\Model\NewsletterQuery as ChildNewsletterQuery;
+use Thelia\Model\Map\NewsletterTableMap;
 
-abstract class ProfileResource implements ActiveRecordInterface
+abstract class Newsletter implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\ProfileResourceTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\NewsletterTableMap';
 
 
     /**
@@ -65,23 +61,28 @@ abstract class ProfileResource implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the profile_id field.
-     * @var        int
+     * The value for the email field.
+     * @var        string
      */
-    protected $profile_id;
+    protected $email;
 
     /**
-     * The value for the resource_id field.
-     * @var        int
+     * The value for the firstname field.
+     * @var        string
      */
-    protected $resource_id;
+    protected $firstname;
 
     /**
-     * The value for the access field.
-     * Note: this column has a database default value of: 0
-     * @var        int
+     * The value for the lastname field.
+     * @var        string
      */
-    protected $access;
+    protected $lastname;
+
+    /**
+     * The value for the locale field.
+     * @var        string
+     */
+    protected $locale;
 
     /**
      * The value for the created_at field.
@@ -96,16 +97,6 @@ abstract class ProfileResource implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        Profile
-     */
-    protected $aProfile;
-
-    /**
-     * @var        Resource
-     */
-    protected $aResource;
-
-    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -114,23 +105,10 @@ abstract class ProfileResource implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Applies default values to this object.
-     * This method should be called from the object's constructor (or
-     * equivalent initialization method).
-     * @see __construct()
-     */
-    public function applyDefaultValues()
-    {
-        $this->access = 0;
-    }
-
-    /**
-     * Initializes internal state of Thelia\Model\Base\ProfileResource object.
-     * @see applyDefaults()
+     * Initializes internal state of Thelia\Model\Base\Newsletter object.
      */
     public function __construct()
     {
-        $this->applyDefaultValues();
     }
 
     /**
@@ -222,9 +200,9 @@ abstract class ProfileResource implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>ProfileResource</code> instance.  If
-     * <code>obj</code> is an instance of <code>ProfileResource</code>, delegates to
-     * <code>equals(ProfileResource)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>Newsletter</code> instance.  If
+     * <code>obj</code> is an instance of <code>Newsletter</code>, delegates to
+     * <code>equals(Newsletter)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -307,7 +285,7 @@ abstract class ProfileResource implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return ProfileResource The current object, for fluid interface
+     * @return Newsletter The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -339,7 +317,7 @@ abstract class ProfileResource implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return ProfileResource The current object, for fluid interface
+     * @return Newsletter The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -396,36 +374,47 @@ abstract class ProfileResource implements ActiveRecordInterface
     }
 
     /**
-     * Get the [profile_id] column value.
+     * Get the [email] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getProfileId()
+    public function getEmail()
     {
 
-        return $this->profile_id;
+        return $this->email;
     }
 
     /**
-     * Get the [resource_id] column value.
+     * Get the [firstname] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getResourceId()
+    public function getFirstname()
     {
 
-        return $this->resource_id;
+        return $this->firstname;
     }
 
     /**
-     * Get the [access] column value.
+     * Get the [lastname] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getAccess()
+    public function getLastname()
     {
 
-        return $this->access;
+        return $this->lastname;
+    }
+
+    /**
+     * Get the [locale] column value.
+     *
+     * @return   string
+     */
+    public function getLocale()
+    {
+
+        return $this->locale;
     }
 
     /**
@@ -472,7 +461,7 @@ abstract class ProfileResource implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
+     * @return   \Thelia\Model\Newsletter The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -482,7 +471,7 @@ abstract class ProfileResource implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ProfileResourceTableMap::ID;
+            $this->modifiedColumns[] = NewsletterTableMap::ID;
         }
 
 
@@ -490,82 +479,95 @@ abstract class ProfileResource implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [profile_id] column.
+     * Set the value of [email] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Newsletter The current object (for fluent API support)
      */
-    public function setProfileId($v)
+    public function setEmail($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->profile_id !== $v) {
-            $this->profile_id = $v;
-            $this->modifiedColumns[] = ProfileResourceTableMap::PROFILE_ID;
-        }
-
-        if ($this->aProfile !== null && $this->aProfile->getId() !== $v) {
-            $this->aProfile = null;
+        if ($this->email !== $v) {
+            $this->email = $v;
+            $this->modifiedColumns[] = NewsletterTableMap::EMAIL;
         }
 
 
         return $this;
-    } // setProfileId()
+    } // setEmail()
 
     /**
-     * Set the value of [resource_id] column.
+     * Set the value of [firstname] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Newsletter The current object (for fluent API support)
      */
-    public function setResourceId($v)
+    public function setFirstname($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->resource_id !== $v) {
-            $this->resource_id = $v;
-            $this->modifiedColumns[] = ProfileResourceTableMap::RESOURCE_ID;
-        }
-
-        if ($this->aResource !== null && $this->aResource->getId() !== $v) {
-            $this->aResource = null;
+        if ($this->firstname !== $v) {
+            $this->firstname = $v;
+            $this->modifiedColumns[] = NewsletterTableMap::FIRSTNAME;
         }
 
 
         return $this;
-    } // setResourceId()
+    } // setFirstname()
 
     /**
-     * Set the value of [access] column.
+     * Set the value of [lastname] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\Newsletter The current object (for fluent API support)
      */
-    public function setAccess($v)
+    public function setLastname($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->access !== $v) {
-            $this->access = $v;
-            $this->modifiedColumns[] = ProfileResourceTableMap::ACCESS;
+        if ($this->lastname !== $v) {
+            $this->lastname = $v;
+            $this->modifiedColumns[] = NewsletterTableMap::LASTNAME;
         }
 
 
         return $this;
-    } // setAccess()
+    } // setLastname()
+
+    /**
+     * Set the value of [locale] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Newsletter The current object (for fluent API support)
+     */
+    public function setLocale($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->locale !== $v) {
+            $this->locale = $v;
+            $this->modifiedColumns[] = NewsletterTableMap::LOCALE;
+        }
+
+
+        return $this;
+    } // setLocale()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
+     * @return   \Thelia\Model\Newsletter The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -573,7 +575,7 @@ abstract class ProfileResource implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ProfileResourceTableMap::CREATED_AT;
+                $this->modifiedColumns[] = NewsletterTableMap::CREATED_AT;
             }
         } // if either are not null
 
@@ -586,7 +588,7 @@ abstract class ProfileResource implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
+     * @return   \Thelia\Model\Newsletter The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -594,7 +596,7 @@ abstract class ProfileResource implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ProfileResourceTableMap::UPDATED_AT;
+                $this->modifiedColumns[] = NewsletterTableMap::UPDATED_AT;
             }
         } // if either are not null
 
@@ -612,10 +614,6 @@ abstract class ProfileResource implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->access !== 0) {
-                return false;
-            }
-
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -643,25 +641,28 @@ abstract class ProfileResource implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProfileResourceTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : NewsletterTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProfileResourceTableMap::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->profile_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : NewsletterTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->email = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProfileResourceTableMap::translateFieldName('ResourceId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->resource_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : NewsletterTableMap::translateFieldName('Firstname', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->firstname = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProfileResourceTableMap::translateFieldName('Access', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->access = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : NewsletterTableMap::translateFieldName('Lastname', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->lastname = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProfileResourceTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : NewsletterTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->locale = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : NewsletterTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProfileResourceTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : NewsletterTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -674,10 +675,10 @@ abstract class ProfileResource implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = ProfileResourceTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = NewsletterTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\ProfileResource object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\Newsletter object", 0, $e);
         }
     }
 
@@ -696,12 +697,6 @@ abstract class ProfileResource implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aProfile !== null && $this->profile_id !== $this->aProfile->getId()) {
-            $this->aProfile = null;
-        }
-        if ($this->aResource !== null && $this->resource_id !== $this->aResource->getId()) {
-            $this->aResource = null;
-        }
     } // ensureConsistency
 
     /**
@@ -725,13 +720,13 @@ abstract class ProfileResource implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(ProfileResourceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(NewsletterTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildProfileResourceQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildNewsletterQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -741,8 +736,6 @@ abstract class ProfileResource implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aProfile = null;
-            $this->aResource = null;
         } // if (deep)
     }
 
@@ -752,8 +745,8 @@ abstract class ProfileResource implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see ProfileResource::setDeleted()
-     * @see ProfileResource::isDeleted()
+     * @see Newsletter::setDeleted()
+     * @see Newsletter::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -762,12 +755,12 @@ abstract class ProfileResource implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProfileResourceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(NewsletterTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildProfileResourceQuery::create()
+            $deleteQuery = ChildNewsletterQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -804,7 +797,7 @@ abstract class ProfileResource implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProfileResourceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(NewsletterTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -814,16 +807,16 @@ abstract class ProfileResource implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(ProfileResourceTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(NewsletterTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(ProfileResourceTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(NewsletterTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(ProfileResourceTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(NewsletterTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -835,7 +828,7 @@ abstract class ProfileResource implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                ProfileResourceTableMap::addInstanceToPool($this);
+                NewsletterTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -864,25 +857,6 @@ abstract class ProfileResource implements ActiveRecordInterface
         $affectedRows = 0; // initialize var to track total num of affected rows
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
-
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their corresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aProfile !== null) {
-                if ($this->aProfile->isModified() || $this->aProfile->isNew()) {
-                    $affectedRows += $this->aProfile->save($con);
-                }
-                $this->setProfile($this->aProfile);
-            }
-
-            if ($this->aResource !== null) {
-                if ($this->aResource->isModified() || $this->aResource->isNew()) {
-                    $affectedRows += $this->aResource->save($con);
-                }
-                $this->setResource($this->aResource);
-            }
 
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
@@ -915,33 +889,36 @@ abstract class ProfileResource implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ProfileResourceTableMap::ID;
+        $this->modifiedColumns[] = NewsletterTableMap::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProfileResourceTableMap::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . NewsletterTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ProfileResourceTableMap::ID)) {
+        if ($this->isColumnModified(NewsletterTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(ProfileResourceTableMap::PROFILE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'PROFILE_ID';
+        if ($this->isColumnModified(NewsletterTableMap::EMAIL)) {
+            $modifiedColumns[':p' . $index++]  = 'EMAIL';
         }
-        if ($this->isColumnModified(ProfileResourceTableMap::RESOURCE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'RESOURCE_ID';
+        if ($this->isColumnModified(NewsletterTableMap::FIRSTNAME)) {
+            $modifiedColumns[':p' . $index++]  = 'FIRSTNAME';
         }
-        if ($this->isColumnModified(ProfileResourceTableMap::ACCESS)) {
-            $modifiedColumns[':p' . $index++]  = 'ACCESS';
+        if ($this->isColumnModified(NewsletterTableMap::LASTNAME)) {
+            $modifiedColumns[':p' . $index++]  = 'LASTNAME';
         }
-        if ($this->isColumnModified(ProfileResourceTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(NewsletterTableMap::LOCALE)) {
+            $modifiedColumns[':p' . $index++]  = 'LOCALE';
+        }
+        if ($this->isColumnModified(NewsletterTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
-        if ($this->isColumnModified(ProfileResourceTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(NewsletterTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO profile_resource (%s) VALUES (%s)',
+            'INSERT INTO newsletter (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -953,14 +930,17 @@ abstract class ProfileResource implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'PROFILE_ID':
-                        $stmt->bindValue($identifier, $this->profile_id, PDO::PARAM_INT);
+                    case 'EMAIL':
+                        $stmt->bindValue($identifier, $this->email, PDO::PARAM_STR);
                         break;
-                    case 'RESOURCE_ID':
-                        $stmt->bindValue($identifier, $this->resource_id, PDO::PARAM_INT);
+                    case 'FIRSTNAME':
+                        $stmt->bindValue($identifier, $this->firstname, PDO::PARAM_STR);
                         break;
-                    case 'ACCESS':
-                        $stmt->bindValue($identifier, $this->access, PDO::PARAM_INT);
+                    case 'LASTNAME':
+                        $stmt->bindValue($identifier, $this->lastname, PDO::PARAM_STR);
+                        break;
+                    case 'LOCALE':
+                        $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1014,7 +994,7 @@ abstract class ProfileResource implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ProfileResourceTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = NewsletterTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1034,18 +1014,21 @@ abstract class ProfileResource implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getProfileId();
+                return $this->getEmail();
                 break;
             case 2:
-                return $this->getResourceId();
+                return $this->getFirstname();
                 break;
             case 3:
-                return $this->getAccess();
+                return $this->getLastname();
                 break;
             case 4:
-                return $this->getCreatedAt();
+                return $this->getLocale();
                 break;
             case 5:
+                return $this->getCreatedAt();
+                break;
+            case 6:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1065,38 +1048,30 @@ abstract class ProfileResource implements ActiveRecordInterface
      *                    Defaults to TableMap::TYPE_PHPNAME.
      * @param     boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
      * @param     array $alreadyDumpedObjects List of objects to skip to avoid recursion
-     * @param     boolean $includeForeignObjects (optional) Whether to include hydrated related objects. Default to FALSE.
      *
      * @return array an associative array containing the field names (as keys) and field values
      */
-    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
+    public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
     {
-        if (isset($alreadyDumpedObjects['ProfileResource'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['Newsletter'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['ProfileResource'][serialize($this->getPrimaryKey())] = true;
-        $keys = ProfileResourceTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['Newsletter'][$this->getPrimaryKey()] = true;
+        $keys = NewsletterTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getProfileId(),
-            $keys[2] => $this->getResourceId(),
-            $keys[3] => $this->getAccess(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[1] => $this->getEmail(),
+            $keys[2] => $this->getFirstname(),
+            $keys[3] => $this->getLastname(),
+            $keys[4] => $this->getLocale(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
 
-        if ($includeForeignObjects) {
-            if (null !== $this->aProfile) {
-                $result['Profile'] = $this->aProfile->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aResource) {
-                $result['Resource'] = $this->aResource->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-        }
 
         return $result;
     }
@@ -1114,7 +1089,7 @@ abstract class ProfileResource implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ProfileResourceTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = NewsletterTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1134,18 +1109,21 @@ abstract class ProfileResource implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setProfileId($value);
+                $this->setEmail($value);
                 break;
             case 2:
-                $this->setResourceId($value);
+                $this->setFirstname($value);
                 break;
             case 3:
-                $this->setAccess($value);
+                $this->setLastname($value);
                 break;
             case 4:
-                $this->setCreatedAt($value);
+                $this->setLocale($value);
                 break;
             case 5:
+                $this->setCreatedAt($value);
+                break;
+            case 6:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1170,14 +1148,15 @@ abstract class ProfileResource implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = ProfileResourceTableMap::getFieldNames($keyType);
+        $keys = NewsletterTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setProfileId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setResourceId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setAccess($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[1], $arr)) $this->setEmail($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setFirstname($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setLastname($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setLocale($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -1187,14 +1166,15 @@ abstract class ProfileResource implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(ProfileResourceTableMap::DATABASE_NAME);
+        $criteria = new Criteria(NewsletterTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ProfileResourceTableMap::ID)) $criteria->add(ProfileResourceTableMap::ID, $this->id);
-        if ($this->isColumnModified(ProfileResourceTableMap::PROFILE_ID)) $criteria->add(ProfileResourceTableMap::PROFILE_ID, $this->profile_id);
-        if ($this->isColumnModified(ProfileResourceTableMap::RESOURCE_ID)) $criteria->add(ProfileResourceTableMap::RESOURCE_ID, $this->resource_id);
-        if ($this->isColumnModified(ProfileResourceTableMap::ACCESS)) $criteria->add(ProfileResourceTableMap::ACCESS, $this->access);
-        if ($this->isColumnModified(ProfileResourceTableMap::CREATED_AT)) $criteria->add(ProfileResourceTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(ProfileResourceTableMap::UPDATED_AT)) $criteria->add(ProfileResourceTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(NewsletterTableMap::ID)) $criteria->add(NewsletterTableMap::ID, $this->id);
+        if ($this->isColumnModified(NewsletterTableMap::EMAIL)) $criteria->add(NewsletterTableMap::EMAIL, $this->email);
+        if ($this->isColumnModified(NewsletterTableMap::FIRSTNAME)) $criteria->add(NewsletterTableMap::FIRSTNAME, $this->firstname);
+        if ($this->isColumnModified(NewsletterTableMap::LASTNAME)) $criteria->add(NewsletterTableMap::LASTNAME, $this->lastname);
+        if ($this->isColumnModified(NewsletterTableMap::LOCALE)) $criteria->add(NewsletterTableMap::LOCALE, $this->locale);
+        if ($this->isColumnModified(NewsletterTableMap::CREATED_AT)) $criteria->add(NewsletterTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(NewsletterTableMap::UPDATED_AT)) $criteria->add(NewsletterTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1209,40 +1189,30 @@ abstract class ProfileResource implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(ProfileResourceTableMap::DATABASE_NAME);
-        $criteria->add(ProfileResourceTableMap::ID, $this->id);
-        $criteria->add(ProfileResourceTableMap::PROFILE_ID, $this->profile_id);
-        $criteria->add(ProfileResourceTableMap::RESOURCE_ID, $this->resource_id);
+        $criteria = new Criteria(NewsletterTableMap::DATABASE_NAME);
+        $criteria->add(NewsletterTableMap::ID, $this->id);
 
         return $criteria;
     }
 
     /**
-     * Returns the composite primary key for this object.
-     * The array elements will be in same order as specified in XML.
-     * @return array
+     * Returns the primary key for this object (row).
+     * @return   int
      */
     public function getPrimaryKey()
     {
-        $pks = array();
-        $pks[0] = $this->getId();
-        $pks[1] = $this->getProfileId();
-        $pks[2] = $this->getResourceId();
-
-        return $pks;
+        return $this->getId();
     }
 
     /**
-     * Set the [composite] primary key.
+     * Generic method to set the primary key (id column).
      *
-     * @param      array $keys The elements of the composite key (order must match the order in XML file).
+     * @param       int $key Primary key.
      * @return void
      */
-    public function setPrimaryKey($keys)
+    public function setPrimaryKey($key)
     {
-        $this->setId($keys[0]);
-        $this->setProfileId($keys[1]);
-        $this->setResourceId($keys[2]);
+        $this->setId($key);
     }
 
     /**
@@ -1252,7 +1222,7 @@ abstract class ProfileResource implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getId()) && (null === $this->getProfileId()) && (null === $this->getResourceId());
+        return null === $this->getId();
     }
 
     /**
@@ -1261,16 +1231,17 @@ abstract class ProfileResource implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\ProfileResource (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\Newsletter (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setProfileId($this->getProfileId());
-        $copyObj->setResourceId($this->getResourceId());
-        $copyObj->setAccess($this->getAccess());
+        $copyObj->setEmail($this->getEmail());
+        $copyObj->setFirstname($this->getFirstname());
+        $copyObj->setLastname($this->getLastname());
+        $copyObj->setLocale($this->getLocale());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1288,7 +1259,7 @@ abstract class ProfileResource implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\ProfileResource Clone of current object.
+     * @return                 \Thelia\Model\Newsletter Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1302,121 +1273,19 @@ abstract class ProfileResource implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildProfile object.
-     *
-     * @param                  ChildProfile $v
-     * @return                 \Thelia\Model\ProfileResource The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setProfile(ChildProfile $v = null)
-    {
-        if ($v === null) {
-            $this->setProfileId(NULL);
-        } else {
-            $this->setProfileId($v->getId());
-        }
-
-        $this->aProfile = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildProfile object, it will not be re-added.
-        if ($v !== null) {
-            $v->addProfileResource($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildProfile object
-     *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildProfile The associated ChildProfile object.
-     * @throws PropelException
-     */
-    public function getProfile(ConnectionInterface $con = null)
-    {
-        if ($this->aProfile === null && ($this->profile_id !== null)) {
-            $this->aProfile = ChildProfileQuery::create()->findPk($this->profile_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aProfile->addProfileResources($this);
-             */
-        }
-
-        return $this->aProfile;
-    }
-
-    /**
-     * Declares an association between this object and a ChildResource object.
-     *
-     * @param                  ChildResource $v
-     * @return                 \Thelia\Model\ProfileResource The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setResource(ChildResource $v = null)
-    {
-        if ($v === null) {
-            $this->setResourceId(NULL);
-        } else {
-            $this->setResourceId($v->getId());
-        }
-
-        $this->aResource = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildResource object, it will not be re-added.
-        if ($v !== null) {
-            $v->addProfileResource($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildResource object
-     *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildResource The associated ChildResource object.
-     * @throws PropelException
-     */
-    public function getResource(ConnectionInterface $con = null)
-    {
-        if ($this->aResource === null && ($this->resource_id !== null)) {
-            $this->aResource = ChildResourceQuery::create()->findPk($this->resource_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aResource->addProfileResources($this);
-             */
-        }
-
-        return $this->aResource;
-    }
-
-    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
         $this->id = null;
-        $this->profile_id = null;
-        $this->resource_id = null;
-        $this->access = null;
+        $this->email = null;
+        $this->firstname = null;
+        $this->lastname = null;
+        $this->locale = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
-        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1436,8 +1305,6 @@ abstract class ProfileResource implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aProfile = null;
-        $this->aResource = null;
     }
 
     /**
@@ -1447,7 +1314,7 @@ abstract class ProfileResource implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(ProfileResourceTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(NewsletterTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1455,11 +1322,11 @@ abstract class ProfileResource implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildProfileResource The current object (for fluent API support)
+     * @return     ChildNewsletter The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ProfileResourceTableMap::UPDATED_AT;
+        $this->modifiedColumns[] = NewsletterTableMap::UPDATED_AT;
 
         return $this;
     }
