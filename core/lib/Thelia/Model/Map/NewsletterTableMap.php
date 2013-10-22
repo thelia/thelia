@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Customer;
-use Thelia\Model\CustomerQuery;
+use Thelia\Model\Newsletter;
+use Thelia\Model\NewsletterQuery;
 
 
 /**
- * This class defines the structure of the 'customer' table.
+ * This class defines the structure of the 'newsletter' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\CustomerQuery;
  * (i.e. if it's a text column type).
  *
  */
-class CustomerTableMap extends TableMap
+class NewsletterTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.CustomerTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.NewsletterTableMap';
 
     /**
      * The default database name for this class
@@ -42,22 +42,22 @@ class CustomerTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'customer';
+    const TABLE_NAME = 'newsletter';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Customer';
+    const OM_CLASS = '\\Thelia\\Model\\Newsletter';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Customer';
+    const CLASS_DEFAULT = 'Thelia.Model.Newsletter';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 16;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -67,87 +67,42 @@ class CustomerTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 16;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'customer.ID';
-
-    /**
-     * the column name for the REF field
-     */
-    const REF = 'customer.REF';
-
-    /**
-     * the column name for the TITLE_ID field
-     */
-    const TITLE_ID = 'customer.TITLE_ID';
-
-    /**
-     * the column name for the FIRSTNAME field
-     */
-    const FIRSTNAME = 'customer.FIRSTNAME';
-
-    /**
-     * the column name for the LASTNAME field
-     */
-    const LASTNAME = 'customer.LASTNAME';
+    const ID = 'newsletter.ID';
 
     /**
      * the column name for the EMAIL field
      */
-    const EMAIL = 'customer.EMAIL';
+    const EMAIL = 'newsletter.EMAIL';
 
     /**
-     * the column name for the PASSWORD field
+     * the column name for the FIRSTNAME field
      */
-    const PASSWORD = 'customer.PASSWORD';
+    const FIRSTNAME = 'newsletter.FIRSTNAME';
 
     /**
-     * the column name for the ALGO field
+     * the column name for the LASTNAME field
      */
-    const ALGO = 'customer.ALGO';
+    const LASTNAME = 'newsletter.LASTNAME';
 
     /**
-     * the column name for the RESELLER field
+     * the column name for the LOCALE field
      */
-    const RESELLER = 'customer.RESELLER';
-
-    /**
-     * the column name for the LANG field
-     */
-    const LANG = 'customer.LANG';
-
-    /**
-     * the column name for the SPONSOR field
-     */
-    const SPONSOR = 'customer.SPONSOR';
-
-    /**
-     * the column name for the DISCOUNT field
-     */
-    const DISCOUNT = 'customer.DISCOUNT';
-
-    /**
-     * the column name for the REMEMBER_ME_TOKEN field
-     */
-    const REMEMBER_ME_TOKEN = 'customer.REMEMBER_ME_TOKEN';
-
-    /**
-     * the column name for the REMEMBER_ME_SERIAL field
-     */
-    const REMEMBER_ME_SERIAL = 'customer.REMEMBER_ME_SERIAL';
+    const LOCALE = 'newsletter.LOCALE';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'customer.CREATED_AT';
+    const CREATED_AT = 'newsletter.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'customer.UPDATED_AT';
+    const UPDATED_AT = 'newsletter.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -161,12 +116,12 @@ class CustomerTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Ref', 'TitleId', 'Firstname', 'Lastname', 'Email', 'Password', 'Algo', 'Reseller', 'Lang', 'Sponsor', 'Discount', 'RememberMeToken', 'RememberMeSerial', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'titleId', 'firstname', 'lastname', 'email', 'password', 'algo', 'reseller', 'lang', 'sponsor', 'discount', 'rememberMeToken', 'rememberMeSerial', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CustomerTableMap::ID, CustomerTableMap::REF, CustomerTableMap::TITLE_ID, CustomerTableMap::FIRSTNAME, CustomerTableMap::LASTNAME, CustomerTableMap::EMAIL, CustomerTableMap::PASSWORD, CustomerTableMap::ALGO, CustomerTableMap::RESELLER, CustomerTableMap::LANG, CustomerTableMap::SPONSOR, CustomerTableMap::DISCOUNT, CustomerTableMap::REMEMBER_ME_TOKEN, CustomerTableMap::REMEMBER_ME_SERIAL, CustomerTableMap::CREATED_AT, CustomerTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'TITLE_ID', 'FIRSTNAME', 'LASTNAME', 'EMAIL', 'PASSWORD', 'ALGO', 'RESELLER', 'LANG', 'SPONSOR', 'DISCOUNT', 'REMEMBER_ME_TOKEN', 'REMEMBER_ME_SERIAL', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'ref', 'title_id', 'firstname', 'lastname', 'email', 'password', 'algo', 'reseller', 'lang', 'sponsor', 'discount', 'remember_me_token', 'remember_me_serial', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
+        self::TYPE_PHPNAME       => array('Id', 'Email', 'Firstname', 'Lastname', 'Locale', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'email', 'firstname', 'lastname', 'locale', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(NewsletterTableMap::ID, NewsletterTableMap::EMAIL, NewsletterTableMap::FIRSTNAME, NewsletterTableMap::LASTNAME, NewsletterTableMap::LOCALE, NewsletterTableMap::CREATED_AT, NewsletterTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'EMAIL', 'FIRSTNAME', 'LASTNAME', 'LOCALE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'email', 'firstname', 'lastname', 'locale', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -176,12 +131,12 @@ class CustomerTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'TitleId' => 2, 'Firstname' => 3, 'Lastname' => 4, 'Email' => 5, 'Password' => 6, 'Algo' => 7, 'Reseller' => 8, 'Lang' => 9, 'Sponsor' => 10, 'Discount' => 11, 'RememberMeToken' => 12, 'RememberMeSerial' => 13, 'CreatedAt' => 14, 'UpdatedAt' => 15, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'titleId' => 2, 'firstname' => 3, 'lastname' => 4, 'email' => 5, 'password' => 6, 'algo' => 7, 'reseller' => 8, 'lang' => 9, 'sponsor' => 10, 'discount' => 11, 'rememberMeToken' => 12, 'rememberMeSerial' => 13, 'createdAt' => 14, 'updatedAt' => 15, ),
-        self::TYPE_COLNAME       => array(CustomerTableMap::ID => 0, CustomerTableMap::REF => 1, CustomerTableMap::TITLE_ID => 2, CustomerTableMap::FIRSTNAME => 3, CustomerTableMap::LASTNAME => 4, CustomerTableMap::EMAIL => 5, CustomerTableMap::PASSWORD => 6, CustomerTableMap::ALGO => 7, CustomerTableMap::RESELLER => 8, CustomerTableMap::LANG => 9, CustomerTableMap::SPONSOR => 10, CustomerTableMap::DISCOUNT => 11, CustomerTableMap::REMEMBER_ME_TOKEN => 12, CustomerTableMap::REMEMBER_ME_SERIAL => 13, CustomerTableMap::CREATED_AT => 14, CustomerTableMap::UPDATED_AT => 15, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'TITLE_ID' => 2, 'FIRSTNAME' => 3, 'LASTNAME' => 4, 'EMAIL' => 5, 'PASSWORD' => 6, 'ALGO' => 7, 'RESELLER' => 8, 'LANG' => 9, 'SPONSOR' => 10, 'DISCOUNT' => 11, 'REMEMBER_ME_TOKEN' => 12, 'REMEMBER_ME_SERIAL' => 13, 'CREATED_AT' => 14, 'UPDATED_AT' => 15, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'title_id' => 2, 'firstname' => 3, 'lastname' => 4, 'email' => 5, 'password' => 6, 'algo' => 7, 'reseller' => 8, 'lang' => 9, 'sponsor' => 10, 'discount' => 11, 'remember_me_token' => 12, 'remember_me_serial' => 13, 'created_at' => 14, 'updated_at' => 15, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Email' => 1, 'Firstname' => 2, 'Lastname' => 3, 'Locale' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'email' => 1, 'firstname' => 2, 'lastname' => 3, 'locale' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(NewsletterTableMap::ID => 0, NewsletterTableMap::EMAIL => 1, NewsletterTableMap::FIRSTNAME => 2, NewsletterTableMap::LASTNAME => 3, NewsletterTableMap::LOCALE => 4, NewsletterTableMap::CREATED_AT => 5, NewsletterTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'EMAIL' => 1, 'FIRSTNAME' => 2, 'LASTNAME' => 3, 'LOCALE' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'email' => 1, 'firstname' => 2, 'lastname' => 3, 'locale' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -194,26 +149,17 @@ class CustomerTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('customer');
-        $this->setPhpName('Customer');
-        $this->setClassName('\\Thelia\\Model\\Customer');
+        $this->setName('newsletter');
+        $this->setPhpName('Newsletter');
+        $this->setClassName('\\Thelia\\Model\\Newsletter');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', true, 50, null);
-        $this->addForeignKey('TITLE_ID', 'TitleId', 'INTEGER', 'customer_title', 'ID', true, null, null);
-        $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 255, null);
-        $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 255, null);
-        $this->addColumn('EMAIL', 'Email', 'VARCHAR', false, 255, null);
-        $this->addColumn('PASSWORD', 'Password', 'VARCHAR', false, 255, null);
-        $this->addColumn('ALGO', 'Algo', 'VARCHAR', false, 128, null);
-        $this->addColumn('RESELLER', 'Reseller', 'TINYINT', false, null, null);
-        $this->addColumn('LANG', 'Lang', 'VARCHAR', false, 10, null);
-        $this->addColumn('SPONSOR', 'Sponsor', 'VARCHAR', false, 50, null);
-        $this->addColumn('DISCOUNT', 'Discount', 'FLOAT', false, null, null);
-        $this->addColumn('REMEMBER_ME_TOKEN', 'RememberMeToken', 'VARCHAR', false, 255, null);
-        $this->addColumn('REMEMBER_ME_SERIAL', 'RememberMeSerial', 'VARCHAR', false, 255, null);
+        $this->addColumn('EMAIL', 'Email', 'VARCHAR', true, 255, null);
+        $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', false, 255, null);
+        $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', false, 255, null);
+        $this->addColumn('LOCALE', 'Locale', 'VARCHAR', false, 45, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -223,10 +169,6 @@ class CustomerTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CustomerTitle', '\\Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('Address', '\\Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'CASCADE', 'RESTRICT', 'Addresses');
-        $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'RESTRICT', 'RESTRICT', 'Orders');
-        $this->addRelation('Cart', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), null, null, 'Carts');
     } // buildRelations()
 
     /**
@@ -241,15 +183,6 @@ class CustomerTableMap extends TableMap
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
-    /**
-     * Method to invalidate the instance pool of all tables related to customer     * by a foreign key with ON DELETE CASCADE
-     */
-    public static function clearRelatedInstancePool()
-    {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                AddressTableMap::clearInstancePool();
-            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -307,7 +240,7 @@ class CustomerTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? CustomerTableMap::CLASS_DEFAULT : CustomerTableMap::OM_CLASS;
+        return $withPrefix ? NewsletterTableMap::CLASS_DEFAULT : NewsletterTableMap::OM_CLASS;
     }
 
     /**
@@ -321,21 +254,21 @@ class CustomerTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Customer object, last column rank)
+     * @return array (Newsletter object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = CustomerTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = CustomerTableMap::getInstanceFromPool($key))) {
+        $key = NewsletterTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = NewsletterTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + CustomerTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + NewsletterTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = CustomerTableMap::OM_CLASS;
+            $cls = NewsletterTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            CustomerTableMap::addInstanceToPool($obj, $key);
+            NewsletterTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -358,8 +291,8 @@ class CustomerTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = CustomerTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = CustomerTableMap::getInstanceFromPool($key))) {
+            $key = NewsletterTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = NewsletterTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -368,7 +301,7 @@ class CustomerTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                CustomerTableMap::addInstanceToPool($obj, $key);
+                NewsletterTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -389,37 +322,19 @@ class CustomerTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CustomerTableMap::ID);
-            $criteria->addSelectColumn(CustomerTableMap::REF);
-            $criteria->addSelectColumn(CustomerTableMap::TITLE_ID);
-            $criteria->addSelectColumn(CustomerTableMap::FIRSTNAME);
-            $criteria->addSelectColumn(CustomerTableMap::LASTNAME);
-            $criteria->addSelectColumn(CustomerTableMap::EMAIL);
-            $criteria->addSelectColumn(CustomerTableMap::PASSWORD);
-            $criteria->addSelectColumn(CustomerTableMap::ALGO);
-            $criteria->addSelectColumn(CustomerTableMap::RESELLER);
-            $criteria->addSelectColumn(CustomerTableMap::LANG);
-            $criteria->addSelectColumn(CustomerTableMap::SPONSOR);
-            $criteria->addSelectColumn(CustomerTableMap::DISCOUNT);
-            $criteria->addSelectColumn(CustomerTableMap::REMEMBER_ME_TOKEN);
-            $criteria->addSelectColumn(CustomerTableMap::REMEMBER_ME_SERIAL);
-            $criteria->addSelectColumn(CustomerTableMap::CREATED_AT);
-            $criteria->addSelectColumn(CustomerTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(NewsletterTableMap::ID);
+            $criteria->addSelectColumn(NewsletterTableMap::EMAIL);
+            $criteria->addSelectColumn(NewsletterTableMap::FIRSTNAME);
+            $criteria->addSelectColumn(NewsletterTableMap::LASTNAME);
+            $criteria->addSelectColumn(NewsletterTableMap::LOCALE);
+            $criteria->addSelectColumn(NewsletterTableMap::CREATED_AT);
+            $criteria->addSelectColumn(NewsletterTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.REF');
-            $criteria->addSelectColumn($alias . '.TITLE_ID');
+            $criteria->addSelectColumn($alias . '.EMAIL');
             $criteria->addSelectColumn($alias . '.FIRSTNAME');
             $criteria->addSelectColumn($alias . '.LASTNAME');
-            $criteria->addSelectColumn($alias . '.EMAIL');
-            $criteria->addSelectColumn($alias . '.PASSWORD');
-            $criteria->addSelectColumn($alias . '.ALGO');
-            $criteria->addSelectColumn($alias . '.RESELLER');
-            $criteria->addSelectColumn($alias . '.LANG');
-            $criteria->addSelectColumn($alias . '.SPONSOR');
-            $criteria->addSelectColumn($alias . '.DISCOUNT');
-            $criteria->addSelectColumn($alias . '.REMEMBER_ME_TOKEN');
-            $criteria->addSelectColumn($alias . '.REMEMBER_ME_SERIAL');
+            $criteria->addSelectColumn($alias . '.LOCALE');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -434,7 +349,7 @@ class CustomerTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(CustomerTableMap::DATABASE_NAME)->getTable(CustomerTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(NewsletterTableMap::DATABASE_NAME)->getTable(NewsletterTableMap::TABLE_NAME);
     }
 
     /**
@@ -442,16 +357,16 @@ class CustomerTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CustomerTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(CustomerTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new CustomerTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(NewsletterTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(NewsletterTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new NewsletterTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Customer or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a Newsletter or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Customer object or primary key or array of primary keys
+     * @param mixed               $values Criteria or Newsletter object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -462,25 +377,25 @@ class CustomerTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CustomerTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(NewsletterTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Customer) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\Newsletter) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(CustomerTableMap::DATABASE_NAME);
-            $criteria->add(CustomerTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(NewsletterTableMap::DATABASE_NAME);
+            $criteria->add(NewsletterTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = CustomerQuery::create()->mergeWith($criteria);
+        $query = NewsletterQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { CustomerTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { NewsletterTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { CustomerTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { NewsletterTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -488,20 +403,20 @@ class CustomerTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the customer table.
+     * Deletes all rows from the newsletter table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return CustomerQuery::create()->doDeleteAll($con);
+        return NewsletterQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Customer or Criteria object.
+     * Performs an INSERT on the database, given a Newsletter or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Customer object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or Newsletter object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -510,22 +425,22 @@ class CustomerTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CustomerTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(NewsletterTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Customer object
+            $criteria = $criteria->buildCriteria(); // build Criteria from Newsletter object
         }
 
-        if ($criteria->containsKey(CustomerTableMap::ID) && $criteria->keyContainsValue(CustomerTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CustomerTableMap::ID.')');
+        if ($criteria->containsKey(NewsletterTableMap::ID) && $criteria->keyContainsValue(NewsletterTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.NewsletterTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = CustomerQuery::create()->mergeWith($criteria);
+        $query = NewsletterQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -541,7 +456,7 @@ class CustomerTableMap extends TableMap
         return $pk;
     }
 
-} // CustomerTableMap
+} // NewsletterTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-CustomerTableMap::buildTableMap();
+NewsletterTableMap::buildTableMap();

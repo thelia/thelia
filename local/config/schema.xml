@@ -339,7 +339,7 @@
     <column name="title_id" required="true" type="INTEGER" />
     <column name="firstname" required="true" size="255" type="VARCHAR" />
     <column name="lastname" required="true" size="255" type="VARCHAR" />
-    <column name="email" size="50" type="VARCHAR" />
+    <column name="email" size="255" type="VARCHAR" />
     <column name="password" size="255" type="VARCHAR" />
     <column name="algo" size="128" type="VARCHAR" />
     <column name="reseller" type="TINYINT" />
@@ -1243,6 +1243,14 @@
     <index name="idx_ order_product_tax_order_product_id">
       <index-column name="order_product_id" />
     </index>
+    <behavior name="timestampable" />
+  </table>
+  <table name="newsletter" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="email" required="true" size="255" type="VARCHAR" />
+    <column name="firstname" size="255" type="VARCHAR" />
+    <column name="lastname" size="255" type="VARCHAR" />
+    <column name="locale" size="45" type="VARCHAR" />
     <behavior name="timestampable" />
   </table>
 </database>

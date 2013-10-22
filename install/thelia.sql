@@ -437,7 +437,7 @@ CREATE TABLE `customer`
     `title_id` INTEGER NOT NULL,
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
-    `email` VARCHAR(50),
+    `email` VARCHAR(255),
     `password` VARCHAR(255),
     `algo` VARCHAR(128),
     `reseller` TINYINT,
@@ -1579,6 +1579,24 @@ CREATE TABLE `order_product_tax`
         REFERENCES `order_product` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- newsletter
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `newsletter`;
+
+CREATE TABLE `newsletter`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `email` VARCHAR(255) NOT NULL,
+    `firstname` VARCHAR(255),
+    `lastname` VARCHAR(255),
+    `locale` VARCHAR(45),
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

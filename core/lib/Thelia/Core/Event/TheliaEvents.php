@@ -681,4 +681,9 @@ final class TheliaEvents
      * sent for clearing cache
      */
     const CACHE_CLEAR = 'thelia.cache.clear';
+
+    /**
+     * sent for subscribing to the newsletter
+     */
+    const NEWSLETTER_SUBSCRIBE = 'thelia.newsletter.subscribe';
 }
