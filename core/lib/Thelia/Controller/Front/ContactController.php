@@ -58,7 +58,7 @@ class ContactController extends BaseFrontController
         }
 
         if ($error_message !== false) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error during customer creation process : %s", $error_message));
+            \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during sending contant mail : %s', $error_message));
 
             $contactForm->setErrorMessage($error_message);
 
