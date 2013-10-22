@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Orders'}{/block}
 
-{block name="check-permissions"}admin.orders.view{/block}
+{block name="check-resource"}admin.order{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
     {assign order_page {$smarty.get.page|default:1}}

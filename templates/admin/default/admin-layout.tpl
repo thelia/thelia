@@ -1,7 +1,7 @@
 {* -- By default, check admin login ----------------------------------------- *}
 
 {block name="check-auth"}
-    {check_auth roles="ADMIN" permissions="{block name="check-permissions"}{/block}" login_tpl="/admin/login"}
+    {check_auth role="ADMIN" resource="{block name="check-resource"}{/block}" access="{block name="check-access"}{/block}" login_tpl="/admin/login"}
 {/block}
 
 {* -- Define some stuff for Smarty ----------------------------------------- *}

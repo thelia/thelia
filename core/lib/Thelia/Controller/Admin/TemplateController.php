@@ -23,11 +23,12 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Template\TemplateDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Template\TemplateUpdateEvent;
 use Thelia\Core\Event\Template\TemplateCreateEvent;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Model\TemplateQuery;
 use Thelia\Form\TemplateModificationForm;
 use Thelia\Form\TemplateCreationForm;
@@ -52,10 +53,7 @@ class TemplateController extends AbstractCrudController
             null,
             null,
 
-            AdminResources::TEMPLATE_VIEW,
-            AdminResources::TEMPLATE_CREATE,
-            AdminResources::TEMPLATE_UPDATE,
-            AdminResources::TEMPLATE_DELETE,
+            AdminResources::TEMPLATE,
 
             TheliaEvents::TEMPLATE_CREATE,
             TheliaEvents::TEMPLATE_UPDATE,
@@ -213,7 +211,7 @@ class TemplateController extends AbstractCrudController
     public function addAttributeAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE_UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, AccessManager::UPDATE)) return $response;
 
         $attribute_id = intval($this->getRequest()->get('attribute_id'));
 
@@ -237,7 +235,7 @@ class TemplateController extends AbstractCrudController
     public function deleteAttributeAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE_UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, AccessManager::UPDATE)) return $response;
 
         $event = new TemplateDeleteAttributeEvent(
                 $this->getExistingObject(),
@@ -272,7 +270,7 @@ class TemplateController extends AbstractCrudController
     public function addFeatureAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE_UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, AccessManager::UPDATE)) return $response;
 
         $feature_id = intval($this->getRequest()->get('feature_id'));
 
@@ -296,7 +294,7 @@ class TemplateController extends AbstractCrudController
     public function deleteFeatureAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE_UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, AccessManager::UPDATE)) return $response;
 
         $event = new TemplateDeleteFeatureEvent(
                 $this->getExistingObject(),

@@ -45,7 +45,8 @@ class AdminUtilities extends AbstractSmartyPlugin
     public function generatePositionChangeBlock($params, &$smarty)
     {
         // The required permissions
-        $permission = $this->getParam($params, 'permission');
+        $resource = $this->getParam($params, 'resource');
+        $access = $this->getParam($params, 'access');
 
         // The base position change path
         $path = $this->getParam($params, 'path');
@@ -68,7 +69,7 @@ class AdminUtilities extends AbstractSmartyPlugin
         <a href="{url path='/admin/configuration/currencies/positionDown' currency_id=$ID}"><i class="icon-arrow-down"></i></a>
         */
 
-        if ($permissions == null || $this->securityContext->isGranted("ADMIN", array($permission))) {
+        if ($permissions == null || $this->securityContext->isGranted("ADMIN", array($resource), array($access))) {
             return sprintf(
                 '<a href="%s"><i class="glyphicon glyphicon-arrow-up"></i></a><span class="%s" data-id="%s">%s</span><a href="%s"><i class="glyphicon glyphicon-arrow-down"></i></a>',
                 URL::getInstance()->absoluteUrl($path, array('mode' => 'up', $url_parameter => $id)),

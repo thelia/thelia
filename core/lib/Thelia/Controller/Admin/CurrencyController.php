@@ -23,7 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
@@ -47,10 +47,7 @@ class CurrencyController extends AbstractCrudController
             'manual',
             'order',
 
-            AdminResources::CURRENCY_VIEW,
-            AdminResources::CURRENCY_CREATE,
-            AdminResources::CURRENCY_UPDATE,
-            AdminResources::CURRENCY_DELETE,
+            AdminResources::CURRENCY,
 
             TheliaEvents::CURRENCY_CREATE,
             TheliaEvents::CURRENCY_UPDATE,
@@ -187,7 +184,7 @@ class CurrencyController extends AbstractCrudController
     public function updateRatesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         try {
             $this->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES);
@@ -205,7 +202,7 @@ class CurrencyController extends AbstractCrudController
     public function setDefaultAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $changeEvent = new CurrencyUpdateEvent($this->getRequest()->get('currency_id', 0));
 

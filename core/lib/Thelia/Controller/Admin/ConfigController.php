@@ -23,11 +23,12 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Config\ConfigDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Model\ConfigQuery;
 use Thelia\Form\ConfigModificationForm;
 use Thelia\Form\ConfigCreationForm;
@@ -46,10 +47,7 @@ class ConfigController extends AbstractCrudController
             'name',
             'order',
 
-            AdminResources::CONFIG_VIEW,
-            AdminResources::CONFIG_CREATE,
-            AdminResources::CONFIG_UPDATE,
-            AdminResources::CONFIG_DELETE,
+            AdminResources::CONFIG,
 
             TheliaEvents::CONFIG_CREATE,
             TheliaEvents::CONFIG_UPDATE,
@@ -188,7 +186,7 @@ class ConfigController extends AbstractCrudController
     public function changeValuesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $variables = $this->getRequest()->get('variable', array());
 

@@ -24,8 +24,9 @@
 namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;
 use Thelia\Model\AddressQuery;
@@ -45,10 +46,7 @@ class AddressController extends AbstractCrudController
             null,
             null,
 
-            AdminResources::ADDRESS_VIEW,
-            AdminResources::ADDRESS_CREATE,
-            AdminResources::ADDRESS_UPDATE,
-            AdminResources::ADDRESS_DELETE,
+            AdminResources::ADDRESS,
 
             TheliaEvents::ADDRESS_CREATE,
             TheliaEvents::ADDRESS_UPDATE,
@@ -61,7 +59,7 @@ class AddressController extends AbstractCrudController
 
     public function useAddressAction()
     {
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $address_id = $this->getRequest()->request->get('address_id');
 

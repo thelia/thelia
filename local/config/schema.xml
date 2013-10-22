@@ -776,8 +776,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="profile_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="resource_id" primaryKey="true" required="true" type="INTEGER" />
-    <column defaultValue="0" name="read" type="TINYINT" />
-    <column defaultValue="0" name="write" type="TINYINT" />
+    <column defaultValue="0" name="access" required="true" type="INTEGER" />
     <foreign-key foreignTable="profile" name="fk_profile_resource_profile_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="profile_id" />
     </foreign-key>

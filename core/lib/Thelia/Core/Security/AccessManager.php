@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -20,44 +20,65 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+
+namespace Thelia\Core\Security;
+
+use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Security\User\UserInterface;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Model\ProfileQuery;
+use Thelia\Model\ProfileResourceQuery;
 
 /**
+ * A simple security manager, in charge of checking user
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
  */
-
-class AlphaNumStringListType extends BaseType
+class AccessManager
 {
-    public function getType()
+    const VIEW = 'VIEW';
+    const CREATE = 'CREATE';
+    const UPDATE = 'UPDATE';
+    const DELETE = 'DELETE';
+
+    protected $accessGranted = array(
+        self::VIEW      =>  false,
+        self::CREATE    =>  false,
+        self::UPDATE    =>  false,
+        self::DELETE    =>  false,
+    );
+
+    protected $accessPows = array(
+        self::VIEW      =>  3,
+        self::CREATE    =>  2,
+        self::UPDATE    =>  1,
+        self::DELETE    =>  0,
+    );
+
+    protected $accessValue;
+
+    public function __construct($accessValue)
     {
-        return 'Alphanumeric string list type';
+        $this->accessValue = $accessValue;
+
+        foreach($this->accessPows as $type => $value) {
+            if($accessValue >= $value) {
+                $accessValue -= $value;
+                $this->accessGranted[$type] = true;
+            } else {
+                $this->accessGranted[$type] = false;
+            }
+        }
     }
 
-    public function isValid($values)
+    public function can($type)
     {
-        foreach (explode(',', $values) as $value) {
-            if(!preg_match('#^[a-zA-Z0-9\-_\.]+$#', $value))
-
-                return false;
+        if(!array_key_exists($type, $this->accessGranted)) {
+            return false;
         }
 
-        return true;
-    }
+        return $this->accessGranted[$type];
 
-    public function getFormattedValue($values)
-    {
-        return $this->isValid($values) ? explode(',', $values) : null;
-    }
-
-    public function getFormType()
-    {
-        return 'text';
-    }
-
-    public function getFormOptions()
-    {
-        return array();
     }
 }

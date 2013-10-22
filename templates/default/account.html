@@ -1,7 +1,7 @@
 {extends file="layout.tpl"}
 
 {block name="no-return-functions" prepend}
-    {check_auth context="front" roles="CUSTOMER" login_tpl="login"}
+    {check_auth context="front" role="CUSTOMER" login_tpl="login"}
 {/block}
 
 {* Breadcrumb *}

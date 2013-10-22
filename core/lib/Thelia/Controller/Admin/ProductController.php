@@ -23,13 +23,14 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Model\ProductQuery;
 use Thelia\Form\ProductModificationForm;
 use Thelia\Form\ProductCreationForm;
@@ -62,10 +63,7 @@ class ProductController extends AbstractCrudController
             'manual',
             'product_order',
 
-            AdminResources::PRODUCT_VIEW,
-            AdminResources::PRODUCT_CREATE,
-            AdminResources::PRODUCT_UPDATE,
-            AdminResources::PRODUCT_DELETE,
+            AdminResources::PRODUCT,
 
             TheliaEvents::PRODUCT_CREATE,
             TheliaEvents::PRODUCT_UPDATE,
@@ -281,7 +279,7 @@ class ProductController extends AbstractCrudController
     public function setToggleVisibilityAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $event = new ProductToggleVisibilityEvent($this->getExistingObject());
 
@@ -357,7 +355,7 @@ class ProductController extends AbstractCrudController
     {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $content_id = intval($this->getRequest()->get('content_id'));
 
@@ -383,7 +381,7 @@ class ProductController extends AbstractCrudController
     {
 
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $content_id = intval($this->getRequest()->get('content_id'));
 
@@ -435,7 +433,7 @@ class ProductController extends AbstractCrudController
     public function addAccessoryAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $accessory_id = intval($this->getRequest()->get('accessory_id'));
 
@@ -460,7 +458,7 @@ class ProductController extends AbstractCrudController
     public function deleteAccessoryAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $accessory_id = intval($this->getRequest()->get('accessory_id'));
 
@@ -516,7 +514,7 @@ class ProductController extends AbstractCrudController
     public function setProductTemplateAction($productId)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $product = ProductQuery::create()->findPk($productId);
 
@@ -613,7 +611,7 @@ class ProductController extends AbstractCrudController
     public function addAdditionalCategoryAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $category_id = intval($this->getRequest()->request->get('additional_category_id'));
 
@@ -638,7 +636,7 @@ class ProductController extends AbstractCrudController
     public function deleteAdditionalCategoryAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $category_id = intval($this->getRequest()->get('additional_category_id'));
 
@@ -735,7 +733,7 @@ class ProductController extends AbstractCrudController
     public function addCombinationAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $event = new ProductCreateCombinationEvent(
                 $this->getExistingObject(),
@@ -760,7 +758,7 @@ class ProductController extends AbstractCrudController
     public function deleteCombinationAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $event = new ProductDeleteCombinationEvent(
                 $this->getExistingObject(),

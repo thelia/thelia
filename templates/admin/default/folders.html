@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Folders'}{/block}
 
-{block name="check-permissions"}admin.folders.view{/block}
+{block name="check-resource"}admin.folder{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
     <div class="folders">
@@ -132,12 +133,13 @@
 
                                     <td>
                                         {admin_position_block
-                                        permission="admin.folders.edit"
-                                        path={url path='admin/folders/update-position' folder_id=$ID}
-                                        url_parameter="folder_id"
-                                        in_place_edit_class="folderPositionChange"
-                                        position=$POSITION
-                                        id=$ID
+                                            resource="admin.folder"
+                                            access="update"
+                                            path={url path='admin/folders/update-position' folder_id=$ID}
+                                            url_parameter="folder_id"
+                                            in_place_edit_class="folderPositionChange"
+                                            position=$POSITION
+                                            id=$ID
                                         }
                                     </td>
 
@@ -287,12 +289,13 @@
 
                                     <td>
                                         {admin_position_block
-                                        permission="admin.content.edit"
-                                        path={url path='/admin/content/update-position' content_id=$ID}
-                                        url_parameter="content_id"
-                                        in_place_edit_class="contentPositionChange"
-                                        position=$POSITION
-                                        id=$ID
+                                            resource="admin.content"
+                                            access="update"
+                                            path={url path='/admin/content/update-position' content_id=$ID}
+                                            url_parameter="content_id"
+                                            in_place_edit_class="contentPositionChange"
+                                            position=$POSITION
+                                            id=$ID
                                         }
                                     </td>
 

@@ -24,11 +24,12 @@
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Customer\CustomerAddressEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Form\CustomerModification;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
@@ -43,13 +44,13 @@ class CustomerController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER_VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, AccessManager::VIEW)) return $response;
         return $this->render("customers", array("display_customer" => 20));
     }
 
     public function viewAction($customer_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER_VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, AccessManager::VIEW)) return $response;
         return $this->render("customer-edit", array(
             "customer_id" => $customer_id
         ));
@@ -63,7 +64,7 @@ class CustomerController extends BaseAdminController
      */
     public function updateAction($customer_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER_UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, AccessManager::UPDATE)) return $response;
 
         $message = false;
 
@@ -119,7 +120,7 @@ class CustomerController extends BaseAdminController
 
     public function deleteAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER_DELETE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::CUSTOMER, AccessManager::DELETE)) return $response;
 
         $message = null;
 
