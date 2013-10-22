@@ -168,6 +168,7 @@
         <default key="_controller">Thelia\Controller\Front\Mail::test</default>
     </route>
 
+    <!-- contact management -->
     <route id="contact.display" path="/contact" methods="get">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">contact</default>
@@ -182,5 +183,19 @@
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">contact-success</default>
     </route>
+    <!-- end contact management -->
 
+    <!-- newsletter management -->
+
+    <route id="newsletter.process" path="/newsletter">
+        <default key="_controller">Thelia\Controller\Front\NewsletterController::subscribeAction</default>
+        <default key="_view">newsletter</default>
+    </route>
+
+    <route id="newsletter.success" path="/newsletter/success">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">newsletter-success</default>
+    </route>
+
+    <!-- end newsletter management -->
 </routes>
