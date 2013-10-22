@@ -44,7 +44,9 @@ class DefinePropel
             "dsn" => $connection["dsn"],
             "user" => $connection["user"],
             "password" => $connection["password"],
-            "classname" => $connection["classname"]
+            "classname" => $connection["classname"],
+            'options' => array(
+                \PDO::MYSQL_ATTR_INIT_COMMAND => array('value' =>'SET NAMES \'UTF8\''))
         );
     }
 }
