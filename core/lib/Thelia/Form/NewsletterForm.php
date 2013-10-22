@@ -23,9 +23,12 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\NewsletterQuery;
 
 
 /**
@@ -62,13 +65,27 @@ class NewsletterForm extends BaseForm
             ->add('email', 'email', array(
                 'constraints' => array(
                     new NotBlank(),
-                    new Email()
+                    new Email(),
+                    new Callback(array(
+                        "methods" => array(
+                            array($this,
+                                "verifyExistingEmail")
+                        )
+                    ))
                 ),
                 'label' => Translator::getInstance()->trans('email'),
                 'label_attr' => array(
                     'for' => 'email_newsletter'
                 )
             ));
+    }
+
+    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    {
+        $customer = NewsletterQuery::create()->findOneByEmail($value);
+        if ($customer) {
+            $context->addViolation("This email already exists");
+        }
     }
 
     /**
