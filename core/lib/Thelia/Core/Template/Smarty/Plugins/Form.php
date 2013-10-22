@@ -255,6 +255,8 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
             self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']->setRendered();
 
             $repeat = true;
+        } else {
+            $content = null;
         }
 
         if (! $repeat) {

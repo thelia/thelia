@@ -57,7 +57,7 @@ class ProfileResourceTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -67,12 +67,7 @@ class ProfileResourceTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
-
-    /**
-     * the column name for the ID field
-     */
-    const ID = 'profile_resource.ID';
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the PROFILE_ID field
@@ -111,12 +106,12 @@ class ProfileResourceTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ProfileId', 'ResourceId', 'Access', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'profileId', 'resourceId', 'access', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProfileResourceTableMap::ID, ProfileResourceTableMap::PROFILE_ID, ProfileResourceTableMap::RESOURCE_ID, ProfileResourceTableMap::ACCESS, ProfileResourceTableMap::CREATED_AT, ProfileResourceTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PROFILE_ID', 'RESOURCE_ID', 'ACCESS', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'profile_id', 'resource_id', 'access', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('ProfileId', 'ResourceId', 'Access', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('profileId', 'resourceId', 'access', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ProfileResourceTableMap::PROFILE_ID, ProfileResourceTableMap::RESOURCE_ID, ProfileResourceTableMap::ACCESS, ProfileResourceTableMap::CREATED_AT, ProfileResourceTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('PROFILE_ID', 'RESOURCE_ID', 'ACCESS', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('profile_id', 'resource_id', 'access', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -126,12 +121,12 @@ class ProfileResourceTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ProfileId' => 1, 'ResourceId' => 2, 'Access' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'profileId' => 1, 'resourceId' => 2, 'access' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(ProfileResourceTableMap::ID => 0, ProfileResourceTableMap::PROFILE_ID => 1, ProfileResourceTableMap::RESOURCE_ID => 2, ProfileResourceTableMap::ACCESS => 3, ProfileResourceTableMap::CREATED_AT => 4, ProfileResourceTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PROFILE_ID' => 1, 'RESOURCE_ID' => 2, 'ACCESS' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'profile_id' => 1, 'resource_id' => 2, 'access' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('ProfileId' => 0, 'ResourceId' => 1, 'Access' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('profileId' => 0, 'resourceId' => 1, 'access' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(ProfileResourceTableMap::PROFILE_ID => 0, ProfileResourceTableMap::RESOURCE_ID => 1, ProfileResourceTableMap::ACCESS => 2, ProfileResourceTableMap::CREATED_AT => 3, ProfileResourceTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('PROFILE_ID' => 0, 'RESOURCE_ID' => 1, 'ACCESS' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('profile_id' => 0, 'resource_id' => 1, 'access' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -148,10 +143,9 @@ class ProfileResourceTableMap extends TableMap
         $this->setPhpName('ProfileResource');
         $this->setClassName('\\Thelia\\Model\\ProfileResource');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         $this->setIsCrossRef(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignPrimaryKey('PROFILE_ID', 'ProfileId', 'INTEGER' , 'profile', 'ID', true, null, null);
         $this->addForeignPrimaryKey('RESOURCE_ID', 'ResourceId', 'INTEGER' , 'resource', 'ID', true, null, null);
         $this->addColumn('ACCESS', 'Access', 'INTEGER', true, null, 0);
@@ -196,7 +190,7 @@ class ProfileResourceTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled()) {
             if (null === $key) {
-                $key = serialize(array((string) $obj->getId(), (string) $obj->getProfileId(), (string) $obj->getResourceId()));
+                $key = serialize(array((string) $obj->getProfileId(), (string) $obj->getResourceId()));
             } // if key === null
             self::$instances[$key] = $obj;
         }
@@ -216,11 +210,11 @@ class ProfileResourceTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled() && null !== $value) {
             if (is_object($value) && $value instanceof \Thelia\Model\ProfileResource) {
-                $key = serialize(array((string) $value->getId(), (string) $value->getProfileId(), (string) $value->getResourceId()));
+                $key = serialize(array((string) $value->getProfileId(), (string) $value->getResourceId()));
 
-            } elseif (is_array($value) && count($value) === 3) {
+            } elseif (is_array($value) && count($value) === 2) {
                 // assume we've been passed a primary key";
-                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2]));
+                $key = serialize(array((string) $value[0], (string) $value[1]));
             } elseif ($value instanceof Criteria) {
                 self::$instances = [];
 
@@ -248,11 +242,11 @@ class ProfileResourceTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('ResourceId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ResourceId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('ResourceId', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ResourceId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -368,14 +362,12 @@ class ProfileResourceTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ProfileResourceTableMap::ID);
             $criteria->addSelectColumn(ProfileResourceTableMap::PROFILE_ID);
             $criteria->addSelectColumn(ProfileResourceTableMap::RESOURCE_ID);
             $criteria->addSelectColumn(ProfileResourceTableMap::ACCESS);
             $criteria->addSelectColumn(ProfileResourceTableMap::CREATED_AT);
             $criteria->addSelectColumn(ProfileResourceTableMap::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.PROFILE_ID');
             $criteria->addSelectColumn($alias . '.RESOURCE_ID');
             $criteria->addSelectColumn($alias . '.ACCESS');
@@ -439,9 +431,8 @@ class ProfileResourceTableMap extends TableMap
                 $values = array($values);
             }
             foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(ProfileResourceTableMap::ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(ProfileResourceTableMap::PROFILE_ID, $value[1]));
-                $criterion->addAnd($criteria->getNewCriterion(ProfileResourceTableMap::RESOURCE_ID, $value[2]));
+                $criterion = $criteria->getNewCriterion(ProfileResourceTableMap::PROFILE_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(ProfileResourceTableMap::RESOURCE_ID, $value[1]));
                 $criteria->addOr($criterion);
             }
         }
@@ -487,10 +478,6 @@ class ProfileResourceTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from ProfileResource object
-        }
-
-        if ($criteria->containsKey(ProfileResourceTableMap::ID) && $criteria->keyContainsValue(ProfileResourceTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProfileResourceTableMap::ID.')');
         }
 
 

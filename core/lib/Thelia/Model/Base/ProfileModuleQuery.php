@@ -21,14 +21,12 @@ use Thelia\Model\Map\ProfileModuleTableMap;
  *
  *
  *
- * @method     ChildProfileModuleQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildProfileModuleQuery orderByProfileId($order = Criteria::ASC) Order by the profile_id column
  * @method     ChildProfileModuleQuery orderByModuleId($order = Criteria::ASC) Order by the module_id column
  * @method     ChildProfileModuleQuery orderByAccess($order = Criteria::ASC) Order by the access column
  * @method     ChildProfileModuleQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProfileModuleQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildProfileModuleQuery groupById() Group by the id column
  * @method     ChildProfileModuleQuery groupByProfileId() Group by the profile_id column
  * @method     ChildProfileModuleQuery groupByModuleId() Group by the module_id column
  * @method     ChildProfileModuleQuery groupByAccess() Group by the access column
@@ -50,14 +48,12 @@ use Thelia\Model\Map\ProfileModuleTableMap;
  * @method     ChildProfileModule findOne(ConnectionInterface $con = null) Return the first ChildProfileModule matching the query
  * @method     ChildProfileModule findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProfileModule matching the query, or a new ChildProfileModule object populated from the query conditions when no match is found
  *
- * @method     ChildProfileModule findOneById(int $id) Return the first ChildProfileModule filtered by the id column
  * @method     ChildProfileModule findOneByProfileId(int $profile_id) Return the first ChildProfileModule filtered by the profile_id column
  * @method     ChildProfileModule findOneByModuleId(int $module_id) Return the first ChildProfileModule filtered by the module_id column
  * @method     ChildProfileModule findOneByAccess(int $access) Return the first ChildProfileModule filtered by the access column
  * @method     ChildProfileModule findOneByCreatedAt(string $created_at) Return the first ChildProfileModule filtered by the created_at column
  * @method     ChildProfileModule findOneByUpdatedAt(string $updated_at) Return the first ChildProfileModule filtered by the updated_at column
  *
- * @method     array findById(int $id) Return ChildProfileModule objects filtered by the id column
  * @method     array findByProfileId(int $profile_id) Return ChildProfileModule objects filtered by the profile_id column
  * @method     array findByModuleId(int $module_id) Return ChildProfileModule objects filtered by the module_id column
  * @method     array findByAccess(int $access) Return ChildProfileModule objects filtered by the access column
@@ -110,10 +106,10 @@ abstract class ProfileModuleQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj  = $c->findPk(12, $con);
+     * $obj = $c->findPk(array(12, 34), $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param array[$profile_id, $module_id] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildProfileModule|array|mixed the result, formatted by the current formatter
@@ -123,7 +119,7 @@ abstract class ProfileModuleQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = ProfileModuleTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = ProfileModuleTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
@@ -151,10 +147,11 @@ abstract class ProfileModuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PROFILE_ID, MODULE_ID, ACCESS, CREATED_AT, UPDATED_AT FROM profile_module WHERE ID = :p0';
+        $sql = 'SELECT PROFILE_ID, MODULE_ID, ACCESS, CREATED_AT, UPDATED_AT FROM profile_module WHERE PROFILE_ID = :p0 AND MODULE_ID = :p1';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
+            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -164,7 +161,7 @@ abstract class ProfileModuleQuery extends ModelCriteria
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
             $obj = new ChildProfileModule();
             $obj->hydrate($row);
-            ProfileModuleTableMap::addInstanceToPool($obj, (string) $key);
+            ProfileModuleTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
         }
         $stmt->closeCursor();
 
@@ -193,7 +190,7 @@ abstract class ProfileModuleQuery extends ModelCriteria
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(12, 56, 832), $con);
+     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     ConnectionInterface $con an optional connection object
@@ -223,8 +220,10 @@ abstract class ProfileModuleQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
+        $this->addUsingAlias(ProfileModuleTableMap::PROFILE_ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(ProfileModuleTableMap::MODULE_ID, $key[1], Criteria::EQUAL);
 
-        return $this->addUsingAlias(ProfileModuleTableMap::ID, $key, Criteria::EQUAL);
+        return $this;
     }
 
     /**
@@ -236,49 +235,17 @@ abstract class ProfileModuleQuery extends ModelCriteria
      */
     public function filterByPrimaryKeys($keys)
     {
-
-        return $this->addUsingAlias(ProfileModuleTableMap::ID, $keys, Criteria::IN);
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProfileModuleQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(ProfileModuleTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(ProfileModuleTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
+        if (empty($keys)) {
+            return $this->add(null, '1<>1', Criteria::CUSTOM);
+        }
+        foreach ($keys as $key) {
+            $cton0 = $this->getNewCriterion(ProfileModuleTableMap::PROFILE_ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(ProfileModuleTableMap::MODULE_ID, $key[1], Criteria::EQUAL);
+            $cton0->addAnd($cton1);
+            $this->addOr($cton0);
         }
 
-        return $this->addUsingAlias(ProfileModuleTableMap::ID, $id, $comparison);
+        return $this;
     }
 
     /**
@@ -602,7 +569,7 @@ abstract class ProfileModuleQuery extends ModelCriteria
      *
      * @return ChildProfileModuleQuery The current query, for fluid interface
      */
-    public function joinModule($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinModule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Module');
@@ -637,7 +604,7 @@ abstract class ProfileModuleQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\ModuleQuery A secondary query class using the current class as primary query
      */
-    public function useModuleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinModule($relationAlias, $joinType)
@@ -654,7 +621,9 @@ abstract class ProfileModuleQuery extends ModelCriteria
     public function prune($profileModule = null)
     {
         if ($profileModule) {
-            $this->addUsingAlias(ProfileModuleTableMap::ID, $profileModule->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond0', $this->getAliasedColName(ProfileModuleTableMap::PROFILE_ID), $profileModule->getProfileId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(ProfileModuleTableMap::MODULE_ID), $profileModule->getModuleId(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 
         return $this;

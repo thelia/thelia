@@ -2733,7 +2733,10 @@ abstract class Module implements ActiveRecordInterface
         $profileModulesToDelete = $this->getProfileModules(new Criteria(), $con)->diff($profileModules);
 
 
-        $this->profileModulesScheduledForDeletion = $profileModulesToDelete;
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->profileModulesScheduledForDeletion = clone $profileModulesToDelete;
 
         foreach ($profileModulesToDelete as $profileModuleRemoved) {
             $profileModuleRemoved->setModule(null);
@@ -2826,7 +2829,7 @@ abstract class Module implements ActiveRecordInterface
                 $this->profileModulesScheduledForDeletion = clone $this->collProfileModules;
                 $this->profileModulesScheduledForDeletion->clear();
             }
-            $this->profileModulesScheduledForDeletion[]= $profileModule;
+            $this->profileModulesScheduledForDeletion[]= clone $profileModule;
             $profileModule->setModule(null);
         }
 

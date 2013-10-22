@@ -23,12 +23,14 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\ProfileCreationForm;
 use Thelia\Form\ProfileModificationForm;
 use Thelia\Form\ProfileProfileListUpdateForm;
+use Thelia\Form\ProfileUpdateResourceAccessForm;
 use Thelia\Model\ProfileQuery;
 
 class ProfileController extends AbstractCrudController
@@ -114,6 +116,16 @@ class ProfileController extends AbstractCrudController
 
         // Setup the object form
         return new ProfileModificationForm($this->getRequest(), "form", $data);
+    }
+
+    protected function hydrateResourceUpdateForm($object)
+    {
+        $data = array(
+            'id'           => $object->getId(),
+        );
+
+        // Setup the object form
+        return new ProfileUpdateResourceAccessForm($this->getRequest(), "form", $data);
     }
 
     protected function getObjectFromEvent($event)
@@ -222,5 +234,104 @@ class ProfileController extends AbstractCrudController
         }
 
         return $requirements;
+    }
+
+    public function updateAction()
+    {
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+
+        $object = $this->getExistingObject();
+
+        if ($object != null) {
+
+            // Hydrate the form and pass it to the parser
+            $resourceAccessForm = $this->hydrateResourceUpdateForm($object);
+
+            // Pass it to the parser
+            $this->getParserContext()->addForm($resourceAccessForm);
+        }
+
+        return parent::updateAction();
+    }
+
+    protected function getUpdateResourceAccessEvent($formData)
+    {
+        $event = new ProfileEvent();
+
+        $event->setId($formData['id']);
+        $event->setResourceAccess($this->getResourceAccess($formData));
+
+        return $event;
+    }
+
+    protected function getResourceAccess($formData)
+    {
+        $requirements = array();
+        foreach($formData as $data => $value) {
+            if(!strstr($data, ':')) {
+                continue;
+            }
+
+            $explosion = explode(':', $data);
+
+            $prefix = array_shift ( $explosion );
+
+            if($prefix != ProfileUpdateResourceAccessForm::RESOURCE_ACCESS_FIELD_PREFIX) {
+                continue;
+            }
+
+            $requirements[implode('.', $explosion)] = $value;
+        }
+
+        return $requirements;
+    }
+
+    public function processUpdateResourceAccess()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+
+        $error_msg = false;
+
+        // Create the form from the request
+        $changeForm = new ProfileUpdateResourceAccessForm($this->getRequest());
+
+        try {
+            // Check the form against constraints violations
+            $form = $this->validateForm($changeForm, "POST");
+
+            // Get the form field values
+            $data = $form->getData();
+
+            $changeEvent = $this->getUpdateResourceAccessEvent($data);
+
+            $this->dispatch(TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE, $changeEvent);
+
+            if (! $this->eventContainsObject($changeEvent))
+                throw new \LogicException(
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName)));
+
+            // Log object modification
+            if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
+                $this->adminLogAppend(sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+            }
+
+            if ($response == null) {
+                $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+            } else {
+                return $response;
+            }
+        } catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext($this->getTranslator()->trans("%obj modification", array('%obj' => 'taxrule')), $error_msg, $changeForm, $ex);
+
+        // At this point, the form has errors, and should be redisplayed.
+        return $this->renderEditionTemplate();
     }
 }

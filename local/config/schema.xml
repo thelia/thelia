@@ -773,7 +773,6 @@
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="profile_resource" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="profile_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="resource_id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="0" name="access" required="true" type="INTEGER" />
@@ -783,7 +782,7 @@
     <foreign-key foreignTable="resource" name="fk_profile_resource_resource_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="resource_id" />
     </foreign-key>
-    <index name="id_profile_resource_profile_id">
+    <index name="idx_profile_resource_profile_id">
       <index-column name="profile_id" />
     </index>
     <index name="idx_profile_resource_resource_id">
@@ -792,10 +791,9 @@
     <behavior name="timestampable" />
   </table>
   <table name="profile_module" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="profile_id" required="true" type="INTEGER" />
-    <column name="module_id" type="INTEGER" />
-    <column defaultValue="0" name="access" type="TINYINT" />
+    <column name="profile_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="module_id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="0" name="access" required="true" type="INTEGER" />
     <foreign-key foreignTable="profile" name="fk_profile_module_profile_id" onDelete="CASCADE" onUpdate="CASCADE">
       <reference foreign="id" local="profile_id" />
     </foreign-key>
@@ -1245,12 +1243,10 @@
     </index>
     <behavior name="timestampable" />
   </table>
-  <table name="newsletter" namespace="Thelia\Model">
+  <table name="newsletter">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="email" required="true" size="255" type="VARCHAR" />
     <column name="firstname" size="255" type="VARCHAR" />
     <column name="lastname" size="255" type="VARCHAR" />
-    <column name="locale" size="45" type="VARCHAR" />
-    <behavior name="timestampable" />
   </table>
 </database>

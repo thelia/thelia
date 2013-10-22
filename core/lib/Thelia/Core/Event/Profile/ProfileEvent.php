@@ -36,6 +36,7 @@ class ProfileEvent extends ActionEvent
     protected $chapo = null;
     protected $description = null;
     protected $postscriptum = null;
+    protected $resourceAccess = null;
 
     public function __construct(Profile $profile = null)
     {
@@ -127,5 +128,15 @@ class ProfileEvent extends ActionEvent
     public function getTitle()
     {
         return $this->title;
+    }
+
+    public function setResourceAccess($resourceAccess)
+    {
+        $this->resourceAccess = $resourceAccess;
+    }
+
+    public function getResourceAccess()
+    {
+        return $this->resourceAccess;
     }
 }
