@@ -926,6 +926,11 @@
         <default key="_controller">Thelia\Controller\Admin\LangController::defaultAction</default>
     </route>
 
+    <route id="admin.configuration.languages.update" path="/admin/configuration/languages/update/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::updateAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
 
     <!-- The default route, to display a template -->
 

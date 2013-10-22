@@ -153,6 +153,8 @@
 
         <form name="thelia.contact" class="Thelia\Form\ContactForm"/>
         <form name="thelia.newsletter" class="Thelia\Form\NewsletterForm"/>
+
+        <form name="thelia.lang.update" class="Thelia\Form\Lang\LangUpdateForm"/>
     </forms>
 
 

@@ -21,50 +21,34 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
-
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Form\Lang\LangUpdateForm;
-use Thelia\Model\LangQuery;
+namespace Thelia\Form\Lang;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 
 /**
- * Class LangController
- * @package Thelia\Controller\Admin
+ * Class LangUpdateForm
+ * @package Thelia\Form\Lang
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class LangController extends BaseAdminController
+class LangUpdateForm extends LangCreateForm
 {
 
-    public function defaultAction()
+    public function buildForm()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::VIEW)) return $response;
+        parent::buildForm();
 
-        return $this->render('languages');
+        $this->formBuilder
+            ->add('id', 'hidden', array(
+                'constraints' => array(
+                    new NotBlank(),
+                    new GreaterThan(array('value' => 0))
+                )
+            ));
     }
 
-    public function updateAction($lang_id)
+    public function getName()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
-
-        $this->checkXmlHttpRequest();
-
-        $lang = LangQuery::create()->findPk($lang_id);
-
-        $langForm = new LangUpdateForm($this->getRequest(), 'form', array(
-            'id' => $lang->getId(),
-            'title' => $lang->getTitle(),
-            'code' => $lang->getCode(),
-            'locale' => $lang->getLocale(),
-            'date_format' => $lang->getDateFormat(),
-            'time_format' => $lang->getTimeFormat()
-        ));
-
-        $this->getParserContext()->addForm($langForm);
-
-        return $this->render('ajax/language-update-modal', array(
-            'lang_id' => $lang_id
-        ));
+        return 'thelia_lang_update';
     }
 }
