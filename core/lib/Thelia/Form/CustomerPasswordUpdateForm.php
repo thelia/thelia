@@ -25,7 +25,6 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\CustomerQuery;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -80,7 +79,7 @@ class CustomerPasswordUpdateForm extends BaseForm
 
     public function verifyCurrentPasswordField($value, ExecutionContextInterface $context)
     {
-
+        // Check current password
     }
 
     public function verifyPasswordField($value, ExecutionContextInterface $context)
@@ -88,7 +87,7 @@ class CustomerPasswordUpdateForm extends BaseForm
         $data = $context->getRoot()->getData();
 
         if ($data["password"] != $data["password_confirm"]) {
-            $context->addViolation("password confirmation is not the same as password field.");
+            $context->addViolation("Password confirmation is not the same as password field.");
         }
     }
 
