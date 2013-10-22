@@ -28,7 +28,7 @@ use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
-use Thelia\Form\CustomerCreation;
+use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerLogin;
 use Thelia\Form\CustomerLostPasswordForm;
 use Thelia\Form\CustomerUpdateForm;
@@ -93,7 +93,7 @@ class CustomerController extends BaseFrontController
 
             $message = false;
 
-            $customerCreation = new CustomerCreation($this->getRequest());
+            $customerCreation = new CustomerCreateForm($this->getRequest());
 
             try {
                 $form = $this->validateForm($customerCreation, "post");
