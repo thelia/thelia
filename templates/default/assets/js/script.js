@@ -29,7 +29,11 @@
             .on('mouseleave.subnav', '.dropdown', function(){
                 if(!$(this).hasClass('open'))
                     return;
-                $(this).removeClass('open');
+
+                //This will check if an input child has focus. If no then remove class open
+                if ($(this).find(":input:focus").length == 0){
+                    $(this).removeClass('open');
+                }
             });
 
         // Tooltip
