@@ -60,14 +60,31 @@ class CartItem extends BaseCartItem
             }
         }
 
-        $this->addQuantity($value);
+        $this->setQuantity($value);
 
         return $this;
     }
 
-    public function addQuantity($quantity)
+    public function addQuantity($value)
     {
-        $this->setQuantity($this->getQuantity() + $quantity);
+        $currentQuantity = $this->getQuantity();
+        $newQuantity = $currentQuantity + $value;
+
+        if($value <= 0)
+        {
+            $value = $currentQuantity;
+        }
+
+        if(ConfigQuery::read("verifyStock", 1) == 1)
+        {
+            $productSaleElements = $this->getProductSaleElements();
+
+            if($productSaleElements->getQuantity() < $newQuantity) {
+                $newQuantity = $currentQuantity;
+            }
+        }
+
+        $this->setQuantity($newQuantity);
 
         return $this;
     }
