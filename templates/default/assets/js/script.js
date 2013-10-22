@@ -89,6 +89,32 @@
             }).find(':radio:checked').trigger('change.account');
         }
 
+        // Mini Newsletter Subscription
+        var $form_newsletter = $('#form-newsletter-mini');
+        if($form_newsletter.size() > 0) {
+            $form_newsletter.on('submit.newsletter', function(){
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: $(this).attr('method'),
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function(json) {
+                        var $msg = '';
+                        if(json.success){
+                            $msg = json.message;
+                        }else{
+                            $msg = json.message;
+                        }
+                        bootbox.alert($msg);
+                    }
+                });
+
+                return false;
+            });
+        }
+
+
         // Forgot Password
         /*
          var $forgot_password = $('.forgot-password', $form_login);

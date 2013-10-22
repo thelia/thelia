@@ -73,7 +73,7 @@ class NewsletterForm extends BaseForm
                         )
                     ))
                 ),
-                'label' => Translator::getInstance()->trans('email'),
+                'label' => Translator::getInstance()->trans('Email address'),
                 'label_attr' => array(
                     'for' => 'email_newsletter'
                 )
@@ -84,7 +84,7 @@ class NewsletterForm extends BaseForm
     {
         $customer = NewsletterQuery::create()->findOneByEmail($value);
         if ($customer) {
-            $context->addViolation("This email already exists");
+            $context->addViolation("You are already subscribed!");
         }
     }
 

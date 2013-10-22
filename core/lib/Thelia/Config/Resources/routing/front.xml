@@ -207,10 +207,5 @@
         <default key="_view">newsletter</default>
     </route>
 
-    <route id="newsletter.success" path="/newsletter/success">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">newsletter-success</default>
-    </route>
-
     <!-- end newsletter management -->
 </routes>
