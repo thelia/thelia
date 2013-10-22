@@ -19,7 +19,7 @@
 
             <h1 id="main-label" class="page-header">{intl l="Update Profil"}</h1>
 
-            {form name="thelia.customer.update"}
+            {form name="thelia.front.customer.profil.update"}
                 {assign var="isPost" value="{$smarty.post|count}"}
             <form id="form-register" class="form-horizontal" action="{url path="/account/update"}" method="post" role="form">
                 {form_field form=$form field='success_url'}

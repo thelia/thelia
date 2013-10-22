@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,31 +17,55 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints;
+use Thelia\Model\ConfigQuery;
+use Thelia\Core\Translation\Translator;
+
 /**
- * Class AddressUpdateForm
+ * Class CustomerProfilUpdateForm
  * @package Thelia\Form
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Christophe Laffont <claffont@openstudio.fr>
  */
-class AddressUpdateForm extends AddressCreateForm
+class CustomerProfilUpdateForm extends CustomerCreateForm
 {
 
     protected function buildForm()
     {
         parent::buildForm();
 
+        $this->formBuilder
+            ->remove("auto_login")
+            // Remove From Personal Informations
+            ->remove("phone")
+            ->remove("cellphone")
+            // Remove Delivery Informations
+            ->remove("company")
+            ->remove("address1")
+            ->remove("address2")
+            ->remove("address3")
+            ->remove("city")
+            ->remove("zipcode")
+            ->remove("country")
+            // Remove Terms & conditions
+            ->remove("agreed")
+
+            // Add Newsletter
+            ->add("newsletter", "checkbox", array(
+                "label" => "I would like to receive the newsletter our the latest news.",
+                "label_attr" => array(
+                    "for" => "newsletter"
+                ),
+                "required" => false
+            ));
     }
 
-    /**
-     * @return string the name of you form. This name must be unique
-     */
     public function getName()
     {
-        return "thelia_address_update";
+        return "thelia_customer_profil_update";
     }
 }
