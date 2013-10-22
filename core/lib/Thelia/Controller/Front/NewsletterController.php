@@ -22,6 +22,8 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Front;
+use Thelia\Core\Event\Newsletter\NewsletterEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\NewsletterForm;
 
@@ -43,10 +45,31 @@ class NewsletterController extends BaseFrontController
 
             $form = $this->validateForm($newsletterForm);
 
+            $event = new NewsletterEvent($form->get('email')->getData());
 
+            if (null !== $customer = $this->getSecurityContext()->getCustomerUser())
+            {
+                $event->setFirstname($customer->getFirstname());
+                $event->setLastname($customer->getLastname());
+            }
+
+            $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $event);
 
         } catch(FormValidationException $e) {
+            $error_message = $e->getMessage();
+        }
 
+        if($error_message) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during sending contact mail : %s', $error_message));
+
+            $newsletterForm->setErrorMessage($error_message);
+
+            $this->getParserContext()
+                ->addForm($newsletterForm)
+                ->setGeneralError($error_message)
+            ;
+        } else {
+            $this->redirectToRoute('newsletter.success');
         }
     }
 }
