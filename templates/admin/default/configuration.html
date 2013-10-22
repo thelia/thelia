@@ -24,42 +24,42 @@
 
                                 {module_include location='catalog_configuration_top'}
 
-                                {loop type="auth" name="pcc1" roles="ADMIN" permissions="admin.configuration.templates"}
+                                {loop type="auth" name="pcc1" role="ADMIN" resource="admin.configuration.template" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/templates'}">{intl l='Product templates'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/templates'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc2" roles="ADMIN" permissions="admin.configuration.attributes"}
+                                {loop type="auth" name="pcc2" role="ADMIN" resource="admin.configuration.attribute" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/attributes'}">{intl l='Product attributes'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/attributes'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc3" roles="ADMIN" permissions="admin.configuration.features"}
+                                {loop type="auth" name="pcc3" role="ADMIN" resource="admin.configuration.feature" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/features'}">{intl l='Product features'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/features'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc4" roles="ADMIN" permissions="admin.configuration.messages"}
+                                {loop type="auth" name="pcc4" role="ADMIN" resource="admin.configuration.message" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/messages'}">{intl l='Mailing templates'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/messages'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc5" roles="ADMIN" permissions="admin.configuration.currencies"}
+                                {loop type="auth" name="pcc5" role="ADMIN" resource="admin.configuration.currency" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/currencies'}">{intl l='Currencies'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/currencies'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc6" roles="ADMIN" permissions="admin.configuration.taxe-rules"}
+                                {loop type="auth" name="pcc6" role="ADMIN" resource="admin.configuration.tax-rule" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/taxes_rules'}">{intl l='Taxes rules'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/taxes_rules'}"><i class="glyphicon glyphicon-edit"></i></a></td>
@@ -80,21 +80,21 @@
 
                                 {module_include location='shipping_configuration_top'}
 
-                                {loop type="auth" name="pcc1" roles="ADMIN" permissions="admin.configuration.contries"}
+                                {loop type="auth" name="pcc1" role="ADMIN" resource="admin.configuration.contry" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/countries'}">{intl l='Countries'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/countries'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc2" roles="ADMIN" permissions="admin.configuration.shipping_zones"}
+                                {loop type="auth" name="pcc2" role="ADMIN" resource="admin.configuration.shipping-zone" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/shipping_zones'}">{intl l='Shipping zones'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_zones'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc3" roles="ADMIN" permissions="admin.configuration.shipping_configuration"}
+                                {loop type="auth" name="pcc3" role="ADMIN" resource="admin.configuration.shipping-configuration" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l='Shipping configuration'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/shipping_configuration'}"><i class="glyphicon glyphicon-edit"></i></a></td>
@@ -116,56 +116,56 @@
 
                                 {module_include location='system_configuration_top'}
 
-                                {loop type="auth" name="pcc1" roles="ADMIN" permissions="admin.configuration.modules"}
+                                {loop type="auth" name="pcc1" role="ADMIN" resource="admin.configuration.module" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/modules'}">{intl l='Modules activation'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/modules'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc2" roles="ADMIN" permissions="admin.configuration.variables"}
+                                {loop type="auth" name="pcc2" role="ADMIN" resource="admin.configuration.variable" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/variables'}">{intl l='System variables'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/variables'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc3" roles="ADMIN" permissions="admin.configuration.profiles"}
+                                {loop type="auth" name="pcc3" role="ADMIN" resource="admin.configuration.profile" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/profiles'}">{intl l='Administration profiles'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/profiles'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc4" roles="ADMIN" permissions="admin.configuration.admin_users"}
+                                {loop type="auth" name="pcc4" role="ADMIN" resource="admin.configuration.administrator" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/administrators'}">{intl l='Administrators'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/administrators'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc5" roles="ADMIN" permissions="admin.configuration.languages"}
+                                {loop type="auth" name="pcc5" role="ADMIN" resource="admin.configuration.language" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/languages'}">{intl l='Languages &amp; URLs'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/languages'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc6" roles="ADMIN" permissions="admin.configuration.mailing_system"}
+                                {loop type="auth" name="pcc6" role="ADMIN" resource="admin.configuration.mailing-system" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/mailing_system'}">{intl l='Mailing system'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/mailing_system'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc7" roles="ADMIN" permissions="admin.configuration.admin_logs"}
+                                {loop type="auth" name="pcc7" role="ADMIN" resource="admin.configuration.admin-logs" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/admin_logs'}">{intl l='Administration logs'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/admin_logs'}"><i class="glyphicon glyphicon-edit"></i></a></td>
                                     </tr>
                                 {/loop}
 
-                                {loop type="auth" name="pcc8" roles="ADMIN" permissions="admin.configuration.system_logs"}
+                                {loop type="auth" name="pcc8" role="ADMIN" resource="admin.configuration.system-logs" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/system_logs'}">{intl l='System logs'}</a></td>
                                         <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/system_logs'}"><i class="glyphicon glyphicon-edit"></i></a></td>

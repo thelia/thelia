@@ -26,7 +26,7 @@
     	                    <table class="table table-striped table-condensed table-left-aligned">
     	                        <caption>
     	                           {intl l='Thelia mailing templates'}
-    	                           {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.messages.create"}
+    	                           {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.message" access="CREATE"}
                                     <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new mailing template'}" href="#creation_dialog" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
                                     </a>
@@ -52,7 +52,7 @@
 
                                            <td>
                                            {if ! $SECURED}
-                                               {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.messages.change"}
+                                               {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.message" access="UPDATE"}
                                                    <a title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}">{$NAME}</a>
                                                {/loop}
                                                {elseloop rel="can_change"}
@@ -68,11 +68,11 @@
         	                                <td class="actions">
         	                                    {if ! $SECURED}
         		                                    <div class="btn-group">
-                                                       {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.messages.change"}
+                                                       {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.message" access="UPDATE"}
                                                            <a class="btn btn-default btn-xs message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
                                                        {/loop}
 
-                                                       {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.messages.delete"}
+                                                       {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.message" access="DELETE"}
                                                            <a class="btn btn-default btn-xs message-delete" title="{intl l='Delete this mailing template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
                                                        {/loop}
         		                                    </div>

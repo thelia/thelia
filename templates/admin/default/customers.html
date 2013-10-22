@@ -30,7 +30,7 @@
 
                                     {module_include location='customer_list_caption'}
 
-                                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.customers.create"}
+                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.customer" access="CREATE"}
                                         <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new Customer'}" href="#add_customer_dialog" data-toggle="modal">
                                             <span class="glyphicon glyphicon-plus-sign"></span>
                                         </a>
@@ -101,13 +101,13 @@
                                             <td>
                                                 <div class="btn-group">
 
-                                                    {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.customer.edit"}
+                                                    {loop type="auth" name="can_change" role="ADMIN" resource="admin.customer" access="UPDATE"}
                                                         <a class="btn btn-default btn-xs" title="{intl l='Edit this customer'}" href="{url path="/admin/customer/update/{$ID}" }"><i class="glyphicon glyphicon-edit"></i></a>
                                                     {/loop}
-                                                    {loop type="auth" name="can_send_mail" roles="ADMIN" permissions="admin.customer.sendMail"}
+                                                    {loop type="auth" name="can_send_mail" role="ADMIN" resource="admin.customer" access="VIEW"}
                                                         <a class="btn btn-default btn-xs" title="{intl l="Send a mail to this customer"}" href="mailto:{$EMAIL}"><span class="glyphicon glyphicon-envelope"></span></a>
                                                     {/loop}
-                                                    {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.customer.delete"}
+                                                    {loop type="auth" name="can_delete" role="ADMIN" resource="admin.customer" access="DELETE"}
                                                         <a class="btn btn-default btn-xs customer-delete" title="{intl l='Delete this customer and all his orders'}"  href="#delete_customer_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                                     {/loop}
                                                 </div>

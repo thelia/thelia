@@ -203,7 +203,7 @@
 
 					        {module_include location='product_combinations_list_caption'}
 
-					        {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.products.update"}
+					        {loop type="auth" name="can_create" role="ADMIN" resource="admin.product" access="UPDATE"}
 					        <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new combination'}" href="#combination_creation_dialog" data-toggle="modal">
 					            <span class="glyphicon glyphicon-plus-sign"></span>
 					        </a>

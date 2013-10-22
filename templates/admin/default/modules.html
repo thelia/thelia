@@ -15,7 +15,7 @@
                 <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                 <li><a href="{url path='/admin/modules'}">{intl l="Modules"}</a></li>
             </ul>
-            {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.modules.install"}
+            {loop type="auth" name="can_create" role="ADMIN" resource="admin.module" access="UPDATE"}
                 <a class="btn btn-default btn-primary pull-right" title="{intl l='Install a new module'}" href="#install_dialog" data-toggle="modal">
                     <span class="glyphicon glyphicon-import"></span> {intl l="Install a new module"}
                 </a>

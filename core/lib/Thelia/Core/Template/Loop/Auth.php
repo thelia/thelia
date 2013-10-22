@@ -45,7 +45,7 @@ class Auth extends BaseLoop
     {
         return new ArgumentCollection(
             new Argument(
-                'roles',
+                'role',
                 new TypeCollection(
                     new AlphaNumStringListType()
                 ),
@@ -75,7 +75,7 @@ class Auth extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $roles = $this->getRoles();
+        $roles = $this->getRole();
         $resource = $this->getResource();
         $access = $this->getAccess();
 
