@@ -21,65 +21,15 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
-
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Form\Lang\LangUpdateForm;
-use Thelia\Model\LangQuery;
+namespace Thelia\Core\Event\Lang;
 
 
 /**
- * Class LangController
- * @package Thelia\Controller\Admin
+ * Class LangUpdateEvent
+ * @package Thelia\Core\Event\Lang
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class LangController extends BaseAdminController
+class LangUpdateEvent extends LangCreateEvent
 {
 
-    public function defaultAction()
-    {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::VIEW)) return $response;
-
-        return $this->render('languages');
-    }
-
-    public function updateAction($lang_id)
-    {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
-
-        $this->checkXmlHttpRequest();
-
-        $lang = LangQuery::create()->findPk($lang_id);
-
-        $langForm = new LangUpdateForm($this->getRequest(), 'form', array(
-            'id' => $lang->getId(),
-            'title' => $lang->getTitle(),
-            'code' => $lang->getCode(),
-            'locale' => $lang->getLocale(),
-            'date_format' => $lang->getDateFormat(),
-            'time_format' => $lang->getTimeFormat()
-        ));
-
-        $this->getParserContext()->addForm($langForm);
-
-        return $this->render('ajax/language-update-modal', array(
-            'lang_id' => $lang_id
-        ));
-    }
-
-    public function processUpdateAction($lang_id)
-    {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
-
-        $error_msg = false;
-
-        $langForm = new LangUpdateForm($this->getRequest());
-
-        try {
-            $form = $this->validateForm($langForm);
-        } catch(\Exception $e) {
-
-        }
-    }
 }

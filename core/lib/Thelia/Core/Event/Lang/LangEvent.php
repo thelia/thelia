@@ -21,65 +21,56 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
-
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Form\Lang\LangUpdateForm;
-use Thelia\Model\LangQuery;
+namespace Thelia\Core\Event\Lang;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Lang;
 
 
 /**
- * Class LangController
- * @package Thelia\Controller\Admin
+ * Class LangEvent
+ * @package Thelia\Core\Event\Lang
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class LangController extends BaseAdminController
+class LangEvent extends ActionEvent
 {
+    /**
+     * @var \Thelia\Model\Lang
+     */
+    protected $lang;
 
-    public function defaultAction()
+    function __construct(Lang $lang = null)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::VIEW)) return $response;
-
-        return $this->render('languages');
+        $this->lang = $lang;
     }
 
-    public function updateAction($lang_id)
+    /**
+     * @param \Thelia\Model\Lang $lang
+     */
+    public function setLang(Lang $lang)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
-
-        $this->checkXmlHttpRequest();
-
-        $lang = LangQuery::create()->findPk($lang_id);
-
-        $langForm = new LangUpdateForm($this->getRequest(), 'form', array(
-            'id' => $lang->getId(),
-            'title' => $lang->getTitle(),
-            'code' => $lang->getCode(),
-            'locale' => $lang->getLocale(),
-            'date_format' => $lang->getDateFormat(),
-            'time_format' => $lang->getTimeFormat()
-        ));
-
-        $this->getParserContext()->addForm($langForm);
-
-        return $this->render('ajax/language-update-modal', array(
-            'lang_id' => $lang_id
-        ));
+        $this->lang = $lang;
     }
 
-    public function processUpdateAction($lang_id)
+    /**
+     * @return \Thelia\Model\Lang
+     */
+    public function getLang()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
-
-        $error_msg = false;
-
-        $langForm = new LangUpdateForm($this->getRequest());
-
-        try {
-            $form = $this->validateForm($langForm);
-        } catch(\Exception $e) {
-
-        }
+        return $this->lang;
     }
+
+    /**
+     *
+     * check if lang object is present
+     *
+     * @return bool
+     */
+    public function hasLang()
+    {
+        return null !== $this->lang;
+    }
+
+
+
+
 }

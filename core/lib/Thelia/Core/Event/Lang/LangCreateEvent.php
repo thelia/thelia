@@ -21,65 +21,121 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
-
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Form\Lang\LangUpdateForm;
-use Thelia\Model\LangQuery;
+namespace Thelia\Core\Event\Lang;
 
 
 /**
- * Class LangController
- * @package Thelia\Controller\Admin
+ * Class LangCreateEvent
+ * @package Thelia\Core\Event\Lang
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class LangController extends BaseAdminController
+class LangCreateEvent extends LangEvent
 {
+    protected $title;
+    protected $code;
+    protected $locale;
+    protected $date_format;
+    protected $time_format;
 
-    public function defaultAction()
+    /**
+     * @param mixed $code
+     *
+     * @return $this
+     */
+    public function setCode($code)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::VIEW)) return $response;
+        $this->code = $code;
 
-        return $this->render('languages');
+        return $this;
     }
 
-    public function updateAction($lang_id)
+    /**
+     * @return mixed
+     */
+    public function getCode()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
-
-        $this->checkXmlHttpRequest();
-
-        $lang = LangQuery::create()->findPk($lang_id);
-
-        $langForm = new LangUpdateForm($this->getRequest(), 'form', array(
-            'id' => $lang->getId(),
-            'title' => $lang->getTitle(),
-            'code' => $lang->getCode(),
-            'locale' => $lang->getLocale(),
-            'date_format' => $lang->getDateFormat(),
-            'time_format' => $lang->getTimeFormat()
-        ));
-
-        $this->getParserContext()->addForm($langForm);
-
-        return $this->render('ajax/language-update-modal', array(
-            'lang_id' => $lang_id
-        ));
+        return $this->code;
     }
 
-    public function processUpdateAction($lang_id)
+    /**
+     * @param mixed $date_format
+     *
+     * @return $this
+     */
+    public function setDateFormat($date_format)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
+        $this->date_format = $date_format;
 
-        $error_msg = false;
-
-        $langForm = new LangUpdateForm($this->getRequest());
-
-        try {
-            $form = $this->validateForm($langForm);
-        } catch(\Exception $e) {
-
-        }
+        return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getDateFormat()
+    {
+        return $this->date_format;
+    }
+
+    /**
+     * @param mixed $locale
+     *
+     * @return $this
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    /**
+     * @param mixed $time_format
+     *
+     * @return $this
+     */
+    public function setTimeFormat($time_format)
+    {
+        $this->time_format = $time_format;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTimeFormat()
+    {
+        return $this->time_format;
+    }
+
+    /**
+     * @param mixed $title
+     *
+     * @return $this
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+
 }
