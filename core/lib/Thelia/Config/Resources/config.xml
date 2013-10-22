@@ -64,7 +64,6 @@
         <form name="thelia.front.address.update" class="Thelia\Form\AddressUpdateForm"/>
         <form name="thelia.front.contact" class="Thelia\Form\ContactForm"/>
 
-
         <!--  Forms for Admin -->
         <form name="thelia.install.step3" class="Thelia\Form\InstallStep3Form"/>
 
@@ -154,8 +153,6 @@
 
         <form name="thelia.shopping_zone_area" class="Thelia\Form\ShippingZone\ShippingZoneAddArea"/>
         <form name="thelia.shopping_zone_remove_area" class="Thelia\Form\ShippingZone\ShippingZoneRemoveArea"/>
-
-        <form name="thelia.contact" class="Thelia\Form\ContactForm"/>
     </forms>
 
 
