@@ -30,6 +30,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\ProfileCreationForm;
 use Thelia\Form\ProfileModificationForm;
 use Thelia\Form\ProfileProfileListUpdateForm;
+use Thelia\Form\ProfileUpdateModuleAccessForm;
 use Thelia\Form\ProfileUpdateResourceAccessForm;
 use Thelia\Model\ProfileQuery;
 
@@ -126,6 +127,16 @@ class ProfileController extends AbstractCrudController
 
         // Setup the object form
         return new ProfileUpdateResourceAccessForm($this->getRequest(), "form", $data);
+    }
+
+    protected function hydrateModuleUpdateForm($object)
+    {
+        $data = array(
+            'id'           => $object->getId(),
+        );
+
+        // Setup the object form
+        return new ProfileUpdateModuleAccessForm($this->getRequest(), "form", $data);
     }
 
     protected function getObjectFromEvent($event)
@@ -246,9 +257,11 @@ class ProfileController extends AbstractCrudController
 
             // Hydrate the form and pass it to the parser
             $resourceAccessForm = $this->hydrateResourceUpdateForm($object);
+            $moduleAccessForm = $this->hydrateModuleUpdateForm($object);
 
             // Pass it to the parser
             $this->getParserContext()->addForm($resourceAccessForm);
+            $this->getParserContext()->addForm($moduleAccessForm);
         }
 
         return parent::updateAction();
@@ -260,6 +273,16 @@ class ProfileController extends AbstractCrudController
 
         $event->setId($formData['id']);
         $event->setResourceAccess($this->getResourceAccess($formData));
+
+        return $event;
+    }
+
+    protected function getUpdateModuleAccessEvent($formData)
+    {
+        $event = new ProfileEvent();
+
+        $event->setId($formData['id']);
+        $event->setModuleAccess($this->getModuleAccess($formData));
 
         return $event;
     }
@@ -277,6 +300,28 @@ class ProfileController extends AbstractCrudController
             $prefix = array_shift ( $explosion );
 
             if($prefix != ProfileUpdateResourceAccessForm::RESOURCE_ACCESS_FIELD_PREFIX) {
+                continue;
+            }
+
+            $requirements[implode('.', $explosion)] = $value;
+        }
+
+        return $requirements;
+    }
+
+    protected function getModuleAccess($formData)
+    {
+        $requirements = array();
+        foreach($formData as $data => $value) {
+            if(!strstr($data, ':')) {
+                continue;
+            }
+
+            $explosion = explode(':', $data);
+
+            $prefix = array_shift ( $explosion );
+
+            if($prefix != ProfileUpdateModuleAccessForm::MODULE_ACCESS_FIELD_PREFIX) {
                 continue;
             }
 
@@ -306,6 +351,55 @@ class ProfileController extends AbstractCrudController
             $changeEvent = $this->getUpdateResourceAccessEvent($data);
 
             $this->dispatch(TheliaEvents::PROFILE_RESOURCE_ACCESS_UPDATE, $changeEvent);
+
+            if (! $this->eventContainsObject($changeEvent))
+                throw new \LogicException(
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName)));
+
+            // Log object modification
+            if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
+                $this->adminLogAppend(sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+            }
+
+            if ($response == null) {
+                $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+            } else {
+                return $response;
+            }
+        } catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext($this->getTranslator()->trans("%obj modification", array('%obj' => 'taxrule')), $error_msg, $changeForm, $ex);
+
+        // At this point, the form has errors, and should be redisplayed.
+        return $this->renderEditionTemplate();
+    }
+
+    public function processUpdateModuleAccess()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
+
+        $error_msg = false;
+
+        // Create the form from the request
+        $changeForm = new ProfileUpdateModuleAccessForm($this->getRequest());
+
+        try {
+            // Check the form against constraints violations
+            $form = $this->validateForm($changeForm, "POST");
+
+            // Get the form field values
+            $data = $form->getData();
+
+            $changeEvent = $this->getUpdateModuleAccessEvent($data);
+
+            $this->dispatch(TheliaEvents::PROFILE_MODULE_ACCESS_UPDATE, $changeEvent);
 
             if (! $this->eventContainsObject($changeEvent))
                 throw new \LogicException(

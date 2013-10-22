@@ -129,6 +129,7 @@
         <form name="thelia.admin.profile.add" class="Thelia\Form\ProfileCreationForm"/>
         <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
         <form name="thelia.admin.profile.resource-access.modification" class="Thelia\Form\ProfileUpdateResourceAccessForm"/>
+        <form name="thelia.admin.profile.module-access.modification" class="Thelia\Form\ProfileUpdateModuleAccessForm"/>
 
         <form name="thelia.admin.template.creation" class="Thelia\Form\TemplateCreationForm"/>
         <form name="thelia.admin.template.modification" class="Thelia\Form\TemplateModificationForm"/>

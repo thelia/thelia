@@ -781,6 +781,10 @@
         <default key="_controller">Thelia\Controller\Admin\ProfileController::processUpdateResourceAccess</default>
     </route>
 
+    <route id="admin.configuration.profiles.saveModuleAccess" path="/admin/configuration/profiles/saveModuleAccess">
+        <default key="_controller">Thelia\Controller\Admin\ProfileController::processUpdateModuleAccess</default>
+    </route>
+
     <route id="admin.configuration.profiles.delete" path="/admin/configuration/profiles/delete">
         <default key="_controller">Thelia\Controller\Admin\ProfileController::deleteAction</default>
     </route>
