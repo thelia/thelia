@@ -35,6 +35,7 @@
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
         <loop class="Thelia\Core\Template\Loop\ProductSaleElements" name="product_sale_elements"/>
         <loop class="Thelia\Core\Template\Loop\Profile" name="profile"/>
+        <loop class="Thelia\Core\Template\Loop\Resource" name="resource"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
         <loop class="Thelia\Core\Template\Loop\Title" name="title"/>
         <loop class="Thelia\Core\Template\Loop\Lang" name="lang"/>

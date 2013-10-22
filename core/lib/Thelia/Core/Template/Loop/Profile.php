@@ -79,20 +79,20 @@ class Profile extends BaseI18nLoop
         $search->orderById(Criteria::ASC);
 
         /* perform search */
-        $features = $this->search($search, $pagination);
+        $profiles = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult($features);
+        $loopResult = new LoopResult($profiles);
 
-        foreach ($features as $feature) {
-            $loopResultRow = new LoopResultRow($loopResult, $feature, $this->versionable, $this->timestampable, $this->countable);
-            $loopResultRow->set("ID", $feature->getId())
-                ->set("IS_TRANSLATED",$feature->getVirtualColumn('IS_TRANSLATED'))
+        foreach ($profiles as $profile) {
+            $loopResultRow = new LoopResultRow($loopResult, $profile, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow->set("ID", $profile->getId())
+                ->set("IS_TRANSLATED",$profile->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE",$locale)
-                ->set("CODE",$feature->getCode())
-                ->set("TITLE",$feature->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $feature->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $feature->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $feature->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("CODE",$profile->getCode())
+                ->set("TITLE",$profile->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $profile->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $profile->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $profile->getVirtualColumn('i18n_POSTSCRIPTUM'))
             ;
 
             $loopResult->addRow($loopResultRow);

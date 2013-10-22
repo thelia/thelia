@@ -1193,7 +1193,6 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
 (5, 'en_US', 'Canceled', '', '', ''),
 (5, 'fr_FR', 'Annulée', '', '', '');
 
-
 /**
 generated with command : php Thelia thelia:generate-resources --output sql
  */
@@ -1220,4 +1219,55 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (NULL, 'admin.configuration.profile', NOW(), NOW()),
 (NULL, 'admin.configuration.shipping-zone', NOW(), NOW()),
 (NULL, 'admin.configuration.tax', NOW(), NOW()),
-(NULL, 'admin.configuration.template', NOW(), NOW())
+(NULL, 'admin.configuration.template', NOW(), NOW());
+
+/**
+generated with command : php Thelia thelia:generate-resources --output sql-i18n
+ */
+INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+(1, 'en_US', 'Address'),
+(1, 'fr_FR', 'Address'),
+(2, 'en_US', 'Configuration / Admin'),
+(2, 'fr_FR', 'Configuration / Admin'),
+(3, 'en_US', 'Configuration / Area'),
+(3, 'fr_FR', 'Configuration / Area'),
+(4, 'en_US', 'Configuration / Attribute'),
+(4, 'fr_FR', 'Configuration / Attribute'),
+(5, 'en_US', 'Category'),
+(5, 'fr_FR', 'Category'),
+(6, 'en_US', 'Configuration'),
+(6, 'fr_FR', 'Configuration'),
+(7, 'en_US', 'Content'),
+(7, 'fr_FR', 'Content'),
+(8, 'en_US', 'Configuration / Country'),
+(8, 'fr_FR', 'Configuration / Country'),
+(9, 'en_US', 'Coupon'),
+(9, 'fr_FR', 'Coupon'),
+(10, 'en_US', 'Configuration / Currency'),
+(10, 'fr_FR', 'Configuration / Currency'),
+(11, 'en_US', 'Customer'),
+(11, 'fr_FR', 'Customer'),
+(12, 'en_US', 'Configuration / Feature'),
+(12, 'fr_FR', 'Configuration / Feature'),
+(13, 'en_US', 'Folder'),
+(13, 'fr_FR', 'Folder'),
+(14, 'en_US', 'Configuration / Language'),
+(14, 'fr_FR', 'Configuration / Language'),
+(15, 'en_US', 'Configuration / Mailing-system'),
+(15, 'fr_FR', 'Configuration / Mailing-system'),
+(16, 'en_US', 'Configuration / Message'),
+(16, 'fr_FR', 'Configuration / Message'),
+(17, 'en_US', 'Configuration / Module'),
+(17, 'fr_FR', 'Configuration / Module'),
+(18, 'en_US', 'Order'),
+(18, 'fr_FR', 'Order'),
+(19, 'en_US', 'Product'),
+(19, 'fr_FR', 'Product'),
+(20, 'en_US', 'Configuration / Profile'),
+(20, 'fr_FR', 'Configuration / Profile'),
+(21, 'en_US', 'Configuration / Shipping-zone'),
+(21, 'fr_FR', 'Configuration / Shipping-zone'),
+(22, 'en_US', 'Configuration / Tax'),
+(22, 'fr_FR', 'Configuration / Tax'),
+(23, 'en_US', 'Configuration / Template'),
+(23, 'fr_FR', 'Configuration / Template');
