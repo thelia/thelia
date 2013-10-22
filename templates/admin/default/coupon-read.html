@@ -1,5 +1,8 @@
 {extends file="admin-layout.tpl"}
-{block name="check-permissions"}admin.coupon.view{/block}
+
+{block name="check-resource"}admin.coupon{/block}
+{block name="check-access"}view{/block}
+
 {block name="page-title"}{intl l='Coupon'}{/block}
 
 {block name="main-content"}

@@ -22,7 +22,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
 use Thelia\Core\Event\Content\ContentDeleteEvent;
@@ -31,6 +31,7 @@ use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Form\ContentCreationForm;
 use Thelia\Form\ContentModificationForm;
 use Thelia\Model\ContentQuery;
@@ -50,10 +51,7 @@ class ContentController extends AbstractCrudController
             'manual',
             'content_order',
 
-            AdminResources::CONTENT_VIEW,
-            AdminResources::CONTENT_CREATE,
-            AdminResources::CONTENT_UPDATE,
-            AdminResources::CONTENT_DELETE,
+            AdminResources::CONTENT,
 
             TheliaEvents::CONTENT_CREATE,
             TheliaEvents::CONTENT_UPDATE,
@@ -71,7 +69,7 @@ class ContentController extends AbstractCrudController
     public function addAdditionalFolderAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $folder_id = intval($this->getRequest()->request->get('additional_folder_id'));
 
@@ -99,7 +97,7 @@ class ContentController extends AbstractCrudController
     public function removeAdditionalFolderAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $folder_id = intval($this->getRequest()->request->get('additional_folder_id'));
 

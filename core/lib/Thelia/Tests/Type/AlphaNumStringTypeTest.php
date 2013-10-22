@@ -36,7 +36,7 @@ class AlphaNumStringTypeTest extends \PHPUnit_Framework_TestCase
     {
         $type = new AlphaNumStringType();
         $this->assertTrue($type->isValid('azs_qs-0-9ds'));
-        $this->assertFalse($type->isValid('3.3'));
+        $this->assertTrue($type->isValid('3.3'));
         $this->assertFalse($type->isValid('3 3'));
         $this->assertFalse($type->isValid('3€3'));
     }

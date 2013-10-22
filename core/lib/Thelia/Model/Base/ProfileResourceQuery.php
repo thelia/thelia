@@ -24,16 +24,14 @@ use Thelia\Model\Map\ProfileResourceTableMap;
  * @method     ChildProfileResourceQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildProfileResourceQuery orderByProfileId($order = Criteria::ASC) Order by the profile_id column
  * @method     ChildProfileResourceQuery orderByResourceId($order = Criteria::ASC) Order by the resource_id column
- * @method     ChildProfileResourceQuery orderByRead($order = Criteria::ASC) Order by the read column
- * @method     ChildProfileResourceQuery orderByWrite($order = Criteria::ASC) Order by the write column
+ * @method     ChildProfileResourceQuery orderByAccess($order = Criteria::ASC) Order by the access column
  * @method     ChildProfileResourceQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProfileResourceQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildProfileResourceQuery groupById() Group by the id column
  * @method     ChildProfileResourceQuery groupByProfileId() Group by the profile_id column
  * @method     ChildProfileResourceQuery groupByResourceId() Group by the resource_id column
- * @method     ChildProfileResourceQuery groupByRead() Group by the read column
- * @method     ChildProfileResourceQuery groupByWrite() Group by the write column
+ * @method     ChildProfileResourceQuery groupByAccess() Group by the access column
  * @method     ChildProfileResourceQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildProfileResourceQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -55,16 +53,14 @@ use Thelia\Model\Map\ProfileResourceTableMap;
  * @method     ChildProfileResource findOneById(int $id) Return the first ChildProfileResource filtered by the id column
  * @method     ChildProfileResource findOneByProfileId(int $profile_id) Return the first ChildProfileResource filtered by the profile_id column
  * @method     ChildProfileResource findOneByResourceId(int $resource_id) Return the first ChildProfileResource filtered by the resource_id column
- * @method     ChildProfileResource findOneByRead(int $read) Return the first ChildProfileResource filtered by the read column
- * @method     ChildProfileResource findOneByWrite(int $write) Return the first ChildProfileResource filtered by the write column
+ * @method     ChildProfileResource findOneByAccess(int $access) Return the first ChildProfileResource filtered by the access column
  * @method     ChildProfileResource findOneByCreatedAt(string $created_at) Return the first ChildProfileResource filtered by the created_at column
  * @method     ChildProfileResource findOneByUpdatedAt(string $updated_at) Return the first ChildProfileResource filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildProfileResource objects filtered by the id column
  * @method     array findByProfileId(int $profile_id) Return ChildProfileResource objects filtered by the profile_id column
  * @method     array findByResourceId(int $resource_id) Return ChildProfileResource objects filtered by the resource_id column
- * @method     array findByRead(int $read) Return ChildProfileResource objects filtered by the read column
- * @method     array findByWrite(int $write) Return ChildProfileResource objects filtered by the write column
+ * @method     array findByAccess(int $access) Return ChildProfileResource objects filtered by the access column
  * @method     array findByCreatedAt(string $created_at) Return ChildProfileResource objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildProfileResource objects filtered by the updated_at column
  *
@@ -155,7 +151,7 @@ abstract class ProfileResourceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PROFILE_ID, RESOURCE_ID, READ, WRITE, CREATED_AT, UPDATED_AT FROM profile_resource WHERE ID = :p0 AND PROFILE_ID = :p1 AND RESOURCE_ID = :p2';
+        $sql = 'SELECT ID, PROFILE_ID, RESOURCE_ID, ACCESS, CREATED_AT, UPDATED_AT FROM profile_resource WHERE ID = :p0 AND PROFILE_ID = :p1 AND RESOURCE_ID = :p2';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -388,16 +384,16 @@ abstract class ProfileResourceQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the read column
+     * Filter the query on the access column
      *
      * Example usage:
      * <code>
-     * $query->filterByRead(1234); // WHERE read = 1234
-     * $query->filterByRead(array(12, 34)); // WHERE read IN (12, 34)
-     * $query->filterByRead(array('min' => 12)); // WHERE read > 12
+     * $query->filterByAccess(1234); // WHERE access = 1234
+     * $query->filterByAccess(array(12, 34)); // WHERE access IN (12, 34)
+     * $query->filterByAccess(array('min' => 12)); // WHERE access > 12
      * </code>
      *
-     * @param     mixed $read The value to use as filter.
+     * @param     mixed $access The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -405,16 +401,16 @@ abstract class ProfileResourceQuery extends ModelCriteria
      *
      * @return ChildProfileResourceQuery The current query, for fluid interface
      */
-    public function filterByRead($read = null, $comparison = null)
+    public function filterByAccess($access = null, $comparison = null)
     {
-        if (is_array($read)) {
+        if (is_array($access)) {
             $useMinMax = false;
-            if (isset($read['min'])) {
-                $this->addUsingAlias(ProfileResourceTableMap::READ, $read['min'], Criteria::GREATER_EQUAL);
+            if (isset($access['min'])) {
+                $this->addUsingAlias(ProfileResourceTableMap::ACCESS, $access['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($read['max'])) {
-                $this->addUsingAlias(ProfileResourceTableMap::READ, $read['max'], Criteria::LESS_EQUAL);
+            if (isset($access['max'])) {
+                $this->addUsingAlias(ProfileResourceTableMap::ACCESS, $access['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -425,48 +421,7 @@ abstract class ProfileResourceQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProfileResourceTableMap::READ, $read, $comparison);
-    }
-
-    /**
-     * Filter the query on the write column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByWrite(1234); // WHERE write = 1234
-     * $query->filterByWrite(array(12, 34)); // WHERE write IN (12, 34)
-     * $query->filterByWrite(array('min' => 12)); // WHERE write > 12
-     * </code>
-     *
-     * @param     mixed $write The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProfileResourceQuery The current query, for fluid interface
-     */
-    public function filterByWrite($write = null, $comparison = null)
-    {
-        if (is_array($write)) {
-            $useMinMax = false;
-            if (isset($write['min'])) {
-                $this->addUsingAlias(ProfileResourceTableMap::WRITE, $write['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($write['max'])) {
-                $this->addUsingAlias(ProfileResourceTableMap::WRITE, $write['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ProfileResourceTableMap::WRITE, $write, $comparison);
+        return $this->addUsingAlias(ProfileResourceTableMap::ACCESS, $access, $comparison);
     }
 
     /**

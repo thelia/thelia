@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Edit an attribute'}{/block}
 
-{block name="check-permissions"}admin.configuration.attributes.edit{/block}
+{block name="check-resource"}admin.configuration.attribute{/block}
+{block name="check-access"}update{/block}
 
 {block name="main-content"}
 <div class="attributes edit-attribute">
@@ -133,7 +134,8 @@
 
     				                                    <td class="text-center">
     				                                        {admin_position_block
-    				                                        permission="admin.attributes.edit"
+                                                            resource="admin.configuration.attribute"
+                                                            access="update"
     				                                        path={url path='/admin/configuration/attributes-av/update-position' attribute_id=$attribute_id}
     				                                        url_parameter="attributeav_id"
     				                                        in_place_edit_class="positionChange"

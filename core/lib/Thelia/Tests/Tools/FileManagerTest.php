@@ -14,6 +14,10 @@ use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\ImageException;
 use Thelia\Model\Admin;
+use Thelia\Model\CategoryQuery;
+use Thelia\Model\ContentQuery;
+use Thelia\Model\FolderQuery;
+use Thelia\Model\ProductQuery;
 use Thelia\Tools\FileManager;
 
 /**
@@ -631,13 +635,13 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $fileManager = new FileManager($stubContainer);
-        $actual = $fileManager->getParentFileModel(FileManager::TYPE_PRODUCT, 1);
+        $actual = $fileManager->getParentFileModel(FileManager::TYPE_PRODUCT, ProductQuery::create()->findOne()->getId());
         $this->assertInstanceOf('\Thelia\Model\Product', $actual);
-        $actual = $fileManager->getParentFileModel(FileManager::TYPE_CATEGORY, 1);
+        $actual = $fileManager->getParentFileModel(FileManager::TYPE_CATEGORY, CategoryQuery::create()->findOne()->getId());
         $this->assertInstanceOf('\Thelia\Model\Category', $actual);
-        $actual = $fileManager->getParentFileModel(FileManager::TYPE_CONTENT, 1);
+        $actual = $fileManager->getParentFileModel(FileManager::TYPE_CONTENT, ContentQuery::create()->findOne()->getId());
         $this->assertInstanceOf('\Thelia\Model\Content', $actual);
-        $actual = $fileManager->getParentFileModel(FileManager::TYPE_FOLDER, 1);
+        $actual = $fileManager->getParentFileModel(FileManager::TYPE_FOLDER, FolderQuery::create()->findOne()->getId());
         $this->assertInstanceOf('\Thelia\Model\Folder', $actual, 1);
         $actual = $fileManager->getParentFileModel('bad', 1);
         $this->assertNull($actual);
