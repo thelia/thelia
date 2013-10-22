@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Thelia Shipping zones'}{/block}
 
-{block name="check-permissions"}admin.configuration.shipping-zones.view{/block}
+{block name="check-resource"}admin.configuration.shipping-zone{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
 <div class="shipping-zones">
@@ -44,7 +45,7 @@
 
                                     <td>
                                         <div class="btn-group">
-                                           {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.shipping-zones.change"}
+                                           {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.shipping-zone" access="UPDATE"}
                                                <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
                                            {/loop}
                                         </div>

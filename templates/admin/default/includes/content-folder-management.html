@@ -73,7 +73,7 @@
 
                                 <td class="actions">
                                     <div class="btn-group">
-                                        {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.product.category.delete"}
+                                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.category" access="UPDATE"}
                                             <a class="btn btn-default btn-xs delete-folder" title="{intl l='Remove the product from this category'}" href="#delete_folder_dialog" data-id="{$ID}" data-toggle="modal">
                                                 <span class="glyphicon glyphicon-trash"></span>
                                             </a>

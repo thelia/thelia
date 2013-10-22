@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Security\AccessManager;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\UpdatePositionEvent;
 
@@ -40,10 +41,7 @@ abstract class AbstractCrudController extends BaseAdminController
     protected $orderRequestParameterName;
 
     // Permissions
-    protected $viewPermissionIdentifier;
-    protected $createPermissionIdentifier;
-    protected $updatePermissionIdentifier;
-    protected $deletePermissionIdentifier;
+    protected $resourceCode;
 
     // Events
     protected $createEventIdentifier;
@@ -58,10 +56,7 @@ abstract class AbstractCrudController extends BaseAdminController
      * @param string $defaultListOrder          the default object list order, or null if list is not sortable. Example: manual
      * @param string $orderRequestParameterName Name of the request parameter that set the list order (null if list is not sortable)
      *
-     * @param string $viewPermissionIdentifier   the 'view' permission identifier. Example: "admin.configuration.message.view"
-     * @param string $createPermissionIdentifier the 'create' permission identifier. Example: "admin.configuration.message.create"
-     * @param string $updatePermissionIdentifier the 'update' permission identifier. Example: "admin.configuration.message.update"
-     * @param string $deletePermissionIdentifier the 'delete' permission identifier. Example: "admin.configuration.message.delete"
+     * @param string $resourceCode   the 'resource' code. Example: "admin.configuration.message"
      *
      * @param string $createEventIdentifier the dispatched create TheliaEvent identifier. Example: TheliaEvents::MESSAGE_CREATE
      * @param string $updateEventIdentifier the dispatched update TheliaEvent identifier. Example: TheliaEvents::MESSAGE_UPDATE
@@ -76,10 +71,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $defaultListOrder = null,
             $orderRequestParameterName = null,
 
-            $viewPermissionIdentifier,
-            $createPermissionIdentifier,
-            $updatePermissionIdentifier,
-            $deletePermissionIdentifier,
+            $resourceCode,
 
             $createEventIdentifier,
             $updateEventIdentifier,
@@ -92,10 +84,7 @@ abstract class AbstractCrudController extends BaseAdminController
             $this->defaultListOrder = $defaultListOrder;
             $this->orderRequestParameterName = $orderRequestParameterName;
 
-            $this->viewPermissionIdentifier  = $viewPermissionIdentifier;
-            $this->createPermissionIdentifier = $createPermissionIdentifier;
-            $this->updatePermissionIdentifier = $updatePermissionIdentifier;
-            $this->deletePermissionIdentifier = $deletePermissionIdentifier;
+            $this->resourceCode  = $resourceCode;
 
             $this->createEventIdentifier = $createEventIdentifier;
             $this->updateEventIdentifier = $updateEventIdentifier;
@@ -278,7 +267,7 @@ abstract class AbstractCrudController extends BaseAdminController
      */
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth($this->viewPermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::VIEW)) return $response;
         return $this->renderList();
     }
 
@@ -290,7 +279,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function createAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->createPermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::CREATE)) return $response;
 
         $error_msg = false;
 
@@ -351,7 +340,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function updateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         // Load the object
         $object = $this->getExistingObject();
@@ -377,7 +366,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function processUpdateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
 
@@ -442,7 +431,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function updatePositionAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         try {
             $mode = $this->getRequest()->get('mode', null);
@@ -476,7 +465,7 @@ abstract class AbstractCrudController extends BaseAdminController
     protected function genericUpdatePositionAction($object, $eventName, $doFinalRedirect = true)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         if ($object != null) {
 
@@ -510,7 +499,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function setToggleVisibilityAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $changeEvent = $this->createToggleVisibilityEvent($this->getRequest());
 
@@ -532,7 +521,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function deleteAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->deletePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::DELETE)) return $response;
 
         // Get the currency id, and dispatch the delet request
         $deleteEvent = $this->getDeleteEvent();

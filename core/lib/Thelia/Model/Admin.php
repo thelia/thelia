@@ -3,7 +3,8 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Security\Role\Role;
 
@@ -39,7 +40,7 @@ class Admin extends BaseAdmin implements UserInterface
 
         $userPermissions = array();
         foreach($userPermissionsQuery as $userPermission) {
-            $userPermissions[] = $userPermission->getVirtualColumn('code');
+            $userPermissions[$userPermission->getVirtualColumn('code')] = new AccessManager($userPermission->getAccess());
         }
 
         return $userPermissions;

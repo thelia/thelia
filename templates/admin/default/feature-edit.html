@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Edit a feature'}{/block}
 
-{block name="check-permissions"}admin.configuration.features.edit{/block}
+{block name="check-resource"}admin.configuration.feature{/block}
+{block name="check-access"}update{/block}
 
 {block name="main-content"}
 <div class="features edit-feature">
@@ -65,7 +66,7 @@
 
 		     						         {intl l='Feature values'}
 
-		                                     {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.feature-av.create"}
+		                                     {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
 		                                     <span class="pull-right">
 		                                         <a data-toggle="modal" href="#creation_dialog" title="Add a new feature value" class="btn btn-default btn-primary">
 		                                             <span class="glyphicon glyphicon-plus-sign"></span>
@@ -133,12 +134,13 @@
 
     				                                    <td class="text-center">
     				                                        {admin_position_block
-    				                                        permission="admin.features.edit"
-    				                                        path={url path='/admin/configuration/features-av/update-position' feature_id=$feature_id}
-    				                                        url_parameter="featureav_id"
-    				                                        in_place_edit_class="positionChange"
-    				                                        position="$POSITION"
-    				                                        id="$ID"
+                                                                resource="admin.configuration.feature"
+                                                                access="update"
+                                                                path={url path='/admin/configuration/features-av/update-position' feature_id=$feature_id}
+                                                                url_parameter="featureav_id"
+                                                                in_place_edit_class="positionChange"
+                                                                position="$POSITION"
+                                                                id="$ID"
     				                                        }
     				                                    </td>
 
@@ -146,7 +148,7 @@
 
     				                                    <td class="actions">
     				                                        <div class="btn-group">
-    				                                            {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.feature-av.delete"}
+    				                                            {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
     				                                               <a class="btn btn-default btn-xs value-delete" title="{intl l='Delete this value'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
     				                                                <span class="glyphicon glyphicon-trash"></span>
     				                                               </a>

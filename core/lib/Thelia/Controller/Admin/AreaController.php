@@ -23,7 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaCreateEvent;
 use Thelia\Core\Event\Area\AreaDeleteEvent;
@@ -31,6 +31,7 @@ use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\Area\AreaUpdateEvent;
 use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Form\Area\AreaCountryForm;
 use Thelia\Form\Area\AreaCreateForm;
 use Thelia\Form\Area\AreaModificationForm;
@@ -53,10 +54,7 @@ class AreaController extends AbstractCrudController
             null,
             null,
 
-            AdminResources::AREA_VIEW,
-            AdminResources::AREA_CREATE,
-            AdminResources::AREA_UPDATE,
-            AdminResources::AREA_DELETE,
+            AdminResources::AREA,
 
             TheliaEvents::AREA_CREATE,
             TheliaEvents::AREA_UPDATE,
@@ -233,7 +231,7 @@ class AreaController extends AbstractCrudController
     public function addCountry()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $areaCountryForm = new AreaCountryForm($this->getRequest());
         $error_msg = null;
@@ -275,7 +273,7 @@ class AreaController extends AbstractCrudController
     public function removeCountry()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
         $request = $this->getRequest();
         $removeCountryEvent = new AreaRemoveCountryEvent($request->request->get('areai_id', 0), $request->request->get('country_id', 0));
 
@@ -286,7 +284,7 @@ class AreaController extends AbstractCrudController
 
     public function updatePostageAction()
     {
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $areaUpdateForm = new AreaPostageForm($this->getRequest());
         $error_msg = null;

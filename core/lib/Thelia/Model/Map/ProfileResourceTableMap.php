@@ -57,7 +57,7 @@ class ProfileResourceTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class ProfileResourceTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the ID field
@@ -85,14 +85,9 @@ class ProfileResourceTableMap extends TableMap
     const RESOURCE_ID = 'profile_resource.RESOURCE_ID';
 
     /**
-     * the column name for the READ field
+     * the column name for the ACCESS field
      */
-    const READ = 'profile_resource.READ';
-
-    /**
-     * the column name for the WRITE field
-     */
-    const WRITE = 'profile_resource.WRITE';
+    const ACCESS = 'profile_resource.ACCESS';
 
     /**
      * the column name for the CREATED_AT field
@@ -116,12 +111,12 @@ class ProfileResourceTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ProfileId', 'ResourceId', 'Read', 'Write', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'profileId', 'resourceId', 'read', 'write', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProfileResourceTableMap::ID, ProfileResourceTableMap::PROFILE_ID, ProfileResourceTableMap::RESOURCE_ID, ProfileResourceTableMap::READ, ProfileResourceTableMap::WRITE, ProfileResourceTableMap::CREATED_AT, ProfileResourceTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PROFILE_ID', 'RESOURCE_ID', 'READ', 'WRITE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'profile_id', 'resource_id', 'read', 'write', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'ProfileId', 'ResourceId', 'Access', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'profileId', 'resourceId', 'access', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ProfileResourceTableMap::ID, ProfileResourceTableMap::PROFILE_ID, ProfileResourceTableMap::RESOURCE_ID, ProfileResourceTableMap::ACCESS, ProfileResourceTableMap::CREATED_AT, ProfileResourceTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'PROFILE_ID', 'RESOURCE_ID', 'ACCESS', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'profile_id', 'resource_id', 'access', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -131,12 +126,12 @@ class ProfileResourceTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ProfileId' => 1, 'ResourceId' => 2, 'Read' => 3, 'Write' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'profileId' => 1, 'resourceId' => 2, 'read' => 3, 'write' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(ProfileResourceTableMap::ID => 0, ProfileResourceTableMap::PROFILE_ID => 1, ProfileResourceTableMap::RESOURCE_ID => 2, ProfileResourceTableMap::READ => 3, ProfileResourceTableMap::WRITE => 4, ProfileResourceTableMap::CREATED_AT => 5, ProfileResourceTableMap::UPDATED_AT => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PROFILE_ID' => 1, 'RESOURCE_ID' => 2, 'READ' => 3, 'WRITE' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'profile_id' => 1, 'resource_id' => 2, 'read' => 3, 'write' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ProfileId' => 1, 'ResourceId' => 2, 'Access' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'profileId' => 1, 'resourceId' => 2, 'access' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(ProfileResourceTableMap::ID => 0, ProfileResourceTableMap::PROFILE_ID => 1, ProfileResourceTableMap::RESOURCE_ID => 2, ProfileResourceTableMap::ACCESS => 3, ProfileResourceTableMap::CREATED_AT => 4, ProfileResourceTableMap::UPDATED_AT => 5, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PROFILE_ID' => 1, 'RESOURCE_ID' => 2, 'ACCESS' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'profile_id' => 1, 'resource_id' => 2, 'access' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -159,8 +154,7 @@ class ProfileResourceTableMap extends TableMap
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignPrimaryKey('PROFILE_ID', 'ProfileId', 'INTEGER' , 'profile', 'ID', true, null, null);
         $this->addForeignPrimaryKey('RESOURCE_ID', 'ResourceId', 'INTEGER' , 'resource', 'ID', true, null, null);
-        $this->addColumn('READ', 'Read', 'TINYINT', false, null, 0);
-        $this->addColumn('WRITE', 'Write', 'TINYINT', false, null, 0);
+        $this->addColumn('ACCESS', 'Access', 'INTEGER', true, null, 0);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -377,16 +371,14 @@ class ProfileResourceTableMap extends TableMap
             $criteria->addSelectColumn(ProfileResourceTableMap::ID);
             $criteria->addSelectColumn(ProfileResourceTableMap::PROFILE_ID);
             $criteria->addSelectColumn(ProfileResourceTableMap::RESOURCE_ID);
-            $criteria->addSelectColumn(ProfileResourceTableMap::READ);
-            $criteria->addSelectColumn(ProfileResourceTableMap::WRITE);
+            $criteria->addSelectColumn(ProfileResourceTableMap::ACCESS);
             $criteria->addSelectColumn(ProfileResourceTableMap::CREATED_AT);
             $criteria->addSelectColumn(ProfileResourceTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.PROFILE_ID');
             $criteria->addSelectColumn($alias . '.RESOURCE_ID');
-            $criteria->addSelectColumn($alias . '.READ');
-            $criteria->addSelectColumn($alias . '.WRITE');
+            $criteria->addSelectColumn($alias . '.ACCESS');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

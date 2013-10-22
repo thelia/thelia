@@ -1,7 +1,7 @@
 {* -- By default, check admin login ----------------------------------------- *}
 
 {block name="check-auth"}
-    {check_auth roles="ADMIN" permissions="{block name="check-permissions"}{/block}" login_tpl="/admin/login"}
+    {check_auth role="ADMIN" resource="{block name="check-resource"}{/block}" access="{block name="check-access"}{/block}" login_tpl="/admin/login"}
 {/block}
 
 {* -- Define some stuff for Smarty ----------------------------------------- *}
@@ -44,7 +44,7 @@
 <body>
 	{* display top bar only if admin is connected *}
 
-	{loop name="top-bar-auth" type="auth" roles="ADMIN"}
+	{loop name="top-bar-auth" type="auth" role="ADMIN"}
 
 	    {* -- Brand bar section ------------------------------------------------- *}
 
@@ -107,13 +107,13 @@
                                 <a href="{url path='/admin/home'}">{intl l="Home"}</a>
                             </li>
 
-                            {loop name="menu-auth-customer" type="auth" roles="ADMIN" permissions="admin.customers.view"}
+                            {loop name="menu-auth-customer" type="auth" role="ADMIN" resource="admin.customer" access="VIEW"}
                             <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
                                 <a href="{url path='/admin/customers'}">{intl l="Customers"}</a>
                             </li>
                             {/loop}
 
-                            {loop name="menu-auth-order" type="auth" roles="ADMIN" permissions="admin.orders.view"}
+                            {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
                                 <li class="dropdown {if $admin_current_location == 'order'}active{/if}" id="orders_menu">
 
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Orders"} <span class="caret"></span></a>
@@ -140,31 +140,31 @@
                                 </li>
                             {/loop}
 
-                            {loop name="menu-auth-catalog" type="auth" roles="ADMIN" permissions="admin.catalog.view"}
+                            {loop name="menu-auth-catalog" type="auth" role="ADMIN" resource="admin.category" access="VIEW"}
                             <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
                                 <a href="{url path='/admin/catalog'}">{intl l="Catalog"}</a>
                             </li>
                             {/loop}
 
-                            {loop name="menu-auth-content" type="auth" roles="ADMIN" permissions="admin.folders.view"}
+                            {loop name="menu-auth-content" type="auth" role="ADMIN" resource="admin.folder"  access="VIEW"}
                             <li class="{if $admin_current_location == 'folder'}active{/if}" id="folders_menu">
                                 <a href="{url path='/admin/folders'}">{intl l="Folders"}</a>
                             </li>
                             {/loop}
 
-                            {loop name="menu-auth-coupon" type="auth" roles="ADMIN" permissions="admin.coupon.view"}
+                            {loop name="menu-auth-coupon" type="auth" role="ADMIN" resource="admin.coupon"  access="VIEW"}
                             <li class="{if $admin_current_location == 'coupon'}active{/if}" id="coupon_menu">
                                 <a href="{url path='/admin/coupon'}">{intl l="Coupons"}</a>
                             </li>
                             {/loop}
 
-                            {loop name="menu-auth-config" type="auth" roles="ADMIN" permissions="admin.config.view"}
+                            {loop name="menu-auth-config" type="auth" role="ADMIN" resource="admin.config"  access="VIEW"}
                             <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
                                 <a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a>
                             </li>
                             {/loop}
 
-                            {loop name="menu-auth-modules" type="auth" roles="ADMIN" permissions="admin.modules.view"}
+                            {loop name="menu-auth-modules" type="auth" role="ADMIN" resource="admin.module"  access="VIEW"}
                             <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
                                 <a href="{url path='/admin/modules'}">{intl l="Modules"}</a>
                             </li>
@@ -174,7 +174,7 @@
                             {/loop}
                         </ul>
 
-                        {loop name="top-bar-search" type="auth" roles="ADMIN" permissions="admin.search"}
+                        {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
                         <form class="navbar-form pull-right hidden-xs" action="{url path='/admin/search'}">
                             <div class="form-group">
                                 <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">

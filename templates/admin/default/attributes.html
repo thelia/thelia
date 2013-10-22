@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Thelia Product Attributes'}{/block}
 
-{block name="check-permissions"}admin.configuration.attributes.view{/block}
+{block name="check-resource"}admin.configuration.attribute{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
 <div class="attributes">
@@ -26,7 +27,7 @@
     	                        <caption>
     	                           {intl l='Thelia product attributes'}
 
-                                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.attributes.create"}
+                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.attribute" access="CREATE"}
                                     <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new product attribute'}" href="#creation_dialog" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
                                     </a>
@@ -76,7 +77,7 @@
                                         <td>{$ID}</td>
 
                                         <td>
-                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.attributes.change"}
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
                                                 <a title="{intl l='Change this attribute'}" href="{url path='/admin/configuration/attributes/update' attribute_id=$ID}">{$TITLE}</a>
                                             {/loop}
                                             {elseloop rel="can_change"}
@@ -86,7 +87,8 @@
 
                                         <td class="text-center">
                                             {admin_position_block
-                                            permission="admin.attributes.edit"
+                                            resource="admin.configuration.attribute"
+                                            access="update"
                                             path="/admin/configuration/attributes/update-position"
                                             url_parameter="attribute_id"
                                             in_place_edit_class="positionChange"
@@ -98,7 +100,7 @@
                                         {module_include location='attributes_table_row'}
 
                                         <td class="actions">
-                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.attributes.change"}
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
                                             <div class="btn-group">
                                                 <a class="btn btn-default btn-xs attribute-remove-from-all" title="{intl l='Remove this attribute from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
                                                     <span class="glyphicon glyphicon-minus"></span>
@@ -110,11 +112,11 @@
                                             {/loop}
 
                                             <div class="btn-group">
-    	                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.attributes.change"}
+    	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
     	                                            <a class="btn btn-default btn-xs attribute-change" title="{intl l='Change this product attribute'}" href="{url path='/admin/configuration/attributes/update' attribute_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
     	                                        {/loop}
 
-    	                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.attributes.delete"}
+    	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="DELETE"}
     	                                            <a class="btn btn-default btn-xs attribute-delete" title="{intl l='Delete this product attribute'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
     	                                        {/loop}
                                             </div>

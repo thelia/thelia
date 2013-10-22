@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Folders'}{/block}
 
-{block name="check-permissions"}admin.folders.view{/block}
+{block name="check-resource"}admin.folder{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
     <div class="folders">
@@ -35,7 +36,7 @@
                             </td>*}
                             {module_include location='folder_list_caption'}
 
-                            {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.folders.create"}
+                            {loop type="auth" name="can_create" role="ADMIN" resource="admin.folder" access="CREATE"}
                                 <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new folder'}" href="#folder_creation_dialog" data-toggle="modal">
                                     <span class="glyphicon glyphicon-plus-sign"></span>
                                 </a>
@@ -117,7 +118,7 @@
                                     {module_include location='folder_list_row'}
 
                                     <td>
-                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.folders.edit"}
+                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
                                             <div class="make-switch switch-small folderVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                 <input type="checkbox" class="folderVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
                                             </div>
@@ -132,12 +133,13 @@
 
                                     <td>
                                         {admin_position_block
-                                        permission="admin.folders.edit"
-                                        path={url path='admin/folders/update-position' folder_id=$ID}
-                                        url_parameter="folder_id"
-                                        in_place_edit_class="folderPositionChange"
-                                        position=$POSITION
-                                        id=$ID
+                                            resource="admin.folder"
+                                            access="update"
+                                            path={url path='admin/folders/update-position' folder_id=$ID}
+                                            url_parameter="folder_id"
+                                            in_place_edit_class="folderPositionChange"
+                                            position=$POSITION
+                                            id=$ID
                                         }
                                     </td>
 
@@ -145,11 +147,11 @@
                                         <div class="btn-group">
                                             <a class="btn btn-default btn-xs" title="{intl l='Browse this folder'}" href="{url path='admin/folders' parent=$ID}"><i class="glyphicon glyphicon-folder-open"></i></a>
 
-                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.folders.edit"}
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
                                                 <a class="btn btn-default btn-xs" title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/{$ID}"}"><i class="glyphicon glyphicon-edit"></i></a>
                                             {/loop}
 
-                                            {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.folders.delete"}
+                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.folder" access="DELETE"}
                                                 <a class="btn btn-default btn-xs folder-delete" title="{intl l='Delete this folder and all its contents'}"  href="#folder_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
                                             {/loop}
                                         </div>
@@ -164,7 +166,7 @@
                             <tr>
                                 <td class="message">
                                     <div class="alert alert-info">
-                                        {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.folders.create"}
+                                        {loop type="auth" name="can_create" role="ADMIN" resource="admin.folder" access="CREATE"}
                                         {intl l="This folder has no sub-folders. To create a new one, click the + button above."}
                                         {/loop}
 
@@ -272,7 +274,7 @@
                                     {module_include location='content_list_row'}
 
                                     <td>
-                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.contents.edit"}
+                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
                                             <div class="make-switch switch-small contentVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                 <input type="checkbox" class="contentVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
                                             </div>
@@ -287,22 +289,23 @@
 
                                     <td>
                                         {admin_position_block
-                                        permission="admin.content.edit"
-                                        path={url path='/admin/content/update-position' content_id=$ID}
-                                        url_parameter="content_id"
-                                        in_place_edit_class="contentPositionChange"
-                                        position=$POSITION
-                                        id=$ID
+                                            resource="admin.content"
+                                            access="update"
+                                            path={url path='/admin/content/update-position' content_id=$ID}
+                                            url_parameter="content_id"
+                                            in_place_edit_class="contentPositionChange"
+                                            position=$POSITION
+                                            id=$ID
                                         }
                                     </td>
 
                                     <td>
                                         <div class="btn-group">
-                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.content.edit"}
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
                                                 <a class="btn btn-default btn-xs" title="{intl l='Edit this content'}" href="{url path="admin/content/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
                                             {/loop}
 
-                                            {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.content.delete"}
+                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.content" access="DELETE"}
                                                 <a class="btn btn-default btn-xs content-delete" title="{intl l='Delete this content'}"  href="#content_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
                                             {/loop}
                                         </div>

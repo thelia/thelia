@@ -25,6 +25,7 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
+use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
@@ -44,7 +45,7 @@ use Thelia\Type\BooleanOrBothType;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Admin extends BaseI18nLoop
+class Admin extends BaseLoop
 {
     public $timestampable = true;
 
@@ -83,17 +84,17 @@ class Admin extends BaseI18nLoop
         $search->orderByFirstname(Criteria::ASC);
 
         /* perform search */
-        $features = $this->search($search, $pagination);
+        $admins = $this->search($search, $pagination);
 
-        $loopResult = new LoopResult($features);
+        $loopResult = new LoopResult($admins);
 
-        foreach ($features as $feature) {
-            $loopResultRow = new LoopResultRow($loopResult, $feature, $this->versionable, $this->timestampable, $this->countable);
-            $loopResultRow->set("ID", $feature->getId())
-                ->set("PROFILE",$feature->getProfileId())
-                ->set("FIRSTNAME",$feature->getFirstname())
-                ->set("LASTNAME",$feature->getLastname())
-                ->set("LOGIN",$feature->getLogin())
+        foreach ($admins as $admin) {
+            $loopResultRow = new LoopResultRow($loopResult, $admin, $this->versionable, $this->timestampable, $this->countable);
+            $loopResultRow->set("ID", $admin->getId())
+                ->set("PROFILE",$admin->getProfileId())
+                ->set("FIRSTNAME",$admin->getFirstname())
+                ->set("LASTNAME",$admin->getLastname())
+                ->set("LOGIN",$admin->getLogin())
             ;
 
             $loopResult->addRow($loopResultRow);

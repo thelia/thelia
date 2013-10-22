@@ -52,7 +52,8 @@
 
             <td class="text-center">
             {admin_position_block
-                permission="admin.templates.edit"
+                resource="admin.configuration.template"
+                access="update"
                 path={url path="/admin/template/update-feature-position" template_id=$template_id}
                 url_parameter="feature_id"
                 in_place_edit_class="featurePositionChange"
@@ -65,7 +66,7 @@
 
             <td class="actions">
                 <div class="btn-group">
-                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.template.feature.delete"}
+                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.template"  access="UPDATE"}
                        <a class="btn btn-default btn-xs delete-feature" title="{intl l='Delete this feature'}" href="#delete_feature_dialog" data-id="{$ID}" data-toggle="modal">
                         <span class="glyphicon glyphicon-trash"></span>
                        </a>

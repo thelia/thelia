@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Countries'}{/block}
 
-{block name="check-permissions"}admin.configuration.countries.view{/block}
+{block name="check-resource"}admin.configuration.country{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
     <div class="countries">
@@ -27,7 +28,7 @@
                                 <table class="table table-striped table-condensed">
                                    <caption class="clearfix">
                                         {intl l='Countries'}
-                                        {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.countries.create"}
+                                        {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.country" access="CREATE"}
                                             <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new country'}" href="#add_country_dialog" data-toggle="modal">
                                                 <span class="glyphicon glyphicon-plus-sign"></span>
                                             </a>
@@ -70,13 +71,13 @@
 
                                                 <td class="actions">
                                                     <div class="btn-group">
-                                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.countries.change"}
+                                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.country" access="UPDATE"}
                                                             <a class="btn btn-default btn-xs country-change" title="{intl l='Change this country'}" href="{url path="/admin/configuration/country/update/{$ID}"}">
                                                                 <span class="glyphicon glyphicon-edit"></span>
                                                             </a>
                                                         {/loop}
 
-                                                        {loop type="auth" name="can_delete" roles="ADMIN" permissions="admin.configuration.countries.delete"}
+                                                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.country" access="DELETE"}
                                                             <a class="btn btn-default btn-xs country-delete" title="{intl l='Delete this country'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
                                                                 <span class="glyphicon glyphicon-trash"></span>
                                                             </a>

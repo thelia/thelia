@@ -69,7 +69,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
         }
 
         if ($append && $cartItem !== null) {
-            $this->updateQuantity($cartItem, $quantity);
+            $cartItem->addQuantity($quantity)
+                ->save();
         }
     }
 

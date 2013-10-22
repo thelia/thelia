@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Thelia Product Features'}{/block}
 
-{block name="check-permissions"}admin.configuration.features.view{/block}
+{block name="check-resource"}admin.configuration.feature{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
 <div class="features">
@@ -26,7 +27,7 @@
     	                        <caption>
     	                           {intl l='Thelia product features'}
 
-                                    {loop type="auth" name="can_create" roles="ADMIN" permissions="admin.configuration.features.create"}
+                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.feature" access="CREATE"}
                                     <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new product feature'}" href="#creation_dialog" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
                                     </a>
@@ -76,7 +77,7 @@
                                         <td>{$ID}</td>
 
                                         <td>
-                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.features.change"}
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
                                                 <a title="{intl l='Change this feature'}" href="{url path='/admin/configuration/features/update' feature_id=$ID}">{$TITLE}</a>
                                             {/loop}
                                             {elseloop rel="can_change"}
@@ -86,19 +87,20 @@
 
                                         <td class="text-center">
                                             {admin_position_block
-                                            permission="admin.features.edit"
-                                            path="/admin/configuration/features/update-position"
-                                            url_parameter="feature_id"
-                                            in_place_edit_class="positionChange"
-                                            position="$POSITION"
-                                            id="$ID"
+                                                resource="admin.configuration.feature"
+                                                access="update"
+                                                path="/admin/configuration/features/update-position"
+                                                url_parameter="feature_id"
+                                                in_place_edit_class="positionChange"
+                                                position="$POSITION"
+                                                id="$ID"
                                             }
                                         </td>
 
                                         {module_include location='features_table_row'}
 
                                         <td class="actions">
-                                            {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.features.change"}
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
                                             <div class="btn-group">
                                                 <a class="btn btn-default btn-xs feature-remove-from-all" title="{intl l='Remove this feature from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
                                                     <span class="glyphicon glyphicon-minus"></span>
@@ -110,11 +112,11 @@
                                             {/loop}
 
                                             <div class="btn-group">
-    	                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.features.change"}
+    	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
     	                                            <a class="btn btn-default btn-xs feature-change" title="{intl l='Change this product feature'}" href="{url path='/admin/configuration/features/update' feature_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
     	                                        {/loop}
 
-    	                                        {loop type="auth" name="can_change" roles="ADMIN" permissions="admin.configuration.features.delete"}
+    	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="DELETE"}
     	                                            <a class="btn btn-default btn-xs feature-delete" title="{intl l='Delete this product feature'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
     	                                        {/loop}
                                             </div>

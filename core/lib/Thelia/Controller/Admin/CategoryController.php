@@ -24,11 +24,12 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\Response;
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Model\CategoryQuery;
 use Thelia\Form\CategoryModificationForm;
 use Thelia\Form\CategoryCreationForm;
@@ -55,10 +56,7 @@ class CategoryController extends AbstractCrudController
             'manual',
             'category_order',
 
-            AdminResources::CATEGORY_VIEW,
-            AdminResources::CATEGORY_CREATE,
-            AdminResources::CATEGORY_UPDATE,
-            AdminResources::CATEGORY_DELETE,
+            AdminResources::CATEGORY,
 
             TheliaEvents::CATEGORY_CREATE,
             TheliaEvents::CATEGORY_UPDATE,
@@ -217,7 +215,7 @@ class CategoryController extends AbstractCrudController
     public function setToggleVisibilityAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $event = new CategoryToggleVisibilityEvent($this->getExistingObject());
 
@@ -297,7 +295,7 @@ class CategoryController extends AbstractCrudController
     public function addRelatedContentAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $content_id = intval($this->getRequest()->get('content_id'));
 
@@ -327,7 +325,7 @@ class CategoryController extends AbstractCrudController
     public function addRelatedPictureAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -355,7 +353,7 @@ class CategoryController extends AbstractCrudController
     public function deleteRelatedContentAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->updatePermissionIdentifier)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
         $content_id = intval($this->getRequest()->get('content_id'));
 
