@@ -22,8 +22,10 @@
 /*************************************************************************************/
 
 namespace Thelia\Form;
+
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Thelia\Core\Translation\Translator;
 
 
 /**
@@ -61,6 +63,10 @@ class NewsletterForm extends BaseForm
                 'constraints' => array(
                     new NotBlank(),
                     new Email()
+                ),
+                'label' => Translator::getInstance()->trans('email'),
+                'label_attr' => array(
+                    'for' => 'email_newsletter'
                 )
             ));
     }

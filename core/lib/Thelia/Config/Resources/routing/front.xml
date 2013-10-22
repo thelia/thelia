@@ -187,7 +187,12 @@
 
     <!-- newsletter management -->
 
-    <route id="newsletter.process" path="/newsletter">
+    <route id="newsletter.display" path="/newsletter" methods="get">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">newsletter</default>
+    </route>
+
+    <route id="newsletter.process" path="/newsletter" methods="post">
         <default key="_controller">Thelia\Controller\Front\NewsletterController::subscribeAction</default>
         <default key="_view">newsletter</default>
     </route>

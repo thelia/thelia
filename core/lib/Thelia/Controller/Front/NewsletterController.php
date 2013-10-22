@@ -62,8 +62,8 @@ class NewsletterController extends BaseFrontController
             $error_message = $e->getMessage();
         }
 
-        if($error_message) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during sending contact mail : %s', $error_message));
+        if($error_message !== false) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during newsletter subscription : %s', $error_message));
 
             $newsletterForm->setErrorMessage($error_message);
 
