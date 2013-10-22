@@ -29,6 +29,9 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Type\AlphaNumStringListType;
+use Thelia\Type\EnumListType;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -41,40 +44,45 @@ class Auth extends BaseLoop
     public function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createAnyTypeArgument('roles', null, true),
-            Argument::createAnyTypeArgument('permissions'),
+            new Argument(
+                'roles',
+                new TypeCollection(
+                    new AlphaNumStringListType()
+                ),
+                null,
+                true
+            ),
+            new Argument(
+                'resource',
+                new TypeCollection(
+                    new AlphaNumStringListType()
+                )
+            ),
+            new Argument(
+                'access',
+                new TypeCollection(
+                    new EnumListType(array("view", "create", "update", "delete"))
+                )
+            ),
             Argument::createAnyTypeArgument('context', 'front', false)
          );
     }
 
-    private function _explode($commaSeparatedValues)
-    {
-
-        $array = explode(',', $commaSeparatedValues);
-
-        if (array_walk($array, function(&$item) {
-            $item = strtoupper(trim($item));
-        })) {
-            return $array;
-        }
-
-        return array();
-    }
-
     /**
+     * @param $pagination
      *
-     *
-     * @return \Thelia\Core\Template\Element\LoopResult
+     * @return LoopResult
      */
     public function exec(&$pagination)
     {
-        $roles = $this->_explode($this->getRoles());
-        $permissions = $this->_explode($this->getPermissions());
+        $roles = $this->getRoles();
+        $resource = $this->getResource();
+        $access = $this->getAccess();
 
         $loopResult = new LoopResult();
 
         try {
-            if (true === $this->securityContext->isGranted($roles, $permissions == null ? array() : $permissions)) {
+            if (true === $this->securityContext->isGranted($roles, $resource === null ? array() : $resource, $access === null ? array() : $access)) {
 
                 // Create an empty row: loop is no longer empty :)
                 $loopResult->addRow(new LoopResultRow());

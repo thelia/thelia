@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Thelia Product Features'}{/block}
 
-{block name="check-permissions"}admin.configuration.features.view{/block}
+{block name="check-resource"}admin.configuration.feature{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
 <div class="features">
@@ -86,12 +87,13 @@
 
                                         <td class="text-center">
                                             {admin_position_block
-                                            permission="admin.features.edit"
-                                            path="/admin/configuration/features/update-position"
-                                            url_parameter="feature_id"
-                                            in_place_edit_class="positionChange"
-                                            position="$POSITION"
-                                            id="$ID"
+                                                resource="admin.configuration.feature"
+                                                access="update"
+                                                path="/admin/configuration/features/update-position"
+                                                url_parameter="feature_id"
+                                                in_place_edit_class="positionChange"
+                                                position="$POSITION"
+                                                id="$ID"
                                             }
                                         </td>
 

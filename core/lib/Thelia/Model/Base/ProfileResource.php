@@ -77,18 +77,11 @@ abstract class ProfileResource implements ActiveRecordInterface
     protected $resource_id;
 
     /**
-     * The value for the read field.
+     * The value for the access field.
      * Note: this column has a database default value of: 0
      * @var        int
      */
-    protected $read;
-
-    /**
-     * The value for the write field.
-     * Note: this column has a database default value of: 0
-     * @var        int
-     */
-    protected $write;
+    protected $access;
 
     /**
      * The value for the created_at field.
@@ -128,8 +121,7 @@ abstract class ProfileResource implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->read = 0;
-        $this->write = 0;
+        $this->access = 0;
     }
 
     /**
@@ -426,25 +418,14 @@ abstract class ProfileResource implements ActiveRecordInterface
     }
 
     /**
-     * Get the [read] column value.
+     * Get the [access] column value.
      *
      * @return   int
      */
-    public function getRead()
+    public function getAccess()
     {
 
-        return $this->read;
-    }
-
-    /**
-     * Get the [write] column value.
-     *
-     * @return   int
-     */
-    public function getWrite()
-    {
-
-        return $this->write;
+        return $this->access;
     }
 
     /**
@@ -559,46 +540,25 @@ abstract class ProfileResource implements ActiveRecordInterface
     } // setResourceId()
 
     /**
-     * Set the value of [read] column.
+     * Set the value of [access] column.
      *
      * @param      int $v new value
      * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
      */
-    public function setRead($v)
+    public function setAccess($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->read !== $v) {
-            $this->read = $v;
-            $this->modifiedColumns[] = ProfileResourceTableMap::READ;
+        if ($this->access !== $v) {
+            $this->access = $v;
+            $this->modifiedColumns[] = ProfileResourceTableMap::ACCESS;
         }
 
 
         return $this;
-    } // setRead()
-
-    /**
-     * Set the value of [write] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProfileResource The current object (for fluent API support)
-     */
-    public function setWrite($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->write !== $v) {
-            $this->write = $v;
-            $this->modifiedColumns[] = ProfileResourceTableMap::WRITE;
-        }
-
-
-        return $this;
-    } // setWrite()
+    } // setAccess()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -652,11 +612,7 @@ abstract class ProfileResource implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->read !== 0) {
-                return false;
-            }
-
-            if ($this->write !== 0) {
+            if ($this->access !== 0) {
                 return false;
             }
 
@@ -696,19 +652,16 @@ abstract class ProfileResource implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProfileResourceTableMap::translateFieldName('ResourceId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->resource_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProfileResourceTableMap::translateFieldName('Read', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->read = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProfileResourceTableMap::translateFieldName('Access', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->access = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProfileResourceTableMap::translateFieldName('Write', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->write = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProfileResourceTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProfileResourceTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProfileResourceTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProfileResourceTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -721,7 +674,7 @@ abstract class ProfileResource implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = ProfileResourceTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = ProfileResourceTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ProfileResource object", 0, $e);
@@ -977,11 +930,8 @@ abstract class ProfileResource implements ActiveRecordInterface
         if ($this->isColumnModified(ProfileResourceTableMap::RESOURCE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'RESOURCE_ID';
         }
-        if ($this->isColumnModified(ProfileResourceTableMap::READ)) {
-            $modifiedColumns[':p' . $index++]  = 'READ';
-        }
-        if ($this->isColumnModified(ProfileResourceTableMap::WRITE)) {
-            $modifiedColumns[':p' . $index++]  = 'WRITE';
+        if ($this->isColumnModified(ProfileResourceTableMap::ACCESS)) {
+            $modifiedColumns[':p' . $index++]  = 'ACCESS';
         }
         if ($this->isColumnModified(ProfileResourceTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -1009,11 +959,8 @@ abstract class ProfileResource implements ActiveRecordInterface
                     case 'RESOURCE_ID':
                         $stmt->bindValue($identifier, $this->resource_id, PDO::PARAM_INT);
                         break;
-                    case 'READ':
-                        $stmt->bindValue($identifier, $this->read, PDO::PARAM_INT);
-                        break;
-                    case 'WRITE':
-                        $stmt->bindValue($identifier, $this->write, PDO::PARAM_INT);
+                    case 'ACCESS':
+                        $stmt->bindValue($identifier, $this->access, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1093,15 +1040,12 @@ abstract class ProfileResource implements ActiveRecordInterface
                 return $this->getResourceId();
                 break;
             case 3:
-                return $this->getRead();
+                return $this->getAccess();
                 break;
             case 4:
-                return $this->getWrite();
-                break;
-            case 5:
                 return $this->getCreatedAt();
                 break;
-            case 6:
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1136,10 +1080,9 @@ abstract class ProfileResource implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getProfileId(),
             $keys[2] => $this->getResourceId(),
-            $keys[3] => $this->getRead(),
-            $keys[4] => $this->getWrite(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[3] => $this->getAccess(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1197,15 +1140,12 @@ abstract class ProfileResource implements ActiveRecordInterface
                 $this->setResourceId($value);
                 break;
             case 3:
-                $this->setRead($value);
+                $this->setAccess($value);
                 break;
             case 4:
-                $this->setWrite($value);
-                break;
-            case 5:
                 $this->setCreatedAt($value);
                 break;
-            case 6:
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1235,10 +1175,9 @@ abstract class ProfileResource implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setProfileId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setResourceId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setRead($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setWrite($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[3], $arr)) $this->setAccess($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -1253,8 +1192,7 @@ abstract class ProfileResource implements ActiveRecordInterface
         if ($this->isColumnModified(ProfileResourceTableMap::ID)) $criteria->add(ProfileResourceTableMap::ID, $this->id);
         if ($this->isColumnModified(ProfileResourceTableMap::PROFILE_ID)) $criteria->add(ProfileResourceTableMap::PROFILE_ID, $this->profile_id);
         if ($this->isColumnModified(ProfileResourceTableMap::RESOURCE_ID)) $criteria->add(ProfileResourceTableMap::RESOURCE_ID, $this->resource_id);
-        if ($this->isColumnModified(ProfileResourceTableMap::READ)) $criteria->add(ProfileResourceTableMap::READ, $this->read);
-        if ($this->isColumnModified(ProfileResourceTableMap::WRITE)) $criteria->add(ProfileResourceTableMap::WRITE, $this->write);
+        if ($this->isColumnModified(ProfileResourceTableMap::ACCESS)) $criteria->add(ProfileResourceTableMap::ACCESS, $this->access);
         if ($this->isColumnModified(ProfileResourceTableMap::CREATED_AT)) $criteria->add(ProfileResourceTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ProfileResourceTableMap::UPDATED_AT)) $criteria->add(ProfileResourceTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1332,8 +1270,7 @@ abstract class ProfileResource implements ActiveRecordInterface
     {
         $copyObj->setProfileId($this->getProfileId());
         $copyObj->setResourceId($this->getResourceId());
-        $copyObj->setRead($this->getRead());
-        $copyObj->setWrite($this->getWrite());
+        $copyObj->setAccess($this->getAccess());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1474,8 +1411,7 @@ abstract class ProfileResource implements ActiveRecordInterface
         $this->id = null;
         $this->profile_id = null;
         $this->resource_id = null;
-        $this->read = null;
-        $this->write = null;
+        $this->access = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

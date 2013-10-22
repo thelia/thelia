@@ -24,11 +24,12 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\Response;
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Form\OrderUpdateAddress;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Base\OrderAddressQuery;
@@ -45,7 +46,7 @@ class OrderController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER_VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::VIEW)) return $response;
         return $this->render("orders", array("display_order" => 20));
     }
 
@@ -58,7 +59,7 @@ class OrderController extends BaseAdminController
 
     public function updateStatus($order_id = null)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER_UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
 
         $message = null;
 
@@ -109,7 +110,7 @@ class OrderController extends BaseAdminController
 
     public function updateDeliveryRef($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER_UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
 
         $message = null;
 
@@ -144,7 +145,7 @@ class OrderController extends BaseAdminController
 
     public function updateAddress($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER_UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
 
         $message = null;
 
@@ -210,7 +211,7 @@ class OrderController extends BaseAdminController
 
     protected function generatePdf($order_id, $fileName)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER_UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, AccessManager::UPDATE)) return $response;
 
         $html = $this->renderRaw(
             $fileName,

@@ -205,7 +205,7 @@ class CustomerTableMap extends TableMap
         $this->addForeignKey('TITLE_ID', 'TitleId', 'INTEGER', 'customer_title', 'ID', true, null, null);
         $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 255, null);
         $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 255, null);
-        $this->addColumn('EMAIL', 'Email', 'VARCHAR', false, 50, null);
+        $this->addColumn('EMAIL', 'Email', 'VARCHAR', false, 255, null);
         $this->addColumn('PASSWORD', 'Password', 'VARCHAR', false, 255, null);
         $this->addColumn('ALGO', 'Algo', 'VARCHAR', false, 128, null);
         $this->addColumn('RESELLER', 'Reseller', 'TINYINT', false, null, null);

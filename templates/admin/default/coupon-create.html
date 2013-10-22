@@ -1,5 +1,8 @@
 {extends file="admin-layout.tpl"}
-{block name="check-permissions"}admin.coupon.create{/block}
+
+{block name="check-resource"}admin.coupon{/block}
+{block name="check-access"}create{/block}
+
 {block name="page-title"}{intl l='Create coupon'}{/block}
 
 {block name="main-content"}

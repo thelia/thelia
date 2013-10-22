@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Edit a feature'}{/block}
 
-{block name="check-permissions"}admin.configuration.features.edit{/block}
+{block name="check-resource"}admin.configuration.feature{/block}
+{block name="check-access"}update{/block}
 
 {block name="main-content"}
 <div class="features edit-feature">
@@ -133,12 +134,13 @@
 
     				                                    <td class="text-center">
     				                                        {admin_position_block
-    				                                        permission="admin.features.edit"
-    				                                        path={url path='/admin/configuration/features-av/update-position' feature_id=$feature_id}
-    				                                        url_parameter="featureav_id"
-    				                                        in_place_edit_class="positionChange"
-    				                                        position="$POSITION"
-    				                                        id="$ID"
+                                                                resource="admin.configuration.feature"
+                                                                access="update"
+                                                                path={url path='/admin/configuration/features-av/update-position' feature_id=$feature_id}
+                                                                url_parameter="featureav_id"
+                                                                in_place_edit_class="positionChange"
+                                                                position="$POSITION"
+                                                                id="$ID"
     				                                        }
     				                                    </td>
 

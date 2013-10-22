@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Currencies'}{/block}
 
-{block name="check-permissions"}admin.configuration.currencies.view{/block}
+{block name="check-resource"}admin.configuration.currency{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
     <div class="currencies">
@@ -137,12 +138,13 @@
 
                                                 <td class="text-center">
                                                     {admin_position_block
-                                                    permission="admin.currencies.edit"
-                                                    path="/admin/configuration/currencies/update-position"
-                                                    url_parameter="currency_id"
-                                                    in_place_edit_class="currencyPositionChange"
-                                                    position="$POSITION"
-                                                    id="$ID"
+                                                        resource="admin.configuration.currency"
+                                                        access="update"
+                                                        path="/admin/configuration/currencies/update-position"
+                                                        url_parameter="currency_id"
+                                                        in_place_edit_class="currencyPositionChange"
+                                                        position="$POSITION"
+                                                        id="$ID"
                                                     }
                                                 </td>
 

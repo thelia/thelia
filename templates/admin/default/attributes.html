@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Thelia Product Attributes'}{/block}
 
-{block name="check-permissions"}admin.configuration.attributes.view{/block}
+{block name="check-resource"}admin.configuration.attribute{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
 <div class="attributes">
@@ -86,7 +87,8 @@
 
                                         <td class="text-center">
                                             {admin_position_block
-                                            permission="admin.attributes.edit"
+                                            resource="admin.configuration.attribute"
+                                            access="update"
                                             path="/admin/configuration/attributes/update-position"
                                             url_parameter="attribute_id"
                                             in_place_edit_class="positionChange"

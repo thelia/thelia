@@ -3,7 +3,8 @@
 
 {block name="page-title"}{intl l='Customer'}{/block}
 
-{block name="check-permissions"}admin.customer.view{/block}
+{block name="check-resource"}admin.customer{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
     {assign var=customer_page value={$smarty.get.page|default:1}}

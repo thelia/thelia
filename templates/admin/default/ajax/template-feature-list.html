@@ -52,7 +52,8 @@
 
             <td class="text-center">
             {admin_position_block
-                permission="admin.templates.edit"
+                resource="admin.configuration.template"
+                access="update"
                 path={url path="/admin/template/update-feature-position" template_id=$template_id}
                 url_parameter="feature_id"
                 in_place_edit_class="featurePositionChange"

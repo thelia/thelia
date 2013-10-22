@@ -2,7 +2,8 @@
 
 {block name="page-title"}{intl l='Categories'}{/block}
 
-{block name="check-permissions"}admin.categories.view{/block}
+{block name="check-resource"}admin.category{/block}
+{block name="check-access"}view{/block}
 
 {block name="main-content"}
 <div class="categories">
@@ -127,7 +128,8 @@
 
                                      <td>
                                      {admin_position_block
-                                         permission="admin.categories.edit"
+                                         resource="admin.category"
+                                         access="update"
                                          path={url path='admin/categories/update-position' category_id=$ID}
                                          url_parameter="category_id"
                                          in_place_edit_class="categoryPositionChange"
@@ -294,7 +296,8 @@
 
                              <td>
                              {admin_position_block
-                                 permission="admin.product.edit"
+                                 resource="admin.product"
+                                 access="update"
                                  path={url path='/admin/products/update-position' product_id=$ID}
                                  url_parameter="product_id"
                                  in_place_edit_class="productPositionChange"

@@ -22,10 +22,11 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\ShippingZone\ShippingZoneAddAreaEvent;
 use Thelia\Core\Event\ShippingZone\ShippingZoneRemoveAreaEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ShippingZone\ShippingZoneAddArea;
 use Thelia\Form\ShippingZone\ShippingZoneRemoveArea;
@@ -41,13 +42,13 @@ class ShippingZoneController extends BaseAdminController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE_VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, AccessManager::VIEW)) return $response;
         return $this->render("shipping-zones", array("display_shipping_zone" => 20));
     }
 
     public function updateAction($shipping_zones_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE_VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, AccessManager::VIEW)) return $response;
         return $this->render("shipping-zones-edit", array(
             "shipping_zones_id" => $shipping_zones_id
         ));
@@ -58,7 +59,7 @@ class ShippingZoneController extends BaseAdminController
      */
     public function addArea()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE_UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, AccessManager::UPDATE)) return $response;
 
         $shippingAreaForm = new ShippingZoneAddArea($this->getRequest());
         $error_msg = null;
@@ -93,7 +94,7 @@ class ShippingZoneController extends BaseAdminController
 
     public function removeArea()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE_UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SHIPPING_ZONE, AccessManager::UPDATE)) return $response;
 
         $shippingAreaForm = new ShippingZoneRemoveArea($this->getRequest());
         $error_msg = null;

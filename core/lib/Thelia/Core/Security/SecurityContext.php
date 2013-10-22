@@ -24,7 +24,7 @@
 namespace Thelia\Core\Security;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Event\AdminResources;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\ProfileQuery;
@@ -126,12 +126,8 @@ class SecurityContext
     *
     * @return Boolean
     */
-    final public function isGranted(array $roles, array $permissions)
+    final public function isGranted(array $roles, array $resources, array $accesses)
     {
-        if (empty($permissions)) {
-            return true;
-        }
-
         // Find a user which matches the required roles.
         $user = $this->getCustomerUser();
 
@@ -147,7 +143,11 @@ class SecurityContext
             return false;
         }
 
-        if( !method_exists($user, 'getProfileId') ) {
+        if (empty($resources) || empty($accesses)) {
+            return true;
+        }
+
+        if( !method_exists($user, 'getPermissions') ) {
             return false;
         }
 
@@ -157,13 +157,21 @@ class SecurityContext
             return true;
         }
 
-        foreach($permissions as $permission) {
-            if($permission === '') {
+        foreach($resources as $resource) {
+            if($resource === '') {
                 continue;
             }
 
-            if(! in_array($permission, $userPermissions)) {
+            $resource = strtolower($resource);
+
+            if(!array_key_exists($resource, $userPermissions)) {
                 return false;
+            }
+
+            foreach($accesses as $access) {
+                if(!$userPermissions[$resource]->can($access)) {
+                    return false;
+                }
             }
         }
 

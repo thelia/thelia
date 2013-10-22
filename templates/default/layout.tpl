@@ -297,13 +297,17 @@ URL: http://www.thelia.net
                         <div class="block-heading"><h3 class="block-title">{intl l="Newsletter"}</h3></div>
                         <div class="block-content">
                             <p id="newletter-describe">{intl l="Sign up to receive our latest news."}</p>
+                            {form name="thelia.newsletter"}
                             <form id="form-newsletter" action="{url path="/newsletter"}" method="post" role="form">
+                                {form_field form=$form field="email"}
                                 <div class="form-group">
-                                    <label for="email">{intl l="Email address"}</label>
-                                    <input type="email" name="email" id="email" class="form-control" placeholder="{intl l="Your email address"}" aria-describedby="newletter-describe" aria-required="true" required autocomplete="off">
+                                    <label for="{$label_attr.for}">{intl l="Email address"}</label>
+                                    <input type="email" name="{$name}" id="{$label_attr.for}" class="form-control" placeholder="{intl l="Your email address"}" aria-describedby="newletter-describe" {if $required} aria-required="true" required{/if} autocomplete="off">
                                 </div>
+                                {/form_field}
                                 <button type="submit" class="btn btn-subscribe">{intl l="Subscribe"}</button>
                             </form>
+                            {/form}
                         </div>
                     </section>
                 </div>

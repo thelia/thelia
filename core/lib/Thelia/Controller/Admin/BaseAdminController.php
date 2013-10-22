@@ -111,16 +111,18 @@ class BaseAdminController extends BaseController
     /**
      * Check current admin user authorisations. An ADMIN role is assumed.
      *
-     * @param mixed $permissions a single permission or an array of permissions.
+     * @param mixed $resources a single resource or an array of resources.
+     * @param mixed $accesses a single access or an array of accesses.
      *
      * @return mixed null if authorization is granted, or a Response object which contains the error page otherwise
      *
      */
-    protected function checkAuth($permissions)
+    protected function checkAuth($resources, $accesses)
     {
-         $permArr = is_array($permissions) ? $permissions : array($permissions);
+        $resources = is_array($resources) ? $resources : array($resources);
+        $accesses = is_array($accesses) ? $accesses : array($accesses);
 
-         if ($this->getSecurityContext()->isGranted(array("ADMIN"), $permArr)) {
+         if ($this->getSecurityContext()->isGranted(array("ADMIN"), $resources, $accesses)) {
              // Okay !
              return null;
          }
