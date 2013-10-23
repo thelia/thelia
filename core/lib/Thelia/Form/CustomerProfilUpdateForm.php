@@ -24,7 +24,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
-use Thelia\Model\Base\CustomerQuery;
+use Thelia\Model\CustomerQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Translation\Translator;
 
