@@ -46,6 +46,23 @@ use Thelia\Model\CategoryQuery;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
+use Thelia\Model\AttributeQuery;
+use Thelia\Model\AttributeAvQuery;
+use Thelia\Form\ProductSaleElementUpdateForm;
+use Thelia\Model\ProductSaleElements;
+use Thelia\Model\ProductPriceQuery;
+use Thelia\Form\ProductDefaultSaleElementUpdateForm;
+use Thelia\Model\ProductPrice;
+use Thelia\Model\Currency;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Thelia\TaxEngine\Calculator;
+use Thelia\Model\Country;
+use Thelia\Model\CountryQuery;
+use Thelia\Model\TaxRuleQuery;
+use Thelia\Tools\NumberFormat;
 
 /**
  * Manages products
@@ -173,10 +190,58 @@ class ProductController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-        // Get the default produc sales element
-        $salesElement = ProductSaleElementsQuery::create()->filterByProduct($object)->filterByIsDefault(true)->findOne();
+        $defaultPseData = $combinationPseData = array();
 
-//        $prices = $salesElement->getProductPrices();
+        // Find product's sale elements
+        $saleElements = ProductSaleElementsQuery::create()
+            ->filterByProduct($object)
+            ->find();
+
+        foreach($saleElements as $saleElement) {
+
+            // Get the product price for the current currency
+
+            $productPrice = ProductPriceQuery::create()
+                ->filterByCurrency($this->getCurrentEditionCurrency())
+                ->filterByProductSaleElements($saleElement)
+                ->findOne()
+            ;
+
+            if ($productPrice == null) $productPrice = new ProductPrice();
+
+            $isDefaultPse = count($saleElement->getAttributeCombinations()) == 0;
+
+            // If this PSE has no combination -> this is the default one
+            // affect it to the thelia.admin.product_sale_element.update form
+            if ($isDefaultPse) {
+
+                $defaultPseData = array(
+                    "product_id"              => $object->getId(),
+                    "product_sale_element_id" => $saleElement->getId(),
+                    "reference"               => $saleElement->getRef(),
+                    "price"                   => $productPrice->getPrice(),
+                    "use_exchange_rate"       => $productPrice->getFromDefaultCurrency() ? 1 : 0,
+                    "tax_rule"                => $object->getTaxRuleId(),
+                    "currency"                => $productPrice->getCurrencyId(),
+                    "weight"                  => $saleElement->getWeight(),
+                    "quantity"                => $saleElement->getQuantity(),
+                    "sale_price"              => $productPrice->getPromoPrice(),
+                    "onsale"                  => $saleElement->getPromo() > 0 ? 1 : 0,
+                    "isnew"                   => $saleElement->getNewness() > 0 ? 1 : 0,
+                    "isdefault"               => $saleElement->getIsDefault() > 0 ? 1 : 0,
+                    "ean_code"                => $saleElement->getEanCode()
+                );
+
+            }
+            else {
+            }
+
+            $defaultPseForm = new ProductDefaultSaleElementUpdateForm($this->getRequest(), "form", $defaultPseData);
+            $this->getParserContext()->addForm($defaultPseForm);
+
+            $combinationPseForm = new ProductSaleElementUpdateForm($this->getRequest(), "form", $combinationPseData);
+            $this->getParserContext()->addForm($combinationPseForm);
+        }
 
         // Prepare the data that will hydrate the form
         $data = array(
@@ -227,7 +292,7 @@ class ProductController extends AbstractCrudController
                 'product_id'            => $this->getRequest()->get('product_id', 0),
                 'folder_id'             => $this->getRequest()->get('folder_id', 0),
                 'accessory_category_id' => $this->getRequest()->get('accessory_category_id', 0),
-                'current_tab'          => $this->getRequest()->get('current_tab', 'general')
+                'current_tab'           => $this->getRequest()->get('current_tab', 'general')
         );
     }
 
@@ -731,44 +796,45 @@ class ProductController extends AbstractCrudController
     /**
      * A a new combination to a product
      */
-    public function addCombinationAction()
+    public function addProductSaleElementAction()
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
 
-        $event = new ProductCreateCombinationEvent(
+        $event = new ProductSaleElementCreateEvent(
                 $this->getExistingObject(),
                 $this->getRequest()->get('combination_attributes', array()),
                 $this->getCurrentEditionCurrency()->getId()
         );
 
         try {
-            $this->dispatch(TheliaEvents::PRODUCT_ADD_COMBINATION, $event);
-        } catch (\Exception $ex) {
+            $this->dispatch(TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT, $event);
+        }
+        catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
 
         $this->redirectToEditionTemplate();
     }
-
 
     /**
      * A a new combination to a product
      */
-    public function deleteCombinationAction()
+    public function deleteProductSaleElementAction()
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
 
-        $event = new ProductDeleteCombinationEvent(
-                $this->getExistingObject(),
-                $this->getRequest()->get('product_sale_element_id',0)
+        $event = new ProductSaleElementDeleteEvent(
+                $this->getRequest()->get('product_sale_element_id',0),
+                $this->getCurrentEditionCurrency()->getId()
         );
 
         try {
-            $this->dispatch(TheliaEvents::PRODUCT_DELETE_COMBINATION, $event);
-        } catch (\Exception $ex) {
+            $this->dispatch(TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT, $event);
+        }
+        catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
@@ -776,4 +842,124 @@ class ProductController extends AbstractCrudController
         $this->redirectToEditionTemplate();
     }
 
+    /**
+     * Change a product sale element
+     */
+    protected function processProductSaleElementUpdate($changeForm) {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth("admin.products.update")) return $response;
+
+        $error_msg = false;
+
+        try {
+
+            // Check the form against constraints violations
+            $form = $this->validateForm($changeForm, "POST");
+
+            // Get the form field values
+            $data = $form->getData();
+
+            $event = new ProductSaleElementUpdateEvent(
+                    $this->getExistingObject(),
+                    $data['product_sale_element_id']
+            );
+
+            $event
+                ->setReference($data['reference'])
+                ->setPrice($data['price'])
+                ->setCurrencyId($data['currency'])
+                ->setWeight($data['weight'])
+                ->setQuantity($data['quantity'])
+                ->setSalePrice($data['sale_price'])
+                ->setOnsale($data['onsale'])
+                ->setIsnew($data['isnew'])
+                ->setIsdefault($data['isdefault'])
+                ->setEanCode($data['ean_code'])
+                ->setTaxrule($data['tax_rule'])
+            ;
+
+            $this->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $event);
+
+            // Log object modification
+            if (null !== $changedObject = $event->getProductSaleElement()) {
+                $this->adminLogAppend(sprintf("Product Sale Element (ID %s) for product reference %s modified", $changedObject->getId(), $event->getProduct()->getRef()));
+            }
+
+            // If we have to stay on the same page, do not redirect to the succesUrl, just redirect to the edit page again.
+            if ($this->getRequest()->get('save_mode') == 'stay') {
+                $this->redirectToEditionTemplate($this->getRequest());
+            }
+
+           // Redirect to the success URL
+           $this->redirect($changeForm->getSuccessUrl());
+        }
+        catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        }
+        catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext(
+                $this->getTranslator()->trans("ProductSaleElement modification"), $error_msg, $changeForm, $ex);
+
+        // At this point, the form has errors, and should be redisplayed.
+        return $this->renderEditionTemplate();
+    }
+
+    /**
+     * Change a product sale element attached to a combination
+     */
+    public function updateProductSaleElementAction() {
+        return $this->processProductSaleElementUpdate(
+                new ProductSaleElementUpdateForm($this->getRequest())
+        );
+    }
+
+    /**
+     * Update default product sale element (not attached to any combination)
+     */
+    public function updateProductDefaultSaleElementAction() {
+
+        return $this->processProductSaleElementUpdate(
+                new ProductDefaultSaleElementUpdateForm($this->getRequest())
+        );
+    }
+
+    public function priceCaclulator() {
+
+        $price     = floatval($this->getRequest()->get('price', 0));
+        $tax_rule  = intval($this->getRequest()->get('tax_rule_id', 0)); // The tax rule ID
+        $action    = $this->getRequest()->get('action', ''); // With ot without tax
+        $convert   = intval($this->getRequest()->get('convert_from_default_currency', 0));
+
+        $calc = new Calculator();
+
+        $calc->loadTaxRule(
+                TaxRuleQuery::create()->findPk($tax_rule),
+                Country::getShopLocation()
+        );
+
+        if ($action == 'to_tax') {
+            $return_price = $calc->getTaxedPrice($price);
+        }
+        else if ($action == 'from_tax') {
+            $return_price = $calc->getUntaxedPrice($price);
+        }
+        else {
+            $return_price = $price;
+        }
+
+        if ($convert != 0) {
+            $return_price = $prix * Currency::getDefaultCurrency()->getRate();
+        }
+
+        // Format the number using '.', to perform further calculation
+        $return_price = NumberFormat::getInstance($this->getRequest())->format($return_price, null, '.');
+
+        return new JsonResponse(array('result' => $return_price));
+    }
 }

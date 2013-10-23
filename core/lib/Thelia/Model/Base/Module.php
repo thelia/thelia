@@ -19,8 +19,6 @@ use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\AreaDeliveryModule as ChildAreaDeliveryModule;
 use Thelia\Model\AreaDeliveryModuleQuery as ChildAreaDeliveryModuleQuery;
-use Thelia\Model\GroupModule as ChildGroupModule;
-use Thelia\Model\GroupModuleQuery as ChildGroupModuleQuery;
 use Thelia\Model\Module as ChildModule;
 use Thelia\Model\ModuleI18n as ChildModuleI18n;
 use Thelia\Model\ModuleI18nQuery as ChildModuleI18nQuery;
@@ -29,6 +27,8 @@ use Thelia\Model\ModuleImageQuery as ChildModuleImageQuery;
 use Thelia\Model\ModuleQuery as ChildModuleQuery;
 use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
+use Thelia\Model\ProfileModule as ChildProfileModule;
+use Thelia\Model\ProfileModuleQuery as ChildProfileModuleQuery;
 use Thelia\Model\Map\ModuleTableMap;
 
 abstract class Module implements ActiveRecordInterface
@@ -132,10 +132,10 @@ abstract class Module implements ActiveRecordInterface
     protected $collAreaDeliveryModulesPartial;
 
     /**
-     * @var        ObjectCollection|ChildGroupModule[] Collection to store aggregation of ChildGroupModule objects.
+     * @var        ObjectCollection|ChildProfileModule[] Collection to store aggregation of ChildProfileModule objects.
      */
-    protected $collGroupModules;
-    protected $collGroupModulesPartial;
+    protected $collProfileModules;
+    protected $collProfileModulesPartial;
 
     /**
      * @var        ObjectCollection|ChildModuleImage[] Collection to store aggregation of ChildModuleImage objects.
@@ -193,7 +193,7 @@ abstract class Module implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $groupModulesScheduledForDeletion = null;
+    protected $profileModulesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -880,7 +880,7 @@ abstract class Module implements ActiveRecordInterface
 
             $this->collAreaDeliveryModules = null;
 
-            $this->collGroupModules = null;
+            $this->collProfileModules = null;
 
             $this->collModuleImages = null;
 
@@ -1070,17 +1070,17 @@ abstract class Module implements ActiveRecordInterface
                 }
             }
 
-            if ($this->groupModulesScheduledForDeletion !== null) {
-                if (!$this->groupModulesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\GroupModuleQuery::create()
-                        ->filterByPrimaryKeys($this->groupModulesScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->profileModulesScheduledForDeletion !== null) {
+                if (!$this->profileModulesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProfileModuleQuery::create()
+                        ->filterByPrimaryKeys($this->profileModulesScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->groupModulesScheduledForDeletion = null;
+                    $this->profileModulesScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collGroupModules !== null) {
-            foreach ($this->collGroupModules as $referrerFK) {
+                if ($this->collProfileModules !== null) {
+            foreach ($this->collProfileModules as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1345,8 +1345,8 @@ abstract class Module implements ActiveRecordInterface
             if (null !== $this->collAreaDeliveryModules) {
                 $result['AreaDeliveryModules'] = $this->collAreaDeliveryModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collGroupModules) {
-                $result['GroupModules'] = $this->collGroupModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collProfileModules) {
+                $result['ProfileModules'] = $this->collProfileModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collModuleImages) {
                 $result['ModuleImages'] = $this->collModuleImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1557,9 +1557,9 @@ abstract class Module implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getGroupModules() as $relObj) {
+            foreach ($this->getProfileModules() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addGroupModule($relObj->copy($deepCopy));
+                    $copyObj->addProfileModule($relObj->copy($deepCopy));
                 }
             }
 
@@ -1625,8 +1625,8 @@ abstract class Module implements ActiveRecordInterface
         if ('AreaDeliveryModule' == $relationName) {
             return $this->initAreaDeliveryModules();
         }
-        if ('GroupModule' == $relationName) {
-            return $this->initGroupModules();
+        if ('ProfileModule' == $relationName) {
+            return $this->initProfileModules();
         }
         if ('ModuleImage' == $relationName) {
             return $this->initModuleImages();
@@ -2616,31 +2616,31 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collGroupModules collection
+     * Clears out the collProfileModules collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addGroupModules()
+     * @see        addProfileModules()
      */
-    public function clearGroupModules()
+    public function clearProfileModules()
     {
-        $this->collGroupModules = null; // important to set this to NULL since that means it is uninitialized
+        $this->collProfileModules = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collGroupModules collection loaded partially.
+     * Reset is the collProfileModules collection loaded partially.
      */
-    public function resetPartialGroupModules($v = true)
+    public function resetPartialProfileModules($v = true)
     {
-        $this->collGroupModulesPartial = $v;
+        $this->collProfileModulesPartial = $v;
     }
 
     /**
-     * Initializes the collGroupModules collection.
+     * Initializes the collProfileModules collection.
      *
-     * By default this just sets the collGroupModules collection to an empty array (like clearcollGroupModules());
+     * By default this just sets the collProfileModules collection to an empty array (like clearcollProfileModules());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -2649,17 +2649,17 @@ abstract class Module implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initGroupModules($overrideExisting = true)
+    public function initProfileModules($overrideExisting = true)
     {
-        if (null !== $this->collGroupModules && !$overrideExisting) {
+        if (null !== $this->collProfileModules && !$overrideExisting) {
             return;
         }
-        $this->collGroupModules = new ObjectCollection();
-        $this->collGroupModules->setModel('\Thelia\Model\GroupModule');
+        $this->collProfileModules = new ObjectCollection();
+        $this->collProfileModules->setModel('\Thelia\Model\ProfileModule');
     }
 
     /**
-     * Gets an array of ChildGroupModule objects which contain a foreign key that references this object.
+     * Gets an array of ChildProfileModule objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -2669,109 +2669,112 @@ abstract class Module implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildGroupModule[] List of ChildGroupModule objects
+     * @return Collection|ChildProfileModule[] List of ChildProfileModule objects
      * @throws PropelException
      */
-    public function getGroupModules($criteria = null, ConnectionInterface $con = null)
+    public function getProfileModules($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collGroupModulesPartial && !$this->isNew();
-        if (null === $this->collGroupModules || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collGroupModules) {
+        $partial = $this->collProfileModulesPartial && !$this->isNew();
+        if (null === $this->collProfileModules || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProfileModules) {
                 // return empty collection
-                $this->initGroupModules();
+                $this->initProfileModules();
             } else {
-                $collGroupModules = ChildGroupModuleQuery::create(null, $criteria)
+                $collProfileModules = ChildProfileModuleQuery::create(null, $criteria)
                     ->filterByModule($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collGroupModulesPartial && count($collGroupModules)) {
-                        $this->initGroupModules(false);
+                    if (false !== $this->collProfileModulesPartial && count($collProfileModules)) {
+                        $this->initProfileModules(false);
 
-                        foreach ($collGroupModules as $obj) {
-                            if (false == $this->collGroupModules->contains($obj)) {
-                                $this->collGroupModules->append($obj);
+                        foreach ($collProfileModules as $obj) {
+                            if (false == $this->collProfileModules->contains($obj)) {
+                                $this->collProfileModules->append($obj);
                             }
                         }
 
-                        $this->collGroupModulesPartial = true;
+                        $this->collProfileModulesPartial = true;
                     }
 
-                    $collGroupModules->getInternalIterator()->rewind();
+                    $collProfileModules->getInternalIterator()->rewind();
 
-                    return $collGroupModules;
+                    return $collProfileModules;
                 }
 
-                if ($partial && $this->collGroupModules) {
-                    foreach ($this->collGroupModules as $obj) {
+                if ($partial && $this->collProfileModules) {
+                    foreach ($this->collProfileModules as $obj) {
                         if ($obj->isNew()) {
-                            $collGroupModules[] = $obj;
+                            $collProfileModules[] = $obj;
                         }
                     }
                 }
 
-                $this->collGroupModules = $collGroupModules;
-                $this->collGroupModulesPartial = false;
+                $this->collProfileModules = $collProfileModules;
+                $this->collProfileModulesPartial = false;
             }
         }
 
-        return $this->collGroupModules;
+        return $this->collProfileModules;
     }
 
     /**
-     * Sets a collection of GroupModule objects related by a one-to-many relationship
+     * Sets a collection of ProfileModule objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $groupModules A Propel collection.
+     * @param      Collection $profileModules A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildModule The current object (for fluent API support)
      */
-    public function setGroupModules(Collection $groupModules, ConnectionInterface $con = null)
+    public function setProfileModules(Collection $profileModules, ConnectionInterface $con = null)
     {
-        $groupModulesToDelete = $this->getGroupModules(new Criteria(), $con)->diff($groupModules);
+        $profileModulesToDelete = $this->getProfileModules(new Criteria(), $con)->diff($profileModules);
 
 
-        $this->groupModulesScheduledForDeletion = $groupModulesToDelete;
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->profileModulesScheduledForDeletion = clone $profileModulesToDelete;
 
-        foreach ($groupModulesToDelete as $groupModuleRemoved) {
-            $groupModuleRemoved->setModule(null);
+        foreach ($profileModulesToDelete as $profileModuleRemoved) {
+            $profileModuleRemoved->setModule(null);
         }
 
-        $this->collGroupModules = null;
-        foreach ($groupModules as $groupModule) {
-            $this->addGroupModule($groupModule);
+        $this->collProfileModules = null;
+        foreach ($profileModules as $profileModule) {
+            $this->addProfileModule($profileModule);
         }
 
-        $this->collGroupModules = $groupModules;
-        $this->collGroupModulesPartial = false;
+        $this->collProfileModules = $profileModules;
+        $this->collProfileModulesPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related GroupModule objects.
+     * Returns the number of related ProfileModule objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related GroupModule objects.
+     * @return int             Count of related ProfileModule objects.
      * @throws PropelException
      */
-    public function countGroupModules(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countProfileModules(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collGroupModulesPartial && !$this->isNew();
-        if (null === $this->collGroupModules || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collGroupModules) {
+        $partial = $this->collProfileModulesPartial && !$this->isNew();
+        if (null === $this->collProfileModules || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProfileModules) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getGroupModules());
+                return count($this->getProfileModules());
             }
 
-            $query = ChildGroupModuleQuery::create(null, $criteria);
+            $query = ChildProfileModuleQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -2781,53 +2784,53 @@ abstract class Module implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collGroupModules);
+        return count($this->collProfileModules);
     }
 
     /**
-     * Method called to associate a ChildGroupModule object to this object
-     * through the ChildGroupModule foreign key attribute.
+     * Method called to associate a ChildProfileModule object to this object
+     * through the ChildProfileModule foreign key attribute.
      *
-     * @param    ChildGroupModule $l ChildGroupModule
+     * @param    ChildProfileModule $l ChildProfileModule
      * @return   \Thelia\Model\Module The current object (for fluent API support)
      */
-    public function addGroupModule(ChildGroupModule $l)
+    public function addProfileModule(ChildProfileModule $l)
     {
-        if ($this->collGroupModules === null) {
-            $this->initGroupModules();
-            $this->collGroupModulesPartial = true;
+        if ($this->collProfileModules === null) {
+            $this->initProfileModules();
+            $this->collProfileModulesPartial = true;
         }
 
-        if (!in_array($l, $this->collGroupModules->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddGroupModule($l);
+        if (!in_array($l, $this->collProfileModules->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProfileModule($l);
         }
 
         return $this;
     }
 
     /**
-     * @param GroupModule $groupModule The groupModule object to add.
+     * @param ProfileModule $profileModule The profileModule object to add.
      */
-    protected function doAddGroupModule($groupModule)
+    protected function doAddProfileModule($profileModule)
     {
-        $this->collGroupModules[]= $groupModule;
-        $groupModule->setModule($this);
+        $this->collProfileModules[]= $profileModule;
+        $profileModule->setModule($this);
     }
 
     /**
-     * @param  GroupModule $groupModule The groupModule object to remove.
+     * @param  ProfileModule $profileModule The profileModule object to remove.
      * @return ChildModule The current object (for fluent API support)
      */
-    public function removeGroupModule($groupModule)
+    public function removeProfileModule($profileModule)
     {
-        if ($this->getGroupModules()->contains($groupModule)) {
-            $this->collGroupModules->remove($this->collGroupModules->search($groupModule));
-            if (null === $this->groupModulesScheduledForDeletion) {
-                $this->groupModulesScheduledForDeletion = clone $this->collGroupModules;
-                $this->groupModulesScheduledForDeletion->clear();
+        if ($this->getProfileModules()->contains($profileModule)) {
+            $this->collProfileModules->remove($this->collProfileModules->search($profileModule));
+            if (null === $this->profileModulesScheduledForDeletion) {
+                $this->profileModulesScheduledForDeletion = clone $this->collProfileModules;
+                $this->profileModulesScheduledForDeletion->clear();
             }
-            $this->groupModulesScheduledForDeletion[]= $groupModule;
-            $groupModule->setModule(null);
+            $this->profileModulesScheduledForDeletion[]= clone $profileModule;
+            $profileModule->setModule(null);
         }
 
         return $this;
@@ -2839,7 +2842,7 @@ abstract class Module implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this Module is new, it will return
      * an empty collection; or if this Module has previously
-     * been saved, it will retrieve related GroupModules from storage.
+     * been saved, it will retrieve related ProfileModules from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -2848,14 +2851,14 @@ abstract class Module implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildGroupModule[] List of ChildGroupModule objects
+     * @return Collection|ChildProfileModule[] List of ChildProfileModule objects
      */
-    public function getGroupModulesJoinGroup($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getProfileModulesJoinProfile($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildGroupModuleQuery::create(null, $criteria);
-        $query->joinWith('Group', $joinBehavior);
+        $query = ChildProfileModuleQuery::create(null, $criteria);
+        $query->joinWith('Profile', $joinBehavior);
 
-        return $this->getGroupModules($query, $con);
+        return $this->getProfileModules($query, $con);
     }
 
     /**
@@ -3348,8 +3351,8 @@ abstract class Module implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collGroupModules) {
-                foreach ($this->collGroupModules as $o) {
+            if ($this->collProfileModules) {
+                foreach ($this->collProfileModules as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -3381,10 +3384,10 @@ abstract class Module implements ActiveRecordInterface
             $this->collAreaDeliveryModules->clearIterator();
         }
         $this->collAreaDeliveryModules = null;
-        if ($this->collGroupModules instanceof Collection) {
-            $this->collGroupModules->clearIterator();
+        if ($this->collProfileModules instanceof Collection) {
+            $this->collProfileModules->clearIterator();
         }
-        $this->collGroupModules = null;
+        $this->collProfileModules = null;
         if ($this->collModuleImages instanceof Collection) {
             $this->collModuleImages->clearIterator();
         }

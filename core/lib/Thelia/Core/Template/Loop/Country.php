@@ -115,7 +115,10 @@ class Country extends BaseI18nLoop
                 ->set("POSTSCRIPTUM", $country->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("ISOCODE", $country->getIsocode())
                 ->set("ISOALPHA2", $country->getIsoalpha2())
-                ->set("ISOALPHA3", $country->getIsoalpha3());
+                ->set("ISOALPHA3", $country->getIsoalpha3())
+                ->set("IS_DEFAULT", $country->getByDefault() ? "1" : "0")
+                ->set("IS_SHOP_COUNTRY", $country->getShopCountry() ? "1" : "0")
+                ;
 
             $loopResult->addRow($loopResultRow);
         }

@@ -220,6 +220,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->setWeight($pse->getWeight())
                 ->setTaxRuleTitle($taxRuleI18n->getTitle())
                 ->setTaxRuleDescription($taxRuleI18n->getDescription())
+                ->setEanCode($pse->getEanCode())
             ;
             $orderProduct->setDispatcher($this->getDispatcher());
             $orderProduct->save($con);

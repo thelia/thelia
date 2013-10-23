@@ -177,6 +177,7 @@ class ProductSaleElements extends BaseLoop
                 ->set("IS_NEW"            , $PSEValue->getNewness() === 1 ? 1 : 0)
                 ->set("IS_DEFAULT"        , $PSEValue->getIsDefault() === 1 ? 1 : 0)
                 ->set("WEIGHT"            , $PSEValue->getWeight())
+                ->set("EAN_CODE"          , $PSEValue->getEanCode())
                 ->set("PRICE"             , $price)
                 ->set("PRICE_TAX"         , $taxedPrice - $price)
                 ->set("TAXED_PRICE"       , $taxedPrice)

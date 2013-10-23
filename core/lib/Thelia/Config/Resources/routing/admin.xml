@@ -274,6 +274,10 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateContentPositionAction</default>
     </route>
 
+    <route id="admin.product.update-content-position" path="/admin/product/calculate-price">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::priceCaclulator</default>
+    </route>
+
     <!-- accessories -->
 
     <route id="admin.products.accessories.add" path="/admin/products/accessory/add">
@@ -320,19 +324,19 @@
     </route>
 
     <route id="admin.product.combination.add" path="/admin/product/combination/add">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::addCombinationAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ProductController::addProductSaleElementAction</default>
     </route>
 
     <route id="admin.product.combination.delete" path="/admin/product/combination/delete">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::deleteCombinationAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ProductController::deleteProductSaleElementAction</default>
     </route>
 
     <route id="admin.product.combination.update" path="/admin/product/combination/update">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::updateCombinationAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductSaleElementAction</default>
     </route>
 
     <route id="admin.product.combination.defaut-price.update" path="/admin/product/default-price/update">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::updateDefaultPriceAction</default>
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductDefaultSaleElementAction</default>
     </route>
 
 
@@ -741,6 +745,13 @@
 
     <!-- end Modules rule management -->
 
+<!--  test form !!! -->
+    <route id="admin.testform" path="/admin/testform">
+        <default key="_controller">Thelia\Controller\Admin\TestController::updateAction</default>
+    </route>
+    <route id="admin.testformupdate" path="/admin/testformupdate">
+        <default key="_controller">Thelia\Controller\Admin\TestController::processUpdateAction</default>
+    </route>
 
 	<!-- The default route, to display a template -->
 

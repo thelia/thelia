@@ -160,8 +160,12 @@ class BaseController extends ContainerAware
         }
 
         foreach ($form->all() as $child) {
+
             if (!$child->isValid()) {
-                $errors .= $this->getErrorMessages($child) . ', ';
+
+                $fieldName = $child->getConfig()->getOption('label', $child->getName());
+
+                $errors .= sprintf("[%s] %s, ", $fieldName, $this->getErrorMessages($child));
             }
         }
 
@@ -190,13 +194,15 @@ class BaseController extends ContainerAware
                 $errorMessage = null;
                 if ($form->get("error_message")->getData() != null) {
                     $errorMessage = $form->get("error_message")->getData();
-                } else {
+                }
+                else {
                     $errorMessage = sprintf("Missing or invalid data: %s", $this->getErrorMessages($form));
                 }
 
                 throw new FormValidationException($errorMessage);
             }
-        } else {
+        }
+        else {
             throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
         }
     }
@@ -221,7 +227,8 @@ class BaseController extends ContainerAware
     {
         if ($form != null) {
             $url = $form->getSuccessUrl();
-        } else {
+        }
+        else {
             $url = $this->getRequest()->get("success_url");
         }
 

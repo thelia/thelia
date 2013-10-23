@@ -21,28 +21,59 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Product;
+namespace Thelia\Core\Event\ProductSaleElement;
 
 use Thelia\Model\Product;
+use Thelia\Core\Event\Product\ProductEvent;
 
-class ProductDeleteCombinationEvent extends ProductEvent
+class ProductSaleElementCreateEvent extends ProductSaleElementEvent
 {
-    protected $product_sale_element_id;
+    protected $product;
+    protected $attribute_av_list;
+    protected $currency_id;
 
-    public function __construct(Product $product, $product_sale_element_id)
+    public function __construct(Product $product, $attribute_av_list, $currency_id)
     {
-        parent::__construct($product);
+        parent::__construct();
 
-        $this->product_sale_element_id = $product_sale_element_id;
+        $this->setAttributeAvList($attribute_av_list);
+        $this->setCurrencyId($currency_id);
+        $this->setProduct($product);
     }
 
-    public function getProductSaleElementId()
+    public function getAttributeAvList()
     {
-        return $this->product_sale_element_id;
+        return $this->attribute_av_list;
     }
 
-    public function setProductSaleElementId($product_sale_element_id)
+    public function setAttributeAvList($attribute_av_list)
     {
-        $this->product_sale_element_id = $product_sale_element_id;
+        $this->attribute_av_list = $attribute_av_list;
+
+        return $this;
     }
+
+    public function getCurrencyId()
+    {
+        return $this->currency_id;
+    }
+
+    public function setCurrencyId($currency_id)
+    {
+        $this->currency_id = $currency_id;
+
+        return $this;
+    }
+
+    public function getProduct() {
+      return $this->product;
+    }
+
+    public function setProduct($product) {
+      $this->product = $product;
+
+      return $this;
+    }
+
+
 }

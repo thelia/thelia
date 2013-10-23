@@ -57,7 +57,7 @@ class CountryTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 8;
+    const NUM_COLUMNS = 9;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class CountryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 8;
+    const NUM_HYDRATE_COLUMNS = 9;
 
     /**
      * the column name for the ID field
@@ -100,6 +100,11 @@ class CountryTableMap extends TableMap
     const BY_DEFAULT = 'country.BY_DEFAULT';
 
     /**
+     * the column name for the SHOP_COUNTRY field
+     */
+    const SHOP_COUNTRY = 'country.SHOP_COUNTRY';
+
+    /**
      * the column name for the CREATED_AT field
      */
     const CREATED_AT = 'country.CREATED_AT';
@@ -130,12 +135,12 @@ class CountryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'AreaId', 'Isocode', 'Isoalpha2', 'Isoalpha3', 'ByDefault', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'areaId', 'isocode', 'isoalpha2', 'isoalpha3', 'byDefault', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CountryTableMap::ID, CountryTableMap::AREA_ID, CountryTableMap::ISOCODE, CountryTableMap::ISOALPHA2, CountryTableMap::ISOALPHA3, CountryTableMap::BY_DEFAULT, CountryTableMap::CREATED_AT, CountryTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'AREA_ID', 'ISOCODE', 'ISOALPHA2', 'ISOALPHA3', 'BY_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'area_id', 'isocode', 'isoalpha2', 'isoalpha3', 'by_default', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
+        self::TYPE_PHPNAME       => array('Id', 'AreaId', 'Isocode', 'Isoalpha2', 'Isoalpha3', 'ByDefault', 'ShopCountry', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'areaId', 'isocode', 'isoalpha2', 'isoalpha3', 'byDefault', 'shopCountry', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CountryTableMap::ID, CountryTableMap::AREA_ID, CountryTableMap::ISOCODE, CountryTableMap::ISOALPHA2, CountryTableMap::ISOALPHA3, CountryTableMap::BY_DEFAULT, CountryTableMap::SHOP_COUNTRY, CountryTableMap::CREATED_AT, CountryTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'AREA_ID', 'ISOCODE', 'ISOALPHA2', 'ISOALPHA3', 'BY_DEFAULT', 'SHOP_COUNTRY', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'area_id', 'isocode', 'isoalpha2', 'isoalpha3', 'by_default', 'shop_country', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -145,12 +150,12 @@ class CountryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'AreaId' => 1, 'Isocode' => 2, 'Isoalpha2' => 3, 'Isoalpha3' => 4, 'ByDefault' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'areaId' => 1, 'isocode' => 2, 'isoalpha2' => 3, 'isoalpha3' => 4, 'byDefault' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
-        self::TYPE_COLNAME       => array(CountryTableMap::ID => 0, CountryTableMap::AREA_ID => 1, CountryTableMap::ISOCODE => 2, CountryTableMap::ISOALPHA2 => 3, CountryTableMap::ISOALPHA3 => 4, CountryTableMap::BY_DEFAULT => 5, CountryTableMap::CREATED_AT => 6, CountryTableMap::UPDATED_AT => 7, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'AREA_ID' => 1, 'ISOCODE' => 2, 'ISOALPHA2' => 3, 'ISOALPHA3' => 4, 'BY_DEFAULT' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'area_id' => 1, 'isocode' => 2, 'isoalpha2' => 3, 'isoalpha3' => 4, 'by_default' => 5, 'created_at' => 6, 'updated_at' => 7, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'AreaId' => 1, 'Isocode' => 2, 'Isoalpha2' => 3, 'Isoalpha3' => 4, 'ByDefault' => 5, 'ShopCountry' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'areaId' => 1, 'isocode' => 2, 'isoalpha2' => 3, 'isoalpha3' => 4, 'byDefault' => 5, 'shopCountry' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
+        self::TYPE_COLNAME       => array(CountryTableMap::ID => 0, CountryTableMap::AREA_ID => 1, CountryTableMap::ISOCODE => 2, CountryTableMap::ISOALPHA2 => 3, CountryTableMap::ISOALPHA3 => 4, CountryTableMap::BY_DEFAULT => 5, CountryTableMap::SHOP_COUNTRY => 6, CountryTableMap::CREATED_AT => 7, CountryTableMap::UPDATED_AT => 8, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'AREA_ID' => 1, 'ISOCODE' => 2, 'ISOALPHA2' => 3, 'ISOALPHA3' => 4, 'BY_DEFAULT' => 5, 'SHOP_COUNTRY' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'area_id' => 1, 'isocode' => 2, 'isoalpha2' => 3, 'isoalpha3' => 4, 'by_default' => 5, 'shop_country' => 6, 'created_at' => 7, 'updated_at' => 8, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -167,14 +172,15 @@ class CountryTableMap extends TableMap
         $this->setPhpName('Country');
         $this->setClassName('\\Thelia\\Model\\Country');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('AREA_ID', 'AreaId', 'INTEGER', 'area', 'ID', false, null, null);
         $this->addColumn('ISOCODE', 'Isocode', 'VARCHAR', true, 4, null);
         $this->addColumn('ISOALPHA2', 'Isoalpha2', 'VARCHAR', false, 2, null);
         $this->addColumn('ISOALPHA3', 'Isoalpha3', 'VARCHAR', false, 4, null);
-        $this->addColumn('BY_DEFAULT', 'ByDefault', 'TINYINT', false, null, null);
+        $this->addColumn('BY_DEFAULT', 'ByDefault', 'TINYINT', false, null, 0);
+        $this->addColumn('SHOP_COUNTRY', 'ShopCountry', 'BOOLEAN', true, 1, false);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -358,6 +364,7 @@ class CountryTableMap extends TableMap
             $criteria->addSelectColumn(CountryTableMap::ISOALPHA2);
             $criteria->addSelectColumn(CountryTableMap::ISOALPHA3);
             $criteria->addSelectColumn(CountryTableMap::BY_DEFAULT);
+            $criteria->addSelectColumn(CountryTableMap::SHOP_COUNTRY);
             $criteria->addSelectColumn(CountryTableMap::CREATED_AT);
             $criteria->addSelectColumn(CountryTableMap::UPDATED_AT);
         } else {
@@ -367,6 +374,7 @@ class CountryTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ISOALPHA2');
             $criteria->addSelectColumn($alias . '.ISOALPHA3');
             $criteria->addSelectColumn($alias . '.BY_DEFAULT');
+            $criteria->addSelectColumn($alias . '.SHOP_COUNTRY');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -464,6 +472,10 @@ class CountryTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from Country object
+        }
+
+        if ($criteria->containsKey(CountryTableMap::ID) && $criteria->keyContainsValue(CountryTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CountryTableMap::ID.')');
         }
 
 

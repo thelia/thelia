@@ -68,9 +68,11 @@
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
         <form name="thelia.admin.product.modification" class="Thelia\Form\ProductModificationForm"/>
-        <form name="thelia.admin.product.details.modification" class="Thelia\Form\ProductDetailsModificationForm"/>
         <form name="thelia.admin.product.image.modification" class="Thelia\Form\ProductImageModification"/>
         <form name="thelia.admin.product.document.modification" class="Thelia\Form\ProductDocumentModification"/>
+
+        <form name="thelia.admin.product_sale_element.update" class="Thelia\Form\ProductSaleElementUpdateForm"/>
+        <form name="thelia.admin.product_default_sale_element.update" class="Thelia\Form\ProductDefaultSaleElementUpdateForm"/>
 
         <form name="thelia.admin.product.deletion" class="Thelia\Form\ProductModificationForm"/>
 
@@ -118,6 +120,8 @@
         <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
 
         <form name="thelia.admin.profile.modification" class="Thelia\Form\ProfileModificationForm"/>
+
+        <form name="thelia.admin.test.form" class="Thelia\Form\TestForm"/>
 
     </forms>
 
