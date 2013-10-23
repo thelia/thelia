@@ -134,7 +134,7 @@
                 </div>
 
                 {form name="thelia.cart.add" }
-                <form id="form-product-details" action="{url path="/cart/add" }" method="post" role="form">
+                <form id="form-product-details" action="{url path="/cart/add" }" method="post" role="form" class="form-product">
                     {form_hidden_fields form=$form}
                     <input type="hidden" name="view" value="product">
                     <input type="hidden" name="product_id" value="{$ID}">
@@ -238,4 +238,6 @@
         </div>
 
     </div><!-- /.container -->
+
+
 {/block}

@@ -204,10 +204,12 @@
 
             var $old_price_container    = $(".old-price", $("#product-details"));
 
+            var $select_quantity        = $(this).find(":selected").attr("data-quantity");
+
 
             // Switch Quantity in product page
             $("select", $(".product-options")).change(function(){
-                var $select_quantity        = $(this).find(":selected").attr("data-quantity");
+                $select_quantity        = $(this).find(":selected").attr("data-quantity");
                 var $old_price              = $(this).find(":selected").attr("data-old-price");
 
                 var $best_price             = $(this).find(":selected").attr("data-price");
@@ -259,7 +261,31 @@
             });
         }
 
+        $(".form-product").submit(function(){
+            var url_action      = $(this).attr("action");
+            var $cartContainer  = $(".cart-container");
 
+            $.ajax({type:"POST", data: $(this).serialize(), url:url_action,
+                    success: function(data){
+                        console.log($(data).html());
+                        $cartContainer.html($(data).html());
+
+                        $.ajax({url:"ajax/addCartMessage",
+                            success: function(data){
+                                bootbox.dialog({
+                                    message : data,
+                                    buttons : {}
+                                });
+                            }
+                        });
+                },
+                error: function(){
+                    console.log('Error.');
+                }
+            });
+
+        return false;
+        });
 
         $('#limit-top').change(function(e){
             window.location = $(this).val()
