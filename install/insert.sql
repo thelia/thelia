@@ -8,7 +8,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('session_config.default', '1', 1, 1, NOW(), NOW()),
 ('verifyStock', '1', 0, 0, NOW(), NOW()),
 ('active-template', 'default', 0, 0, NOW(), NOW()),
-('default_lang_without_translation', '1', 0, 0, NOW(), NOW()),
+('default_lang_without_translation', '1', 1, 1, NOW(), NOW()),
 ('rewriting_enable', '0', 0, 0, NOW(), NOW()),
 ('imagine_graphic_driver', 'gd', 0, 0, NOW(), NOW()),
 ('default_images_quality_percent', '75', 0, 0, NOW(), NOW()),
@@ -29,7 +29,8 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('thelia_customer_remember_me_cookie_expiration', 31536000, 0, 0, NOW(), NOW()),
 ('session_config.handlers', 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\NativeFileSessionHandler', 0, 0, NOW(), NOW()),
 ('company_name','', 0, 0, NOW(), NOW()),
-('contact_email','', 0, 0, NOW(), NOW())
+('contact_email','', 0, 0, NOW(), NOW()),
+('one_domain_foreach_lang','0', 1, 1, NOW(), NOW())
 ;
 
 

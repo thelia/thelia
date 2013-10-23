@@ -156,6 +156,7 @@
         <form name="thelia.lang.update" class="Thelia\Form\Lang\LangUpdateForm"/>
         <form name="thelia.lang.create" class="Thelia\Form\Lang\LangCreateForm"/>
         <form name="thelia.lang.defaultBehavior" class="Thelia\Form\Lang\LangDefaultBehaviorForm"/>
+        <form name="thelia.lang.url" class="Thelia\Form\Lang\LangUrlForm"/>
     </forms>
 
 
