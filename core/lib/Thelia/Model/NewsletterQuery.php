@@ -17,5 +17,8 @@ use Thelia\Model\Base\NewsletterQuery as BaseNewsletterQuery;
  */
 class NewsletterQuery extends BaseNewsletterQuery
 {
-
+    public static function isSubscribed($email)
+    {
+        return (null === self::create()->findOneByEmail($email)) ? false : true;
+    }
 } // NewsletterQuery
