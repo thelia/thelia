@@ -15,7 +15,7 @@ A generic modal creation dialog template. Parameters
 
     ok_button_id (optionnal) = the id of the OK button
 *}
-<div class="modal fade" id="{$dialog_id}" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade {if ! empty($form_error_message)}modal-force-show{/if}" id="{$dialog_id}" tabindex="-1" {if empty($form_error_message)}aria-hidden="true"{else}aria-hidden="false"{/if}>
 
     <div class="modal-dialog">
         <div class="modal-content">

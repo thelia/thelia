@@ -694,4 +694,23 @@ final class TheliaEvents
      * sent for subscribing to the newsletter
      */
     const NEWSLETTER_SUBSCRIBE = 'thelia.newsletter.subscribe';
+
+    /************ LANG MANAGEMENT ****************************/
+
+    const LANG_UPDATE = 'action.lang.update';
+    const LANG_CREATE = 'action.lang.create';
+    const LANG_DELETE = 'action.lang.delete';
+
+    const LANG_DEFAULTBEHAVIOR = 'action.lang.defaultBehavior';
+
+    const LANG_TOGGLEDEFAULT = 'action.lang.toggleDefault';
+
+    const BEFORE_UPDATELANG = 'action.lang.beforeUpdate';
+    const AFTER_UPDATELANG = 'action.lang.afterUpdate';
+
+    const BEFORE_CREATELANG = 'action.lang.beforeCreate';
+    const AFTER_CREATELANG = 'action.lang.afterCreate';
+
+    const BEFORE_DELETELANG = 'action.lang.beforeDelete';
+    const AFTER_DELETELANG = 'action.lang.afterDelete';
 }

@@ -97,14 +97,17 @@ class BaseAdminController extends BaseController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function errorPage($message)
+    protected function errorPage($message, $status = 500)
     {
         if ($message instanceof \Exception) {
             $message = $this->getTranslator()->trans("Sorry, an error occured: %msg", array('%msg' => $message->getMessage()));
         }
 
-        return $this->render('general_error', array(
-                "error_message" => $message)
+        return $this->render('general_error',
+            array(
+                "error_message" => $message
+            ),
+            $status
         );
     }
 
@@ -133,7 +136,7 @@ class BaseAdminController extends BaseController
          // Generate the proper response
          $response = new Response();
 
-         return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"));
+         return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"), 403);
     }
 
     /*
@@ -366,14 +369,13 @@ class BaseAdminController extends BaseController
      * Render the given template, and returns the result as an Http Response.
      *
      * @param $templateName the complete template name, with extension
-     * @param  array                                      $args the template arguments
+     * @param  array $args the template arguments
+     * @param int $status http code status
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function render($templateName, $args = array())
+    protected function render($templateName, $args = array(), $status = 200)
     {
-        $response = new Response();
-
-        return $response->setContent($this->renderRaw($templateName, $args));
+        return Response::create($this->renderRaw($templateName, $args), $status);
     }
 
     /**
@@ -430,7 +432,7 @@ class BaseAdminController extends BaseController
             Redirect::exec(URL::getInstance()->absoluteUrl($ex->getLoginTemplate()));
         } catch (AuthorizationException $ex) {
             // User is not allowed to perform the required action. Return the error page instead of the requested page.
-            return $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."));
+            return $this->errorPage($this->getTranslator()->trans("Sorry, you are not allowed to perform this action."), 403);
         }
     }
 }

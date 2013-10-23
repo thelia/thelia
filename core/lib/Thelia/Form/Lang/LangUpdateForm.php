@@ -20,39 +20,35 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
+namespace Thelia\Form\Lang;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
 
-class LanguageCreationForm extends BaseForm
+
+/**
+ * Class LangUpdateForm
+ * @package Thelia\Form\Lang
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+class LangUpdateForm extends LangCreateForm
 {
-    protected function buildForm()
+
+    public function buildForm()
     {
+        parent::buildForm();
+
         $this->formBuilder
-            ->add("title", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Language title *"),
-                "label_attr" => array(
-                    "for" => "title"
+            ->add('id', 'hidden', array(
+                'constraints' => array(
+                    new NotBlank(),
+                    new GreaterThan(array('value' => 0))
                 )
-            ))            
-            ->add("isocode", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("ISO Code *"),
-                "label_attr" => array(
-                    "for" => "isocode"
-                )
-            ))        
-        ;
+            ));
     }
 
     public function getName()
     {
-        return "thelia_language_creation";
+        return 'thelia_lang_update';
     }
 }

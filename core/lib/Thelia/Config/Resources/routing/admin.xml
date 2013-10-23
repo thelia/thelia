@@ -933,6 +933,39 @@
 
     <!-- end tax rules management -->
 
+    <!-- language management -->
+
+    <route id="admin.configuration.languages" path="/admin/configuration/languages">
+        <default key="_controller">Thelia\Controller\Admin\LangController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.languages.update" path="/admin/configuration/languages/update/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::updateAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.languages.update.process" path="/admin/configuration/languages/save/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::processUpdateAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.languages.toggleDefault" path="/admin/configuration/languages/toggleDefault/{lang_id}">
+        <default key="_controller">Thelia\Controller\Admin\LangController::toggleDefaultAction</default>
+        <requirement key="lang_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.languages.add" path="/admin/configuration/languages/add">
+        <default key="_controller">Thelia\Controller\Admin\LangController::addAction</default>
+    </route>
+
+    <route id="admin.configuration.languages.delete" path="/admin/configuration/languages/delete">
+        <default key="_controller">Thelia\Controller\Admin\LangController::deleteAction</default>
+    </route>
+
+    <route id="admin.configuration.languages.defaultBehavior" path="/admin/configuration/languages/defaultBehavior">
+        <default key="_controller">Thelia\Controller\Admin\LangController::defaultBehaviorAction</default>
+    </route>
+
 
     <!-- The default route, to display a template -->
 
