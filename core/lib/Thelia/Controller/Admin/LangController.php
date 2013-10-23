@@ -36,6 +36,8 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\Lang\LangCreateForm;
 use Thelia\Form\Lang\LangDefaultBehaviorForm;
 use Thelia\Form\Lang\LangUpdateForm;
+use Thelia\Form\Lang\LangUrlEvent;
+use Thelia\Form\Lang\LangUrlForm;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 
@@ -57,6 +59,13 @@ class LangController extends BaseAdminController
 
     public function renderDefault(array $param = array())
     {
+        $data = array();
+        foreach (LangQuery::create()->find() as $lang) {
+            $data[LangUrlForm::LANG_PREFIX.$lang->getId()] = $lang->getUrl();
+        }
+        $langUrlForm = new LangUrlForm($this->getRequest(), 'form', $data);
+        $this->getParserContext()->addForm($langUrlForm);
+
         return $this->render('languages', array_merge($param, array(
             'lang_without_translation' => ConfigQuery::getDefaultLangWhenNoTranslationAvailable(),
             'one_domain_per_lang' => ConfigQuery::read("one_domain_foreach_lang", false)
@@ -263,6 +272,36 @@ class LangController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
+        $langUrlForm = new LangUrlForm($this->getRequest());
+
+        try {
+            $form = $this->validateForm($langUrlForm);
+
+            $data = $form->getData();
+            $event = new LangUrlEvent();
+            foreach ($data as $key => $value) {
+                $pos= strpos($key, LangUrlForm::LANG_PREFIX);
+                if(false !== strpos($key, LangUrlForm::LANG_PREFIX)) {
+                    $event->addUrl(substr($key,strlen(LangUrlForm::LANG_PREFIX)), $value);
+                }
+            }
+
+            $this->dispatch(TheliaEvents::LANG_URL, $event);
+
+            $this->redirectToRoute('admin.configuration.languages');
+        } catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext(
+            $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $langUrlForm, $ex);
+
+        // At this point, the form has error, and should be redisplayed.
+        return $this->renderDefault();
     }
 
     public function activateDomainAction()

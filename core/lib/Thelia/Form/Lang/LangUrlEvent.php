@@ -22,66 +22,25 @@
 /*************************************************************************************/
 
 namespace Thelia\Form\Lang;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Form\BaseForm;
-use Thelia\Model\LangQuery;
+use Thelia\Core\Event\ActionEvent;
 
 
 /**
- * Class LangUrlForm
+ * Class LangUrlEvent
  * @package Thelia\Form\Lang
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class LangUrlForm extends BaseForm
+class LangUrlEvent extends ActionEvent
 {
-    const LANG_PREFIX = 'url_';
+    protected $url = array();
 
-    /**
-     *
-     * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
-     *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
-     *           "attr" => array(
-     *               "class" => "field"
-     *           ),
-     *           "label" => "email",
-     *           "constraints" => array(
-     *               new \Symfony\Component\Validator\Constraints\NotBlank()
-     *           )
-     *       )
-     *   )
-     *   ->add('age', 'integer');
-     *
-     * @return null
-     */
-    protected function buildForm()
+    public function addUrl($id, $url)
     {
-        foreach (LangQuery::create()->find() as $lang) {
-            $this->formBuilder->add(
-                self::LANG_PREFIX . $lang->getId(),
-                'text',
-                array(
-                    'constraints' => array(
-                        new NotBlank()
-                    ),
-                    "attr" => array(
-                        "tag" => "url",
-                        "url_id" => $lang->getId(),
-                        "url_title" => $lang->getTitle()
-                    ),
-
-                )
-            );
-        }
+        $this->url[$id] = $url;
     }
 
-    /**
-     * @return string the name of you form. This name must be unique
-     */
-    public function getName()
+    public function getUrl()
     {
-        return 'thelia_language_url';
+        return $this->url;
     }
 }

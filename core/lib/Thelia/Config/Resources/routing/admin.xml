@@ -966,7 +966,7 @@
         <default key="_controller">Thelia\Controller\Admin\LangController::defaultBehaviorAction</default>
     </route>
 
-    <route id="admin.configuration.languages.domain" path="/admin/configuration/languages/domain">
+    <route id="admin.configuration.languages.updateUrl" path="/admin/configuration/languages/updateUrl">
         <default key="_controller">Thelia\Controller\Admin\LangController::domainAction</default>
     </route>
 
