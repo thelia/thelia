@@ -953,6 +953,17 @@
         <default key="_controller">Thelia\Controller\Admin\LangController::defaultBehaviorAction</default>
     </route>
 
+    <route id="admin.configuration.languages.domain" path="/admin/configuration/languages/domain">
+        <default key="_controller">Thelia\Controller\Admin\LangController::domainAction</default>
+    </route>
+
+    <route id="admin.configuration.languages.domain.activation" path="/admin/configuration/languages/domain/activate">
+        <default key="_controller">Thelia\Controller\Admin\LangController::activateDomainAction</default>
+    </route>
+
+    <route id="admin.configuration.languages.domain.deactivation" path="/admin/configuration/languages/domain/deactivate">
+        <default key="_controller">Thelia\Controller\Admin\LangController::deactivateDomainAction</default>
+    </route>
 
     <!-- The default route, to display a template -->
 

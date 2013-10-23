@@ -231,7 +231,6 @@ class LangController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
-        $exception = false;
 
         $behaviorForm = new LangDefaultBehaviorForm($this->getRequest());
 
@@ -257,5 +256,35 @@ class LangController extends BaseAdminController
 
         // At this point, the form has error, and should be redisplayed.
         return $this->renderDefault();
+    }
+
+    public function domainAction()
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
+
+        $error_msg = false;
+    }
+
+    public function activateDomainAction()
+    {
+        $this->domainActivation(1);
+    }
+
+    public function deactivateDomainAction()
+    {
+        $this->domainActivation(0);
+    }
+
+    private function domainActivation($activate)
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
+
+        $error_msg = false;
+
+        ConfigQuery::create()
+            ->filterByName('one_domain_foreach_lang')
+            ->update(array('Value' => $activate));
+
+        $this->redirectToRoute('admin.configuration.languages');
     }
 }
