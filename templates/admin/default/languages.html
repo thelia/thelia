@@ -66,7 +66,7 @@
                                                 </a>
                                             {/loop}
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.language" access="DELETE"}
-                                                <a href="#delete_dialog" data-toggle="modal" class="btn btn-default btn-xs" title="{intl l="Delete this language"}">
+                                                <a href="#delete_dialog" data-toggle="modal" data-id="{$ID}" class="btn btn-default btn-xs lang-delete" title="{intl l="Delete this language"}">
                                                     <span class="glyphicon glyphicon-trash"></span>
                                                 </a>
                                             {/loop}
@@ -222,7 +222,7 @@
 {* Delete confirmation dialog *}
 
 {capture "delete_dialog"}
-    <input type="hidden" name="message_id" id="language_delete_id" value="" />
+    <input type="hidden" name="language_id" id="language_delete_id" value="" />
 
     {module_include location='languages_delete_form'}
 
@@ -262,13 +262,6 @@
 {block name="javascript-initialization"}
     {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
         <script src="{$asset_url}"></script>
-
-        <script>
-            // Toogle switch on input radio
-            $('.switch-radio').on('switch-change', function () {
-                $('.switch-radio').bootstrapSwitch('toggleRadioState');
-            });
-        </script>
     {/javascripts}
 
     {javascripts file='assets/js/main.js'}
@@ -306,6 +299,10 @@
                         $('#toggle-default-failed').modal('show');
                     });
                 }
+            });
+
+            $(".lang-delete").click(function(){
+                $("#language_delete_id").val($(this).data("id"));
             });
         });
     </script>

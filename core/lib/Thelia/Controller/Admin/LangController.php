@@ -189,4 +189,11 @@ class LangController extends BaseAdminController
         return $this->render('languages');
 
     }
+
+    public function deleteAction()
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::DELETE)) return $response;
+
+
+    }
 }
