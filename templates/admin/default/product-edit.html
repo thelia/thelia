@@ -136,12 +136,16 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
 
+	{javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+	    <script src="{$asset_url}"></script>
+	{/javascripts}
 
-{javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
+    {javascripts file='assets/js/jquery.typewatch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
 <script src="{url file='/tinymce/tinymce.min.js'}"></script>
+
 <script>
 	tinymce.init({
 		selector: ".wysiwyg",
@@ -268,6 +272,49 @@ $(function() {
     // In create combination dialog, select all element of conbination list
     $('#combination_creation_dialog_ok').click(function() {
     	$('#combination_attributes option').prop('selected', 'selected');
+    });
+
+    // In details tab, process exchange rate usage checkbox changes
+    $('use_exchange_rate_box').change(function(ev) {
+        $('.')
+    });
+
+    // Automatic update of price fields: any change in the taxed (resp. untaxed) price
+    // will update the untaxed (resp. taxed) one
+    $('.automatic_price_field').typeWatch({
+    	captureLength: 1,
+    	callback: function () {
+
+    		var tax_rule_id = $('#tax_rule_field').val();
+
+    		if (tax_rule_id != "") {
+		     	var priceType = $(this).data('price-type');
+		    	var dest_field_id = $(this).data('rel-price');
+
+		    	var operation;
+
+		    	if (priceType == 'with-tax')
+		    		operation = 'from_tax';
+		    	else if (priceType == 'without-tax')
+		    		operation = 'to_tax';
+		    	else
+		    		operation = '';
+
+		        $.ajax({
+		            url      : '{url path="/admin/product/calculate-price"}',
+		            data     : {
+		            	price       : $(this).val(),
+		            	action      : operation,
+		            	tax_rule_id : $('#tax_rule_field').val()
+		            },
+		            type     : 'get',
+		            dataType : 'json',
+		            success  : function(json) {
+		            	$('#' + dest_field_id).val(json.result);
+		            }
+		       });
+    		}
+    	}
     });
 
 });

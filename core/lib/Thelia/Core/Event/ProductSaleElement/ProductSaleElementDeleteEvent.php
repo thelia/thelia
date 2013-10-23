@@ -21,31 +21,31 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Product;
-
+namespace Thelia\Core\Event\ProductSaleElement;
 use Thelia\Model\Product;
+use Thelia\Core\Event\Product\ProductEvent;
 
-class ProductCreateCombinationEvent extends ProductEvent
+class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
 {
-    protected $attribute_av_list;
+    protected $product_sale_element_id;
     protected $currency_id;
 
-    public function __construct(Product $product, $attribute_av_list, $currency_id)
+    public function __construct($product_sale_element_id, $currency_id)
     {
-        parent::__construct($product);
+        parent::__construct();
 
-        $this->attribute_av_list = $attribute_av_list;
-        $this->currency_id = $currency_id;
+        $this->product_sale_element_id = $product_sale_element_id;
+        $this->setCurrencyId($currency_id);
     }
 
-    public function getAttributeAvList()
+    public function getProductSaleElementId()
     {
-        return $this->attribute_av_list;
+        return $this->product_sale_element_id;
     }
 
-    public function setAttributeAvList($attribute_av_list)
+    public function setProductSaleElementId($product_sale_element_id)
     {
-        $this->attribute_av_list = $attribute_av_list;
+        $this->product_sale_element_id = $product_sale_element_id;
 
         return $this;
     }
@@ -58,7 +58,6 @@ class ProductCreateCombinationEvent extends ProductEvent
     public function setCurrencyId($currency_id)
     {
         $this->currency_id = $currency_id;
-
         return $this;
     }
 

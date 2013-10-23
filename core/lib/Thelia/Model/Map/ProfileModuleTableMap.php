@@ -147,7 +147,7 @@ class ProfileModuleTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('PROFILE_ID', 'ProfileId', 'INTEGER' , 'profile', 'ID', true, null, null);
         $this->addForeignPrimaryKey('MODULE_ID', 'ModuleId', 'INTEGER' , 'module', 'ID', true, null, null);
-        $this->addColumn('ACCESS', 'Access', 'INTEGER', true, null, 0);
+        $this->addColumn('ACCESS', 'Access', 'TINYINT', false, null, 0);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()

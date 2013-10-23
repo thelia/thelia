@@ -25,6 +25,7 @@ use Thelia\Model\Map\ProductPriceTableMap;
  * @method     ChildProductPriceQuery orderByCurrencyId($order = Criteria::ASC) Order by the currency_id column
  * @method     ChildProductPriceQuery orderByPrice($order = Criteria::ASC) Order by the price column
  * @method     ChildProductPriceQuery orderByPromoPrice($order = Criteria::ASC) Order by the promo_price column
+ * @method     ChildProductPriceQuery orderByFromDefaultCurrency($order = Criteria::ASC) Order by the from_default_currency column
  * @method     ChildProductPriceQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProductPriceQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -32,6 +33,7 @@ use Thelia\Model\Map\ProductPriceTableMap;
  * @method     ChildProductPriceQuery groupByCurrencyId() Group by the currency_id column
  * @method     ChildProductPriceQuery groupByPrice() Group by the price column
  * @method     ChildProductPriceQuery groupByPromoPrice() Group by the promo_price column
+ * @method     ChildProductPriceQuery groupByFromDefaultCurrency() Group by the from_default_currency column
  * @method     ChildProductPriceQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildProductPriceQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -54,6 +56,7 @@ use Thelia\Model\Map\ProductPriceTableMap;
  * @method     ChildProductPrice findOneByCurrencyId(int $currency_id) Return the first ChildProductPrice filtered by the currency_id column
  * @method     ChildProductPrice findOneByPrice(double $price) Return the first ChildProductPrice filtered by the price column
  * @method     ChildProductPrice findOneByPromoPrice(double $promo_price) Return the first ChildProductPrice filtered by the promo_price column
+ * @method     ChildProductPrice findOneByFromDefaultCurrency(boolean $from_default_currency) Return the first ChildProductPrice filtered by the from_default_currency column
  * @method     ChildProductPrice findOneByCreatedAt(string $created_at) Return the first ChildProductPrice filtered by the created_at column
  * @method     ChildProductPrice findOneByUpdatedAt(string $updated_at) Return the first ChildProductPrice filtered by the updated_at column
  *
@@ -61,6 +64,7 @@ use Thelia\Model\Map\ProductPriceTableMap;
  * @method     array findByCurrencyId(int $currency_id) Return ChildProductPrice objects filtered by the currency_id column
  * @method     array findByPrice(double $price) Return ChildProductPrice objects filtered by the price column
  * @method     array findByPromoPrice(double $promo_price) Return ChildProductPrice objects filtered by the promo_price column
+ * @method     array findByFromDefaultCurrency(boolean $from_default_currency) Return ChildProductPrice objects filtered by the from_default_currency column
  * @method     array findByCreatedAt(string $created_at) Return ChildProductPrice objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildProductPrice objects filtered by the updated_at column
  *
@@ -151,7 +155,7 @@ abstract class ProductPriceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT PRODUCT_SALE_ELEMENTS_ID, CURRENCY_ID, PRICE, PROMO_PRICE, CREATED_AT, UPDATED_AT FROM product_price WHERE PRODUCT_SALE_ELEMENTS_ID = :p0 AND CURRENCY_ID = :p1';
+        $sql = 'SELECT PRODUCT_SALE_ELEMENTS_ID, CURRENCY_ID, PRICE, PROMO_PRICE, FROM_DEFAULT_CURRENCY, CREATED_AT, UPDATED_AT FROM product_price WHERE PRODUCT_SALE_ELEMENTS_ID = :p0 AND CURRENCY_ID = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -418,6 +422,33 @@ abstract class ProductPriceQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductPriceTableMap::PROMO_PRICE, $promoPrice, $comparison);
+    }
+
+    /**
+     * Filter the query on the from_default_currency column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByFromDefaultCurrency(true); // WHERE from_default_currency = true
+     * $query->filterByFromDefaultCurrency('yes'); // WHERE from_default_currency = true
+     * </code>
+     *
+     * @param     boolean|string $fromDefaultCurrency The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductPriceQuery The current query, for fluid interface
+     */
+    public function filterByFromDefaultCurrency($fromDefaultCurrency = null, $comparison = null)
+    {
+        if (is_string($fromDefaultCurrency)) {
+            $from_default_currency = in_array(strtolower($fromDefaultCurrency), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(ProductPriceTableMap::FROM_DEFAULT_CURRENCY, $fromDefaultCurrency, $comparison);
     }
 
     /**

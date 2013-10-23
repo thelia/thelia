@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -21,28 +21,32 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Product;
+namespace Thelia\Tools;
 
-use Thelia\Model\Product;
+use Symfony\Component\HttpFoundation\Request;
 
-class ProductDeleteCombinationEvent extends ProductEvent
+class NumberFormat
 {
-    protected $product_sale_element_id;
+    protected $request;
 
-    public function __construct(Product $product, $product_sale_element_id)
+    public function __construct(Request $request)
     {
-        parent::__construct($product);
-
-        $this->product_sale_element_id = $product_sale_element_id;
+        $this->request = $request;
     }
 
-    public function getProductSaleElementId()
+    public static function getInstance(Request $request)
     {
-        return $this->product_sale_element_id;
+        return new NumberFormat($request);
     }
 
-    public function setProductSaleElementId($product_sale_element_id)
+    public function format($number, $decimals = null, $decPoint = null, $thousandsSep = null)
     {
-        $this->product_sale_element_id = $product_sale_element_id;
+        $lang = $this->request->getSession()->getLang();
+
+        if ($decimals == null) $decimals = $lang->getDecimals();
+        if ($decPoint == null) $decPoint = $lang->getDecimalSeparator();
+        if ($thousandsSep == null) $thousandsSep = $lang->getThousandsSeparator();
+
+        return number_format($number, $decimals, $decPoint, $thousandsSep);
     }
 }

@@ -98,7 +98,8 @@ CREATE TABLE `country`
     `isocode` VARCHAR(4) NOT NULL,
     `isoalpha2` VARCHAR(2),
     `isoalpha3` VARCHAR(4),
-    `by_default` TINYINT,
+    `by_default` TINYINT DEFAULT 0,
+    `shop_country` TINYINT(1) DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -983,7 +984,7 @@ CREATE TABLE `admin`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `fk_admin_profile_id` (`profile_id`),
+    INDEX `idx_admin_profile_id` (`profile_id`),
     CONSTRAINT `fk_admin_profile_id`
         FOREIGN KEY (`profile_id`)
         REFERENCES `profile` (`id`)
@@ -1029,7 +1030,7 @@ CREATE TABLE `profile_module`
 (
     `profile_id` INTEGER NOT NULL,
     `module_id` INTEGER NOT NULL,
-    `access` INTEGER DEFAULT 0 NOT NULL,
+    `access` TINYINT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`profile_id`,`module_id`),
@@ -1257,6 +1258,7 @@ CREATE TABLE `product_price`
     `currency_id` INTEGER NOT NULL,
     `price` FLOAT NOT NULL,
     `promo_price` FLOAT,
+    `from_default_currency` TINYINT(1) DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`product_sale_elements_id`,`currency_id`),
