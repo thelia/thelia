@@ -1,3 +1,4 @@
+<div class="clearfix">
     {loop type="cart" name="cartloop" position="last"}
         <table>
             <tr>
@@ -29,10 +30,11 @@
         </table>
     {/loop}
 
-    <a href="{navigate to="index"}" role="button" class="btn btn_add_to_cart pull-right"><span>{intl l="View cart"}</span></a>
-    <a href="{navigate to="index"}" role="button" class="btn btn-checkout pull-right"><span>{intl l="Continue Shopping"}</span></a>
+    <a href="{url path="/cart"}" role="button" class="btn btn_add_to_cart pull-right"><span>{intl l="View cart"}</span></a>
+    <button type="button" class="btn btn-checkout pull-right" data-dismiss="modal"><span>{intl l="Continue Shopping"}</span></button>
+</div>
 
-    {ifloop rel="product_upsell"}
+{ifloop rel="product_upsell"}
         <aside id="products-upsell" role="complementary" aria-labelledby="products-upsell-label">
             <div class="products-heading">
                 <h3 id="products-upsell-label">{intl l="Upsell Products"}</h3>
