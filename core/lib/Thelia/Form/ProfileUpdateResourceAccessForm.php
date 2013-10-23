@@ -71,7 +71,6 @@ class ProfileUpdateResourceAccessForm extends BaseForm
                     "attr" => array(
                         "tag" => "resources",
                         "resource_code" => $resource->getCode(),
-                        "resource_title" => $resource->getTitle(),
                     ),
                     "multiple" => true,
                     "constraints" => array(

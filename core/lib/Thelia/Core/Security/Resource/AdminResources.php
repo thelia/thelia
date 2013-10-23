@@ -37,16 +37,16 @@ final class AdminResources
 
     static public function retrieve($name)
     {
-        $contantName = strtoupper($name);
+        $constantName = strtoupper($name);
 
         if(null === self::$selfReflection) {
             self::$selfReflection = new \ReflectionClass(__CLASS__);
         }
 
-        if(self::$selfReflection->hasConstant($contantName)) {
-            return self::$selfReflection->getConstant($contantName);
+        if(self::$selfReflection->hasConstant($constantName)) {
+            return self::$selfReflection->getConstant($constantName);
         } else {
-            throw new ResourceException(sprintf('Resource `%s` not found', $contantName), ResourceException::RESOURCE_NOT_FOUND);
+            throw new ResourceException(sprintf('Resource `%s` not found', $constantName), ResourceException::RESOURCE_NOT_FOUND);
         }
     }
 
@@ -54,7 +54,7 @@ final class AdminResources
 
     const ADDRESS = "admin.address";
 
-    const ADMIN = "admin.configuration.admin";
+    const ADMINISTRATOR = "admin.configuration.administrator";
 
     const AREA = "admin.configuration.area";
 

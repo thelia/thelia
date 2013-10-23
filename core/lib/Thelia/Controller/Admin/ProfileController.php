@@ -220,33 +220,6 @@ class ProfileController extends AbstractCrudController
         );
     }
 
-    protected function checkRequirements($formData)
-    {
-        $type = $formData['type'];
-
-
-    }
-
-    protected function getRequirements($type, $formData)
-    {
-        $requirements = array();
-        foreach($formData as $data => $value) {
-            if(!strstr($data, ':')) {
-                continue;
-            }
-
-            $couple = explode(':', $data);
-
-            if(count($couple) != 2 || $couple[0] != $type) {
-                continue;
-            }
-
-            $requirements[$couple[1]] = $value;
-        }
-
-        return $requirements;
-    }
-
     public function updateAction()
     {
         if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
