@@ -255,8 +255,6 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
             self::$taggedFieldsStack[self::$taggedFieldsStackPosition]['view']->setRendered();
 
             $repeat = true;
-        } else {
-            $content = null;
         }
 
         if (! $repeat) {
@@ -264,7 +262,9 @@ $this->assignFieldValues($template, $formFieldView->vars["full_name"], $fieldVar
             self::$taggedFieldsStackPosition = null;
         }
 
-        return $content;
+        if(null !== $content) {
+            return $content;
+        }
     }
 
     public function renderHiddenFormField($params, \Smarty_Internal_Template $template)
