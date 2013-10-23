@@ -24,6 +24,7 @@
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Lang\LangCreateEvent;
+use Thelia\Core\Event\Lang\LangDeleteEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -71,6 +72,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
         $lang = new LangModel();
 
         $lang
+            ->setDispatcher($this->getDispatcher())
             ->setTitle($event->getTitle())
             ->setCode($event->getCode())
             ->setLocale($event->getLocale())
@@ -79,6 +81,16 @@ class Lang extends BaseAction implements EventSubscriberInterface
             ->save();
 
         $event->setLang($lang);
+    }
+
+    public function delete(LangDeleteEvent $event)
+    {
+        if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
+            $lang->setDispatcher($this->getDispatcher())
+                ->delete();
+
+            $event->setLang($lang);
+        }
     }
 
     /**
@@ -106,7 +118,8 @@ class Lang extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::LANG_UPDATE => array('update', 128),
             TheliaEvents::LANG_TOGGLEDEFAULT => array('toggleDefault', 128),
-            TheliaEvents::LANG_CREATE => array('create', 128)
+            TheliaEvents::LANG_CREATE => array('create', 128),
+            TheliaEvents::LANG_DELETE => array('delete', 128),
         );
     }
 }

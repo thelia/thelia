@@ -25,6 +25,7 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Form;
 use Thelia\Core\Event\Lang\LangCreateEvent;
+use Thelia\Core\Event\Lang\LangDeleteEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -194,6 +195,23 @@ class LangController extends BaseAdminController
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::DELETE)) return $response;
 
+        $error_msg = false;
+
+        try {
+
+            $deleteEvent = new LangDeleteEvent($this->getRequest()->get('language_id', 0));
+
+            $this->dispatch(TheliaEvents::LANG_DELETE, $deleteEvent);
+
+            $this->redirectToRoute('admin.configuration.languages');
+        } catch (\Exception $ex) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("error during language removal with message : %s", $ex->getMessage()));
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->render('languages', array(
+           'error_delete_message' => $error_msg
+        ));
 
     }
 }

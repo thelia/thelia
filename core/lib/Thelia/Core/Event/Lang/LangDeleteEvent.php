@@ -64,7 +64,4 @@ class LangDeleteEvent extends LangEvent
         return $this->lang_id;
     }
 
-
-
-
 }
