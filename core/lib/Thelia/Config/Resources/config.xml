@@ -138,8 +138,6 @@
 
         <form name="thelia.admin.country.creation" class="Thelia\Form\CountryCreationForm"/>
         <form name="thelia.admin.country.modification" class="Thelia\Form\CountryModificationForm"/>
-        
-        <form name="thelia.admin.language.creation" class="Thelia\Form\LanguageCreationForm"/>
 
         <form name="thelia.admin.admin-profile.creation" class="Thelia\Form\AdminProfileCreationForm"/>
 
@@ -155,6 +153,7 @@
         <form name="thelia.newsletter" class="Thelia\Form\NewsletterForm"/>
 
         <form name="thelia.lang.update" class="Thelia\Form\Lang\LangUpdateForm"/>
+        <form name="thelia.lang.create" class="Thelia\Form\Lang\LangCreateForm"/>
     </forms>
 
 

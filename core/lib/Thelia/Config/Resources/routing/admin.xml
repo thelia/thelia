@@ -941,6 +941,10 @@
         <requirement key="lang_id">\d+</requirement>
     </route>
 
+    <route id="admin.configuration.languages.add" path="/admin/configuration/languages/add">
+        <default key="_controller">Thelia\Controller\Admin\LangController::addAction</default>
+    </route>
+
 
     <!-- The default route, to display a template -->
 

@@ -250,6 +250,17 @@
 
     {block name="javascript-initialization"}{/block}
 
+    <script>
+        (function($) {
+            $(document).ready(function(){
+               var testModal = $(".modal-force-show");
+               if(testModal.length > 0) {
+                   testModal.modal("show");
+               }
+            });
+        })(jQuery);
+    </script>
+
 	{* Modules scripts are included now *}
 	{module_include location='footer_js'}
 

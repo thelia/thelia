@@ -23,10 +23,12 @@
 
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Lang\LangCreateEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\LangQuery;
+use Thelia\Model\Lang as LangModel;
 
 
 /**
@@ -64,6 +66,21 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function create(LangCreateEvent $event)
+    {
+        $lang = new LangModel();
+
+        $lang
+            ->setTitle($event->getTitle())
+            ->setCode($event->getCode())
+            ->setLocale($event->getLocale())
+            ->setDateFormat($event->getDateFormat())
+            ->setTimeFormat($event->getTimeFormat())
+            ->save();
+
+        $event->setLang($lang);
+    }
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -88,7 +105,8 @@ class Lang extends BaseAction implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::LANG_UPDATE => array('update', 128),
-            TheliaEvents::LANG_TOGGLEDEFAULT => array('toggleDefault', 128)
+            TheliaEvents::LANG_TOGGLEDEFAULT => array('toggleDefault', 128),
+            TheliaEvents::LANG_CREATE => array('create', 128)
         );
     }
 }

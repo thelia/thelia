@@ -136,7 +136,7 @@ class BaseAdminController extends BaseController
          // Generate the proper response
          $response = new Response();
 
-         return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"));
+         return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"), 403);
     }
 
     /*

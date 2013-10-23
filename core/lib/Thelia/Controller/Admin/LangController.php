@@ -23,11 +23,15 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Form\Form;
+use Thelia\Core\Event\Lang\LangCreateEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Form\Lang\LangCreateForm;
 use Thelia\Form\Lang\LangUpdateForm;
 use Thelia\Model\LangQuery;
 
@@ -83,13 +87,7 @@ class LangController extends BaseAdminController
             $form = $this->validateForm($langForm);
 
             $event = new LangUpdateEvent($form->get('id')->getData());
-            $event
-                ->setTitle($form->get('title')->getData())
-                ->setCode($form->get('code')->getData())
-                ->setLocale($form->get('locale')->getData())
-                ->setDateFormat($form->get('date_format')->getData())
-                ->setTimeFormat($form->get('time_format')->getData())
-            ;
+            $event = $this->hydrateEvent($event, $form);
 
             $this->dispatch(TheliaEvents::LANG_UPDATE, $event);
 
@@ -106,6 +104,17 @@ class LangController extends BaseAdminController
         }
 
         return $this->render('languages');
+    }
+
+    protected function hydrateEvent($event,Form $form)
+    {
+        return $event
+            ->setTitle($form->get('title')->getData())
+            ->setCode($form->get('code')->getData())
+            ->setLocale($form->get('locale')->getData())
+            ->setDateFormat($form->get('date_format')->getData())
+            ->setTimeFormat($form->get('time_format')->getData())
+        ;
     }
 
     public function toggleDefaultAction($lang_id)
@@ -137,5 +146,47 @@ class LangController extends BaseAdminController
         } else {
             return $this->nullResponse();
         }
+    }
+
+    public function addAction()
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::CREATE)) return $response;
+
+        $createForm = new LangCreateForm($this->getRequest());
+
+        $error_msg = false;
+
+        try {
+            $form = $this->validateForm($createForm);
+
+            $createEvent = new LangCreateEvent();
+            $createEvent = $this->hydrateEvent($createEvent, $form);
+
+            $this->dispatch(TheliaEvents::LANG_CREATE, $createEvent);
+
+            if (false === $createEvent->hasLang()) {
+                throw new \LogicException(
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang')));
+            }
+
+            $createdObject = $createEvent->getLang();
+            $this->adminLogAppend(sprintf("%s %s (ID %s) created", 'Lang', $createdObject->getTitle(), $createdObject->getId()));
+
+            $this->redirectToRoute('admin.configuration.languages');
+
+        } catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext(
+            $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $createForm, $ex);
+
+        // At this point, the form has error, and should be redisplayed.
+        return $this->render('languages');
+
     }
 }

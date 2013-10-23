@@ -692,6 +692,7 @@ final class TheliaEvents
     /************ LANG MANAGEMENT ****************************/
 
     const LANG_UPDATE = 'action.lang.update';
+    const LANG_CREATE = 'action.lang.create';
 
     const LANG_TOGGLEDEFAULT = 'action.lang.toggleDefault';
 
