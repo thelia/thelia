@@ -26,7 +26,7 @@ namespace Thelia\Condition\Implementation;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;
 use Thelia\Condition\SerializableCondition;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -59,20 +59,20 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputOperator()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter->expects($this->any())
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::IN
         );
@@ -96,19 +96,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testInValidBackOfficeInputValue()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
         );
@@ -132,19 +132,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleInferior()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::INFERIOR
         );
@@ -168,19 +168,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleInferior()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::INFERIOR
         );
@@ -204,19 +204,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleInferiorEquals()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::INFERIOR_OR_EQUAL,
         );
@@ -240,19 +240,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleInferiorEquals2()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::INFERIOR_OR_EQUAL
         );
@@ -276,19 +276,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleInferiorEquals()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::INFERIOR_OR_EQUAL
         );
@@ -312,19 +312,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleEqual()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::EQUAL
         );
@@ -348,19 +348,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleEqual()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::EQUAL
         );
@@ -384,19 +384,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleSuperiorEquals()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL
         );
@@ -420,19 +420,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleSuperiorEquals2()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL
         );
@@ -456,19 +456,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleSuperiorEquals()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR_OR_EQUAL
         );
@@ -492,19 +492,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMatchingRuleSuperior()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
         );
@@ -528,19 +528,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotMatchingRuleSuperior()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
         );
@@ -558,19 +558,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSerializableRule()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
         );
@@ -594,19 +594,19 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAvailableOperators()
     {
-        /** @var AdapterInterface $stubAdapter */
-        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
+        /** @var FacadeInterface $stubFacade */
+        $stubFacade = $this->getMockBuilder('\Thelia\Coupon\BaseFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getNbArticlesInCart')
             ->will($this->returnValue(4));
-        $stubAdapter->expects($this->any())
+        $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
 
-        $condition1 = new MatchForXArticlesManager($stubAdapter);
+        $condition1 = new MatchForXArticlesManager($stubFacade);
         $operators = array(
             MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
         );
@@ -629,35 +629,6 @@ class MatchForXArticlesManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
 
     }
-
-//    public function testGetValidators()
-//    {
-//        $stubAdapter = $this->getMockBuilder('\Thelia\Coupon\BaseAdapter')
-//            ->disableOriginalConstructor()
-//            ->getMock();
-//
-//        $stubAdapter->expects($this->any())
-//            ->method('getNbArticlesInCart')
-//            ->will($this->returnValue(4));
-//
-//        $condition1 = new MatchForXArticlesManager($stubAdapter);
-//        $operators = array(
-//            MatchForXArticlesManager::INPUT1 => Operators::SUPERIOR
-//        );
-//        $values = array(
-//            MatchForXArticlesManager::INPUT1 => 4
-//        );
-//        $condition1->setValidatorsFromForm($operators, $values);
-//
-//        $expected = array(
-//            $operators,
-//            $values
-//        );
-//        $actual = $condition1->getValidators();
-//
-//        $this->assertEquals($expected, $actual);
-//
-//    }
 
     /**
      * Tears down the fixture, for example, closes a network connection.

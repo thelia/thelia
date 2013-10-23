@@ -27,8 +27,8 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
+use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
 use Thelia\Cart\CartTrait;
@@ -44,10 +44,9 @@ use Thelia\Model\CurrencyQuery;
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
- * @todo implements
  *
  */
-class BaseAdapter implements AdapterInterface
+class BaseFacade implements FacadeInterface
 {
     use CartTrait {
         CartTrait::getCart as getCartFromTrait;
@@ -86,7 +85,7 @@ class BaseAdapter implements AdapterInterface
      */
     public function getDeliveryAddress()
     {
-        // TODO: Implement getDeliveryAddress() method.
+        // @todo: Implement getDeliveryAddress() method.
     }
 
     /**
@@ -106,7 +105,7 @@ class BaseAdapter implements AdapterInterface
      */
     public function getCheckoutTotalPrice()
     {
-        // TODO: Implement getCheckoutTotalPrice() method.
+        return $this->getRequest()->getSession()->getOrder()->getTotalAmount();
     }
 
     /**
@@ -116,7 +115,7 @@ class BaseAdapter implements AdapterInterface
      */
     public function getCheckoutPostagePrice()
     {
-        // TODO: Implement getCheckoutPostagePrice() method.
+        return $this->getRequest()->getSession()->getOrder()->getPostage();
     }
 
     /**
@@ -126,7 +125,8 @@ class BaseAdapter implements AdapterInterface
      */
     public function getCartTotalPrice()
     {
-        // TODO: Implement getCartTotalPrice() method.
+        return $this->getRequest()->getSession()->getCart()->getTotalAmount();
+
     }
 
     /**
@@ -136,7 +136,7 @@ class BaseAdapter implements AdapterInterface
      */
     public function getCheckoutCurrency()
     {
-        $this->getRequest()->getSession()->getCurrency();
+        return $this->getRequest()->getSession()->getCurrency()->getCode();
     }
 
 
@@ -147,7 +147,7 @@ class BaseAdapter implements AdapterInterface
      */
     public function getNbArticlesInCart()
     {
-        // TODO: Implement getNbArticlesInCart() method.
+        return count($this->getRequest()->getSession()->getCart()->getCartItems());
     }
 
     /**
@@ -157,15 +157,12 @@ class BaseAdapter implements AdapterInterface
      */
     public function getCurrentCoupons()
     {
-        // @todo implement
-//        $consumedCoupons = $this->getRequest()->getSession()->getConsumedCoupons();
-        // @todo convert coupon code to coupon Interface
+        $couponCodes = $this->getRequest()->getSession()->getConsumedCoupons();
 
-
+        if (null === $couponCodes) {
+            return array();
+        }
         $couponFactory = $this->container->get('thelia.coupon.factory');
-
-        // @todo get from cart
-        $couponCodes = array('XMAS', 'SPRINGBREAK');
 
         $coupons = array();
         foreach ($couponCodes as $couponCode) {
@@ -190,34 +187,7 @@ class BaseAdapter implements AdapterInterface
     }
 
     /**
-     * Save a Coupon in the database
-     *
-     * @param CouponInterface $coupon Coupon
-     *
-     * @return $this
-     */
-    public function saveCoupon(CouponInterface $coupon)
-    {
-//        $couponModel = new Coupon();
-//        $couponModel->setCode($coupon->getCode());
-//        $couponModel->setType(get_class($coupon));
-//        $couponModel->setTitle($coupon->getTitle());
-//        $couponModel->setShortDescription($coupon->getShortDescription());
-//        $couponModel->setDescription($coupon->getDescription());
-//        $couponModel->setAmount($coupon->getDiscount());
-//        $couponModel->setIsUsed(0);
-//        $couponModel->setIsEnabled(1);
-//        $couponModel->set
-//        $couponModel->set
-//        $couponModel->set
-//        $couponModel->set
-//        $couponModel->set
-//        $couponModel->set
-//        $couponModel->set
-    }
-
-    /**
-     * Return plateform Container
+     * Return platform Container
      *
      * @return Container
      */
@@ -245,7 +215,7 @@ class BaseAdapter implements AdapterInterface
      */
     public function getMainCurrency()
     {
-        // TODO: Implement getMainCurrency() method.
+        return $this->getRequest()->getSession()->getCurrency();
     }
 
     /**
@@ -261,7 +231,7 @@ class BaseAdapter implements AdapterInterface
     /**
      * Return Constraint Validator
      *
-     * @return ConditionValidator
+     * @return ConditionEvaluator
      */
     public function getConditionEvaluator()
     {

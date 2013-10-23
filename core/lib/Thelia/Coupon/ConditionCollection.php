@@ -25,8 +25,6 @@ namespace Thelia\Coupon;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionManagerInterface;
-use Thelia\Constraint\Rule\CouponRuleInterface;
-use Thelia\Constraint\Rule\SerializableRule;
 
 /**
  * Created by JetBrains PhpStorm.

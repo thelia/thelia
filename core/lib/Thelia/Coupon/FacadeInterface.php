@@ -25,11 +25,9 @@ namespace Thelia\Coupon;
 
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Model\Coupon;
 
 /**
@@ -43,7 +41,7 @@ use Thelia\Model\Coupon;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-interface AdapterInterface
+interface FacadeInterface
 {
 
     /**
@@ -125,15 +123,6 @@ interface AdapterInterface
      * @return Coupon
      */
     public function findOneCouponByCode($code);
-
-    /**
-     * Save a Coupon in the database
-     *
-     * @param CouponInterface $coupon Coupon
-     *
-     * @return $this
-     */
-    public function saveCoupon(CouponInterface $coupon);
 
     /**
      * Return platform Container

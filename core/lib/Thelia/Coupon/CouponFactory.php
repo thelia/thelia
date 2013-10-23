@@ -47,7 +47,7 @@ class CouponFactory
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
-    /** @var  AdapterInterface Provide necessary value from Thelia*/
+    /** @var  FacadeInterface Provide necessary value from Thelia*/
     protected $adapter;
 
     /**

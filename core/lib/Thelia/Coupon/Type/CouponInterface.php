@@ -23,7 +23,6 @@
 
 namespace Thelia\Coupon\Type;
 
-use Thelia\Coupon\AdapterInterface;
 use Thelia\Coupon\ConditionCollection;
 
 /**
@@ -205,11 +204,11 @@ interface CouponInterface
      *
      * @return float Amount removed from the Total Checkout
      */
-    public function getDiscount();
+    public function exec();
 
     /**
      * Check if the current Coupon is matching its conditions (Rules)
-     * Thelia variables are given by the AdapterInterface
+     * Thelia variables are given by the FacadeInterface
      *
      * @return bool
      */

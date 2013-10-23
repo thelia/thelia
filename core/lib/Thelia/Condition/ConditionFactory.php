@@ -24,7 +24,7 @@
 namespace Thelia\Condition;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Coupon\AdapterInterface;
+use Thelia\Coupon\FacadeInterface;
 use Thelia\Coupon\ConditionCollection;
 
 
@@ -44,7 +44,7 @@ class ConditionFactory
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
-    /** @var  AdapterInterface Provide necessary value from Thelia */
+    /** @var  FacadeInterface Provide necessary value from Thelia */
     protected $adapter;
 
     /** @var array ConditionCollection to process*/
@@ -82,10 +82,6 @@ class ConditionFactory
         if ($conditions !== null) {
             /** @var $condition ConditionManagerInterface */
             foreach ($conditions as $condition) {
-                // Remove all condition if the "no condition" condition is found
-//                if ($condition->getServiceId() == 'thelia.condition.match_for_everyone') {
-//                    return base64_encode(json_encode(array($condition->getSerializableRule())));
-//                }
                 $serializableConditions[] = $condition->getSerializableCondition();
             }
         }

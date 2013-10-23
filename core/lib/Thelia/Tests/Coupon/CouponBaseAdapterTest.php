@@ -28,7 +28,7 @@ namespace Thelia\Coupon;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test BaseAdapter Class
+ * Unit Test BaseFacade Class
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
@@ -43,61 +43,5 @@ class CouponBaseAdapterTest extends \PHPUnit_Framework_TestCase
             'This test has not been implemented yet.'
         );
     }
-//    /**
-//     * @var BaseAdapter
-//     */
-//    protected $object;
-//
-//    /**
-//     * Sets up the fixture, for example, opens a network connection.
-//     * This method is called before a test is executed.
-//     */
-//    protected function setUp()
-//    {
-//        $this->object = new BaseAdapter;
-//    }
-//
-//    /**
-//     * Tears down the fixture, for example, closes a network connection.
-//     * This method is called after a test is executed.
-//     */
-//    protected function tearDown()
-//    {
-//    }
-//
-//    /**
-//     * @covers Thelia\Coupon\BaseAdapter::getCart
-//     * @todo   Implement testGetCart().
-//     */
-//    public function testGetCart()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//          'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Thelia\Coupon\BaseAdapter::getDeliveryAddress
-//     * @todo   Implement testGetDeliveryAddress().
-//     */
-//    public function testGetDeliveryAddress()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//          'This test has not been implemented yet.'
-//        );
-//    }
-//
-//    /**
-//     * @covers Thelia\Coupon\BaseAdapter::getCustomer
-//     * @todo   Implement testGetCustomer().
-//     */
-//    public function testGetCustomer()
-//    {
-//        // Remove the following lines when you implement this test.
-//        $this->markTestIncomplete(
-//          'This test has not been implemented yet.'
-//        );
-//    }
+
 }

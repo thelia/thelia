@@ -45,33 +45,4 @@ class SerializableCondition
     /** @var array Values set by Admin for this Condition */
     public $values = array();
 
-//    /**
-//     * Get Operators set by Admin for this Condition
-//     *
-//     * @return array
-//     */
-//    public function getOperators()
-//    {
-//        return $this->operators;
-//    }
-//
-//    /**
-//     * Get Condition Service id
-//     *
-//     * @return string
-//     */
-//    public function getConditionServiceId()
-//    {
-//        return $this->conditionServiceId;
-//    }
-//
-//    /**
-//     * Get Values set by Admin for this Condition
-//     *
-//     * @return array
-//     */
-//    public function getValues()
-//    {
-//        return $this->values;
-//    }
 }

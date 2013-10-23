@@ -27,6 +27,7 @@ use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
+use Symfony\Component\Validator\Constraints\Range;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -109,7 +110,7 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'isEnabled',
-                'checkbox',
+                'text',
                 array()
             )
             ->add(
@@ -124,17 +125,17 @@ class CouponCreationForm extends BaseForm
             )
             ->add(
                 'isCumulative',
-                'checkbox',
+                'text',
                 array()
             )
             ->add(
                 'isRemovingPostage',
-                'checkbox',
+                'text',
                 array()
             )
             ->add(
                 'isAvailableOnSpecialOffers',
-                'checkbox',
+                'text',
                 array()
             )
             ->add(

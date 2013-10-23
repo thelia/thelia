@@ -23,11 +23,6 @@
 
 namespace Thelia\Coupon;
 
-use Thelia\Constraint\Validator\PriceParam;
-use Thelia\Constraint\Validator\RuleValidator;
-use Thelia\Constraint\Rule\AvailableForTotalAmount;
-use Thelia\Constraint\Rule\Operators;
-
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
@@ -48,39 +43,4 @@ class CouponRuleCollectionTest extends \PHPUnit_Framework_TestCase
             'This test has not been implemented yet.'
         );
     }
-//    /**
-//     *
-//     */
-//    public function testRuleSerialisation()
-//    {
-////        $rule1 = new AvailableForTotalAmount(
-////            , array(
-////                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
-////                    Operators::SUPERIOR,
-////                    new PriceParam(
-////                        , 40.00, 'EUR'
-////                    )
-////                )
-////            )
-////        );
-////        $rule2 = new AvailableForTotalAmount(
-////            , array(
-////                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
-////                    Operators::INFERIOR,
-////                    new PriceParam(
-////                        , 400.00, 'EUR'
-////                    )
-////                )
-////            )
-////        );
-////        $rules = new ConditionCollection(array($rule1, $rule2));
-////
-////        $serializedRules = base64_encode(serialize($rules));
-////        $unserializedRules = unserialize(base64_decode($serializedRules));
-////
-////        $expected = $rules;
-////        $actual = $unserializedRules;
-////
-////        $this->assertEquals($expected, $actual);
-//    }
 }

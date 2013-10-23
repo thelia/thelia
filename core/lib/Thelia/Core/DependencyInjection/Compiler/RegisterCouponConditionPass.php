@@ -21,18 +21,51 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Type;
+namespace Thelia\Core\DependencyInjection\Compiler;
+
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Created by JetBrains PhpStorm.
- * Date: 8/19/13
+ * Date: 9/05/13
  * Time: 3:24 PM
  *
- * @package Coupon
+ * Class RegisterListenersPass
+ * Source code come from Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass class
+ *
+ * Register all available Conditions for the coupon module
+ *
+ * @package Thelia\Core\DependencyInjection\Compiler
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveXPercentForProductY extends RemoveXPercent
+class RegisterCouponConditionPass implements CompilerPassInterface
 {
+    /**
+     * You can modify the container here before it is dumped to PHP code.
+     *
+     * @param ContainerBuilder $container Container
+     *
+     * @api
+     */
+    public function process(ContainerBuilder $container)
+    {
+        if (!$container->hasDefinition('thelia.coupon.manager')) {
+            return;
+        }
 
+        $couponManager = $container->getDefinition('thelia.coupon.manager');
+        $services = $container->findTaggedServiceIds("thelia.coupon.addCondition");
+
+        foreach ($services as $id => $condition) {
+            $couponManager->addMethodCall(
+                'addAvailableCondition',
+                array(
+                    new Reference($id)
+                )
+            );
+        }
+    }
 }
