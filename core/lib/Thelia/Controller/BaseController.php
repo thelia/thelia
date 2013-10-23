@@ -57,8 +57,10 @@ class BaseController extends ContainerAware
 
     /**
      * Return an empty response (after an ajax request, for example)
+     * @param int $status
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function nullResponse($content = null, $status = 200)
+    protected function nullResponse($status = 200)
     {
         return new Response(null, $status);
     }

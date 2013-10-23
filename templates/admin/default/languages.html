@@ -54,7 +54,7 @@
                                     <td>{$DATE_FORMAT}</td>
                                     <td>{$TIME_FORMAT}</td>
                                     <td>
-                                        <div class="make-switch switch-small switch-radio lang-default-change" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                        <div class="make-switch switch-small switch-radio lang-default-change" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                             <input type="radio" name="is_default" {if $IS_DEFAULT}checked{/if}>
                                         </div>
                                     </td>
@@ -287,8 +287,9 @@
                 });
             });
 
-            $(".lang-default-change").on("switch-change", function(data, value){
-                var baseUrl = "{url path='/admin/configuration/languages/toggleDefault'}";
+            $(".lang-default-change").on("switch-change", function(e, data){
+                $('.lang-default-change').bootstrapSwitch('toggleRadioState');
+                var baseUrl = "{url path='/admin/configuration/languages/toggleDefault/'}";
                 if(data.value) {
                     $.ajax({
                         url : baseUrl+$(this).data('id')

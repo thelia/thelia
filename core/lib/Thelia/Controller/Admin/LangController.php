@@ -23,6 +23,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
@@ -109,6 +110,32 @@ class LangController extends BaseAdminController
 
     public function toggleDefaultAction($lang_id)
     {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
 
+        $this->checkXmlHttpRequest();
+        $error = false;
+        try {
+            $event = new LangToggleDefaultEvent($lang_id);
+
+            $this->dispatch(TheliaEvents::LANG_TOGGLEDEFAULT, $event);
+
+            if (false === $event->hasLang()) {
+                throw new \LogicException(
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang')));
+            }
+
+            $changedObject = $event->getLang();
+            $this->adminLogAppend(sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
+
+        } catch (\Exception $e) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("Error on changing default languages with message : %s", $e->getMessage()));
+            $error = $e->getMessage();
+        }
+
+        if($error) {
+            return $this->nullResponse(500);
+        } else {
+            return $this->nullResponse();
+        }
     }
 }
