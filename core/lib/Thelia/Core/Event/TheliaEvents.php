@@ -555,6 +555,12 @@ final class TheliaEvents
     const PROFILE_RESOURCE_ACCESS_UPDATE    = "action.updateProfileResourceAccess";
     const PROFILE_MODULE_ACCESS_UPDATE      = "action.updateProfileModuleAccess";
 
+    // -- Administrator management ---------------------------------------------
+
+    const ADMINISTRATOR_CREATE                    = "action.createAdministrator";
+    const ADMINISTRATOR_UPDATE                    = "action.updateAdministrator";
+    const ADMINISTRATOR_DELETE                    = "action.deleteAdministrator";
+
     // -- Tax Rules management ---------------------------------------------
 
     const TAX_RULE_CREATE          = "action.createTaxRule";

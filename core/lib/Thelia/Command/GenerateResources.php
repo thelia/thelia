@@ -28,6 +28,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Thelia\Command\ContainerAwareCommand;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Model\Admin;
 use Thelia\Model\Map\ResourceI18nTableMap;
 use Thelia\Model\Map\ResourceTableMap;
@@ -72,7 +73,7 @@ class GenerateResources extends ContainerAwareCommand
                 );
                 $compteur = 0;
                 foreach($constants as $constant => $value) {
-                    if($constant == 'SUPERADMINISTRATOR') {
+                    if($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
                     }
                     $compteur++;
@@ -87,7 +88,7 @@ class GenerateResources extends ContainerAwareCommand
                 );
                 $compteur = 0;
                 foreach($constants as $constant => $value) {
-                    if($constant == 'SUPERADMINISTRATOR') {
+                    if($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
                     }
 
@@ -105,7 +106,7 @@ class GenerateResources extends ContainerAwareCommand
                 break;
             default :
                 foreach($constants as $constant => $value) {
-                    if($constant == 'SUPERADMINISTRATOR') {
+                    if($constant == AdminResources::SUPERADMINISTRATOR) {
                         continue;
                     }
                     $output->writeln('[' . $constant . "] => " . $value);

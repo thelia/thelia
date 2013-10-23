@@ -24,13 +24,6 @@
         <default key="_controller">Thelia\Controller\Admin\SessionController::checkLoginAction</default>
     </route>
 
-    <!-- Route to edit admin profile -->
-    <route id="admin.profile.update.view" path="/admin/profile/update" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\AdminController::updateAction</default>
-    </route>
-
-
-
     <!-- Route to the catalog controller -->
 
     <route id="admin.catalog" path="/admin/catalog">
@@ -790,6 +783,26 @@
     </route>
 
     <!-- end profiles management -->
+
+    <!-- administrator management -->
+
+    <route id="admin.configuration.administrators.view" path="/admin/configuration/administrators">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::defaultAction</default>
+    </route>
+
+    <route id="admin.configuration.administrators.add" path="/admin/configuration/administrators/add">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::createAction</default>
+    </route>
+
+    <route id="admin.configuration.administrators.save" path="/admin/configuration/administrators/save">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::processUpdateAction</default>
+    </route>
+
+    <route id="admin.configuration.administrators.delete" path="/admin/configuration/administrators/delete">
+        <default key="_controller">Thelia\Controller\Admin\AdministratorController::deleteAction</default>
+    </route>
+
+    <!-- end administrator management -->
 
     <!-- feature and features value management -->
 

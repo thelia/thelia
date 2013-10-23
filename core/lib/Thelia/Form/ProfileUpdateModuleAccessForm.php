@@ -71,7 +71,6 @@ class ProfileUpdateModuleAccessForm extends BaseForm
                     "attr" => array(
                         "tag" => "modules",
                         "module_code" => $module->getCode(),
-                        "module_title" => $module->getTitle(),
                     ),
                     "multiple" => true,
                     "constraints" => array(
