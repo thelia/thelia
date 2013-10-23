@@ -291,7 +291,7 @@
 
             $.ajax({type:"POST", data: $(this).serialize(), url:url_action,
                     success: function(data){
-                        console.log($(data).html());
+
                         $cartContainer.html($(data).html());
 
                         $.ajax({url:"ajax/addCartMessage",

@@ -99,8 +99,8 @@ class CartAdd extends BaseForm
                     "for" => "quantity"
                 )
             ))
-            ->add("append", "hidden")
-            ->add("newness", "hidden")
+            ->add("append", "integer")
+            ->add("newness", "integer")
         ;
     }
 

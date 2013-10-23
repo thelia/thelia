@@ -145,15 +145,7 @@
 
                     {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
 
-                    {form_field form=$form field='product_sale_elements_id'}
-                    {if $default_product_sale_elements }
-                        <input type="hidden" name="{$name}" value="{$default_product_sale_elements}" {$attr}>
-                    {else}
-                    {loop name="productSaleElements_promo" type="product_sale_elements" product="{$ID}" limit="1"}
-                        <input type="hidden" name="{$name}" value="{$ID}" {$attr}>
-                    {/loop}
-                    {/if}
-                    {/form_field}
+
                     {form_field form=$form field="product"}
                         <input id="{$label_attr.for}" type="hidden" name="{$name}" value="{$ID}" {$attr} >
                     {/form_field}
@@ -163,13 +155,15 @@
                         <div class="option">
                             <label for="options" class="option-heading">Options</label>
                             <div class="option-content">
-                                <select name="options" class="form-control">
-                                    {loop name="stock" type="product_sale_elements" product="$ID" order="min_price"}
-                                        {loop name="combi" type="attribute_combination" product_sale_elements="$ID" order="alpha"}
-                                            <option value="{$ID}" data-quantity="{$QUANTITY}" data-price="{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}" data-old-price="{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}">{$ATTRIBUTE_AVAILABILITY_TITLE}</small></option>
+                                {form_field form=$form field='product_sale_elements_id'}
+                                    <select name="{$name}" class="form-control">
+                                        {loop name="stock" type="product_sale_elements" product="$ID" order="min_price"}
+                                            {loop name="combi" type="attribute_combination" product_sale_elements="$ID" order="alpha"}
+                                                <option value="{$ID}" data-quantity="{$QUANTITY}" data-price="{format_number number="{$BEST_TAXED_PRICE}"} {currency attr="symbol"}" data-old-price="{format_number number="{$TAXED_PRICE}"} {currency attr="symbol"}">{$ATTRIBUTE_AVAILABILITY_TITLE}</option>
+                                            {/loop}
                                         {/loop}
-                                    {/loop}
-                                </select>
+                                    </select>
+                                {/form_field}
                             </div>
                         </div>
                         {/ifloop}
