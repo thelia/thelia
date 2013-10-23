@@ -27,12 +27,18 @@
                 $(this).addClass('open');
             })
             .on('mouseleave.subnav', '.dropdown', function(){
-                if(!$(this).hasClass('open'))
+                var $this = $(this);
+
+                if(!$this.hasClass('open'))
                     return;
 
                 //This will check if an input child has focus. If no then remove class open
-                if ($(this).find(":input:focus").length == 0){
-                    $(this).removeClass('open');
+                if ($this.find(":input:focus").length == 0){
+                    $this.removeClass('open');
+                } else {
+                    $this.find(":input:focus").one('blur', function(){
+                        $this.trigger('mouseleave.subnav');
+                    });
                 }
             });
 
@@ -68,7 +74,6 @@
         var $category_products = $('#category-products');
         if($category_products.size() > 0){
             var $parent = $category_products.parent();
-
 
             $parent.on('click.view-mode', '[data-toggle=view]', function(){
                 if( ($(this).hasClass('btn-grid') && $parent.hasClass('grid')) || ($(this).hasClass('btn-list') && $parent.hasClass('list')))
