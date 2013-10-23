@@ -689,7 +689,11 @@ final class TheliaEvents
      */
     const NEWSLETTER_SUBSCRIBE = 'thelia.newsletter.subscribe';
 
+    /************ LANG MANAGEMENT ****************************/
+
     const LANG_UPDATE = 'action.lang.update';
+
+    const LANG_TOGGLEDEFAULT = 'action.lang.toggleDefault';
 
     const BEFORE_UPDATELANG = 'action.lang.beforeUpdate';
     const AFTER_UPDATELANG = 'action.lang.afterUpdate';

@@ -106,4 +106,9 @@ class LangController extends BaseAdminController
 
         return $this->render('languages');
     }
+
+    public function toggleDefaultAction($lang_id)
+    {
+
+    }
 }
