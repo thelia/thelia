@@ -111,7 +111,7 @@ class CustomerCreateForm extends AddressCreateForm
 
     public function verifyExistingEmail($value, ExecutionContextInterface $context)
     {
-        $customer = CustomerQuery::create()->findOneByEmail($value);
+        $customer = CustomerQuery::getCustomerByEmail($value);
         if ($customer) {
             $context->addViolation("This email already exists.");
         }

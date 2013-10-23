@@ -76,7 +76,7 @@ class CustomerProfilUpdateForm extends CustomerCreateForm
      */
     public function verifyExistingEmail($value, ExecutionContextInterface $context)
     {
-        $customer = CustomerQuery::create()->findOneByEmail($value);
+        $customer = CustomerQuery::getCustomerByEmail($value);
         // If there is already a customer for this email address and if the customer is different from the current user, do a violation
         if ($customer && $customer->getId() != $this->getRequest()->getSession()->getCustomerUser()->getId()) {
             $context->addViolation("This email already exists.");
