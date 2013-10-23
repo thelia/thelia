@@ -25,6 +25,7 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Form\Form;
 use Thelia\Core\Event\Lang\LangCreateEvent;
+use Thelia\Core\Event\Lang\LangDefaultBehaviorEvent;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
@@ -33,6 +34,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\Lang\LangCreateForm;
+use Thelia\Form\Lang\LangDefaultBehaviorForm;
 use Thelia\Form\Lang\LangUpdateForm;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
@@ -226,6 +228,34 @@ class LangController extends BaseAdminController
 
     public function defaultBehaviorAction()
     {
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::UPDATE)) return $response;
 
+        $error_msg = false;
+        $exception = false;
+
+        $behaviorForm = new LangDefaultBehaviorForm($this->getRequest());
+
+        try {
+            $form = $this->validateForm($behaviorForm);
+
+            $event = new LangDefaultBehaviorEvent($form->get('behavior')->getData());
+
+            $this->dispatch(TheliaEvents::LANG_DEFAULTBEHAVIOR, $event);
+
+            $this->redirectToRoute('admin.configuration.languages');
+
+        } catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext(
+            $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $behaviorForm, $ex);
+
+        // At this point, the form has error, and should be redisplayed.
+        return $this->renderDefault();
     }
 }

@@ -695,6 +695,8 @@ final class TheliaEvents
     const LANG_CREATE = 'action.lang.create';
     const LANG_DELETE = 'action.lang.delete';
 
+    const LANG_DEFAULTBEHAVIOR = 'action.lang.defaultBehavior';
+
     const LANG_TOGGLEDEFAULT = 'action.lang.toggleDefault';
 
     const BEFORE_UPDATELANG = 'action.lang.beforeUpdate';

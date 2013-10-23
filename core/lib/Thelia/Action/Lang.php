@@ -24,10 +24,12 @@
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Lang\LangCreateEvent;
+use Thelia\Core\Event\Lang\LangDefaultBehaviorEvent;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Lang as LangModel;
 
@@ -93,6 +95,13 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function defaultBehavior(LangDefaultBehaviorEvent $event)
+    {
+        ConfigQuery::create()
+            ->filterByName('default_lang_without_translation')
+            ->update(array('Value' => $event->getDefaultBehavior()));
+    }
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -120,6 +129,7 @@ class Lang extends BaseAction implements EventSubscriberInterface
             TheliaEvents::LANG_TOGGLEDEFAULT => array('toggleDefault', 128),
             TheliaEvents::LANG_CREATE => array('create', 128),
             TheliaEvents::LANG_DELETE => array('delete', 128),
+            TheliaEvents::LANG_DEFAULTBEHAVIOR => array('defaultBehavior', 128)
         );
     }
 }

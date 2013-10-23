@@ -93,8 +93,9 @@
                     <div class="title title-without-tabs">{intl l="Parameters"}</div>
                     {form name="thelia.lang.defaultBehavior"}
                     <form action="{url path="/admin/configuration/languages/defaultBehavior"}" method="post">
+                        {form_hidden_fields form=$form}
                         {form_field form=$form field="behavior"}
-                        <div class="form-group">
+                        <div class="form-group {if $error}has-error{/if}" >
                             <label for="{$label_attr.for}" class="label-control">{intl l="If a translation is missing or incomplete :"}</label>
                             <div class="input-group">
                                 <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
