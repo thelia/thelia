@@ -189,6 +189,25 @@
             }).filter(':has(:checked)').addClass('active');
         });
 
+        // Apply validation
+        $('#form-contact, #form-register').validate({
+            highlight: function(element) {
+                $(element).closest('.form-group').addClass('has-error');
+            },
+            unhighlight: function(element) {
+                $(element).closest('.form-group').removeClass('has-error');
+            },
+            errorElement: 'span',
+            errorClass: 'help-block',
+            errorPlacement: function(error, element) {
+                if(element.parent('.input-group').length || element.prop('type') === 'checkbox' || element.prop('type') === 'radio'){
+                    error.prepend('<i class="icon-remove"></i> ').insertAfter(element.parent());
+                }else{
+                    error.prepend('<i class="icon-remove"></i> ').insertAfter(element);
+                }
+            }
+        });
+
 
         if($("body").is(".page-product")){
 
