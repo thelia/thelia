@@ -12,8 +12,11 @@ namespace Thelia\Core\Template\Loop;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\CountryQuery;
+use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 class Cart extends BaseLoop
 {
@@ -40,7 +43,8 @@ class Cart extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-
+            Argument::createIntTypeArgument('limit'),
+            Argument::createAnyTypeArgument('position')
         );
     }
 
@@ -74,6 +78,7 @@ class Cart extends BaseLoop
     {
 
         $cart = $this->getCart($this->request);
+
         $cartItems = $cart->getCartItems();
         $result = new LoopResult($cartItems);
 
@@ -81,9 +86,32 @@ class Cart extends BaseLoop
             return $result;
         }
 
+        $limit = $this->getLimit();
+
+        $countCartItems = count($cartItems);
+
+        if($limit <= 0 || $limit >= $countCartItems){
+            $limit = $countCartItems;
+        }
+
+        $position = $this->getPosition();
+
+        if(isset($position)){
+            if($position == "first"){
+                $limit = 1;
+                $cartItems = array($cartItems[0]);
+            }else if($position == "last"){
+                $limit = 1;
+                $cartItems = array(end($cartItems));
+            }
+
+            // @TODO : if the position is a number
+        }
+
         $taxCountry = CountryQuery::create()->findPk(64); // @TODO : make it magic;
 
-        foreach ($cartItems as $cartItem) {
+        for ($i=0; $i<$limit; $i ++) {
+            $cartItem = $cartItems[$i];
             $product = $cartItem->getProduct();
             $productSaleElement = $cartItem->getProductSaleElements();
 
