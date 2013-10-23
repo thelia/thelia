@@ -34,6 +34,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\Lang\LangCreateForm;
 use Thelia\Form\Lang\LangUpdateForm;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 
 
@@ -49,7 +50,15 @@ class LangController extends BaseAdminController
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, AccessManager::VIEW)) return $response;
 
-        return $this->render('languages');
+        return $this->renderDefault();
+    }
+
+    public function renderDefault(array $param = array())
+    {
+        return $this->render('languages', array_merge($param, array(
+            'lang_without_translation' => ConfigQuery::getDefaultLangWhenNoTranslationAvailable(),
+            'one_domain_per_lang' => ConfigQuery::read("one_domain_foreach_lang", false)
+        )));
     }
 
     public function updateAction($lang_id)
@@ -104,7 +113,7 @@ class LangController extends BaseAdminController
             $error_msg = $e->getMessage();
         }
 
-        return $this->render('languages');
+        return $this->renderDefault();
     }
 
     protected function hydrateEvent($event,Form $form)
@@ -187,7 +196,7 @@ class LangController extends BaseAdminController
             $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $createForm, $ex);
 
         // At this point, the form has error, and should be redisplayed.
-        return $this->render('languages');
+        return $this->renderDefault();
 
     }
 
@@ -209,9 +218,14 @@ class LangController extends BaseAdminController
             $error_msg = $ex->getMessage();
         }
 
-        $this->render('languages', array(
+        return $this->renderDefault(array(
            'error_delete_message' => $error_msg
         ));
+
+    }
+
+    public function defaultBehaviorAction()
+    {
 
     }
 }

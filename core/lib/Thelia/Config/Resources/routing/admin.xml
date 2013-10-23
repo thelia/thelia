@@ -949,6 +949,10 @@
         <default key="_controller">Thelia\Controller\Admin\LangController::deleteAction</default>
     </route>
 
+    <route id="admin.configuration.languages.defaultBehavior" path="/admin/configuration/languages/defaultBehavior">
+        <default key="_controller">Thelia\Controller\Admin\LangController::defaultBehaviorAction</default>
+    </route>
+
 
     <!-- The default route, to display a template -->
 

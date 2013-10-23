@@ -91,24 +91,25 @@
                 <div class="general-block-decorator">
 
                     <div class="title title-without-tabs">{intl l="Parameters"}</div>
-
-                    <form action="" method="post">
-
+                    {form name="thelia.lang.defaultBehavior"}
+                    <form action="{url path="/admin/configuration/languages/defaultBehavior"}" method="post">
+                        {form_field form=$form field="behavior"}
                         <div class="form-group">
-                            <label for="" class="label-control">{intl l="If a translation is missing or incomplete :"}</label>
+                            <label for="{$label_attr.for}" class="label-control">{intl l="If a translation is missing or incomplete :"}</label>
                             <div class="input-group">
-                                <select name="" id="" data-toggle="selectpicker">
-                                    <option value="">Replace by the default language</option>
-                                    <option value="">Strictly use the requested language</option>
+                                <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
+                                    {foreach $choices as $choice}
+                                        <option value="{$choice->value}" {if $lang_without_translation == $choice->value}selected="selected"{/if}>{$choice->label}</option>
+                                    {/foreach}
                                 </select>
                                 <div class="input-group-btn">
                                     <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span></button>
                                 </div>
                             </div>
                         </div>
-
+                        {/form_field}
                     </form>
-
+                    {/form}
                 </div>
             </div>
             <div class="col-md-6">
