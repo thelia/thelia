@@ -26,6 +26,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\CustomerQuery;
 
 /**
  * Class CustomerPasswordUpdateForm
@@ -79,7 +80,10 @@ class CustomerPasswordUpdateForm extends BaseForm
 
     public function verifyCurrentPasswordField($value, ExecutionContextInterface $context)
     {
-        // Check current password
+        // Check if value of the old password match the password of the current user
+        if (!password_verify($value, $this->getRequest()->getSession()->getCustomerUser()->getPassword())) {
+            $context->addViolation("Your current password does not match.");
+        }
     }
 
     public function verifyPasswordField($value, ExecutionContextInterface $context)
