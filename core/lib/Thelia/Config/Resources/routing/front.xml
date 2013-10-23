@@ -9,6 +9,14 @@
         <default key="_view">index</default>
     </route>
 
+    <route id="ajax.mini-cart" path="/ajax/mini-cart">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">includes/mini-cart</default>
+    </route>
+    <route id="ajax.addCartMessage" path="/ajax/addCartMessage">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">includes/addedToCart</default>
+    </route>
 
     <!-- Search routes -->
     <route id="search" path="/search">
