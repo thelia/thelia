@@ -23,6 +23,7 @@
 
 namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\LangQuery;
@@ -47,6 +48,17 @@ class Lang extends BaseAction implements EventSubscriberInterface
                 ->setDateFormat($event->getDateFormat())
                 ->setTimeFormat($event->getTimeFormat())
                 ->save();
+
+            $event->setLang($lang);
+        }
+    }
+
+    public function toggleDefault(LangToggleDefaultEvent $event)
+    {
+        if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
+            $lang->setDispatcher($this->getDispatcher());
+
+            $lang->toggleDefault();
 
             $event->setLang($lang);
         }
