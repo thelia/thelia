@@ -4,12 +4,15 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <!--<route id="home" path="/">
+    <route id="ajax.mini-cart" path="/ajax/mini-cart">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">index</default>
+        <default key="_view">includes/mini-cart</default>
+    </route>
+    <route id="ajax.addCartMessage" path="/ajax/addCartMessage">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">includes/addedToCart</default>
     </route>
 
-     Customer routes -->
 
     <!-- Register -->
     <route id="customer.create.process" path="/register" methods="post">
