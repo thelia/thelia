@@ -55,7 +55,13 @@ class Resource extends BaseI18nLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('profile')
+            Argument::createIntTypeArgument('profile'),
+            new Argument(
+                'code',
+                new Type\TypeCollection(
+                    new Type\AlphaNumStringListType()
+                )
+            )
         );
     }
 
@@ -75,8 +81,14 @@ class Resource extends BaseI18nLoop
 
         if (null !== $profile) {
             $search->leftJoinProfileResource('profile_resource')
+                ->addJoinCondition('profile_resource', 'profile_resource.PROFILE_ID=?', $profile, null, \PDO::PARAM_INT)
                 ->withColumn('profile_resource.access', 'access');
-            //$search->filterById($id, Criteria::IN);
+        }
+
+        $code = $this->getCode();
+
+        if(null !== $code) {
+            $search->filterByCode($code, Criteria::IN);
         }
 
         $search->orderById(Criteria::ASC);
@@ -101,10 +113,11 @@ class Resource extends BaseI18nLoop
             if (null !== $profile) {
                 $accessValue = $resource->getVirtualColumn('access');
                 $manager = new AccessManager($accessValue);
-                $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW))
-                    ->set("CREATABLE", $manager->can(AccessManager::CREATE))
-                    ->set("UPDATABLE", $manager->can(AccessManager::UPDATE))
-                    ->set("DELETABLE", $manager->can(AccessManager::DELETE));
+
+                $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW)? 1 : 0)
+                    ->set("CREATABLE", $manager->can(AccessManager::CREATE) ? 1 : 0)
+                    ->set("UPDATABLE", $manager->can(AccessManager::UPDATE)? 1 : 0)
+                    ->set("DELETABLE", $manager->can(AccessManager::DELETE)? 1 : 0);
             }
 
             $loopResult->addRow($loopResultRow);

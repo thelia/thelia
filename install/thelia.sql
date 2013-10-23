@@ -999,14 +999,13 @@ DROP TABLE IF EXISTS `profile_resource`;
 
 CREATE TABLE `profile_resource`
 (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `profile_id` INTEGER NOT NULL,
     `resource_id` INTEGER NOT NULL,
     `access` INTEGER DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`,`profile_id`,`resource_id`),
-    INDEX `id_profile_resource_profile_id` (`profile_id`),
+    PRIMARY KEY (`profile_id`,`resource_id`),
+    INDEX `idx_profile_resource_profile_id` (`profile_id`),
     INDEX `idx_profile_resource_resource_id` (`resource_id`),
     CONSTRAINT `fk_profile_resource_profile_id`
         FOREIGN KEY (`profile_id`)
@@ -1028,13 +1027,12 @@ DROP TABLE IF EXISTS `profile_module`;
 
 CREATE TABLE `profile_module`
 (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `profile_id` INTEGER NOT NULL,
-    `module_id` INTEGER,
-    `access` TINYINT DEFAULT 0,
+    `module_id` INTEGER NOT NULL,
+    `access` INTEGER DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`profile_id`,`module_id`),
     INDEX `idx_profile_module_profile_id` (`profile_id`),
     INDEX `idx_profile_module_module_id` (`module_id`),
     CONSTRAINT `fk_profile_module_profile_id`
@@ -1593,9 +1591,6 @@ CREATE TABLE `newsletter`
     `email` VARCHAR(255) NOT NULL,
     `firstname` VARCHAR(255),
     `lastname` VARCHAR(255),
-    `locale` VARCHAR(45),
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 

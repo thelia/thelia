@@ -21,14 +21,12 @@ use Thelia\Model\Map\ProfileResourceTableMap;
  *
  *
  *
- * @method     ChildProfileResourceQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildProfileResourceQuery orderByProfileId($order = Criteria::ASC) Order by the profile_id column
  * @method     ChildProfileResourceQuery orderByResourceId($order = Criteria::ASC) Order by the resource_id column
  * @method     ChildProfileResourceQuery orderByAccess($order = Criteria::ASC) Order by the access column
  * @method     ChildProfileResourceQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProfileResourceQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildProfileResourceQuery groupById() Group by the id column
  * @method     ChildProfileResourceQuery groupByProfileId() Group by the profile_id column
  * @method     ChildProfileResourceQuery groupByResourceId() Group by the resource_id column
  * @method     ChildProfileResourceQuery groupByAccess() Group by the access column
@@ -50,14 +48,12 @@ use Thelia\Model\Map\ProfileResourceTableMap;
  * @method     ChildProfileResource findOne(ConnectionInterface $con = null) Return the first ChildProfileResource matching the query
  * @method     ChildProfileResource findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProfileResource matching the query, or a new ChildProfileResource object populated from the query conditions when no match is found
  *
- * @method     ChildProfileResource findOneById(int $id) Return the first ChildProfileResource filtered by the id column
  * @method     ChildProfileResource findOneByProfileId(int $profile_id) Return the first ChildProfileResource filtered by the profile_id column
  * @method     ChildProfileResource findOneByResourceId(int $resource_id) Return the first ChildProfileResource filtered by the resource_id column
  * @method     ChildProfileResource findOneByAccess(int $access) Return the first ChildProfileResource filtered by the access column
  * @method     ChildProfileResource findOneByCreatedAt(string $created_at) Return the first ChildProfileResource filtered by the created_at column
  * @method     ChildProfileResource findOneByUpdatedAt(string $updated_at) Return the first ChildProfileResource filtered by the updated_at column
  *
- * @method     array findById(int $id) Return ChildProfileResource objects filtered by the id column
  * @method     array findByProfileId(int $profile_id) Return ChildProfileResource objects filtered by the profile_id column
  * @method     array findByResourceId(int $resource_id) Return ChildProfileResource objects filtered by the resource_id column
  * @method     array findByAccess(int $access) Return ChildProfileResource objects filtered by the access column
@@ -110,10 +106,10 @@ abstract class ProfileResourceQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj = $c->findPk(array(12, 34, 56), $con);
+     * $obj = $c->findPk(array(12, 34), $con);
      * </code>
      *
-     * @param array[$id, $profile_id, $resource_id] $key Primary key to use for the query
+     * @param array[$profile_id, $resource_id] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildProfileResource|array|mixed the result, formatted by the current formatter
@@ -123,7 +119,7 @@ abstract class ProfileResourceQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = ProfileResourceTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2]))))) && !$this->formatter) {
+        if ((null !== ($obj = ProfileResourceTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
@@ -151,12 +147,11 @@ abstract class ProfileResourceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PROFILE_ID, RESOURCE_ID, ACCESS, CREATED_AT, UPDATED_AT FROM profile_resource WHERE ID = :p0 AND PROFILE_ID = :p1 AND RESOURCE_ID = :p2';
+        $sql = 'SELECT PROFILE_ID, RESOURCE_ID, ACCESS, CREATED_AT, UPDATED_AT FROM profile_resource WHERE PROFILE_ID = :p0 AND RESOURCE_ID = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
             $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
-            $stmt->bindValue(':p2', $key[2], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -166,7 +161,7 @@ abstract class ProfileResourceQuery extends ModelCriteria
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
             $obj = new ChildProfileResource();
             $obj->hydrate($row);
-            ProfileResourceTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2])));
+            ProfileResourceTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
         }
         $stmt->closeCursor();
 
@@ -225,9 +220,8 @@ abstract class ProfileResourceQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(ProfileResourceTableMap::ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(ProfileResourceTableMap::PROFILE_ID, $key[1], Criteria::EQUAL);
-        $this->addUsingAlias(ProfileResourceTableMap::RESOURCE_ID, $key[2], Criteria::EQUAL);
+        $this->addUsingAlias(ProfileResourceTableMap::PROFILE_ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(ProfileResourceTableMap::RESOURCE_ID, $key[1], Criteria::EQUAL);
 
         return $this;
     }
@@ -245,56 +239,13 @@ abstract class ProfileResourceQuery extends ModelCriteria
             return $this->add(null, '1<>1', Criteria::CUSTOM);
         }
         foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(ProfileResourceTableMap::ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(ProfileResourceTableMap::PROFILE_ID, $key[1], Criteria::EQUAL);
+            $cton0 = $this->getNewCriterion(ProfileResourceTableMap::PROFILE_ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(ProfileResourceTableMap::RESOURCE_ID, $key[1], Criteria::EQUAL);
             $cton0->addAnd($cton1);
-            $cton2 = $this->getNewCriterion(ProfileResourceTableMap::RESOURCE_ID, $key[2], Criteria::EQUAL);
-            $cton0->addAnd($cton2);
             $this->addOr($cton0);
         }
 
         return $this;
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProfileResourceQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(ProfileResourceTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(ProfileResourceTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ProfileResourceTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -670,10 +621,9 @@ abstract class ProfileResourceQuery extends ModelCriteria
     public function prune($profileResource = null)
     {
         if ($profileResource) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(ProfileResourceTableMap::ID), $profileResource->getId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(ProfileResourceTableMap::PROFILE_ID), $profileResource->getProfileId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond2', $this->getAliasedColName(ProfileResourceTableMap::RESOURCE_ID), $profileResource->getResourceId(), Criteria::NOT_EQUAL);
-            $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2'), Criteria::LOGICAL_OR);
+            $this->addCond('pruneCond0', $this->getAliasedColName(ProfileResourceTableMap::PROFILE_ID), $profileResource->getProfileId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(ProfileResourceTableMap::RESOURCE_ID), $profileResource->getResourceId(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 
         return $this;

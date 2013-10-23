@@ -549,9 +549,11 @@ final class TheliaEvents
 
     // -- Profile management ---------------------------------------------
 
-    const PROFILE_CREATE          = "action.createProfile";
-    const PROFILE_UPDATE          = "action.updateProfile";
-    const PROFILE_DELETE          = "action.deleteProfile";
+    const PROFILE_CREATE                    = "action.createProfile";
+    const PROFILE_UPDATE                    = "action.updateProfile";
+    const PROFILE_DELETE                    = "action.deleteProfile";
+    const PROFILE_RESOURCE_ACCESS_UPDATE    = "action.updateProfileResourceAccess";
+    const PROFILE_MODULE_ACCESS_UPDATE      = "action.updateProfileModuleAccess";
 
     // -- Tax Rules management ---------------------------------------------
 

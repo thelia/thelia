@@ -49,7 +49,7 @@ class AccessManager
         self::DELETE    =>  false,
     );
 
-    protected $accessPows = array(
+    static protected $accessPows = array(
         self::VIEW      =>  3,
         self::CREATE    =>  2,
         self::UPDATE    =>  1,
@@ -62,15 +62,7 @@ class AccessManager
     {
         $this->accessValue = $accessValue;
 
-        foreach($this->accessPows as $type => $value) {
-            $pow = pow(2, $value);
-            if($accessValue >= $pow) {
-                $accessValue -= $pow;
-                $this->accessGranted[$type] = true;
-            } else {
-                $this->accessGranted[$type] = false;
-            }
-        }
+        $this->fillGrantedAccess();
     }
 
     public function can($type)
@@ -81,5 +73,42 @@ class AccessManager
 
         return $this->accessGranted[$type];
 
+    }
+
+    static public function getMaxAccessValue()
+    {
+        return pow(2, current(array_slice( self::$accessPows, -1, 1, true ))) - 1;
+    }
+
+    public function build($accesses)
+    {
+        $this->accessValue = 0;
+        foreach($accesses as $access) {
+            if(array_key_exists($access, self::$accessPows)) {
+                $this->accessValue += pow(2, self::$accessPows[$access]);
+            }
+        }
+
+        $this->fillGrantedAccess();
+    }
+
+    protected function fillGrantedAccess()
+    {
+        $accessValue = $this->accessValue;
+        foreach(self::$accessPows as $type => $value) {
+            $pow = pow(2, $value);
+            if($accessValue >= $pow) {
+                $accessValue -= $pow;
+                $this->accessGranted[$type] = true;
+            } else {
+                $this->accessGranted[$type] = false;
+            }
+        }
+    }
+
+
+    public function getAccessValue()
+    {
+        return $this->accessValue;
     }
 }
