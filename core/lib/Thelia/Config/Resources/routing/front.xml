@@ -4,11 +4,6 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="home" path="/">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">index</default>
-    </route>
-
     <route id="ajax.mini-cart" path="/ajax/mini-cart">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">includes/mini-cart</default>
@@ -18,60 +13,31 @@
         <default key="_view">includes/addedToCart</default>
     </route>
 
-    <!-- Search routes -->
-    <route id="search" path="/search">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">search</default>
-    </route>
 
-    <route id="view_all" path="/view_all"  methods="get">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">view_all</default>
-    </route>
-
-    <!-- Customer routes : Register -->
+    <!-- Register -->
     <route id="customer.create.process" path="/register" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::createAction</default>
         <default key="_view">register</default>
     </route>
 
-    <route id="customer.create.view" path="/register">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">register</default>
-    </route>
-
-    <!-- Customer routes : Login -->
+    <!-- Login -->
     <route id="customer.login.process" path="/login" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::loginAction</default>
         <default key="_view">login</default>
     </route>
 
-    <route id="customer.login.view" path="/login">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">login</default>
-    </route>
-
+    <!-- Forgot Password -->
     <route id="customer.password.retrieve.process" path="/password" methods="post">
         <default key="_controller">Thelia\Controller\Front\CustomerController::newPasswordAction</default>
         <default key="_view">password</default>
     </route>
 
-    <route id="customer.password.retrieve.view" path="/password" methods="get">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">password</default>
-    </route>
-
-    <!-- Customer routes : Logout -->
+    <!-- Logout -->
     <route id="customer.logout.process" path="/logout">
         <default key="_controller">Thelia\Controller\Front\CustomerController::logoutAction</default>
     </route>
 
-    <!-- Customer routes : Account -->
-    <route id="customer.account.view" path="/account">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">account</default>
-    </route>
-
+    <!-- Account -->
     <route id="customer.update.view" path="/account/update" methods="get">
         <default key="_controller">Thelia\Controller\Front\CustomerController::viewAction</default>
         <default key="_view">account-update</default>
@@ -84,7 +50,7 @@
 
 
     <route id="customer.password.change.process" path="/account/password" methods="post">
-        <default key="_controller">Thelia\Controller\Front\CustomerController::newPasswordAction</default>
+        <default key="_controller">Thelia\Controller\Front\CustomerController::updatePasswordAction</default>
         <default key="_view">account-password</default>
     </route>
 
@@ -92,7 +58,6 @@
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">account-password</default>
     </route>
-
     <!-- end customer routes -->
 
     <!-- customer address routes -->
@@ -130,11 +95,6 @@
     <!-- end customer address routes -->
 
     <!-- cart routes -->
-    <route id="cart.view" path="/cart">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">cart</default>
-    </route>
-
     <route id="cart.add.process" path="/cart/add">
         <default key="_controller">Thelia\Controller\Front\CartController::addItem</default>
     </route>
@@ -148,7 +108,6 @@
         <default key="_controller">Thelia\Controller\Front\CartController::changeItem</default>
         <default key="_view">cart</default>
     </route>
-
     <!-- end cart routes -->
 
     <!-- order management process -->
@@ -187,11 +146,6 @@
     </route>
 
     <!-- contact management -->
-    <route id="contact.display" path="/contact" methods="get">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">contact</default>
-    </route>
-
     <route id="contact.send" path="/contact" methods="post">
         <default key="_controller">Thelia\Controller\Front\ContactController::sendAction</default>
         <default key="_view">contact</default>
@@ -204,16 +158,17 @@
     <!-- end contact management -->
 
     <!-- newsletter management -->
-
-    <route id="newsletter.display" path="/newsletter" methods="get">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
-        <default key="_view">newsletter</default>
-    </route>
-
     <route id="newsletter.process" path="/newsletter" methods="post">
         <default key="_controller">Thelia\Controller\Front\NewsletterController::subscribeAction</default>
         <default key="_view">newsletter</default>
     </route>
-
     <!-- end newsletter management -->
+
+    <!-- Default Route -->
+    <route id="default" path="/{_view}">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">index</default>
+        <requirement key="_view">^(?!admin)[^/]+</requirement>
+    </route>
+
 </routes>

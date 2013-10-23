@@ -31,6 +31,7 @@ use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerLogin;
 use Thelia\Form\CustomerLostPasswordForm;
+use Thelia\Form\CustomerPasswordUpdateForm;
 use Thelia\Form\CustomerUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
@@ -48,6 +49,7 @@ use Thelia\Core\Security\Exception\WrongPasswordException;
 class CustomerController extends BaseFrontController
 {
     use \Thelia\Cart\CartTrait;
+
 
     public function newPasswordAction()
     {
@@ -156,6 +158,44 @@ class CustomerController extends BaseFrontController
 
         // Pass it to the parser
         $this->getParserContext()->addForm($customerUpdateForm);
+    }
+
+
+    public function updatePasswordAction()
+    {
+        if ($this->getSecurityContext()->hasCustomerUser()) {
+            $message = false;
+
+            $customerPasswordUpdateForm = new CustomerPasswordUpdateForm($this->getRequest());
+
+            try {
+                $customer = $this->getSecurityContext()->getCustomerUser();
+
+                $form = $this->validateForm($customerPasswordUpdateForm, "post");
+
+                $customerChangeEvent = $this->createEventInstance($form->getData());
+                $customerChangeEvent->setCustomer($customer);
+                //$this->dispatch(TheliaEvents::CUSTOMER_UPDATEACCOUNT, $customerChangeEvent);
+
+                $this->redirectSuccess($customerPasswordUpdateForm);
+
+            } catch (FormValidationException $e) {
+                $message = sprintf("Please check your input: %s", $e->getMessage());
+            } catch (\Exception $e) {
+                $message = sprintf("Sorry, an error occured: %s", $e->getMessage());
+            }
+
+            if ($message !== false) {
+                Tlog::getInstance()->error(sprintf("Error during customer password modification process : %s.", $message));
+
+                $customerPasswordUpdateForm->setErrorMessage($message);
+
+                $this->getParserContext()
+                    ->addForm($customerPasswordUpdateForm)
+                    ->setGeneralError($message)
+                ;
+            }
+        }
     }
 
     public function updateAction()
