@@ -71,7 +71,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
             ->setTitleId($event->getTitle())
             ->setFirstname($event->getFirstname())
             ->setLastname($event->getLastname())
-            ->setEmail($event->getEmail())
+            ->setEmail($event->getEmail(), true)
             ->setPassword($event->getPassword())
             ->setReseller($event->getReseller())
             ->setSponsor($event->getSponsor())

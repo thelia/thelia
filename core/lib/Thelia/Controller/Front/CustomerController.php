@@ -25,6 +25,7 @@ namespace Thelia\Controller\Front;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
+use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
@@ -146,7 +147,7 @@ class CustomerController extends BaseFrontController
             'firstname'    => $customer->getFirstName(),
             'lastname'     => $customer->getLastName(),
             'email'        => $customer->getEmail(),
-            'newsletter'   => NewsletterQuery::isSubscribed($customer->getEmail())
+            'newsletter'   => null !== NewsletterQuery::create()->findOneByEmail($customer->getEmail()),
         );
 
         $customerProfilUpdateForm = new CustomerProfilUpdateForm($this->getRequest(), 'form', $data);
@@ -203,6 +204,7 @@ class CustomerController extends BaseFrontController
 
             try {
                 $customer = $this->getSecurityContext()->getCustomerUser();
+                $newsletterOldEmail = $customer->getEmail();
 
                 $form = $this->validateForm($customerProfilUpdateForm, "post");
 
@@ -210,14 +212,29 @@ class CustomerController extends BaseFrontController
                 $customerChangeEvent->setCustomer($customer);
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFIL, $customerChangeEvent);
 
+                $updatedCustomer = $customerChangeEvent->getCustomer();
+
                 // Newsletter
-                if ($form->get('newsletter')->getData()){
-                    //$this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $customerChangeEvent);
+                if (true === $form->get('newsletter')->getData()) {
+                    $nlEvent = new NewsletterEvent($updatedCustomer->getEmail(), $this->getRequest()->getSession()->getLang()->getLocale());
+                    $nlEvent->setFirstname($updatedCustomer->getFirstname());
+                    $nlEvent->setLastname($updatedCustomer->getLastname());
+
+                    if(null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
+                        $nlEvent->setId($newsletter->getId());
+                        $this->dispatch(TheliaEvents::NEWSLETTER_UPDATE, $nlEvent);
+                    } else {
+                        $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $nlEvent);
+                    }
                 } else {
-                    //$this->dispatch(TheliaEvents::NEWSLETTER_UNSUBSCRIBE, $customerChangeEvent);
+                    if(null !== $newsletter = NewsletterQuery::create()->findOneByEmail($newsletterOldEmail)) {
+                        $nlEvent = new NewsletterEvent($updatedCustomer->getEmail(), $this->getRequest()->getSession()->getLang()->getLocale());
+                        $nlEvent->setId($newsletter->getId());
+                        $this->dispatch(TheliaEvents::NEWSLETTER_UNSUBSCRIBE, $nlEvent);
+                    }
                 }
 
-                $this->processLogin($customerChangeEvent->getCustomer());
+                $this->processLogin($updatedCustomer);
 
                 $this->redirectSuccess($customerProfilUpdateForm);
 
