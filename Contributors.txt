@@ -1,0 +1,12 @@
+If you contribute to this project and you don't appear in this list,
+email us (info@thelia.net) or fork this file and send a pull-request
+
+Manuel Raynaud - mraynaud@openstudio.fr
+Étienne Roudeix - eroudeix@openstudio.fr
+Franck Allimant - franck@allimant.org
+Guillaume Morel - gmorel@openstudio.fr
+Michael Espeche - mespeche@openstudio.fr
+Christophe Laffont - claffont@openstudio.fr
+Bruno Goléo - bgoleo@openstudio.fr
+Stéphanie Pinet - spinet@openstudio.fr
+Cédric Sibaud - csibaud@openstudio.fr
