@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\OrderQuery as BaseOrderQuery;
@@ -52,4 +53,5 @@ class OrderQuery extends BaseOrderQuery
 
         return $obj;
     }
+
 } // OrderQuery

@@ -30,6 +30,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
+use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
@@ -53,7 +54,7 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Product extends BaseI18nLoop
+class Product extends BaseI18nLoop implements SearchLoopInterface
 {
     public $timestampable = true;
     public $versionable = true;
@@ -127,6 +128,39 @@ class Product extends BaseI18nLoop
                 'none'
             )
         );
+    }
+
+    public function getSearchIn()
+    {
+        return array(
+            "ref",
+            "title",
+        );
+    }
+
+    /**
+     * @param ProductQuery $search
+     * @param $searchTerm
+     * @param $searchIn
+     * @param $searchCriteria
+     */
+    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
+    {
+
+        $search->_and();
+        foreach($searchIn as $index => $searchInElement) {
+            if($index > 0) {
+                $search->_or();
+            }
+            switch($searchInElement) {
+                case "ref":
+                    $search->filterByRef($searchTerm, $searchCriteria);
+                    break;
+                case "title":
+                    $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$searchCriteria." ?", $searchTerm, \PDO::PARAM_STR);
+                    break;
+            }
+        }
     }
 
     /**
