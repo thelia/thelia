@@ -20,57 +20,25 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-$step=6;
-include "header.php";
+namespace Thelia\Core\Template\Element;
 
-if($_SESSION['install']['step'] != $step && (empty($_POST['admin_login']) || empty($_POST['admin_password']) || ($_POST['admin_password'] != $_POST['admin_password_verif']))) {
-    header('location: config.php?err=1');
+use Symfony\Component\Validator\ExecutionContextInterface;
+
+/**
+ *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ */
+interface SearchLoopInterface
+{
+    const MODE_ANY_WORD = 'any_word';
+    const MODE_SENTENCE = 'sentence';
+    const MODE_STRICT_SENTENCE = 'strict_sentence';
+
+    /**
+     * @return array of available field to search in
+     */
+    public function getSearchIn();
+
+    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria);
 }
-
-if($_SESSION['install']['step'] == 5) {
-    $admin = new \Thelia\Model\Admin();
-    $admin->setLogin($_POST['admin_login'])
-        ->setPassword($_POST['admin_password'])
-        ->setFirstname('admin')
-        ->setLastname('admin')
-        ->save();
-
-
-    \Thelia\Model\ConfigQuery::create()
-        ->filterByName('contact_email')
-        ->update(array('Value' => $_POST['email_contact']));
-
-    \Thelia\Model\ConfigQuery::create()
-        ->filterByName('company_name')
-        ->update(array('Value' => $_POST['company_name']));
-
-    \Thelia\Model\ConfigQuery::create()
-        ->filterByName('url_site')
-        ->update(array('Value' => $_POST['url_site']));
-}
-
-//clean up cache directories
-$fs = new \Symfony\Component\Filesystem\Filesystem();
-
-$fs->remove(THELIA_ROOT . '/cache/prod');
-$fs->remove(THELIA_ROOT . '/cache/dev');
-
-
-$request = \Thelia\Core\HttpFoundation\Request::createFromGlobals();
-$_SESSION['install']['step'] = $step;
-?>
-
-    <div class="well">
-        <p class="lead text-center">
-            Thanks, you have installed Thelia
-        </p>
-        <p class="lead text-center">
-            Don't forget to delete the web/install directory.
-        </p>
-
-        <p class="lead text-center">
-            <a href="<?php echo $request->getSchemeAndHttpHost(); ?>/admin">Go to back office</a>
-        </p>
-
-    </div>
-<?php include "footer.php"; ?>

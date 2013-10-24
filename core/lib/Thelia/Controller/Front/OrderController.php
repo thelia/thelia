@@ -197,7 +197,7 @@ class OrderController extends BaseFrontController
             $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute('order.placed', array('order_id' => $orderEvent->getPlacedOrder()->getId()))));
         } else {
             /* order has not been placed */
-            $this->redirectToRoute("cart.view");
+            $this->redirectToRoute('cart.view');
         }
     }
 

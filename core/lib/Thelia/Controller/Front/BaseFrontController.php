@@ -56,7 +56,7 @@ class BaseFrontController extends BaseController
     public function checkAuth()
     {
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirectToRoute("customer.login.view");
+            $this->redirectToRoute('default', array('view'=>'login'));
         }
     }
 
@@ -64,7 +64,7 @@ class BaseFrontController extends BaseController
     {
         $cart = $this->getSession()->getCart();
         if ($cart===null || $cart->countCartItems() == 0) {
-            $this->redirectToRoute("cart.view");
+            $this->redirectToRoute('cart.view');
         }
     }
 

@@ -20,57 +20,21 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-$step=6;
-include "header.php";
 
-if($_SESSION['install']['step'] != $step && (empty($_POST['admin_login']) || empty($_POST['admin_password']) || ($_POST['admin_password'] != $_POST['admin_password_verif']))) {
-    header('location: config.php?err=1');
+namespace Thelia\Core\Template\Element\Exception;
+
+class SearchLoopException extends \RuntimeException
+{
+    const UNKNOWN_EXCEPTION = 0;
+
+    public function __construct($message, $code = null, $arguments = array(), $previous = null)
+    {
+        if (is_array($arguments)) {
+            $this->arguments = $arguments;
+        }
+        if ($code === null) {
+            $code = self::UNKNOWN_EXCEPTION;
+        }
+        parent::__construct($message, $code, $previous);
+    }
 }
-
-if($_SESSION['install']['step'] == 5) {
-    $admin = new \Thelia\Model\Admin();
-    $admin->setLogin($_POST['admin_login'])
-        ->setPassword($_POST['admin_password'])
-        ->setFirstname('admin')
-        ->setLastname('admin')
-        ->save();
-
-
-    \Thelia\Model\ConfigQuery::create()
-        ->filterByName('contact_email')
-        ->update(array('Value' => $_POST['email_contact']));
-
-    \Thelia\Model\ConfigQuery::create()
-        ->filterByName('company_name')
-        ->update(array('Value' => $_POST['company_name']));
-
-    \Thelia\Model\ConfigQuery::create()
-        ->filterByName('url_site')
-        ->update(array('Value' => $_POST['url_site']));
-}
-
-//clean up cache directories
-$fs = new \Symfony\Component\Filesystem\Filesystem();
-
-$fs->remove(THELIA_ROOT . '/cache/prod');
-$fs->remove(THELIA_ROOT . '/cache/dev');
-
-
-$request = \Thelia\Core\HttpFoundation\Request::createFromGlobals();
-$_SESSION['install']['step'] = $step;
-?>
-
-    <div class="well">
-        <p class="lead text-center">
-            Thanks, you have installed Thelia
-        </p>
-        <p class="lead text-center">
-            Don't forget to delete the web/install directory.
-        </p>
-
-        <p class="lead text-center">
-            <a href="<?php echo $request->getSchemeAndHttpHost(); ?>/admin">Go to back office</a>
-        </p>
-
-    </div>
-<?php include "footer.php"; ?>

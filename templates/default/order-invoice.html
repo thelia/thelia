@@ -73,12 +73,11 @@
 
                     <tr>
                         <td class="image">
-                            <a href="{$PRODUCT_URL}" class="thumbnail">
 
                             {assign "cart_count" $LOOP_COUNT}
                             {ifloop rel='product-image'}
                                 {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
-                                    <img src="{$IMAGE_URL}" alt="Product #{$cart_count}"></a>
+                                    <img src="{$IMAGE_URL}" alt="Product #{$cart_count}">
                                 {/loop}
                             {/ifloop}
                             {elseloop rel="product-image"}
