@@ -2,7 +2,7 @@
     "name" : "thelia/thelia",
     "description" : "Thelia is an ecommerce CMS.",
     "license" : "GPL-3.0+",
-    "homepage" : "http://thelia.net",
+    "homepage" : "http://thelia.net/v2",
     "support" : {
         "forum" : "http://thelia.net/forum",
         "wiki" : "http://thelia.net/wiki"
