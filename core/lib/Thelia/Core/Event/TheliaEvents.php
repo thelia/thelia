@@ -691,9 +691,6 @@ final class TheliaEvents
      * sent for subscribing to the newsletter
      */
     const NEWSLETTER_SUBSCRIBE = 'thelia.newsletter.subscribe';
-
-    /**
-     * sent for subscribing to the newsletter
-     */
+    const NEWSLETTER_UPDATE = 'thelia.newsletter.update';
     const NEWSLETTER_UNSUBSCRIBE = 'thelia.newsletter.unsubscribe';
 }
