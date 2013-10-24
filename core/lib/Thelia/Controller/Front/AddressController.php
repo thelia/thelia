@@ -101,7 +101,7 @@ class AddressController extends BaseFrontController
         $address = AddressQuery::create()->findPk($address_id);
 
         if (!$address || $customer->getId() != $address->getCustomerId()) {
-            $this->redirectToRoute("home");
+            $this->redirectToRoute('default');
         }
 
         $this->getParserContext()->set("address_id", $address_id);
@@ -122,11 +122,11 @@ class AddressController extends BaseFrontController
             $address = AddressQuery::create()->findPk($address_id);
 
             if (null === $address) {
-                $this->redirectToRoute("home");
+                $this->redirectToRoute('default');
             }
 
             if ($address->getCustomer()->getId() != $customer->getId()) {
-                $this->redirectToRoute("home");
+                $this->redirectToRoute('default');
             }
 
             $event = $this->createAddressEvent($form);
@@ -161,12 +161,12 @@ class AddressController extends BaseFrontController
         $address = AddressQuery::create()->findPk($address_id);
 
         if (!$address || $customer->getId() != $address->getCustomerId()) {
-            $this->redirectToRoute("home");
+            $this->redirectToRoute('default');
         }
 
         $this->dispatch(TheliaEvents::ADDRESS_DELETE, new AddressEvent($address));
 
-        $this->redirectToRoute("customer.account.view");
+        $this->redirectToRoute('default', array('view'=>'account'));
     }
 
     protected function createAddressEvent($form)

@@ -355,14 +355,16 @@ class Product extends BaseI18nLoop
 
         $search->groupBy(ProductTableMap::ID);
 
-        $search->withColumn('ROUND(' . $priceToCompareAsSQL . ', 2)', 'real_price');
-        $search->withColumn('`price`.PRICE', 'price');
-        $search->withColumn('`price`.PROMO_PRICE', 'promo_price');
+        $search->withColumn('`pse`.ID', 'pse_id');
         $search->withColumn('`pse`.NEWNESS', 'is_new');
         $search->withColumn('`pse`.PROMO', 'is_promo');
         $search->withColumn('`pse`.QUANTITY', 'quantity');
         $search->withColumn('`pse`.WEIGHT', 'weight');
         $search->withColumn('`pse`.EAN_CODE', 'ean_code');
+
+        $search->withColumn('ROUND(' . $priceToCompareAsSQL . ', 2)', 'real_price');
+        $search->withColumn('`price`.PRICE', 'price');
+        $search->withColumn('`price`.PROMO_PRICE', 'promo_price');
 
         $orders  = $this->getOrder();
 
@@ -471,37 +473,38 @@ class Product extends BaseI18nLoop
             ;
 
             $loopResultRow
-                ->set("ID"               , $product->getId())
-                ->set("REF"              , $product->getRef())
-                ->set("IS_TRANSLATED"    , $product->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"           , $locale)
-                ->set("TITLE"            , $product->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"            , $product->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"      , $product->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM"     , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL"              , $product->getUrl($locale))
-                ->set("BEST_PRICE"       , $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
-                ->set("BEST_PRICE_TAX"   , $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
-                ->set("BEST_TAXED_PRICE" , $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice)
-                ->set("PRICE"            , $price)
-                ->set("PRICE_TAX"        , $taxedPrice - $price)
-                ->set("TAXED_PRICE"      , $taxedPrice)
-                ->set("PROMO_PRICE"      , $promoPrice)
-                ->set("PROMO_PRICE_TAX"  , $taxedPromoPrice - $promoPrice)
-                ->set("TAXED_PROMO_PRICE", $taxedPromoPrice)
-                ->set("WEIGHT"           , $product->getVirtualColumn('weight'))
-                ->set("QUANTITY"         , $product->getVirtualColumn('quantity'))
-                ->set("EAN_CODE"         , $product->getVirtualColumn('ean_code'))
-                ->set("IS_PROMO"         , $product->getVirtualColumn('is_promo'))
-                ->set("IS_NEW"           , $product->getVirtualColumn('is_new'))
-                ->set("POSITION"         , $product->getPosition())
-                ->set("VISIBLE"          , $product->getVisible() ? "1" : "0")
-                ->set("TEMPLATE"         , $product->getTemplateId())
-                ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
-                ->set("HAS_NEXT"         , $next != null ? 1 : 0)
-                ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
-                ->set("NEXT"             , $next != null ? $next->getId() : -1)
-                ->set("DEFAULT_CATEGORY" , $default_category_id)
+                ->set("ID"                      , $product->getId())
+                ->set("REF"                     , $product->getRef())
+                ->set("IS_TRANSLATED"           , $product->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE"                  , $locale)
+                ->set("TITLE"                   , $product->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO"                   , $product->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION"             , $product->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM"            , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("URL"                     , $product->getUrl($locale))
+                ->set("BEST_PRICE"              , $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
+                ->set("BEST_PRICE_TAX"          , $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
+                ->set("BEST_TAXED_PRICE"        , $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice)
+                ->set("PRICE"                   , $price)
+                ->set("PRICE_TAX"               , $taxedPrice - $price)
+                ->set("TAXED_PRICE"             , $taxedPrice)
+                ->set("PROMO_PRICE"             , $promoPrice)
+                ->set("PROMO_PRICE_TAX"         , $taxedPromoPrice - $promoPrice)
+                ->set("TAXED_PROMO_PRICE"       , $taxedPromoPrice)
+                ->set("PRODUCT_SALE_ELEMENT"    , $product->getVirtualColumn('pse_id'))
+                ->set("WEIGHT"                  , $product->getVirtualColumn('weight'))
+                ->set("QUANTITY"                , $product->getVirtualColumn('quantity'))
+                ->set("EAN_CODE"                , $product->getVirtualColumn('ean_code'))
+                ->set("IS_PROMO"                , $product->getVirtualColumn('is_promo'))
+                ->set("IS_NEW"                  , $product->getVirtualColumn('is_new'))
+                ->set("POSITION"                , $product->getPosition())
+                ->set("VISIBLE"                 , $product->getVisible() ? "1" : "0")
+                ->set("TEMPLATE"                , $product->getTemplateId())
+                ->set("HAS_PREVIOUS"            , $previous != null ? 1 : 0)
+                ->set("HAS_NEXT"                , $next != null ? 1 : 0)
+                ->set("PREVIOUS"                , $previous != null ? $previous->getId() : -1)
+                ->set("NEXT"                    , $next != null ? $next->getId() : -1)
+                ->set("DEFAULT_CATEGORY"        , $default_category_id)
             ;
 
             $loopResult->addRow($loopResultRow);
