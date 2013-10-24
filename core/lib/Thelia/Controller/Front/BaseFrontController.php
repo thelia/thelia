@@ -64,7 +64,7 @@ class BaseFrontController extends BaseController
     {
         $cart = $this->getSession()->getCart();
         if ($cart===null || $cart->countCartItems() == 0) {
-            $this->redirectToRoute('default', array('view'=>'cart'));
+            $this->redirectToRoute('cart.view');
         }
     }
 

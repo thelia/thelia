@@ -95,6 +95,11 @@
     <!-- end customer address routes -->
 
     <!-- cart routes -->
+    <route id="cart.view" path="/cart">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">cart</default>
+    </route>
+
     <route id="cart.add.process" path="/cart/add">
         <default key="_controller">Thelia\Controller\Front\CartController::addItem</default>
     </route>

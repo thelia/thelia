@@ -197,7 +197,7 @@ class OrderController extends BaseFrontController
             $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute('order.placed', array('order_id' => $orderEvent->getPlacedOrder()->getId()))));
         } else {
             /* order has not been placed */
-            $this->redirectToRoute('default', array('view'=>'cart'));
+            $this->redirectToRoute('cart.view');
         }
     }
 
@@ -205,7 +205,7 @@ class OrderController extends BaseFrontController
     {
         /* check if the placed order matched the customer */
         $placedOrder = OrderQuery::create()->findPk(
-            $this->getRequest()->attributes->get('order_id')
+            $this->getRequest()->attributes->get('order_id');
         );
 
         if (null === $placedOrder) {
