@@ -205,7 +205,7 @@ class OrderController extends BaseFrontController
     {
         /* check if the placed order matched the customer */
         $placedOrder = OrderQuery::create()->findPk(
-            $this->getRequest()->attributes->get('order_id');
+            $this->getRequest()->attributes->get('order_id')
         );
 
         if (null === $placedOrder) {
