@@ -1,0 +1,103 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Modules'}{/block}
+
+{block name="check-resource"}admin.configuration.search{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+<div class="modules">
+
+    <div id="wrapper" class="container">
+        
+        <div class="clearfix">
+            <ul class="breadcrumb pull-left">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="#">{intl l="Search"}</a></li>
+            </ul>
+        </div>
+
+        {module_include location='modules_top'}
+
+        <div class="row">
+            <div class="col-md-12">
+
+                {* order search *}
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <caption class="clearfix">
+                                {intl l='Orders'}
+                            </caption>
+                            <thead>
+                            <tr>
+                                <th>{intl l="Order n°"}</th>
+                                <th>{intl l="Date & Hour"}</th>
+                                <th>{intl l="Company"}</th>
+                                <th>{intl l="Name"}</th>
+                                <th>{intl l="Amount"}</th>
+                                <th>{intl l="Status"}</th>
+
+                                <th class="actions">{intl l="Actions"}</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {loop type="order" name="order-search" backend_context=1 customer="*" search_term=$smarty.get.search_term search_in="ref,customer_ref,customer_firstname,customer_lastname,customer_email"}
+                                {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
+                                {assign "orderInvoiceFirstName" $FIRSTNAME}
+                                {assign "orderInvoiceLastName" $LASTNAME}
+                                {assign "orderInvoiceCompany" $COMPANY}
+                                {/loop}
+
+                                {loop type="order-status" name="order-status" id=$STATUS}
+                                {assign "orderStatus" $TITLE}
+                                {assign "orderStatusLabel" "order_$CODE"}
+                                {/loop}
+
+                                <tr>
+
+                                    <td><a href="{url path="/admin/order/update/$ID"}">{$REF}</a></td>
+                                    <td>{format_date date=$CREATE_DATE}</td>
+                                    <td>{$orderInvoiceCompany}</td>
+                                    <td><a href="{url path="/admin/customer/update/$CUSTOMER"}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
+                                    <td>{$TOTAL_TAXED_AMOUNT}</td>
+                                    <td><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
+
+                                    {module_include location='orders_table_row'}
+
+                                    <td>
+                                        <div class="btn-group">
+
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
+                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                            {if $STATUS !== 5}
+                                                <a class="btn btn-default btn-xs order-cancel" title="{intl l='Cancel this order'}" href="#cancel_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
+                                            {/if}
+                                            {/loop}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {* end order search *}
+
+            </div>
+        </div>
+
+        {module_include location='modules_bottom'}
+
+    </div>
+</div>
+
+{/block}
+
+{block name="javascript-initialization"}
+
+
+    <script>
+    </script>
+{/block}

@@ -23,12 +23,18 @@
 
 namespace Thelia\Core\Template\Element;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Template\Element\Exception\SearchLoopException;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Type\AlphaNumStringListType;
+use Thelia\Type\EnumListType;
+use Thelia\Type\EnumType;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -84,13 +90,43 @@ abstract class BaseLoop
      */
     protected function getDefaultArgs()
     {
-        return array(
-            Argument::createIntTypeArgument('offset', 0),
-            Argument::createIntTypeArgument('page'),
-            Argument::createIntTypeArgument('limit', PHP_INT_MAX),
+        $defaultArgs = array(
             Argument::createBooleanTypeArgument('backend_context', false),
             Argument::createBooleanTypeArgument('force_return', false),
         );
+
+        if(true === $this->countable) {
+            $defaultArgs = array_merge($defaultArgs, array(
+                Argument::createIntTypeArgument('offset', 0),
+                Argument::createIntTypeArgument('page'),
+                Argument::createIntTypeArgument('limit', PHP_INT_MAX),
+            ));
+        }
+
+        if($this instanceof SearchLoopInterface) {
+            $defaultArgs = array_merge($defaultArgs, array(
+                Argument::createAnyTypeArgument('search_term'),
+                new Argument(
+                    'search_in',
+                    new TypeCollection(
+                        new EnumListType($this->getSearchIn())
+                    )
+                ),
+                new Argument(
+                    'search_mode',
+                    new TypeCollection(
+                        new EnumType(array(
+                            SearchLoopInterface::MODE_ANY_WORD,
+                            SearchLoopInterface::MODE_SENTENCE,
+                            SearchLoopInterface::MODE_STRICT_SENTENCE,
+                        ))
+                    ),
+                    SearchLoopInterface::MODE_STRICT_SENTENCE
+                )
+            ));
+        }
+
+        return $defaultArgs;
     }
 
     /**
@@ -205,6 +241,32 @@ abstract class BaseLoop
      */
     protected function search(ModelCriteria $search, &$pagination = null)
     {
+        if($this instanceof SearchLoopInterface) {
+            $searchTerm = $this->getSearch_term();
+            $searchIn = $this->getSearch_in();
+            $searchMode = $this->getSearch_mode();
+            if(null !== $searchTerm && null !== $searchIn) {
+
+                switch($searchMode) {
+                    case SearchLoopInterface::MODE_ANY_WORD:
+                        $searchCriteria = Criteria::IN;
+                        $searchTerm = explode(' ', $searchTerm);
+                        break;
+                    case SearchLoopInterface::MODE_SENTENCE:
+                        $searchCriteria = Criteria::EQUAL;
+                        $searchTerm = '%' . $searchTerm . '%';
+                        break;
+                    case SearchLoopInterface::MODE_STRICT_SENTENCE:
+                        $searchCriteria = Criteria::EQUAL;
+                        break;
+                }
+
+                $this->doSearch($search, $searchTerm, $searchIn, $searchCriteria);
+
+                $in = 'true';
+            }
+        }
+
         if ($this->getArgValue('page') !== null) {
             return $this->searchWithPagination($search, $pagination);
         } else {
