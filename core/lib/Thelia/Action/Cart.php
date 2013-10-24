@@ -26,6 +26,7 @@ namespace Thelia\Action;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cart\CartEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\CartItem;
@@ -93,6 +94,17 @@ class Cart extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Clear the cart
+     * @param CartEvent $event
+     */
+    public function clear(CartEvent $event)
+    {
+        if (null !== $cart = $event->getCart()) {
+            $cart->delete();
+        }
+    }
+
+    /**
      *
      * Modify article's quantity
      *
@@ -139,9 +151,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            "action.addArticle" => array("addItem", 128),
-            "action.deleteArticle" => array("deleteItem", 128),
-            "action.updateArticle" => array("changeItem", 128),
+            TheliaEvents::CART_ADDITEM => array("addItem", 128),
+            TheliaEvents::CART_DELETEITEM => array("deleteItem", 128),
+            TheliaEvents::CART_UPDATEITEM => array("changeItem", 128),
+            TheliaEvents::CART_CLEAR => array("clear", 128),
         );
     }
 

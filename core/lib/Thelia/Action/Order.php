@@ -25,6 +25,8 @@ namespace Thelia\Action;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Cart\CartTrait;
+use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -47,6 +49,8 @@ use Thelia\Tools\I18n;
  */
 class Order extends BaseAction implements EventSubscriberInterface
 {
+    use CartTrait;
+
     /**
      * @param \Thelia\Core\Event\Order\OrderEvent $event
      */
@@ -97,7 +101,9 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\Order\OrderEvent $event
+     * @param OrderEvent $event
+     *
+     * @throws \Thelia\Exception\TheliaProcessException
      */
     public function create(OrderEvent $event)
     {
@@ -266,7 +272,8 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setPlacedOrder($placedOrder);
         $this->getSession()->setOrder($sessionOrder);
 
-        /* empty cart @todo */
+        /* empty cart */
+        $this->getDispatcher()->dispatch(TheliaEvents::CART_CLEAR, new CartEvent($this->getCart($this->getRequest())));
 
         /* call pay method */
         $paymentModuleReflection = new \ReflectionClass($paymentModule->getFullNamespace());

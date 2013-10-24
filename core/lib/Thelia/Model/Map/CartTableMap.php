@@ -181,11 +181,11 @@ class CartTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Customer', '\\Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('customer_id' => 'id', ), null, null);
-        $this->addRelation('AddressRelatedByAddressDeliveryId', '\\Thelia\\Model\\Address', RelationMap::MANY_TO_ONE, array('address_delivery_id' => 'id', ), null, null);
-        $this->addRelation('AddressRelatedByAddressInvoiceId', '\\Thelia\\Model\\Address', RelationMap::MANY_TO_ONE, array('address_invoice_id' => 'id', ), null, null);
-        $this->addRelation('Currency', '\\Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), null, null);
-        $this->addRelation('CartItem', '\\Thelia\\Model\\CartItem', RelationMap::ONE_TO_MANY, array('id' => 'cart_id', ), null, null, 'CartItems');
+        $this->addRelation('Customer', '\\Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('customer_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('AddressRelatedByAddressDeliveryId', '\\Thelia\\Model\\Address', RelationMap::MANY_TO_ONE, array('address_delivery_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('AddressRelatedByAddressInvoiceId', '\\Thelia\\Model\\Address', RelationMap::MANY_TO_ONE, array('address_invoice_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('Currency', '\\Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('CartItem', '\\Thelia\\Model\\CartItem', RelationMap::ONE_TO_MANY, array('id' => 'cart_id', ), 'CASCADE', 'RESTRICT', 'CartItems');
     } // buildRelations()
 
     /**
@@ -200,6 +200,15 @@ class CartTableMap extends TableMap
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
+    /**
+     * Method to invalidate the instance pool of all tables related to cart     * by a foreign key with ON DELETE CASCADE
+     */
+    public static function clearRelatedInstancePool()
+    {
+        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+                CartItemTableMap::clearInstancePool();
+            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.

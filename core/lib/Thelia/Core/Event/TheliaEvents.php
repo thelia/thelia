@@ -357,8 +357,8 @@ final class TheliaEvents
      * sent on modify article action
      */
     const CART_UPDATEITEM = "action.updateArticle";
-
     const CART_DELETEITEM = "action.deleteArticle";
+    const CART_CLEAR = "action.clear";
 
     /**
      * Order linked event
