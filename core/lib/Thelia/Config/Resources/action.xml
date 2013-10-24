@@ -51,6 +51,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.product_sale_element" class="Thelia\Action\ProductSaleElement">
+            <argument type="service" id="service_container"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.config" class="Thelia\Action\Config">
             <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>

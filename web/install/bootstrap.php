@@ -20,7 +20,7 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-
+define('THELIA_INSTALL_MODE', true);
 include __DIR__ . "/../../core/bootstrap.php";
 
 $thelia = new \Thelia\Core\Thelia("install", false);

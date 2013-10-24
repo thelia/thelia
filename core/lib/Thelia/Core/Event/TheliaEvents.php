@@ -255,14 +255,14 @@ final class TheliaEvents
 
     // -- Categories Associated Content ----------------------------------------
 
-    const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT   = "action.before_createCategoryAssociatedContent";
-    const AFTER_CREATECATEGORY_ASSOCIATED_CONTENT 	= "action.after_createCategoryAssociatedContent";
+    const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT = "action.before_createCategoryAssociatedContent";
+    const AFTER_CREATECATEGORY_ASSOCIATED_CONTENT  = "action.after_createCategoryAssociatedContent";
 
-    const BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT   = "action.before_deleteCategoryAssociatedContent";
-    const AFTER_DELETECATEGORY_ASSOCIATED_CONTENT 	= "action.after_deleteCategoryAssociatedContent";
+    const BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT = "action.before_deleteCategoryAssociatedContent";
+    const AFTER_DELETECATEGORY_ASSOCIATED_CONTENT  = "action.after_deleteCategoryAssociatedContent";
 
-    const BEFORE_UPDATECATEGORY_ASSOCIATED_CONTENT   = "action.before_updateCategoryAssociatedContent";
-    const AFTER_UPDATECATEGORY_ASSOCIATED_CONTENT 	= "action.after_updateCategoryAssociatedContent";
+    const BEFORE_UPDATECATEGORY_ASSOCIATED_CONTENT = "action.before_updateCategoryAssociatedContent";
+    const AFTER_UPDATECATEGORY_ASSOCIATED_CONTENT  = "action.after_updateCategoryAssociatedContent";
 
     // -- Product management -----------------------------------------------
 
@@ -276,8 +276,9 @@ final class TheliaEvents
     const PRODUCT_REMOVE_CONTENT          = "action.productRemoveContent";
     const PRODUCT_UPDATE_CONTENT_POSITION = "action.updateProductContentPosition";
 
-    const PRODUCT_ADD_COMBINATION    = "action.productAddCombination";
-    const PRODUCT_DELETE_COMBINATION = "action.productDeleteCombination";
+    const PRODUCT_ADD_PRODUCT_SALE_ELEMENT    = "action.addProductSaleElement";
+    const PRODUCT_DELETE_PRODUCT_SALE_ELEMENT = "action.deleteProductSaleElement";
+    const PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT = "action.updateProductSaleElement";
 
     const PRODUCT_SET_TEMPLATE = "action.productSetTemplate";
 
@@ -697,20 +698,21 @@ final class TheliaEvents
 
     /************ LANG MANAGEMENT ****************************/
 
-    const LANG_UPDATE = 'action.lang.update';
-    const LANG_CREATE = 'action.lang.create';
-    const LANG_DELETE = 'action.lang.delete';
+    const LANG_UPDATE                           = 'action.lang.update';
+    const LANG_CREATE                           = 'action.lang.create';
+    const LANG_DELETE                           = 'action.lang.delete';
 
-    const LANG_DEFAULTBEHAVIOR = 'action.lang.defaultBehavior';
+    const LANG_DEFAULTBEHAVIOR                  = 'action.lang.defaultBehavior';
+    const LANG_URL                              = 'action.lang.url';
 
-    const LANG_TOGGLEDEFAULT = 'action.lang.toggleDefault';
+    const LANG_TOGGLEDEFAULT                    = 'action.lang.toggleDefault';
 
-    const BEFORE_UPDATELANG = 'action.lang.beforeUpdate';
-    const AFTER_UPDATELANG = 'action.lang.afterUpdate';
+    const BEFORE_UPDATELANG                     = 'action.lang.beforeUpdate';
+    const AFTER_UPDATELANG                      = 'action.lang.afterUpdate';
 
-    const BEFORE_CREATELANG = 'action.lang.beforeCreate';
-    const AFTER_CREATELANG = 'action.lang.afterCreate';
+    const BEFORE_CREATELANG                     = 'action.lang.beforeCreate';
+    const AFTER_CREATELANG                      = 'action.lang.afterCreate';
 
-    const BEFORE_DELETELANG = 'action.lang.beforeDelete';
-    const AFTER_DELETELANG = 'action.lang.afterDelete';
+    const BEFORE_DELETELANG                     = 'action.lang.beforeDelete';
+    const AFTER_DELETELANG                      = 'action.lang.afterDelete';
 }

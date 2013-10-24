@@ -116,45 +116,42 @@
             <div class="col-md-6">
                 <div class="general-block-decorator clearfix">
                     
-                    <div class="title title-without-tabs">{intl l="Association language/URL"}</div>
-                    
-                    <form action="" method="post">
+                    <div class="title title-without-tabs">{intl l="Using a domain or subdomain for each language"}</div>
+                    {form name="thelia.lang.url"}
+                    <form action="{url path="/admin/configuration/languages/updateUrl"}" method="post">
+                        {form_hidden_fields form=$form}
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <tbody>
+                            {form_tagged_fields form=$form tag='url'}
+                                {if $attr_list.url_id}
+                                <tr>
+                                    <th>{$attr_list.url_title}</th>
+                                    <td>
+                                        <div class="form-group {if $error}has-error{/if}">
+                                        <input type="text" class="form-control" name="{$name}" value="{$value}" placeholder="http://www.domain.com" {if $one_domain_per_lang == 0}readonly{/if}>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {/if}
+                            {/form_tagged_fields}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td class="pull-right">
+                                        {if $one_domain_per_lang == 0}
+                                            <a href="{url path="/admin/configuration/languages/domain/activate"}" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok-sign"></span> {intl l="activate"}</a>
+                                        {else}
+                                            <a href="{url path="/admin/configuration/languages/domain/deactivate"}" class="btn btn-default btn-danger"><span class="glyphicon glyphicon-ok-sign"></span> {intl l="deactivate"}</a>
+                                        {/if}
 
-                            <div class="form-group">
-                                <label for="" class="label-control"><input type="radio" name="" checked> {intl l="Using a same domain for all languages"}</label>
-                                <input type="url" class="form-control" name="" placeholder="http://www.domain.com">                            
-                            </div>
-
-                        
-                            <div class="form-group">
-                                <label for="" class="label-control"><input type="radio" name=""> {intl l="Using a domain or subdomain for each language"}</label>
-                            </div>
-
-                            <table class="table table-striped table-condensed table-left-aligned">
-                                <tbody>
-                                    <tr>
-                                        <th>{intl l="France"}</th>
-                                        <td><input type="text" class="form-control" name="" placeholder="http://www.domain.com" readonly></td>
-                                    </tr>
-                                    <tr>
-                                        <th>{intl l="English"}</th>
-                                        <td><input type="text" class="form-control" name="" placeholder="http://www.domain.com" readonly></td>
-                                    </tr>
-                                    <tr>
-                                        <th>{intl l="Spanish"}</th>
-                                        <td><input type="text" class="form-control" name="" placeholder="http://www.domain.com" readonly></td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="2">
-                                            <button type="submit" disabled class="btn btn-default btn-primary pull-right"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
-                                        </td>
-                                    </tr>                                
-                                </tfoot>
-                            </table>        
+                                        <button type="submit" {if $one_domain_per_lang == 0}disabled{/if} class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l="Save"}</button>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </form>
-
+                    {/form}
                 </div>
             </div>
         </div>

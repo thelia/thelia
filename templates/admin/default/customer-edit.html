@@ -203,6 +203,45 @@
         			</div>
 
         		</div>
+                <div class="row">
+                    <div class="col-md-12 general-block-decorator">
+                        <div class="row">
+                            <div class="col-md-12 title title-without-tabs">
+                                {intl l="orders for this customer"}
+                            </div>
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-left-aligned">
+                                        <thead>
+                                        <tr>
+                                            <th>{intl l="Order n°"}</th>
+                                            <th>{intl l="Date & Hour"}</th>
+                                            <th>{intl l="Amount"}</th>
+                                            <th>{intl l="Status"}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {loop type="order" name="order-list" customer="{$customer_id}" backend_context="1" status='*'}
+                                        {loop type="order-status" name="order-status" id=$STATUS}
+                                        {assign "orderStatus" $TITLE}
+                                        {assign "orderStatusLabel" "order_$CODE"}
+                                        {/loop}
+                                            <tr>
+                                                <td><a href="{url path="/admin/order/update/$ID"}">{$REF}</a></td>
+                                                <td>{format_date date=$CREATE_DATE}</td>
+                                                <td>{$TOTAL_TAXED_AMOUNT}</td>
+                                                <td>
+                                                    <span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span>
+                                                </td>
+                                            </tr>
+                                        {/loop}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
     		{/loop}
 

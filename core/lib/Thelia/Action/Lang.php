@@ -29,6 +29,7 @@ use Thelia\Core\Event\Lang\LangDeleteEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Form\Lang\LangUrlEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Lang as LangModel;
@@ -102,6 +103,15 @@ class Lang extends BaseAction implements EventSubscriberInterface
             ->update(array('Value' => $event->getDefaultBehavior()));
     }
 
+    public function langUrl(LangUrlEvent $event)
+    {
+        foreach($event->getUrl() as $id => $url){
+            LangQuery::create()
+                ->filterById($id)
+                ->update(array('Url' => $url));
+        }
+    }
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -129,7 +139,8 @@ class Lang extends BaseAction implements EventSubscriberInterface
             TheliaEvents::LANG_TOGGLEDEFAULT => array('toggleDefault', 128),
             TheliaEvents::LANG_CREATE => array('create', 128),
             TheliaEvents::LANG_DELETE => array('delete', 128),
-            TheliaEvents::LANG_DEFAULTBEHAVIOR => array('defaultBehavior', 128)
+            TheliaEvents::LANG_DEFAULTBEHAVIOR => array('defaultBehavior', 128),
+            TheliaEvents::LANG_URL => array('langUrl', 128)
         );
     }
 }
