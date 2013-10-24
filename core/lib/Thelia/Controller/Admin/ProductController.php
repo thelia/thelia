@@ -206,10 +206,14 @@ class ProductController extends AbstractCrudController
         }
     }
 
+    protected function appendValue(&$array, $key, $value) {
+        if (! isset($array[$key])) $array[$key] = array();
+
+        $array[$key][] = $value;
+    }
+
     protected function hydrateObjectForm($object)
     {
-        $defaultPseData = $combinationPseData = array();
-
         // Find product's sale elements
         $saleElements = ProductSaleElementsQuery::create()
             ->filterByProduct($object)
@@ -217,6 +221,12 @@ class ProductController extends AbstractCrudController
 
         $defaultCurrency = Currency::getDefaultCurrency();
         $currentCurrency = $this->getCurrentEditionCurrency();
+
+        // Common parts
+        $defaultPseData = $combinationPseData = array(
+            "product_id"  => $object->getId(),
+            "tax_rule"    => $object->getTaxRuleId()
+        );
 
         foreach($saleElements as $saleElement) {
 
@@ -251,15 +261,12 @@ class ProductController extends AbstractCrudController
             // If this PSE has no combination -> this is the default one
             // affect it to the thelia.admin.product_sale_element.update form
             if ($isDefaultPse) {
-
                 $defaultPseData = array(
-                    "product_id"              => $object->getId(),
                     "product_sale_element_id" => $saleElement->getId(),
                     "reference"               => $saleElement->getRef(),
                     "price"                   => $productPrice->getPrice(),
                     "price_with_tax"          => $this->computePrice($productPrice->getPrice(), 'without_tax', $object),
                     "use_exchange_rate"       => $productPrice->getFromDefaultCurrency() ? 1 : 0,
-                    "tax_rule"                => $object->getTaxRuleId(),
                     "currency"                => $productPrice->getCurrencyId(),
                     "weight"                  => $saleElement->getWeight(),
                     "quantity"                => $saleElement->getQuantity(),
@@ -272,6 +279,25 @@ class ProductController extends AbstractCrudController
                 );
             }
             else {
+
+                if ($saleElement->getIsDefault()) {
+                    $combinationPseData['default_pse']       = $saleElement->getId();
+                    $combinationPseData['currency']          = $currentCurrency->getId();
+                    $combinationPseData['use_exchange_rate'] = $productPrice->getFromDefaultCurrency() ? 1 : 0;
+                }
+
+                $this->appendValue($combinationPseData, "product_sale_element_id" , $saleElement->getId());
+                $this->appendValue($combinationPseData, "reference"               , $saleElement->getRef());
+                $this->appendValue($combinationPseData, "price"                   , $productPrice->getPrice());
+                $this->appendValue($combinationPseData, "price_with_tax"          , $this->computePrice($productPrice->getPrice(), 'without_tax', $object));
+                $this->appendValue($combinationPseData, "weight"                  , $saleElement->getWeight());
+                $this->appendValue($combinationPseData, "quantity"                , $saleElement->getQuantity());
+                $this->appendValue($combinationPseData, "sale_price"              , $productPrice->getPromoPrice());
+                $this->appendValue($combinationPseData, "sale_price_with_tax"     , $this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object));
+                $this->appendValue($combinationPseData, "onsale"                  , $saleElement->getPromo() > 0 ? 1 : 0);
+                $this->appendValue($combinationPseData, "isnew"                   , $saleElement->getNewness() > 0 ? 1 : 0);
+                $this->appendValue($combinationPseData, "isdefault"               , $saleElement->getIsDefault() > 0 ? 1 : 0);
+                $this->appendValue($combinationPseData, "ean_code"                , $saleElement->getEanCode());
             }
 
             $defaultPseForm = new ProductDefaultSaleElementUpdateForm($this->getRequest(), "form", $defaultPseData);
@@ -281,7 +307,7 @@ class ProductController extends AbstractCrudController
             $this->getParserContext()->addForm($combinationPseForm);
         }
 
-        // Prepare the data that will hydrate the form(s)
+        // The "General" tab form
         $data = array(
             'id'               => $object->getId(),
             'ref'              => $object->getRef(),
@@ -879,10 +905,46 @@ class ProductController extends AbstractCrudController
     }
 
     /**
+     * Process a single PSE update, using form data array.
+     *
+     * @param array $data the form data
+     * @throws Exception is someting goes wrong.
+     */
+    protected function processSingleProductSaleElementUpdate($data)
+    {
+        $event = new ProductSaleElementUpdateEvent(
+                $this->getExistingObject(),
+                $data['product_sale_element_id']
+        );
+
+        $event
+            ->setReference($data['reference'])
+            ->setPrice($data['price'])
+            ->setCurrencyId($data['currency'])
+            ->setWeight($data['weight'])
+            ->setQuantity($data['quantity'])
+            ->setSalePrice($data['sale_price'])
+            ->setOnsale($data['onsale'])
+            ->setIsnew($data['isnew'])
+            ->setIsdefault($data['isdefault'])
+            ->setEanCode($data['ean_code'])
+            ->setTaxRuleId($data['tax_rule'])
+            ->setFromDefaultCurrency($data['use_exchange_rate'])
+        ;
+
+        $this->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $event);
+
+        // Log object modification
+        if (null !== $changedObject = $event->getProductSaleElement()) {
+            $this->adminLogAppend(sprintf("Product Sale Element (ID %s) for product reference %s modified", $changedObject->getId(), $event->getProduct()->getRef()));
+        }
+    }
+
+    /**
      * Change a product sale element
      */
-    protected function processProductSaleElementUpdate($changeForm) {
-
+    protected function processProductSaleElementUpdate($changeForm)
+    {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, AccessManager::UPDATE)) return $response;
 
@@ -896,31 +958,35 @@ class ProductController extends AbstractCrudController
             // Get the form field values
             $data = $form->getData();
 
-            $event = new ProductSaleElementUpdateEvent(
-                    $this->getExistingObject(),
-                    $data['product_sale_element_id']
-            );
+            if (is_array($data['product_sale_element_id'])) {
 
-            $event
-                ->setReference($data['reference'])
-                ->setPrice($data['price'])
-                ->setCurrencyId($data['currency'])
-                ->setWeight($data['weight'])
-                ->setQuantity($data['quantity'])
-                ->setSalePrice($data['sale_price'])
-                ->setOnsale($data['onsale'])
-                ->setIsnew($data['isnew'])
-                ->setIsdefault($data['isdefault'])
-                ->setEanCode($data['ean_code'])
-                ->setTaxRuleId($data['tax_rule'])
-                ->setFromDefaultCurrency($data['use_exchange_rate'])
-            ;
+                // Common fields
+                $tmp_data = array(
+                    'tax_rule'          => $data['tax_rule'],
+                    'currency'          => $data['currency'],
+                    'use_exchange_rate' => $data['use_exchange_rate'],
+                );
 
-            $this->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $event);
+                $count = count($data['product_sale_element_id']);
 
-            // Log object modification
-            if (null !== $changedObject = $event->getProductSaleElement()) {
-                $this->adminLogAppend(sprintf("Product Sale Element (ID %s) for product reference %s modified", $changedObject->getId(), $event->getProduct()->getRef()));
+                for($idx = 0; $idx < $count; $idx++) {
+                    $tmp_data['product_sale_element_id'] = $pse_id = $data['product_sale_element_id'][$idx];
+                    $tmp_data['reference']               = $data['reference'][$idx];
+                    $tmp_data['price']                   = $data['price'][$idx];
+                    $tmp_data['weight']                  = $data['weight'][$idx];
+                    $tmp_data['quantity']                = $data['quantity'][$idx];
+                    $tmp_data['sale_price']              = $data['sale_price'][$idx];
+                    $tmp_data['onsale']                  = isset($data['onsale'][$idx]) ? 1 : 0;
+                    $tmp_data['isnew']                   = isset($data['isnew'][$idx]) ? 1 : 0;
+                    $tmp_data['isdefault']               = $data['default_pse'] == $pse_id;
+                    $tmp_data['ean_code']                = $data['ean_code'][$idx];
+
+                    $this->processSingleProductSaleElementUpdate($tmp_data);
+                }
+            }
+            else {
+                // No need to preprocess data
+                $this->processSingleProductSaleElementUpdate($data);
             }
 
             // If we have to stay on the same page, do not redirect to the succesUrl, just redirect to the edit page again.
@@ -948,9 +1014,9 @@ class ProductController extends AbstractCrudController
     }
 
     /**
-     * Change a product sale element attached to a combination
+     * Process the change of product's PSE list.
      */
-    public function updateProductSaleElementAction() {
+    public function updateProductSaleElementsAction() {
         return $this->processProductSaleElementUpdate(
                 new ProductSaleElementUpdateForm($this->getRequest())
         );
@@ -960,14 +1026,13 @@ class ProductController extends AbstractCrudController
      * Update default product sale element (not attached to any combination)
      */
     public function updateProductDefaultSaleElementAction() {
-
         return $this->processProductSaleElementUpdate(
                 new ProductDefaultSaleElementUpdateForm($this->getRequest())
         );
     }
 
     /**
-     * Invoked through Ajax; this methow calculate the taxed price from the unaxed price, and
+     * Invoked through Ajax; this method calculates the taxed price from the unaxed price, and
      * vice versa.
      */
     public function priceCaclulator() {
@@ -999,6 +1064,11 @@ class ProductController extends AbstractCrudController
         return new JsonResponse(array('result' => $return_price));
     }
 
+    /**
+     * Calculate all prices
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function loadConvertedPrices() {
 
         $product_sale_element_id  = intval($this->getRequest()->get('product_sale_element_id', 0));

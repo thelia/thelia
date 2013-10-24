@@ -119,7 +119,7 @@ class Form extends AbstractSmartyPlugin
         }
     }
 
-    protected function assignFieldValues($template, $fieldName, $fieldValue, $fieldVars)
+    protected function assignFieldValues($template, $fieldName, $fieldValue, $fieldVars, $total_value_count = 1)
     {
         $template->assign("name", $fieldName);
 
@@ -135,6 +135,8 @@ class Form extends AbstractSmartyPlugin
         $template->assign("label_attr", $fieldVars["label_attr"]);
 
         $template->assign('required', isset($fieldVars['required']) ? $fieldVars['required'] : false);
+
+        $template->assign('total_value_count', $total_value_count);
 
         $errors = $fieldVars["errors"];
 
@@ -208,23 +210,19 @@ class Form extends AbstractSmartyPlugin
             $value = $formFieldView->vars["value"];
 
             // We have a collection
-            if (count($formFieldView->children) > 0) {
+            if (0 < $value_count = count($formFieldView->children)) {
 
-                $key = $this->getParam($params, 'value_key');
+                $key = $this->getParam($params, 'value_key', null);
 
-                if ($key != null) {
+                if ($key !== null) {
+                    // If the field is not found, use an empty value
+                    $val = array_key_exists($key, $value) ? $value[$key] : '';
 
-                    if (isset($value[$key])) {
+                    $name = sprintf("%s[%s]", $formFieldView->vars["full_name"], $key);
 
-                        $name = sprintf("%s[%s]", $formFieldView->vars["full_name"], $key);
+                    $val = $value[$key];
 
-                        $val = $value[$key];
-
-                        $this->assignFieldValues($template, $name, $val, $formFieldView->vars);
-                    }
-                    else {
-                        throw new \LogicException(sprintf("Cannot find a value for key '%s' in field '%s'", $key, $formFieldView->vars["name"]));
-                    }
+                    $this->assignFieldValues($template, $name, $val, $formFieldView->vars, $value_count);
                 }
                 else {
                     throw new \InvalidArgumentException(sprintf("Missing or empty parameter 'value_key' for field '%s'", $formFieldView->vars["name"]));

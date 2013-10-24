@@ -348,7 +348,8 @@ $(function() {
     // will update the untaxed (resp. taxed) one
     $('.automatic_price_field').typeWatch({
     	captureLength: 1,
-    	callback: function () {
+    	wait         : 300,
+    	callback     : function () {
     		update_price($(this).val(), $(this).data('price-type'), $(this).data('rel-price'));
     	}
     });

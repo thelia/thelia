@@ -192,6 +192,7 @@ class Product extends BaseProduct
             ->setNewness(0)
             ->setWeight($weight)
             ->setIsDefault($isDefault)
+            ->setEanCode('')
             ->save($con)
         ;
 

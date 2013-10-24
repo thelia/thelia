@@ -23,9 +23,9 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\GreaterThan;
-use Thelia\Core\Translation\Translator;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Model\Currency;
+use Thelia\Core\Translation\Translator;
 
 class ProductSaleElementUpdateForm extends BaseForm
 {
@@ -34,75 +34,123 @@ class ProductSaleElementUpdateForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
+            ->add("tax_rule", "integer", array(
+                    "constraints" => array(new NotBlank()),
+                    "label"      => Translator::getInstance()->trans("Tax rule for this product *"),
+                    "label_attr" => array("for" => "tax_rule_field")
+            ))
             ->add("product_id", "integer", array(
-                "label"       => Translator::getInstance()->trans("Product ID *"),
-                "label_attr"  => array("for" => "product_id_field"),
-                "constraints" => array(new GreaterThan(array('value' => 0)))
+                    "label"       => Translator::getInstance()->trans("Product ID *"),
+                    "label_attr"  => array("for" => "product_id_field"),
+                    "constraints" => array(new GreaterThan(array('value' => 0)))
             ))
-            ->add("product_sale_element_id", "integer", array(
-                "label"       => Translator::getInstance()->trans("Product sale element ID *"),
-                "label_attr"  => array("for" => "product_sale_element_id_field")
-            ))
-            ->add("reference", "text", array(
-                "label"      => Translator::getInstance()->trans("Reference *"),
-                "label_attr" => array("for" => "reference_field")
-            ))
-            ->add("price", "number", array(
-                "constraints" => array(new NotBlank()),
-                "label"      => Translator::getInstance()->trans("Product price excluding taxes *"),
-                "label_attr" => array("for" => "price_field")
-            ))
-            ->add("price_with_tax", "number", array(
-                "label"      => Translator::getInstance()->trans("Product price including taxes"),
-                "label_attr" => array("for" => "price_with_tax_field")
+            ->add("default_pse", "integer", array(
+                    "label"       => Translator::getInstance()->trans("Default product sale element"),
+                    "label_attr"  => array("for" => "default_pse_field"),
             ))
             ->add("currency", "integer", array(
-                "constraints" => array(new NotBlank()),
-                "label"      => Translator::getInstance()->trans("Price currency *"),
-                "label_attr" => array("for" => "currency_field")
-            ))
-            ->add("tax_rule", "integer", array(
-                "constraints" => array(new NotBlank()),
-                "label"      => Translator::getInstance()->trans("Tax rule for this product *"),
-                "label_attr" => array("for" => "tax_rule_field")
-            ))
-            ->add("weight", "number", array(
-                "constraints" => array(new NotBlank()),
-                "label"      => Translator::getInstance()->trans("Weight *"),
-                "label_attr" => array("for" => "weight_field")
-            ))
-            ->add("quantity", "number", array(
-                "constraints" => array(new NotBlank()),
-                "label"      => Translator::getInstance()->trans("Available quantity *"),
-                "label_attr" => array("for" => "quantity_field")
-            ))
-            ->add("sale_price", "number", array(
-                "label"      => Translator::getInstance()->trans("Sale price without taxes"),
-                "label_attr" => array("for" => "price_with_tax_field")
-            ))
-            ->add("sale_price_with_tax", "number", array(
-                "label"      => Translator::getInstance()->trans("Sale price including taxes"),
-                "label_attr" => array("for" => "sale_price_with_tax_field")
-            ))
-            ->add("onsale", "integer", array(
-                    "label"      => Translator::getInstance()->trans("This product is on sale"),
-                    "label_attr" => array("for" => "onsale_field")
-            ))
-            ->add("isnew", "integer", array(
-                    "label"      => Translator::getInstance()->trans("Advertise this product as new"),
-                    "label_attr" => array("for" => "isnew_field")
-            ))
-            ->add("isdefault", "integer", array(
-                    "label"      => Translator::getInstance()->trans("Is it the default product sale element ?"),
-                    "label_attr" => array("for" => "isdefault_field")
-            ))
-            ->add("ean_code", "text", array(
-                    "label"      => Translator::getInstance()->trans("EAN Code"),
-                    "label_attr" => array("for" => "ean_code_field")
+                    "constraints" => array(new NotBlank()),
+                    "label"      => Translator::getInstance()->trans("Price currency *"),
+                    "label_attr" => array("for" => "currency_field")
             ))
             ->add("use_exchange_rate", "integer", array(
                     "label"      => Translator::getInstance()->trans("Apply exchange rates on price in %sym", array("%sym" => Currency::getDefaultCurrency()->getSymbol())),
                     "label_attr" => array("for" => "use_exchange_rate_field")
+            ))
+
+            // -- Collections
+
+            ->add('product_sale_element_id', 'collection', array(
+                'type'         => 'integer',
+                'label'        => Translator::getInstance()->trans('Product sale element ID *'),
+                'label_attr'   => array('for' => 'product_sale_element_id_field'),
+                'allow_add'    => true,
+                'allow_delete' => true,
+            ))
+            ->add('reference', 'collection', array(
+                'type'         => 'text',
+                'label'        => Translator::getInstance()->trans('Reference *'),
+                'label_attr'   => array('for' => 'reference_field'),
+                'allow_add'    => true,
+                'allow_delete' => true,
+            ))
+            ->add('price', 'collection', array(
+                'type'         => 'number',
+                'label'        => Translator::getInstance()->trans('Product price excluding taxes *'),
+                'label_attr'   => array('for' => 'price_field'),
+                'allow_add'    => true,
+                'allow_delete' => true,
+                'options'      => array(
+                    'constraints' => array(new NotBlank()),
+                )
+            ))
+            ->add('price_with_tax', 'collection', array(
+                'type'         => 'number',
+                'label'        => Translator::getInstance()->trans('Product price including taxes'),
+                'label_attr'   => array('for' => 'price_with_tax_field'),
+                'allow_add'    => true,
+                'allow_delete' => true,
+            ))
+            ->add('weight', 'collection', array(
+                'type'         => 'number',
+                'label'        => Translator::getInstance()->trans('Weight *'),
+                'label_attr'   => array('for' => 'weight_field'),
+                'allow_add'    => true,
+                'allow_delete' => true,
+                'options'      => array(
+                    'constraints' => array(new NotBlank()),
+                )
+            ))
+            ->add('quantity', 'collection', array(
+                'type'         => 'number',
+                'label'        => Translator::getInstance()->trans('Available quantity *'),
+                'label_attr'   => array('for' => 'quantity_field'),
+                'allow_add'    => true,
+                'allow_delete' => true,
+                'options'      => array(
+                        'constraints' => array(new NotBlank()),
+                )
+            ))
+            ->add('sale_price', 'collection', array(
+                'label'        => Translator::getInstance()->trans('Sale price without taxes'),
+                'label_attr'   => array('for' => 'price_with_tax_field'),
+                'allow_add'    => true,
+                'allow_delete' => true,
+            ))
+            ->add('sale_price_with_tax', 'collection', array(
+                'type'         => 'number',
+                'label'        => Translator::getInstance()->trans('Sale price including taxes'),
+                'label_attr'   => array('for' => 'sale_price_with_tax_field'),
+                'allow_add'    => true,
+                'allow_delete' => true,
+            ))
+            ->add('onsale', 'collection', array(
+                'type'         => 'integer',
+                'label'        => Translator::getInstance()->trans('This product is on sale'),
+                'label_attr'   => array('for' => 'onsale_field'),
+                'allow_add'    => true,
+                'allow_delete' => true,
+            ))
+            ->add('isnew', 'collection', array(
+                 'type'         => 'integer',
+                'label'        => Translator::getInstance()->trans('Advertise this product as new'),
+                'label_attr'   => array('for' => 'isnew_field'),
+                'allow_add'    => true,
+                'allow_delete' => true,
+            ))
+            ->add('isdefault', 'collection', array(
+                'type'         => 'integer',
+                'label'        => Translator::getInstance()->trans('Is it the default product sale element ?'),
+                'label_attr'   => array('for' => 'isdefault_field'),
+                'allow_add'    => true,
+                'allow_delete' => true,
+            ))
+            ->add('ean_code', 'collection', array(
+                 'type'        => 'text',
+                'label'        => Translator::getInstance()->trans('EAN Code'),
+                'label_attr'   => array('for' => 'ean_code_field'),
+                'allow_add'    => true,
+                'allow_delete' => true,
             ))
         ;
     }

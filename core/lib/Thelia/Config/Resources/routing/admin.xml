@@ -364,8 +364,8 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::deleteProductSaleElementAction</default>
     </route>
 
-    <route id="admin.product.combination.update" path="/admin/product/combination/update">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductSaleElementAction</default>
+    <route id="admin.product.combination.update" path="/admin/product/combinations/update">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductSaleElementsAction</default>
     </route>
 
     <route id="admin.product.combination.defaut-price.update" path="/admin/product/default-price/update">

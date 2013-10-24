@@ -215,10 +215,14 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                     // If we just deleted the last PSE, create a default one
                     $product->createDefaultProductSaleElement($con, 0, 0, $event->getCurrencyId(), true);
                 }
-                else if ($product->getDefaultSaleElements() == null) {
+                else if ($pse->getIsDefault()) {
 
                     // If we deleted the default PSE, make the last created one the default
-                    $pse = ProductSaleElementsQuery::create()->filterByProductId($this->id)->orderByCreatedAt(Criteria::DESC)->findOne($con);
+                    $pse = ProductSaleElementsQuery::create()
+                        ->filterByProductId($product->getId())
+                        ->orderByCreatedAt(Criteria::DESC)
+                        ->findOne($con)
+                    ;
 
                     $pse->setIsDefault(true)->save($con);
                 }
