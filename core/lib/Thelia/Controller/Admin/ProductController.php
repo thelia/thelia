@@ -279,10 +279,6 @@ class ProductController extends AbstractCrudController
 
             $combinationPseForm = new ProductSaleElementUpdateForm($this->getRequest(), "form", $combinationPseData);
             $this->getParserContext()->addForm($combinationPseForm);
-
-            var_dump($defaultPseData);
-
-            var_dump($combinationPseData);
         }
 
         // Prepare the data that will hydrate the form(s)
