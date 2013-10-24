@@ -376,6 +376,9 @@ URL: http://www.thelia.net
     }
 </script>
 
+<script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+
+
 {javascripts file='assets/js/bootstrap/bootstrap.js'}
     <script src="{$asset_url}"></script>
 {/javascripts}

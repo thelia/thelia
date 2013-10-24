@@ -23,6 +23,8 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\ExecutionContextInterface;
+use Thelia\Model\CustomerQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Translation\Translator;
 
@@ -51,6 +53,9 @@ class CustomerProfilUpdateForm extends CustomerCreateForm
             ->remove("city")
             ->remove("zipcode")
             ->remove("country")
+            // Remove Login Information
+            ->remove("password")
+            ->remove("password_confirm")
             // Remove Terms & conditions
             ->remove("agreed")
 
@@ -62,6 +67,20 @@ class CustomerProfilUpdateForm extends CustomerCreateForm
                 ),
                 "required" => false
             ));
+    }
+
+
+    /**
+     * @param $value
+     * @param ExecutionContextInterface $context
+     */
+    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    {
+        $customer = CustomerQuery::getCustomerByEmail($value);
+        // If there is already a customer for this email address and if the customer is different from the current user, do a violation
+        if ($customer && $customer->getId() != $this->getRequest()->getSession()->getCustomerUser()->getId()) {
+            $context->addViolation("This email already exists.");
+        }
     }
 
     public function getName()

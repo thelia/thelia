@@ -49,6 +49,11 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
             ->save();
     }
 
+    public function unsubscribe(NewsletterEvent $event)
+    {
+        // TODO
+    }
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -72,7 +77,8 @@ class Newsletter extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::NEWSLETTER_SUBSCRIBE => array('subscribe', 128)
+            TheliaEvents::NEWSLETTER_SUBSCRIBE => array('subscribe', 128),
+            TheliaEvents::NEWSLETTER_UNSUBSCRIBE => array('unsubscribe', 128)
         );
     }
 }

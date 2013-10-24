@@ -71,7 +71,7 @@
                             <div class="form-group group-message {if $error}has-error{elseif $value != "" && !$error}has-success{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">
-                                    <textarea name="{$name}" id="{$label_attr.for}" placeholder="{intl l='And your message...'}" rows="6" class="form-control">{$value}</textarea>
+                                    <textarea name="{$name}" id="{$label_attr.for}" placeholder="{intl l='And your message...'}" rows="6" class="form-control"{if $required} aria-required="true" required{/if}>{$value}</textarea>
                                     {if $error }
                                         <span class="help-block"><i class="icon-remove"></i> {$message}</span>
                                         {assign var="error_focus" value="true"}

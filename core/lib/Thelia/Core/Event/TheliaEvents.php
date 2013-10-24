@@ -72,6 +72,11 @@ final class TheliaEvents
     const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
 
     /**
+     * sent on customer account update profil
+     */
+    const CUSTOMER_UPDATEPROFIL = "action.updateProfilCustomer";
+
+    /**
      * sent on customer removal
      */
     const CUSTOMER_DELETEACCOUNT = "action.deleteCustomer";
@@ -686,4 +691,9 @@ final class TheliaEvents
      * sent for subscribing to the newsletter
      */
     const NEWSLETTER_SUBSCRIBE = 'thelia.newsletter.subscribe';
+
+    /**
+     * sent for subscribing to the newsletter
+     */
+    const NEWSLETTER_UNSUBSCRIBE = 'thelia.newsletter.unsubscribe';
 }
