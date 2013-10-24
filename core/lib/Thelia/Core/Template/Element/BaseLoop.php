@@ -253,7 +253,7 @@ abstract class BaseLoop
                         $searchTerm = explode(' ', $searchTerm);
                         break;
                     case SearchLoopInterface::MODE_SENTENCE:
-                        $searchCriteria = Criteria::EQUAL;
+                        $searchCriteria = Criteria::LIKE;
                         $searchTerm = '%' . $searchTerm . '%';
                         break;
                     case SearchLoopInterface::MODE_STRICT_SENTENCE:
@@ -262,8 +262,6 @@ abstract class BaseLoop
                 }
 
                 $this->doSearch($search, $searchTerm, $searchIn, $searchCriteria);
-
-                $in = 'true';
             }
         }
 

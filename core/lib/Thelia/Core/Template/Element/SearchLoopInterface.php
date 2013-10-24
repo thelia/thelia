@@ -31,9 +31,9 @@ use Symfony\Component\Validator\ExecutionContextInterface;
  */
 interface SearchLoopInterface
 {
-    const MODE_ANY_WORD = 1;
-    const MODE_SENTENCE = 2;
-    const MODE_STRICT_SENTENCE = 3;
+    const MODE_ANY_WORD = 'any_word';
+    const MODE_SENTENCE = 'sentence';
+    const MODE_STRICT_SENTENCE = 'strict_sentence';
 
     /**
      * @return array of available field to search in
