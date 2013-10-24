@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -1245,7 +1245,7 @@
     </index>
     <behavior name="timestampable" />
   </table>
-  <table name="newsletter">
+  <table name="newsletter" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="email" required="true" size="255" type="VARCHAR" />
     <column name="firstname" size="255" type="VARCHAR" />
