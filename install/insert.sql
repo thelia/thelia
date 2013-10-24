@@ -30,6 +30,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('session_config.handlers', 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\NativeFileSessionHandler', 0, 0, NOW(), NOW()),
 ('company_name','', 0, 0, NOW(), NOW()),
 ('contact_email','', 0, 0, NOW(), NOW()),
+('url_site','', 0, 0, NOW(), NOW()),
 ('one_domain_foreach_lang','0', 1, 1, NOW(), NOW())
 ;
 
