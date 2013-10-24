@@ -539,6 +539,8 @@ class Product extends BaseI18nLoop implements SearchLoopInterface
                 ->set("PREVIOUS"                , $previous != null ? $previous->getId() : -1)
                 ->set("NEXT"                    , $next != null ? $next->getId() : -1)
                 ->set("DEFAULT_CATEGORY"        , $default_category_id)
+                ->set("TAX_RULE_ID"             , $product->getTaxRuleId())
+
             ;
 
             $loopResult->addRow($loopResultRow);

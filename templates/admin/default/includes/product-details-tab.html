@@ -300,7 +300,7 @@
 					            <div class="form-group {if $error}has-error{/if}">
 					                <label for="tax_rule_field" class="control-label">{$label} : </label>
 					                <div class="form-group">
-					                    <select id="tax_rule_field" required="required" name="{$name}" class="form-control">
+					                   <select id="tax_rule_field" required="required" name="{$name}" class="form-control">
 					                        <option value="">{intl l="Select a tax tule"}</option>
 					                        {loop name="tax" type="tax-rule" backend_context="1"}
 					                            <option value="{$ID}" {if $ID == $TAX_RULE_ID}selected="selected"{/if}>{$TITLE}</option>
