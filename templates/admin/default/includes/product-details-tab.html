@@ -83,7 +83,7 @@
 			                    <select id="tax_rule_field" required="required" name="{$name}" class="form-control">
 			                        <option value="">{intl l="Select a tax tule"}</option>
 			                        {loop name="tax" type="tax-rule" backend_context="1"}
-			                            <option value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}>{$TITLE}</option>
+			                            <option value="{$ID}" {if $ID == $TAX_RULE_ID}selected="selected"{/if}>{$TITLE}</option>
 			                        {/loop}
 			                    </select>
 			                </div>
@@ -115,7 +115,7 @@
 			                      <div class="form-group {if $error}has-error{/if}">
 			                          <div class="checkbox">
 			                              <label>
-			                                  <input type="checkbox" id="use_exchange_rate_box" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
+			                                  <input type="checkbox" data-pse-id="{$default_product_sale_element_id}" class="use_exchange_rate_box" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
 			                                  {$label}
 			                              </label>
 			                          </div>
@@ -129,19 +129,21 @@
 			                      <label for="price_without_tax" class="control-label">{$label} : </label>
 
 			                         <div class="input-group">
-			                             <input {if !$show_pricing_fields}readonly{/if} data-price-type="without-tax" data-rel-price="price_with_tax" type="text" id="price_without_tax" required="required" name="{$name}" class="automatic_price_field form-control" value="{$value}" title="{$label}" placeholder="{intl l='Price excl. taxes'}">
+			                             <input {if !$show_pricing_fields}readonly{/if} data-pse-id="{$default_product_sale_element_id}" data-price-type="price-without-tax" data-rel-price="price_with_tax" type="text" id="price_without_tax" required="required" name="{$name}" class="price_field automatic_price_field form-control" value="{$value}" title="{$label}" placeholder="{intl l='Price excl. taxes'}">
 			                             <span class="input-group-addon">{$currency_symbol}</span>
 			                         </div>
 			                  </div>
 			              {/form_field}
 
-		                  <div class="form-group">
-		                      <label for="price_with_tax" class="control-label">{intl l="Product price including taxes"} : </label>
-		                      <div class="input-group">
-		                          <input {if !$show_pricing_fields}readonly{/if} data-price-type="with-tax" data-rel-price="price_without_tax" type="text" id="price_with_tax" name="price_with_tax" class="automatic_price_field form-control" value="" title="{intl l='Product price including taxes'}" placeholder="{intl l='Price incl. taxes'}">
-		                          <span class="input-group-addon">{$currency_symbol}</span>
-		                      </div>
-		                  </div>
+                          {form_field form=$form field='price_with_tax'}
+			                  <div class="form-group">
+			                      <label for="price_with_tax" class="control-label">{intl l="Product price including taxes"} : </label>
+			                      <div class="input-group">
+			                          <input {if !$show_pricing_fields}readonly{/if} data-pse-id="{$default_product_sale_element_id}" data-price-type="price-with-tax" data-rel-price="price_without_tax" type="text" id="price_with_tax" name="{$name}" class="price_field automatic_price_field form-control" value="{$value}" title="{$value}" placeholder="{intl l='Price incl. taxes'}">
+			                          <span class="input-group-addon">{$currency_symbol}</span>
+			                      </div>
+			                  </div>
+                          {/form_field}
 
 			              {module_include location='product_details_pricing_form'}
 			          </div>
@@ -203,19 +205,21 @@
 			                    <label for="sale_price_without_tax" class="control-label">{$label} : </label>
 
 			                    <div class="input-group">
-			                        <input {if !$show_pricing_fields}readonly{/if} data-price-type="without-tax" data-rel-price="sale_price_with_tax" type="text" id="sale_price_without_tax" required="required" name="{$name}" class="automatic_price_field form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
+			                        <input {if !$show_pricing_fields}readonly{/if} data-pse-id="{$default_product_sale_element_id}" data-price-type="sale-price-without-tax" data-rel-price="sale_price_with_tax" type="text" id="sale_price_without_tax" required="required" name="{$name}" class="price_field automatic_price_field form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
 			                        <span class="input-group-addon">{$currency_symbol}</span>
 			                    </div>
 			               </div>
 			            {/form_field}
 
+                        {form_field form=$form field='sale_price_with_tax'}
                         <div class="form-group">
-                            <label for="sale_price_with_tax" class="control-label">{intl l="Sale price including taxes"} : </label>
+                            <label for="sale_price_with_tax" class="control-label">{$label} : </label>
                             <div class="input-group">
-                                <input {if !$show_pricing_fields}readonly{/if} data-price-type="with-tax" data-rel-price="sale_price_without_tax" type="text" id="sale_price_with_tax" name="sale_price_with_tax" class="automatic_price_field form-control" value="" title="{intl l='Sale price including taxes'}" placeholder="{intl l='Sale price incl. taxes'}">
+                                <input {if !$show_pricing_fields}readonly{/if} data-pse-id="{$default_product_sale_element_id}" data-price-type="sale-price-with-tax" data-rel-price="sale_price_without_tax" type="text" id="sale_price_with_tax" name="sale_price_with_tax" class="price_field automatic_price_field form-control" value="{$value}" title="{$label}" placeholder="{intl l='Sale price incl. taxes'}">
                                 <span class="input-group-addon">{$currency_symbol}</span>
                             </div>
                         </div>
+                        {/form_field}
 
 						{form_field form=$form field='onsale'}
 						<div class="form-group {if $error}has-error{/if}">
@@ -276,7 +280,7 @@
 		                               <select id="tax_rule_field" required="required" name="{$name}" class="form-control">
 		                                   <option value="">{intl l="Select a tax tule"}</option>
 		                                   {loop name="tax" type="tax-rule" backend_context="1"}
-		                                       <option value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}>{$TITLE}</option>
+		                                       <option value="{$ID}" {if $ID == $TAX_RULE_ID}selected="selected"{/if}>{$TITLE}</option>
 		                                   {/loop}
 		                               </select>
 		                           </div>

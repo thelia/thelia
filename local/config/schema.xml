@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -994,9 +994,9 @@
   <table name="product_price" namespace="Thelia\Model">
     <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="price" required="true" type="FLOAT" />
-    <column name="promo_price" type="FLOAT" />
-    <column defaultValue="0" name="from_default_currency" required="true" type="BOOLEAN" />
+    <column defaultValue="0" name="price" required="true" type="FLOAT" />
+    <column defaultValue="0" name="promo_price" required="true" type="FLOAT" />
+    <column defaultValue="1" name="from_default_currency" required="true" type="BOOLEAN" />
     <foreign-key foreignTable="product_sale_elements" name="fk_product_price_product_sale_elements_id" onDelete="CASCADE">
       <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
@@ -1250,5 +1250,10 @@
     <column name="email" required="true" size="255" type="VARCHAR" />
     <column name="firstname" size="255" type="VARCHAR" />
     <column name="lastname" size="255" type="VARCHAR" />
+    <column name="locale" size="5" type="VARCHAR" />
+    <unique name="email_UNIQUE">
+      <unique-column name="email" />
+    </unique>
+    <behavior name="timestampable" />
   </table>
 </database>

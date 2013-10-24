@@ -72,19 +72,21 @@ abstract class ProductPrice implements ActiveRecordInterface
 
     /**
      * The value for the price field.
+     * Note: this column has a database default value of: 0
      * @var        double
      */
     protected $price;
 
     /**
      * The value for the promo_price field.
+     * Note: this column has a database default value of: 0
      * @var        double
      */
     protected $promo_price;
 
     /**
      * The value for the from_default_currency field.
-     * Note: this column has a database default value of: false
+     * Note: this column has a database default value of: true
      * @var        boolean
      */
     protected $from_default_currency;
@@ -127,7 +129,9 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->from_default_currency = false;
+        $this->price = 0;
+        $this->promo_price = 0;
+        $this->from_default_currency = true;
     }
 
     /**
@@ -658,7 +662,15 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->from_default_currency !== false) {
+            if ($this->price !== 0) {
+                return false;
+            }
+
+            if ($this->promo_price !== 0) {
+                return false;
+            }
+
+            if ($this->from_default_currency !== true) {
                 return false;
             }
 
