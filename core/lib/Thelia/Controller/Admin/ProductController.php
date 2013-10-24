@@ -189,6 +189,23 @@ class ProductController extends AbstractCrudController
         return $event->hasProduct();
     }
 
+    protected function updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency) {
+
+        // Get price for default currency
+        $priceForDefaultCurrency = ProductPriceQuery::create()
+        ->filterByCurrency($defaultCurrency)
+        ->filterByProductSaleElements($saleElement)
+        ->findOne()
+        ;
+
+        if ($priceForDefaultCurrency !== null) {
+            $productPrice
+            ->setPrice($priceForDefaultCurrency->getPrice() * $currentCurrency->getRate())
+            ->setPromoPrice($priceForDefaultCurrency->getPromoPrice() * $currentCurrency->getRate())
+            ;
+        }
+    }
+
     protected function hydrateObjectForm($object)
     {
         $defaultPseData = $combinationPseData = array();
@@ -198,18 +215,35 @@ class ProductController extends AbstractCrudController
             ->filterByProduct($object)
             ->find();
 
+        $defaultCurrency = Currency::getDefaultCurrency();
+        $currentCurrency = $this->getCurrentEditionCurrency();
+
         foreach($saleElements as $saleElement) {
 
             // Get the product price for the current currency
-
             $productPrice = ProductPriceQuery::create()
-                ->filterByCurrency($this->getCurrentEditionCurrency())
+                ->filterByCurrency($currentCurrency)
                 ->filterByProductSaleElements($saleElement)
                 ->findOne()
             ;
 
-            if ($productPrice == null) {
+            // No one exists ?
+            if ($productPrice === null) {
                 $productPrice = new ProductPrice();
+
+                // If the current currency is not the default one, calculate the price
+                // using default currency price and current currency rate
+                if ($currentCurrency->getId() != $defaultCurrency->getId()) {
+
+                    $productPrice->setFromDefaultCurrency(true);
+
+                    $this->updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency);
+                }
+            }
+
+            // Caclulate prices if we have to use the rate * defaulkt currency price
+            if ($productPrice->getFromDefaultCurrency() == true) {
+                $this->updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency);
             }
 
             $isDefaultPse = count($saleElement->getAttributeCombinations()) == 0;
@@ -236,7 +270,6 @@ class ProductController extends AbstractCrudController
                     "isdefault"               => $saleElement->getIsDefault() > 0 ? 1 : 0,
                     "ean_code"                => $saleElement->getEanCode()
                 );
-
             }
             else {
             }
@@ -246,9 +279,13 @@ class ProductController extends AbstractCrudController
 
             $combinationPseForm = new ProductSaleElementUpdateForm($this->getRequest(), "form", $combinationPseData);
             $this->getParserContext()->addForm($combinationPseForm);
+
+            var_dump($defaultPseData);
+
+            var_dump($combinationPseData);
         }
 
-        // Prepare the data that will hydrate the form
+        // Prepare the data that will hydrate the form(s)
         $data = array(
             'id'               => $object->getId(),
             'ref'              => $object->getRef(),
@@ -260,8 +297,6 @@ class ProductController extends AbstractCrudController
             'visible'          => $object->getVisible(),
             'url'              => $object->getRewrittenUrl($this->getCurrentEditionLocale()),
             'default_category' => $object->getDefaultCategoryId()
-
-            // A terminer pour les prix
         );
 
         // Setup the object form
@@ -881,7 +916,8 @@ class ProductController extends AbstractCrudController
                 ->setIsnew($data['isnew'])
                 ->setIsdefault($data['isdefault'])
                 ->setEanCode($data['ean_code'])
-                ->setTaxrule($data['tax_rule'])
+                ->setTaxRuleId($data['tax_rule'])
+                ->setFromDefaultCurrency($data['use_exchange_rate'])
             ;
 
             $this->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $event);

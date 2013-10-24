@@ -77,7 +77,7 @@ class ProductSaleElementUpdateForm extends BaseForm
                 "label_attr" => array("for" => "quantity_field")
             ))
             ->add("sale_price", "number", array(
-                "label"      => Translator::getInstance()->trans("Sale price without taxes *"),
+                "label"      => Translator::getInstance()->trans("Sale price without taxes"),
                 "label_attr" => array("for" => "price_with_tax_field")
             ))
             ->add("sale_price_with_tax", "number", array(
@@ -96,7 +96,7 @@ class ProductSaleElementUpdateForm extends BaseForm
                     "label"      => Translator::getInstance()->trans("Is it the default product sale element ?"),
                     "label_attr" => array("for" => "isdefault_field")
             ))
-            ->add("ean_code", "integer", array(
+            ->add("ean_code", "text", array(
                     "label"      => Translator::getInstance()->trans("EAN Code"),
                     "label_attr" => array("for" => "ean_code_field")
             ))
